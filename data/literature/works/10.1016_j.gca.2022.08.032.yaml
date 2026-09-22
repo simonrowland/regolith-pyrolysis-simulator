@@ -53,128 +53,250 @@ experiments:
     note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are
       1-sigma uncertainty on the last digit, b.d.l. means below detection limit.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-- experiment_id: 10.1016/j.gca.2022.08.032::2
+- experiment_id: 10.1016/j.gca.2022.08.032::experiment::sulfate-solubility-series
   kind: literature
   method:
     tag: unknown
-    reason: source does not state method
-  sample: {}
+    reason: regime 'melt_equilibration_quench' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00001'
+          approximate: false
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+        note: Printed 5-10 mg; unit conversion only.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 151
+        table: '1'
+        note: Fourteen synthetic and natural compositions; no single series composition.
+    form:
+      state:
+        tag: value
+        value: Powder suspended on platinum wire loop with paraffin oil
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+    characterization:
+      state:
+        tag: value
+        value: Quenched glasses analyzed by EPMA and
+      locator:
+        page: 152
+        section: 2.3 Analyses
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide and carbonate powders crushed under ethanol then decarbonated overnight at 1273 K; starting compositions
+          reground.
+      locator:
+        page: 151
+        section: 2.1 Starting materials
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        page: 152
+        table: '2'
+        note: Multiple Table 2 setpoints; no single series setpoint.
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+        note: Atmospheric pressure
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: Air-SO2
+          flow_sccm:
+            tag: value
+            value: '200'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-    pumping:
-      pumping:
+        reason: not_published
+  work_id: 10.1016/j.gca.2022.08.032
+  locator:
+    page: 152
+    section: 2.2 Experimental conditions
+    note: Series of equilibration experiments; individual Table 2 conditions remain in observations.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Air/SO2 ratios 0.11
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+  bench_id: 10.1016/j.gca.2022.08.032::bench::gero-vertical-furnace
+  equipment_context_id: boulliung-wood-2022-so2-solubility-silicate-melts::context::boulliung_wood_2022_run_conditions
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated then quenched under the same atmosphere in the cold area at the top of the vertical furnace
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+    setpoints_and_holds:
+    - temperature_K:
         state:
           tag: value
-          value: not stated
+          value:
+            kind: interval
+            interval_low: '1473'
+            interval_high: '1773'
+            approximate: false
         locator:
           page: 152
           table: '2'
-          section: 2.2 Experimental conditions
-          note: Every value below is transcribed from the printed Table 2 cell under its column header.
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+          note: Printed series span in 50 K increments.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 152
+        table: '2'
+        note: Table gives 10 h at lower temperatures
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched under the same atmosphere in the cold area at the top of the vertical furnace
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+benches:
+- id: 10.1016/j.gca.2022.08.032::bench::gero-vertical-furnace
   work_id: 10.1016/j.gca.2022.08.032
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Gero vertical furnace HTRV 70-250/18
+    locator:
+      page: 152
+      section: 2.2 Experimental conditions
+  detector:
+    state:
+      tag: value
+      value: Cameca SX-Five-FE EPMA and Cameca IMS 1270 E7 SIMS
+    locator:
+      page: 152
+      section: 2.3 Analyses
+  heating_method:
+    state:
+      tag: value
+      value: Vertical resistance furnace
+    locator:
+      page: 152
+      section: 2.2 Experimental conditions
+  other_facts:
+  - name: gas_mix_control
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Tylan mass flow controllers
+          approximate: false
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+  - name: sample_support
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 0.25 mm platinum wire loop on Pt chandelier suspended from silica rod
+          approximate: false
+      locator:
+        page: 152
+        section: 2.2 Experimental conditions
+context:
+- observation_id: boulliung_wood_2022_run_conditions
+  experiment: sulfate-solubility-series
+  type: laboratory_conditions
   locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
     page: 152
     table: '2'
     section: 2.2 Experimental conditions
     note: Every value below is transcribed from the printed Table 2 cell under its column header.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-  apparatus:
-    temperature_measurement:
-      temperature_calibration:
-        state:
-          tag: value
-          value: not stated
-        locator:
-          page: 152
-          table: '2'
-          section: 2.2 Experimental conditions
-          note: Every value below is transcribed from the printed Table 2 cell under its column header.
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-- experiment_id: 10.1016/j.gca.2022.08.032::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  units: K, cm3 min^-1, cm s^-1, atm, h, dimensionless ratios and log10 fugacity relative to the stated standard
+  values:
+    quantity: atmosphere_controlled_sulfate_equilibration_runs
+    method_class: measured_condition_or_author_calculated_condition
+    apparatus:
+      furnace: Gero vertical furnace HTRV 70-250/18
+      support: platinum wire loop, 0.25 mm diameter
+      charges: up to 7 experimental charges hung on a Pt chandelier suspended from a silica rod
+      sample_mass_range_mg: 5-10
+      gas_flow_cm3_min: 200
+      gas_linear_velocity_cm_s: '0.2'
+      gas_pretreatment_min: 10
+      equilibration_time_range_h: 6-10
+      pressure: 1 atm
+      atmosphere: Air-SO2
+      fO2_control: FMQ-buffered/oxidizing; tabulated log(fO2) values are calculated from NIST/JANAF thermochemical tables
+      temperature_measurement: not stated
+      temperature_calibration: not stated
+      exposed_area: not stated
+      crucible: not used; sample suspended on Pt loop
+      vacuum_level: not applicable
+      pumping: not stated
+    table_transcription: "Table 2\nRun conditions and gas mixtures for the different S equilibration experiments of this study\
+      \ at P = 1 atm. The conditions to study the temperature effect on sulfur solubility were\nwith a Air/SO2 ratio of 0.60.\
+      \ The fO2 and fS2 parameters were determined using NIST and JANAF thermochemical tables.\n\n  Temperature (K)      \
+      \             Air                 SO2                   Air/SO2               log(fO2)                     DFMQ    \
+      \            log(fS2)               t (h)\n  1473                              37.5                62.5            \
+      \      0.6                    1.10                        7.2                  16.22                 10\n  1523    \
+      \                          37.5                62.5                  0.6                    1.10                   \
+      \     6.6                  15.38                 10\n  1573                              37.5                62.5  \
+      \                0.6                    1.10                        6.1                  14.6                  10\n\
+      \  1573                              10                  90                    0.11                   1.68         \
+      \               5.5                  13.13                 10\n  1573                              80              \
+      \    20                    4                      0.77                        6.5                  15.87           \
+      \      10\n  1623                              37.5                62.5                  0.6                    1.10\
+      \                        5.6                  13.86                 10\n  1673                              37.5   \
+      \             62.5                  0.6                    1.10                        5.2                  13.16  \
+      \               10\n  1723                              37.5                62.5                  0.6              \
+      \      1.10                        4.7                  12.51                 8\n  1773                            \
+      \  37.5                62.5                  0.6                    1.10                        4.3                \
+      \  11.89                 6\n\n\n                                                                                   \
+      \           3. Results\n\n                                                                                         \
+      \     3.1. Compositions of products\n"
+  context_id: boulliung-wood-2022-so2-solubility-silicate-melts::context::boulliung_wood_2022_run_conditions
   work_id: 10.1016/j.gca.2022.08.032
-  locator:
-    page: 153
-    table: '3'
-    note: Table continues on printed pages 154-155. Every value below remains in the printed column order; values in parentheses
-      are 1-sigma uncertainty on the last digit(s), b.d.l. is not zero, and EPMA/SIMS is the stated analytical method.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-- experiment_id: 10.1016/j.gca.2022.08.032::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2022.08.032
-  locator:
-    page: 158
-    table: '4'
-    note: Every value below is transcribed from the printed Table 4 cell under its column header; the table reports final
-      glass products at 1573 K for Air/SO2 4.00 and 0.11.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+  species: S

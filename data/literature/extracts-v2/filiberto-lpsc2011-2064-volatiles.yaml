@@ -1,0 +1,534 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/filiberto-lpsc2011-2064-volatiles.yaml
+observations:
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_author_calculated_lunar_effects
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Fe-Mg
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_magma' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 2
+    section: Implications
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_author_calculated_martian_effects
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Fe-Mg
+      phase:
+        tag: unknown
+        reason: phase string 'Martian_basalt_melt_and_minerals' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 2
+    section: Implications
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_experimental_method_chlorine
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    section: Experimental technique
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_experimental_method_fluorine
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: F
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    section: Experimental technique
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_experimental_method_water
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: phase string 'similar_high_Fe_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    section: Experimental technique
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure1_fe_mg_partitioning
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'KDmin_Fe-Mg_mineral_minus_melt'
+    species:
+      formula: Fe-Mg
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_and_pyroxene_coexisting_with_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'KDmin_Fe-Mg_mineral_minus_melt'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: qualitative_comparison_only
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 2
+    figure: '1'
+    section: Fe-Mg Partitioning
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure1_near_liquidus_relations::point:0
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimentally_determined_near_liquidus_phase_relations'
+    species:
+      formula: F_Cl_H2O
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt_near_liquidus' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure1_near_liquidus_relations::point:1
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimentally_determined_near_liquidus_phase_relations'
+    species:
+      formula: F_Cl_H2O
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt_near_liquidus' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure1_near_liquidus_relations::point:2
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimentally_determined_near_liquidus_phase_relations'
+    species:
+      formula: F_Cl_H2O
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt_near_liquidus' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure1_near_liquidus_relations::point:3
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimentally_determined_near_liquidus_phase_relations'
+    species:
+      formula: F_Cl_H2O
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_Humphrey_basalt_near_liquidus' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_figure2_liquidus_depression_relation
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'liquidus_temperature_depression'
+    species:
+      formula: F_Cl_H2O
+      phase:
+        tag: unknown
+        reason: phase string 'volatile_bearing_basalt_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'liquidus_temperature_depression'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: within_error_statement_only
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 1
+    figure: '2'
+    section: Liquidus Depression
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_quoted_lunar_volatile_abundances
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: planetary_volatile_abundances
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_magma' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 2
+    section: Fe-Mg Partitioning
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles
+- observation_id: filiberto-lpsc2011-2064-volatiles::filiberto_2011_quoted_martian_volatile_abundances
+  experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: planetary_volatile_abundances
+      phase:
+        tag: unknown
+        reason: phase string 'Martian_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: filiberto-lpsc2011-2064-volatiles
+  locator:
+    published_page: 2
+    section: Fe-Mg Partitioning
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+  read_from: unknown:filiberto-lpsc2011-2064-volatiles

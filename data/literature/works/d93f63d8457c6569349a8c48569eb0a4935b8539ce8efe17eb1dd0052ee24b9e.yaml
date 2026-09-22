@@ -41,7 +41,15 @@ experiments:
   method:
     tag: unknown
     reason: source does not state method
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: "log10(Kd / (mol/L)) = -4.378\n  - (48000/(2.302585*1.987204))*(1/T - 1/1300)\nKp_atm = Kd * 0.08205746 * T"
+      locator:
+        table: II
+        note: Datz 1961 correlation Datz1961_TableII_Kd
+        record: Datz1961_TableII_Kd
   conditions:
     temperature_K:
       state:

@@ -1,0 +1,421 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpsc-2014-2057.yaml
+observations:
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_chlorine_release_windows
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evolved_chlorine_species_temperature_windows'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_chlorine_species_temperature_windows';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_cl_qualitative_release
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chlorine_release_temperature'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'pyrite_and_HWMK919_calcium_perchlorate_mixtures' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chlorine_release_temperature'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_dsc_peak_shifts
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Ca_perchlorate_decomposition_peak_temperature_shift'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Ca_perchlorate_decomposition_peak_temperature_shift';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 1
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_dsc_qms_method_difference
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'decomposition_temperature_method_difference'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'decomposition_temperature_method_difference';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::1 and 2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermal_and_evolved_oxygen_curves'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermal_and_evolved_oxygen_curves'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    figure: 1 and 2
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_hcl_qualitative_release
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'HCl_release_temperature'
+    species:
+      formula: HCl
+      phase:
+        tag: unknown
+        reason: phase string 'fayalite_calcium_perchlorate_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'HCl_release_temperature'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_hwmk919_material_characterisation
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterisation'
+    species:
+      formula: HWMK919
+      phase:
+        tag: unknown
+        reason: phase string 'amorphous_martian_soil_analog' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterisation'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 1
+    section: Materials and Methods
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_qms_peak_shifts
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'O2_release_peak_temperature_shift'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'calcium_perchlorate_iron_mineral_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'O2_release_peak_temperature_shift'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Results and Discussion
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reported_Rocknest_iron_oxide_abundance'
+    species:
+      formula: magnetite
+      phase:
+        tag: unknown
+        reason: phase string 'Rocknest_eolian_deposit' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reported_Rocknest_iron_oxide_abundance'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Conclusions
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_hematite_abundance
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reported_Rocknest_iron_oxide_abundance'
+    species:
+      formula: hematite
+      phase:
+        tag: unknown
+        reason: phase string 'Rocknest_eolian_deposit' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reported_Rocknest_iron_oxide_abundance'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 2
+    section: Conclusions
+  read_from: unknown:lpsc-2014-2057
+- observation_id: lpsc-2014-2057::lpsc_2014_2057_thermal_program
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimental_materials_and_thermal_program'
+    species:
+      formula: Ca(ClO4)2
+      phase:
+        tag: unknown
+        reason: phase string 'dehydrated_calcium_perchlorate_mixed_with_iron_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_materials_and_thermal_program'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2014-2057
+  locator:
+    page: 1
+    section: Materials and Methods
+  read_from: unknown:lpsc-2014-2057

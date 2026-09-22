@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
 observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig4_rga_test12_figure_only
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::4
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -68,6 +69,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'residue_EDS_atomic_ratio'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -110,6 +112,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -153,6 +156,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -196,6 +200,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -216,7 +221,7 @@ observations:
     note: Figure 9 System pressure and temperature required to vaporize an Apollo 11 soil simulant
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_psu_10g_mls1a_vaporization
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::8
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::psu-reduced-pressure-test
   identity:
     quantity:
       tag: unknown
@@ -238,6 +243,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'complete_vaporization'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -267,7 +273,7 @@ observations:
         figure: '8'
         note: 'Figure 8 caption: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU; 10 g MLS-1A'
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:10
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -332,6 +338,7 @@ observations:
   value:
     kind: point
     point: '0.0037'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -447,7 +454,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:11
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -512,6 +519,7 @@ observations:
   value:
     kind: point
     point: '0.101'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -627,7 +635,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:2
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -692,6 +700,7 @@ observations:
   value:
     kind: point
     point: '0.16'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -776,7 +785,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:3
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -841,6 +850,7 @@ observations:
   value:
     kind: point
     point: '0.37'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -956,7 +966,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:4
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -1021,6 +1031,7 @@ observations:
   value:
     kind: point
     point: '0.0005'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1136,7 +1147,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:5
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -1201,6 +1212,7 @@ observations:
   value:
     kind: point
     point: '0.0092'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1316,7 +1328,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:7
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -1381,6 +1393,7 @@ observations:
   value:
     kind: point
     point: '0.0047'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1496,7 +1509,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:8
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -1561,6 +1574,7 @@ observations:
   value:
     kind: point
     point: '0.1066'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1676,7 +1690,7 @@ observations:
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:9
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
       tag: value
@@ -1741,6 +1755,7 @@ observations:
   value:
     kind: point
     point: '0.0073'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

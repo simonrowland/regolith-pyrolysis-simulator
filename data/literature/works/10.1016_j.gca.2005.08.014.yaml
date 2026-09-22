@@ -84,7 +84,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0013'
+        value:
+          kind: point
+          point: '0.0013'
+          approximate: false
       locator:
         paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
         section: '4.1'

@@ -71,7 +71,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.000025'
+        value:
+          kind: point
+          point: '0.000025'
+          approximate: false
       locator:
         page: 5
         section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
@@ -134,7 +137,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         page: 2
         section: Abstract
@@ -198,7 +204,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00002'
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
@@ -221,7 +230,10 @@ experiments:
       chamber_length_m:
         state:
           tag: value
-          value: '0.7'
+          value:
+            kind: point
+            point: '0.7'
+            approximate: false
         locator:
           page: 6
           section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
@@ -259,7 +271,15 @@ experiments:
   method:
     tag: unknown
     reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: glass_bead_on_wire_loop
+      locator:
+        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+        line_range: '71'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   conditions:
     temperature_K:
       state:
@@ -269,7 +289,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '100000'
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
       locator:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
@@ -328,7 +351,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00002'
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
@@ -353,7 +379,15 @@ experiments:
   method:
     tag: unknown
     reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: glass_bead_on_wire_loop
+      locator:
+        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+        line_range: '71'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   conditions:
     temperature_K:
       state:
@@ -363,7 +397,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '100000'
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
       locator:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
@@ -422,7 +459,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00002'
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
@@ -447,7 +487,15 @@ experiments:
   method:
     tag: unknown
     reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: glass_bead_on_wire_loop
+      locator:
+        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+        line_range: '71'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   conditions:
     temperature_K:
       state:
@@ -457,7 +505,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '100000'
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
       locator:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
@@ -515,7 +566,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00002'
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
@@ -620,7 +674,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '100000'
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
       locator:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
@@ -661,8 +718,8 @@ experiments:
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     section: 4.6 Evaporation coefficients
-    line_range: 300-302
-    note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
+    line_range: '306'
+    note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   apparatus:
     cell_material_and_liner:
@@ -670,9 +727,87 @@ experiments:
         tag: value
         value: Re/Pt wire loops
       locator:
-        paragraph: metal wire loop
         line_range: '67'
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
+        locator:
+          paragraph: surface areas ≈ 2e-5 m
+          line_range: '71'
+          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: surface areas ≈ 2e-5 m
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
+- experiment_id: 10.1016/j.gca.2019.06.021::experiment::open-furnace-ferrobasalt-series
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000025'
+          approximate: true
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+        note: Printed around 25 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: synthetic FCMAS ferrobasalt with 20 trace elements
+      locator:
+        page: 1
+        section: Abstract
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: conflicting printed pressures; not collapsed into one number
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+        note: Printed as CO-CO2 gas mixtures; the SweepGas shape carries one species field and cannot represent a two-gas
+          mixture, so the printed text is retained here rather than reduced to a single species.
+    regime:
+      regime_class:
+        tag: value
+        value: viscous
+  work_id: 10.1016/j.gca.2019.06.021
+  locator:
+    page: 4
+    section: 2.1 Experimental Methods
+  apparatus:
     geometry:
       exposed_area_m2:
         state:
@@ -699,6 +834,51 @@ experiments:
                 line_range: '71'
                 source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
           output_unit: m2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: approximately IW (10^-10 bar) to air (10^-0.68 bar)
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+  bench_id: 10.1016/j.gca.2019.06.021::bench::gero-open-furnace
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1573.15'
+            interval_high: '1823.15'
+            approximate: false
+        locator:
+          page: 4
+          section: 2.1 Experimental Methods
+          note: Printed 1300 to 1550 C; unit conversion only
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '900'
+          interval_high: '55800'
+          approximate: false
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+        note: Printed 15 to 930 min; unit conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: dropped into distilled water
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
 - experiment_id: 10.1016/j.gca.2019.06.021::sossi_2019_na_open_furnace_apparent
   kind: literature
   method:
@@ -730,3 +910,59 @@ experiments:
   locator:
     note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
     record: sossi_2019_na_open_furnace_apparent
+benches:
+- id: 10.1016/j.gca.2019.06.021::bench::gero-open-furnace
+  work_id: 10.1016/j.gca.2019.06.021
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: GERO vertical alumina tube gas-mixing furnace
+    locator:
+      page: 4
+      section: 2.1 Experimental Methods
+  detector:
+    state:
+      tag: value
+      value: LA-ICP-MS
+    locator:
+      page: 4
+      section: 2.2 Analytical Methods
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type B thermocouple bead located less than 5 mm above sample
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: value
+        value: '{''kind'': ''point'', ''point'': ''1''}'
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+        note: Controller limited fluctuations to within +/-1 C; this is stability, not independently stated calibration uncertainty
+  heating_method:
+    state:
+      tag: value
+      value: vertical alumina tube furnace at set temperature
+    locator:
+      page: 4
+      section: 2.1 Experimental Methods
+  other_facts:
+  - name: furnace_tube_dimensions
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 42-mm internal diameter; 70-cm long; 3-cm hotspot
+          approximate: false
+      locator:
+        page: 4
+        section: 2.1 Experimental Methods
+    unit: as_printed

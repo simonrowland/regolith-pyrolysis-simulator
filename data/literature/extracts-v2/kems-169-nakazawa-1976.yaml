@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-169-nakazawa-1976.yaml
 observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_fig7_ion_intensity_figure_only
-  experiment_id: 10.2320/jinstmet1952.40.5_526::7
+  experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -46,7 +47,7 @@ observations:
     note: log I+ T vs 1/T for 114Cd+ and 64Zn+ at X_Zn=0.10, 0.27, 0.50, 0.70, 0.83
   read_from: pdf:kems-169-nakazawa-1976
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_fig9_activities_667k_figure_only
-  experiment_id: 10.2320/jinstmet1952.40.5_526::9
+  experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   identity:
     quantity:
       tag: unknown
@@ -68,6 +69,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -100,7 +102,7 @@ observations:
         figure: '9'
         note: a_Cd(l) and a_Zn(l) at 667 K
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_gamma_Zn_667k
-  experiment_id: 10.2320/jinstmet1952.40.5_526::kems-169-nakazawa-1976
+  experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   identity:
     quantity:
       tag: unknown
@@ -123,6 +125,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -153,7 +156,7 @@ observations:
         pdf_page_index: 1
         note: log gamma_Zn(l)=(1.35/2) X_Cd^2 at 667 K
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_gamma_regular_667k
-  experiment_id: 10.2320/jinstmet1952.40.5_526::kems-169-nakazawa-1976
+  experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   identity:
     quantity:
       tag: unknown
@@ -176,6 +179,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -206,7 +210,7 @@ observations:
         pdf_page_index: 1
         note: English abstract; also Fig. 8 slope 1.35 at 667 K
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_kems_geometry_and_calibration
-  experiment_id: 10.2320/jinstmet1952.40.5_526::1
+  experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   identity:
     quantity:
       tag: unknown
@@ -229,6 +233,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

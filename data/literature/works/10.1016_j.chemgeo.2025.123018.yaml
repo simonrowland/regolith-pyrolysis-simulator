@@ -19,16 +19,50 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.chemgeo.2025.123018
 experiments:
-- experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+- experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   kind: literature
   method:
     tag: unknown
-    reason: source does not state method
+    reason: regime 'melt_equilibration_quench' is not a closed method token (kems_effusion alone is insufficient)
   sample:
-    container:
+    mass_kg:
       state:
         tag: value
-        value: alumina crucible
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Printed starting material about 100 mg; SI unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Icelandic basalt with 93 +/-3 ppm Hg as HgO and about 500 ppm each of listed trace-element dopants
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+    form:
+      state:
+        tag: value
+        value: crushed and ground powder
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+    characterization:
+      state:
+        tag: value
+        value: Major elements by ICP-OES; trace elements by flow-injection ICP-MS, atomic absorption, spectrophotometry, potentiometry,
+          and LA-ICP-MS; Hg measured five times for starting-material homogeneity
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+    pretreatment:
+      state:
+        tag: value
+        value: Doped material fused in covered alumina crucible at 1300 C for 5 min, drop-quenched into water, repeated, combined,
+          crushed, ground, then HgO added
       locator:
         pdf_page_index: 8
         section: 2.1 Experiments
@@ -36,88 +70,319 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Discrete 1250
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Initial evacuation pressure is printed; run total pressure increases with temperature and is not measured as
+          one value
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Sealed evacuated silica ampoule
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
     pumping:
-      pumping:
+      base_pressure_Pa:
         state:
           tag: value
-          value: vacuum line overnight; sealed while still evacuating
+          value:
+            kind: point
+            point: '270'
+            approximate: true
         locator:
-          pdf_page_index: 9
+          pdf_page_index: 8
           section: 2.1 Experiments
+          note: Ampoule inner pressure decreased to about 2.7 mbar before sealing; SI unit conversion only
   work_id: 10.1016/j.chemgeo.2025.123018
   locator:
     pdf_page_index: 8
     section: 2.1 Experiments
-    note: Values are transcribed from the SSAS preparation and experiment paragraphs; no value is inferred from the drawing
-      or from an unprovided supplement.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    note: SSAS series; individual temperature and duration combinations remain in observations
   apparatus:
-    cell_material_and_liner:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 8
+          section: 2.1 Experiments
+          note: Sealed ampoule has no effusion orifice
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 8
+          section: 2.1 Experiments
+          note: Sealed ampoule has no effusion channel
+  bench_id: 10.1016/j.chemgeo.2025.123018::bench::ssas-muffle-furnace
+  equipment_context_id: boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+  thermal_schedule:
+    method:
       state:
         tag: value
-        value: alumina
+        value: Sealed ampoules run at 1250, 1300, or 1400 C then quenched in air; discrete run conditions remain in observations
       locator:
         pdf_page_index: 8
         section: 2.1 Experiments
-        note: Values are transcribed from the SSAS preparation and experiment paragraphs; no value is inferred from the drawing
-          or from an unprovided supplement.
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-    temperature_measurement:
-      thermocouple:
-        state:
-          tag: value
-          value: thermocouple; temperature variation not exceeding +/- 5 C over ampoule length
-        locator:
-          pdf_page_index: 9
-          section: 2.1 Experiments
-- experiment_id: 10.1016/j.chemgeo.2025.123018::2A
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
+    total_duration_s:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '86400'
+          approximate: false
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Printed durations 5 min to 24 h; SI unit conversion only
+    cooling_or_quench:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        tag: value
+        value: air quench
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+benches:
+- id: 10.1016/j.chemgeo.2025.123018::bench::ssas-muffle-furnace
   work_id: 10.1016/j.chemgeo.2025.123018
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: muffle furnace for sealed silica ampoule experiments
+    locator:
+      pdf_page_index: 8
+      section: 2.1 Experiments
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: thermocouple
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Estimated +/-5 C is temperature variation along the ampoule, not calibration uncertainty
+  heating_method:
+    state:
+      tag: value
+      value: muffle furnace
+    locator:
+      pdf_page_index: 8
+      section: 2.1 Experiments
+  other_facts:
+  - name: ampoule_temperature_variation
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '5'
+          approximate: false
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Temperature variation over ampoule length estimated not to exceed +/-5 C
+    unit: C
+context:
+- observation_id: boulliung_2025_ag_trace_doping_and_comparator
+  experiment: ssas-hg-volatile-series
+  type: composition_and_volatility_comparator
   locator:
-    pdf_page_index: 13
-    figure: 2A
-    section: 3.1 Element loss as a function of time
-    note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    pdf_page_index: 8
+    section: 2.1 Experiments
+    note: Ag is one of the trace elements added at approximately 500 ppm; its full measured series is in referenced tables
+      not present as readable tables in the supplied PDF.
+  units: ppm as printed
+  values:
+    quantity: trace_element_doping
+    method_class: measured_direct
+    starting_material_doping_ppm: ~500
+    full_result_series: not_present_in_supplied_pdf
+  context_id: boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ag_trace_doping_and_comparator
+  work_id: 10.1016/j.chemgeo.2025.123018
+  source_id: boulliung-2025-mercury-volatile-metals-magmatic
+  species: Ag
+- observation_id: boulliung_2025_hg_oxidation_state_and_fugacity
+  experiment: ssas-hg-volatile-series
+  type: redox_condition
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    pdf_page_index: 20
+    section: 4. Conclusions
+    note: Fe oxidation state was measured by XANES in quenched products; the fO2 relation is the authors' interpretation.
+  units: dimensionless as printed
+  values:
+    quantity: ferric_fraction_and_oxygen_fugacity
+    method_class: measured_direct
+    fe3_fraction_as_printed: ~0.1
+    fe3_fraction_definition: Fe3+/(Fe3++Fe2+)
+    change_during_experiments: none detected
+    oxygen_fugacity_relative_to_FMQ: about -1 log unit
+    measurement: Fe K-edge XANES
+  context_id: boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_hg_oxidation_state_and_fugacity
+  work_id: 10.1016/j.chemgeo.2025.123018
+  source_id: boulliung-2025-mercury-volatile-metals-magmatic
+  species: Hg
+- observation_id: boulliung_2025_ssas_apparatus_and_run_conditions
+  experiment: ssas-hg-volatile-series
+  type: laboratory_conditions
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    pdf_page_index: 8
+    section: 2.1 Experiments
+    note: Values are transcribed from the SSAS preparation and experiment paragraphs; no value is inferred from the drawing
+      or from an unprovided supplement.
+  units: as printed
+  equipment:
+    sample_mass_g:
+      value: ~100
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+    sample_container:
+      value: alumina crucible
+      locator:
+        pdf_page_index: 8
+        section: 2.1 Experiments
+    crucible_material: alumina
+    chamber_pressure:
+      value: ~2.7
+      units: mbar
+      locator:
+        pdf_page_index: 9
+        section: 2.1 Experiments
+    cell_material: silica tube
+    chamber_length_cm:
+      value: ~9
+      units: cm
+      locator:
+        pdf_page_index: 9
+        section: 2.1 Experiments
+    ampoule_volume_m3:
+      value: 4.4 x 10^-6
+      locator:
+        pdf_page_index: 9
+        section: 2.1 Experiments
+    thermocouple:
+      value: thermocouple; temperature variation not exceeding +/- 5 C over ampoule length
+      locator:
+        pdf_page_index: 9
+        section: 2.1 Experiments
+    pumping:
+      value: vacuum line overnight; sealed while still evacuating
+      locator:
+        pdf_page_index: 9
+        section: 2.1 Experiments
+  values:
+    quantity: sealed_silica_ampoule_experiment_conditions
+    method_class: measured_direct
+    apparatus:
+      system: SSAS (Sealed Silica Ampoule System)
+      starting_material_form: powder
+      starting_material_mass_as_printed: ~100 mg
+      sample_container: alumina crucible
+      crucible_dimensions_as_printed: 5-mm outer diameter; 3-mm inner diameter; 10-mm long
+      ampoule: silica tube sealed at both ends
+      silica_tube_dimensions_as_printed: 10-mm outer diameter; 8-mm inner diameter
+      ampoule_length_as_printed: ~9 cm
+      ampoule_volume_as_printed: 4.4 x 10^-6 m3
+      evacuation_pressure_as_printed: ~2.7 mbar
+      pumping: connected to a vacuum line overnight; other extremity sealed while still evacuating
+      furnace: muffle furnace
+      temperature_C_as_printed:
+      - 1250
+      - 1300
+      - 1400
+      duration_as_printed: 5 minutes to 24 hours
+      temperature_measurement: thermocouple
+      temperature_uniformity_as_printed: variations not exceeding +/- 5 C over the ampoule length
+      quench: silica ampoule quenched in air
+      atmosphere: sealed ampoule; no sweep gas during the run stated
+      fO2_control: about 1 log fO2 unit below FMQ, based on product Fe XANES
+    uncertainty:
+      temperature_uniformity_C: +/- 5
+  context_id: boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
+  work_id: 10.1016/j.chemgeo.2025.123018
+  source_id: boulliung-2025-mercury-volatile-metals-magmatic
+  species: Hg
+- observation_id: boulliung_2025_starting_material_hg_and_trace_doping
+  experiment: ssas-hg-volatile-series
+  type: composition
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    pdf_page_index: 8
+    section: 2.1 Experiments
+    note: Values are printed in the starting-material preparation paragraph; the full Table 1 composition is referenced but
+      not present as readable table text in the supplied PDF.
+  units: ppm as printed
+  values:
+    quantity: doped_starting_material_trace_composition
+    method_class: measured_direct
+    material: Icelandic basalt composition from Reykjanes Ridge
+    trace_elements_added_at_approximately_ppm:
+    - Ag
+    - As
+    - Cd
+    - Cl
+    - Co
+    - Cr
+    - Cs
+    - Cu
+    - F
+    - Ga
+    - Ge
+    - In
+    - Li
+    - Mo
+    - Ni
+    - Pb
+    - Rb
+    - Sb
+    - Sc
+    - Sn
+    - Sr
+    - V
+    - W
+    - Y
+    - Zn
+    - Zr
+    trace_element_doping_ppm_as_printed: ~500
+    mercury_species_added: HgO powder
+    mercury_initial_concentration_ppm: 93
+    mercury_initial_concentration_uncertainty_ppm: +/- 3
+    starting_material_homogeneity_measurements: 5 Hg measurements
+    fusion: covered alumina crucible at 1 atm and 1300 C for 5 minutes; two fused glasses combined after water drop-quench
+  context_id: boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
+  work_id: 10.1016/j.chemgeo.2025.123018
+  source_id: boulliung-2025-mercury-volatile-metals-magmatic
+  species: Hg

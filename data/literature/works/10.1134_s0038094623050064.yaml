@@ -39,122 +39,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1134/s0038094623050064
 experiments:
-- experiment_id: 10.1134/s0038094623050064::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'isothermal_degassing_helium_headspace_GC' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1134/s0038094623050064
-  locator:
-    published_page: 576
-    pdf_page_index: 6
-    table: '1'
-    note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
-          for syringe sampling
-      locator:
-        published_page: 573
-        pdf_page_index: 3
-        figure: '2'
-        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
-- experiment_id: 10.1134/s0038094623050064::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'stepwise_degassing_helium_headspace_GC_no_accumulation' is not a closed method token (kems_effusion alone
-      is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1134/s0038094623050064
-  locator:
-    published_page: 576
-    pdf_page_index: 6
-    table: '2'
-    note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
-          for syringe sampling
-      locator:
-        published_page: 573
-        pdf_page_index: 3
-        figure: '2'
-        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
-- experiment_id: 10.1134/s0038094623050064::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'FTIR_ATR_residue' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1134/s0038094623050064
-  locator:
-    published_page: 577
-    pdf_page_index: 7
-    figure: '3'
-    note: Normalized IR transmittance of Murchison after annealing at 200, 500, 800 C
 - experiment_id: 10.1134/s0038094623050064::4
   kind: literature
   method:
@@ -188,36 +72,76 @@ experiments:
     pdf_page_index: 10
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
-- experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
+- experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'isothermal_and_stepwise_degassing_helium' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 573
+        note: No aliquot mass printed
+    printed_composition:
+      state:
+        tag: value
+        value: Ground and dried Murchison CM2 material
+      locator:
+        published_page: 573
+        section: Experimental studies
+    form:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 575
+        note: Crushed and ball-milled forms occur but tables do not assign one form per observation
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 574
+        table: '1'
+        note: Three isothermal setpoints
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+        tag: value
+        value:
+          kind: point
+          point: '110000'
+          approximate: true
+      locator:
+        published_page: 574
+        note: 1.1 +/- 0.1 bar helium; unit conversion only
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: helium
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 573
+        section: Experimental studies
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.1134/s0038094623050064
   locator:
-    published_page: 573
-    pdf_page_index: 3
-    section: Eksperimentalnye issledovaniya degazatsii
-    note: apparatus pp. 573-575; feedstock Murchison CM2; no aliquot mass printed
+    published_page: 574
+    table: '1'
+    note: Murchison isothermal degassing series
   apparatus:
     cell_material_and_liner:
       state:
@@ -229,3 +153,201 @@ experiments:
         pdf_page_index: 3
         figure: '2'
         paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
+  bench_id: 10.1134/s0038094623050064::bench::quartz-helium-degassing-rig
+- experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 573
+        note: No aliquot mass printed
+    printed_composition:
+      state:
+        tag: value
+        value: Ground and dried Murchison CM2 material
+      locator:
+        published_page: 573
+        section: Experimental studies
+    form:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 575
+        note: Crushed and ball-milled forms occur but tables do not assign one form per observation
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 574
+        table: '1'
+        note: Three isothermal setpoints
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '110000'
+          approximate: true
+      locator:
+        published_page: 574
+        note: 1.1 +/- 0.1 bar helium; unit conversion only
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: helium
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 573
+        section: Experimental studies
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 574
+    table: '2'
+    note: Murchison stepped degassing series
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
+          for syringe sampling
+      locator:
+        published_page: 573
+        pdf_page_index: 3
+        figure: '2'
+        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
+  bench_id: 10.1134/s0038094623050064::bench::quartz-helium-degassing-rig
+- experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'equilibrium_calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 576
+    pdf_page_index: 6
+    paragraph: lg(Kp) = -9001/T + 9.28
+    equation: '2'
+benches:
+- id: 10.1134/s0038094623050064::bench::quartz-helium-degassing-rig
+  work_id: 10.1134/s0038094623050064
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Induction-heated helium degassing rig with gas-chromatographic analysis
+    locator:
+      published_page: 573
+      section: Experimental studies
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Quartz-glass reactor and quartz boat
+    locator:
+      published_page: 573
+      section: Experimental studies
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 573
+          section: Experimental studies
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 573
+          section: Experimental studies
+  detector:
+    state:
+      tag: value
+      value: Kristall-Lyuks 4000M gas chromatograph
+    locator:
+      published_page: 574
+      section: Experimental studies
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Nicrobell D thermocouple beside quartz boat
+      locator:
+        published_page: 574
+        section: Experimental studies
+  heating_method:
+    state:
+      tag: value
+      value: Induction heater/furnace
+    locator:
+      published_page: 573
+      section: Experimental studies
+  other_facts:
+  - name: quartz_boat_volume
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+          approximate: false
+      locator:
+        published_page: 573
+        section: Experimental studies
+    unit: ml
+  - name: quartz_reactor_volume
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '80'
+          approximate: false
+      locator:
+        published_page: 573
+        section: Experimental studies
+    unit: ml

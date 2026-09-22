@@ -1,0 +1,772 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml
+observations:
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1823K
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1823'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 140
+    section: 2. Experimentals
+    note: Abstract gives the full temperature range; the apparatus and run parameters are printed in section 2 on published
+      page 140.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1873K
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1873'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 141
+    section: 4. Distribution Ratio of Phosphorus
+    note: One of the three explicitly stated experimental temperatures.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1923K
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1923'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 141
+    section: 4. Distribution Ratio of Phosphorus
+    note: One of the three explicitly stated experimental temperatures.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_ca_p5
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::1
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-251040'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 143
+    table: '1'
+    section: 4. Distribution Ratio of Phosphorus
+    equation: '12'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_mg_p5
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::1
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-37660'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 143
+    table: '1'
+    section: 4. Distribution Ratio of Phosphorus
+    equation: '12'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_si_p5
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::1
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '83680'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 143
+    table: '1'
+    section: 4. Distribution Ratio of Phosphorus
+    equation: '12'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_log_kp1_temperature_fit
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.0, 1953.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, method_class, model, generator, equilibrium,
+      expression_as_printed, intercept, inverse_temperature_coefficient_K, standard_state'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 145
+    section: 6. Equilibrium of Phosphorus Distribution
+    equation: '19'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_log_kp2_temperature_fit
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.0, 1953.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, method_class, model, generator, equilibrium,
+      expression_as_printed, intercept, inverse_temperature_coefficient_K, standard_state'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 145
+    section: 6. Equilibrium of Phosphorus Distribution
+    equation: '21'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_model_accuracy_statement
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'model_accuracy_percent'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_accuracy_percent'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 146
+    section: 7. Conclusions
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::/Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phosphorus_distribution_ratio'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1923.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'phosphorus_distribution_ratio'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 142
+    section: 4. Distribution Ratio of Phosphorus
+    note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table
+      and was not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus

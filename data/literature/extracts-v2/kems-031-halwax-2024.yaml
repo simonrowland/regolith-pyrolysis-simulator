@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-031-halwax-2024.yaml
 observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
-  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_CaO_KEMS_geometry_and_vaporization'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -52,7 +53,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -75,6 +76,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298_15K'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -106,7 +108,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
-  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -128,6 +130,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_geometry_package'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -171,6 +174,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_geometry_package'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -198,7 +202,7 @@ observations:
       lid of the cell had a diameter of 0.3 mm.
   read_from: pdf:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
-  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -221,6 +225,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_MgO_KEMS_geometry_and_vaporization'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -251,7 +256,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -274,6 +279,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298_15K'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -305,7 +311,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:0
-  experiment_id: 10.1007/s11663-024-02995-6::I
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -327,6 +333,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -384,7 +391,7 @@ observations:
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:1
-  experiment_id: 10.1007/s11663-024-02995-6::I
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -406,6 +413,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -463,7 +471,7 @@ observations:
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
-  experiment_id: 10.1007/s11663-024-02995-6::I
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -485,6 +493,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -542,7 +551,7 @@ observations:
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
-  experiment_id: 10.1007/s11663-024-02995-6::I
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -564,6 +573,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -641,6 +651,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_sublimation_enthalpy_comparison'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -678,7 +689,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t2.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_this_study
-  experiment_id: 10.1007/s11663-024-02995-6::II
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::nickel-calibration-series
   identity:
     quantity:
       tag: unknown
@@ -700,6 +711,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_sublimation'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -748,6 +760,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ionization_cross_sections_and_isotopic_abundances';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -779,7 +792,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t3.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_1st_measurement
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -799,6 +812,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -827,7 +841,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_2nd_measurement
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -847,6 +861,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -895,6 +910,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_formation_enthalpy_comparison'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -949,7 +965,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
       tag: unknown
@@ -969,6 +985,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -997,7 +1014,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_1st_measurement
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -1017,6 +1034,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1045,7 +1063,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -1065,6 +1083,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1113,6 +1132,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_formation_enthalpy_comparison'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1167,7 +1187,7 @@ observations:
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
-  experiment_id: 10.1007/s11663-024-02995-6::IV
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
       tag: unknown
@@ -1187,6 +1207,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1237,6 +1258,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_sample_composition_and_heats_of_combustion';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1290,6 +1312,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_reaction_enthalpies_reprint'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1341,6 +1364,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'literature_reaction_enthalpies_reprint'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

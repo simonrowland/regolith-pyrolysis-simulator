@@ -1,0 +1,199 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/llnl-2021-cai-aerodynamic-levitation.yaml
+observations:
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_CAI_starting_and_evaporated_composition_table1
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxide_composition_and_elemental_loss_series'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_composition_and_elemental_loss_series';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1 reports the elemental composition of the starting melt and six levitation-furnace residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 5
+    table: '1'
+    section: Elemental and isotopic composition of the evaporated samples
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_aerodynamic_transport_conditions
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'furnace_geometry_and_transport_conditions'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'furnace_geometry_and_transport_conditions'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 4
+    section: 2. Experimental setup
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_fractionation_factors'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_fractionation_factors'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    section: Isotopic fractionation factors
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_isotope_ratios_table1
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporated_residue_isotope_compositions'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporated_residue_isotope_compositions'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 5
+    table: '1'
+    section: Elemental and isotopic composition of the evaporated samples
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_modified_HKL_saturation_factor
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'vapor_to_saturation_pressure_ratio'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vapor_to_saturation_pressure_ratio'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 13
+    section: 4.2 Isotopic fractionation
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation

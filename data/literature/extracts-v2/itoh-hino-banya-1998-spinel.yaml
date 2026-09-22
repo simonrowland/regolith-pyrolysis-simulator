@@ -1,0 +1,415 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/itoh-hino-banya-1998-spinel.yaml
+observations:
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_assumed_Ca_Mg_interaction
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::/Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'assumed_Ca_Mg_interaction_coefficient'
+    species:
+      formula: Ca
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'assumed_Ca_Mg_interaction_coefficient'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Explicit zero assumption; not a measured zero and no uncertainty printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 87
+    equation: '7'
+    note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'observed_deoxidation_product_phase_presence'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_deoxidation_products_at_1873K' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'observed_deoxidation_product_phase_presence';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed; phase identification by XRD.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 86
+    figure: '1'
+    section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_equilibrium_time
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_hold_time_after_Al_addition'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron_with_dolomite_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_hold_time_after_Al_addition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed; 60 min is the authors' selected equilibrium time, not a measured uncertainty
+        bound.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 86
+    figure: '2'
+    section: 4.1 Equilibrium attainment time
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig1_fig2_measured_concentration_plots
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::/Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_element_concentration_plots'
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_element_concentration_plots'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure error bars or point uncertainties were not transcribed.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 86
+    note: Dissolved Mg/O versus dolomite MgO/CaO and concentration versus time are plotted; points were not digitised.; figures=1-2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_quoted_prior_interaction_parameters
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::/Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_prior_interaction_coefficients'
+    species:
+      formula: Ca
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_prior_interaction_coefficients'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for the attributed values.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 87
+    equation: '7'
+    note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_solid_solution_activity_assumptions
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'author_assumed_solid_solution_activities'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-Al2O3-spinel_solid_solutions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 2023.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'author_assumed_solid_solution_activities'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: These are explicit assumptions for calculated phase boundaries, not measurements; no uncertainty printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 88
+    figure: '5'
+    note: equations=21-24
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_equilibrium_constants
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::/Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_equilibrium_constants_and_relations'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-Al2O3-spinel equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 2023.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_equilibrium_constants_and_relations';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for the equilibrium constants or fitted expressions.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 88
+    note: Printed equations and evaluated 1873 K values; do not treat these author calculations as direct measurements.; equations=12-18,
+      21-24
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+  derived_from:
+  - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_interaction_parameters
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cross_interaction_coefficients'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'cross_interaction_coefficients'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for the fitted interaction coefficients.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 88
+    figure: '4'
+    note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; symbols
+      retain the paper's interaction-coefficient notation.; equations=7-20
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+  derived_from:
+  - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_thresholds
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_spinel_phase_appearance_thresholds'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-Al2O3-spinel_deoxidation_products' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_spinel_phase_appearance_thresholds'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed; phase regions were established by X-ray diffraction and the text's phase-presence
+        summary.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 87
+    figure: '3'
+    section: 4.3 Relationship between dolomite composition and deoxidation-product phases
+    note: Thresholds are printed in text; phase diagrams were not digitised.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel

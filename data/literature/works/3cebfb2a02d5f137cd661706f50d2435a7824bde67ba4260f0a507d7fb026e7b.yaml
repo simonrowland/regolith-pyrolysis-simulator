@@ -50,80 +50,6 @@ experiments:
     pdf_page_index: 2
     figure: '1'
     section: What Is Sintering, and Why Is It a Concern?
-- experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'informal_fluidized_bed_mockup_observation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  locator:
-    pdf_page_index: 3
-    figure: '2'
-    section: How Can Sintering Be Prevented?
-- experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'NASA_JSC_inconel_reaction_chamber_observation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  locator:
-    pdf_page_index: 3
-    figure: '3'
-    section: Indirect evidence of channel formation
-  apparatus:
-    temperature_measurement:
-      thermocouples:
-        state:
-          tag: value
-          value: TC 212, TC 214, TC 215, and TC 221
-        locator:
-          pdf_page_index: 3
-          figure: '3'
-          section: Indirect evidence of channel formation
 - experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::5
   kind: literature
   method:
@@ -156,38 +82,6 @@ experiments:
     pdf_page_index: 5
     figure: '5'
     section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
-- experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'partial_gravity_fluidization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  locator:
-    pdf_page_index: 6
-    figure: '6'
-    section: Discussion
 - experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   kind: literature
   method:
@@ -219,3 +113,135 @@ experiments:
   locator:
     pdf_page_index: 8
     section: Nomenclature
+context:
+- observation_id: cooper_2007_humid_air_channelization_sequence
+  type: mass_loss_fraction_vs_T
+  locator:
+    pdf_page_index: 3
+    figure: '2'
+    section: How Can Sintering Be Prevented?
+  phase: particulate_simulant
+  regime: informal_fluidized_bed_mockup_observation
+  units: seconds as printed
+  values:
+    quantity: channelization_timing
+    method_class: measured_direct
+    gas: humid air
+    elapsed_s_first_frame: 31
+    interval_between_frames_s: 5
+    outcome: fluidization ceases and a channel bypasses the soil
+    note: Informal mockup sequence; no sample mass, vessel dimensions, gas flow, or calibration is stated.
+  uncertainty:
+    note: no numerical uncertainty printed
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_humid_air_channelization_sequence
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: Fluidized_bed
+- observation_id: cooper_2007_humidity_channelization_window
+  type: mass_loss_fraction_vs_T
+  locator:
+    pdf_page_index: 6
+    section: Humidity
+  phase: particulate_simulant
+  regime: informal_fluidized_bed_mockup_observation
+  units: seconds and minutes as printed
+  values:
+    quantity: channelization_timing
+    method_class: measured_direct
+    humid_air_complete_channelization_s: 95
+    desiccated_air_observation_window: tens of minutes
+    desiccated_air_channelization: did not occur during the observation window
+    note: Informal tests with mockups; no gas humidity, flow, sample mass, or chamber geometry is stated.
+  uncertainty:
+    note: observation window is qualitative and retained as printed
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_humidity_channelization_window
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: Fluidized_bed
+- observation_id: cooper_2007_jsc1a_glass_fraction
+  type: condensate_composition
+  locator:
+    pdf_page_index: 1
+    section: What Is Sintering, and Why Is It a Concern?
+  phase: glass
+  regime: simulant_characterisation
+  units: wt% as printed
+  values:
+    quantity: printed_composition
+    method_class: quoted_unattributed
+    glass_fraction_wt_pct: approximately 49
+    material: JSC-1A
+    note: The paper gives this composition without a source citation at the statement.
+  uncertainty:
+    note: approximate qualifier retained; no numerical uncertainty printed
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_jsc1a_glass_fraction
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: JSC-1A
+- observation_id: cooper_2007_lunar_soil_agglutinate_fraction
+  type: condensate_composition
+  locator:
+    pdf_page_index: 8
+    section: Nomenclature
+  phase: lunar_soil
+  regime: lunar_material_characterisation
+  units: volume percent as printed
+  values:
+    quantity: printed_composition
+    method_class: compilation_assessed
+    agglutinate_fraction_volume_pct: 25 to 30
+    mature_soil_agglutinate_fraction_volume_pct: up to 60
+    component: agglutinates / soil grains bonded by glass
+  uncertainty:
+    note: range and upper bound retained; no numerical uncertainty printed
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_lunar_soil_agglutinate_fraction
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: Lunar_soil
+- observation_id: cooper_2007_partial_gravity_fluidized_bed_figure_only
+  type: transition_temperature
+  locator:
+    pdf_page_index: 6
+    figure: '6'
+    section: Discussion
+  phase: particulate_simulant
+  regime: partial_gravity_fluidization
+  units: gravity fraction as printed
+  values:
+    quantity: fluidization_behavior
+    method_class: figure_only
+    quoted_from: Gibson and Knudsen (1989)
+    gravity_level: 1/6 g
+    note: Figure-only qualitative study; no plotted values were read.
+  uncertainty:
+    note: figure-only; no numerical uncertainty printed
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_partial_gravity_fluidized_bed_figure_only
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: Fluidized_bed
+- observation_id: cooper_2007_thermocouple_divergence_after_heater_600c
+  type: transition_temperature
+  locator:
+    pdf_page_index: 3
+    figure: '3'
+    section: Indirect evidence of channel formation
+  phase: particulate_simulant
+  regime: NASA_JSC_inconel_reaction_chamber_observation
+  units: degree C and time as printed
+  values:
+    quantity: channelization_indicator
+    method_class: measured_direct
+    heater_thermocouple_temperature_C: approximately 600
+    central_temperature_divergence: within a few minutes after heater reaches approximately 600 C
+    thermocouples: TC 212, TC 214, TC 215, and TC 221
+    note: Figure 3 identifies TC 212 and TC 215 near the outer edge/middle sample area; no calibration or complete run conditions
+      are printed.
+  uncertainty:
+    note: approximate qualifiers retained; no numerical uncertainty printed
+  equipment:
+    chamber_material: inconel
+    temperature_measurement: thermocouples
+  context_id: cooper-2007-sintering-lunar-simulant::context::cooper_2007_thermocouple_divergence_after_heater_600c
+  work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
+  source_id: cooper-2007-sintering-lunar-simulant
+  species: Fluidized_bed

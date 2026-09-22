@@ -46,7 +46,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0015'
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: false
       locator:
         published_page: 576
         pdf_page_index: 2

@@ -50,130 +50,207 @@ experiments:
   locator:
     page: 2
     table: '1'
-- experiment_id: 10.1186/s40645-020-00354-0::2
+- experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'laser_boiling_with_inert_gas_cooling' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: regime 'laser_boiling' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000015'
+          approximate: true
+      locator:
+        page: 3
+        section: Experimental methods
+        note: Printed approximately 15 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Allende meteorite powder or synthetic Lsil
+      locator:
+        page: 2
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: cylindrical pressed and fired charge
+      locator:
+        page: 3
+        section: Experimental methods
+    pretreatment:
+      state:
+        tag: value
+        value: Fired 12 h at 1100 C (Lsil) or 1000 C (Allende) in H2/CO2
+      locator:
+        page: 2
+        section: Experimental methods
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: point
+          point: '30000'
+          approximate: false
+      locator:
+        page: 3
+        section: Apparatus
+        note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        page: 3
+        section: Apparatus
+        note: The registry SweepGas shape cannot represent the printed two-gas mixture without selecting one species.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00133322'
+        locator:
+          page: 3
+          section: Apparatus
+          note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
   work_id: 10.1186/s40645-020-00354-0
   locator:
-    page: 6
-    table: '2'
-- experiment_id: 10.1186/s40645-020-00354-0::3
-  kind: literature
+    page: 3
+    section: Experimental methods; Apparatus
+    note: Own laser-heating and inert-gas-cooling experiments.
+  bench_id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: laser heating followed by chamber-wall and copper-plate quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        table: '2'
+        note: Run-specific heating durations remain in observation rows; no one duration applies to the series.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Cu plate and chamber-wall quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
+benches:
+- id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
+  work_id: 10.1186/s40645-020-00354-0
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: CO2-laser boiling chamber
+    locator:
+      page: 3
+      section: Apparatus
   method:
-    tag: unknown
-    reason: regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity' is not a closed method token (kems_effusion
-      alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+    state:
+      tag: value
+      value: cw-CO2 laser heating with inert-gas cooling
+    locator:
+      page: 3
+      section: Apparatus
+  geometry:
+    chamber_dimensions:
+      inner_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.097'
+            approximate: false
+        locator:
+          page: 3
+          section: Apparatus
+          note: Printed 97 mm ID; unit conversion only
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.31'
+            approximate: false
+        locator:
+          page: 3
+          section: Apparatus
+          note: Printed 310 mm H; unit conversion only
+  pumping_type:
+    state:
+      tag: value
+      value: 50 L/s turbomolecular pump and oil-free roughing pump
+    locator:
+      page: 3
+      section: Apparatus
+  pumping_speed_m3_s:
+    state:
+      tag: value
+      value:
+        kind: point
+        point: '0.05'
+        approximate: false
+    locator:
+      page: 3
+      section: Apparatus
+      note: Printed 50 Liter s-1; unit conversion only
+  detector:
+    state:
+      tag: value
+      value: precision microbalance, video camera, and FE-SEM
+    locator:
+      page: 4
+      section: Experimental methods
+  temperature_measurement:
+    sensor:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
+        tag: value
+        value: IMPAC IS-12 automated pyrometer
+      locator:
+        page: 3
+        section: Apparatus
+  heating_method:
+    state:
+      tag: value
+      value: cw-CO2 laser, 10.6 um, 20-210 W
+    locator:
+      page: 3
+      section: Apparatus
+  other_facts:
+  - name: measurement_gas_composition_as_printed
+    value:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1186/s40645-020-00354-0
-  locator:
-    page: 8
-    table: '3'
-- experiment_id: 10.1186/s40645-020-00354-0::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'relative_volatility_from_measured_droplet_composition_ensembles' is not a closed method token (kems_effusion
-      alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1186/s40645-020-00354-0
-  locator:
-    page: 12
-    table: '4'
-- experiment_id: 10.1186/s40645-020-00354-0::nakano-hashimoto-2020-bubbles-to-chondrites-i
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'laser_boiling_with_inert_gas_cooling' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1186/s40645-020-00354-0
-  locator:
-    page: 10
-    section: Characteristics of the droplets and the condensed particles
-    note: figures=2-3
+        tag: value
+        value:
+          kind: categorical
+          categorical: Ar 0.3 bar; H2 0.01 bar; total stated 0.3 bar
+          approximate: false
+      locator:
+        page: 3
+        section: Apparatus
+        note: Printed operands retained without deriving a combined pressure.
+    unit: as_published

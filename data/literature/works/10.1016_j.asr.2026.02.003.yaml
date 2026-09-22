@@ -37,107 +37,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.asr.2026.02.003
 experiments:
-- experiment_id: 10.1016/j.asr.2026.02.003::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 4
-    pdf_page_index: 5
-    figure: '1'
-    note: HSC 10 O and O2 mass fraction vs T at 1e-2, 1e-7, and 3e-15 bar
-- experiment_id: 10.1016/j.asr.2026.02.003::4
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 8
-    pdf_page_index: 9
-    figure: '4'
-    note: Fig. 4a O2 ppm and solar power vs time; Fig. 4b cumulative O2 mg and energy Wh
-- experiment_id: 10.1016/j.asr.2026.02.003::4a
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 7
-    pdf_page_index: 8
-    figure: 4a
-    section: '4.1'
-    note: Printed power / time / ppm points in §4.1 prose (not digitised from Fig. 4a)
-- experiment_id: 10.1016/j.asr.2026.02.003::4b
+- experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   kind: literature
   method:
     tag: value
@@ -146,7 +46,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.00338'
+        value:
+          kind: point
+          point: '0.00338'
+          approximate: false
       locator:
         published_page: 7
         pdf_page_index: 8
@@ -182,31 +85,76 @@ experiments:
               section: '4.1'
               note: Oxygen production and mass yield from the reported EAC-1 run
         output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: EAC-1 lunar regolith simulant
+      locator:
+        section: 3.2 Solar pyrolysis procedure
+    form:
+      state:
+        tag: value
+        value: Hydraulically pressed pellet
+      locator:
+        section: 3.2 Solar pyrolysis procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Hydraulic press at 2.5 tons
+      locator:
+        section: 3.2 Solar pyrolysis procedure
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        section: 4.1 Experimental results
+        note: Around 1800 C is a punctual peak measurement
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: conflicting printed pressures; not collapsed into one number
+        tag: value
+        value:
+          kind: point
+          point: '1300'
+          approximate: true
+      locator:
+        section: 4.1 Experimental results
+        note: About 13 mbar under argon; converted to Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: argon
+          flow_sccm:
+            tag: value
+            value: '300'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        section: 4.1 Experimental results
+        note: Argon 99.999 percent at 0.3 NL/min; converted to 300 sccm at normal conditions
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: <
+            bound_value: '0.1'
+        locator:
+          section: 3.2 Solar pyrolysis procedure
+          note: Below 10^-3 mbar before heating; converted to Pa
   work_id: 10.1016/j.asr.2026.02.003
   locator:
-    published_page: 7
-    pdf_page_index: 8
-    figure: 4b
-    section: '4.1'
-    note: Oxygen production and mass yield from the reported EAC-1 run
+    section: 3.2 Solar pyrolysis procedure
+    note: EAC-1 solar-pyrolysis experiment; mass-balance and oxygen results reported in section 4.1
   apparatus:
     cell_material_and_liner:
       state:
@@ -218,151 +166,41 @@ experiments:
         pdf_page_index: 5
         paragraph: The sample was placed on a water-cooled steel holder
         section: '3.1'
-- experiment_id: 10.1016/j.asr.2026.02.003::4c
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample:
-    mass_kg:
+  bench_id: 10.1016/j.asr.2026.02.003::bench::solar-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          section: 4.1 Experimental results
+          note: Peak temperature reported around 1800 C
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1980'
+            approximate: false
+        locator:
+          section: 4.1 Experimental results
+          note: 33 min at fully open shutters / 1460 W
+    total_duration_s:
       state:
         tag: value
-        value: '0.00338'
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        figure: 4c
-        section: '4.1'
-        note: Mass-balance numbers printed in §4.1 prose
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=3.38 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '3.38'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4c
-              section: '4.1'
-              note: Mass-balance numbers printed in §4.1 prose
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4c
-              section: '4.1'
-              note: Mass-balance numbers printed in §4.1 prose
-        output_unit: kg
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 7
-    pdf_page_index: 8
-    figure: 4c
-    section: '4.1'
-    note: Mass-balance numbers printed in §4.1 prose
-- experiment_id: 10.1016/j.asr.2026.02.003::5
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 7
-    pdf_page_index: 8
-    figure: '5'
-    paragraph: major elements in oxides found on the sample holder were Na and Fe
-    section: '4.2'
-- experiment_id: 10.1016/j.asr.2026.02.003::8
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    published_page: 12
-    pdf_page_index: 13
-    figure: '8'
-    paragraph: At the experimentally-obtained yield, a mass of 80 kg of regolith is required
+        section: 4.1 Experimental results
+        note: One-hour heating period
 - experiment_id: 10.1016/j.asr.2026.02.003::kems-044-robinot-2026
   kind: literature
   method:
-    tag: value
-    value: solar_furnace_pyrolysis
+    tag: unknown
+    reason: regime 'compiled_composition' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     initial_composition:
       state:
@@ -603,7 +441,49 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.asr.2026.02.003
   locator:
-    published_page: 7
-    pdf_page_index: 8
-    section: '4.1'
-    note: Comparable yield 1.17 %; figure in supplementary data not in this PDF
+    published_page: 3
+    pdf_page_index: 4
+    paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+benches:
+- id: 10.1016/j.asr.2026.02.003::bench::solar-reactor
+  work_id: 10.1016/j.asr.2026.02.003
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Concentrated-solar vacuum pyrolysis reactor
+    locator:
+      section: 3.1 Experimental setup
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Water-cooled steel sample holder in glass-sphere reactor
+    locator:
+      section: 3.1 Experimental setup
+  pumping_type:
+    state:
+      tag: value
+      value: Edwards NDX15 scroll pump
+    locator:
+      section: 3.1 Experimental setup
+  detector:
+    state:
+      tag: value
+      value: Systech oxygen trace analyzer; Brooks CMC mass-flow controllers
+    locator:
+      section: 3.1 Experimental setup
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Omicron IN 140/5 pyrometer
+      locator:
+        section: 3.1 Experimental setup
+  heating_method:
+    state:
+      tag: value
+      value: 2 m diameter parabolic solar dish with shutter-controlled concentrated radiation
+    locator:
+      section: 3.1 Experimental setup
+  other_facts: []

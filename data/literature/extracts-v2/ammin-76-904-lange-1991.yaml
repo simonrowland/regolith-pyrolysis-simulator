@@ -22,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -63,6 +64,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -102,6 +104,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -140,6 +143,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -156,44 +160,6 @@ observations:
     published_page: 909
     section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
     note: pdf_page=6
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
-  read_from: unknown:ammin-76-904
-- observation_id: ammin-76-904::ammin_76_904_table1_diopside_composition
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::1
-  identity:
-    quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
-    species:
-      formula: CaMgSi2O6
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_and_diopside_glass' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: ammin-76-904
-  locator:
-    published_page: 905
-    table: '1'
-    note: pdf_page=2
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
   read_from: unknown:ammin-76-904
 - observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
@@ -220,6 +186,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -262,6 +229,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -304,6 +272,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -346,6 +315,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -388,6 +358,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -430,6 +401,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -472,6 +444,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -514,6 +487,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -556,6 +530,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -598,6 +573,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -640,6 +616,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -682,6 +659,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -724,6 +702,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -766,6 +745,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -808,6 +788,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -850,6 +831,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -892,6 +874,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -934,6 +917,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -976,6 +960,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1018,6 +1003,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1060,6 +1046,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1102,6 +1089,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1144,6 +1132,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1186,6 +1175,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1228,6 +1218,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1270,6 +1261,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1312,6 +1304,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1354,6 +1347,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1396,6 +1390,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: empty values
+    approximate: false
   uncertainty:
     kind: none
   evidence:

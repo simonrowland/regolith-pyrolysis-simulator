@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-116-nunoue-1987.yaml
 observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_consolute_author_estimate
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::5
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'consolute_temperature'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -56,7 +57,7 @@ observations:
         figure: '5'
         note: Synopsis and Fig. 5 label ~1495 C; not a Table 2 row
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig1_literature_gap_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::1
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -78,6 +79,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -98,7 +100,7 @@ observations:
     figure: '1'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig2_ion_ratio_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::2
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -120,6 +122,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -140,7 +143,7 @@ observations:
     figure: '2'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig3_ion_ratio_gap_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::3
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -162,6 +165,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -182,7 +186,7 @@ observations:
     figure: '3'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig5_gap_this_work_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::5
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -204,6 +208,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -224,7 +229,7 @@ observations:
     figure: '5'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig6_isothermal_ion_ratio_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::6
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -246,6 +251,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -266,7 +272,7 @@ observations:
     figure: '6'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig7_activities_1550C_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::7
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -288,6 +294,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -308,7 +315,7 @@ observations:
     figure: '7'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig8_activities_1600C_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::8
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -330,6 +337,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -350,7 +358,7 @@ observations:
     figure: '8'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::kems-116-nunoue-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -373,6 +381,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -393,7 +402,7 @@ observations:
     section: 2.1 / 2.2
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table1_starting_materials
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::1
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -415,6 +424,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -435,7 +445,7 @@ observations:
     table: '1'
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::2
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -458,6 +468,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'miscibility_gap_temperature'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -479,7 +490,7 @@ observations:
     note: Table 2. Miscibility gap in Fe-Sn system.
   read_from: pdf:kems-116-nunoue-1987
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities
-  experiment_id: 10.2355/tetsutohagane1955.73.7_868::3
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -505,6 +516,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

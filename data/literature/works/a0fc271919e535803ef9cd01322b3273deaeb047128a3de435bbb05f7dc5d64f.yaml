@@ -80,7 +80,10 @@ experiments:
       orifice_area_m2:
         state:
           tag: value
-          value: '0.000001767146'
+          value:
+            kind: point
+            point: '0.000001767146'
+            approximate: false
         locator:
           paragraph: typical orifice diameter 1.5 mm
           line_range: '315'
@@ -106,7 +109,10 @@ experiments:
       clausing_factor:
         state:
           tag: value
-          value: '0.672'
+          value:
+            kind: point
+            point: '0.672'
+            approximate: false
         locator:
           table: I
           paragraph: L/r=1.0 Clausing factor 0.6720
@@ -129,7 +135,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00007853982'
+          value:
+            kind: point
+            point: '0.00007853982'
+            approximate: false
         locator:
           paragraph: cavity diameter 10 mm
           line_range: '315'
@@ -189,7 +198,10 @@ experiments:
       orifice_area_m2:
         state:
           tag: value
-          value: '0.000001767146'
+          value:
+            kind: point
+            point: '0.000001767146'
+            approximate: false
         locator:
           paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
           line_range: '315'
@@ -215,7 +227,10 @@ experiments:
       clausing_factor:
         state:
           tag: value
-          value: '0.3566'
+          value:
+            kind: point
+            point: '0.3566'
+            approximate: false
         locator:
           table: I
           line_range: 292-294
@@ -238,7 +253,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.00007853982'
+          value:
+            kind: point
+            point: '0.00007853982'
+            approximate: false
         locator:
           paragraph: cavity diameter 10 mm and height 7.6 mm
           line_range: '315'

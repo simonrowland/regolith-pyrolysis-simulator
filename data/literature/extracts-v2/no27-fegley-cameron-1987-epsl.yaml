@@ -22,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -61,6 +62,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -101,6 +103,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_magma_composition_and_model_scope'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -145,6 +148,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'vaporization_model_results'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -233,6 +237,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, evidence_class, method_class, source_generators,
       rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -316,6 +321,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, evidence_class, method_class, source_generators,
       rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -399,6 +405,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, evidence_class, method_class,
       model_generator, rows, note'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -483,6 +490,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped condensate_composition field selected; source fields: quantity, evidence_class, method_class,
       derivation, model_generator, condition, model_columns, rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:

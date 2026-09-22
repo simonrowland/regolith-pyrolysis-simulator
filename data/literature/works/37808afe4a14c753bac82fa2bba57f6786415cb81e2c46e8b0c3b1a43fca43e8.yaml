@@ -27,7 +27,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.000027914'
+        value:
+          kind: point
+          point: '0.000027914'
+          approximate: false
       locator:
         published_page: 782
         section: Samples and apparatus
@@ -60,6 +63,15 @@ experiments:
               note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
         output_unit: kg
+    form:
+      state:
+        tag: value
+        value: dull green powder; well-crystallized emerald green grains under low magnification
+      locator:
+        published_page: 782
+        section: Samples and apparatus
+        note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
     container:
       state:
         tag: value

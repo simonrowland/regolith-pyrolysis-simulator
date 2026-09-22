@@ -38,11 +38,11 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.6028/nbs.sp.561v1
 experiments:
-- experiment_id: 10.6028/nbs.sp.561v1::2
+- experiment_id: 10.6028/nbs.sp.561v1::experiment::k2o-sio2-effusion-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample:
     initial_composition:
       state:
@@ -121,33 +121,51 @@ experiments:
       locator:
         published_page: 271
         section: 3. Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Dried overnight at 500 C
+      locator:
+        page: 269
+        section: 3. Procedure
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        section: Abstract
+        note: The 1300-1800 K range is series-wide
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000001333223684210526315789474'
+          interval_high: '0.00001333223684210526315789474'
+          approximate: false
+      locator:
+        page: 267
+        section: 2. Description of Mass Spectrometric System
+        note: 10^-8 to 10^-7 Torr; converted to Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 267
+        section: 2. Description of Mass Spectrometric System
+        note: Vacuum system
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.6028/nbs.sp.561v1
   locator:
-    published_page: 276
-    pdf_page_index: 300
-    table: '2'
-    note: Series 1104 T=1302 K, 43.94 wt% K2O, P_K=6.910e-07 atm as printed
+    page: 270
+    section: 3. Procedure
+    note: K2O-SiO2 solution measurements; per-row compositions and temperatures remain in observations
   apparatus:
     cell_material_and_liner:
       state:
@@ -157,3 +175,114 @@ experiments:
         published_page: 267
         figure: '2'
         paragraph: Knudsen cell constructed of platinum
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 271
+          section: 3. Procedure
+          note: Alternatives are printed but table-row assignment is not published
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 271
+          section: 3. Procedure
+  bench_id: 10.6028/nbs.sp.561v1::bench::kems-system
+benches:
+- id: 10.6028/nbs.sp.561v1::bench::kems-system
+  work_id: 10.6028/nbs.sp.561v1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Modulated-beam quadrupole Knudsen-effusion mass spectrometer
+    locator:
+      page: 266
+      section: 2. Description of Mass Spectrometric System
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Platinum effusion cell
+    locator:
+      page: 268
+      section: 2. Description of Mass Spectrometric System
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.008'
+            approximate: false
+        locator:
+          page: 268
+          section: 2. Description of Mass Spectrometric System
+          note: 0.80 cm outside diameter; converted to m
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.019'
+            approximate: false
+        locator:
+          page: 268
+          section: 2. Description of Mass Spectrometric System
+          note: 1.90 cm height; converted to m
+  pumping_type:
+    state:
+      tag: value
+      value: Two liquid-nitrogen-trapped four-inch oil diffusion pumps
+    locator:
+      page: 266
+      section: 2. Description of Mass Spectrometric System
+  detector:
+    state:
+      tag: value
+      value: Extranuclear-component quadrupole mass spectrometer with beam modulation
+    locator:
+      page: 266
+      section: 2. Description of Mass Spectrometric System
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pyro-Micro optical pyrometer and Pt/Pt-10 percent Rh thermocouple
+      locator:
+        page: 269
+        section: 2. Description of Mass Spectrometric System
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Pyrometer scale checked against NBS-calibrated bandlamp
+      locator:
+        page: 269
+        section: 2. Description of Mass Spectrometric System
+  heating_method:
+    state:
+      tag: value
+      value: Tantalum-sheet resistance furnace
+    locator:
+      page: 268
+      section: 2. Description of Mass Spectrometric System
+  other_facts:
+  - name: printed_orifice_diameter_alternatives
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1 or 1/2
+          approximate: false
+      locator:
+        page: 271
+        section: 3. Procedure
+        note: Printed preliminary/BJ alternatives; no effective area calculated and no universal run assignment asserted
+    unit: mm

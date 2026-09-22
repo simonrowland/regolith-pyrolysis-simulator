@@ -37,33 +37,101 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2320/jinstmet1952.40.5_526
 experiments:
-- experiment_id: 10.2320/jinstmet1952.40.5_526::1
+- experiment_id: 10.2320/jinstmet1952.40.5_526::experiment::cd-zn-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.006'
+          interval_high: '0.011'
+          approximate: false
+      locator:
+        page: 528
+        published_page: 528
+        note: Printed alloy mass 6-11 g
+    printed_composition:
+      state:
+        tag: value
+        value: Cd-Zn alloys over the whole binary composition range
+      locator:
+        page: 527
+        published_page: 527
+    form:
+      state:
+        tag: value
+        value: Alloy melt in alumina inner crucible
+      locator:
+        page: 528
+        published_page: 528
+        section: Apparatus and experiment
+        note: Newly constructed apparatus described in this work
+    surface_area_m2:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 528
+        published_page: 528
+        note: Only an estimated sample-surface to orifice-area ratio of about 10^4:1 is printed
+    pretreatment:
+      state:
+        tag: value
+        value: Cd acid
+      locator:
+        page: 528
+        published_page: 528
+        section: Apparatus and experiment
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        page: 527
+        published_page: 527
+        note: The 450-700 K range applies across the series; no one run setpoint is published
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: point
+          point: '0.00001'
+          approximate: true
+      locator:
+        page: 528
+        published_page: 528
+        note: Residual gas pressure during cell heating in the 10^-5 Pa range
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 528
+        published_page: 528
+        note: Ar was used for alloy preparation
     regime:
       regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        tag: value
+        value: molecular
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0001'
+            approximate: true
+        locator:
+          page: 528
+          published_page: 528
+          note: Vacuum reached about 10^-4 Pa before heater energization
     cell_internal_pressure_note:
       state:
         tag: value
@@ -75,16 +143,15 @@ experiments:
         note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
   work_id: 10.2320/jinstmet1952.40.5_526
   locator:
+    page: 527
     published_page: 527
-    pdf_page_index: 2
-    figure: '1'
-    note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+    note: Measurements of liquid Cd-Zn over the whole binary from 450 to 700 K
   apparatus:
     cell_material_and_liner:
       state:
         tag: value
         value: 'Mo Knudsen cell (lid, body, orifice plate) with alumina inner crucible. Fig. 3: outer 27 mm phi, inner crucible
-          16 mm phi, inner height 22 mm, outer height 27 mm. Orifice about 0.18 mm phi in a 0.05 mm plate (Fig. 5 example
+          16 mm phi, inner height 22 mm, outer height 27 mm. Orifice about 0.18 mm phi in a 0.051 mm plate (Fig. 5 example
           annotated 0.19 O). Estimated melt-surface:orifice-area ratio about 1e4:1. NEVA (Nippon Electric Varian) NAG-530
           quadrupole mass filter. Alumel-chromel thermocouple in the lid well. Ionization 70 eV, 0.1 mA for all samples.'
       locator:
@@ -93,42 +160,17 @@ experiments:
         figure: '1'
         note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
     geometry:
-      orifice_diameter_m:
+      orifice_channel_length_m:
         state:
           tag: value
-          value: '0.00018'
+          value:
+            kind: point
+            point: '0.000051'
+            approximate: false
         locator:
-          published_page: 527
-          pdf_page_index: 2
-          figure: '1'
-          note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
-        inference:
-          relation: mm_to_m
-          inputs:
-          - L_m = L_mm / 1000
-          - original_unit=mm
-          - as_published=0.18 mm
-          - printed=orifice_diameter_mm_as_printed
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.18'
-              locator:
-                published_page: 527
-                pdf_page_index: 2
-                figure: '1'
-                note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
-          - - factor
-            - state:
-                tag: value
-                value: '1000'
-              locator:
-                published_page: 527
-                pdf_page_index: 2
-                figure: '1'
-                note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
-          output_unit: m
+          page: 528
+          published_page: 528
+          note: Printed 0.051 mm orifice-plate thickness
     ionization:
       electron_energy_eV:
         state:
@@ -190,101 +232,109 @@ experiments:
           pdf_page_index: 2
           figure: '1'
           note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
-- experiment_id: 10.2320/jinstmet1952.40.5_526::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+  bench_id: 10.2320/jinstmet1952.40.5_526::bench::nag-530
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Stepwise heating; spectra taken after ion peaks and cell temperature were nearly constant
+      locator:
+        page: 528
+        published_page: 528
+        section: Mass spectrum
+    total_duration_s:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+      locator:
+        page: 528
+        published_page: 528
+        note: Overnight about 450 K bakeout is not a measurement duration
+benches:
+- id: 10.2320/jinstmet1952.40.5_526::bench::nag-530
   work_id: 10.2320/jinstmet1952.40.5_526
-  locator:
-    published_page: 530
-    pdf_page_index: 5
-    figure: '7'
-    note: log I+ T vs 1/T for 114Cd+ and 64Zn+ at X_Zn=0.10, 0.27, 0.50, 0.70, 0.83
-- experiment_id: 10.2320/jinstmet1952.40.5_526::9
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen cell-quadrupole mass-filter system
+    locator:
+      page: 528
+      published_page: 528
+      section: Apparatus and experiment
+      note: Newly constructed apparatus described in this work
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum lid
+    locator:
+      page: 528
+      published_page: 528
+      section: Apparatus and experiment
+      note: Newly constructed apparatus described in this work
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.016'
+            approximate: false
+        locator:
+          page: 528
+          published_page: 528
+          figure: '3'
+          note: Alumina inner crucible diameter 16 mm
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.022'
+            approximate: false
+        locator:
+          page: 528
+          published_page: 528
+          figure: '3'
+          note: Alumina inner crucible height 22 mm
+  pumping_type:
+    state:
+      tag: value
+      value: Ion pumps
+    locator:
+      page: 528
+      published_page: 528
+      section: Apparatus and experiment
+  pumping_speed_m3_s:
+    state:
+      tag: value
+      value:
+        kind: categorical
+        categorical: 20 and 60 L/s
+        approximate: false
+    locator:
+      page: 528
+      published_page: 528
+      section: Apparatus and experiment
+      note: Printed pump speeds retained without pairing to a run
+  detector:
+    state:
+      tag: value
+      value: NEVA NAG-530 quadrupole mass filter with secondary electron multiplier
+    locator:
+      page: 527
+      published_page: 527
+      figure: '1'
+  temperature_measurement:
+    sensor:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2320/jinstmet1952.40.5_526
-  locator:
-    published_page: 530
-    pdf_page_index: 5
-    figure: '9'
-    note: a_Cd(l) and a_Zn(l) at 667 K
-- experiment_id: 10.2320/jinstmet1952.40.5_526::kems-169-nakazawa-1976
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2320/jinstmet1952.40.5_526
-  locator:
-    published_page: 526
-    pdf_page_index: 1
-    note: English abstract; also Fig. 8 slope 1.35 at 667 K
+        tag: value
+        value: Alumel-chromel thermocouple in lid well
+      locator:
+        page: 528
+        published_page: 528
+        section: Apparatus and experiment
+        note: Newly constructed apparatus described in this work
+  other_facts: []

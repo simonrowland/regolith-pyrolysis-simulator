@@ -139,135 +139,6 @@ experiments:
         pdf_page_index: 13
         figure: '2'
         paragraph: Knudsen cell was made of 0.025 cm Pt sheet
-- experiment_id: 10.6028/nbs.ir.83-2731::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6028/nbs.ir.83-2731
-  locator:
-    figure: '2'
-    paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
-    line_range: 145-163
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)
-      locator:
-        paragraph: Knudsen cell was made of 0.025 cm Pt sheet
-        line_range: '163'
-        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-    geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value: '0.00001963495'
-        locator:
-          paragraph: An effusion orifice diameter of 0.5 cm was used
-          line_range: '163'
-          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - area = π (d/2)^2 from stated effusion orifice diameter 0.5 cm
-          - extract_value=1.963495e-05 m2
-          - extract_field=orifice_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00001963495'
-              locator:
-                paragraph: An effusion orifice diameter of 0.5 cm was used
-                line_range: '163'
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-          output_unit: m2
-      orifice_diameter_m:
-        state:
-          tag: value
-          value: '0.005'
-        locator:
-          paragraph: An effusion orifice diameter of 0.5 cm was used
-          line_range: '163'
-          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-        inference:
-          relation: identity:m
-          inputs:
-          - as_published=0.005 m
-          - printed=diameter_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.005'
-              locator:
-                paragraph: An effusion orifice diameter of 0.5 cm was used
-                line_range: '163'
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-          output_unit: m
-    wall:
-      cell_wall_thickness_m:
-        state:
-          tag: value
-          value: '0.00025'
-        locator:
-          figure: '2'
-          paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
-          line_range: 145-163
-          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-        inference:
-          relation: cm_to_m
-          inputs:
-          - L_m = L_cm / 100
-          - original_unit=cm
-          - as_published=0.025 cm
-          - printed=cell_wall_thickness_cm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.025'
-              locator:
-                figure: '2'
-                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
-                line_range: 145-163
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-          - - factor
-            - state:
-                tag: value
-                value: '100'
-              locator:
-                figure: '2'
-                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
-                line_range: 145-163
-                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-          output_unit: m
 - experiment_id: 10.6028/nbs.ir.83-2731::20
   kind: literature
   method:
@@ -301,39 +172,6 @@ experiments:
     pdf_page_index: 71
     figure: '20'
     note: Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements.
-- experiment_id: 10.6028/nbs.ir.83-2731::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6028/nbs.ir.83-2731
-  locator:
-    published_page: 15
-    pdf_page_index: 21
-    table: '3'
-    note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
 - experiment_id: 10.6028/nbs.ir.83-2731::4
   kind: literature
   method:
@@ -349,7 +187,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         published_page: 33
         pdf_page_index: 39
@@ -432,7 +273,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -460,41 +301,6 @@ experiments:
     published_page: 16
     pdf_page_index: 22
     figure: '6'
-    note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
-- experiment_id: 10.6028/nbs.ir.83-2731::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6028/nbs.ir.83-2731
-  locator:
-    published_page: 16
-    pdf_page_index: 22
-    figure: '7'
-    note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence, from P/P°(JANAF
-      NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
 - experiment_id: 10.6028/nbs.ir.83-2731::7 caption; plate 5
   kind: literature
   method:
@@ -527,6 +333,235 @@ experiments:
     published_page: 44
     pdf_page_index: 50
     figure: 7 caption; plate 5
+- experiment_id: 10.6028/nbs.ir.83-2731::experiment::kms-vacuum-glass-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 15
+        table: '3'
+        note: Series I and II initial masses are separately printed; no single mass assigned to this aggregate series
+    printed_composition:
+      state:
+        tag: value
+        value: Simulated nuclear-waste borosilicate glass; analytical and nominal compositions in Table 1
+      locator:
+        published_page: 2
+        table: '1'
+        note: ICP analysis except Cs, Ru, and Re by neutron activation analysis; nominal composition used for thermodynamic
+          estimates
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 12
+        section: 2.5.1
+        note: 800-1150 C is the range across observed ion measurements, not one experiment setpoint; retained on observations
+          without collapsing to a point
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Basis of Technique
+        note: Approximate 1e-4 atm is the molecular-effusion upper cell-pressure limit for practical 0.5 mm orifices, not
+          the run pressure for this 0.5 cm orifice
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 11
+        section: 2.5.1
+        note: Vacuum vaporization
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.6028/nbs.ir.83-2731
+  locator:
+    published_page: 11
+    section: 2.5.1 Glass Vaporization in Vacuum
+    note: Several series; each series is a sequence of runs using the same portion of glass
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)
+      locator:
+        paragraph: Knudsen cell was made of 0.025 cm Pt sheet
+        line_range: '163'
+        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.005'
+            approximate: false
+        locator:
+          published_page: 7
+          section: 2.2 Apparatus
+          note: Printed 0.5 cm effusion-orifice diameter; unit conversion only
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 7
+          section: 2.2 Apparatus
+          note: Lid sheet is 0.015 cm but source does not identify it as orifice channel length
+    wall:
+      cell_wall_thickness_m:
+        state:
+          tag: value
+          value: '0.00025'
+        locator:
+          figure: '2'
+          paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+          line_range: 145-163
+          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          - as_published=0.025 cm
+          - printed=cell_wall_thickness_cm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.025'
+              locator:
+                figure: '2'
+                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+                line_range: 145-163
+                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                figure: '2'
+                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+                line_range: 145-163
+                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+          output_unit: m
+  bench_id: 10.6028/nbs.ir.83-2731::bench::kms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 11
+        section: 2.5.1
+        note: Runs contain pressure-temperature points but no duration is printed
+- experiment_id: 10.6028/nbs.ir.83-2731::experiment::tms-n2-glass-series
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        section: '3.5'
+        note: Sample mass not printed for this series
+    printed_composition:
+      state:
+        tag: value
+        value: Simulated nuclear-waste borosilicate glass
+      locator:
+        published_page: 29
+        section: '3.5'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        section: '3.5'
+        note: Higher temperatures than KMS are stated
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30397.5'
+          approximate: false
+      locator:
+        published_page: 29
+        section: '3.5'
+        note: N2 carrier gas at 0.3 atm; unit conversion only
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 29
+        section: '3.5'
+        note: Ultra-high-purity nitrogen carrier gas; no flow is printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6028/nbs.ir.83-2731
+  locator:
+    published_page: 29
+    section: 3.5 Glass Vaporization in N2 Atmosphere
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 23
+          section: 3.2 Apparatus
+          note: Glass sampling used a capillary nozzle; no assigned numeric diameter printed
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 23
+          section: 3.2 Apparatus
+          note: Glass sampling used a capillary nozzle; no channel length printed
+  bench_id: 10.6028/nbs.ir.83-2731::bench::tms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 29
+        section: '3.5'
+        note: Higher temperatures than KMS stated
 - experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   kind: literature
   method:
@@ -559,3 +594,189 @@ experiments:
     published_page: 44
     pdf_page_index: 50
     note: §8 figure captions and all numbered tables; no evaporation/condensation coefficient
+benches:
+- id: 10.6028/nbs.ir.83-2731::bench::kms
+  work_id: 10.6028/nbs.ir.83-2731
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry apparatus
+    locator:
+      published_page: 6
+      figure: '1'
+      section: 2.2 Apparatus
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 6
+      figure: '1'
+      section: 2.2 Apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Welded platinum cell; 0.025 cm Pt sheet
+    locator:
+      published_page: 7
+      figure: '2'
+      section: 2.2 Apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 7
+          section: 2.2 Apparatus
+          note: 0.80 cm is explicitly outside diameter, not internal diameter
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 7
+          section: 2.2 Apparatus
+          note: 1.90 cm is stated cell height; internal depth is not separately stated
+  detector:
+    state:
+      tag: value
+      value: Quadrupole mass filter with modulated molecular beam and lock-in detection
+    locator:
+      published_page: 6
+      figure: '1'
+      section: 2.2 Apparatus
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        published_page: 10
+        section: 2.3.2 Sensitivity Constant
+        note: 30 eV ionizing electron energy used for calibration and normal experimental procedures
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Thermocouple
+      locator:
+        published_page: 6
+        section: 2.2 Apparatus
+        note: Thermocouple used at the relatively low temperatures of this study
+  heating_method:
+    state:
+      tag: value
+      value: Tantalum sheet radiation furnace; high-amperage low-voltage power
+    locator:
+      published_page: 7
+      figure: '2'
+      section: 2.2 Apparatus
+  other_facts:
+  - name: cell_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.8'
+          approximate: false
+      locator:
+        published_page: 7
+        section: 2.2 Apparatus
+    unit: cm
+  - name: cell_height
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.9'
+          approximate: false
+      locator:
+        published_page: 7
+        section: 2.2 Apparatus
+    unit: cm
+  - name: lid_sheet_thickness
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.015'
+          approximate: false
+      locator:
+        published_page: 7
+        section: 2.2 Apparatus
+        note: Printed lid-sheet thickness; not asserted as orifice channel length
+    unit: cm
+- id: 10.6028/nbs.ir.83-2731::bench::tms
+  work_id: 10.6028/nbs.ir.83-2731
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: High-pressure transpiration mass spectrometer
+    locator:
+      published_page: 22
+      figure: '13'
+      section: 3.2 Apparatus
+  method:
+    state:
+      tag: value
+      value: Transpiration mass spectrometry
+    locator:
+      published_page: 21
+      section: 3.1 Basis of Technique
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Platinum transpiration reactor; alumina thermocouple insulator
+    locator:
+      published_page: 23
+      figure: '14'
+      section: 3.2 Apparatus
+  pumping_type:
+    state:
+      tag: value
+      value: 'Differentially pumped stages: diffusion pumps, cold trap, Roots blower, and rotary-vane backing pump'
+    locator:
+      published_page: 22
+      figure: '13'
+      section: 3.2 Apparatus
+  detector:
+    state:
+      tag: value
+      value: Extranuclear Laboratories Component quadrupole system with Galileo Electro-Optics channeltron multiplier
+    locator:
+      published_page: 23
+      section: 3.2 Apparatus
+  heating_method:
+    state:
+      tag: value
+      value: Tantalum foil radiation furnace, AC currents to 400 A
+    locator:
+      published_page: 22
+      figure: '13'
+      section: 3.2 Apparatus
+  other_facts:
+  - name: maximum_sampler_temperature_with_new_element
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1700'
+          approximate: false
+      locator:
+        published_page: 22
+        section: 3.2 Apparatus
+        note: Can be achieved with a new furnace element; not a run setpoint
+    unit: K

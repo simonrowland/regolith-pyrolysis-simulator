@@ -42,7 +42,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'open_system_hydropyrolysis_15_MPa_H2' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'H2O_pyrolysis_Sephton_1998_remeasured' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -70,7 +70,7 @@ experiments:
     published_page: 1389
     pdf_page_index: 5
     table: '1'
-    note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
+    note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
 - experiment_id: 10.1016/j.gca.2003.08.019::2
   kind: literature
   method:
@@ -134,36 +134,75 @@ experiments:
     pdf_page_index: 6
     table: '3'
     note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
-- experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+- experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'open_system_hydropyrolysis_15_MPa_H2' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: regime 'open_system_temperature_programmed_hydropyrolysis' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00005'
+          interval_high: '0.0003'
+          approximate: false
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: 50-300 mg solvent-extracted sample; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Crushed whole Murchison meteorite
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: Program has 220 C and 520 C endpoints
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: unmapped pressure unit 'MPa hydrogen as printed'
+        tag: value
+        value:
+          kind: point
+          point: '15000000'
+          approximate: false
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: 15 MPa hydrogen; unit conversion only
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: hydrogen
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.1016/j.gca.2003.08.019
   locator:
     published_page: 1386
-    pdf_page_index: 2
-    section: 2.1. H2-Pyrolysis
-    note: thermal program, 15 MPa H2, stainless-steel 316 reactor, dry-ice trap
+    section: 2.1 H2-Pyrolysis
   apparatus:
     cell_material_and_liner:
       state:
@@ -173,3 +212,31 @@ experiments:
         published_page: 1386
         pdf_page_index: 2
         paragraph: catalyst-loaded samples (50-300 mg) were initially heated in a stainless steel (316 grade) reactor tube
+  bench_id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
+benches:
+- id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
+  work_id: 10.1016/j.gca.2003.08.019
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Open-system temperature-programmed hydropyrolysis reactor
+    locator:
+      published_page: 1386
+      section: 2.1 H2-Pyrolysis
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: 316-grade stainless-steel reactor tube
+    locator:
+      published_page: 1386
+      section: 2.1 H2-Pyrolysis
+  detector:
+    state:
+      tag: value
+      value: Agilent 6890 gas chromatograph with 5973 mass-selective detector
+    locator:
+      published_page: 1387
+      section: 2.2 Gas Chromatography-Mass Spectrometry
+  other_facts: []

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-200-ueshima-1983.yaml
 observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_geometry
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'method_geometry_reference'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -47,7 +48,7 @@ observations:
     note: Annealing apparatus; not a Knudsen cell. KEMS geometry is not in this paper
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_invariant_this_work
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -69,6 +70,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'invariant_reaction'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -100,7 +102,7 @@ observations:
         equation: '3'
         note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::1
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -123,6 +125,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -144,7 +147,7 @@ observations:
     note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::2
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -167,6 +170,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -190,7 +194,7 @@ observations:
     note: Table 2. Phase boundary determination by EPMA. Result of analysis as at% of Mo
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig1_epma_calibration_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::1
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -212,6 +216,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -233,7 +238,7 @@ observations:
     note: EPMA calibration curve for Fe-Mo alloy. Measured vs calculated I vs x_Mo
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig2_epma_results_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::2
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -255,6 +260,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -276,7 +282,7 @@ observations:
     note: Results of EPMA analysis. Phase boundaries vs T
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig3_phase_diagram_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::3
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -298,6 +304,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -320,7 +327,7 @@ observations:
       triangles Sykes; chain Gibson liquidus; KEMS thermal-analysis invariants as marks
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_pure_Fe_melting_check
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -342,6 +349,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_Fe_melting_onset'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -374,7 +382,7 @@ observations:
         pdf_page_index: 6
         paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_activities
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -396,6 +404,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -417,7 +426,7 @@ observations:
       alloys'
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_thermal_analysis
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
     quantity:
       tag: unknown
@@ -440,6 +449,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_kems_invariant_temperatures'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

@@ -2,55 +2,8 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/norris-2017-earth-volatiles-nature.yaml
 observations:
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_analytical_measurement_performance
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'analytical_conditions'
-    species:
-      formula: basaltic_silicate_melt
-      phase:
-        tag: unknown
-        reason: phase string 'quenched_basaltic_glass' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'analytical_conditions'; refusing to pick a number
-  uncertainty:
-    kind: printed
-    verbatim:
-      major_element_precision_RSD_percent: approximately 2
-      trace_element_precision_RSD_percent: approximately 5-10
-      high_concentration_elements: Ag, Ga, In, Mo, Pb, Sn, W, Zn
-      high_concentration_intra_spot_RSD_percent: less than 5
-      intermediate_variation_elements: Bi, Cd, Cu, Ge, Sb, Tl
-      intermediate_variation_RSD_percent: 10-15
-      most_depleted_element_intra_spot_RSD_percent: 25 for Bi, Ge, and Sb
-      diffusion_into_nickel_max_distance_um: 200
-      diffusion_worst_case_melt_volume_percent: no more than 5
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: norris-2017-earth-volatiles-nature
-  locator:
-    pdf_page_index: 12
-    section: Analysis
-    note: SEM/EDS and LA-ICP-MS operating and calibration conditions.
-  read_from: unknown:norris-2017-earth-volatiles-nature
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_author_volatility_factor_definition
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   identity:
     quantity:
       tag: unknown
@@ -69,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -89,47 +43,8 @@ observations:
     section: Results
     note: Author-defined ratio used to compare measured volatile loss.
   read_from: unknown:norris-2017-earth-volatiles-nature
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_crucible_capacity_disagreement
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'crucible_capacity_conflicting_printed_value'
-    species:
-      formula: basaltic_silicate_melt
-      phase:
-        tag: unknown
-        reason: phase string 'quenched_basaltic_glass' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'crucible_capacity_conflicting_printed_value';
-      refusing to pick a number
-  uncertainty:
-    kind: printed
-    verbatim: {}
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: norris-2017-earth-volatiles-nature
-  locator:
-    pdf_page_index: 13
-    section: Analysis
-    note: Later sample-description paragraph prints 4.5 mm2; this conflicts with 4.5 cm3 on PDF pages 3 and 11.
-  read_from: unknown:norris-2017-earth-volatiles-nature
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure2_time_series
-  experiment_id: 10.1038/nature23645::2
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   identity:
     quantity:
       tag: unknown
@@ -152,6 +67,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'normalized_trace_element_concentration_time_series';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -179,7 +95,7 @@ observations:
         figure: '2'
         note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors
-  experiment_id: 10.1038/nature23645::3
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   identity:
     quantity:
       tag: unknown
@@ -202,6 +118,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -229,7 +146,7 @@ observations:
         figure: '3'
         note: Volatility-factor plot; values retained as figure-only and not read off the graph.
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility
-  experiment_id: 10.1038/nature23645::4a,b
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   identity:
     quantity:
       tag: unknown
@@ -252,6 +169,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'BSE_CI_abundance_vs_measured_volatility_factor';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -278,90 +196,8 @@ observations:
         pdf_page_index: 17
         figure: 4a,b
         note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_one_atmosphere_stirred_gas_mixing_furnace
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparatus_and_starting_material'
-    species:
-      formula: basaltic_silicate_melt
-      phase:
-        tag: unknown
-        reason: phase string 'natural_Reykjanes_Ridge_basalt_trace_element_doped_silicate_melt' is not in the closed automatic
-          map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparatus_and_starting_material'; refusing to
-      pick a number
-  uncertainty:
-    kind: printed
-    verbatim:
-      major_element_homogeneity_RSD_percent: approximately 2
-      trace_element_homogeneity_RSD_percent: 5-10
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: norris-2017-earth-volatiles-nature
-  locator:
-    pdf_page_index: 3
-    section: Experimental apparatus
-    note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods on PDF
-      page 11.
-  read_from: unknown:norris-2017-earth-volatiles-nature
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_starting_material_preparation
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'sample_provenance_and_preparation'
-    species:
-      formula: basaltic_silicate_melt
-      phase:
-        tag: unknown
-        reason: phase string 'natural_Reykjanes_Ridge_basalt_trace_element_doped_powder' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_preparation'; refusing to
-      pick a number
-  uncertainty:
-    kind: printed
-    verbatim: {}
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: norris-2017-earth-volatiles-nature
-  locator:
-    pdf_page_index: 11
-    section: Methods
-    note: Starting-material preparation and piston-cylinder characterisation.
-  read_from: unknown:norris-2017-earth-volatiles-nature
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions
-  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   identity:
     quantity:
       tag: unknown
@@ -384,6 +220,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_loss_experiment_conditions'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

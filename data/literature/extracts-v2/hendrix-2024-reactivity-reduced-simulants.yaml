@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml
 observations:
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_jsc1a_reduction_apparatus_and_conditions
-  experiment_id: 10.1111/maps.14228::1
+  experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -23,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'simulant_milling_and_reduction_conditions'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -42,7 +43,7 @@ observations:
     section: Methods - Milling and Reduction of Lunar Simulants
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_reduced_jsc1a_alpha_fe_and_bleb_characterization
-  experiment_id: 10.1111/maps.14228::2
+  experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -61,6 +62,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'reduction_products'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -80,7 +82,7 @@ observations:
     section: Results - Experimental Reduction of Lunar Simulants - Solid Phase Characterization
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table1_jsc1a_composition_and_mineralogy
-  experiment_id: 10.1111/maps.14228::1
+  experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -126,6 +128,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_composition_and_mineralogy'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -145,7 +148,7 @@ observations:
     section: Lunar Simulants Used in this Study
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table1_lhs1_composition_and_mineralogy
-  experiment_id: 10.1111/maps.14228::1
+  experiment_id: 10.1111/maps.14228::experiment::lhs-1-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -191,6 +194,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_composition_and_mineralogy'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -209,7 +213,7 @@ observations:
     table: '1'
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table1_lms1_composition_and_mineralogy
-  experiment_id: 10.1111/maps.14228::1
+  experiment_id: 10.1111/maps.14228::experiment::lms-1-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -257,6 +261,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_composition_and_mineralogy'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -275,7 +280,7 @@ observations:
     table: '1'
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table4_jsc1a_grain_size_and_bet_area
-  experiment_id: 10.1111/maps.14228::4
+  experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -295,6 +300,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'median_grain_size_and_surface_area'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -314,7 +320,7 @@ observations:
     section: Solid Phase Characterization
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table4_lhs1_grain_size_and_bet_area
-  experiment_id: 10.1111/maps.14228::4
+  experiment_id: 10.1111/maps.14228::experiment::lhs-1-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -334,6 +340,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'median_grain_size_and_surface_area'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -353,7 +360,7 @@ observations:
     section: Solid Phase Characterization
   read_from: unknown:hendrix-2024-reactivity-reduced-simulants
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table4_lms1_grain_size_and_bet_area
-  experiment_id: 10.1111/maps.14228::4
+  experiment_id: 10.1111/maps.14228::experiment::lms-1-h2-reduction
   identity:
     quantity:
       tag: unknown
@@ -373,6 +380,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'median_grain_size_and_surface_area'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

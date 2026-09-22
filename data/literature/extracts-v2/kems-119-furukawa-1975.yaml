@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-119-furukawa-1975.yaml
 observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_HM_fe_infinite_dilution
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::9
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -29,6 +29,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_enthalpy_of_mixing'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -51,7 +52,7 @@ observations:
     note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_HM_v_infinite_dilution
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -77,6 +78,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_enthalpy_of_mixing'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -98,7 +100,7 @@ observations:
     note: H^M_V = -8.6 kcal mol^-1 at infinite dilution
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
       tag: unknown
@@ -120,6 +122,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -141,7 +144,7 @@ observations:
     note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig12_ternary_activities_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::12
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
       tag: unknown
@@ -163,6 +166,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -185,7 +189,7 @@ observations:
     note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::4
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -207,6 +211,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -228,7 +233,7 @@ observations:
     note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig6_fe_v_activities_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::6
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -250,6 +255,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -272,7 +278,7 @@ observations:
     note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig7_av_comparison_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::7
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -294,6 +300,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -315,7 +322,7 @@ observations:
     note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_fe_1600c
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -338,6 +345,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -359,7 +367,7 @@ observations:
     note: infinite-dilution gamma_Fe = 0.38_9 at 1600 C; conclusions round to 0.39
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_v_1600c
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -382,6 +390,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -404,7 +413,7 @@ observations:
     note: gamma0_V = 0.16_3 (solid standard) at 1600 C; conclusions round to 0.16
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_fe_binary_fit
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -427,6 +436,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -459,7 +469,7 @@ observations:
         equation: '10'
         note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv02_fits
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
       tag: unknown
@@ -482,6 +492,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -504,7 +515,7 @@ observations:
     note: eqs. (14)(15) at N_V=0.2 after dropping the small N_Cr^2 term
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv03_fits
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
       tag: unknown
@@ -527,6 +538,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -549,7 +561,7 @@ observations:
     note: eqs. (16)(17) at N_V=0.3
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_v_fe_binary_fit
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -572,6 +584,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -627,11 +640,13 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Temperature hold +/-0.5 C. Surface-depletion calculation at N_V=0.796 gives Fe 1% depletion time >1e8 s; authors
-        treat depletion as negligible. 51V+ at N_V=0.093 was ~20% of empty-cell background after the run and was corrected;
+      note: Temperature stability within +/-0.5 C. Ideal-orifice surface-depletion calculation at 1600 C assuming effective
+        evaporation area/orifice area=324 gives Fe 1% depletion time >=1e5 s; authors treat depletion as negligible (published
+        p.3054, section 4.2). Empty-cell 51V+ background was about 20% of the sample signal at N_V=0.093 and was corrected;
         at N_V=0.201 the correction was <5%.
   evidence:
     class:
@@ -651,7 +666,7 @@ observations:
     note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_liquidus_solidus_1600c
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: unknown
@@ -674,6 +689,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'liquidus_and_solidus_at_1600C'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -718,6 +734,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient_infinite_dilution';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -804,6 +821,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, cited, equation_as_printed,
       gamma0_V, N_V_less_than, V_wt_percent_greater_than'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -848,6 +866,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient_infinite_dilution';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -891,6 +910,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -912,7 +932,7 @@ observations:
     note: Table 1 chemical composition of Fe, V, Cr starting metals
   read_from: pdf:kems-119-furukawa-1975
 - observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::2
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
       tag: value
@@ -977,6 +997,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
       T_K, T_K_conversion, composition_basis, ion_ratio, n_rows, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1009,7 +1030,7 @@ observations:
         table: '2'
         note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
 - observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
       tag: value
@@ -1074,6 +1095,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
       T_K, T_K_conversion, composition_basis, columns_as_printed, n_rows, mole_fraction_sum_note, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

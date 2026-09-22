@@ -49,7 +49,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -123,7 +126,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -198,7 +204,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -247,7 +256,16 @@ experiments:
   method:
     tag: value
     value: tabulation
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: basalt
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 10017 Initial column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
@@ -306,7 +324,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -355,7 +376,16 @@ experiments:
   method:
     tag: value
     value: tabulation
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: breccia
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 10073 Initial column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
@@ -414,7 +444,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -489,7 +522,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -564,7 +600,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -639,7 +678,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -688,7 +730,16 @@ experiments:
   method:
     tag: value
     value: tabulation
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: basalt
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 12022 Initial column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
@@ -747,7 +798,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -822,7 +876,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -897,7 +954,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -972,7 +1032,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.0002666447368421052631578947368'
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -1021,7 +1084,16 @@ experiments:
   method:
     tag: value
     value: tabulation
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: soil
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 Initial† column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
@@ -1049,3 +1121,149 @@ experiments:
     table: '2'
     paragraph: K row; 14163 Initial† column
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::lunar-volatilization-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermal_volatilization' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Sample weight was recorded but no numerical mass is printed
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2005
+        table: '2'
+        note: Multiple sample types and compositions; elemental rows remain on observations
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    form:
+      state:
+        tag: value
+        value: powdered lunar samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed 2 x 10^-6 Torr; unit conversion only
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: No distinct base-pressure history printed
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated at 4 or 6 C/min to 950
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Most runs held 2 h; one 950/1050 C set held 1-72 h; no universal duration
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    cooling_or_quench:
+      state:
+        tag: value
+        value: normal cooling curve; 1400 C to room temperature required 4 h
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+benches:
+- id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Mettler recording vacuum thermal analyzer
+    locator:
+      published_page: 2004
+      section: Experimental procedures
+      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: platinum crucible
+    locator:
+      published_page: 2004
+      section: Experimental procedures
+      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  detector:
+    state:
+      tag: value
+      value: continuously recorded sample weight
+    locator:
+      published_page: 2004
+      section: Experimental procedures
+      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  other_facts: []

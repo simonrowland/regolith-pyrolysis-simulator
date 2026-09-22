@@ -1,0 +1,755 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
+observations:
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_abstract_factor3_model_accuracy
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'model_accuracy_factor'
+    species:
+      formula: VapoRock
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_accuracy_factor'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    section: abstract
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::4
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source temperature_range_K [1500, 3000]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: no mapped numeric p_partial selected; temperature_range_K [1500, 3000] is a temperature domain, not
+      the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 22
+    pdf_page_index: 22
+    figure: '4'
+    section: '4.3'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_demaria_lunar_kems_scope
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, attribution,
+      source_measurement, samples, heated_to_K, pO2_determined_range_K, comparison_range_used_by_VapoRock_K, stated_uncertainty,
+      raw_pressure_points'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: De Maria et al. 1971 KEMS measurements summarized by Wolf et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 12
+    pdf_page_index: 12
+    figure: '2'
+    section: '3.3'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_eq9_sio_sio2_fo2_proxy
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: VapoRock
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, method_class, generator, evidence_class,
+      gas_reaction, logK_expression, proxy_expression'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 25
+    pdf_page_index: 25
+    section: '4.5'
+    equation: '9'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_hastie_kems_scope_and_uncertainty
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::1
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, attribution,
+      source_measurement, temperature_ranges_K, stated_uncertainty, raw_pressure_points'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Hastie et al. 1981 and Hastie & Bonnell 1985, 1986 KEMS measurements summarized by Wolf et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    figure: '1'
+    section: '3.2'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_illite_and_srm_activity_fits
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: VapoRock
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, generator,
+      evidence_class, illite, SRM_621, model_comparison'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 11
+    pdf_page_index: 11
+    section: '3.2'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_basalt_12065_composition_compiled
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_major_oxide_composition'
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4907365012400076206880491387'
+        - - MgO
+          - '0.1220572612383703434509613227'
+        - - Al2O3
+          - '0.06200702926658935573310827424'
+        - - TiO2
+          - '0.02630843346455530792127123855'
+        - - FeO
+          - '0.173022050285844642027681695'
+        - - CaO
+          - '0.1203704733017293304583815388'
+        - - Na2O
+          - '0.00274048513484628247126932044'
+        - - K2O
+          - '0.000487525415712266909414167384'
+        - - MnO
+          - '0.002270240652344850339863304047'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_major_oxide_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 14
+    pdf_page_index: 14
+    table: '2'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_vaporock_activity_fits
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: VapoRock
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, generator,
+      evidence_class, composition, ln_gamma_NaO05, ln_gamma_KO05, gamma_KO05_over_gamma_NaO05, model_comparison'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 12
+    pdf_page_index: 12
+    section: '3.3'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table2_model_compositions
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_major_oxide_composition'
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_major_oxide_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 14
+    pdf_page_index: 14
+    table: '2'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'model_elemental_vapor_abundance'
+    species:
+      formula: external_KEMS
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_elemental_vapor_abundance'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 17
+    pdf_page_index: 17
+    table: '3'
+    section: '3.4'
+  read_from: unknown:kems-039-wolf-2023-vaporock
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+        table: '3'
+        section: '3.4'
+- observation_id: kems-039-wolf-2023-vaporock::wolf_2023_vaporock_system_and_species
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'model_system_and_vapor_species'
+    species:
+      formula: VapoRock
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_system_and_vapor_species'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-039-wolf-2023-vaporock
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    table: '1'
+    section: '2.2'
+  read_from: unknown:kems-039-wolf-2023-vaporock

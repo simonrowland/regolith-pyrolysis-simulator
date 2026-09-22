@@ -23,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -63,6 +64,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'alpha_25Mg_24Mg'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -101,6 +103,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'JMg'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -141,6 +144,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'alpha_29Si_28Si'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -179,6 +183,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'JSi'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -194,44 +199,6 @@ observations:
   locator:
     published_page: 11
     paragraph: average evaporation rates JSi
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
-  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
-- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_table1_sample_geometry_readable_columns
-  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::1
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'readable_table1_experimental_conditions'
-    species:
-      formula: total
-      phase:
-        tag: unknown
-        reason: phase string 'CAI4B2_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'readable_table1_experimental_conditions'; refusing
-      to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: mendybaev-2021-cai-low-pressure-h2-evap
-  locator:
-    published_page: 28
-    table: '1'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
   read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
 - observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_weight_loss_rates_by_arm
@@ -255,6 +222,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_area_normalized_total_weight_loss_rate';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

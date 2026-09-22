@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-066-ichise-1977.yaml
 observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_1600C_fig4_extrapolation_rejected
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -66,7 +67,7 @@ observations:
         note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
           and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
 - observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -92,6 +93,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -124,7 +126,7 @@ observations:
         table: '1'
         note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
 - observation_id: kems-066-ichise-1977::ichise_1977_eq10_11_ion_ratio_integrand_1400C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -147,6 +149,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'belton_fruehan_integrand_linear_fit'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -179,7 +182,7 @@ observations:
         equation: 10-11
         note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
 - observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -205,6 +208,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -237,7 +241,7 @@ observations:
         table: '1'
         note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
 - observation_id: kems-066-ichise-1977::ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::10
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -259,6 +263,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -280,7 +285,7 @@ observations:
     note: Fig. 10. Ion ratio according to Equation (36).
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig11_quadratic_Al2O_plot_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::11
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -302,6 +307,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -324,7 +330,7 @@ observations:
     note: Fig. 11. Quadratic plots according to Equation (37).
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::12
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -346,6 +352,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -367,7 +374,7 @@ observations:
     note: Fig. 12. Evaluation of the fragmentation ionization according to Equation (43).
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig2_temperature_correction_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -389,6 +396,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -410,7 +418,7 @@ observations:
     note: Fig. 2. Change in the correcting value with the temperature gradient of the cell holder.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::3
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -432,6 +440,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -453,7 +462,7 @@ observations:
     note: Fig. 3. Effect of the chamber voltage on the ion ratio.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::4
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -475,6 +484,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -496,7 +506,7 @@ observations:
     note: Fig. 4. Experimental results for the Fe-Al alloys.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig5_solidus_liquidus_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::5
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -518,6 +528,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -539,7 +550,7 @@ observations:
     note: Fig. 5. Solidus and liquidus of the Fe-Al alloy.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig6_integration_curve_1400C_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::6
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -561,6 +572,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -583,7 +595,7 @@ observations:
     note: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig7_activities_1400C_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::7
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -605,6 +617,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -627,7 +640,7 @@ observations:
     note: Fig. 7. Activities in the Fe-Al alloy at 1400 C.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::8
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -649,6 +662,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -671,7 +685,7 @@ observations:
     note: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::9
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -693,6 +707,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -738,6 +753,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -769,7 +785,7 @@ observations:
         table: '2'
         note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_this_study_1600C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -792,6 +808,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -824,7 +841,7 @@ observations:
         table: '2'
         note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_from_Al2O_ratio_rejected
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -847,6 +864,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -880,7 +898,7 @@ observations:
         note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour of the ion-intensity-ratio
           (Belton-Fruehan) value
 - observation_id: kems-066-ichise-1977::ichise_1977_ion_ratio_NAl_0p5_1470C_30V
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: value
@@ -945,6 +963,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, N_Al,
       composition_basis, ionizing_voltage_V, I_Al_plus, I_Al2O_plus, I_AlO_plus, I_Al2_plus, ratio_as_printed, authors_assignment'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -976,7 +995,7 @@ observations:
         section: '2.5'
         note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
 - observation_id: kems-066-ichise-1977::ichise_1977_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -999,6 +1018,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1023,7 +1043,7 @@ observations:
       captions only.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_limiting_molar_heat_of_mixing_Al
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -1046,6 +1066,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'limiting_molar_heat_of_mixing'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1068,7 +1089,7 @@ observations:
       for the liquid alloy
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_ln_gamma_al_temperature_equations
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -1094,6 +1115,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_temperature_composition_equation';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1116,7 +1138,7 @@ observations:
     note: eqs (24) solid N_Al <= 0.33; (25) liquid N_Al <= 0.17; also English synopsis p. 417
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_ln_gamma_fe_temperature_equations
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: unknown
@@ -1142,6 +1164,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_temperature_equation'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1166,7 +1189,7 @@ observations:
       440/T - 4.30
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_p_Al2O_p_Al_1500C_author_estimate
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
     quantity:
       tag: value
@@ -1231,6 +1254,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, T_C, T_K, N_Al, P_Al2O_Torr,
       P_Al_Torr, P_total_Torr, authors_use'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

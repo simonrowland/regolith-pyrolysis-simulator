@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml
 observations:
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_fractionation_measured_reduced::point:0
-  experiment_id: 10.1016/j.gca.2020.08.011::5a
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -68,6 +68,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_65Cu_63Cu, uncertainty,
       N, intercept_delta65Cu_per_mil, intercept_2SD_per_mil'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -86,7 +87,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_fractionation_measured_reduced::point:1
-  experiment_id: 10.1016/j.gca.2020.08.011::5a
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -151,6 +152,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_65Cu_63Cu, uncertainty,
       N, intercept_delta65Cu_per_mil, intercept_2SD_per_mil'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -169,7 +171,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs
-  experiment_id: 10.1016/j.gca.2020.08.011::1
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -234,6 +236,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, note,
       rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -253,7 +256,7 @@ observations:
     section: modelled logK* values
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs
-  experiment_id: 10.1016/j.gca.2020.08.011::1
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -318,6 +321,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, isotope_reference,
       rows, starting_material, laboratory_conditions'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -336,7 +340,7 @@ observations:
     section: Sample run conditions and Cu abundances/isotope compositions
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model
-  experiment_id: 10.1016/j.gca.2020.08.011::2
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -401,6 +405,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, model,
       assumptions, rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -420,7 +425,7 @@ observations:
     section: standalone elemental zoning profiles
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:0
-  experiment_id: 10.1016/j.gca.2020.08.011::5b
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -485,6 +490,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, uncertainty,
       N, intercept_delta66Zn_per_mil, intercept_2SD_per_mil'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -503,7 +509,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:1
-  experiment_id: 10.1016/j.gca.2020.08.011::5b
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -568,6 +574,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, uncertainty,
       N, intercept_delta66Zn_per_mil, intercept_2SD_per_mil'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -586,7 +593,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:2
-  experiment_id: 10.1016/j.gca.2020.08.011::5b
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -651,6 +658,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, N,
       intercept_forced_through_origin'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -669,7 +677,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:3
-  experiment_id: 10.1016/j.gca.2020.08.011::5b
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -734,6 +742,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, N,
       intercept_forced_through_origin'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -752,7 +761,7 @@ observations:
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_logKstar_model_runs
-  experiment_id: 10.1016/j.gca.2020.08.011::1
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -817,6 +826,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, note,
       selected_rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -836,7 +846,7 @@ observations:
     section: modelled logK* values
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs
-  experiment_id: 10.1016/j.gca.2020.08.011::1
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
       tag: value
@@ -901,6 +911,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, isotope_reference,
       rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:

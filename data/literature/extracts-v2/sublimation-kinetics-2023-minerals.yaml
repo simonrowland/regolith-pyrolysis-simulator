@@ -67,6 +67,7 @@ observations:
   value:
     kind: point
     point: '0.08'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -164,6 +165,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, admission_status, semantics,
       factsage_version, factsage_databases, factsage_method, composition_wt_pct, authors_verdict, demaria_overlay, T_axis_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -250,6 +252,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, admission_status, semantics,
       proxy_systems_as_printed, proxy_system_mole_fractions, legend_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -335,6 +338,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_rate field selected; source fields: quantity, method_class, admission_status,
       semantics, traces_as_printed, construction, printed_1200C_rates_are_in_prose_not_this_figure'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -419,6 +423,7 @@ observations:
   value:
     kind: point
     point: '1'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -505,6 +510,7 @@ observations:
   value:
     kind: point
     point: '1.02'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -535,7 +541,7 @@ observations:
         pdf_page_index: 10
         section: '5'
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:0
-  experiment_id: 10.3390/min13010079::1
+  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
       tag: unknown
@@ -557,6 +563,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -595,7 +602,7 @@ observations:
         pdf_page_index: 1
         paragraph: abstract
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:1
-  experiment_id: 10.3390/min13010079::1
+  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
       tag: unknown
@@ -617,6 +624,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -655,7 +663,7 @@ observations:
         pdf_page_index: 5
         section: '3.1'
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:2
-  experiment_id: 10.3390/min13010079::1
+  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
       tag: unknown
@@ -677,6 +685,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -715,7 +724,7 @@ observations:
         pdf_page_index: 5
         section: '3.1'
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig1_ssa_curve_figure_only
-  experiment_id: 10.3390/min13010079::1
+  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
       tag: unknown
@@ -737,6 +746,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bet_ssa_vs_T_figure'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -756,7 +766,7 @@ observations:
     figure: '1'
   read_from: unknown:sublimation-kinetics-2023-minerals
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig2_micrographs_and_partial_melt
-  experiment_id: 10.3390/min13010079::2
+  experiment_id: 10.3390/min13010079::experiment::lms1-sintering-series
   identity:
     quantity:
       tag: unknown
@@ -779,6 +789,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_melting_observed'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -874,6 +885,7 @@ observations:
   value:
     kind: point
     point: '3.03'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -893,7 +905,7 @@ observations:
     section: '2.2'
   read_from: unknown:sublimation-kinetics-2023-minerals
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_sintering_apparatus
-  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  experiment_id: 10.3390/min13010079::experiment::lms1-sintering-series
   identity:
     quantity:
       tag: unknown
@@ -916,6 +928,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_apparatus_and_pellet_geometry'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1005,6 +1018,7 @@ observations:
   value:
     kind: point
     point: '1.38'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1081,6 +1095,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_major_oxide_composition'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1165,6 +1180,7 @@ observations:
   value:
     kind: point
     point: '0.000000000032'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1265,6 +1281,7 @@ observations:
   value:
     kind: point
     point: '0.0000000014'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1365,6 +1382,7 @@ observations:
   value:
     kind: point
     point: '0.000000031'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1465,6 +1483,7 @@ observations:
   value:
     kind: point
     point: '0.00000013'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1565,6 +1584,7 @@ observations:
   value:
     kind: point
     point: '0.00000046'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1665,6 +1685,7 @@ observations:
   value:
     kind: point
     point: '0.0000015'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1765,6 +1786,7 @@ observations:
   value:
     kind: point
     point: '0.0000046'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1865,6 +1887,7 @@ observations:
   value:
     kind: point
     point: '0.000000056742'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1981,6 +2004,7 @@ observations:
   value:
     kind: point
     point: '0.000002533125'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2097,6 +2121,7 @@ observations:
   value:
     kind: point
     point: '0.000060795'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2213,6 +2238,7 @@ observations:
   value:
     kind: point
     point: '0.0002533125'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2329,6 +2355,7 @@ observations:
   value:
     kind: point
     point: '0.0009220575'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2445,6 +2472,7 @@ observations:
   value:
     kind: point
     point: '0.00303975'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2561,6 +2589,7 @@ observations:
   value:
     kind: point
     point: '0.00952455'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2677,6 +2706,7 @@ observations:
   value:
     kind: point
     point: '0.0000000021'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2775,6 +2805,7 @@ observations:
   value:
     kind: point
     point: '0.00000006'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2873,6 +2904,7 @@ observations:
   value:
     kind: point
     point: '0.00000097'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2971,6 +3003,7 @@ observations:
   value:
     kind: point
     point: '0.0000033'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3069,6 +3102,7 @@ observations:
   value:
     kind: point
     point: '0.00001'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3167,6 +3201,7 @@ observations:
   value:
     kind: point
     point: '0.00003'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3265,6 +3300,7 @@ observations:
   value:
     kind: point
     point: '0.00008'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3363,6 +3399,7 @@ observations:
   value:
     kind: point
     point: '0.000003141075'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3478,6 +3515,7 @@ observations:
   value:
     kind: point
     point: '0.00009220575'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3593,6 +3631,7 @@ observations:
   value:
     kind: point
     point: '0.001519875'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3708,6 +3747,7 @@ observations:
   value:
     kind: point
     point: '0.00547155'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3823,6 +3863,7 @@ observations:
   value:
     kind: point
     point: '0.01722525'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3938,6 +3979,7 @@ observations:
   value:
     kind: point
     point: '0.0506625'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4053,6 +4095,7 @@ observations:
   value:
     kind: point
     point: '0.141855'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4168,6 +4211,7 @@ observations:
   value:
     kind: point
     point: '0.0000000034'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4266,6 +4310,7 @@ observations:
   value:
     kind: point
     point: '0.000000082'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4364,6 +4409,7 @@ observations:
   value:
     kind: point
     point: '0.0000016'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4462,6 +4508,7 @@ observations:
   value:
     kind: point
     point: '0.0000059'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4560,6 +4607,7 @@ observations:
   value:
     kind: point
     point: '0.00002'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4658,6 +4706,7 @@ observations:
   value:
     kind: point
     point: '0.000063'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4756,6 +4805,7 @@ observations:
   value:
     kind: point
     point: '0.00018'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4854,6 +4904,7 @@ observations:
   value:
     kind: point
     point: '0.00000385035'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4970,6 +5021,7 @@ observations:
   value:
     kind: point
     point: '0.000097272'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -5086,6 +5138,7 @@ observations:
   value:
     kind: point
     point: '0.001925175'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -5202,6 +5255,7 @@ observations:
   value:
     kind: point
     point: '0.007396725'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -5318,6 +5372,7 @@ observations:
   value:
     kind: point
     point: '0.0263445'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -5434,6 +5489,7 @@ observations:
   value:
     kind: point
     point: '0.08207325'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -5550,6 +5606,7 @@ observations:
   value:
     kind: point
     point: '0.24318'
+    approximate: false
   uncertainty:
     kind: none
   evidence:

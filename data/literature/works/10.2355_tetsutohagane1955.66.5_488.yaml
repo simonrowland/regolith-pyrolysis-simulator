@@ -37,305 +37,17 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.66.5_488
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 490
-    pdf_page_index: 3
-    table: '1'
-    note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried and abandoned (no reproducible Fe/Si
-          ion-intensity ratio; abundant SiO(g))
-      locator:
-        published_page: 489
-        pdf_page_index: 2
-        section: 2.3-2.4
-        note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 492
-    pdf_page_index: 5
-    table: '2'
-    equation: '8'
-    note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried and abandoned (no reproducible Fe/Si
-          ion-intensity ratio; abundant SiO(g))
-      locator:
-        published_page: 489
-        pdf_page_index: 2
-        section: 2.3-2.4
-        note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 490
-    pdf_page_index: 3
-    figure: '3'
-    note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 490
-    pdf_page_index: 3
-    figure: '4'
-    note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium concentration in the specimen
-      for the deoxidizer.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 491
-    pdf_page_index: 4
-    figure: '5'
-    note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 491
-    pdf_page_index: 4
-    figure: '6'
-    note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 492
-    pdf_page_index: 5
-    figure: '7'
-    note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.66.5_488
-  locator:
-    published_page: 492
-    pdf_page_index: 5
-    figure: '8'
-    note: Fig. 8. Activities for the Fe-Si system at 1600 C.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::9
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -355,59 +67,41 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.66.5_488
   locator:
     published_page: 493
-    pdf_page_index: 6
-    figure: '9'
-    note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
-- experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+    table: '2'
+    note: Quoted investigators' values are not assigned this work's bench
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample:
-    mass_kg:
+    printed_composition:
       state:
-        tag: value
-        value: '0.001'
+        tag: unknown
+        reason: not_published
       locator:
         published_page: 488
-        pdf_page_index: 1
-        section: '2'
-        note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for
-          numerals and English captions only.
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=1.0 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 488
-              pdf_page_index: 1
-              section: '2'
-              note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed
-                for numerals and English captions only.
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 488
-              pdf_page_index: 1
-              section: '2'
-              note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed
-                for numerals and English captions only.
-        output_unit: kg
+        section: Synopsis
+        note: N_Si spans 0.05 to 0.5; no single series charge composition
+    form:
+      state:
+        tag: value
+        value: Fe-Si charge with trace Th added as Fe-Th alloy
+      locator:
+        published_page: 489
+        section: '2.3'
+    pretreatment:
+      state:
+        tag: value
+        value: Pure Fe deoxidized in an alumina crucible under high vacuum before charging
+      locator:
+        published_page: 489
+        section: '2.2'
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -427,10 +121,8 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.66.5_488
   locator:
     published_page: 488
-    pdf_page_index: 1
-    section: '2'
-    note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for numerals
-      and English captions only.
+    section: Synopsis
+    note: This-work Fe-Si KEMS measurements at 1600 C
   apparatus:
     cell_material_and_liner:
       state:
@@ -442,3 +134,57 @@ experiments:
         pdf_page_index: 2
         section: 2.3-2.4
         note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 490
+          section: '3.1'
+          note: The source prints varying 0.4-0.7 mm diameters without a run assignment; no area computed
+  bench_id: 10.2355/tetsutohagane1955.66.5_488::bench::rm6k
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1873.15'
+            approximate: false
+        locator:
+          published_page: 488
+          section: Synopsis
+          note: Printed 1600 C
+benches:
+- id: 10.2355/tetsutohagane1955.66.5_488::bench::rm6k
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  identity:
+    basis: cited_by_author
+    ref:
+      cited_as: Yamada and Kato (1977), reference 2
+      for_parameters:
+      - apparatus_family
+      - temperature_measurement
+      locator:
+        published_page: 489
+        section: 2.3 Experimental method
+        note: The modified Hitachi RM-6K and thermocouple correction defer to reference 2
+  apparatus_family:
+    state:
+      tag: value
+      value: Modified Hitachi RM-6K Knudsen-cell mass spectrometer
+    locator:
+      published_page: 489
+      section: 2.3 Experimental method
+      note: The modified Hitachi RM-6K and thermocouple correction defer to reference 2
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: W-26%Re/W-5%Re thermocouples at Knudsen-cell top and bottom
+      locator:
+        published_page: 493
+        section: '4.2'
+  other_facts: []

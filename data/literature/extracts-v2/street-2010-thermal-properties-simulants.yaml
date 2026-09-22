@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/street-2010-thermal-properties-simulants.yaml
 observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_anorthosite_water_mass_loss_0p1_pct
-  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-series
   identity:
     quantity:
       tag: unknown
@@ -22,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'mass_loss'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -63,6 +64,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'thermal_program_and_apparatus'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -82,7 +84,7 @@ observations:
     section: Equipment / Results
   read_from: pdf:street-2010-thermal-properties-simulants
 - observation_id: street-2010-thermal-properties-simulants::street_2010_fig1_jsc1af_dta_tga_figure_only
-  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
       tag: unknown
@@ -101,6 +103,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_tga_curves'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -126,7 +129,7 @@ observations:
     figure: '1'
   read_from: pdf:street-2010-thermal-properties-simulants
 - observation_id: street-2010-thermal-properties-simulants::street_2010_fig3_nulht2m_dta_tga_figure_only
-  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::3
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
       tag: unknown
@@ -145,6 +148,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_tga_curves'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -170,7 +174,7 @@ observations:
     figure: '3'
   read_from: pdf:street-2010-thermal-properties-simulants
 - observation_id: street-2010-thermal-properties-simulants::street_2010_jsc1af_tga_ftir_windows
-  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-ftir-series
   identity:
     quantity:
       tag: unknown
@@ -190,6 +194,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_temperature_windows'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -227,6 +232,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_mineralogy'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -245,7 +251,7 @@ observations:
     section: Discussion JSC-1AF
   read_from: pdf:street-2010-thermal-properties-simulants
 - observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
-  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
       tag: unknown
@@ -268,6 +274,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_transition_temperatures'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

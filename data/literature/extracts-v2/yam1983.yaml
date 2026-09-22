@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/yam1983.yaml
 observations:
 - observation_id: yam1983::yam1983_na2o_prose_activity_range
-  experiment_id: 10.2320/jinstmet1952.47.9_736::yam1983
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
   identity:
     quantity:
       tag: unknown
@@ -28,6 +28,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_range'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -47,7 +48,7 @@ observations:
     paragraph: English abstract + 結言 (p.741)
   read_from: pdf:yam1983
 - observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B
-  experiment_id: 10.2320/jinstmet1952.47.9_736::1
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
   identity:
     quantity:
       tag: unknown
@@ -73,6 +74,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -100,7 +102,7 @@ observations:
       reference melt, not a binary X_Na2O.'
   read_from: pdf:yam1983
 - observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B
-  experiment_id: 10.2320/jinstmet1952.47.9_736::2
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
   identity:
     quantity:
       tag: unknown
@@ -123,6 +125,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_gibbs_duhem_from_Na2O'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

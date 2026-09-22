@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-088-ichise-1975.yaml
 observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3
-  experiment_id: 10.2355/isijinternational1966.15.115::3
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -49,7 +50,7 @@ observations:
     note: Table 3. Interaction parameter of sulfur in liquid iron
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fe_heat_of_vaporization_fig8
-  experiment_id: 10.2355/isijinternational1966.15.115::8
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -71,6 +72,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vaporization'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -94,7 +96,7 @@ observations:
     note: ln(I_Fe+ T) vs 1/T for pure iron; slope gives 82.4 kcal/g-atom from 1484 to 1584 C
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig10_e_S_comparison_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::10
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -116,6 +118,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -138,7 +141,7 @@ observations:
     note: Fig. 10. Interaction parameters of sulfur in liquid iron
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig1_chamber_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::1
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -160,6 +163,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -181,7 +185,7 @@ observations:
     note: Fig. 1. Knudsen cell chamber
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig2_cell_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::2
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -203,6 +207,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -224,7 +229,7 @@ observations:
     note: Fig. 2. Knudsen cell and cell holder
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::3
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -246,6 +251,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -267,7 +273,7 @@ observations:
     note: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig4_integration_1550C_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::4
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -289,6 +295,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -311,7 +318,7 @@ observations:
     note: Fig. 4. Integration curve for the Fe-S system at 1550 C
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::5
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -333,6 +340,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -355,7 +363,7 @@ observations:
     note: Fig. 5. Integration curve for the Fe-S system at 1600 C
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::6
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -377,6 +385,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -399,7 +408,7 @@ observations:
     note: Fig. 6. Integration curve for the Fe-S system at 1650 C
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::7
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -421,6 +430,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -443,7 +453,7 @@ observations:
     note: Fig. 7. Activity coefficient of sulfur in liquid iron
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::8
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -465,6 +475,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -486,7 +497,7 @@ observations:
     note: Fig. 8. Experimental results for pure iron
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_fig9_holder_heating_figure_only
-  experiment_id: 10.2355/isijinternational1966.15.115::9
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -509,6 +520,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -530,7 +542,7 @@ observations:
     note: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total emission current: 0.68 A)'
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2
-  experiment_id: 10.2355/isijinternational1966.15.115::2
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: value
@@ -595,6 +607,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, composition_basis,
       points'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -616,7 +629,7 @@ observations:
     note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_kems_geometry_and_calibration
-  experiment_id: 10.2355/isijinternational1966.15.115::2
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -639,6 +652,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -661,7 +675,7 @@ observations:
     note: Hitachi RM-6K; alumina cell / Ta holder; ~10 g; chamber voltage 30 V; cell chamber (4-6)e-6 Torr
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
-  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -684,6 +698,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'belton_fruehan_integrand_linear_fit'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -706,7 +721,7 @@ observations:
     note: LS fits of (1-N_S)/(2-N_S) vs ln(I_Fe+ N_S^2 / I_S2+ N_Fe)
   read_from: pdf:kems-088-ichise-1975
 - observation_id: kems-088-ichise-1975::ichise_1975_table1_pure_iron_composition
-  experiment_id: 10.2355/isijinternational1966.15.115::1
+  experiment_id: 10.2355/isijinternational1966.15.115::experiment::fes-kems-series
   identity:
     quantity:
       tag: unknown
@@ -729,6 +744,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_chemical_analysis'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

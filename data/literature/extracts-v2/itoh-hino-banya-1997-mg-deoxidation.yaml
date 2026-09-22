@@ -2,48 +2,6 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml
 observations:
-- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_experimental_setup
-  experiment_id: 10.2355/tetsutohagane1955.83.10_623::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_run_conditions'
-    species:
-      formula: Mg
-      phase:
-        tag: unknown
-        reason: phase string 'liquid_iron_with_dissolved_Mg_and_O' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_run_conditions'; refusing to pick
-      a number
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numerical uncertainty is printed for the apparatus dimensions, concentrations, or analysis results in the cited
-        section.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: itoh-hino-banya-1997-mg-deoxidation
-  locator:
-    published_page: 624
-    pdf_page_index: 2
-    figure: '2'
-    section: 2. Experimental method
-  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
 - observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_present_work_parameters
   experiment_id: 10.2355/tetsutohagane1955.83.10_623::1
   identity:
@@ -68,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'Mg_deoxidation_thermodynamic_parameters'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -114,6 +73,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'prior_Mg_deoxidation_parameters'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -158,6 +118,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_Mg_and_O_concentration'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

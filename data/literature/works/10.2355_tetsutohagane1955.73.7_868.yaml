@@ -38,62 +38,17 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.73.7_868
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::1
+- experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::cited-results
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 869
-    pdf_page_index: 2
-    table: '1'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
-      locator:
-        published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -113,9 +68,8 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.73.7_868
   locator:
     published_page: 872
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2. Miscibility gap in Fe-Sn system.
+    figure: '1'
+    note: Literature comparison; not this work's bench
   apparatus:
     cell_material_and_liner:
       state:
@@ -129,63 +83,43 @@ experiments:
         section: '2.1'
         note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
           Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::3
+- experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 873
-    pdf_page_index: 6
-    table: '3'
-    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
-  apparatus:
-    cell_material_and_liner:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
       state:
         tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
+        value:
+          kind: point
+          point: '0.0017'
+          approximate: true
       locator:
         published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+        section: 2.2 Sample
+        note: About 1.7 g
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 868-869
+        section: Synopsis/2.2 Sample
+        note: Composition range is not a single charge composition
+    pretreatment:
+      state:
+        tag: value
+        value: Fe 1500 C for 4 h and Sn 1000 C for 12 h in H2 flow; alloys arc melted
+      locator:
+        published_page: 869
+        section: 2.2 Sample
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -205,9 +139,8 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.73.7_868
   locator:
     published_page: 868
-    pdf_page_index: 1
-    figure: '5'
-    note: Synopsis and Fig. 5 label ~1495 C; not a Table 2 row
+    section: Synopsis
+    note: This-work Fe-Sn measurements
   apparatus:
     cell_material_and_liner:
       state:
@@ -221,186 +154,18 @@ experiments:
         section: '2.1'
         note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
           Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 872
-    pdf_page_index: 5
-    figure: '6'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
-      locator:
-        published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 874
-    pdf_page_index: 7
-    figure: '7'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
-      locator:
-        published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::8
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 874
-    pdf_page_index: 7
-    figure: '8'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
-      locator:
-        published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
-- experiment_id: 10.2355/tetsutohagane1955.73.7_868::kems-116-nunoue-1987
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.73.7_868
-  locator:
-    published_page: 869
-    pdf_page_index: 2
-    section: 2.1 / 2.2
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S): inner diameter 9 mm, outer diameter 11 mm, height
-          12 mm, orifice about 0.3 mm. Hitachi RM-6E Knudsen-cell mass spectrometer. W-26%Re/W-5%Re thermocouples at top and
-          bottom of the cell susceptor, calibrated at the melting points of pure Ni and pure Fe (Kato and Furukawa, ref 8).'
-      locator:
-        published_page: 869
-        pdf_page_index: 2
-        section: '2.1'
-        note: Japanese experimental section; cell dimensions and instrument IDs transcribed from the printed numerals and
-          Latin-script tokens
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0003'
+            approximate: true
+        locator:
+          published_page: 869
+          section: 2.1 Apparatus
+          note: About 0.3 mm; no effective area computed
     ionization:
       ionizing_energy:
         state:
@@ -410,3 +175,74 @@ experiments:
           published_page: 869
           pdf_page_index: 2
           section: 2.1 / 2.2
+  bench_id: 10.2355/tetsutohagane1955.73.7_868::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1473.15'
+            interval_high: '1873.15'
+            approximate: false
+        locator:
+          published_page: 868
+          section: Synopsis
+          note: Printed 1200-1600 C
+benches:
+- id: 10.2355/tetsutohagane1955.73.7_868::bench::rm6e
+  work_id: 10.2355/tetsutohagane1955.73.7_868
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hitachi RM-6E Knudsen-cell mass spectrometer
+    locator:
+      published_page: 869
+      section: 2.1 Apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: High-purity alumina SSA-S Knudsen cell
+    locator:
+      published_page: 869
+      section: 2.1 Apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.009'
+            approximate: false
+        locator:
+          published_page: 869
+          section: 2.1 Apparatus
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 869
+          section: 2.1 Apparatus
+          note: Printed 12 mm cell height is not separately identified as internal depth
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: W-26%Re/W-5%Re thermocouples at upper and lower cell positions
+      locator:
+        published_page: 869
+        section: 2.1 Apparatus
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Calibrated at pure Ni and pure Fe melting points
+      locator:
+        published_page: 869
+        section: 2.1 Apparatus
+  other_facts: []

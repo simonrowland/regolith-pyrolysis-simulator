@@ -137,74 +137,6 @@ experiments:
     line_range: 174-176
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-- experiment_id: 10.2320/jinstmet1952.30.6_515::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '1.333223684210526315789473684'
-      locator:
-        paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-        line_range: '29'
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.01 mmHg
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.01'
-            locator:
-              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              line_range: '29'
-              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              line_range: '29'
-              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2320/jinstmet1952.30.6_515
-  locator:
-    table: '4'
-    paragraph: English abstract specific evaporation constants
-    line_range: 5-7
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
-      locator:
-        paragraph: 市販アルミナるつぼ (CP-2)
-        line_range: '27'
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - experiment_id: 10.2320/jinstmet1952.30.6_515::4, 5
   kind: literature
   method:
@@ -265,9 +197,8 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2320/jinstmet1952.30.6_515
   locator:
+    page: '519'
     table: '5'
-    line_range: 216-218
-    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   kind: literature
   method:
@@ -311,7 +242,10 @@ experiments:
       exposed_area_m2:
         state:
           tag: value
-          value: '0.0011341149'
+          value:
+            kind: point
+            point: '0.0011341149'
+            approximate: false
         locator:
           paragraph: commercial alumina crucible CP-2 ID 38 mm
           source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
@@ -332,3 +266,229 @@ experiments:
                 paragraph: commercial alumina crucible CP-2 ID 38 mm
                 source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
           output_unit: m2
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::alloy-vacuum-evaporation-series
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Fe-Mn, Fe-C-Mn, Fe-Cu, or Fe-Sn master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.333223684210526315789473684'
+          approximate: false
+      locator:
+        paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+        line_range: '29'
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.01 mmHg
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+      locator:
+        paragraph: 市販アルミナるつぼ (CP-2)
+        line_range: '27'
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+benches:
+- id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  work_id: 10.2320/jinstmet1952.30.6_515
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: VIF-II high-frequency vacuum induction furnace
+    locator:
+      page: 516
+      section: II. Experimental method
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: commercial alumina crucible CP-2
+    locator:
+      page: 516
+      section: II. Experimental method
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.038'
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed inner diameter 38 mm; unit conversion only
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed height 100 mm; unit conversion only
+  pumping_type:
+    state:
+      tag: value
+      value: oil rotary pump and oil diffusion pump
+    locator:
+      page: 516
+      section: II. Experimental method
+  heating_method:
+    state:
+      tag: value
+      value: high-frequency induction
+    locator:
+      page: 516
+      section: II. Experimental method
+  other_facts:
+  - name: oil_rotary_pump_speed
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '450'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+    unit: L/h
+  - name: oil_diffusion_pump_speed
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+    unit: L/s
+  - name: crucible_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '49'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+    unit: mm

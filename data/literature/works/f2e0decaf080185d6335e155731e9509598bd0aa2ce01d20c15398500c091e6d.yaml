@@ -1,0 +1,381 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  citation: 'Wolf, A. S., Jäggi, N., Sossi, P. A. & Bower, D. J. (2023), "VapoRock: Thermodynamics of vaporized silicate melts
+    for modeling volcanic outgassing and magma ocean atmospheres", The Astrophysical Journal, arXiv:2208.09582v2.'
+  source_ids:
+  - kems-039-wolf-2023-vaporock
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:kems-039-wolf-2023-vaporock
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::1
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    table: '1'
+    section: '2.2'
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.06200702926658935573310827424'
+          - - CaO
+            - '0.1203704733017293304583815388'
+          - - FeO
+            - '0.173022050285844642027681695'
+          - - K2O
+            - '0.000487525415712266909414167384'
+          - - MgO
+            - '0.1220572612383703434509613227'
+          - - MnO
+            - '0.002270240652344850339863304047'
+          - - Na2O
+            - '0.00274048513484628247126932044'
+          - - SiO2
+            - '0.4907365012400076206880491387'
+          - - TiO2
+            - '0.02630843346455530792127123855'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.05'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.73'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.76'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.073'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.82'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.256'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.87'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.34'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 14
+              pdf_page_index: 14
+              table: '2'
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.05'
+          CaO: '10.73'
+          FeO: '19.76'
+          K2O: '0.073'
+          MgO: '7.82'
+          MnO: '0.256'
+          Na2O: '0.27'
+          SiO2: '46.87'
+          TiO2: '3.34'
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  locator:
+    published_page: 12
+    pdf_page_index: 12
+    figure: '2'
+    section: '3.3'
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::3
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  locator:
+    published_page: 17
+    pdf_page_index: 17
+    table: '3'
+    section: '3.4'
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::4
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  locator:
+    published_page: 22
+    pdf_page_index: 22
+    figure: '4'
+    section: '4.3'
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    section: abstract

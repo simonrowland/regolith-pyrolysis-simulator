@@ -2,46 +2,8 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
 observations:
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_apparatus_and_conditions
-  experiment_id: 10.1016/j.gca.2025.01.020::/Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparatus_and_laboratory_conditions'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparatus_and_laboratory_conditions'; refusing
-      to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 210
-    section: Experimental procedure
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
 - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-  experiment_id: 10.1016/j.gca.2025.01.020::/Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+  experiment_id: 10.1016/j.gca.2025.01.020::experiment::icb-series
   identity:
     quantity:
       tag: unknown
@@ -60,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -100,6 +63,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_material_composition'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -117,199 +81,4 @@ observations:
     table: '1'
     section: Experimental procedure
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb1
-  experiment_id: 10.1016/j.gca.2025.01.020::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_conditions_and_melt_composition'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
-    original_method_class: measured_tabulated
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 212
-    table: '2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-    record: ICB-1
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb2
-  experiment_id: 10.1016/j.gca.2025.01.020::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_conditions_and_melt_composition'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
-    original_method_class: measured_tabulated
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 212
-    table: '2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-    record: ICB-2
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb3
-  experiment_id: 10.1016/j.gca.2025.01.020::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_conditions_and_melt_composition'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
-    original_method_class: measured_tabulated
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 212
-    table: '2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-    record: ICB-3
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb4_to_icb7
-  experiment_id: 10.1016/j.gca.2025.01.020::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_conditions_and_melt_composition'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
-    original_method_class: measured_tabulated
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 212
-    table: '2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-    record: ICB-4_to_ICB-7
-  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb8_to_icb10
-  experiment_id: 10.1016/j.gca.2025.01.020::2
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'experimental_conditions_and_melt_composition'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
-    original_method_class: measured_tabulated
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 212
-    table: '2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-    record: ICB-8_to_ICB-10
   read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts

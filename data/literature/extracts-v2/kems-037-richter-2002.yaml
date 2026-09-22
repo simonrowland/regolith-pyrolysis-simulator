@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-037-richter-2002.yaml
 observations:
 - observation_id: kems-037-richter-2002::richter_2002_mg_cai_langmuir_gamma
-  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
   identity:
     quantity:
       tag: value
@@ -67,6 +67,7 @@ observations:
   value:
     kind: point
     point: '0.04'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -89,7 +90,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
 - observation_id: kems-037-richter-2002::richter_2002_mg_table1_per_run_areas_b1
-  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
   identity:
     quantity:
       tag: value
@@ -153,6 +154,7 @@ observations:
   value:
     kind: point
     point: '0.04'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -171,7 +173,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
 - observation_id: kems-037-richter-2002::richter_2002_sio_cai_langmuir_gamma
-  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
   identity:
     quantity:
       tag: unknown
@@ -194,6 +196,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -212,7 +215,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
 - observation_id: kems-037-richter-2002::richter_2002_sio_table1_per_run_areas_b1
-  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+  experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
   identity:
     quantity:
       tag: unknown
@@ -235,6 +238,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

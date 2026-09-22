@@ -19,205 +19,325 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1038/nature23645
 experiments:
-- experiment_id: 10.1038/nature23645::2
+- experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'stirred_one_atmosphere_CO_CO2_vaporisation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/nature23645
-  locator:
-    pdf_page_index: 15
-    figure: '2'
-    note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
-- experiment_id: 10.1038/nature23645::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'stirred_one_atmosphere_CO_CO2_vaporisation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/nature23645
-  locator:
-    pdf_page_index: 16
-    figure: '3'
-    note: Volatility-factor plot; values retained as figure-only and not read off the graph.
-- experiment_id: 10.1038/nature23645::4a,b
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'comparison_of_measured_volatility_with_BSE_abundance' is not a closed method token (kems_effusion alone
-      is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/nature23645
-  locator:
-    pdf_page_index: 17
-    figure: 4a,b
-    note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
-- experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'stirred_one_atmosphere_gas_mixing_furnace' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: quench_equilibration
   sample:
     mass_kg:
       state:
         tag: value
-        value: '0.003'
+        value:
+          kind: point
+          point: '0.003'
+          approximate: false
       locator:
         pdf_page_index: 11
         section: Methods
-        note: Starting-material preparation and piston-cylinder characterisation.
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=3 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '3'
-            locator:
-              pdf_page_index: 11
-              section: Methods
-              note: Starting-material preparation and piston-cylinder characterisation.
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 11
-              section: Methods
-              note: Starting-material preparation and piston-cylinder characterisation.
-        output_unit: kg
+        note: Printed 3 g; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Natural Reykjanes Ridge basalt plus trace-element oxide mixture
+      locator:
+        pdf_page_index: 11
+        section: Methods
+    form:
+      state:
+        tag: value
+        value: 12 mm diameter pressed pellet
+      locator:
+        pdf_page_index: 11
+        section: Methods
+    pretreatment:
+      state:
+        tag: value
+        value: Basalt crushed and ground; 60 g stored in desiccator
+      locator:
+        pdf_page_index: 11
+        section: Methods
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 11
+        section: Methods
+        note: Printed 1300 C; unit conversion only
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         pdf_page_index: 3
         section: Experimental apparatus
-        note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods on
-          PDF page 11.
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1 atm
-        - printed=total_pressure_atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              pdf_page_index: 3
-              section: Experimental apparatus
-              note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods
-                on PDF page 11.
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              pdf_page_index: 3
-              section: Experimental apparatus
-              note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods
-                on PDF page 11.
-        output_unit: Pa
+        note: Printed one atmosphere; unit conversion only
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Methods
+        note: Flowing CO/CO2 mixture printed
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.1038/nature23645
+  locator:
+    pdf_page_index: 11
+    section: Methods
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Methods
+  bench_id: 10.1038/nature23645::bench::stirred-gas-mixing-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        pdf_page_index: 4
+        section: Experimental vaporisation experiments
+        note: Printed 60 min; unit conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Drop quench into water bath
+      locator:
+        pdf_page_index: 11
+        section: Methods
+benches:
+- id: 10.1038/nature23645::bench::stirred-gas-mixing-furnace
+  work_id: 10.1038/nature23645
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: One-atmosphere gas-mixing furnace with stirring apparatus
+    locator:
+      pdf_page_index: 3
+      section: Experimental apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: High-purity nickel crucible and stirrer mechanism
+    locator:
+      pdf_page_index: 11
+      section: Methods
+  geometry:
+    cell_internal_dimensions:
+      volume_m3:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000045'
+            approximate: false
+        locator:
+          pdf_page_index: 11
+          section: Methods
+          note: Printed 4.5 cm3 crucible capacity; unit conversion only
+  detector:
+    state:
+      tag: value
+      value: EDS and LA-ICP-MS
+    locator:
+      pdf_page_index: 12
+      section: Analysis
+  heating_method:
+    state:
+      tag: value
+      value: Molybdenum-disilicide heating elements
+    locator:
+      pdf_page_index: 11
+      section: Methods
+  other_facts: []
+context:
+- observation_id: norris_2017_analytical_measurement_performance
+  experiment: volatile-loss-series
+  type: apparatus
+  locator:
+    pdf_page_index: 12
+    section: Analysis
+    note: SEM/EDS and LA-ICP-MS operating and calibration conditions.
+  phase: quenched_basaltic_glass
+  regime: post_experiment_composition_analysis
+  units: as printed
+  values:
+    quantity: analytical_conditions
+    method_class: measured_direct
+    evidence_class: measured_direct
+    authors_own_experiment: true
+    sem: FEI Quanta FEG 650
+    eds: Oxford X-MaxN standard-less EDS
+    eds_voltage_kV: 20
+    eds_spot_diameter_um: less than 1
+    eds_beam_current_nA: 3
+    standards: GSE-1G, GSD-1G, GSC-1G, and MPI Ding basaltic glasses
+    la_icp_ms_laser: 213 nm Nd:YAG New Wave Research
+    icp: Perkin Elmer NexION 400Q
+    nebulizer_gas_flow_ml_per_min: 450
+    helium_flow_ml_per_min: 800
+    primary_calibration_standard: USGS basaltic glass GSE-1G
+    internal_standard: 43Ca
+    laser_frequency_Hz: 5
+    laser_spot_diameter_um: 50
+    laser_fluence_J_per_cm2: 4
+    laser_scan_speed_um_per_s: 3
+    laser_scan_length_um: 180
+    signal_duration_s: 60
+    cell_washout_s: 120
+    gas_blank_s: 20
+    standards_interval_min: 45
+    quantified_isotopes:
+    - 107Ag
+    - 209Bi
+    - 111Cd
+    - 53Cr
+    - 65Cu
+    - 71Ga
+    - 74Ge
+    - 115In
+    - 95Mo
+    - 208Pb
+    - 121Sb
+    - 118Sn
+    - 203Tl
+    - 51V
+    - 182W
+    - 66Zn
+    overlap_correction: less than 0.1% correction for 115Sn on 115In
+    detection_limit_ug_per_g: below 0.1 for most elements
+  uncertainty:
+    major_element_precision_RSD_percent: approximately 2
+    trace_element_precision_RSD_percent: approximately 5-10
+    high_concentration_elements: Ag, Ga, In, Mo, Pb, Sn, W, Zn
+    high_concentration_intra_spot_RSD_percent: less than 5
+    intermediate_variation_elements: Bi, Cd, Cu, Ge, Sb, Tl
+    intermediate_variation_RSD_percent: 10-15
+    most_depleted_element_intra_spot_RSD_percent: 25 for Bi, Ge, and Sb
+    diffusion_into_nickel_max_distance_um: 200
+    diffusion_worst_case_melt_volume_percent: no more than 5
+  context_id: norris-2017-earth-volatiles-nature::context::norris_2017_analytical_measurement_performance
+  work_id: 10.1038/nature23645
+  source_id: norris-2017-earth-volatiles-nature
+  species: basaltic_silicate_melt
+- observation_id: norris_2017_crucible_capacity_disagreement
+  experiment: volatile-loss-series
+  type: apparatus
+  locator:
+    pdf_page_index: 13
+    section: Analysis
+    note: Later sample-description paragraph prints 4.5 mm2; this conflicts with 4.5 cm3 on PDF pages 3 and 11.
+  phase: quenched_basaltic_glass
+  regime: post_experiment_sample_description
+  units: as printed
+  values:
+    quantity: crucible_capacity_conflicting_printed_value
+    method_class: measured_direct
+    evidence_class: measured_direct
+    crucible_capacity_mm2_as_printed: '4.5'
+    disagreement: printed unit/value is inconsistent with the apparatus descriptions' 4.5 cm3; not reconciled
+  uncertainty: {}
+  context_id: norris-2017-earth-volatiles-nature::context::norris_2017_crucible_capacity_disagreement
+  work_id: 10.1038/nature23645
+  source_id: norris-2017-earth-volatiles-nature
+  species: basaltic_silicate_melt
+- observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
+  experiment: volatile-loss-series
+  type: apparatus
   locator:
     pdf_page_index: 3
     section: Experimental apparatus
     note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods on PDF
       page 11.
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: high-purity nickel
-      locator:
-        pdf_page_index: 3
-        section: Experimental apparatus
-        note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods on
-          PDF page 11.
+  phase: natural_Reykjanes_Ridge_basalt_trace_element_doped_silicate_melt
+  regime: stirred_one_atmosphere_gas_mixing_furnace
+  units: as printed
+  values:
+    quantity: apparatus_and_starting_material
+    method_class: measured_direct
+    evidence_class: measured_direct
+    authors_own_experiment: true
+    total_pressure_atm: 1
+    total_pressure_as_printed: one atmosphere
+    crucible_capacity_cm3_as_printed: '4.5'
+    crucible_material: high-purity nickel
+    stirrer_material: high-purity nickel
+    furnace_tube_material: high-purity alumina
+    heating_elements: molybdenum disilicide
+    assembly: entirely gas-tight
+    temperature_capability_C: 1700
+    carrier_gas: CO/CO2
+    gas_mixture: CO/CO2
+    gas_function: oxygen-fugacity control and continuous flushing of vapor from the furnace
+    quench: drop-quenched into a water bath
+    starting_material: natural basalt dredged from the Reykjanes Ridge south of Iceland
+    basalt_preparation: crushed and ground, then mixed with reagent-grade trace-element oxide powders
+    target_trace_element_concentration_ug_per_g: 300-500
+    measured_product_form: homogeneous black glass with no observable gas bubbles
+    composition_measurement: SEM with energy-dispersive detector for major elements; LA-ICP-MS for trace elements
+    homogeneity_checks: SEM BSE imaging, X-ray mapping, and repeated EDS spot analysis
+  uncertainty:
+    major_element_homogeneity_RSD_percent: approximately 2
+    trace_element_homogeneity_RSD_percent: 5-10
+  context_id: norris-2017-earth-volatiles-nature::context::norris_2017_one_atmosphere_stirred_gas_mixing_furnace
+  work_id: 10.1038/nature23645
+  source_id: norris-2017-earth-volatiles-nature
+  species: basaltic_silicate_melt
+- observation_id: norris_2017_starting_material_preparation
+  experiment: volatile-loss-series
+  type: sample_preparation
+  locator:
+    pdf_page_index: 11
+    section: Methods
+    note: Starting-material preparation and piston-cylinder characterisation.
+  phase: natural_Reykjanes_Ridge_basalt_trace_element_doped_powder
+  regime: prepared_basalt_feed
+  units: as printed
+  values:
+    quantity: sample_provenance_and_preparation
+    method_class: measured_direct
+    evidence_class: measured_direct
+    authors_own_experiment: true
+    source_material: natural basalt dredged from the Reykjanes Ridge south of Iceland
+    crusher: Fritsch steel-jaw rock crusher
+    mill: Tema agate disc mill
+    bulk_crushed_mass_g: approximately 500
+    final_prepared_mass_g: 60
+    trace_powders: reagent-grade oxide powders
+    storage: desiccator to maintain dryness
+    starting_composition_characterisation: melted and quenched to glass in a high-pressure piston-cylinder experiment
+    piston_cylinder_pressure_GPa: '1.5'
+    piston_cylinder_temperature_C: 1500
+    piston_cylinder_duration_min: 5
+    piston_cylinder_capsule: graphite
+    sample_mass_g: 3
+    pellet_mass_g: 3
+    pellet_diameter_mm: 12
+    pellet_press: 10 ton press
+  uncertainty: {}
+  context_id: norris-2017-earth-volatiles-nature::context::norris_2017_starting_material_preparation
+  work_id: 10.1038/nature23645
+  source_id: norris-2017-earth-volatiles-nature
+  species: basaltic_silicate_melt

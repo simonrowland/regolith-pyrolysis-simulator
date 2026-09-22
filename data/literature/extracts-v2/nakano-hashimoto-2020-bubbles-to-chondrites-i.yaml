@@ -23,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -41,7 +42,7 @@ observations:
     section: Experimental methods
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups
-  experiment_id: 10.1186/s40645-020-00354-0::3
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -61,6 +62,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_and_corrected_mlb_surface_temperature';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -78,7 +80,7 @@ observations:
     table: '3'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_droplet_and_condensate_characterization
-  experiment_id: 10.1186/s40645-020-00354-0::nakano-hashimoto-2020-bubbles-to-chondrites-i
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -98,6 +100,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -116,7 +119,7 @@ observations:
     note: figures=2-3
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs
-  experiment_id: 10.1186/s40645-020-00354-0::2
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -136,6 +139,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'assembly_mass_loss_relative_to_initial_mass';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -153,7 +157,7 @@ observations:
     table: '2'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_fe
-  experiment_id: 10.1186/s40645-020-00354-0::4
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -173,6 +177,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZFe_over_ZSi'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -190,7 +195,7 @@ observations:
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_k
-  experiment_id: 10.1186/s40645-020-00354-0::4
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -210,6 +215,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZK_over_ZSi'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -227,7 +233,7 @@ observations:
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_na
-  experiment_id: 10.1186/s40645-020-00354-0::4
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -247,6 +253,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZNa_over_ZSi'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -264,7 +271,7 @@ observations:
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_table4
-  experiment_id: 10.1186/s40645-020-00354-0::4
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
       tag: unknown
@@ -284,6 +291,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_Zj_over_ZSi'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -321,6 +329,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_material_composition'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

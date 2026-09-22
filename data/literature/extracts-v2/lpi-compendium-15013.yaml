@@ -1,0 +1,390 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpi-compendium-15013.yaml
+observations:
+- observation_id: lpi-compendium-15013::lpi_15013_carbon_and_nitrogen
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: sample_15013
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    section: Chemistry
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_grain_size_distribution_figure_only
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'grain_size_distribution'
+    species:
+      formula: sample_15013_figure_only
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'grain_size_distribution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 2
+    figure: '5'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_lm_exhaust_release_context
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'low_temperature_vacuum_release_of_lm_exhaust_breakdown_products'
+    species:
+      formula: sample_15013_volatile_context
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'low_temperature_vacuum_release_of_lm_exhaust_breakdown_products';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 3
+    figure: '6'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_maturity_and_grain_size
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: sample_15013
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 1
+    section: Petrography
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_maturity_carbon_figure_only
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'maturity_index_vs_carbon_content'
+    species:
+      formula: sample_15013_figure_only
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'maturity_index_vs_carbon_content'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_ree_normalized_pattern_figure_only
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'rare_earth_element_pattern'
+    species:
+      formula: sample_15013_figure_only
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'rare_earth_element_pattern'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 2
+    figure: '4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_sample_mass_and_collection
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: sample_15013
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 1
+    figure: '1'
+    section: Introduction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_table1_major_oxide_composition
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_composition'
+    species:
+      formula: sample_15013_chemistry
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chemical_composition'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 4
+    table: '1'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_table1_trace_element_composition
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'trace_element_composition'
+    species:
+      formula: sample_15013_chemistry
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'trace_element_composition'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 4
+    table: '1'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013
+- observation_id: lpi-compendium-15013::lpi_15013_volatile_release_curve_figure_only
+  experiment_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f::7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatile_release_curve'
+    species:
+      formula: sample_15013_volatile_context
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_release_curve'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-15013
+  locator:
+    pdf_page_index: 3
+    figure: '7'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  read_from: unknown:lpi-compendium-15013

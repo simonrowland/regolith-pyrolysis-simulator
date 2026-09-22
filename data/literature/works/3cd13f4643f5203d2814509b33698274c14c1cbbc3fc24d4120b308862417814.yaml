@@ -26,7 +26,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.171'
+        value:
+          kind: point
+          point: '0.171'
+          approximate: false
       locator:
         pdf_page_index: 0
         section: Introduction and Petrography

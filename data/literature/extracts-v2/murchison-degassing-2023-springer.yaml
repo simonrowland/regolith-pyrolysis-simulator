@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'Boudouard_equilibrium_constant_fit'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -46,7 +47,7 @@ observations:
     equation: '2'
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_cm2_method_and_feedstock
-  experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -69,6 +70,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'method_geometry_and_feedstock'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -88,7 +90,7 @@ observations:
     note: apparatus pp. 573-575; feedstock Murchison CM2; no aliquot mass printed
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_ir_fig3_figure_only
-  experiment_id: 10.1134/s0038094623050064::3
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -110,6 +112,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -129,7 +132,7 @@ observations:
     note: Normalized IR transmittance of Murchison after annealing at 200, 500, 800 C
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -151,6 +154,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -174,7 +178,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -196,6 +200,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -219,7 +224,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -241,6 +246,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -264,7 +270,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -286,6 +292,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -309,7 +316,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -331,6 +338,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -354,7 +362,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -376,6 +384,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -399,7 +408,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -421,6 +430,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -444,7 +454,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1
-  experiment_id: 10.1134/s0038094623050064::1
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-isothermal-series
   identity:
     quantity:
       tag: unknown
@@ -466,6 +476,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -489,7 +500,7 @@ observations:
     note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -511,6 +522,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -533,7 +545,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -555,6 +567,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -577,7 +590,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -599,6 +612,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -621,7 +635,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -643,6 +657,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -665,7 +680,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -687,6 +702,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -709,7 +725,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -731,6 +747,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -753,7 +770,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -775,6 +792,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -797,7 +815,7 @@ observations:
     note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
   read_from: pdf:murchison-degassing-2023-springer
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
-  experiment_id: 10.1134/s0038094623050064::2
+  experiment_id: 10.1134/s0038094623050064::experiment::murchison-stepwise-series
   identity:
     quantity:
       tag: unknown
@@ -819,6 +837,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -858,11 +877,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -881,6 +901,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_co
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -899,11 +929,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -922,6 +953,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_co2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -940,11 +981,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -963,6 +1005,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_cos
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -981,11 +1033,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1004,6 +1057,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -1022,11 +1085,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1045,6 +1109,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2o
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -1063,11 +1137,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1086,6 +1161,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2s
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -1104,11 +1189,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1127,6 +1213,16 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_n2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
@@ -1145,11 +1241,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1073.15, 1073.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'specific_gas_yield'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1168,3 +1265,13 @@ observations:
     table: '4'
     note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
   read_from: pdf:murchison-degassing-2023-springer
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 580
+        pdf_page_index: 10
+        table: '4'
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)

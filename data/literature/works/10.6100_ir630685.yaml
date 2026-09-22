@@ -19,365 +19,217 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.6100/ir630685
 experiments:
-- experiment_id: 10.6100/ir630685::/Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+- experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 153
-    section: 4.3.1
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::3.2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: transpiration
   sample:
     mass_kg:
       state:
         tag: value
-        value: '0.025'
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
       locator:
         page: 127
-        figure: '3.2'
-        section: 3.2.1-3.2.2
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=25 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '25'
-            locator:
-              page: 127
-              figure: '3.2'
-              section: 3.2.1-3.2.2
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              page: 127
-              figure: '3.2'
-              section: 3.2.1-3.2.2
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-        output_unit: kg
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium-silicate
+      locator:
+        page: 127
+        section: 3.2.1
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450
+          C
+      locator:
+        page: 127
+        section: 3.2.1
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.6100/ir630685
   locator:
     page: 127
-    figure: '3.2'
     section: 3.2.1-3.2.2
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.15
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  bench_id: 10.6100/ir630685::bench::glass-transpiration-rig
+  thermal_schedule:
+    method:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+benches:
+- id: 10.6100/ir630685::bench::glass-transpiration-rig
   work_id: 10.6100/ir630685
-  locator:
-    page: 172
-    figure: '4.15'
-    note: figure reading; measured markers kept separate from ASM model
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
-- experiment_id: 10.6100/ir630685::4.2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: High-temperature transpiration set-up for glass-melt evaporation
+    locator:
+      page: 127
+      figure: '3.2'
+      section: 3.2.1
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Pt/10% Rh boat in horizontal Al2O3 tube furnace
+    locator:
+      page: 127
+      figure: '3.2'
+      section: 3.2.1
+  geometry:
+    cell_internal_dimensions:
+      length_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.05'
+            approximate: false
+        locator:
+          page: 127
+          section: 3.2.1
+          note: Printed boat dimensions 50 x 30 x 15 mm
+      width_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.03'
+            approximate: false
+        locator:
+          page: 127
+          section: 3.2.1
+          note: Printed boat dimensions 50 x 30 x 15 mm
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.015'
+            approximate: false
+        locator:
+          page: 127
+          section: 3.2.1
+          note: Printed boat dimensions 50 x 30 x 15 mm
+    chamber_dimensions:
+      length_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '3'
+            approximate: false
+        locator:
+          page: 127
+          section: 3.2.1
+      inner_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: false
+        locator:
+          page: 127
+          section: 3.2.1
+  detector:
+    state:
+      tag: value
+      value: Extractive gas sampling probe
+    locator:
+      page: 127
+      figure: '3.2'
+      section: 3.2.2
+  temperature_measurement:
+    sensor:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 141
-    table: '4.2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 141
-    table: '4.3'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 158
-    table: '4.4'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 154
-    figure: '4.5'
-    note: figure reading; measured markers only, approximate values from plotted points
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 156
-    figure: '4.6'
-    note: figure reading; measured markers only, approximate values
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-- experiment_id: 10.6100/ir630685::4.8
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 161
-    figure: '4.8'
-    note: page image checked; diamond markers measured, line excluded; approximate plot readings
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
-- experiment_id: 10.6100/ir630685::maximum errors table
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.6100/ir630685
-  locator:
-    page: 183
-    table: maximum errors table
-    section: '4.6'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        tag: value
+        value: Thermocouples
+      locator:
+        page: 127
+        figure: '3.2'
+  heating_method:
+    state:
+      tag: value
+      value: Electrically heated horizontal Al2O3 tube furnace
+    locator:
+      page: 127
+      section: 3.2.1
+  other_facts: []

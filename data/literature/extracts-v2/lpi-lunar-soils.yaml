@@ -1,0 +1,396 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpi-lunar-soils.yaml
+observations:
+- observation_id: lpi-lunar-soils::lpi_1983_soil_10002_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_11_lunar_soil_10002' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4482179563822329892898798186'
+        - - TiO2
+          - '0.06198483717310117232642549639'
+        - - Al2O3
+          - '0.08520184745324769234386567368'
+        - - Cr2O3
+          - '0.001260807500710294724489468641'
+        - - FeO
+          - '0.1363876711001578392273197207'
+        - - MnO
+          - '0.001800931385365283445071141607'
+        - - MgO
+          - '0.1229854768329683661979145104'
+        - - CaO
+          - '0.1360065465485117243888155863'
+        - - Na2O
+          - '0.004843918023047031975558626706'
+        - - K2O
+          - '0.001084999714845602705990370296'
+        - - P2O5
+          - '0.0002250078858120033746695867007'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 11
+    section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils
+- observation_id: lpi-lunar-soils::lpi_1983_soil_12032_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_soil_12032' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4844673848895474957671091185'
+        - - TiO2
+          - '0.02273027569246872332160201248'
+        - - Al2O3
+          - '0.09332040921346317140083990356'
+        - - Cr2O3
+          - '0.001070838113376258619394971995'
+        - - FeO
+          - '0.1228547096358398450086509307'
+        - - MnO
+          - '0.001764900027535649184911103493'
+        - - MgO
+          - '0.1459966547419160682943217789'
+        - - CaO
+          - '0.1194434137636824142698110849'
+        - - Na2O
+          - '0.005959006807230657161043131744'
+        - - K2O
+          - '0.002392407114939716972315963296'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 84
+    section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils
+- observation_id: lpi-lunar-soils::lpi_1983_soil_14148_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_14_lunar_soil_14148' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5065659171684998243898801026'
+        - - TiO2
+          - '0.01343647818118637240613570302'
+        - - Al2O3
+          - '0.1069708518276457139584804979'
+        - - FeO
+          - '0.09215264229801138024425806414'
+        - - MnO
+          - '0.00115004835740188572951026672'
+        - - MgO
+          - '0.1504093426105566038343505981'
+        - - CaO
+          - '0.1163843014870913727955818547'
+        - - Na2O
+          - '0.007188906813784814787769534195'
+        - - K2O
+          - '0.003530946112582345480201933412'
+        - - P2O5
+          - '0.002210565143239686373831445559'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 244
+    section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils
+- observation_id: lpi-lunar-soils::lpi_1983_soil_15020_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_15_lunar_soil_15020' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4839411613094535312507877752'
+        - - TiO2
+          - '0.01368399014164711017570535516'
+        - - Al2O3
+          - '0.08409527254284683442984724556'
+        - - FeO
+          - '0.1322117061824337856476253436'
+        - - MnO
+          - '0.001760711125628758052293255072'
+        - - MgO
+          - '0.1606799937547729219343657337'
+        - - CaO
+          - '0.1173780902062143389576827272'
+        - - Na2O
+          - '0.004131176262919844743078447752'
+        - - K2O
+          - '0.001325960475754883854669230155'
+        - - P2O5
+          - '0.0007919379983279909539448855104'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 367
+    section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils
+- observation_id: lpi-lunar-soils::lpi_1983_soil_60050_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_16_lunar_soil_60050' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4915326438344631645430135187'
+        - - TiO2
+          - '0.003631801815503020202256673021'
+        - - Al2O3
+          - '0.1842640727868984309978554364'
+        - - FeO
+          - '0.04129029355200691106107207531'
+        - - MnO
+          - '0.0003717173780113951956575482375'
+        - - MgO
+          - '0.08259793481898373371968535793'
+        - - CaO
+          - '0.1904391365412091109292990199'
+        - - Na2O
+          - '0.004892630982277362295239304135'
+        - - K2O
+          - '0.0009797682906468710559210661524'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 584
+    section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils
+- observation_id: lpi-lunar-soils::lpi_1983_soil_74220_provenance_and_characterization
+  experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: lunar_soil_samples
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_17_lunar_soil_74220' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3932384060098347359170451526'
+        - - TiO2
+          - '0.06757363938878683447870221907'
+        - - Al2O3
+          - '0.03797036928403595918830978502'
+        - - Cr2O3
+          - '0.003022779245876980880967896828'
+        - - FeO
+          - '0.1879225874178887624623495662'
+        - - MnO
+          - '0.00259063402392377986349710849'
+        - - MgO
+          - '0.2194708979330922957561804444'
+        - - CaO
+          - '0.08389466528916029987340278641'
+        - - Na2O
+          - '0.00355810751294316829976282685'
+        - - K2O
+          - '0.0005852882292049041297784876751'
+        - - P2O5
+          - '0.0001726256652522791500037266289'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-soils
+  locator:
+    pdf_page_index: 921
+    section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  read_from: unknown:lpi-lunar-soils

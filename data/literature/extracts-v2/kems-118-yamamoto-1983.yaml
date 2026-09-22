@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-118-yamamoto-1983.yaml
 observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_critical_mixing_author_estimate
-  experiment_id: 10.2355/isijinternational1966.23.56::14
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'consolute_temperature'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -54,7 +55,7 @@ observations:
         pdf_page_index: 1
         figure: '14'
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_figs_activities_figure_only
-  experiment_id: 10.2355/isijinternational1966.23.56::3
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -79,6 +80,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -101,7 +103,7 @@ observations:
     note: also Figs 5, 7, 9, 10, 11, 12, 13, 14, 15
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_figs_ion_ratios_figure_only
-  experiment_id: 10.2355/isijinternational1966.23.56::1
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -123,6 +125,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -144,7 +147,7 @@ observations:
     note: also Figs 2, 6, 8
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_gamma_inf_and_epsilon
-  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-cu-series
   identity:
     quantity:
       tag: unknown
@@ -167,6 +170,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_wagner_epsilon';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -189,7 +193,7 @@ observations:
     section: Synopsis
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_kems_geometry_and_calibration
-  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -212,6 +216,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -254,6 +259,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -274,7 +280,7 @@ observations:
     table: '1'
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios
-  experiment_id: 10.2355/isijinternational1966.23.56::2
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: value
@@ -339,6 +345,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, composition_basis,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -360,7 +367,7 @@ observations:
     note: Table 2 caption prints 'iron current ratios' (ion).
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
-  experiment_id: 10.2355/isijinternational1966.23.56::3
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: unknown
@@ -386,6 +393,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_gamma_and_partial_molar_heats'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -407,7 +415,7 @@ observations:
     table: '3'
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C
-  experiment_id: 10.2355/isijinternational1966.23.56::4
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
       tag: value
@@ -472,6 +480,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, composition_basis,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -501,7 +510,7 @@ observations:
         pdf_page_index: 4
         table: '4'
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table5_FeSnCu
-  experiment_id: 10.2355/isijinternational1966.23.56::5
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-cu-series
   identity:
     quantity:
       tag: unknown
@@ -527,6 +536,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_and_wagner_interaction_parameter';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -571,6 +581,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

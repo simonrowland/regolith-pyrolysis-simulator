@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml
 observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
-  experiment_id: 10.1016/j.pss.2019.05.001::2-4
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'apparatus_and_pressure_regime'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -54,7 +55,7 @@ observations:
     note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::6,10
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -77,6 +78,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'CO2_release_from_mineral_decomposition'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -119,6 +121,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_on_figure_adsorption_fit_coefficients';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -143,7 +146,7 @@ observations:
     note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::6-7
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -166,6 +169,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'species_identity_from_fragmentation_pattern';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -188,7 +192,7 @@ observations:
     paragraph: 206-207
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
-  experiment_id: 10.1016/j.pss.2019.05.001::9
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -211,6 +215,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'H2S_release_from_sulfur_minerals'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -234,7 +239,7 @@ observations:
     paragraph: 336-337
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
-  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -257,6 +262,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'indicative_mz18_mass_content_from_rga_integral';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -284,7 +290,7 @@ observations:
     note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
-  experiment_id: 10.1016/j.pss.2019.05.001::6
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -307,6 +313,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_release_peak_temperature_bands'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -333,7 +340,7 @@ observations:
     note: Printed peak-band temperatures in prose, not read off Fig. 6
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::6-11
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -358,6 +365,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -381,7 +389,7 @@ observations:
     note: RGA partial-pressure and total-pressure vs set-point T; not digitised; pdf_page_index=12-20
   read_from: pdf:reiss-2019-thermal-extraction-nulht2m
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
-  experiment_id: 10.1016/j.pss.2019.05.001::1
+  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   identity:
     quantity:
       tag: unknown
@@ -403,6 +411,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_matrix'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -446,6 +455,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'mineral_phase_volume_percent'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

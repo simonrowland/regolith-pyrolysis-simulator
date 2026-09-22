@@ -1,0 +1,462 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nasa-tm-2024-simulant-guide.yaml
+observations:
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_figure24_evolved_species
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::24
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evolved_species_traces'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'CSM-LHT-1G_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_species_traces'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No printed numeric trace values or uncertainty table.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 83
+    pdf_page_index: 99
+    figure: '24'
+    section: 6.2.2.B.(ii) High Temperatures
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_high_temperature_vacuum_guidance
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::24
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evolved_gas_and_thermal_processing_context'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'CSM-LHT-1G_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_and_thermal_processing_context'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure traces and source-specific uncertainties are not printed as numeric tables in this guide.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 83
+    pdf_page_index: 99
+    figure: '24'
+    section: 6.2.2.B.(ii) High Temperatures
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table10_particle_size_distribution
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'particle_size_distribution_quartiles'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_particles' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'particle_size_distribution_quartiles'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; values are averaged quartiles.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 38
+    pdf_page_index: 48
+    table: '10'
+    section: 4.5 Particle Size Distribution
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table13_particle_geometry
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'particle_geometry'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_particles' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'particle_geometry'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 42
+    pdf_page_index: 52
+    table: '13'
+    section: 4.6 Particle Geometry
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table16_density
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::16
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_density_range'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_granular_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_density_range'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; GreenSpar and OPRH4W30 are n/a
+      not zero.: null
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 45
+    pdf_page_index: 55
+    table: '16'
+    section: 4.7 Density
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table19_shear_strength
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::19
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'shear_strength_parameters'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_granular_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'shear_strength_parameters'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ranges retained; n/a rows omitted from numeric rows.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 49
+    pdf_page_index: 59
+    table: '19'
+    section: 4.8 Shear Strength
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table22_magnetic_susceptibility
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::22
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'magnetic_susceptibility'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnetic_susceptibility'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Instrument calibration and field/frequency tolerances are printed; row-specific uncertainty is not.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 51
+    pdf_page_index: 61
+    table: '22'
+    section: 4.9 Magnetic Susceptibility
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table25_crystalline_silica
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::25
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'crystalline_and_respirable_silica'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'planetary_simulant_and_feedstock_materials' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'crystalline_and_respirable_silica'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: '''<0.01'' is retained as the printed detection-limit bound; No data cells omitted, not zero.'
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 61
+    pdf_page_index: 71
+    table: '25'
+    section: 5.4 Crystalline Silica Content in Simulants
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table5_modal_mineralogy
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'modal_mineralogy'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_mixtures' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'modal_mineralogy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; n/a cells retained as absent.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 32
+    pdf_page_index: 42
+    table: '5'
+    section: 4.3 Mineralogy
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table6_apollo_bulk_chemistry
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regional_bulk_oxide_composition'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'apollo_lunar_regolith_regional_averages' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'regional_bulk_oxide_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 33
+    pdf_page_index: 43
+    table: '6'
+    section: 4.4 Chemistry
+  read_from: unknown:nasa-tm-2024-simulant-guide
+- observation_id: nasa-tm-2024-simulant-guide::nasa_tm_2024_table7_bulk_chemistry
+  experiment_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320::7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_composition'
+    species:
+      formula: lunar_regolith_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_mixtures' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_oxide_composition'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; K2O 0.0 values are printed table values
+      not inferred absence.: null
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nasa-tm-2024-simulant-guide
+  locator:
+    published_page: 34
+    pdf_page_index: 44
+    table: '7'
+    section: 4.4 Chemistry
+  read_from: unknown:nasa-tm-2024-simulant-guide

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-058-ohara-1987.yaml
 observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_cao_epsilon_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -68,6 +68,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_CaO,
       uncertainty_95pct, T_K'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -98,7 +99,7 @@ observations:
         pdf_page_index: 1
         note: epsilon_P2O5^CaO = -23 +/- 3
 - observation_id: kems-058-ohara-1987::ohara_1987_feto_t_and_pO2_gate
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -121,6 +122,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'FetO_stoichiometry_and_activity_proxy'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -143,7 +145,7 @@ observations:
     note: FetO t=0.95 used to estimate pO2 for L_P; a_FetO taken from Kambayashi binary, not measured here
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_fig1_a_p2o5_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -165,6 +167,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -186,7 +189,7 @@ observations:
     note: a_P2O5 vs X_P2O5 at 1370 C with CaO, MgO, MnO, SiO2 additions
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_fig2_ln_gamma_vs_Ni_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -208,6 +211,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -229,7 +233,7 @@ observations:
     note: ln gamma_P2O5 vs N_i for CaO, MgO, MnO, SiO2
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::3
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -251,6 +255,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -273,7 +278,7 @@ observations:
     note: L_P vs mol% P2O5 at 1370 C
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_interaction_parameters_1643k
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -340,6 +345,7 @@ observations:
       T_C_as_printed, T_K, gamma0_P2O5_1370C, gamma0_source, epsilon_P2O5_CaO, epsilon_P2O5_CaO_as_printed, epsilon_P2O5_MgO,
       epsilon_P2O5_MgO_as_printed, epsilon_P2O5_MnO, epsilon_P2O5_MnO_as_printed, epsilon_P2O5_SiO2, epsilon_P2O5_SiO2_as_printed,
       eq10_as_printed, fit_excluded'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -399,6 +405,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'phosphorus_distribution_ratio'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -419,7 +426,7 @@ observations:
     note: Iwasaki et al. L_P about 5.5 x 10^2 at 1370 C vs this work samples 18-19
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -442,6 +449,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -475,7 +483,7 @@ observations:
         note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370
           C'
 - observation_id: kems-058-ohara-1987::ohara_1987_mgo_epsilon_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -540,6 +548,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MgO,
       uncertainty_95pct, T_K'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -570,7 +579,7 @@ observations:
         pdf_page_index: 1
         note: epsilon_P2O5^MgO = -20 +/- 2
 - observation_id: kems-058-ohara-1987::ohara_1987_mno_epsilon_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -635,6 +644,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MnO,
       uncertainty_95pct, T_K'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -665,7 +675,7 @@ observations:
         pdf_page_index: 1
         note: epsilon_P2O5^MnO = -13 +/- 1
 - observation_id: kems-058-ohara-1987::ohara_1987_p2_table1_partial_pressure
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -730,6 +740,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, model_or_data_source,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -774,6 +785,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'saturation_pressure'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -806,7 +818,7 @@ observations:
         section: '2.3'
         note: P_P4O10_sat = 700 atm (1643 K)
 - observation_id: kems-058-ohara-1987::ohara_1987_po2_table1_partial_pressure
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -871,6 +883,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, model_or_data_source,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -893,7 +906,7 @@ observations:
     note: Table 1 ion current ratios and partial pressures at 1643 K
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_sio2_epsilon_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -958,6 +971,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_SiO2,
       uncertainty_95pct, T_K, authors_note'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -988,7 +1002,7 @@ observations:
         pdf_page_index: 1
         note: epsilon_P2O5^SiO2 = -4 +/- 1
 - observation_id: kems-058-ohara-1987::ohara_1987_table1_ion_current_ratios_1643k
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -1053,6 +1067,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
       T_K, internal_standard, sample_20_note, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1084,7 +1099,7 @@ observations:
         table: '1'
         note: Table 1 ion current ratios and partial pressures at 1643 K
 - observation_id: kems-058-ohara-1987::ohara_1987_table1_partial_pressures_1643k
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: value
@@ -1149,6 +1164,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, model_or_data_source,
       T_K, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1181,7 +1197,7 @@ observations:
         table: '1'
         note: Table 1 ion current ratios and partial pressures at 1643 K
 - observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
     quantity:
       tag: unknown
@@ -1204,6 +1220,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1249,6 +1266,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_ln_gamma_expression'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -68,6 +69,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -111,6 +113,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -154,6 +157,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -197,6 +201,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -244,6 +249,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_Al_and_pO2_from_oxide_equilibria'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -289,8 +295,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -330,6 +336,7 @@ observations:
   value:
     kind: point
     point: '180'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -350,6 +357,16 @@ observations:
     table: '1'
     note: Table 1 Al vapor pressure at 1873 K = 1.8 × 10^{2} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Al vapor pressure at 1873 K = 1.8 × 10^{2} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_au_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -374,8 +391,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -415,6 +432,7 @@ observations:
   value:
     kind: point
     point: '8.1'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -435,6 +453,16 @@ observations:
     table: '1'
     note: Table 1 Au vapor pressure at 1873 K = 8.1 Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Au vapor pressure at 1873 K = 8.1 Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_co_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -459,8 +487,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -500,6 +528,7 @@ observations:
   value:
     kind: point
     point: '3.7'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -520,6 +549,16 @@ observations:
     table: '1'
     note: Table 1 Co vapor pressure at 1873 K = 3.7 Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Co vapor pressure at 1873 K = 3.7 Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cr_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -544,8 +583,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -585,6 +624,7 @@ observations:
   value:
     kind: point
     point: '25'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -605,6 +645,16 @@ observations:
     table: '1'
     note: Table 1 Cr vapor pressure at 1873 K = 2.5 × 10^{1} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Cr vapor pressure at 1873 K = 2.5 × 10^{1} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cu_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -629,8 +679,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -670,6 +720,7 @@ observations:
   value:
     kind: point
     point: '120'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -690,6 +741,16 @@ observations:
     table: '1'
     note: Table 1 Cu vapor pressure at 1873 K = 1.2 × 10^{2} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Cu vapor pressure at 1873 K = 1.2 × 10^{2} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_fe_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -714,8 +775,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -755,6 +816,7 @@ observations:
   value:
     kind: point
     point: '8'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -775,6 +837,16 @@ observations:
     table: '1'
     note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ge_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -799,8 +871,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -840,6 +912,7 @@ observations:
   value:
     kind: point
     point: '46'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -860,6 +933,16 @@ observations:
     table: '1'
     note: Table 1 Ge vapor pressure at 1873 K = 4.6 × 10^{1} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Ge vapor pressure at 1873 K = 4.6 × 10^{1} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -884,8 +967,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -925,6 +1008,7 @@ observations:
   value:
     kind: point
     point: '5200'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -945,6 +1029,16 @@ observations:
     table: '1'
     note: Table 1 Mn vapor pressure at 1873 K = 5.2 × 10^{3} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Mn vapor pressure at 1873 K = 5.2 × 10^{3} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mo_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -969,8 +1063,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1010,6 +1104,7 @@ observations:
   value:
     kind: point
     point: '0.0000021'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1030,6 +1125,16 @@ observations:
     table: '1'
     note: Table 1 Mo vapor pressure at 1873 K = 2.1 × 10^{-6} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Mo vapor pressure at 1873 K = 2.1 × 10^{-6} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_nb_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1054,8 +1159,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1095,6 +1200,7 @@ observations:
   value:
     kind: point
     point: '0.0000001'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1115,6 +1221,16 @@ observations:
     table: '1'
     note: Table 1 Nb vapor pressure at 1873 K = 1.0 × 10^{-7} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Nb vapor pressure at 1873 K = 1.0 × 10^{-7} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ni_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1139,8 +1255,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1180,6 +1296,7 @@ observations:
   value:
     kind: point
     point: '3.8'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1200,6 +1317,16 @@ observations:
     table: '1'
     note: Table 1 Ni vapor pressure at 1873 K = 3.8 Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Ni vapor pressure at 1873 K = 3.8 Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_p_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1224,8 +1351,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1265,6 +1392,7 @@ observations:
   value:
     kind: point
     point: '0.00014'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1285,6 +1413,16 @@ observations:
     table: '1'
     note: Table 1 P vapor pressure at 1873 K = 1.4 × 10^{-4} Pa (1 mass%)
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 P vapor pressure at 1873 K = 1.4 × 10^{-4} Pa (1 mass%)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_pd_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1309,8 +1447,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1350,6 +1488,7 @@ observations:
   value:
     kind: point
     point: '7.3'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1370,6 +1509,16 @@ observations:
     table: '1'
     note: Table 1 Pd vapor pressure at 1873 K = 7.3 Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Pd vapor pressure at 1873 K = 7.3 Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_s_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1394,8 +1543,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1435,6 +1584,7 @@ observations:
   value:
     kind: point
     point: '1.7'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1455,6 +1605,16 @@ observations:
     table: '1'
     note: Table 1 S vapor pressure at 1873 K = 1.7 Pa (1 mass%)
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 S vapor pressure at 1873 K = 1.7 Pa (1 mass%)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_si_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1479,8 +1639,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1520,6 +1680,7 @@ observations:
   value:
     kind: point
     point: '0.88'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1540,6 +1701,16 @@ observations:
     table: '1'
     note: Table 1 Si vapor pressure at 1873 K = 8.8 × 10^{-1} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Si vapor pressure at 1873 K = 8.8 × 10^{-1} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_sn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1564,8 +1735,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1605,6 +1776,7 @@ observations:
   value:
     kind: point
     point: '120'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1625,6 +1797,16 @@ observations:
     table: '1'
     note: Table 1 Sn vapor pressure at 1873 K = 1.2 × 10^{2} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Sn vapor pressure at 1873 K = 1.2 × 10^{2} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ta_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1649,8 +1831,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1690,6 +1872,7 @@ observations:
   value:
     kind: point
     point: '0.00000000043'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1710,6 +1893,16 @@ observations:
     table: '1'
     note: Table 1 Ta vapor pressure at 1873 K = 4.3 × 10^{-10} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Ta vapor pressure at 1873 K = 4.3 × 10^{-10} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ti_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1734,8 +1927,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1775,6 +1968,7 @@ observations:
   value:
     kind: point
     point: '0.15'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1795,6 +1989,16 @@ observations:
     table: '1'
     note: Table 1 Ti vapor pressure at 1873 K = 1.5 × 10^{-1} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 Ti vapor pressure at 1873 K = 1.5 × 10^{-1} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_v_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1819,8 +2023,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1860,6 +2064,7 @@ observations:
   value:
     kind: point
     point: '0.02'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1880,6 +2085,16 @@ observations:
     table: '1'
     note: Table 1 V vapor pressure at 1873 K = 2.0 × 10^{-2} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 V vapor pressure at 1873 K = 2.0 × 10^{-2} Pa
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_w_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
@@ -1904,8 +2119,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1945,6 +2160,7 @@ observations:
   value:
     kind: point
     point: '0.000000000067'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1965,3 +2181,13 @@ observations:
     table: '1'
     note: Table 1 W vapor pressure at 1873 K = 6.7 × 10^{-11} Pa
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 302
+        pdf_page_index: 6
+        table: '1'
+        note: Table 1 W vapor pressure at 1873 K = 6.7 × 10^{-11} Pa

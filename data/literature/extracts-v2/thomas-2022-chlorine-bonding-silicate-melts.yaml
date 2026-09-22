@@ -1,0 +1,290 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
+observations:
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_apparatus_and_analytical_conditions
+  experiment_id: 10.1016/j.chemgeo.2022.121269::/Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparatus_and_laboratory_conditions'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_quenched_to_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparatus_and_laboratory_conditions'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121270
+    pdf_page_index: 2
+    section: 2.1 Starting compositions and experimental conditions
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
+  experiment_id: 10.1016/j.chemgeo.2022.121269::/Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chloride_capacity_model'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121270
+    pdf_page_index: 2
+    section: 1.1 Chlorine incorporation in silicate melts and glasses
+    equation: '3'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_qualitative_xafs_conclusions
+  experiment_id: 10.1016/j.chemgeo.2022.121269::/Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chlorine_bonding_environment'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chlorine_bonding_environment'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121279
+    pdf_page_index: 11
+    section: 4 Conclusions
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_salt_standard_xaf_measurements
+  experiment_id: 10.1016/j.chemgeo.2022.121269::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compressed_salt_standard_XAF_parameters'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'compressed_crystalline_chloride_salt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compressed_salt_standard_XAF_parameters'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121275
+    pdf_page_index: 7
+    table: '2'
+    section: 3.1 Salt standard spectra
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_table1_chlorine_concentrations_all_rows
+  experiment_id: 10.1016/j.chemgeo.2022.121269::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chlorine_concentration_EPMA'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'experimentally_quenched_silicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chlorine_concentration_EPMA'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121271
+    pdf_page_index: 3
+    table: '1'
+    note: continued on published page 121272
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_table1_epma_compositions
+  experiment_id: 10.1016/j.chemgeo.2022.121269::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_melt_composition'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'experimentally_quenched_silicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_melt_composition'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121271
+    pdf_page_index: 3
+    table: '1'
+    section: Starting compositions and experimental conditions
+    note: Table 1 continues on published page 121272 (PDF page 4); each row has one shared table locator.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts
+- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_table2_experimental_conditions_and_xaf
+  experiment_id: 10.1016/j.chemgeo.2022.121269::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimental_conditions_and_XAF_parameters'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'experimentally_quenched_silicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_XAF_parameters'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  locator:
+    published_page: 121273
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 continues on published page 121274 (PDF page 6); values shown are measured XAF parameters and tabulated
+      run conditions.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  read_from: unknown:thomas-2022-chlorine-bonding-silicate-melts

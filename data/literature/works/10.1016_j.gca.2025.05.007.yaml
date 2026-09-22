@@ -52,7 +52,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
@@ -460,7 +463,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
@@ -527,7 +533,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
@@ -687,7 +696,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row

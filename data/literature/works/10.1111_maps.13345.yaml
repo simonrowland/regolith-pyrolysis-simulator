@@ -277,6 +277,14 @@ experiments:
         pdf_page_index: 9
         table: '3'
         note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+    form:
+      state:
+        tag: value
+        value: crushed powder
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
   conditions:
     temperature_K:
       state:
@@ -303,102 +311,108 @@ experiments:
     pdf_page_index: 9
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
-- experiment_id: 10.1111/maps.13345::6
+- experiment_id: 10.1111/maps.13345::experiment::tga-ega-simulant-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'tga_ega_flowing_helium' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: regime 'thermogravimetry_evolved_gas_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: CI
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_numeric
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        note: Starts at ambient; no numerical start temperature printed
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: point
+          point: '3000'
+          approximate: false
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        note: 30-mbar helium atmosphere; unit conversion only
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: Helium
+          flow_sccm:
+            tag: value
+            value: '10'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        note: Helium flow 10 sccm
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.1111/maps.13345
   locator:
     pdf_page_index: 11
-    figure: '6'
     section: Thermogravimetry and Evolved Gas Analysis
-    note: TG/EGA method paragraph; Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer.
-- experiment_id: 10.1111/maps.13345::6a
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'tga_ega_flowing_helium' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+    note: CI
+  bench_id: 10.1111/maps.13345::bench::labsys-evo-thermostar
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated from ambient to 1000 C at 35 C/min under 10 sccm helium
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+    total_duration_s:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        note: Heating rate and ambient start are printed
+benches:
+- id: 10.1111/maps.13345::bench::labsys-evo-thermostar
   work_id: 10.1111/maps.13345
-  locator:
-    pdf_page_index: 11
-    figure: 6a
-    section: Thermogravimetry and Evolved Gas Analysis
-    note: Body text prints CI total integrated mass loss from 0 to 1000 °C.
-- experiment_id: 10.1111/maps.13345::6b-d
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'tga_ega_flowing_helium' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1111/maps.13345
-  locator:
-    pdf_page_index: 11
-    figure: 6b-d
-    section: Thermogravimetry and Evolved Gas Analysis
-    note: Text description of the measured EGA traces; curves were not digitized.
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Differential scanning calorimeter and thermal gravimeter with quadrupole mass spectrometer
+    locator:
+      pdf_page_index: 11
+      section: Thermogravimetry and Evolved Gas Analysis
+      note: Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer
+  detector:
+    state:
+      tag: value
+      value: ThermoStar quadrupole mass spectrometer
+    locator:
+      pdf_page_index: 11
+      section: Thermogravimetry and Evolved Gas Analysis
+      note: Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer
+  heating_method:
+    state:
+      tag: value
+      value: Labsys EVO differential scanning calorimeter/thermal gravimeter
+    locator:
+      pdf_page_index: 11
+      section: Thermogravimetry and Evolved Gas Analysis
+      note: Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer
+  other_facts: []

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml
 observations:
 - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_laser_levitation_apparatus
-  experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
+  experiment_id: 10.1016/j.gca.2019.06.016::experiment::soil-laser-heating-series
   identity:
     quantity:
       tag: unknown
@@ -23,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_apparatus_and_conditions'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -43,7 +44,7 @@ observations:
     note: Apparatus and run schedule; pressure and imposed flow rate are not printed.; pdf_page=6
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
 - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows
-  experiment_id: 10.1016/j.gca.2019.06.016::1
+  experiment_id: 10.1016/j.gca.2019.06.016::experiment::soil-laser-heating-series
   identity:
     quantity:
       tag: value
@@ -108,6 +109,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, evidence_class, row_columns,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -192,6 +194,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, evidence_class, rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -210,7 +213,7 @@ observations:
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
 - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
-  experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
+  experiment_id: 10.1016/j.gca.2019.06.016::experiment::soil-laser-heating-series
   identity:
     quantity:
       tag: value
@@ -274,6 +277,7 @@ observations:
   value:
     kind: point
     point: '0.99879'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -358,6 +362,7 @@ observations:
   value:
     kind: point
     point: '0.985'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

@@ -46,7 +46,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -209,6 +212,14 @@ experiments:
         section: EXPERIMENTS
         line_range: 33-90
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -297,7 +308,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -472,6 +486,14 @@ experiments:
         figure: '10'
         paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
         note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -488,7 +510,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -560,7 +585,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 114
         pdf_page_index: 4
@@ -726,6 +754,14 @@ experiments:
         pdf_page_index: 4
         table: '2'
         note: Heating conditions and run notations
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -742,7 +778,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -813,7 +852,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -976,6 +1018,13 @@ experiments:
         pdf_page_index: 6
         table: '3'
         note: Summary of experimental results; residue bulk composition vs VF, T, t
+    form:
+      state:
+        tag: value
+        value: powder pressed into tubes then recovered as a single molten spherule
+      locator:
+        published_page: 112
+        section: Sample preparation
     container:
       state:
         tag: value
@@ -1064,7 +1113,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -1227,6 +1279,14 @@ experiments:
         pdf_page_index: 8
         table: '4'
         note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -1243,7 +1303,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -1314,7 +1377,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -1477,6 +1543,14 @@ experiments:
         pdf_page_index: 12
         table: '5'
         note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -1493,7 +1567,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -1564,7 +1641,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -1727,6 +1807,14 @@ experiments:
         pdf_page_index: 14
         table: '6'
         note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -1743,7 +1831,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -1814,7 +1905,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -1989,6 +2083,14 @@ experiments:
         figure: '9'
         paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
         note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -2005,7 +2107,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -2077,7 +2182,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -2216,6 +2324,14 @@ experiments:
       locator:
         paragraph: molten spherule free evaporation graphite crucible
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 112
+        paragraph: tubes of 4mm height and 4mm diameter with a straight hole of 1.2mm diameter
+        section: Sample preparation
     container:
       state:
         tag: value
@@ -2292,6 +2408,112 @@ experiments:
         locator:
           published_page: 113
           section: Experimental device
+- experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-evaporation-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        published_page: 112
+        section: Sample preparation
+        note: Printed 100.0 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+      locator:
+        published_page: 112
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: tubular pellet pressed from powder
+      locator:
+        published_page: 112
+        section: Sample preparation
+    pretreatment:
+      state:
+        tag: value
+        value: semi-sintered in vacuum for one minute to remove pores and absorbed water
+      locator:
+        published_page: 112
+        section: Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 114
+        section: Experimental conditions and procedures
+        note: Printed 1700-2000 C and per-run Table 2 values; no single series setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 114
+        section: Experimental conditions and procedures
+        note: Pressure changes with temperature and time; no single series value
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 114
+        section: Experimental conditions and procedures
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.001333223684210526315789473684'
+        locator:
+          published_page: 114
+          section: Experimental conditions and procedures
+          note: Printed about 10^-5 Torr; unit conversion only
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 114
+    section: Experimental conditions and procedures
+  bench_id: 10.2343/geochemj.17.111::bench::graphite-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Per-run temperatures and durations are printed in Table 2
+      locator:
+        published_page: 114
+        table: '2'
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 114
+        table: '2'
+        note: Multiple per-run durations; no single series duration
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power supply cut off
+      locator:
+        published_page: 114
+        section: Experimental conditions and procedures
 - experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   kind: literature
   method:
@@ -2301,7 +2523,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0001'
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
       locator:
         published_page: 112
         paragraph: finally their weights were adjusted to 100.0mg with a knife
@@ -2476,6 +2701,14 @@ experiments:
         equation: '14'
         note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in
           eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
     container:
       state:
         tag: value
@@ -2492,7 +2725,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '0.01333223684210526315789473684'
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
@@ -2555,3 +2791,56 @@ experiments:
         locator:
           published_page: 113
           section: Experimental device
+benches:
+- id: 10.2343/geochemj.17.111::bench::graphite-vacuum-furnace
+  work_id: 10.2343/geochemj.17.111
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: vacuum furnace
+    locator:
+      published_page: 112
+      section: Experimental device
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: high-purity graphite crucible
+    locator:
+      published_page: 113
+      section: Experimental device
+  pumping_type:
+    state:
+      tag: value
+      value: diffusion pump
+    locator:
+      published_page: 114
+      section: Experimental device
+  pumping_speed_m3_s:
+    state:
+      tag: value
+      value:
+        kind: point
+        point: '0.1'
+        approximate: false
+    locator:
+      published_page: 114
+      section: Experimental device
+      note: Printed 100 L/s; unit conversion only
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: optical pyrometer on crucible surface; Pt/Pt-13%Rh and W/W-26%Re thermocouples for monitoring
+      locator:
+        published_page: 113
+        section: Experimental device
+  heating_method:
+    state:
+      tag: value
+      value: tungsten resistance heater with tungsten-molybdenum thermal shields
+    locator:
+      published_page: 112
+      section: Experimental device
+  other_facts: []

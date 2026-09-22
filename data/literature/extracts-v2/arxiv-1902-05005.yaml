@@ -1,0 +1,131 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/arxiv-1902-05005.yaml
+observations:
+- observation_id: arxiv-1902-05005::sossi_fegley_2018_table1_parent_oxide_vapour_species
+  experiment_id: 10.2138/rmg.2018.84.11::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'saturated_vapour_species'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'saturated_vapour_species'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for these compilation ranges.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1902-05005
+  locator:
+    pdf_page_index: 12
+    table: '1'
+    note: Table 1, printed p. 13; values are compilation rows and superscript references.
+  read_from: unknown:arxiv-1902-05005
+- observation_id: arxiv-1902-05005::sossi_fegley_2018_table2_activity_coefficients
+  experiment_id: 10.2138/rmg.2018.84.11::2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'complex_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, source_basis,
+      rows'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty intervals are printed; ranges and approximate markers are retained.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1902-05005
+  locator:
+    pdf_page_index: 22
+    table: '2'
+    note: Table 2, printed pp. 23-24; all 28 listed oxide species transcribed below.
+  read_from: unknown:arxiv-1902-05005

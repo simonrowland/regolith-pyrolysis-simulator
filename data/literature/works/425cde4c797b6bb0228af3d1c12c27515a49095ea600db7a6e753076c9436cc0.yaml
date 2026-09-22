@@ -1,0 +1,51 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0
+  citation: Morris, R. V., Score, R., Dardano, C. & Heiken, G. (1983), Handbook of Lunar Soils, NASA JSC 19069.
+  source_ids:
+  - lpi-lunar-soils
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:lpi-lunar-soils
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'handbook_sample_characterization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0
+  locator:
+    pdf_page_index: 11
+    section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf

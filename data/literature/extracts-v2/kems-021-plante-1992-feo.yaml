@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -72,6 +73,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -99,7 +101,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
 - observation_id: kems-021-plante-1992-feo::plante_1992_table1_ion_intensity_ratios_1973k
-  experiment_id: 10.2355/isijinternational.32.1276::1
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
       tag: unknown
@@ -122,6 +124,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -153,7 +156,7 @@ observations:
         table: '1'
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k
-  experiment_id: 10.2355/isijinternational.32.1276::2
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
       tag: unknown
@@ -179,6 +182,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

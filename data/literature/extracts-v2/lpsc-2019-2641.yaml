@@ -1,0 +1,379 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpsc-2019-2641.yaml
+observations:
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_calibration_figures_not_digitized
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::1-2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'calibration_curve_shapes'
+    species:
+      formula: calibration_reference_gases
+      phase:
+        tag: unknown
+        reason: phase string 'calibration_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'calibration_curve_shapes'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not printed
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 1
+    figure: 1-2
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_calibration_gas_mixture
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::lpsc-2019-2641
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'calibration_reference_gas_composition'
+    species:
+      formula: calibration_reference_gases
+      phase:
+        tag: unknown
+        reason: phase string 'calibration_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'calibration_reference_gas_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_abundance: approximately 1% relative
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 1
+    paragraph: reference-gas mixture composition
+    section: Calibration procedures
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_flow_calibration_range
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::lpsc-2019-2641
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reference_gas_flow_rate_calibration'
+    species:
+      formula: calibration_reference_gases
+      phase:
+        tag: unknown
+        reason: phase string 'calibration_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reference_gas_flow_rate_calibration'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed for the flow-rate range
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 1
+    section: Introduction
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_murchison_apparatus
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::lpsc-2019-2641
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evolved_gas_apparatus'
+    species:
+      formula: Murchison_CM2_meteorite
+      phase:
+        tag: unknown
+        reason: phase string 'powdered_meteorite_sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_apparatus'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed for apparatus geometry or temperature calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 1
+    section: Experimental technique
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_murchison_figures_not_digitized
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::3-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_release_curves'
+    species:
+      formula: Murchison_CM2_meteorite
+      phase:
+        tag: unknown
+        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_release_curves'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not printed
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 2
+    figure: 3-4
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_murchison_heating_program
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::lpsc-2019-2641
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Murchison_run_conditions'
+    species:
+      formula: Murchison_CM2_meteorite
+      phase:
+        tag: unknown
+        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [473.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Murchison_run_conditions'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed for sample mass, heating rate or run conditions
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 2
+    section: Analysis of the PROSPECT reference Murchison meteorite sample
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_murchison_major_gas_release_patterns
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'major_gas_release_pattern'
+    species:
+      formula: Murchison_CM2_meteorite
+      phase:
+        tag: unknown
+        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [473.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'major_gas_release_pattern'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      water_amount: lower limit only; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 2
+    figure: '3'
+    section: Analysis of the PROSPECT reference Murchison meteorite sample
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_murchison_minor_gas_release_patterns
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minor_gas_release_pattern'
+    species:
+      formula: Murchison_CM2_meteorite
+      phase:
+        tag: unknown
+        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [473.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'minor_gas_release_pattern'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 2
+    figure: '4'
+    section: Analysis of the PROSPECT reference Murchison meteorite sample
+  read_from: unknown:lpsc-2019-2641
+- observation_id: lpsc-2019-2641::lpsc_2019_2641_qms_calibration_power_law_fits
+  experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'author_power_law_calibration_fits'
+    species:
+      formula: calibration_reference_gases
+      phase:
+        tag: unknown
+        reason: phase string 'calibration_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'author_power_law_calibration_fits'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      fit_residuals: R values are printed for each fit; no parameter uncertainties are printed
+      calibration_coefficient_variation: approximately +/-30% from the average coefficient across gases
+      water_calibration: not made; uniform heating of the vacuum line to 100 °C was challenging, so average calibration coefficient
+        was used to estimate water content
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2019-2641
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    note: Figure 1 also prints the two pressure-versus-time calibration lines below.
+  read_from: unknown:lpsc-2019-2641

@@ -57,44 +57,8 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'induction_furnace_inert_reducing_gas' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    mass_kg:
-      state:
-        tag: value
-        value: '0.09'
-      locator:
-        published_page: 624
-        pdf_page_index: 2
-        figure: '2'
-        section: 2. Experimental method
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=90 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '90'
-            locator:
-              published_page: 624
-              pdf_page_index: 2
-              figure: '2'
-              section: 2. Experimental method
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 624
-              pdf_page_index: 2
-              figure: '2'
-              section: 2. Experimental method
-        output_unit: kg
+    reason: regime 'liquid_metal_deoxidation_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
   conditions:
     temperature_K:
       state:
@@ -118,7 +82,96 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.83.10_623
   locator:
+    published_page: 625
+    pdf_page_index: 3
+    table: '2'
+    note: Experimental data list concerning Mg deoxidation equilibrium at 1873 K and 2023 K.
+context:
+- observation_id: itoh_hino_banya_1997_experimental_setup
+  type: experimental_setup
+  locator:
     published_page: 624
     pdf_page_index: 2
-    figure: '2'
     section: 2. Experimental method
+    figure: '2'
+  phase: liquid_iron_with_dissolved_Mg_and_O
+  regime: induction_furnace_inert_reducing_gas
+  units: as printed
+  values:
+    quantity: experimental_run_conditions
+    method_class: measured_direct
+    semantics: apparatus_and_condition_record_not_species_observation
+    sample_mass_g: 90
+    sample_mass_as_printed: about 90 g per melt
+    iron_form: electrolytic iron vacuum-melted and formed into a round bar
+    initial_iron_composition_mass_pct:
+      C: <0.003
+      Si: <0.007
+      S: <0.005
+      P: <0.004
+      O: <0.005
+    deoxidizer: commercial Mg metal
+    deoxidizer_purity_pct: '99.99'
+    deoxidizer_loading_mass_pct_of_iron: 1
+    deoxidizer_container: iron foil
+    reaction_tube: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
+    protective_crucible: MgO
+    melting_crucible: MgO, 25 mm OD × 20 mm ID × 50 mm H
+    gas_inlet_tube: alumina, 13 mm OD × 9 mm ID
+    furnace: high-frequency induction furnace
+    initial_gas: Ar-H2 1:1 mixture, 200 ml/min
+    deoxidation_hold_gas: H2, 150 ml/min
+    pre_addition_deoxidation_hold: 4 h at 1873 K
+    post_addition_gas: Ar, 150 ml/min
+    post_addition_temperature_K:
+    - 1873
+    - 2023
+    sampling: melt was quenched after the specified isothermal hold; some samples were withdrawn in opaque quartz tubes and
+      water-quenched
+    temperature_measurement: optical pyrometer corrected at the melting point of iron
+    sample_sectioning: analytical samples cut at least 1 mm from crucible interface or shrinkage cavity
+    oxygen_sample_mass_g: about 1
+    oxygen_analysis: inert-gas impulse-fusion infrared absorption
+    oxygen_calibration_materials:
+    - JSS-2b, 14.6 × 10^-4 mass% O
+    - GS-1c, 46.0 × 10^-4 mass% O
+    magnesium_analysis_sample_mass_g: about 1
+    magnesium_dissolution: (1+1) HCl, 15 ml, gentle hot-water-bath dissolution in Teflon beaker; made to 50 ml in polypropylene
+      volumetric flask
+    magnesium_analysis: ICP atomic-emission spectrometry
+    ion_exchange_water_conductivity_uS_cm: '0.1'
+  uncertainty:
+    note: No numerical uncertainty is printed for the apparatus dimensions, concentrations, or analysis results in the cited
+      section.
+  equipment:
+    reaction_tube:
+      value: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
+      locator:
+        published_page: 624
+        pdf_page_index: 2
+        figure: '2'
+        section: 2. Experimental method
+    crucibles:
+      value: MgO protective and melting crucibles; melting crucible 25 mm OD × 20 mm ID × 50 mm H
+      locator:
+        published_page: 624
+        pdf_page_index: 2
+        figure: '2'
+        section: 2. Experimental method
+    gas_inlet:
+      value: alumina tube, 13 mm OD × 9 mm ID
+      locator:
+        published_page: 624
+        pdf_page_index: 2
+        figure: '2'
+        section: 2. Experimental method
+    temperature:
+      value: optical pyrometer corrected using iron melting temperature
+      locator:
+        published_page: 624
+        pdf_page_index: 2
+        section: 2. Experimental method
+  context_id: itoh-hino-banya-1997-mg-deoxidation::context::itoh_hino_banya_1997_experimental_setup
+  work_id: 10.2355/tetsutohagane1955.83.10_623
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  species: Mg

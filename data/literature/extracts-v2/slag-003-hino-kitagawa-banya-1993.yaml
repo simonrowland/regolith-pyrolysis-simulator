@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphur_distribution_ratio_logLs'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -72,6 +73,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxygen_dissolution_in_liquid_iron_logK'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -116,6 +118,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphur_dissolution_in_liquid_iron_logK'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -160,6 +163,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'slag_metal_sulphur_ratio_from_Cs'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -205,6 +209,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'aluminium_deoxidation_logK'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -246,9 +251,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -274,6 +283,18 @@ observations:
     note: Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition
       of MgO or SiO2 to the slag at 1873 K.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 41
+        published_page: 41
+        pdf_page_index: 6
+        figure: '10'
+        note: Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition
+          of MgO or SiO2 to the slag at 1873 K.
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig1_figure_only
   experiment_id: 10.2355/isijinternational.33.36::1
   identity:
@@ -294,6 +315,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -337,6 +359,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -380,6 +403,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -420,9 +444,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -448,6 +476,18 @@ observations:
     note: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical values
       show −log Cs.'
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 39
+        published_page: 39
+        pdf_page_index: 4
+        figure: '4'
+        note: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical
+          values show −log Cs.'
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig5_figure_only
   experiment_id: 10.2355/isijinternational.33.36::5
   identity:
@@ -465,9 +505,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -493,6 +537,18 @@ observations:
     note: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical values
       show −log Cs.'
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 39
+        published_page: 39
+        pdf_page_index: 4
+        figure: '5'
+        note: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical
+          values show −log Cs.'
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig6_figure_only
   experiment_id: 10.2355/isijinternational.33.36::6
   identity:
@@ -510,9 +566,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1923'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -538,6 +598,18 @@ observations:
     note: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical values
       show −log Cs.'
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 39
+        published_page: 39
+        pdf_page_index: 4
+        figure: '6'
+        note: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical
+          values show −log Cs.'
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig7_figure_only
   experiment_id: 10.2355/isijinternational.33.36::7
   identity:
@@ -555,9 +627,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -581,6 +657,17 @@ observations:
     figure: '7'
     note: Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 39
+        published_page: 39
+        pdf_page_index: 4
+        figure: '7'
+        note: Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig8_figure_only
   experiment_id: 10.2355/isijinternational.33.36::8
   identity:
@@ -598,9 +685,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -626,6 +717,18 @@ observations:
     note: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical values
       show −log Cs.'
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 40
+        published_page: 40
+        pdf_page_index: 5
+        figure: '8'
+        note: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical
+          values show −log Cs.'
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig9_figure_only
   experiment_id: 10.2355/isijinternational.33.36::9
   identity:
@@ -643,9 +746,13 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -670,6 +777,17 @@ observations:
     figure: '9'
     note: Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 40
+        published_page: 40
+        pdf_page_index: 5
+        figure: '9'
+        note: Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table1_cao_al2o3_cs
   experiment_id: 10.2355/isijinternational.33.36::1
   identity:
@@ -694,6 +812,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -749,6 +868,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -811,6 +931,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

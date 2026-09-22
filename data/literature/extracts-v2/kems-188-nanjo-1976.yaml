@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-188-nanjo-1976.yaml
 observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_fig7_activities_714k_figure_only
-  experiment_id: 10.2320/jinstmet1952.40.9_958::7
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -57,7 +58,7 @@ observations:
         figure: '7'
         note: Belton-Fruehan plots and a_Se, a_Te at 714 K
 - observation_id: kems-188-nanjo-1976::nanjo_1976_gamma_Te_regular_714k
-  experiment_id: 10.2320/jinstmet1952.40.9_958::7
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
       tag: unknown
@@ -80,6 +81,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -112,7 +114,7 @@ observations:
         figure: '7'
         note: log gamma_Te = 0.33 X_Se2^2 from I+_128/I+_160; also 0.32 and 0.27 from other ion pairs
 - observation_id: kems-188-nanjo-1976::nanjo_1976_kems_geometry_and_calibration
-  experiment_id: 10.2320/jinstmet1952.40.9_958::1
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
       tag: unknown
@@ -135,6 +137,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -179,6 +182,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_vaporization'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -200,7 +204,7 @@ observations:
     note: Table 1 literature column
   read_from: pdf:kems-188-nanjo-1976
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap
-  experiment_id: 10.2320/jinstmet1952.40.9_958::1
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
       tag: unknown
@@ -223,6 +227,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -244,7 +249,7 @@ observations:
     note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
   read_from: pdf:kems-188-nanjo-1976
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se
-  experiment_id: 10.2320/jinstmet1952.40.9_958::1
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
       tag: unknown
@@ -267,6 +272,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

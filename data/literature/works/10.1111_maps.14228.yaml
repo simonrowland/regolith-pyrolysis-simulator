@@ -20,256 +20,107 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1111/maps.14228
 experiments:
-- experiment_id: 10.1111/maps.14228::1
+- experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   kind: literature
   method:
     tag: unknown
-    reason: regime 'simulant_characterization' is not a closed method token (kems_effusion alone is insufficient)
+    reason: not_published
   sample:
-    initial_composition:
+    mass_kg:
       state:
         tag: value
         value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.1635763109467948057043917027'
-          - - CaO
-            - '0.1317067671946714087371469334'
-          - - Cr2O3
-            - '0.00008363806952774552626811101116'
-          - - FeO
-            - '0.0268948925187085301150100733'
-          - - K2O
-            - '0.003103944508793697681962630031'
-          - - MgO
-            - '0.1769422071862410895424937676'
-          - - MnO
-            - '0.0004480058147428027402829115468'
-          - - Na2O
-            - '0.02358702884624193456470039396'
-          - - SiO2
-            - '0.4673700041449281633455703389'
-          - - TiO2
-            - '0.006287200769349822042173137266'
-          amount_basis: mole_fraction
+          kind: point
+          point: '0.003'
+          approximate: false
       locator:
-        published_page: 2489
-        pdf_page_index: 4
-        table: '1'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '26.24'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '11.62'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_Cr2O3_wt_pct
-          - state:
-              tag: value
-              value: '0.02'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_Cr2O3_g_mol
-          - state:
-              tag: value
-              value: '151.98919999999998'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '3.04'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.46'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '11.22'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.05'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '2.3'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '44.18'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.79'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 2489
-              pdf_page_index: 4
-              table: '1'
-        output_unit: mole_fraction
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Printed three grams of milled material; unit conversion only
     printed_composition:
       state:
         tag: value
-        value:
-          Al2O3: '26.24'
-          CaO: '11.62'
-          Cr2O3: '0.02'
-          FeO: '3.04'
-          K2O: '0.46'
-          MgO: '11.22'
-          MnO: '0.05'
-          Na2O: '2.3'
-          SO3: '0.1'
-          SiO2: '44.18'
-          TiO2: '0.79'
+        value: JSC-1A lunar simulant
       locator:
-        published_page: 2489
-        pdf_page_index: 4
-        table: '1'
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+    form:
+      state:
+        tag: value
+        value: Milled powder
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    pretreatment:
+      state:
+        tag: value
+        value: 10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven
+          20-mm agate balls in a 125-mL agate mortar
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Target temperature 950 C; unit conversion only
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: H2 flow is described but no pressure is printed
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Pure H2 is stated; no flow or partial pressure is printed
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention
   work_id: 10.1111/maps.14228
   locator:
-    published_page: 2489
-    pdf_page_index: 4
-    table: '1'
-    section: Lunar Simulants Used in this Study
+    published_page: 2491
+    pdf_page_index: 6
+    figure: '1'
+    section: Methods - Milling and Reduction of Lunar Simulants
   apparatus:
     cell_material_and_liner:
       state:
@@ -279,69 +130,396 @@ experiments:
         published_page: 2491
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
-- experiment_id: 10.1111/maps.14228::2
+  bench_id: 10.1111/maps.14228::bench::horizontal-tube-reduction-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: H2 flush before heating; furnace turned off after roasting; tube immediately removed and cooled by pressurized
+          air then wet towels
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Target temperature 950 C; unit conversion only
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '900'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Reaction continued 15 min at target temperature; unit conversion only
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: No total run duration printed; only a 15-min target-temperature hold is specified
+- experiment_id: 10.1111/maps.14228::experiment::lhs-1-h2-reduction
   kind: literature
   method:
     tag: unknown
-    reason: regime 'XRD_and_SEM_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+          approximate: false
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Printed three grams of milled material; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: LHS-1 lunar simulant
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+    form:
+      state:
+        tag: value
+        value: Milled powder
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    pretreatment:
+      state:
+        tag: value
+        value: 10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven
+          20-mm agate balls in a 125-mL agate mortar
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Target temperature 950 C; unit conversion only
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: H2 flow is described but no pressure is printed
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Pure H2 is stated; no flow or partial pressure is printed
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention
   work_id: 10.1111/maps.14228
   locator:
-    published_page: 2493
-    pdf_page_index: 8
-    figure: '2'
-    section: Results - Experimental Reduction of Lunar Simulants - Solid Phase Characterization
-- experiment_id: 10.1111/maps.14228::4
+    published_page: 2491
+    pdf_page_index: 6
+    figure: '1'
+    section: Methods - Milling and Reduction of Lunar Simulants
+  bench_id: 10.1111/maps.14228::bench::horizontal-tube-reduction-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: H2 flush before heating; furnace turned off after roasting; tube immediately removed and cooled by pressurized
+          air then wet towels
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Target temperature 950 C; unit conversion only
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '900'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Reaction continued 15 min at target temperature; unit conversion only
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: No total run duration printed; only a 15-min target-temperature hold is specified
+- experiment_id: 10.1111/maps.14228::experiment::lms-1-h2-reduction
   kind: literature
   method:
     tag: unknown
-    reason: regime 'particle_size_and_bet_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+          approximate: false
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Printed three grams of milled material; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1 lunar simulant
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+    form:
+      state:
+        tag: value
+        value: Milled powder
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    pretreatment:
+      state:
+        tag: value
+        value: 10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven
+          20-mm agate balls in a 125-mL agate mortar
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Target temperature 950 C; unit conversion only
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: H2 flow is described but no pressure is printed
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Pure H2 is stated; no flow or partial pressure is printed
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention
   work_id: 10.1111/maps.14228
   locator:
-    published_page: 2500
-    pdf_page_index: 15
-    table: '4'
-    section: Solid Phase Characterization
+    published_page: 2491
+    pdf_page_index: 6
+    figure: '1'
+    section: Methods - Milling and Reduction of Lunar Simulants
+  bench_id: 10.1111/maps.14228::bench::horizontal-tube-reduction-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: H2 flush before heating; furnace turned off after roasting; tube immediately removed and cooled by pressurized
+          air then wet towels
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Target temperature 950 C; unit conversion only
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '900'
+            approximate: false
+        locator:
+          published_page: 2491
+          pdf_page_index: 6
+          section: Methods - Milling and Reduction of Lunar Simulants
+          note: Reaction continued 15 min at target temperature; unit conversion only
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: No total run duration printed; only a 15-min target-temperature hold is specified
+benches:
+- id: 10.1111/maps.14228::bench::horizontal-tube-reduction-furnace
+  work_id: 10.1111/maps.14228
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Horizontal-tube hydrogen-reduction furnace
+    locator:
+      published_page: 2491
+      pdf_page_index: 6
+      figure: '1'
+      section: Methods - Milling and Reduction of Lunar Simulants
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Silica boat in a horizontal silica glass tube; one-hole rubber stoppers at both ends
+    locator:
+      published_page: 2491
+      pdf_page_index: 6
+      figure: '1'
+      section: Methods - Milling and Reduction of Lunar Simulants
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Monitoring Type K thermocouple
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        figure: '1'
+        section: Methods - Milling and Reduction of Lunar Simulants
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2491
+        pdf_page_index: 6
+        section: Methods - Milling and Reduction of Lunar Simulants
+        note: Monitoring Type K thermocouple is named; calibration or uncertainty is not printed
+  heating_method:
+    state:
+      tag: value
+      value: Furnace voltage controlled by a Variac voltage regulator
+    locator:
+      published_page: 2491
+      pdf_page_index: 6
+      figure: '1'
+      section: Methods - Milling and Reduction of Lunar Simulants
+  other_facts: []

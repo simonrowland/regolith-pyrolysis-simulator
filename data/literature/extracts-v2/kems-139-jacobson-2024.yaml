@@ -22,6 +22,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -74,6 +75,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_HfO_g'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -115,6 +117,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -154,11 +157,12 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2500.0, 2500.0]; no midpoint invented
+      tag: value
+      value: '2500'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -181,6 +185,17 @@ observations:
     table: '1'
     note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage 115 calculations)
   read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 18
+        published_page: 18
+        pdf_page_index: 19
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage 115 calculations)
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_snyder_12022_composition
   experiment_id: 10.1002/rcm.9744::1
   identity:
@@ -201,6 +216,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -240,12 +256,13 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1976.0, 1976.0]; no midpoint invented
+      tag: value
+      value: '1976'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_reaction_enthalpy'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -268,6 +285,16 @@ observations:
     pdf_page_index: 24
     paragraph: A second law plot of ln(IT) versus 1/T
   read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1976'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 24
+        paragraph: A second law plot of ln(IT) versus 1/T
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_average_narrative
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -292,6 +319,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_average'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -337,6 +365,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_and_compiled_ion_intensity';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

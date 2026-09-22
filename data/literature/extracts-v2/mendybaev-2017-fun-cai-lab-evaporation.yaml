@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml
 observations:
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_al_non_loss
-  experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: unknown
@@ -22,6 +22,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -42,7 +43,7 @@ observations:
     section: '4.1'
   read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_ca_non_loss
-  experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: unknown
@@ -61,6 +62,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -81,7 +83,7 @@ observations:
     section: '4.1'
   read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:0
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -156,6 +158,7 @@ observations:
   value:
     kind: point
     point: '0.047'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -372,7 +375,7 @@ observations:
           paragraph: FUNC-5
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:1
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -447,6 +450,7 @@ observations:
   value:
     kind: point
     point: '0.166'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -663,7 +667,7 @@ observations:
           paragraph: FUNC-10
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:2
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -738,6 +742,7 @@ observations:
   value:
     kind: point
     point: '0.286'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -954,7 +959,7 @@ observations:
           paragraph: FUNC-1
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:3
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -1029,6 +1034,7 @@ observations:
   value:
     kind: point
     point: '0.397'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1245,7 +1251,7 @@ observations:
           paragraph: FUNC-9
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:4
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -1320,6 +1326,7 @@ observations:
   value:
     kind: point
     point: '0.463'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1536,7 +1543,7 @@ observations:
           paragraph: FUNC-3
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:5
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -1611,6 +1618,7 @@ observations:
   value:
     kind: point
     point: '0.547'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1827,7 +1835,7 @@ observations:
           paragraph: FUNC-7
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:6
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -1902,6 +1910,7 @@ observations:
   value:
     kind: point
     point: '0.617'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2118,7 +2127,7 @@ observations:
           paragraph: FUNC-8
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:7
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -2193,6 +2202,7 @@ observations:
   value:
     kind: point
     point: '0.639'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2409,7 +2419,7 @@ observations:
           paragraph: FUNC-4
     output_unit: dimensionless
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:8
-  experiment_id: 10.1016/j.gca.2016.08.034::1
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
     quantity:
       tag: value
@@ -2484,6 +2494,7 @@ observations:
   value:
     kind: point
     point: '0.693'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

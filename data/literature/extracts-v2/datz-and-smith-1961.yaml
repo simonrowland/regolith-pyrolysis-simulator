@@ -23,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source is a Kd/Kp dissociation equilibrium, not delta_fG; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -60,6 +61,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source is a Kd/Kp dissociation equilibrium, not delta_fG; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -97,6 +99,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

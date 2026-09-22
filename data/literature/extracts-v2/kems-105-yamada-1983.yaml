@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -111,6 +112,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P_Al,
       epsilon_P_Al_as_printed, T_C_as_printed, T_K, a_Fe_source, note'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -208,6 +210,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source,
       epsilon_P_Si, epsilon_P_Si_as_printed, T_C_as_printed, T_K, authors_comment'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -307,6 +310,7 @@ observations:
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_as_printed,
       T_K, T_K_conversion, composition, composition_basis, epsilon_P_Si, epsilon_P_Al, epsilon_P_Ti, epsilon_P_V, epsilon_P_Cr,
       epsilon_P_Co, epsilon_P_Ni, epsilon_P_Nb, epsilon_P_Mo, rows, e_column_note, al_body_text_disagreement'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -371,6 +375,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -424,6 +429,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -477,6 +483,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -530,6 +537,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -583,6 +591,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -636,6 +645,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -690,6 +700,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -745,6 +756,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_purity'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -831,6 +843,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_header_as_printed,
       rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

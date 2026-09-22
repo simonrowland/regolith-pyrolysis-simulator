@@ -52,7 +52,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '1.333223684210526315789473684'
+        value:
+          kind: point
+          point: '1.333223684210526315789473684'
+          approximate: false
       locator:
         paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md

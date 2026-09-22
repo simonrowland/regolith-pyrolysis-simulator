@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-069-furukawa-1976.yaml
 observations:
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C
-  experiment_id: 10.2355/isijinternational1966.16.382::4
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -29,6 +29,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -61,7 +62,7 @@ observations:
         table: '4'
         note: Table 4 Fe columns at 1600 C; liquid Fe reference
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig1_ion_ratio_vs_1_over_T_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::1
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -83,6 +84,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -104,7 +106,7 @@ observations:
     note: Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig2_integration_curve_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::2
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -127,6 +129,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -149,7 +152,7 @@ observations:
     note: Fig. 2. (a) Ion current ratios and (b) integration curve for the Fe-Ti system at 1600 C
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig3_activities_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::3
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -171,6 +174,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -193,7 +197,7 @@ observations:
     note: Fig. 3. Activities in the Fe-Ti alloys at 1600 C
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig4_comparison_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::4
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -216,6 +220,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -238,7 +243,7 @@ observations:
     note: Fig. 4. Comparison of the present study with previous works on the activity of titanium in Fe-Ti alloys
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig5_heat_integration_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::5
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -260,6 +265,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -282,7 +288,7 @@ observations:
     note: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig6_mixing_properties_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::6
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -304,6 +310,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -326,7 +333,7 @@ observations:
     note: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_fig7_log_gamma_vs_one_minus_N_sq_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::7
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -348,6 +355,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -393,6 +401,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -414,7 +423,7 @@ observations:
     note: Table 3 comparison of gamma_Ti^o from previous works
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_this_work_1600C
-  experiment_id: 10.2355/isijinternational1966.16.382::3
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -437,6 +446,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -469,7 +479,7 @@ observations:
         table: '3'
         note: 'Table 3 This work row: 0.017** (liquid Ti) and 0.018* (solid Ti) at 1600 C'
 - observation_id: kems-069-furukawa-1976::furukawa_1976_heats_of_solution
-  experiment_id: 10.2355/isijinternational1966.16.382::6
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -492,6 +502,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_heat_of_solution'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -525,7 +536,7 @@ observations:
         figure: '6'
         note: infinite-dilution heats of solution and maximum H^M from integration of Table 2 slopes via eq (5)
 - observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2
-  experiment_id: 10.2355/isijinternational1966.16.382::2
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: value
@@ -590,6 +601,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, log_base,
       points'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -611,7 +623,7 @@ observations:
     note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_kems_geometry_and_calibration
-  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -634,6 +646,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -656,7 +669,7 @@ observations:
     note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_log_gamma_darken_equations
-  experiment_id: 10.2355/isijinternational1966.16.382::7
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -682,6 +695,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_composition_equation'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -717,7 +731,7 @@ observations:
         equation: 6-7
         note: eqs (6)-(7) and conclusion; synopsis p. 382 prints +0.58 for log gamma_Ti intercept vs +0.53 in the body
 - observation_id: kems-069-furukawa-1976::furukawa_1976_photo1_mass_spectrum_figure_only
-  experiment_id: 10.2355/isijinternational1966.16.382::Photo. 1
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -739,6 +753,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -783,6 +798,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_chemical_analysis'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -804,7 +820,7 @@ observations:
     note: Table 1. Chemical analysis of the pure materials (ppm)
   read_from: pdf:kems-069-furukawa-1976
 - observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C
-  experiment_id: 10.2355/isijinternational1966.16.382::4
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
       tag: unknown
@@ -830,6 +846,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -886,6 +903,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'excess_gibbs_regular_solution'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

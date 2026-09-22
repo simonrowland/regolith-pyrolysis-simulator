@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-120-ueshima-1984.yaml
 observations:
 - observation_id: kems-120-ueshima-1984::ueshima_1984_fig3_activities_1873k_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::3
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -46,7 +47,7 @@ observations:
     note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
   read_from: pdf:kems-120-ueshima-1984
 - observation_id: kems-120-ueshima-1984::ueshima_1984_gamma0_W_1873k
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::kems-120-ueshima-1984
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -69,6 +70,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -99,7 +101,7 @@ observations:
         pdf_page_index: 1
         note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
 - observation_id: kems-120-ueshima-1984::ueshima_1984_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::kems-120-ueshima-1984
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -122,6 +124,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -143,7 +146,7 @@ observations:
     note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
   read_from: pdf:kems-120-ueshima-1984
 - observation_id: kems-120-ueshima-1984::ueshima_1984_quoted_nesmeyanov_a_Fe
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::kems-120-ueshima-1984
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -208,6 +211,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, cited, a_Fe, W_at_percent,
       T_K, authors_comment'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -239,7 +243,7 @@ observations:
         section: '4.3'
         note: Nesmeyanov Knudsen a_Fe=0.865 at 0.345 at% W, 1500 K in gamma-Fe-W
 - observation_id: kems-120-ueshima-1984::ueshima_1984_table1_activity_equations
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::1
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -265,6 +269,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_or_activity_coefficient_equations'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -287,7 +292,7 @@ observations:
     note: Table 1 experimental values for activities or activity coefficients
   read_from: pdf:kems-120-ueshima-1984
 - observation_id: kems-120-ueshima-1984::ueshima_1984_table2_partial_molar_1873k
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::2
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -310,6 +315,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -342,7 +348,7 @@ observations:
         table: '2'
         note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
 - observation_id: kems-120-ueshima-1984::ueshima_1984_table3_partial_molar_1773k
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::3
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
     quantity:
       tag: unknown
@@ -365,6 +371,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -397,7 +404,7 @@ observations:
         table: '3'
         note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
 - observation_id: kems-120-ueshima-1984::ueshima_1984_table4_fe_mo_revised
-  experiment_id: 10.2355/tetsutohagane1955.70.6_549::4
+  experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -420,6 +427,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

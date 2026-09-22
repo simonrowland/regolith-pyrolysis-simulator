@@ -1,0 +1,129 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpsc-2017-2171.yaml
+observations:
+- observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
+  experiment_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c::lpsc-2017-2171
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'method_capability_window'
+    species:
+      formula: lunar_volatiles
+      phase:
+        tag: unknown
+        reason: phase string 'instrument_design' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'method_capability_window'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed; isotope precision, peak power, and mass are approximate or design-level statements
+        where qualified in the source.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2017-2171
+  locator:
+    page: 2
+    pdf_page_index: 2
+    section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
+  read_from: unknown:lpsc-2017-2171
+- observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
+  experiment_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c::lpsc-2017-2171
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'method_capability_window'
+    species:
+      formula: lunar_volatiles
+      phase:
+        tag: unknown
+        reason: phase string 'instrument_design' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'method_capability_window'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty or run duration is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2017-2171
+  locator:
+    page: 2
+    pdf_page_index: 2
+    section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
+  read_from: unknown:lpsc-2017-2171
+- observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
+  experiment_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c::lpsc-2017-2171
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'method_capability_window'
+    species:
+      formula: lunar_volatiles
+      phase:
+        tag: unknown
+        reason: phase string 'instrument_design' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'method_capability_window'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed; the local regolith temperature is explicitly described as assumed and sample
+        volume is an upper estimate.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2017-2171
+  locator:
+    page: 1
+    pdf_page_index: 1
+    section: Volatiles Preservation
+  read_from: unknown:lpsc-2017-2171

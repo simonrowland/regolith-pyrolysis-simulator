@@ -26,6 +26,7 @@ observations:
     kind: expression
     expression_text: evaluator_segments_as_published
     expression_domain: segments
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -74,6 +75,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'adopted_formation_enthalpy'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -129,6 +131,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'competing_formation_enthalpy'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -175,6 +178,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'tabulated_thermo_functions'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

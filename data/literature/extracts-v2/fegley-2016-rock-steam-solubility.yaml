@@ -67,6 +67,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, model, conditions, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -107,6 +108,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'composition'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -145,6 +147,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'composition'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -228,6 +231,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, model, rows'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -269,6 +273,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'distribution_coefficient'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

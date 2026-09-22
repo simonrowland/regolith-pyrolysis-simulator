@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-067-yamada-1980.yaml
 observations:
 - observation_id: kems-067-yamada-1980::yamada_1980_cell_po2_calculated
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_oxygen_partial_pressure'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -60,7 +61,7 @@ observations:
         equation: 2-5
         note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
 - observation_id: kems-067-yamada-1980::yamada_1980_fe_activity_fig8_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -82,6 +83,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -104,7 +106,7 @@ observations:
     note: 'Fig. 8 a_Fe; conclusion: Raoultian negative deviation in 0.05 < N_Si < 0.5'
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig1_peak_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -126,6 +128,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -147,7 +150,7 @@ observations:
     note: Fig. 1. Relation between the measured peak and the reference peak.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig2_Si_O_po2_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -169,6 +172,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -190,7 +194,7 @@ observations:
     note: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O at 1600 C.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig3_ISiO_over_ISi_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::3
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -212,6 +216,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -233,7 +238,7 @@ observations:
     note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::4
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -256,6 +261,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -278,7 +284,7 @@ observations:
       for the deoxidizer.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig5_gamma_Si_comparison_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -300,6 +306,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -321,7 +328,7 @@ observations:
     note: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig6_integration_curve_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::6
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -343,6 +350,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -365,7 +373,7 @@ observations:
     note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig7_gamma_Si_this_work_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::7
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -387,6 +395,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -409,7 +418,7 @@ observations:
     note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig8_activities_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -431,6 +440,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -453,7 +463,7 @@ observations:
     note: Fig. 8. Activities for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fig9_ionization_efficiency_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::9
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -475,6 +485,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -496,7 +507,7 @@ observations:
     note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_fragmentation_BeO_ThO2_ion_ratios
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -522,6 +533,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_and_fragment_fraction'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -544,7 +556,7 @@ observations:
     note: 'BeO-cell and ThO2-cell I+_Fe : I+_Si : I+_SiO; K=0.25%'
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: value
@@ -609,6 +621,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, composition_basis,
       n_points, header_as_printed, points'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -641,7 +654,7 @@ observations:
         table: '1'
         note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
 - observation_id: kems-067-yamada-1980::yamada_1980_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -664,6 +677,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -688,7 +702,7 @@ observations:
       and English captions only.
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: unknown
@@ -711,6 +725,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient_and_self_interaction_parameter';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -751,7 +766,7 @@ observations:
         equation: '8'
         note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
 - observation_id: kems-067-yamada-1980::yamada_1980_p_Si_estimate_NSi_below_0p05
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
     quantity:
       tag: value
@@ -816,6 +831,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, T_C, N_Si_less_than,
       ion_current_A, p_atm_about, note'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -847,7 +863,7 @@ observations:
         section: '3.1'
         note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
     quantity:
       tag: value
@@ -912,6 +928,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, N_Si, composition_basis,
       log10_gamma_Si_average_used_in_eq8, points'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -934,7 +951,7 @@ observations:
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
-  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
     quantity:
       tag: unknown
@@ -960,6 +977,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_and_self_interaction_parameter';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

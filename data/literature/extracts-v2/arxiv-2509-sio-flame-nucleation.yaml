@@ -1,0 +1,620 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml
+observations:
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_brownian_validation
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::14
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Brownian_motion_validation_setup'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Brownian_motion_validation_setup'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 20
+    figure: '14'
+    section: B.2 Validation of expression for Brownian motion
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'particle_radius_growth'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'gas_to_silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'particle_radius_growth'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 20
+    section: C.1 Molecular/kinematic regime
+    note: equations=59-63
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_furnace_particle_size_distribution
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_particle_size_distribution'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_particle_size_distribution'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 15
+    figure: '10'
+    section: 5.3 Particle size distributions
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: method_class, generator, quantity,
+      melting_temperature_as_printed, semantics, disagreement'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 13
+    section: 5.2 Growth of silica fume particles
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'validation_case_parameters_and_runtime'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'gas_to_silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'validation_case_parameters_and_runtime'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 10
+    table: '2'
+    section: 4.1 Lagrangian vs. Eulerian particle tracking
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'critical_radius_and_nucleation_rate'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'gas_to_silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'critical_radius_and_nucleation_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 5
+    section: 2.1.1 Particle nucleation
+    equation: 18-21
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped density field selected; source fields: method_class, generator, quantity, density_g_cm3,
+      density_kg_m3_also_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 20
+    section: B.2 Validation of expression for Brownian motion
+    equation: '52'
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Arrhenius_reaction_mechanism'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'gas_reaction_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Arrhenius_reaction_mechanism'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 7
+    table: '1'
+    section: 2.3 Fluid equations
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: method_class, generator, quantity, pressure_expression,
+      concentration_expression, P_boil_Pa, T_boil_K, DeltaH_options_J_per_mol, DeltaH_used_J_per_mol, reference_pressure_as_printed,
+      DeltaH_from_reference_point_J_per_mol, reference_point_semantics, R_gas_J_per_mol_K'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 9
+    section: 3.3 Saturation concentration
+    equation: 35-36
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_energy'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume_particle' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_energy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 8
+    section: 3.1 Surface energy
+    equation: '31'
+  read_from: unknown:arxiv-2509-sio-flame-nucleation
+- observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds
+  experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'silica_fume' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: method_class, generator, quantity,
+      coalescence_lower_limit_K, upper_limit_semantics, semantics'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-2509-sio-flame-nucleation
+  locator:
+    page: 6
+    section: 2.2 Silica fume particle interactions
+  read_from: unknown:arxiv-2509-sio-flame-nucleation

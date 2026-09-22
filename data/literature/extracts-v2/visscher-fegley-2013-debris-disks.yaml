@@ -67,6 +67,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, composition'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -151,6 +152,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, composition'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -191,6 +193,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source units 'dimensionless ratio; fO2 in bar' do not denote pressure;
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -230,6 +233,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'vapor_species_map'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no figure uncertainty reported
@@ -315,6 +319,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, lower_temperature_dominant_species,
       lower_temperature_regime, transition_temperature_K_as_printed'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -400,6 +405,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, dominant_with_lower_temperature_volatile_species,
       composition_sensitivity'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -485,6 +491,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, mole_fraction_range_as_printed,
       note'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -570,6 +577,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, generator, expression,
       model_approximation, qualitative_result'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -654,6 +662,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, coefficients'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -739,6 +748,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, generator, expression,
       terms'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported
@@ -779,6 +789,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_bulk_silicate_compositions'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: not reported for compiled input values in this paper
@@ -861,6 +872,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, species_scope'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -900,6 +912,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source units 'dimensionless ratio; fO2 in bar' do not denote pressure;
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim: no model uncertainty reported

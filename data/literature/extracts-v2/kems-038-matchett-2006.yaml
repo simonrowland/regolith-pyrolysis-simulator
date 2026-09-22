@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -74,6 +75,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bond_dissociation_and_Tvap'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -94,7 +96,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
   read_from: unknown:kems-038-matchett-2006
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:10
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -159,6 +161,7 @@ observations:
   value:
     kind: point
     point: '0.0037'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -240,7 +243,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:11
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -305,6 +308,7 @@ observations:
   value:
     kind: point
     point: '0.101'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -419,7 +423,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:2
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -484,6 +488,7 @@ observations:
   value:
     kind: point
     point: '0.0016'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -567,7 +572,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:3
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -632,6 +637,7 @@ observations:
   value:
     kind: point
     point: '0.0037'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -746,7 +752,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:4
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -811,6 +817,7 @@ observations:
   value:
     kind: point
     point: '0.0005'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -925,7 +932,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:5
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -990,6 +997,7 @@ observations:
   value:
     kind: point
     point: '0.0092'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1104,7 +1112,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:7
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -1169,6 +1177,7 @@ observations:
   value:
     kind: point
     point: '0.0047'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1250,7 +1259,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:8
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -1315,6 +1324,7 @@ observations:
   value:
     kind: point
     point: '0.1066'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1429,7 +1439,7 @@ observations:
           source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
     output_unit: dimensionless
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:9
-  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
+  experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::experiment::fresnel-test-report-series
   identity:
     quantity:
       tag: value
@@ -1494,6 +1504,7 @@ observations:
   value:
     kind: point
     point: '0.0073'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

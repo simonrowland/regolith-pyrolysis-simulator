@@ -122,7 +122,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'sample_return_container' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'sealed_container_after_return' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -133,7 +133,10 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '68'
+        value:
+          kind: point
+          point: '68'
+          approximate: false
       locator:
         published_page: 3
         section: Results
@@ -163,6 +166,72 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1126/sciadv.abo7239
   locator:
+    published_page: 3
+    section: Results
+    note: Pirani-gauge measurement 30 hours after atmospheric entry
+context:
+- observation_id: okazaki_2022_container_dimensions_and_sampling
+  type: method
+  locator:
     published_page: 1
     section: Introduction
     note: sample-container dimensions and Hayabusa2 sampler size range are printed design/provenance facts, not furnace measurements
+  phase: Ryugu_sample_container
+  regime: sample_return_container
+  units: as printed
+  values:
+    quantity: container_dimensions_and_collectable_sample_size
+    method_class: method_only
+    container_material: aluminum alloy
+    container_diameter_mm: 120
+    container_height_mm: 130
+    collectable_sample_size_as_printed: millimeters to centimeters in diameter
+    sample_catcher_chambers: A and C
+  context_id: okazaki-2022-ryugu-gas-treasure-box::context::okazaki_2022_container_dimensions_and_sampling
+  work_id: 10.1126/sciadv.abo7239
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  species: Ryugu_sample_container
+- observation_id: okazaki_2022_container_pressure_and_extraction_geometry
+  type: method
+  locator:
+    published_page: 6
+    section: Gas sampling and on-site measurement at the QLF in WPA
+    note: inner volume, vacuum-line volume, collection fraction, bottle volume, aliquot volume, and timing are printed in
+      Materials and Methods
+  phase: Ryugu_sample_container
+  regime: GAEA_gas_extraction
+  units: as printed
+  values:
+    quantity: gas_sampling_geometry_and_timing
+    method_class: method_only
+    extraction_time_after_atmospheric_entry_hr: 30
+    container_inner_volume_cm3: ~200
+    vacuum_line_volume_cm3: 79
+    gas_bottles: NT1-NT4
+    gas_bottle_volume_cm3_each: 750
+    fraction_to_NT1_NT4_pct: ~80
+    QMS_split_volume_cm3: 16
+    QMS_split_fraction_pct: ~4
+    cold_traps: CR1 and CR2 at liquid-nitrogen temperature
+  context_id: okazaki-2022-ryugu-gas-treasure-box::context::okazaki_2022_container_pressure_and_extraction_geometry
+  work_id: 10.1126/sciadv.abo7239
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  species: Ryugu_sample_container
+- observation_id: okazaki_2022_container_seal_force
+  type: method
+  locator:
+    published_page: 2
+    section: Introduction
+    note: metal sealing-system design force
+  phase: Ryugu_sample_container
+  regime: metal_seal
+  units: N
+  values:
+    quantity: seal_force
+    method_class: quoted_literature
+    force_N: ~2700
+    seal_materials: softer aluminum alloy lid pressed onto harder Al alloy container edge
+  context_id: okazaki-2022-ryugu-gas-treasure-box::context::okazaki_2022_container_seal_force
+  work_id: 10.1126/sciadv.abo7239
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  species: Ryugu_sample_container

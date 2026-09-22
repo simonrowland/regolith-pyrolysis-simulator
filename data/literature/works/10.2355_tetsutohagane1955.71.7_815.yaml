@@ -37,94 +37,74 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.71.7_815
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.71.7_815::1
+- experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'chemical_equilibration_Na2O-silicate_FeCsat_PbNa' is not a closed method token (kems_effusion alone is
-      insufficient)
-  sample: {}
+    reason: regime 'melt_equilibration_quench' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 819
+        pdf_page_index: 5
+        section: 4.1 Experimental method
+        note: Multiple coexisting charge masses are printed; no single sample mass applies
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 819
+        pdf_page_index: 5
+        section: 4.1 Experimental method
+        note: Na2O content and Pb-Na initial content vary by run and remain in observations
+    form:
+      state:
+        tag: value
+        value: molten Na2O-SiO2 slag over liquid Pb-Na alloy
+      locator:
+        published_page: 819
+        pdf_page_index: 5
+        section: 4.1 Experimental method
+    characterization:
+      state:
+        tag: value
+        value: Post-run Na in slag and Pb by atomic absorption; Si by gravimetry and molybdenum-blue absorptiometry; carbon
+          by combustion CO2 infrared absorption
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+    pretreatment:
+      state:
+        tag: value
+        value: Pb-Na alloy premelted in graphite crucible at about 400 C; carbon-saturated Fe and Fe-Si-C alloys prepared
+          in graphite crucibles
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.3 Samples
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 819
+        pdf_page_index: 5
+        section: 4.1 Experimental method
+        note: Measurements at 1100
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: value
-        value: '101325'
-      locator:
-        page: 3
-        published_page: 817
-        table: '1'
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              page: 3
-              published_page: 817
-              table: '1'
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 3
-              published_page: 817
-              table: '1'
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.71.7_815
-  locator:
-    page: 3
-    published_page: 817
-    pdf_page_index: 3
-    table: '1'
-    note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
-      header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: graphite crucible, inner diameter 15 mm, with graphite lid
-      locator:
-        page: 3
-        published_page: 817
-        figure: '1'
-        paragraph: 3-2 実験方法
-- experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'chemical_equilibration_graphite_CO_PbNa' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '101325'
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
       locator:
         page: 2
         published_page: 816
@@ -156,22 +136,65 @@ experiments:
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: value
+        value:
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+          alternatives:
+          - species: CO
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+            components:
+            - species: CO
+              mole_fraction:
+                tag: unknown
+                reason: not_published
+              flow_sccm:
+                tag: unknown
+                reason: not_published
+              partial_pressure_Pa:
+                tag: unknown
+                reason: not_published
+            - species: Ar
+              mole_fraction:
+                tag: unknown
+                reason: not_published
+              flow_sccm:
+                tag: unknown
+                reason: not_published
+              partial_pressure_Pa:
+                tag: unknown
+                reason: not_published
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+        note: Printed as CO or CO-Ar mixture, dried and deoxidized; alternatives retained without selecting a species or inventing
+          component fractions.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.2355/tetsutohagane1955.71.7_815
   locator:
-    page: 7
-    published_page: 821
-    pdf_page_index: 7
-    table: '2'
-    figure: '4'
-    equation: log a_Na2O = A/T + B
-    note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
-      0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+    published_page: 819
+    pdf_page_index: 5
+    section: 4.1 Experimental method
+    note: Na2O-SiO2 activity measurement series; individual composition and CO-pressure conditions remain in observations
   apparatus:
     cell_material_and_liner:
       state:
@@ -183,10 +206,22 @@ experiments:
         figure: '1'
         paragraph: 3-2 実験方法
     geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 816
+          pdf_page_index: 2
+          section: 3.2 Experimental method
+          note: Gas-blowing hole is not an effusion orifice
       exposed_area_m2:
         state:
           tag: value
-          value: '0.0001767'
+          value:
+            kind: point
+            point: '0.0001767'
+            approximate: false
         locator:
           page: 2
           published_page: 816
@@ -210,108 +245,145 @@ experiments:
                 published_page: 816
                 paragraph: 3-2 実験方法 inner diameter 15 mm
           output_unit: m2
-- experiment_id: 10.2355/tetsutohagane1955.71.7_815::8
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '101325'
-      locator:
-        page: 2
-        published_page: 816
-        paragraph: 実験原理 / eq. (4)
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              page: 2
-              published_page: 816
-              paragraph: 実験原理 / eq. (4)
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 816
-              paragraph: 実験原理 / eq. (4)
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.71.7_815
-  locator:
-    page: 7
-    published_page: 821
-    pdf_page_index: 7
-    figure: '8'
-    paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
-  apparatus:
-    cell_material_and_liner:
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 816
+          pdf_page_index: 2
+          section: 3.2 Experimental method
+          note: No effusion channel
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
       state:
         tag: value
-        value: graphite crucible with graphite lid (CO blow onto melt surface)
+        value: CO partial pressure controlled by CO/Ar mixing
       locator:
-        page: 3
         published_page: 817
-        figure: '1'
-        paragraph: 3-2 実験方法
-- experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'chemical_equilibration_graphite_CO_PbNa' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+  bench_id: 10.2355/tetsutohagane1955.71.7_815::bench::ts-graphite-co-equilibration
+  thermal_schedule:
+    method:
       state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
+        tag: value
+        value: Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+    total_duration_s:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1800'
+          interval_high: '7200'
+          approximate: false
+      locator:
+        published_page: 819
+        pdf_page_index: 5
+        section: 4.1 Experimental method
+        note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
+    cooling_or_quench:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        tag: value
+        value: Ar quench
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+benches:
+- id: 10.2355/tetsutohagane1955.71.7_815::bench::ts-graphite-co-equilibration
   work_id: 10.2355/tetsutohagane1955.71.7_815
-  locator:
-    page: 1
-    published_page: 815
-    pdf_page_index: 1
-    paragraph: English Synopsis + Japanese 結言 (2)
-    note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55). 5e-5
-      at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: graphite-crucible chemical-equilibration apparatus in SiC resistance furnace
+    locator:
+      published_page: 816
+      pdf_page_index: 2
+      section: 3.2 Experimental method
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: graphite crucible with graphite lid
+    locator:
+      published_page: 816
+      pdf_page_index: 2
+      section: 3.2 Experimental method
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pt-Pt13%Rh thermocouple beneath graphite crucible
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+        note: Set-temperature +/-0.5 C is control precision, not calibration uncertainty
+  heating_method:
+    state:
+      tag: value
+      value: SiC electric resistance furnace
+    locator:
+      published_page: 816
+      pdf_page_index: 2
+      section: 3.2 Experimental method
+  other_facts:
+  - name: graphite_crucible_inner_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '15'
+          approximate: false
+      locator:
+        published_page: 816
+        pdf_page_index: 2
+        section: 3.2 Experimental method
+    unit: mm
+  - name: mullite_reaction_tube_dimensions
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: outer diameter 50; inner diameter 42; length 600
+          approximate: false
+      locator:
+        published_page: 816
+        pdf_page_index: 2
+        section: 3.2 Experimental method
+    unit: mm
+  - name: temperature_control_precision
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.5'
+          approximate: false
+      locator:
+        published_page: 817
+        pdf_page_index: 3
+        section: 3.2 Experimental method
+        note: Reaction-zone temperature controlled within set temperature +/-0.5 C
+    unit: C

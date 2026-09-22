@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml
 observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_gcms_chromatograms_figure_only
-  experiment_id: 10.1016/j.gca.2003.08.019::2
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -44,7 +45,7 @@ observations:
     note: also Figs 3-6 SICs of PAH in the H2-pyrolysate; Fig. 7 stepped-combustion profiles
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_murchison_h2_pyrolysis_method
-  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -67,6 +68,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'method_geometry_and_feedstock'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -86,7 +88,7 @@ observations:
     note: thermal program, 15 MPa H2, stainless-steel 316 reactor, dry-ice trap
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
-  experiment_id: 10.1016/j.gca.2003.08.019::1
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -108,6 +110,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_carbon_wt_percent'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -127,7 +130,7 @@ observations:
     note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
-  experiment_id: 10.1016/j.gca.2003.08.019::1
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -149,6 +152,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'stable_isotope_delta'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -171,7 +175,7 @@ observations:
     note: delta13C and delta15N (permil)
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
-  experiment_id: 10.1016/j.gca.2003.08.019::1
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -194,6 +198,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_nitrogen_wt_percent'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -213,7 +218,7 @@ observations:
     note: Bulk N (wt%) and N/C by IRMS
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_total_pyrolysate_mass_balance
-  experiment_id: 10.1016/j.gca.2003.08.019::1
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
       tag: unknown
@@ -236,6 +241,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'stable_isotope_delta_mass_balance'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -278,6 +284,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_C_N_and_isotopes'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -320,6 +327,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'component_classification'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -362,6 +370,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'stepped_combustion_carbon_yield'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -406,6 +415,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'stepped_combustion_nitrogen_yield'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

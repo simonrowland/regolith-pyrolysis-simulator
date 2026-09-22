@@ -62,255 +62,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1051/0004-6361/201220803
 experiments:
-- experiment_id: 10.1051/0004-6361/201220803::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 4
-    table: '1'
-- experiment_id: 10.1051/0004-6361/201220803::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 4
-    table: '2'
-- experiment_id: 10.1051/0004-6361/201220803::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 5
-    table: '3'
-- experiment_id: 10.1051/0004-6361/201220803::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 7
-    table: '4'
-- experiment_id: 10.1051/0004-6361/201220803::4a
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'solid_SiO_growth_coefficient' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '0.0000001'
-      locator:
-        paragraph: UHV
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=1e-09 mbar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000000001'
-            locator:
-              paragraph: UHV
-              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              paragraph: UHV
-              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    figure: 4a
-    paragraph: SiO film growth Arrhenius α(T)
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Ta Knudsen cell (source); UHV film growth
-      locator:
-        paragraph: Ta Knudsen cell
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-- experiment_id: 10.1051/0004-6361/201220803::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 8
-    table: '5'
-- experiment_id: 10.1051/0004-6361/201220803::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 8
-    table: '6'
 - experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
   kind: literature
   method:
@@ -322,6 +73,51 @@ experiments:
       state:
         tag: unknown
         reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    equation: '8'
+    line_range: 317-329
+    note: particle-growth equation; authors call alpha(T) a growth coefficient
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+- experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Commercial SiO (Mateck), 99.9% pure, -325 mesh, CAS no. 10097-28-6
+      locator:
+        page: 2
+        section: '2.1'
+        note: Commercial SiO evaporated from a tantalum Knudsen cell
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        section: '2.4'
+        note: Table 2 summarises 40-873 K from distinct condensation and annealing experiments; no one series setpoint applies
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -359,47 +155,132 @@ experiments:
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: '2.1'
+        note: UHV evaporation; no sweep gas stated
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: <
+            bound_value: '0.00000001'
+        locator:
+          page: 2
+          section: '2.1'
+          note: UHV base pressure <10^-10 mbar; unit conversion only
   work_id: 10.1051/0004-6361/201220803
   locator:
-    equation: '8'
-    line_range: 317-329
-    note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-- experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'published_fit_used_for_dust_growth' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+    page: 2
+    section: '2.1'
+    note: Source describes a measurement series
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ta Knudsen cell (source); UHV film growth
+      locator:
+        paragraph: Ta Knudsen cell
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: '2.1'
+          note: Knudsen cell named
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: '2.1'
+          note: Knudsen cell named
+  bench_id: 10.1051/0004-6361/201220803::bench::wetzel-uhv-film-apparatus
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Gradually increased-temperature annealing for the above-350 K data; lower-temperature data are from condensation
+          experiments
+      locator:
+        page: 4
+        section: '2.4'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '2.4'
+          note: Gradually increased temperatures are not individually printed here
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '6000'
+            approximate: false
+        locator:
+          page: 4
+          section: '2.4'
+          note: Printed 100 min per anneal; unit conversion only
+    total_duration_s:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+      locator:
+        page: 4
+        section: '2.4'
+        note: Multiple gradually increased-temperature anneals; no total series duration printed
+benches:
+- id: 10.1051/0004-6361/201220803::bench::wetzel-uhv-film-apparatus
   work_id: 10.1051/0004-6361/201220803
-  locator:
-    page: 7
-    section: '3.3'
-    equation: '8'
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: UHV physical-vapour-deposition thin-film infrared spectroscopy
+    locator:
+      page: 2
+      section: '2.1'
+      note: In-situ spectra of condensed SiO films produced by evaporation under UHV
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tantalum Knudsen cell
+    locator:
+      page: 2
+      section: '2.1'
+      note: Commercial SiO evaporated from a tantalum Knudsen cell
+  detector:
+    state:
+      tag: value
+      value: Bruker IFS66v/S Fourier-transform IR spectrometer with DTGS detector for MIR; Bruker Vertex80v with special FIR-DTGS
+        detector for ex-situ FIR
+    locator:
+      page: 2
+      section: '2.1'
+      note: The source describes separate MIR in-situ and FIR ex-situ detector configurations
+  heating_method:
+    state:
+      tag: value
+      value: Electron bombardment
+    locator:
+      page: 2
+      section: '2.1'
+      note: Commercial SiO evaporated from a tantalum Knudsen cell
+  other_facts: []

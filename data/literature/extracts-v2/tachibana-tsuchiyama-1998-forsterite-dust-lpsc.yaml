@@ -1,0 +1,496 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml
+observations:
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_dynamic_model_dust_size
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'modeled_dust_size'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'modeled_dust_size'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: caption=Results by dynamic models which includes dust movement and evaporation of 100 micrometre forsterite
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_fig1_model_grid
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_rate_vs_temperature_and_pressure'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_temperature_and_pressure does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_rate_vs_temperature_and_pressure';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 2
+    figure: '1'
+    note: caption=Calculated evaporation rate of forsterite, jFo, with alpha=0.1 plotted in the T-ptotal condition
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_fig2_dynamic_static_comparison
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporated_forsterite_fraction'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporated_forsterite_fraction'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: caption=The amount of forsterite evaporated, dust/(dust+gas) ratio, plotted against distance from the protosun
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_gas_chemistry_species_model
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_vapor_composition'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_vapor_composition'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Eighteen gas species for H, Mg, Si, and O, He(g) and CO(g) were considered to calculate peSiO.
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 1
+    paragraph: Eighteen gas species
+    section: Evaporation rates
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_hbd_alpha_assumption
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 1
+    paragraph: In the HBD regime
+    section: Evaporation rates
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_hkl_flux_equation
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_rate field selected; source fields: quantity, method_class, generator, gas_species,
+      evaporation_coefficient_symbol, variables, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: jFo = alpha(peSiO-pSiO)/(2 pi mSiO k T)^(1/2)
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 1
+    section: Evaporation rates
+    equation: '1'
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_nebula_model_paths
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'model_temperature_paths'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_temperature_paths'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 2
+    figure: '1'
+    note: caption=solar-nebula model paths at the active stage
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_prior_experiment_alpha_constraint
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.03'
+    interval_high: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 1
+    paragraph: In the FED and HRD regimes
+    section: Evaporation rates
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+- observation_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_regime_model
+  experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_regime'
+    species:
+      formula: forsterite
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_dust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_regime'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  locator:
+    page: 1
+    section: Evaporation rates
+    note: paragraphs=Free evaporation and hydrogen reaction regimes; H2O/H2 buffer regime
+  read_from: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc

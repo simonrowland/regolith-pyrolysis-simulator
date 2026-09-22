@@ -37,17 +37,54 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+        note: 5-70 mg; converted to kg
+    printed_composition:
+      state:
+        tag: value
+        value: Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2 composition
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+    form:
+      state:
+        tag: value
+        value: Quenched synthetic glass powder on platinum loops
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+    pretreatment:
+      state:
+        tag: value
+        value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        page: 525
+        table: '1'
+        note: The 1400-1800 C range spans distinct runs; per-run temperatures remain in Table 1 observations
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -56,15 +93,58 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        page: 525
+        section: 5.2 Experimental Procedure
+        note: Multiple pressure-regime furnaces; no common sweep gas
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
   locator:
-    table: '1'
-    figure: '12'
-    line_range: 174-178
-    note: γ_Mg evaporation coefficients from vacuum and H2 experiments
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    page: 525
+    section: 5.1 Starting Materials
+    note: Type B CAI-like evaporation series; Table 1 retains per-run temperature
+  bench_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '900'
+          interval_high: '18000'
+          approximate: false
+      locator:
+        page: 525
+        table: '1'
+        note: 15-300 min per run; converted to s
+benches:
+- id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Langmuir free-evaporation furnace suite
+    locator:
+      page: 525
+      section: 5.2 Experimental Procedure
+  detector:
+    state:
+      tag: value
+      value: JEOL JSM-5800LV SEM with Oxford Link ISIS-300 EDS
+    locator:
+      page: 526
+      section: 5.3 Analytical Procedures
+  heating_method:
+    state:
+      tag: value
+      value: Three furnaces for vacuum
+    locator:
+      page: 525
+      section: 5.2 Experimental Procedure
+  other_facts: []

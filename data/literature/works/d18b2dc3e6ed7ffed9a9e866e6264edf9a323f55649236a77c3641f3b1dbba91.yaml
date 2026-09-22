@@ -51,39 +51,6 @@ experiments:
     section: Abstract
     note: pdf_page=1
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
-- experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'electron_microprobe_and_wet_chemical_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  locator:
-    published_page: 905
-    table: '1'
-    note: pdf_page=2
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
 - experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
   kind: literature
   method:
@@ -151,3 +118,84 @@ experiments:
     section: Observations on incongruent melting and preliminary crystallization study
     note: pdf_page=7
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+context:
+- observation_id: ammin_76_904_table1_diopside_composition
+  type: composition
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+    published_page: 905
+    pdf_page: 2
+    table: '1'
+  phase: crystalline_diopside_and_diopside_glass
+  regime: electron_microprobe_and_wet_chemical_analysis
+  units: wt_pct_and_formula_atoms
+  values:
+    method_class: measured_direct
+    composition_wt_pct:
+      crystal:
+        SiO2:
+          value: '55.75'
+          uncertainty: '0.64'
+        MgO:
+          value: '18.15'
+          uncertainty: '0.32'
+        CaO:
+          value: '25.78'
+          uncertainty: '0.51'
+        total: '99.67'
+      glass_electron_microprobe:
+        SiO2:
+          value: '55.5'
+          uncertainty: '0.58'
+        MgO:
+          value: '18.25'
+          uncertainty: '0.3'
+        CaO:
+          value: '26.11'
+          uncertainty: '0.41'
+        total: '99.86'
+      glass_wet_chemical:
+        SiO2: '55.72'
+        MgO: '18.43'
+        CaO: '25.75'
+        total: '99.9'
+      ideal:
+        SiO2: '55.49'
+        MgO: '18.61'
+        CaO: '25.9'
+        total: '100'
+    formula_atoms:
+      crystal:
+        Si: '2.01'
+        Mg: '0.98'
+        Ca: '0.99'
+        O: '6'
+      glass_electron_microprobe:
+        Si: '2'
+        Mg: '0.98'
+        Ca: '1.01'
+        O: '6'
+      glass_wet_chemical:
+        Si: '2.01'
+        Mg: '0.99'
+        Ca: '0.99'
+        O: '6'
+      ideal:
+        Si: '2'
+        Mg: '1'
+        Ca: '1'
+        O: '6'
+    uncertainty_note: Electron-microprobe standard deviations are in parentheses; wet-chemical standard deviation is ±1%.
+  apparatus:
+    analysis: JEOL 8600 electron microprobe at Rutgers University
+    phase_checks: optical microscopy, backscattered-electron imaging at approximately 1 micrometre resolution, and XRD
+    phase_check_result: single crystalline phase; no forsterite or wollastonite peaks within the XRD detection limit of approximately
+      2%
+  missing:
+  - sample_mass_for_composition_analysis
+  - analysis_pressure
+  - analysis_atmosphere
+  context_id: ammin-76-904::context::ammin_76_904_table1_diopside_composition
+  work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
+  source_id: ammin-76-904
+  species: CaMgSi2O6

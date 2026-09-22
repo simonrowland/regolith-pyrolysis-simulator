@@ -19,282 +19,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1038/s41598-020-62312-4
 experiments:
-- experiment_id: 10.1038/s41598-020-62312-4::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'ambient_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 2
-    figure: '1'
-    section: Grain size distribution
-- experiment_id: 10.1038/s41598-020-62312-4::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'petrographic_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 3
-    figure: '2'
-    section: Mineralogical analysis / Thin sections
-- experiment_id: 10.1038/s41598-020-62312-4::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'xrf_bulk_composition' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.2804926162987529488022540351'
-          - - SiO2
-            - '0.6909592732843177969083779173'
-          - - TiO2
-            - '0.02854811041692925428936804799'
-          amount_basis: mole_fraction
-      locator:
-        page: 4
-        figure: '3'
-        section: Mineralogical analysis / XRF
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '11.9'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '43.7'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '2.4'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              figure: '3'
-              section: Mineralogical analysis / XRF
-        output_unit: mole_fraction
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '11.9'
-          Na2O_plus_K2O: '4.2'
-          SiO2: '43.7'
-          TiO2: '2.4'
-      locator:
-        page: 4
-        figure: '3'
-        section: Mineralogical analysis / XRF
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 4
-    figure: '3'
-    section: Mineralogical analysis / XRF
-- experiment_id: 10.1038/s41598-020-62312-4::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'sem_edx_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 4
-    figure: '5'
-    section: Mineralogical analysis / EDX during SEM imaging
-- experiment_id: 10.1038/s41598-020-62312-4::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'argon_dsc' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 5
-    figure: '6'
-    section: DSC
-- experiment_id: 10.1038/s41598-020-62312-4::Supplemental Fig. 1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'powder_and_solid_xrd' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1038/s41598-020-62312-4
-  locator:
-    page: 4
-    figure: Supplemental Fig. 1
-    section: Mineralogical analysis / XRD
 - experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant
   kind: literature
   method:
@@ -327,3 +51,397 @@ experiments:
     page: 2
     section: Density
     note: standard=ASTM D4442
+- experiment_id: 10.1038/s41598-020-62312-4::experiment::dsc-simulant-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Six lunar regolith simulants
+      locator:
+        page: 5
+        section: DSC
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 5
+        section: DSC
+        note: Starts at room temperature; no numerical start temperature printed
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 5
+    section: DSC
+    note: Six lunar-regolith simulants measured under argon
+  bench_id: 10.1038/s41598-020-62312-4::bench::pegasus-dsc-404c
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated from room temperature to 1
+      locator:
+        page: 5
+        section: DSC
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        section: DSC
+        note: Heating rate and endpoints are printed
+benches:
+- id: 10.1038/s41598-020-62312-4::bench::pegasus-dsc-404c
+  work_id: 10.1038/s41598-020-62312-4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Differential scanning calorimeter
+    locator:
+      page: 5
+      section: DSC
+      note: Measurements performed with a Pegasus DSC 404 C
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.005'
+            approximate: false
+        locator:
+          page: 5
+          section: DSC
+          note: 5 mm diameter crucibles; unit conversion only
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.005'
+            approximate: false
+        locator:
+          page: 5
+          section: DSC
+          note: 5 mm high crucibles; unit conversion only
+  detector:
+    state:
+      tag: value
+      value: Pegasus DSC 404 C
+    locator:
+      page: 5
+      section: DSC
+      note: Measurements performed with a Pegasus DSC 404 C
+  heating_method:
+    state:
+      tag: value
+      value: Pegasus DSC 404 C
+    locator:
+      page: 5
+      section: DSC
+      note: Measurements performed with a Pegasus DSC 404 C
+  other_facts: []
+context:
+- observation_id: engelschion_2020_eac1_host_mineralogy
+  type: characterization
+  locator:
+    page: 3
+    section: Mineralogical analysis / Thin sections
+    figure: '2'
+  phase: EAC-1_basanite_host
+  regime: petrographic_characterization
+  units: percent, micrometres, centimetres, as printed
+  values:
+    quantity: thin_section_mineralogy_and_crystal_sizes
+    method_class: measured_and_visual_classification
+    evidence_class: authors_own_measurement
+    sample_preparation: cut, glued to glass, polished to 30 micrometres
+    mineralogical_units: homogenously aphanitic; aphanitic matrix with olivine glomerocrysts and larger xenoliths
+    xenolith_size_cm_as_printed: '>10'
+    xenolith_composition: dunite (>90% olivine) to olivine-rich lherzolite (~40-90% olivine)
+    major_minerals: plagioclase, olivine, pyroxene
+    pyroxene_percent_both_units_as_printed: ~10
+    olivine_percent:
+      glomerocryst_containing_unit: ~30
+      aphanitic_unit: ~25
+    plagioclase_percent:
+      glomerocryst_containing_unit: ~55
+      aphanitic_unit: ~65
+    plagioclase_crystal_size_um: <100
+    primary_olivine_crystal_size_um: ~20 to ~500
+    olivine_glomerocryst_size_um: ~600-1300
+    pyroxene_crystal_size_um: 100-600
+    amphibole_size_um: ~100-200
+    minor_minerals: amphibole and quartz; possible chlorite cluster
+    no_petrographic_fabric: true
+  uncertainty:
+    note: tilde values and visual classifications retained as printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1_host_mineralogy
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac1_provenance
+  type: characterization
+  locator:
+    page: 1
+    section: Abstract and sample description
+  phase: basanitic_rock_host
+  regime: material_provenance
+  units: as printed (square metres, tonnes, millimetres)
+  values:
+    quantity: simulant_provenance_and_available_grain_fractions
+    method_class: reported_material_description
+    evidence_class: authors_own_description
+    source_material: intracontinental basanite from the Siebengebirge Volcanic Field, Königswinter, Germany
+    producer: Rheinische Provinzial-Basalt-u. Lavawerke GmbH & Co. oHG, Königswinter
+    LUNA_main_testbed_area_m2_as_printed: ~660
+    LUNA_dust_chamber_area_m2_as_printed: ~50
+    bulk_availability_tonnes_as_printed: 600-1000
+    available_grain_size_ranges_mm:
+    - 0.02-0.2
+    - 0.2-0.5
+    - 0.5-1.0
+    EAC1_vs_EAC1A_naming: EAC-1 denotes the material/rock; EAC-1A labels properties measured on the dusty simulant where grain
+      size matters.
+  uncertainty:
+    note: approximate areas and stated availability constraints retained as printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1_provenance
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1
+- observation_id: engelschion_2020_eac1_xrd
+  type: characterization
+  locator:
+    page: 4
+    section: Mineralogical analysis / XRD
+    figure: Supplemental Fig. 1
+  phase: EAC-1_and_EAC-1A_solid_samples
+  regime: powder_and_solid_xrd
+  units: as printed
+  values:
+    quantity: xrd_mineral_identification_and_scan_parameters
+    method_class: measured
+    evidence_class: authors_own_measurement
+    samples: EAC-1 aphanitic unit, EAC-1 glomerocryst-containing unit, EAC-1A simulant
+    minerals_identified: fosterite, fayalite, Ca-plagioclase, diopside, augite, titanite
+    possible_minerals: nepheline; clinochlore and additional feldspathoid peaks in aphanitic unit
+    EAC1A_difference: similar to two basanite units, with weaker ilmenite and titanite signatures
+    instrument: Siemens D5000 Powder diffractometer
+    wavelength_as_printed: 15 406 nm
+    sample_thickness_mm: 1-2
+    sample_diameter_mm: 18
+    scan_range_degree: 10-100
+    step_degree: '0.02'
+    acquisition_time_s: 6
+    grinding_papers_micron: 500 and 800
+  uncertainty:
+    note: possible phases are explicitly uncertain; wavelength retained exactly as printed in extracted text.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1_xrd
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac1a_cohesion
+  type: characterization
+  locator:
+    page: 3
+    section: Cohesion
+  phase: granular_lunar_regolith_simulant
+  regime: ambient_characterization
+  units: kPa and g/cm3, as printed
+  values:
+    quantity: cohesion
+    method_class: measured
+    evidence_class: authors_own_measurement
+    eac1a_cohesion_kPa_at_density_1p95_g_cm3: '0.38'
+    test_method: lowering a plastic plate into a box filled with EAC-1A
+    repeats_as_printed: 8
+    density_variation: different densities; increased using a shaking machine
+    shaking_machine_amplitude_as_printed: 20
+    relationship_with_density: not established
+  uncertainty:
+    note: no numeric uncertainty printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1a_cohesion
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac1a_density
+  type: characterization
+  locator:
+    page: 3
+    section: Density
+  phase: granular_lunar_regolith_simulant
+  regime: ambient_characterization
+  units: g/cm3, as printed
+  values:
+    quantity: bulk_and_absolute_density
+    method_class: measured
+    evidence_class: authors_own_measurement
+    bulk_density_method: weighing a specific volume; density at optimal packing
+    bulk_density_g_cm3:
+      EAC-1A: '1.45'
+      JSC-1A: '1.56'
+      JSC-2A: '1.44'
+      DNA: '1.27'
+      NU-LHT-3M: '1.54'
+    absolute_density_method: gas pycnometer, volume excluding pore space
+    absolute_density_g_cm3:
+      EAC-1: '2.9'
+      JSC-1A: '2.92'
+      JSC-2A: '2.89'
+      DNA: '2.79'
+      NU-LHT-3M: '3.08'
+    instrument: Micromeritic AccuPyc II gas pycnometer for absolute density
+  uncertainty:
+    note: no numeric uncertainty printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1a_density
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac1a_grain_size_distribution
+  type: characterization
+  locator:
+    page: 2
+    section: Grain size distribution
+    figure: '1'
+  phase: granular_lunar_regolith_simulant
+  regime: ambient_characterization
+  units: as printed (phi, micrometres)
+  values:
+    quantity: grain_size_distribution
+    method_class: measured
+    evidence_class: authors_own_measurement
+    instrument: Beckman Coulter LS 13 320 Laser Diffraction Particle Size Analyzer
+    classification_as_printed: silty sand (Wentworth)
+    phi_range_as_printed: 14.6 to -1
+    median_phi_as_printed: '6.47'
+    median_grain_size_um_as_printed: ~11
+    comparison_note: EAC-1A distribution mainly lies within the upper and lower Apollo boundary; the paper notes a lower weight
+      percent between ~180 and 70 micrometres than the lower Apollo limit.
+    no_digitized_figure_values: true
+  uncertainty:
+    note: The median grain size is printed as approximately 11 micrometres; the source does not print a numeric uncertainty.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1a_grain_size_distribution
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac1a_sphericity
+  type: characterization
+  locator:
+    page: 3
+    section: Sphericity
+  phase: granular_lunar_regolith_simulant
+  regime: ambient_characterization
+  units: dimensionless Phi and mm, as printed
+  values:
+    quantity: particle_sphericity
+    method_class: measured
+    evidence_class: authors_own_measurement
+    particles_selected: 80
+    instrument: Zeiss Axio Imager A2 optical microscope
+    calculation_method: Krumbein method
+    fractions_mm:
+    - 0.2-0.5
+    - 0.5-1
+    excluded_fraction_mm: 0.02-0.2
+    average_sphericity_Phi:
+      0.2-0.5_mm: '0.601'
+      0.5-1_mm: '0.591'
+    observed_shapes: elongated, spherical, and platy
+  uncertainty:
+    note: no numeric uncertainty printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac1a_sphericity
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac_edx
+  type: composition
+  locator:
+    page: 4
+    section: Mineralogical analysis / EDX during SEM imaging
+    figure: '5'
+  phase: EAC-1_basanite_host
+  regime: sem_edx_characterization
+  units: nm, kV, seconds, Kc/s, percent, micrometres, as printed
+  values:
+    quantity: endmember_composition_and_sem_conditions
+    method_class: measured
+    evidence_class: authors_own_measurement
+    instrument: Zeiss Ultra 55 scanning electron microscope
+    resolution_nm: 1-2
+    accelerating_voltage_kV: 15
+    systems: Oxford INCA EDX and Oxford Channel5/NordlysII EBSD
+    running_time_s: 50
+    counting_rate_Kc_s: '2.65'
+    dead_time_percent: <30
+    samples: one olivine-poor OP-1 and one olivine-rich OR-1
+    point_measurements: 3 locations including 3 unique particles
+    particle_size_um: 50-300
+    plagioclase_Ca_wt_pct_comparison: ~50-70 in EAC-1 versus ~65-95 in lunar regolith
+    pyroxenes: mainly Mg-rich augite; no enstatite in EAC-1
+  uncertainty:
+    note: comparative plagioclase ranges and the EDX dead-time bound retained as printed.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac_edx
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A
+- observation_id: engelschion_2020_eac_xrf_composition
+  type: composition
+  locator:
+    page: 4
+    section: Mineralogical analysis / XRF
+    figure: '3'
+  phase: EAC-1_basanite_host
+  regime: xrf_bulk_composition
+  units: wt percent and degrees Celsius, as printed
+  values:
+    quantity: bulk_major_element_composition
+    method_class: measured
+    evidence_class: authors_own_measurement
+    representative_samples: 2
+    powder_mass_g: 3
+    drying_temperature_C: 110
+    drying_duration_h: 6
+    loss_on_ignition_temperature_C: 1050
+    loss_on_ignition_duration_h: 2
+    glass_tablet_mix:
+      remaining_powder_g: 1
+      dilithium_tetraborate_g: 9
+      reagent_formula: Li2B4O7
+      preparation: melting and quenching
+    instrument: Philips MagiX Pro WD-XRF
+    composition_wt_pct:
+      MgO: '11.9'
+      TiO2: '2.4'
+      SiO2: '43.7'
+      Na2O_plus_K2O: '4.2'
+    composition_note: EAC-1 values; text says EAC-1A is most similar to intermediate Apollo 17 compositions.
+  uncertainty:
+    note: no numeric uncertainty printed; Na2O plus K2O is a combined value, not separate oxide measurements.
+  context_id: engelschion-2020-eac1a-simulant::context::engelschion_2020_eac_xrf_composition
+  work_id: 10.1038/s41598-020-62312-4
+  source_id: engelschion-2020-eac1a-simulant
+  species: EAC-1A

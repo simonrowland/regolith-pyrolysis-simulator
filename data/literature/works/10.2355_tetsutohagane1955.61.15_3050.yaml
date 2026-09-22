@@ -107,105 +107,111 @@ experiments:
           figure: '1'
           section: '3.1'
           note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.001'
+          interval_high: '0.003'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3057
+        table: '3'
+        note: Multiple Fe-V-Cr compositions retained in observation rows; no single series composition
+    form:
+      state:
+        tag: value
+        value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+    pretreatment:
+      state:
+        tag: value
+        value: Cr reduced in purified H2 at 1200 C for 85 h. Fe-V-Cr alloyed in the cell at approximately 1580 C for 20-30
+          min until constant ion intensity; this is preparation, not a measurement hold.
+      locator:
+        page: 14
+        published_page: 3052
+        section: '3.1'
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 3057
+        table: '3'
+        note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003999671052631578947368421053'
+          interval_high: '0.0001999835526315789473684210526'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Vacuum measurement; preparation H2 is not measurement gas
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     published_page: 3057
-    pdf_page_index: 8
-    figure: '10'
-    note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::12
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.61.15_3050
-  locator:
-    published_page: 3058
-    pdf_page_index: 9
-    figure: '12'
-    note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.61.15_3050
-  locator:
-    published_page: 3054
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+    table: '3'
+    note: Reported Fe-V-Cr measurement series; per-run orifice and charge mass not assigned
   apparatus:
     cell_material_and_liner:
       state:
@@ -221,39 +227,163 @@ experiments:
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Fe-Al addition only for liquid-state measurements
+  bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Measurements at >=1600 C limited to about 1 h due to thermocouple wear; 20-30 min at approximately 1580 C describes
+          alloy preparation only.
+      locator:
+        published_page: 3052-3053
+        section: 3.1; 3.2
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Per-run duration unassigned; about 1 h is a conditional limit
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.001'
+          interval_high: '0.003'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3054
+        table: '2'
+        note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal
+          assays
+    form:
+      state:
+        tag: value
+        value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement; nearly matched master-alloy mixing compositions
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+    pretreatment:
+      state:
+        tag: value
+        value: Argon-arc melted Fe-V master alloys; solid and solid-liquid samples remelted twice for homogenization
+      locator:
+        page: 14
+        published_page: 3052
+        section: '3.1'
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 3054
+        table: '2'
+        note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003999671052631578947368421053'
+          interval_high: '0.0001999835526315789473684210526'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Vacuum measurement; preparation H2 is not measurement gas
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
+    page: 15
     published_page: 3053
-    pdf_page_index: 4
-    figure: '3'
-    note: 1600 C liquidus 66 at% V, solidus 69 at% V from ion-ratio breaks
+    section: '3.2'
+    note: Reported Fe-V measurement series
   apparatus:
     cell_material_and_liner:
       state:
@@ -269,143 +399,224 @@ experiments:
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::4
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Fe-Al addition only for liquid-state measurements
+  bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Temperature-dependent measurements. At >=1600 C, limited to about 1 h due to thermocouple wear. Solid N_V=0.796
+          and 0.900 scans stepped low-high-low twice, about 4 h overall. No numerical heating rate or universal measurement
+          hold printed.
+      locator:
+        published_page: 3053-3054
+        section: 3.2; 4.2
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3053-3054
+        note: Conditional approximate upper limit about 1 h at >=1600 C; approximately 4 h for specified solid scans. Neither
+          applies to every series member
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-solid-scan-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.001'
+          interval_high: '0.003'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3054
+        table: '2'
+        note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal
+          assays
+    form:
+      state:
+        tag: value
+        value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: Printed loading range 1-3 g; individual charge masses not assigned
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement; nearly matched master-alloy mixing compositions
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+    pretreatment:
+      state:
+        tag: value
+        value: Argon-arc melted Fe-V master alloys; solid and solid-liquid samples remelted twice for homogenization
+      locator:
+        page: 14
+        published_page: 3052
+        section: '3.1'
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        published_page: 3054
+        table: '2'
+        note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003999671052631578947368421053'
+          interval_high: '0.0001999835526315789473684210526'
+          approximate: false
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Vacuum measurement; preparation H2 is not measurement gas
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
+    page: 16
     published_page: 3054
-    pdf_page_index: 5
-    figure: '4'
-    note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
+    section: '4.2'
+    note: Explicitly reported scans at N_V=0.796 and 0.900; not an additional inferred charge. Table 2 aggregates several
+      protocols and is not reassigned here
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
+        reason: not_published
+      locator:
+        page: 15
+        published_page: 3053
+        section: '3.2'
+        note: Fe-Al addition only for liquid-state measurements
+  bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
+  thermal_schedule:
+    method:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
+        tag: value
+        value: 'Solid N_V=0.796 and 0.900: stepwise low-high-low scans repeated twice'
+      locator:
+        page: 16
+        published_page: 3054
+        section: '4.2'
+    total_duration_s:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.61.15_3050
-  locator:
-    published_page: 3055
-    pdf_page_index: 6
-    figure: '6'
-    note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.61.15_3050
-  locator:
-    published_page: 3056
-    pdf_page_index: 7
-    figure: '7'
-    note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
-- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::9
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.61.15_3050
-  locator:
-    published_page: 3057
-    pdf_page_index: 8
-    figure: '9'
-    note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+          approximate: true
+      locator:
+        page: 16
+        published_page: 3054
+        section: '4.2'
+        note: About 4 h overall for the reported scan protocol; not a hold at each temperature. Unit conversion only
 - experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'quoted_compilation' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -430,7 +641,195 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
-    published_page: 3057
-    pdf_page_index: 8
-    equation: '10'
-    note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
+    published_page: 3051
+    pdf_page_index: 2
+    section: '2'
+    note: Chipman and Dastur H2-H2O equilibrium, V<1.5 wt%, 1600 C
+benches:
+- id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometer
+    locator:
+      page: 13
+      published_page: 3051
+      pdf_page_index: 2
+      section: '3.1'
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 13
+      published_page: 3051
+      pdf_page_index: 2
+      section: '3.1'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: High-purity alumina SSA-S; tantalum susceptor
+    locator:
+      page: 13
+      published_page: 3051
+      pdf_page_index: 2
+      section: '3.1'
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.009'
+            approximate: false
+        locator:
+          page: 13
+          published_page: 3051
+          pdf_page_index: 2
+          section: '3.1'
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 13
+          published_page: 3051
+          section: '3.1'
+          note: Body height is 12 mm; internal depth is not separately stated
+  detector:
+    state:
+      tag: value
+      value: Hitachi RM-6K; magnetic scanning, single focusing, 90 degree analyser, radius 200 mm
+    locator:
+      page: 13
+      published_page: 3051
+      pdf_page_index: 2
+      section: '3.1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor
+      locator:
+        page: 14
+        published_page: 3052
+        pdf_page_index: 3
+        section: '3.1'
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16
+      locator:
+        page: 15
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 14
+        published_page: 3052
+        section: '3.1'
+        note: The printed +/-0.5 C is temperature stability
+  heating_method:
+    state:
+      tag: value
+      value: Electron bombardment; upper and lower tungsten ring filaments
+    locator:
+      page: 13
+      published_page: 3051
+      pdf_page_index: 2
+      section: '3.1'
+  other_facts:
+  - name: cell_body_height
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12'
+          approximate: false
+      locator:
+        page: 13
+        published_page: 3051
+        pdf_page_index: 2
+        section: '3.1'
+    unit: mm
+  - name: temperature_fluctuation_magnitude_during_ion_ratio_measurements
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.5'
+          approximate: false
+      locator:
+        page: 14
+        published_page: 3052
+        section: '3.1'
+        note: 'Within +/-0.5 C: stability, not calibration uncertainty'
+    unit: C
+  - name: cell_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11'
+          approximate: false
+      locator:
+        page: 13
+        published_page: 3051
+        pdf_page_index: 2
+        section: '3.1'
+    unit: mm
+  - name: offered_orifice_diameters_not_run_assignments
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 0.5 or 0.3
+          approximate: false
+      locator:
+        page: 13
+        published_page: 3051
+        section: '3.1'
+        note: Discrete alternatives
+    unit: mm
+  - name: offered_lid_thicknesses_not_run_assignments
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1 or 0.5
+          approximate: false
+      locator:
+        page: 13
+        published_page: 3051
+        section: '3.1'
+        note: Printed as lid thickness; no run-specific channel length or diameter pairing
+    unit: mm
+  - name: aperture_comparison_at_NV_0_796
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 0.3 and 0.5; agreement reported
+          approximate: false
+      locator:
+        page: 16
+        published_page: 3054
+        section: '4.2'
+        note: Both apertures tested at N_V=0.796; no assignment to Table 2 aggregate or lid-thickness pairing
+    unit: mm

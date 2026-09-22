@@ -68,6 +68,7 @@ observations:
     kind: interval
     interval_low: '0.067'
     interval_high: '1'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -158,6 +159,7 @@ observations:
   value:
     kind: point
     point: '0.2'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -249,6 +251,7 @@ observations:
     kind: interval
     interval_low: '0.09'
     interval_high: '0.4'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -340,6 +343,7 @@ observations:
     kind: interval
     interval_low: '0.015'
     interval_high: '0.11'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -430,6 +434,7 @@ observations:
   value:
     kind: point
     point: '0.2'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -523,6 +528,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -609,6 +615,7 @@ observations:
   value:
     kind: point
     point: '0.14'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -695,6 +702,7 @@ observations:
   value:
     kind: point
     point: '0.067'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -781,6 +789,7 @@ observations:
   value:
     kind: point
     point: '0.08'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -868,6 +877,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_approx'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -954,6 +964,7 @@ observations:
   value:
     kind: point
     point: '0.3'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1042,6 +1053,7 @@ observations:
   value:
     kind: point
     point: '1'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1128,6 +1140,7 @@ observations:
   value:
     kind: point
     point: '0.25'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1214,6 +1227,7 @@ observations:
   value:
     kind: point
     point: '0.4'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1301,6 +1315,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_approx'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1387,6 +1402,7 @@ observations:
   value:
     kind: point
     point: '0.09'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1474,6 +1490,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1560,6 +1577,7 @@ observations:
   value:
     kind: point
     point: '0.022'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1648,6 +1666,7 @@ observations:
   value:
     kind: point
     point: '0.022'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1737,6 +1756,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1824,6 +1844,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1913,6 +1934,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2000,6 +2022,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed, gas_species'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2089,6 +2112,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed, gas_species'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2178,6 +2202,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed, gas_species'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2267,6 +2292,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, material,
       alpha_as_published, reference, alpha_range_as_printed, gas_species'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2310,6 +2336,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2352,6 +2379,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2394,6 +2422,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2436,6 +2465,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2478,6 +2508,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2520,6 +2551,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2562,6 +2594,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2604,6 +2637,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2646,6 +2680,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2688,6 +2723,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2730,6 +2766,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2772,6 +2809,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2814,6 +2852,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2856,6 +2895,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2898,6 +2938,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2940,6 +2981,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2982,6 +3024,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3024,6 +3067,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3066,6 +3110,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3108,6 +3153,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3150,6 +3196,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3192,6 +3239,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3234,6 +3282,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3276,6 +3325,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3318,6 +3368,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3360,6 +3411,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3403,6 +3455,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3444,6 +3497,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3487,6 +3541,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3528,6 +3583,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3571,6 +3627,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3612,6 +3669,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3655,6 +3713,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3696,6 +3755,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3738,6 +3798,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'normalization_identity'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3779,6 +3840,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3822,6 +3884,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3863,6 +3926,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3906,6 +3970,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'secondary_atmospheric_metal_to_sodium_ratio';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3947,6 +4012,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -3989,6 +4055,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4031,6 +4098,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4073,6 +4141,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4115,6 +4184,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4157,6 +4227,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4199,6 +4270,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4241,6 +4313,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4283,6 +4356,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4325,6 +4399,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4367,6 +4442,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4409,6 +4485,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -4451,6 +4528,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:

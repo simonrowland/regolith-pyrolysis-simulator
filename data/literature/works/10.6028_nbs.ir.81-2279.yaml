@@ -184,7 +184,10 @@ experiments:
       orifice_area_m2:
         state:
           tag: value
-          value: '0.00000009079226'
+          value:
+            kind: point
+            point: '0.00000009079226'
+            approximate: false
         locator:
           page: 28
           paragraph: relatively small effusion orifice (0.34 mm diameter)
@@ -208,7 +211,10 @@ experiments:
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.00034'
+          value:
+            kind: point
+            point: '0.00034'
+            approximate: false
         locator:
           page: 28
           paragraph: relatively small effusion orifice (0.34 mm diameter)
@@ -475,7 +481,10 @@ experiments:
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.00034'
+          value:
+            kind: point
+            point: '0.00034'
+            approximate: false
         locator:
           page: 51
           section: '15'

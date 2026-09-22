@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-087-yamada-kato-1980.yaml
 observations:
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_P_plus_count_rate_1p52wt
-  experiment_id: 10.2355/isijinternational1966.20.244::9
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_count_rate'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -56,7 +57,7 @@ observations:
         figure: '9'
         note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_epsilon_P_P_1600C
-  experiment_id: 10.2355/isijinternational1966.20.244::kems-087-yamada-kato-1980
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -79,6 +80,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter_and_henrian_activity_coefficient';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -114,7 +116,7 @@ observations:
         equation: '7'
         note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fe_activity_slight_negative_deviation
-  experiment_id: 10.2355/isijinternational1966.20.244::7
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -136,6 +138,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -158,7 +161,7 @@ observations:
     note: 'conclusion: activity of iron has been found to deviate slightly from Raoultian behavior; Fig. 7 is figure-only'
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig10_P2_over_P_sq_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::10
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -180,6 +183,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -201,7 +205,7 @@ observations:
     note: Fig. 10. Concentration dependence of the ratio of I_P2+ to (I_P+)^2
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig1_cell_assembly_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::1
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -223,6 +227,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -244,7 +249,7 @@ observations:
     note: Fig. 1. Knudsen cell assembly
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig2_P2_background_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::2
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -266,6 +271,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -287,7 +293,7 @@ observations:
     note: Fig. 2. Relation between the P2+ ion peak and the background ion peak
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig3_ion_ratio_vs_1_over_T_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::3
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -309,6 +315,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -330,7 +337,7 @@ observations:
     note: Fig. 3. Temperature dependence of the ion current ratio
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig4_ion_ratio_vs_N_P_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::4
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -352,6 +359,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -373,7 +381,7 @@ observations:
     note: Fig. 4. Ion current ratios for the Fe-P system at 1600 C
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig5_integration_curve_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::5
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -395,6 +403,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -417,7 +426,7 @@ observations:
     note: Fig. 5. Integration curve for the Fe-P system at 1600 C
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig6_gamma_P_comparison_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::6
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -439,6 +448,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -461,7 +471,7 @@ observations:
     note: Fig. 6. Activity coefficient of P in the dilute solution of P in liquid Fe
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig7_activities_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::7
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -483,6 +493,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -505,7 +516,7 @@ observations:
     note: Fig. 7. Activities of P and Fe in the dilute solution of P in liquid Fe at 1600 C
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig8_integration_error_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::8
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -527,6 +538,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -549,7 +561,7 @@ observations:
     note: Fig. 8. Integration curve for the Fe-P system at 1600 C
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig9_P_plus_peak_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::9
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -571,6 +583,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -592,7 +605,7 @@ observations:
     note: Fig. 9. The 31P+ peak measured by the pulse counting system
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_kems_geometry_and_calibration
-  experiment_id: 10.2355/isijinternational1966.20.244::1
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -615,6 +628,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -638,7 +652,7 @@ observations:
     note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_p_vapor_pressure_estimate_1wt
-  experiment_id: 10.2355/isijinternational1966.20.244::kems-087-yamada-kato-1980
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: value
@@ -703,6 +717,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, T_C, P_wt_pct,
       p_atm_about'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -732,7 +747,7 @@ observations:
         pdf_page_index: 2
         note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
-  experiment_id: 10.2355/isijinternational1966.20.244::6
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
       tag: unknown
@@ -755,6 +770,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

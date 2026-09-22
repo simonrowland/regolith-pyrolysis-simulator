@@ -37,246 +37,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.63.3_417
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 418
-    pdf_page_index: 2
-    figure: '1'
-    section: '2'
-    note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals and English
-      captions only.
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
-      locator:
-        published_page: 418
-        pdf_page_index: 2
-        figure: '1'
-        note: Alumina knudsen cell / Tantalum cell holder; (mm)
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: value
-          value: '0.0005'
-        locator:
-          published_page: 418
-          pdf_page_index: 2
-          figure: '1'
-          note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
-        inference:
-          relation: mm_to_m
-          inputs:
-          - L_m = L_mm / 1000
-          - original_unit=mm
-          - as_published=0.5 mm
-          - printed=orifice_diameter_mm_as_printed
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.5'
-              locator:
-                published_page: 418
-                pdf_page_index: 2
-                figure: '1'
-                note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
-          - - factor
-            - state:
-                tag: value
-                value: '1000'
-              locator:
-                published_page: 418
-                pdf_page_index: 2
-                figure: '1'
-                note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
-          output_unit: m
-    ionization:
-      electron_energy_eV:
-        state:
-          tag: value
-          value: '30'
-        locator:
-          published_page: 418
-          pdf_page_index: 2
-          figure: '1'
-          section: '2'
-          note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
-            and English captions only.
-        inference:
-          relation: identity:1
-          inputs:
-          - as_published=30.0 eV
-          - printed=ionizing_electron_energy_V
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '30'
-              locator:
-                published_page: 418
-                pdf_page_index: 2
-                figure: '1'
-                section: '2'
-                note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
-                  and English captions only.
-          output_unit: '1'
-      total_emission_current_uA:
-        state:
-          tag: value
-          value: '200'
-        locator:
-          published_page: 418
-          pdf_page_index: 2
-          figure: '1'
-          section: '2'
-          note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
-            and English captions only.
-        inference:
-          relation: identity:1
-          inputs:
-          - as_published=200.0 uA
-          - printed=total_emission_current_uA
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '200'
-              locator:
-                published_page: 418
-                pdf_page_index: 2
-                figure: '1'
-                section: '2'
-                note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
-                  and English captions only.
-          output_unit: '1'
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::10
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 423
-    pdf_page_index: 7
-    figure: '10'
-    note: Fig. 10. Ion ratio according to Equation (36).
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::11
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 423
-    pdf_page_index: 7
-    figure: '11'
-    note: Fig. 11. Quadratic plots according to Equation (37).
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::12
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 424
-    pdf_page_index: 8
-    figure: '12'
-    note: Fig. 12. Evaluation of the fragmentation ionization according to Equation (43).
 - experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
   kind: literature
   method:
@@ -310,248 +70,33 @@ experiments:
     pdf_page_index: 6
     table: '2'
     note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::3
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 421
+        table: '1'
+        note: Multiple Fe-Al compositions retained in observation rows; starting-metal assays are not a charge
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 418
+        section: '2.3'
+        note: Some alloys were premelted under 1 atm He and others melted in the cell; row assignments are not printed
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 419
-    pdf_page_index: 3
-    figure: '3'
-    note: Fig. 3. Effect of the chamber voltage on the ion ratio.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 419
-    pdf_page_index: 3
-    figure: '4'
-    note: Fig. 4. Experimental results for the Fe-Al alloys.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 420
-    pdf_page_index: 4
-    figure: '5'
-    note: Fig. 5. Solidus and liquidus of the Fe-Al alloy.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 420
-    pdf_page_index: 4
-    figure: '6'
-    note: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 420
-    pdf_page_index: 4
-    figure: '7'
-    note: Fig. 7. Activities in the Fe-Al alloy at 1400 C.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::8
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 421
-    pdf_page_index: 5
-    figure: '8'
-    note: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::9
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/tetsutohagane1955.63.3_417
-  locator:
-    published_page: 422
-    pdf_page_index: 6
-    figure: '9'
-    note: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
-- experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -571,9 +116,8 @@ experiments:
   work_id: 10.2355/tetsutohagane1955.63.3_417
   locator:
     published_page: 418
-    pdf_page_index: 2
-    section: '2.5'
-    note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+    section: 2.3-2.5
+    note: Fe-Al alloy measurement series
   apparatus:
     cell_material_and_liner:
       state:
@@ -588,40 +132,57 @@ experiments:
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.0005'
+          value:
+            kind: point
+            point: '0.0005'
+            approximate: false
         locator:
           published_page: 418
           pdf_page_index: 2
           figure: '1'
-          note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
+          section: '2.2'
+      orifice_channel_length_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.001'
+            approximate: false
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          figure: '1'
+          section: '2.2'
+    ionization:
+      total_emission_current_uA:
+        state:
+          tag: value
+          value: '200'
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          figure: '1'
+          section: '2'
+          note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+            and English captions only.
         inference:
-          relation: mm_to_m
+          relation: identity:1
           inputs:
-          - L_m = L_mm / 1000
-          - original_unit=mm
-          - as_published=0.5 mm
-          - printed=orifice_diameter_mm_as_printed
+          - as_published=200.0 uA
+          - printed=total_emission_current_uA
           parameters:
           - - original
             - state:
                 tag: value
-                value: '0.5'
+                value: '200'
               locator:
                 published_page: 418
                 pdf_page_index: 2
                 figure: '1'
-                note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
-          - - factor
-            - state:
-                tag: value
-                value: '1000'
-              locator:
-                published_page: 418
-                pdf_page_index: 2
-                figure: '1'
-                note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
-          output_unit: m
-    ionization:
+                section: '2'
+                note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+                  and English captions only.
+          output_unit: '1'
       electron_energy_eV:
         state:
           tag: value
@@ -647,3 +208,94 @@ experiments:
                 section: '2.5'
                 note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
           output_unit: '1'
+  bench_id: 10.2355/tetsutohagane1955.63.3_417::bench::rm6k
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1673.15'
+            interval_high: '1873.15'
+            approximate: false
+        locator:
+          published_page: 418
+          section: 2.3-2.5
+          note: Printed 1400-1600 C measurement range; unit conversion only
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: true
+      locator:
+        published_page: 418
+        section: '2.5'
+        note: About 6 h per measurement; unit conversion only
+benches:
+- id: 10.2355/tetsutohagane1955.63.3_417::bench::rm6k
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hitachi RM6K Knudsen-cell mass spectrometer
+    locator:
+      published_page: 418
+      pdf_page_index: 2
+      figure: '1'
+      section: '2.2'
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 418
+      pdf_page_index: 2
+      figure: '1'
+      section: '2.2'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Alumina Knudsen cell; tantalum cell holder
+    locator:
+      published_page: 418
+      pdf_page_index: 2
+      figure: '1'
+      section: '2.2'
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.009'
+            approximate: false
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          figure: '1'
+          section: '2.2'
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 418
+          figure: '1'
+          note: 12 mm body height is not separately printed as internal depth
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Thermocouples at cell-holder points A and B
+      locator:
+        published_page: 418
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.2'
+  other_facts: []

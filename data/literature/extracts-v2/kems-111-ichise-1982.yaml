@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-111-ichise-1982.yaml
 observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_deltaG_henrian_1wt_pct
-  experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_gibbs_energy_change'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -51,7 +52,7 @@ observations:
     equation: '26'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig1_ion_intensity_A4_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::1
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -73,6 +74,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -93,7 +95,7 @@ observations:
     figure: '1'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig2_low_Mo_procedure_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::2
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -115,6 +117,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -135,7 +138,7 @@ observations:
     figure: '2'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig3_Ag_standard_procedure_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::3
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
     quantity:
       tag: unknown
@@ -157,6 +160,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -177,7 +181,7 @@ observations:
     figure: '3'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig4_activities_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::4
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -199,6 +203,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -219,7 +224,7 @@ observations:
     figure: '4'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig5_ln_gamma_Fe_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::5
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -244,6 +249,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -265,7 +271,7 @@ observations:
     figure: '5'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_fig6_error_estimate_figure_only
-  experiment_id: 10.2355/isijinternational1966.22.552::6
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -290,6 +296,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -311,7 +318,7 @@ observations:
     figure: '6'
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_infinite_dilution_gamma
-  experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -334,6 +341,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -373,7 +381,7 @@ observations:
         pdf_page_index: 7
         section: V. Conclusion
 - observation_id: kems-111-ichise-1982::ichise_1982_interaction_parameters_liquid
-  experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: value
@@ -439,6 +447,7 @@ observations:
     unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source,
       T_K, epsilon_Mo_Mo, epsilon_Mo_Mo_as_printed, epsilon_Mo_Mo2, epsilon_Mo_Mo2_as_printed, e_Mo_Mo, e_Mo_Mo_as_printed,
       e_Mo_Mo2, e_Mo_Mo2_as_printed'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -495,6 +504,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -579,6 +589,7 @@ observations:
   value:
     kind: point
     point: '0.0000303975'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -608,7 +619,7 @@ observations:
         pdf_page_index: 1
         paragraph: Mo has very low vapor pressure, about 3×10^{-10} atm even at 2000 K
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda
-  experiment_id: 10.2355/isijinternational1966.22.552::1
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
     quantity:
       tag: value
@@ -673,6 +684,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, lambda_definition,
       T_Ag_K_rows_1_to_5, T_Ag_K_rows_6_to_16, lambda_bar_note, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -694,7 +706,7 @@ observations:
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
 - observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
-  experiment_id: 10.2355/isijinternational1966.22.552::2
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: value
@@ -759,6 +771,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
       low_Mo_method, high_Mo_method, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -791,7 +804,7 @@ observations:
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
 - observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries
-  experiment_id: 10.2355/isijinternational1966.22.552::3
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-phase-boundary-series
   identity:
     quantity:
       tag: unknown
@@ -814,6 +827,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'phase_boundary_composition'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -845,7 +859,7 @@ observations:
         table: '3'
         note: Table 3. The composition of coexisting phases in the Fe-Mo system at 1823 K.
 - observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K
-  experiment_id: 10.2355/isijinternational1966.22.552::4
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -871,6 +885,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_partial_molar_gibbs'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -904,7 +919,7 @@ observations:
         table: '4'
         note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
 - observation_id: kems-111-ichise-1982::ichise_1982_table5_heats
-  experiment_id: 10.2355/isijinternational1966.22.552::5
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
       tag: unknown
@@ -927,6 +942,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_sublimation_and_vaporization'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

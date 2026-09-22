@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-035-sauerborn-2005.yaml
 observations:
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_completeness_ledger
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -22,6 +22,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -48,7 +49,7 @@ observations:
     paragraph: Inhaltsverzeichnis
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_completeness_ledger_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -68,6 +69,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'document_completeness_audit'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -107,6 +109,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_and_apollo14163_oxide_pie_labels'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -155,6 +158,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_and_apollo14163_oxide_pie_labels'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -175,7 +179,7 @@ observations:
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.23
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -198,6 +202,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_glass_spot_series_digitised'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -225,7 +230,7 @@ observations:
     figure: '5.23'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.23
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -244,6 +249,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -261,7 +267,7 @@ observations:
     figure: '5.23'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_printed_epma_sums_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.23
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -280,6 +286,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_epma_sum_labels'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -297,7 +304,7 @@ observations:
     figure: '5.23'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_printed_reduction_ranges_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.32
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -317,6 +324,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_relative_oxide_reduction_ranges'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -334,7 +342,7 @@ observations:
     figure: '5.32'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.32
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -357,6 +365,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'RFA_MO_over_Al2O3_ratio_relative_to_MS0'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -384,7 +393,7 @@ observations:
     figure: '5.32'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.32
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -403,6 +412,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -420,7 +430,7 @@ observations:
     figure: '5.32'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.55
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -443,6 +453,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'qms_O2_partial_pressure_vs_time_baseline_normalised';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -469,7 +480,7 @@ observations:
     figure: '5.55'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.55
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -488,6 +499,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -505,7 +517,7 @@ observations:
     figure: '5.55'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_printed_zno_increase_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.55
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -525,6 +537,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_normalized_oxygen_increase_factor'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -542,7 +555,7 @@ observations:
     figure: '5.55'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.56
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -565,6 +578,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'qms_O2_partial_pressure_vs_T_baseline_normalised';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -591,7 +605,7 @@ observations:
     figure: '5.56'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.56
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -610,6 +624,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -627,7 +642,7 @@ observations:
     figure: '5.56'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_printed_release_bands_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.56
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -647,6 +662,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_oxygen_release_and_outgassing_bands';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -664,7 +680,7 @@ observations:
     figure: '5.56'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_jsc1_composition_figure_only_blocked
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -683,6 +699,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -713,7 +730,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_jsc1_composition_figure_only_blocked_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -732,6 +749,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -752,7 +770,7 @@ observations:
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:0
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -817,6 +835,7 @@ observations:
   value:
     kind: point
     point: '0.011'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -893,7 +912,7 @@ observations:
           page: 76
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:1
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -958,6 +977,7 @@ observations:
   value:
     kind: point
     point: '0.026'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1034,7 +1054,7 @@ observations:
           page: 82
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1099,6 +1119,7 @@ observations:
   value:
     kind: point
     point: '0.032'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1175,7 +1196,7 @@ observations:
           page: 88
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:3
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1240,6 +1261,7 @@ observations:
   value:
     kind: point
     point: '0.029'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1316,7 +1338,7 @@ observations:
           page: 98
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1381,6 +1403,7 @@ observations:
   value:
     kind: point
     point: '0.011'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1456,7 +1479,7 @@ observations:
           page: 76
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:1
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1521,6 +1544,7 @@ observations:
   value:
     kind: point
     point: '0.026'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1596,7 +1620,7 @@ observations:
           page: 82
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1661,6 +1685,7 @@ observations:
   value:
     kind: point
     point: '0.032'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1736,7 +1761,7 @@ observations:
           page: 88
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:3
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: value
@@ -1801,6 +1826,7 @@ observations:
   value:
     kind: point
     point: '0.029'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1876,7 +1902,7 @@ observations:
           page: 98
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_melts_full_melt_model_1261_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -1895,6 +1921,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1913,7 +1940,7 @@ observations:
     paragraph: theoretischen Wert von 1261 °C
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_melts_liquidus_model_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -1932,6 +1959,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -1950,7 +1978,7 @@ observations:
     paragraph: MELTS simulation liquidus
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_qms_traces_figure_only_blocked
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -1972,6 +2000,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2002,7 +2031,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_qms_traces_figure_only_blocked_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2021,6 +2050,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -2058,6 +2088,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_element_wt_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2105,6 +2136,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_element_wt_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2143,6 +2175,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mineral_vol_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2188,6 +2221,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mineral_vol_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2207,7 +2241,7 @@ observations:
     table: '2.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::3.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2227,6 +2261,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'qms_mass_to_species_assignment'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2253,7 +2288,7 @@ observations:
     table: '3.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::3.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2273,6 +2308,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equipment_metadata_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2292,7 +2328,7 @@ observations:
     table: '3.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table41_sample_inventory
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::4.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2312,6 +2348,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_and_holder_inventory'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2338,7 +2375,7 @@ observations:
     table: '4.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table41_sample_inventory_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::4.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2358,6 +2395,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equipment_metadata_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2377,7 +2415,7 @@ observations:
     table: '4.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_full_grid
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2400,6 +2438,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'reference_run_t_T_pressure_grid'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2426,7 +2465,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_full_grid_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2449,6 +2488,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'reference_run_t_T_pressure_grid'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2468,7 +2508,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_runs
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2490,6 +2530,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'reference_run_log'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2518,7 +2559,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_runs_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2540,6 +2581,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'reference_run_log'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2559,7 +2601,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_cao_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2581,6 +2623,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2609,7 +2652,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_cao_cold_trap_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2631,6 +2674,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2650,7 +2694,7 @@ observations:
     table: '5.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2673,6 +2717,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'untreated_foil_edx_standardabweichung'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2701,7 +2746,7 @@ observations:
     note: unbehandelte Folie Standardabweichung
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2721,6 +2766,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'untreated_foil_edx_standardabweichung'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2741,7 +2787,7 @@ observations:
     note: unbehandelte Folie Standardabweichung
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table53_heating_cooling_grid
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2764,6 +2810,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_run_heating_cooling_grid'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2792,7 +2839,7 @@ observations:
     note: full t(Tmax>T) and Aufheiz-/Abkühlraten grid; parent row keeps selected Tmax/mass/duration only
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table53_heating_cooling_grid_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2815,6 +2862,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_run_heating_cooling_grid'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2835,7 +2883,7 @@ observations:
     note: full t(Tmax>T) and Aufheiz-/Abkühlraten grid; parent row keeps selected Tmax/mass/duration only
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table53_jsc1_run_log
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2858,6 +2906,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_run_surface_temperature_log'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2886,7 +2935,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table53_jsc1_run_log_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2909,6 +2958,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_run_surface_temperature_log'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2928,7 +2978,7 @@ observations:
     table: '5.3'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_blank_foil_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.4
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2950,6 +3000,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'blank_foil_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2978,7 +3029,7 @@ observations:
     note: unbehandelte Folie / blank foil block
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_blank_foil_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.4
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -2997,6 +3048,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'blank_foil_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3017,7 +3069,7 @@ observations:
     note: unbehandelte Folie / blank foil block
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_ms1_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.4
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3039,6 +3091,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3067,7 +3120,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_ms1_cold_trap_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.4
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3089,6 +3142,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3108,7 +3162,7 @@ observations:
     table: '5.4'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table55_ms2_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.5
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3130,6 +3184,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3156,7 +3211,7 @@ observations:
     table: '5.5'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table55_ms2_cold_trap_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.5
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3178,6 +3233,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3197,7 +3253,7 @@ observations:
     table: '5.5'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.6
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3220,6 +3276,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3248,7 +3305,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.6
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3268,6 +3325,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct'; refusing to pick a
       number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3287,7 +3345,7 @@ observations:
     table: '5.6'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_full_grid
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.6
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3310,6 +3368,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct_full_grid'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3336,7 +3395,7 @@ observations:
     table: '5.6'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_full_grid_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.6
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3356,6 +3415,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct_full_grid'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3375,7 +3435,7 @@ observations:
     table: '5.6'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table57_evidence_ranking
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.7
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3397,6 +3457,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3423,7 +3484,7 @@ observations:
     table: '5.7'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table57_evidence_ranking_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.7
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3442,6 +3503,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3461,7 +3523,7 @@ observations:
     table: '5.7'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table58_outgassing_peaks
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.8
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3484,6 +3546,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ausheiz_peak_duration_and_pressure_ratio'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3512,7 +3575,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table58_outgassing_peaks_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.8
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3535,6 +3598,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'ausheiz_peak_duration_and_pressure_ratio'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3554,7 +3618,7 @@ observations:
     table: '5.8'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_true_absence_alpha_gamma_psat
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3576,6 +3640,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3604,7 +3669,7 @@ observations:
     note: full-paper audit of tables 2.1-2.3, 3.1-3.3, 4.1, 5.1-5.8, 7.1-7.3 and figures 1.1-7.21
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_true_absence_alpha_gamma_psat_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -3624,6 +3689,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'document_completeness_audit'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

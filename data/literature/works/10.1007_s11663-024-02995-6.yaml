@@ -77,122 +77,11 @@ experiments:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=8; polythermal_published_page=827
-- experiment_id: 10.1007/s11663-024-02995-6::I
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '0.001'
-      locator:
-        page: 825
-        paragraph: experimental
-        note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=1e-05 mbar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00001'
-            locator:
-              page: 825
-              paragraph: experimental
-              note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 825
-              paragraph: experimental
-              note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 825
-    published_page: 825
-    pdf_page_index: 5
-    table: I
-    source_path: tables/kems-031-halwax-2024/t1.csv
-  apparatus:
-    geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value: '0.00000007068583'
-        locator:
-          page: 825
-          paragraph: experimental
-          note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
-          - extract_value=7.068583e-08 m2
-          - extract_field=orifice_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000007068583'
-              locator:
-                page: 825
-                paragraph: experimental
-                note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-          output_unit: m2
-      orifice_diameter_m:
-        state:
-          tag: value
-          value: '0.0003'
-        locator:
-          page: 825
-          paragraph: experimental
-          note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-        inference:
-          relation: identity:m
-          inputs:
-          - as_published=0.0003 m
-          - printed=diameter_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0003'
-              locator:
-                page: 825
-                paragraph: experimental
-                note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-          output_unit: m
 - experiment_id: 10.1007/s11663-024-02995-6::II
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_second_law_calibration' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'literature_compilation' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -221,39 +110,7 @@ experiments:
     published_page: 826
     pdf_page_index: 6
     table: II
-    note: row=This Study
     source_path: tables/kems-031-halwax-2024/t2.csv
-  apparatus:
-    calibration:
-      pressure_calibration_factor:
-        state:
-          tag: value
-          value: '0.0000000076414'
-        locator:
-          page: 826
-          published_page: 826
-          pdf_page_index: 6
-          table: II
-          note: row=This Study
-          source_path: tables/kems-031-halwax-2024/t2.csv
-        inference:
-          relation: identity:1
-          inputs:
-          - as_published=7.6414e-09 1
-          - printed=pressure_calibration_factor
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0000000076414'
-              locator:
-                page: 826
-                published_page: 826
-                pdf_page_index: 6
-                table: II
-                note: row=This Study
-                source_path: tables/kems-031-halwax-2024/t2.csv
-          output_unit: '1'
 - experiment_id: 10.1007/s11663-024-02995-6::III
   kind: literature
   method:
@@ -321,7 +178,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_third_law_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'literature_compilation' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -346,10 +203,11 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1007/s11663-024-02995-6
   locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
     table: IV
-    line_range: 595-607
-    note: Third-law standard formation enthalpy for pure solid MgO
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    source_path: tables/kems-031-halwax-2024/t4.csv
 - experiment_id: 10.1007/s11663-024-02995-6::V
   kind: literature
   method:
@@ -452,51 +310,55 @@ experiments:
     pdf_page_index: 13
     table: VII
     source_path: tables/kems-031-halwax-2024/t7.csv
-- experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+- experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00004951'
+          interval_high: '0.00005393'
+          approximate: false
+      locator:
+        page: 825
+        table: I
+        note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Pure CaO (99.998 pct)
+      locator:
+        page: 825
+        section: III. Experimental
+    form:
+      state:
+        tag: value
+        value: Powder
+      locator:
+        page: 825
+        section: III. Experimental
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        page: 825
+        section: III. Experimental
+        note: The polythermal range is retained in thermal_schedule; no single series setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.001'
-      locator:
-        paragraph: pressure decreased below 10^-5 mbar
-        line_range: '230'
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=1e-05 mbar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00001'
-            locator:
-              paragraph: pressure decreased below 10^-5 mbar
-              line_range: '230'
-              source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              paragraph: pressure decreased below 10^-5 mbar
-              line_range: '230'
-              source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-        output_unit: Pa
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
@@ -507,69 +369,217 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1007/s11663-024-02995-6
   locator:
-    section: III. EXPERIMENTAL
-    line_range: 220-230
-    note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+    page: 825
+    section: III. Experimental
+    note: Pure CaO series; separate first and second measurement rows remain observations
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Ir Knudsen cell in Mo container; Ta radiation shields
-      locator:
-        paragraph: iridium cell; molybdenum container; tantalum radiation shields
-        line_range: '222'
-        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
     geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value: '0.00000007068583'
-        locator:
-          paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-          line_range: '222'
-          source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
-          - extract_value=7.068583e-08 m2
-          - extract_field=orifice_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000007068583'
-              locator:
-                paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-                line_range: '222'
-                source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-          output_unit: m2
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.0003'
+          value:
+            kind: point
+            point: '0.0003'
+            approximate: false
         locator:
-          paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-          line_range: '222'
-          source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-        inference:
-          relation: identity:m
-          inputs:
-          - as_published=0.0003 m
-          - printed=diameter_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0003'
-              locator:
-                paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-                line_range: '222'
-                source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-          output_unit: m
+          page: 825
+          section: III. Experimental
+          note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 825
+          section: III. Experimental
+  bench_id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1825'
+            interval_high: '2125'
+            approximate: true
+        locator:
+          page: 825
+          section: III. Experimental
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '250'
+            approximate: false
+        locator:
+          page: 825
+          section: III. Experimental
+          note: Each temperature held 250 s; unit conversion only
+- experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00005158'
+          interval_high: '0.00005367'
+          approximate: false
+      locator:
+        page: 825
+        table: I
+        note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Pure MgO (99.999 pct)
+      locator:
+        page: 825
+        section: III. Experimental
+    form:
+      state:
+        tag: value
+        value: Powder
+      locator:
+        page: 825
+        section: III. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 825
+        section: III. Experimental
+        note: The polythermal range is retained in thermal_schedule; no single series setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11663-024-02995-6
+  locator:
+    page: 825
+    section: III. Experimental
+    note: Pure MgO series; separate first and second measurement rows remain observations
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0003'
+            approximate: false
+        locator:
+          page: 825
+          section: III. Experimental
+          note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 825
+          section: III. Experimental
+  bench_id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1675'
+            interval_high: '2075'
+            approximate: true
+        locator:
+          page: 825
+          section: III. Experimental
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '250'
+            approximate: false
+        locator:
+          page: 825
+          section: III. Experimental
+          note: Each temperature held 250 s; unit conversion only
+- experiment_id: 10.1007/s11663-024-02995-6::experiment::nickel-calibration-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Pure nickel standard
+      locator:
+        page: 826
+        section: A. Calibration
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11663-024-02995-6
+  locator:
+    page: 826
+    section: A. Calibration
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 825
+          section: III. Experimental
+          note: No calibration-run-specific assignment stated
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 825
+          section: III. Experimental
+  bench_id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
 - experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   kind: literature
   method:
@@ -605,62 +615,63 @@ experiments:
     paragraph: experimental
     note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the
       lid of the cell had a diameter of 0.3 mm.
-  apparatus:
-    cell_material_and_liner:
+benches:
+- id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
+  work_id: 10.1007/s11663-024-02995-6
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Finnigan MAT 271 90 degree magnetic-sector Knudsen effusion mass spectrometer
+    locator:
+      page: 825
+      section: III. Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Iridium Knudsen cell in a molybdenum container with tantalum radiation shields
+    locator:
+      page: 825
+      section: III. Experimental
+  pumping_type:
+    state:
+      tag: value
+      value: Turbomolecular pump
+    locator:
+      page: 825
+      section: III. Experimental
+  detector:
+    state:
+      tag: value
+      value: Continuous dynode multiplier linked to an ion counter
+    locator:
+      page: 825
+      section: III. Experimental
+  ionization:
+    energy_eV:
       state:
         tag: value
-        value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater
+        value:
+          kind: point
+          point: '70'
+          approximate: false
+      locator:
+        page: 826
+        section: III. Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Impac IGA 12 optical pyrometer; type K thermocouple for adjustment
       locator:
         page: 825
-        paragraph: experimental
-        note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
-    geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value: '0.00000007068583'
-        locator:
-          page: 825
-          paragraph: experimental
-          note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
-          - extract_value=7.068583e-08 m2
-          - extract_field=orifice_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000007068583'
-              locator:
-                page: 825
-                paragraph: experimental
-                note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-          output_unit: m2
-      orifice_diameter_m:
-        state:
-          tag: value
-          value: '0.0003'
-        locator:
-          page: 825
-          paragraph: experimental
-          note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-        inference:
-          relation: identity:m
-          inputs:
-          - as_published=0.0003 m
-          - printed=diameter_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0003'
-              locator:
-                page: 825
-                paragraph: experimental
-                note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
-          output_unit: m
+        section: III. Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Radiation then electron bombardment from a hot tungsten wire
+    locator:
+      page: 825
+      section: III. Experimental
+  other_facts: []

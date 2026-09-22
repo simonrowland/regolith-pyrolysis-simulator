@@ -321,6 +321,90 @@ experiments:
     published_page: 5551
     section: 4.1. Evaporation kinetics
     source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-vacuum-evaporation-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: Type B CAI-like SiO2-Al2O3-MgO-CaCO3 glass
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed 1600-1900 C and per-run Table 1 values; no single series setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    section: 3.1 Starting materials and experimental procedure
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated at 20.0 C/min; power cut for cooling
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        note: Per-run durations vary; no single series duration
 - experiment_id: 10.1016/j.gca.2007.09.005::richter_2007_mg_cai_arrhenius_langmuir
   kind: literature
   method:
@@ -383,3 +467,22 @@ experiments:
   locator:
     note: Richter et al. (2007) GCA 71:5544-5564 abstract; cSi form
     record: richter_2007_si_cai_arrhenius_langmuir
+benches:
+- id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  work_id: 10.1016/j.gca.2007.09.005
+  identity:
+    basis: cited_by_author
+    ref:
+      cited_as: Hashimoto (1983)
+      for_parameters:
+      - apparatus_family
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: High-temperature vacuum furnace identified as Hashimoto furnace
+  apparatus_family:
+    state:
+      tag: value
+      value: high-temperature vacuum furnace
+    locator:
+      section: 3.1 Starting materials and experimental procedure
+  other_facts: []

@@ -243,7 +243,15 @@ experiments:
   method:
     tag: unknown
     reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    form:
+      state:
+        tag: value
+        value: log10_P_kPa = A - B * 1.0e3 / T
+      locator:
+        published_page: 294
+        pdf_page_index: 6
+        equation: '2'
   conditions:
     temperature_K:
       state:

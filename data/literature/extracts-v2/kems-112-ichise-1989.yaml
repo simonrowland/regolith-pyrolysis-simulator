@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-112-ichise-1989.yaml
 observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_activities_figure_only
-  experiment_id: 10.2355/isijinternational.29.843::4
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -46,7 +47,7 @@ observations:
     note: also Figs 6 and 7
   read_from: pdf:kems-112-ichise-1989
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
-  experiment_id: 10.2355/isijinternational.29.843::1
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -68,6 +69,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -89,7 +91,7 @@ observations:
     note: also Figs 2 and 5
   read_from: pdf:kems-112-ichise-1989
 - observation_id: kems-112-ichise-1989::ichise_1989_infinite_dilution_gamma
-  experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -112,6 +114,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -169,6 +172,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -212,6 +216,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -241,7 +246,7 @@ observations:
         pdf_page_index: 8
         section: 4. Discussion
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe
-  experiment_id: 10.2355/isijinternational.29.843::1
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: value
@@ -306,6 +311,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
       ion_intensity_equation, L_plus_eps_mean_a_Fe, L_plus_eps_mean_note, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -337,7 +343,7 @@ observations:
         table: '1'
         note: Table 1 split across pp. 846-847. a_Fe at 1873 K from I(alloy)/I(foil).
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography
-  experiment_id: 10.2355/isijinternational.29.843::2
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -359,6 +365,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'phase_identification'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -388,7 +395,7 @@ observations:
         pdf_page_index: 5
         table: '2'
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
-  experiment_id: 10.2355/isijinternational.29.843::3
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -411,6 +418,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'phase_boundary_composition'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -441,7 +449,7 @@ observations:
         pdf_page_index: 5
         table: '3'
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
-  experiment_id: 10.2355/isijinternational.29.843::4
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -467,6 +475,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_partial_molar_gibbs'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -497,7 +506,7 @@ observations:
         pdf_page_index: 6
         table: '4'
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe
-  experiment_id: 10.2355/isijinternational.29.843::5
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: value
@@ -562,6 +571,7 @@ observations:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
       ion_intensity_equation, rows'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -593,7 +603,7 @@ observations:
         table: '5'
         note: Table 5 split across pp. 848-849. a_Fe column on p.849.
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
-  experiment_id: 10.2355/isijinternational.29.843::6
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
     quantity:
       tag: unknown
@@ -619,6 +629,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_partial_molar_gibbs'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

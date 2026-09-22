@@ -46,7 +46,10 @@ experiments:
     mass_kg:
       state:
         tag: value
-        value: '0.0003'
+        value:
+          kind: point
+          point: '0.0003'
+          approximate: false
       locator:
         published_page: 113
         figure: '1'
@@ -119,7 +122,10 @@ experiments:
       orifice_area_m2:
         state:
           tag: value
-          value: '0.00000007068583'
+          value:
+            kind: point
+            point: '0.00000007068583'
+            approximate: false
         locator:
           published_page: 113
           paragraph: experimental
@@ -145,7 +151,10 @@ experiments:
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.0003'
+          value:
+            kind: point
+            point: '0.0003'
+            approximate: false
         locator:
           published_page: 113
           paragraph: experimental

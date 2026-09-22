@@ -2,47 +2,8 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml
 observations:
-- observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ag_trace_doping_and_comparator
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'trace_element_doping'
-    species:
-      formula: Ag
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'trace_element_doping'; refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: boulliung-2025-mercury-volatile-metals-magmatic
-  locator:
-    pdf_page_index: 8
-    section: 2.1 Experiments
-    note: Ag is one of the trace elements added at approximately 500 ppm; its full measured series is in referenced tables
-      not present as readable tables in the supplied PDF.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_equilibrium_comparator
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -62,6 +23,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'closed_system_cd_volatility'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -80,7 +42,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_tl_author_partial_pressures
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -100,6 +62,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_metal_equilibrium_partial_pressures';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -122,9 +85,8 @@ observations:
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_volatile_metal_measured_retention
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ssas_apparatus_and_run_conditions
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_halogen_atmosphere_measurements
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -144,6 +106,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'halogen_partitioning_to_ampoule_atmosphere'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -163,7 +126,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -179,10 +142,14 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure_of_Hg0'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -202,11 +169,20 @@ observations:
     note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure measurement.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 13
+        section: 3.1 Element loss as a function of time; equation (1)
+        note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure measurement.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ssas_apparatus_and_run_conditions
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -222,10 +198,14 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure_of_Hg0'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -246,50 +226,19 @@ observations:
       table.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
-  derived_from:
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_starting_material_hg_and_trace_doping
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ssas_apparatus_and_run_conditions
-- observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_oxidation_state_and_fugacity
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'ferric_fraction_and_oxygen_fugacity'
-    species:
-      formula: Hg
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
+  point_conditions:
+    temperature_K:
+      state:
         tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'ferric_fraction_and_oxygen_fugacity'; refusing
-      to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: boulliung-2025-mercury-volatile-metals-magmatic
-  locator:
-    pdf_page_index: 20
-    section: 4. Conclusions
-    note: Fe oxidation state was measured by XANES in quenched products; the fO2 relation is the authors' interpretation.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
+        value: '1673.15'
+      locator:
+        pdf_page_index: 20
+        section: 4. Conclusions
+        note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate calculation
+          table.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
-  experiment_id: 10.1016/j.chemgeo.2025.123018::2A
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -305,10 +254,14 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'mercury_concentration_in_quenched_melt_vs_time';
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -328,8 +281,19 @@ observations:
     note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 13
+        figure: 2A
+        section: 3.1 Element loss as a function of time
+        note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -349,6 +313,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'dominant_gas_species_assignments'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -368,91 +333,8 @@ observations:
     note: Table 3 itself is not present as readable tabulated data in the supplied PDF; only the prose classification is recorded.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
-  derived_from:
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_starting_material_hg_and_trace_doping
-  - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ssas_apparatus_and_run_conditions
-- observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_ssas_apparatus_and_run_conditions
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'sealed_silica_ampoule_experiment_conditions'
-    species:
-      formula: Hg
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'sealed_silica_ampoule_experiment_conditions';
-      refusing to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: boulliung-2025-mercury-volatile-metals-magmatic
-  locator:
-    pdf_page_index: 8
-    section: 2.1 Experiments
-    note: Values are transcribed from the SSAS preparation and experiment paragraphs; no value is inferred from the drawing
-      or from an unprovided supplement.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
-- observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_starting_material_hg_and_trace_doping
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'doped_starting_material_trace_composition'
-    species:
-      formula: Hg
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'doped_starting_material_trace_composition'; refusing
-      to pick a number
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: boulliung-2025-mercury-volatile-metals-magmatic
-  locator:
-    pdf_page_index: 8
-    section: 2.1 Experiments
-    note: Values are printed in the starting-material preparation paragraph; the full Table 1 composition is referenced but
-      not present as readable table text in the supplied PDF.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_tl_equilibrium_comparator
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -472,6 +354,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'closed_system_tl_volatility'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -490,7 +373,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
   read_from: unknown:boulliung-2025-mercury-volatile-metals-magmatic
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_volatile_metal_measured_retention
-  experiment_id: 10.1016/j.chemgeo.2025.123018::/Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:
     quantity:
       tag: unknown
@@ -510,6 +393,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_metal_loss_examples'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

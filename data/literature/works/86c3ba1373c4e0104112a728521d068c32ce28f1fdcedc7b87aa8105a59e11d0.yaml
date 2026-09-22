@@ -51,38 +51,6 @@ experiments:
     published_page: 11
     paragraph: average evaporation rates JMg
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
-- experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'overhead_gas_arm' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
-  locator:
-    published_page: 28
-    table: '1'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
 - experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::2
   kind: literature
   method:
@@ -181,3 +149,455 @@ experiments:
     figure: '8'
     paragraph: kinetic isotopic fractionation factor α29,28
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+- experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::experiment::cai4b2-h2-2e-4-bar-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.00004'
+          approximate: false
+      locator:
+        published_page: 5
+        note: 10-40 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: 16 MgO
+      locator:
+        published_page: 5
+        section: '3.1'
+    form:
+      state:
+        tag: value
+        value: Melt droplet on iridium wire loop
+      locator:
+        published_page: 5
+        section: '3.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 8
+        note: 1600 C; unit conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+          approximate: true
+      locator:
+        published_page: 8
+        note: ~2x10^-4 bar H2; unit conversion only
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: hydrogen
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 8
+        section: 3.1.2 Low-pressure H2 experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  locator:
+    published_page: 8
+    section: 3.1.2 Low-pressure H2 experiments
+  bench_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::bench::hokkaido-low-pressure-h2-furnace
+- experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::experiment::cai4b2-h2-2e-5-bar-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.00004'
+          approximate: false
+      locator:
+        published_page: 5
+        note: 10-40 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: 16 MgO
+      locator:
+        published_page: 5
+        section: '3.1'
+    form:
+      state:
+        tag: value
+        value: Melt droplet on iridium wire loop
+      locator:
+        published_page: 5
+        section: '3.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 8
+        note: 1600 C; unit conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: true
+      locator:
+        published_page: 8
+        note: ~2x10^-5 bar H2; unit conversion only
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: hydrogen
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 8
+        section: 3.1.2 Low-pressure H2 experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  locator:
+    published_page: 8
+    section: 3.1.2 Low-pressure H2 experiments
+  bench_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::bench::hokkaido-low-pressure-h2-furnace
+- experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::experiment::cai4b2-vacuum-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.00004'
+          approximate: false
+      locator:
+        published_page: 5
+        note: 10-40 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: 16 MgO
+      locator:
+        published_page: 5
+        section: '3.1'
+    form:
+      state:
+        tag: value
+        value: Melt droplet on iridium wire loop
+      locator:
+        published_page: 5
+        section: '3.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 7
+        note: 1600 C; unit conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.01'
+          approximate: true
+      locator:
+        published_page: 7
+        note: ~10^-7 bar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 7
+        section: 3.1.1 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  locator:
+    published_page: 7
+    section: 3.1.1 Vacuum evaporation experiments
+  bench_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::bench::chicago-high-vacuum-furnace
+benches:
+- id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::bench::chicago-high-vacuum-furnace
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: High-temperature high-vacuum evaporation furnace
+    locator:
+      published_page: 7
+      section: 3.1.1 Vacuum evaporation experiments
+  pumping_type:
+    state:
+      tag: value
+      value: Turbomolecular pump
+    locator:
+      published_page: 7
+      section: 3.1.1 Vacuum evaporation experiments
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Two Type G thermocouples and PYRO Micro optical pyrometer
+      locator:
+        published_page: 7
+        section: 3.1.1 Vacuum evaporation experiments
+  heating_method:
+    state:
+      tag: value
+      value: Tungsten-mesh heater
+    locator:
+      published_page: 7
+      section: 3.1.1 Vacuum evaporation experiments
+  other_facts: []
+- id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::bench::hokkaido-low-pressure-h2-furnace
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Low-pressure high-temperature hydrogen evaporation furnace
+    locator:
+      published_page: 8
+      section: 3.1.2 Low-pressure H2 experiments
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Stainless-steel vacuum furnace with tungsten mesh heater and molybdenum heat shield
+    locator:
+      published_page: 8
+      section: 3.1.2 Low-pressure H2 experiments
+  pumping_type:
+    state:
+      tag: value
+      value: Turbomolecular pump
+    locator:
+      published_page: 8
+      section: 3.1.2 Low-pressure H2 experiments
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Molybdenum-sheathed Type C W5Re-W26Re thermocouple 22.5 mm above sample
+      locator:
+        published_page: 8
+        section: 3.1.2 Low-pressure H2 experiments
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Calibrated with Fe
+      locator:
+        published_page: 8
+        section: 3.1.2 Low-pressure H2 experiments
+  heating_method:
+    state:
+      tag: value
+      value: Tungsten-mesh heater
+    locator:
+      published_page: 8
+      section: 3.1.2 Low-pressure H2 experiments
+  other_facts: []
+context:
+- observation_id: mendybaev_2021_table1_sample_geometry_readable_columns
+  type: experiment_series
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_page: 28
+    table: '1'
+  phase: CAI4B2_melt
+  regime: overhead_gas_arm
+  units: diameter mm; duration min; initial weight g; initial surface area cm2
+  values:
+    quantity: readable_table1_experimental_conditions
+    method_class: measured_direct
+    rows:
+    - sample: CAI4B2-2
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 3
+      initial_mass_g: '0.01694'
+      initial_area_cm2: '0.177'
+    - sample: CAI4B2-16
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 10
+      initial_mass_g: '0.03692'
+      initial_area_cm2: '0.278'
+    - sample: CAI4B2-12
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 20
+      initial_mass_g: '0.03363'
+      initial_area_cm2: '0.262'
+    - sample: CAI4B2-3
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 30
+      initial_mass_g: '0.01758'
+      initial_area_cm2: '0.18'
+    - sample: CAI4B2-14
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 35
+      initial_mass_g: '0.0396'
+      initial_area_cm2: '0.291'
+    - sample: CAI4B2-10
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 45
+      initial_mass_g: '0.03568'
+      initial_area_cm2: '0.272'
+    - sample: CAI4B2-4
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 60
+      initial_mass_g: '0.01915'
+      initial_area_cm2: '0.183'
+    - sample: CAI4B2-26
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 10
+      initial_mass_g: '0.00725'
+      initial_area_cm2: '0.095'
+    - sample: CAI4B2-28
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 20
+      initial_mass_g: '0.00783'
+      initial_area_cm2: '0.1'
+    - sample: CAI4B2-30
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 30
+      initial_mass_g: '0.00613'
+      initial_area_cm2: '0.088'
+    - sample: CAI4B2-31
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 30
+      initial_mass_g: '0.00825'
+      initial_area_cm2: '0.103'
+    - sample: CAI4B2-29
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 40
+      initial_mass_g: '0.00536'
+      initial_area_cm2: '0.082'
+    - sample: CAI4B2-32
+      arm: H2_2e-4_bar
+      diameter_mm: '1.5'
+      duration_min: 120
+      initial_mass_g: '0.00849'
+      initial_area_cm2: '0.105'
+    - sample: CAI4B2-13
+      arm: H2_2e-4_bar
+      diameter_mm: '2.5'
+      duration_min: 60
+      initial_mass_g: '0.04731'
+      initial_area_cm2: '0.327'
+    - sample: CAI4B2-1
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 5
+      initial_mass_g: '0.02388'
+      initial_area_cm2: '0.211'
+    - sample: CAI4B2-25
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 300
+      initial_mass_g: '0.01966'
+      initial_area_cm2: '0.19'
+    - sample: CAI4B2-22
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 600
+      initial_mass_g: '0.023'
+      initial_area_cm2: '0.21'
+    - sample: CAI4B2-21
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 1200
+      initial_mass_g: '0.01817'
+      initial_area_cm2: '0.183'
+    - sample: CAI4B2-23
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 1700
+      initial_mass_g: '0.02542'
+      initial_area_cm2: '0.221'
+    - sample: CAI4B2-20
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 1800
+      initial_mass_g: '0.01792'
+      initial_area_cm2: '0.182'
+    - sample: CAI4B2-24
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 2100
+      initial_mass_g: '0.03076'
+      initial_area_cm2: '0.247'
+    - sample: CAI4B2-18
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 2400
+      initial_mass_g: '0.02003'
+      initial_area_cm2: '0.192'
+    - sample: CAI4B2-19
+      arm: vacuum
+      diameter_mm: '2.5'
+      duration_min: 3300
+      initial_mass_g: '0.02826'
+      initial_area_cm2: '0.235'
+  context_id: mendybaev-2021-cai-low-pressure-h2-evap::context::mendybaev_2021_table1_sample_geometry_readable_columns
+  work_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  species: total

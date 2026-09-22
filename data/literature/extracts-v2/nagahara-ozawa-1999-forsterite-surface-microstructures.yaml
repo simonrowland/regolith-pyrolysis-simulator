@@ -1,0 +1,1693 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
+observations:
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_experimental_apparatus
+  experiment_id: 10.2183/pjab.75.29::nagahara-ozawa-1999-forsterite-surface-microstructures
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimental_apparatus_and_conditions'
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_apparatus_and_conditions'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 29
+    pdf_page_index: 1
+    section: Experiments
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure1_1700C_runs::point:0
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-11
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.347'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 30
+    pdf_page_index: 2
+    figure: '1'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '34.7'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure1_1700C_runs::point:1
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-11
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.168'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 30
+    pdf_page_index: 2
+    figure: '1'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '16.8'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure1_1700C_runs::point:2
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-16
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.745'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 30
+    pdf_page_index: 2
+    figure: '1'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '74.5'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure1_1700C_runs::point:3
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-15
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 30
+    pdf_page_index: 2
+    figure: '1'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '24'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 30
+          pdf_page_index: 2
+          figure: '1'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:0
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-11
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.066'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '6.6'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:1
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SC-4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.024'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.4'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:2
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-11
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.074'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.4'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:3
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SC-4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.038'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.8'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:4
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fo-11
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.137'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '13.7'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_figure2_1500C_runs::point:5
+  experiment_id: 10.2183/pjab.75.29::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SC-4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.032'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 31
+    pdf_page_index: 3
+    figure: '2'
+    note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.2'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 31
+          pdf_page_index: 3
+          figure: '2'
+          note: Printed labels below SEM images; values are caption/figure-label values, not axis readings.
+    output_unit: dimensionless
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_olivine_composition_change
+  experiment_id: 10.2183/pjab.75.29::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_composition_change_during_evaporation'
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_composition_change_during_evaporation';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 33
+    pdf_page_index: 5
+    figure: '3'
+    note: Figure 3 caption and accompanying prose; plotted composition trajectories are not digitized.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_table1_rates_and_surface_densities::point:0
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000000075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table I prints 7.5 x 10^-11 +/- 0.8 x 10^-11 m/sec and 617 +/- 15 kJ/mole for forsterite; SC olivine activation
+        energy is printed as about 250 kJ/mole and described as considerably uncertain.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class mixed'
+    original_method_class: mixed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 32
+    pdf_page_index: 4
+    table: '1'
+    note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 32
+        pdf_page_index: 4
+        table: '1'
+        note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters: []
+    output_unit: m/sec for evaporation_rate; cm^-2 for densities; kJ/mole for activation_energy
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_table1_rates_and_surface_densities::point:1
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000000000062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table I prints 7.5 x 10^-11 +/- 0.8 x 10^-11 m/sec and 617 +/- 15 kJ/mole for forsterite; SC olivine activation
+        energy is printed as about 250 kJ/mole and described as considerably uncertain.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class mixed'
+    original_method_class: mixed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 32
+    pdf_page_index: 4
+    table: '1'
+    note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 32
+        pdf_page_index: 4
+        table: '1'
+        note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters: []
+    output_unit: m/sec for evaporation_rate; cm^-2 for densities; kJ/mole for activation_energy
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_table1_rates_and_surface_densities::point:2
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000000008'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table I prints 7.5 x 10^-11 +/- 0.8 x 10^-11 m/sec and 617 +/- 15 kJ/mole for forsterite; SC olivine activation
+        energy is printed as about 250 kJ/mole and described as considerably uncertain.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class mixed'
+    original_method_class: mixed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 32
+    pdf_page_index: 4
+    table: '1'
+    note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 32
+        pdf_page_index: 4
+        table: '1'
+        note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters: []
+    output_unit: m/sec for evaporation_rate; cm^-2 for densities; kJ/mole for activation_energy
+- observation_id: nagahara-ozawa-1999-forsterite-surface-microstructures::nagahara_ozawa_1999_table1_rates_and_surface_densities::point:3
+  experiment_id: 10.2183/pjab.75.29::1
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000000012'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table I prints 7.5 x 10^-11 +/- 0.8 x 10^-11 m/sec and 617 +/- 15 kJ/mole for forsterite; SC olivine activation
+        energy is printed as about 250 kJ/mole and described as considerably uncertain.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class mixed'
+    original_method_class: mixed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
+  locator:
+    published_page: 32
+    pdf_page_index: 4
+    table: '1'
+    note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+  read_from: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 32
+        pdf_page_index: 4
+        table: '1'
+        note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92 olivine.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 32
+              pdf_page_index: 4
+              table: '1'
+              note: Table I, Comparison of dislocation density, pit density, and evaporation rate for forsterite and Fo92
+                olivine.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
+    parameters: []
+    output_unit: m/sec for evaporation_rate; cm^-2 for densities; kJ/mole for activation_energy

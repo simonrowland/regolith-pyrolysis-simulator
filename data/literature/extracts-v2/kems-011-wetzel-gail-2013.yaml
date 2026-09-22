@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-011-wetzel-gail-2013.yaml
 observations:
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_extrapolation_quoted
-  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -25,6 +25,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -55,7 +56,7 @@ observations:
         section: '3.3'
         equation: '8'
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_fit_quoted
-  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -74,6 +75,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -94,7 +96,7 @@ observations:
     equation: '8'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
-  experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -117,6 +119,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -147,7 +150,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
   read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
-  experiment_id: 10.1051/0004-6361/201220803::4a
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -170,6 +173,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
       refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -196,7 +200,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
   read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
-  experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -216,6 +220,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'Ta_Knudsen_source_for_SiO_film_deposition'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -234,7 +239,7 @@ observations:
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
   read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::1
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -253,6 +258,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -280,7 +286,7 @@ observations:
     table: '1'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::1
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -299,6 +305,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -319,7 +326,7 @@ observations:
     table: '1'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::2
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -338,6 +345,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -365,7 +373,7 @@ observations:
     table: '2'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::2
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -384,6 +392,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -404,7 +413,7 @@ observations:
     table: '2'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::3
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -423,6 +432,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -450,7 +460,7 @@ observations:
     table: '3'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::3
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -469,6 +479,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -545,7 +556,7 @@ observations:
     table: '3'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::4
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -564,6 +575,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -591,7 +603,7 @@ observations:
     table: '4'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::4
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -610,6 +622,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -630,7 +643,7 @@ observations:
     table: '4'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::5
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -649,6 +662,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -675,7 +689,7 @@ observations:
     table: '5'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::5
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -694,6 +708,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -713,7 +728,7 @@ observations:
     table: '5'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::6
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -732,6 +747,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -758,7 +774,7 @@ observations:
     table: '6'
   read_from: pdf:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::6
+  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   identity:
     quantity:
       tag: unknown
@@ -777,6 +793,7 @@ observations:
   value:
     kind: categorical
     categorical: bound_not_point_ordering
+    approximate: false
   uncertainty:
     kind: none
   evidence:

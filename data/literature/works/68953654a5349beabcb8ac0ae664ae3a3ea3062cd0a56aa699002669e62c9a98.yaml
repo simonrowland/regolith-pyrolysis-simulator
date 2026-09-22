@@ -17,162 +17,277 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-experiments:
-- experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.1
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
-  locator:
-    published_page: 379
-    table: '8.1'
-- experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.26
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
-  locator:
-    published_page: 420
-    figure: '8.26'
-    section: 8.7.2
-- experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.7
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
-  locator:
-    published_page: 374
-    figure: '8.7'
-    section: '8.4'
-- experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::A8.1-A8.6
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+experiments: []
+context:
+- observation_id: lpi_1991_appendix_statistical_table_coverage
+  type: compilation_scope
   locator:
     published_page: 449
     table: A8.1-A8.6
     section: appendix
-- experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  units: as_published
+  values:
+    quantity: statistical_compilation_coverage
+    method_class: secondary_compilation
+    tables:
+    - id: A8.1
+      subject: major_elements
+      units: wt_percent
+    - id: A8.2
+      subject: incompatible_trace_elements
+      units: microgram_per_gram
+    - id: A8.3
+      subject: miscellaneous_minor_elements
+      units: microgram_per_gram
+    - id: A8.4
+      subject: siderophile_elements
+      units: microgram_per_gram_and_nanogram_per_gram
+    - id: A8.5
+      subject: vapor_mobilized_elements
+      units: as_published
+    - id: A8.6
+      subject: solar_wind_implanted_elements
+      units: as_published
+    summary_statistics:
+    - N
+    - average
+    - standard_deviation
+    - minimum
+    - maximum
+    limitation: The chapter says standard deviations are omitted when N < 3 and that coverage differs by element and sample
+      class.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_appendix_statistical_table_coverage
   work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: appendix_tables
+- observation_id: lpi_1991_incompatible_trace_element_methods
+  type: analytical_method_summary
+  locator:
+    published_page: 374
+    section: '8.4'
+    figure: '8.7'
+  units: as_published
+  values:
+    quantity: compiled_measurement_method_summary
+    method_class: secondary_compilation
+    methods:
+    - mass spectrometry with isotope dilution
+    - neutron activation analysis
+    elements:
+    - Li
+    - Be
+    - B
+    - K
+    - Rb
+    - Y
+    - Zr
+    - Nb
+    - Sn
+    - Cs
+    - Ba
+    - La
+    - Ce
+    - Sm
+    - Eu
+    - Yb
+    - Hf
+    - Ta
+    - Th
+    - U
+    note: Methods describe cited measurements compiled in the figure, not a new experiment in this chapter.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_incompatible_trace_element_methods
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: compiled_analytical_methods
+- observation_id: lpi_1991_major_element_atom_abundances
+  type: composition_summary
   locator:
     published_page: 362
     section: 8.3.1
+  units: atom_percent_as_published
+  values:
+    quantity: lunar_major_element_atom_abundance_summary
+    method_class: secondary_compilation
+    semantics: narrative_summary_of_lunar_surface_materials_not_single_sample
+    oxygen_atoms_percent: '>60'
+    silicon_atoms_percent: 16-17
+    aluminum_atoms_percent_highlands: 10
+    aluminum_atoms_percent_maria: '4.5'
+    calcium_atoms_percent_highlands: about 5
+    calcium_atoms_percent_maria: about 4.5
+    magnesium_atoms_percent: about 5
+    iron_atoms_percent_highlands: approximately 2.5
+    iron_atoms_percent_maria: approximately 6
+    titanium_and_sodium_atoms_percent: remaining percent or so
+  quote: More than 60% of the atoms are O; Si contributes 16-17%; Al is about 10% in highlands and 4.5% in mare basalts; Ca
+    and Mg are about 5% each; Fe is approximately 2.5% in highlands and 6% in maria.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_major_element_atom_abundances
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: lunar_major_elements
+- observation_id: lpi_1991_major_element_weight_abundances
+  type: composition_summary
+  locator:
+    published_page: 363
+    section: 8.3.1
+  units: wt_percent_as_published
+  values:
+    quantity: lunar_major_element_weight_abundance_summary
+    method_class: secondary_compilation
+    semantics: oxide-equivalent_major_element_summary_not_single_sample
+    O: about 45
+    Si: 21
+    Al_highlands: about 13
+    Al_maria: about 5
+    Ca_highlands: about 10
+    Ca_maria: about 8
+    Fe_highlands: about 6
+    Fe_maria: about 15
+    Mg_highlands: '5.5'
+    Mg_maria: '5.5'
+    Ti_highlands: fraction of a percent
+    Na_highlands: fraction of a percent
+    Ti_maria: '>1; may be as high as ~5'
+    Na_maria: fraction of a percent
+  quote: O is about 45% by weight, Si 21%, Al about 13% for highlands and 5% for maria, Ca about 10% for highlands and 8%
+    for maria, Fe about 6% for highlands and 15% for maria, and Mg 5.5% for both.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_major_element_weight_abundances
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: lunar_major_elements
+- observation_id: lpi_1991_miscellaneous_minor_methods
+  type: analytical_method_summary
+  locator:
+    published_page: 390
+    section: 8.5.1
+  units: as_published
+  values:
+    quantity: compiled_measurement_method_summary
+    method_class: secondary_compilation
+    INAA_elements:
+    - Sc
+    - Cr
+    - Mn
+    - V
+    - Ga
+    isotope_dilution_element: Sr
+    XRF_element: P
+    note: The chapter states that selected sources are a subset of the literature and generally internally consistent, not
+      necessarily the most precise available data.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_miscellaneous_minor_methods
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: compiled_analytical_methods
+- observation_id: lpi_1991_noble_gas_stp_conversion
+  type: data_reduction_convention
+  locator:
+    published_page: 437
+    section: 8.8.2
+  units: cm3_per_gram_at_STP_as_published
+  values:
+    quantity: noble_gas_concentration_reporting_convention
+    method_class: secondary_compilation
+    temperature_C: 25
+    pressure_atm: 1
+    alternative_units:
+    - microgram_per_gram
+    - nanogram_per_gram
+    note: Literature atomic abundances were converted to equivalent gas volume at stated STP; this is a reporting convention,
+      not a new measurement.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_noble_gas_stp_conversion
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: compiled_analytical_methods
+- observation_id: lpi_1991_ree_chondrite_standard_table8_1
+  type: reference_composition_table
+  locator:
+    published_page: 379
+    table: '8.1'
+  units: microgram_per_gram_as_published
+  values:
+    quantity: chondritic_ree_reference_composition
+    method_class: secondary_compilation
+    standard: chondritic_meteorites
+    source_basis: Average of values from Haskin et al. (1968), Nakamura (1974), Leedy chondrite/1.225 (Masuda et al. 1973),
+      and CI chondrite average/0.796 (Evensen et al. 1978).
+    La: 0.319 +/- 0.012
+    Ce: 0.836 +/- 0.043
+    Pr: 0.113 +/- 0.007
+    Nd: 0.602 +/- 0.019
+    Sm: 0.186 +/- 0.005
+    Eu: 0.0724 +/- 0.0035
+    Gd: 0.259 +/- 0.012
+    Tb: 0.0483 +/- 0.0022
+    Dy: 0.324 +/- 0.013
+    Ho: 0.0725 +/- 0.0032
+    Er: 0.21 +/- 0.011
+    Tm: 0.0315 +/- 0.0013
+    Yb: 0.208 +/- 0.009
+    Lu: 0.0328 +/- 0.0013
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_ree_chondrite_standard_table8_1
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: rare_earth_elements
+- observation_id: lpi_1991_ree_kreep_standard_table8_1
+  type: reference_composition_table
+  locator:
+    published_page: 379
+    table: '8.1'
+  units: microgram_per_gram_as_published
+  values:
+    quantity: kreep_ree_reference_composition
+    method_class: secondary_compilation
+    standard: Apollo_14_KREEP
+    source_basis: Adapted from Warren and Wasson (1979a).
+    La: 115
+    Ce: 283
+    Pr: '35.8'
+    Nd: 181
+    Sm: '48.7'
+    Eu: '3.1'
+    Gd: 57
+    Tb: '10.1'
+    Dy: '64.8'
+    Ho: 14
+    Er: '39.3'
+    Tm: '5.67'
+    Yb: '35.8'
+    Lu: '5.48'
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_ree_kreep_standard_table8_1
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: rare_earth_elements
+- observation_id: lpi_1991_typical_analytical_sample_size
+  type: sample_characterization
+  locator:
+    published_page: 359
+    section: 8.1.2
+  units: as_published
+  values:
+    quantity: analytical_sample_size_context
+    method_class: secondary_compilation
+    sample_mass_g: typically 1
+    sample_dimension_cm: 0.2-0.4
+    note: Context for samples allocated for analysis; not a reported mass for one named specimen.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_typical_analytical_sample_size
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: lunar_major_elements
+- observation_id: lpi_1991_vapor_mobilized_sample_counts
+  type: compiled_sample_count
+  locator:
+    published_page: 420
+    section: 8.7.2
+    figure: '8.26'
+  units: samples_as_published
+  values:
+    quantity: compiled_sample_count
+    method_class: secondary_compilation
+    mare_basalt_samples: 79
+    soil_samples: 140
+    normalization: CI_carbonaceous_meteorites
+    note: Counts apply to the figure dataset; they are not apparatus runs.
+  context_id: lpi-lunar-sourcebook-chapter08::context::lpi_1991_vapor_mobilized_sample_counts
+  work_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98
+  source_id: lpi-lunar-sourcebook-chapter08
+  species: compiled_analytical_methods

@@ -70,49 +70,6 @@ experiments:
     pdf_page_index: 2
     table: '1'
     note: Table 1. Chemical analysis of the pure materials (ppm)
-- experiment_id: 10.2355/isijinternational1966.16.382::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 384
-    pdf_page_index: 3
-    table: '2'
-    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical density
-      locator:
-        published_page: 383
-        pdf_page_index: 2
-        section: III.1
-        note: thoria cells made in our laboratory
 - experiment_id: 10.2355/isijinternational1966.16.382::3
   kind: literature
   method:
@@ -145,18 +102,34 @@ experiments:
     published_page: 385
     pdf_page_index: 4
     table: '3'
-    note: 'Table 3 This work row: 0.017** (liquid Ti) and 0.018* (solid Ti) at 1600 C'
-- experiment_id: 10.2355/isijinternational1966.16.382::4
+    note: Table 3 comparison of gamma_Ti^o from previous works
+- experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 384
+        table: '2'
+        note: Multiple Fe-Ti compositions retained in observation rows
+    pretreatment:
+      state:
+        tag: value
+        value: Pure Fe and Ti alloyed in situ; Fe-Th alloy added at 1 at% of solute content
+      locator:
+        published_page: 383
+        section: III.2 Experimental Procedure
+        note: Maximum about 0.5 at% Th at N_Ti=0.494
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -175,10 +148,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/isijinternational1966.16.382
   locator:
-    published_page: 385
-    pdf_page_index: 4
-    table: '4'
-    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+    published_page: 383-384
+    section: III.2 Experimental Procedure
+    note: Fe-Ti alloy series made in situ and measured while raising temperature stepwise
   apparatus:
     cell_material_and_liner:
       state:
@@ -189,139 +161,24 @@ experiments:
         pdf_page_index: 2
         section: III.1
         note: thoria cells made in our laboratory
-- experiment_id: 10.2355/isijinternational1966.16.382::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 385
-    pdf_page_index: 4
-    figure: '5'
-    note: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
-- experiment_id: 10.2355/isijinternational1966.16.382::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 386
-    pdf_page_index: 5
-    figure: '6'
-    note: infinite-dilution heats of solution and maximum H^M from integration of Table 2 slopes via eq (5)
-- experiment_id: 10.2355/isijinternational1966.16.382::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 386
-    pdf_page_index: 5
-    figure: '7'
-    equation: 6-7
-    note: eqs (6)-(7) and conclusion; synopsis p. 382 prints +0.58 for log gamma_Ti intercept vs +0.53 in the body
-- experiment_id: 10.2355/isijinternational1966.16.382::Photo. 1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 383
-    pdf_page_index: 2
-    figure: Photo. 1
-    note: Photo. 1. Typical mass spectrum for the Fe-Ti system
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 383
+          section: III.1 Experimental Apparatus
+          note: Offered diameters are not assigned to aggregate observation rows
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 383
+          section: III.1 Experimental Apparatus
+          note: Lid thickness is not a printed channel length
+  bench_id: 10.2355/isijinternational1966.16.382::bench::thoria-kems
 - experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
   kind: literature
   method:
@@ -353,41 +210,113 @@ experiments:
   locator:
     published_page: 383
     pdf_page_index: 2
-    section: III
-    note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
-  apparatus:
-    cell_material_and_liner:
+    equation: 1-3
+    note: Wagner and St. Pierre 1545 C regular-solution G^E = H^M = -9700 N_Fe N_Ti cal/mol; gamma_Ti^o from eq (3) is 0.068
+benches:
+- id: 10.2355/isijinternational1966.16.382::bench::thoria-kems
+  work_id: 10.2355/isijinternational1966.16.382
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Magnetic-deflection Knudsen-cell mass spectrometer
+    locator:
+      published_page: 383
+      pdf_page_index: 2
+      section: III.1 Experimental Apparatus
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 383
+      pdf_page_index: 2
+      section: III.1 Experimental Apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Laboratory-made thoria Knudsen cell
+    locator:
+      published_page: 383
+      pdf_page_index: 2
+      section: III.1 Experimental Apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 383
+          section: III.1 Experimental Apparatus
+          note: Printed 9.5 and 11 mm dimensions are outer/body diameters
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 383
+          section: III.1 Experimental Apparatus
+          note: Printed 11 mm is body height, not separately internal depth
+  detector:
+    state:
+      tag: value
+      value: Magnetic-deflection mass spectrometer with movable ion-source exit slit
+    locator:
+      published_page: 383
+      pdf_page_index: 2
+      section: III.1 Experimental Apparatus
+  other_facts:
+  - name: offered_orifice_diameters_not_run_assignments
+    value:
       state:
         tag: value
-        value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical density
+        value:
+          kind: categorical
+          categorical: 0.4 or 0.6 or 0.7
+          approximate: false
+      locator:
+        published_page: 383
+        section: III.1 Experimental Apparatus
+        note: Used according to experimental purpose; aggregate-row assignments not printed
+    unit: mm
+  - name: cell_upper_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9.5'
+          approximate: false
       locator:
         published_page: 383
         pdf_page_index: 2
-        section: III.1
-        note: thoria cells made in our laboratory
-    ionization:
-      electron_energy_eV:
-        state:
-          tag: value
-          value: '19'
-        locator:
-          published_page: 383
-          pdf_page_index: 2
-          section: III
-          note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
-        inference:
-          relation: identity:1
-          inputs:
-          - as_published=19.0 eV
-          - printed=ionizing_electron_energy_V
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '19'
-              locator:
-                published_page: 383
-                pdf_page_index: 2
-                section: III
-                note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
-          output_unit: '1'
+        section: III.1 Experimental Apparatus
+    unit: mm
+  - name: cell_lower_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11'
+          approximate: false
+      locator:
+        published_page: 383
+        pdf_page_index: 2
+        section: III.1 Experimental Apparatus
+    unit: mm
+  - name: cell_body_height
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11'
+          approximate: false
+      locator:
+        published_page: 383
+        pdf_page_index: 2
+        section: III.1 Experimental Apparatus
+    unit: mm

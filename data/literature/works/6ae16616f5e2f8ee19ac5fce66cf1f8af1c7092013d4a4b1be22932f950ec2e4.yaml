@@ -311,3 +311,142 @@ experiments:
     page: 74
     table: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-vacuum-evaporation-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value: synthetic basaltic oxide and carbonate mixture
+      locator:
+        section: 2.1 Sample preparation
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        section: 2.1 Sample preparation
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: 1200 and 1400 C are distinct run setpoints; no single series setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    section: 2.2 Vacuum evaporation experiments
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        note: Per-run durations vary from zero-time to 2400 min
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+benches:
+- id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: vacuum furnace
+    locator:
+      section: 2.2 Vacuum evaporation experiments
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: two W100/W74Re26 thermocouples and an occasional pyrometer
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Within 5 C is agreement among measured temperatures
+  heating_method:
+    state:
+      tag: value
+      value: vertically mounted tungsten-mesh heater with seven alternating tungsten and molybdenum shield layers
+    locator:
+      section: 2.2 Vacuum evaporation experiments
+  other_facts: []

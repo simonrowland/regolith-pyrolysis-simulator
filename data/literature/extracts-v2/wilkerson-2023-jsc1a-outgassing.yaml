@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
 observations:
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::1
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -22,6 +22,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'tga_ms_release_curve'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -47,7 +48,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::2
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -66,6 +67,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'tga_ms_release_curve'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -91,7 +93,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::4
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -110,6 +112,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'tga_ms_release_curve'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -135,7 +138,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::2
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -155,6 +158,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_temperature_windows'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -173,7 +177,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
-  experiment_id: 10.1016/j.icarus.2023.115577::4
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -195,6 +199,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'total_mass_loss'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -213,7 +218,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -233,6 +238,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_temperature_windows'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -270,6 +276,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'loss_on_ignition'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -288,7 +295,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
-  experiment_id: 10.1016/j.icarus.2023.115577::1
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -308,6 +315,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'mossbauer_metallic_fe_component'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -329,7 +337,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
-  experiment_id: 10.1016/j.icarus.2023.115577::2
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -349,6 +357,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'residual_carbon_and_sulfur'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -370,7 +379,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
-  experiment_id: 10.1016/j.icarus.2023.115577::2
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   identity:
     quantity:
       tag: unknown
@@ -389,6 +398,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'residual_sulfur'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -427,6 +437,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'powder_size_surface_density'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -448,7 +459,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
-  experiment_id: 10.1016/j.icarus.2023.115577::2
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -470,6 +481,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'total_mass_loss'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -491,7 +503,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   identity:
     quantity:
       tag: unknown
@@ -514,6 +526,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'thermal_program_and_apparatus'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -532,7 +545,7 @@ observations:
     note: Icarus journal pre-proof; no printed pagination.
   read_from: pdf:wilkerson-2023-jsc1a-outgassing
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
-  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  experiment_id: 10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series
   identity:
     quantity:
       tag: unknown
@@ -554,6 +567,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'vacuum_ms_apparatus'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -592,6 +606,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'identified_crystalline_phases'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:

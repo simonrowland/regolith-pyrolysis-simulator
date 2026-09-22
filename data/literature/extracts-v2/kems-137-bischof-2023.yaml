@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-137-bischof-2023.yaml
 observations:
 - observation_id: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::9
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_log10_gamma_coefficients'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -65,6 +66,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -82,7 +84,7 @@ observations:
     table: '4'
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -168,6 +170,7 @@ observations:
       - '0.000207'
     - - '1695.4'
       - '0.000273'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -185,7 +188,7 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_preferred_1700k
-  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -249,6 +252,7 @@ observations:
   value:
     kind: point
     point: '0.036'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -282,7 +286,7 @@ observations:
         note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not Table
           8 on page 22
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -346,6 +350,7 @@ observations:
   value:
     kind: point
     point: '0.0632'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -382,7 +387,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -446,6 +451,7 @@ observations:
   value:
     kind: point
     point: '0.0478'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -482,7 +488,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -546,6 +552,7 @@ observations:
   value:
     kind: point
     point: '0.0246'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -582,7 +589,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -646,6 +653,7 @@ observations:
   value:
     kind: point
     point: '0.0369'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -682,7 +690,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -746,6 +754,7 @@ observations:
   value:
     kind: point
     point: '0.0305'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -782,7 +791,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -846,6 +855,7 @@ observations:
   value:
     kind: point
     point: '0.0285'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -882,7 +892,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -946,6 +956,7 @@ observations:
   value:
     kind: point
     point: '0.0367'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -982,7 +993,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1046,6 +1057,7 @@ observations:
   value:
     kind: point
     point: '0.0248'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1082,7 +1094,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1146,6 +1158,7 @@ observations:
   value:
     kind: point
     point: '0.0272'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1182,7 +1195,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1246,6 +1259,7 @@ observations:
   value:
     kind: point
     point: '0.0248'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1282,7 +1296,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1346,6 +1360,7 @@ observations:
   value:
     kind: point
     point: '0.0239'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1382,7 +1397,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1446,6 +1461,7 @@ observations:
   value:
     kind: point
     point: '0.0353'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1482,7 +1498,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1546,6 +1562,7 @@ observations:
   value:
     kind: point
     point: '0.0384'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1582,7 +1599,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1646,6 +1663,7 @@ observations:
   value:
     kind: point
     point: '0.0523'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1682,7 +1700,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:11
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1746,6 +1764,7 @@ observations:
   value:
     kind: point
     point: '0.0455'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1782,7 +1801,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:12
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1846,6 +1865,7 @@ observations:
   value:
     kind: point
     point: '0.0466'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1882,7 +1902,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:13
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -1946,6 +1966,7 @@ observations:
   value:
     kind: point
     point: '0.0427'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -1982,7 +2003,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:14
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2046,6 +2067,7 @@ observations:
   value:
     kind: point
     point: '0.044'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2082,7 +2104,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:15
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2146,6 +2168,7 @@ observations:
   value:
     kind: point
     point: '0.0403'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2182,7 +2205,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2246,6 +2269,7 @@ observations:
   value:
     kind: point
     point: '0.0426'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2282,7 +2306,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2346,6 +2370,7 @@ observations:
   value:
     kind: point
     point: '0.0497'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2382,7 +2407,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2446,6 +2471,7 @@ observations:
   value:
     kind: point
     point: '0.0527'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2482,7 +2508,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2546,6 +2572,7 @@ observations:
   value:
     kind: point
     point: '0.0484'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2582,7 +2609,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2646,6 +2673,7 @@ observations:
   value:
     kind: point
     point: '0.0522'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2682,7 +2710,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2746,6 +2774,7 @@ observations:
   value:
     kind: point
     point: '0.0488'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2782,7 +2811,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2846,6 +2875,7 @@ observations:
   value:
     kind: point
     point: '0.0499'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2882,7 +2912,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -2946,6 +2976,7 @@ observations:
   value:
     kind: point
     point: '0.0518'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -2982,7 +3013,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3046,6 +3077,7 @@ observations:
   value:
     kind: point
     point: '270'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3080,7 +3112,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3144,6 +3176,7 @@ observations:
   value:
     kind: point
     point: '248'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3178,7 +3211,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3242,6 +3275,7 @@ observations:
   value:
     kind: point
     point: '13'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3276,7 +3310,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:11
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3340,6 +3374,7 @@ observations:
   value:
     kind: point
     point: '5.34'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3374,7 +3409,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:12
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3438,6 +3473,7 @@ observations:
   value:
     kind: point
     point: '0.581'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3472,7 +3508,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:13
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3536,6 +3572,7 @@ observations:
   value:
     kind: point
     point: '0.426'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3570,7 +3607,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:14
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3634,6 +3671,7 @@ observations:
   value:
     kind: point
     point: '0.22'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3668,7 +3706,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:15
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3732,6 +3770,7 @@ observations:
   value:
     kind: point
     point: '0.151'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3766,7 +3805,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:16
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3830,6 +3869,7 @@ observations:
   value:
     kind: point
     point: '0.0996'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3864,7 +3904,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:17
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -3928,6 +3968,7 @@ observations:
   value:
     kind: point
     point: '0.0779'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -3962,7 +4003,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:18
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4026,6 +4067,7 @@ observations:
   value:
     kind: point
     point: '0.0634'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4060,7 +4102,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:19
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4124,6 +4166,7 @@ observations:
   value:
     kind: point
     point: '0.0559'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4158,7 +4201,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4222,6 +4265,7 @@ observations:
   value:
     kind: point
     point: '244'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4256,7 +4300,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:20
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4320,6 +4364,7 @@ observations:
   value:
     kind: point
     point: '0.0502'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4354,7 +4399,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:21
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4418,6 +4463,7 @@ observations:
   value:
     kind: point
     point: '0.0447'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4452,7 +4498,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:22
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4516,6 +4562,7 @@ observations:
   value:
     kind: point
     point: '0.0382'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4550,7 +4597,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:23
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4614,6 +4661,7 @@ observations:
   value:
     kind: point
     point: '0.0377'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4648,7 +4696,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:24
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4712,6 +4760,7 @@ observations:
   value:
     kind: point
     point: '0.0377'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4746,7 +4795,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:25
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4810,6 +4859,7 @@ observations:
   value:
     kind: point
     point: '0.0385'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4844,7 +4894,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -4908,6 +4958,7 @@ observations:
   value:
     kind: point
     point: '230'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -4942,7 +4993,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5006,6 +5057,7 @@ observations:
   value:
     kind: point
     point: '195'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5040,7 +5092,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5104,6 +5156,7 @@ observations:
   value:
     kind: point
     point: '145'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5138,7 +5191,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5202,6 +5255,7 @@ observations:
   value:
     kind: point
     point: '112'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5236,7 +5290,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5300,6 +5354,7 @@ observations:
   value:
     kind: point
     point: '74.7'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5334,7 +5389,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5398,6 +5453,7 @@ observations:
   value:
     kind: point
     point: '45.8'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5432,7 +5488,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5496,6 +5552,7 @@ observations:
   value:
     kind: point
     point: '24.3'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5530,7 +5587,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5594,6 +5651,7 @@ observations:
   value:
     kind: point
     point: '0.356'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5628,7 +5686,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5692,6 +5750,7 @@ observations:
   value:
     kind: point
     point: '0.25'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5726,7 +5785,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5790,6 +5849,7 @@ observations:
   value:
     kind: point
     point: '0.209'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5824,7 +5884,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5888,6 +5948,7 @@ observations:
   value:
     kind: point
     point: '0.146'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -5922,7 +5983,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -5986,6 +6047,7 @@ observations:
   value:
     kind: point
     point: '0.147'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6020,7 +6082,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6084,6 +6146,7 @@ observations:
   value:
     kind: point
     point: '0.127'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6118,7 +6181,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6182,6 +6245,7 @@ observations:
   value:
     kind: point
     point: '0.0955'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6216,7 +6280,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6280,6 +6344,7 @@ observations:
   value:
     kind: point
     point: '0.08'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6314,7 +6379,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6378,6 +6443,7 @@ observations:
   value:
     kind: point
     point: '0.0711'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6412,7 +6478,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6476,6 +6542,7 @@ observations:
   value:
     kind: point
     point: '0.0529'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6510,7 +6577,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::9
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -6533,6 +6600,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_log10_gamma_coefficients'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -6572,6 +6640,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -6589,7 +6658,7 @@ observations:
     table: '4'
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6675,6 +6744,7 @@ observations:
       - '0.000207'
     - - '1695.4'
       - '0.000234'
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -6692,7 +6762,7 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
-  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6756,6 +6826,7 @@ observations:
   value:
     kind: point
     point: '0.017'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6786,7 +6857,7 @@ observations:
         paragraph: giving γ(InO1.5) = 0.017(12) at an average T of 1674 K
         note: AM page 23 lines 593-596; not Table 8 on page 22
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6850,6 +6921,7 @@ observations:
   value:
     kind: point
     point: '0.0527'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6884,7 +6956,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -6948,6 +7020,7 @@ observations:
   value:
     kind: point
     point: '0.044'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -6982,7 +7055,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7046,6 +7119,7 @@ observations:
   value:
     kind: point
     point: '0.0254'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7080,7 +7154,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7144,6 +7218,7 @@ observations:
   value:
     kind: point
     point: '0.0486'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7178,7 +7253,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7242,6 +7317,7 @@ observations:
   value:
     kind: point
     point: '0.0349'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7276,7 +7352,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7340,6 +7416,7 @@ observations:
   value:
     kind: point
     point: '0.0377'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7374,7 +7451,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7438,6 +7515,7 @@ observations:
   value:
     kind: point
     point: '0.0329'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7472,7 +7550,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7536,6 +7614,7 @@ observations:
   value:
     kind: point
     point: '0.0315'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7570,7 +7649,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7634,6 +7713,7 @@ observations:
   value:
     kind: point
     point: '0.0286'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7668,7 +7748,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7732,6 +7812,7 @@ observations:
   value:
     kind: point
     point: '0.0301'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7766,7 +7847,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7830,6 +7911,7 @@ observations:
   value:
     kind: point
     point: '0.0265'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7864,7 +7946,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -7928,6 +8010,7 @@ observations:
   value:
     kind: point
     point: '0.0211'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -7962,7 +8045,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8026,6 +8109,7 @@ observations:
   value:
     kind: point
     point: '0.0231'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8060,7 +8144,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8124,6 +8208,7 @@ observations:
   value:
     kind: point
     point: '0.0167'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8158,7 +8243,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:11
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8222,6 +8307,7 @@ observations:
   value:
     kind: point
     point: '0.0189'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8256,7 +8342,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:12
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8320,6 +8406,7 @@ observations:
   value:
     kind: point
     point: '0.0169'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8354,7 +8441,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:13
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8418,6 +8505,7 @@ observations:
   value:
     kind: point
     point: '0.0173'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8452,7 +8540,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:14
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8516,6 +8604,7 @@ observations:
   value:
     kind: point
     point: '0.0167'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8550,7 +8639,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:15
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8614,6 +8703,7 @@ observations:
   value:
     kind: point
     point: '0.0154'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8648,7 +8738,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8712,6 +8802,7 @@ observations:
   value:
     kind: point
     point: '0.0197'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8746,7 +8837,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8810,6 +8901,7 @@ observations:
   value:
     kind: point
     point: '0.022'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8844,7 +8936,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -8908,6 +9000,7 @@ observations:
   value:
     kind: point
     point: '0.0194'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -8942,7 +9035,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9006,6 +9099,7 @@ observations:
   value:
     kind: point
     point: '0.0194'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9040,7 +9134,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9104,6 +9198,7 @@ observations:
   value:
     kind: point
     point: '0.0188'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9138,7 +9233,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9202,6 +9297,7 @@ observations:
   value:
     kind: point
     point: '0.02'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9236,7 +9332,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9300,6 +9396,7 @@ observations:
   value:
     kind: point
     point: '0.0186'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9334,7 +9431,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9398,6 +9495,7 @@ observations:
   value:
     kind: point
     point: '0.0196'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9432,7 +9530,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9496,6 +9594,7 @@ observations:
   value:
     kind: point
     point: '29.6'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9530,7 +9629,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9594,6 +9693,7 @@ observations:
   value:
     kind: point
     point: '16.6'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9628,7 +9728,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:10
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9692,6 +9792,7 @@ observations:
   value:
     kind: point
     point: '1.82'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9726,7 +9827,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:11
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9790,6 +9891,7 @@ observations:
   value:
     kind: point
     point: '0.987'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9824,7 +9926,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:12
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9888,6 +9990,7 @@ observations:
   value:
     kind: point
     point: '0.648'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -9922,7 +10025,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:13
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -9986,6 +10089,7 @@ observations:
   value:
     kind: point
     point: '0.586'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10020,7 +10124,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:14
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10084,6 +10188,7 @@ observations:
   value:
     kind: point
     point: '0.102'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10118,7 +10223,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:15
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10182,6 +10287,7 @@ observations:
   value:
     kind: point
     point: '0.0814'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10216,7 +10322,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:16
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10280,6 +10386,7 @@ observations:
   value:
     kind: point
     point: '0.045'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10314,7 +10421,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:17
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10378,6 +10485,7 @@ observations:
   value:
     kind: point
     point: '0.0307'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10412,7 +10520,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:18
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10476,6 +10584,7 @@ observations:
   value:
     kind: point
     point: '0.0202'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10510,7 +10619,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:19
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10574,6 +10683,7 @@ observations:
   value:
     kind: point
     point: '0.0135'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10608,7 +10718,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10672,6 +10782,7 @@ observations:
   value:
     kind: point
     point: '18.8'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10706,7 +10817,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:20
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10770,6 +10881,7 @@ observations:
   value:
     kind: point
     point: '0.00941'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10804,7 +10916,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:21
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10868,6 +10980,7 @@ observations:
   value:
     kind: point
     point: '0.00626'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -10902,7 +11015,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:22
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -10966,6 +11079,7 @@ observations:
   value:
     kind: point
     point: '0.00462'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11000,7 +11114,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:23
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11064,6 +11178,7 @@ observations:
   value:
     kind: point
     point: '0.00354'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11098,7 +11213,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:24
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11162,6 +11277,7 @@ observations:
   value:
     kind: point
     point: '0.00285'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11196,7 +11312,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:25
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11260,6 +11376,7 @@ observations:
   value:
     kind: point
     point: '0.00216'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11294,7 +11411,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:26
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11358,6 +11475,7 @@ observations:
   value:
     kind: point
     point: '0.00196'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11392,7 +11510,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:27
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11456,6 +11574,7 @@ observations:
   value:
     kind: point
     point: '0.00145'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11490,7 +11609,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11554,6 +11673,7 @@ observations:
   value:
     kind: point
     point: '18.2'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11588,7 +11708,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11652,6 +11772,7 @@ observations:
   value:
     kind: point
     point: '17.9'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11686,7 +11807,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11750,6 +11871,7 @@ observations:
   value:
     kind: point
     point: '16.5'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11784,7 +11906,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11848,6 +11970,7 @@ observations:
   value:
     kind: point
     point: '14.4'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11882,7 +12005,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -11946,6 +12069,7 @@ observations:
   value:
     kind: point
     point: '10.3'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -11980,7 +12104,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12044,6 +12168,7 @@ observations:
   value:
     kind: point
     point: '6.63'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12078,7 +12203,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12142,6 +12267,7 @@ observations:
   value:
     kind: point
     point: '4.27'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12176,7 +12302,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:0
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12240,6 +12366,7 @@ observations:
   value:
     kind: point
     point: '0.0335'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12274,7 +12401,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:1
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12338,6 +12465,7 @@ observations:
   value:
     kind: point
     point: '0.025'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12372,7 +12500,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:2
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12436,6 +12564,7 @@ observations:
   value:
     kind: point
     point: '0.0211'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12470,7 +12599,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:3
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12534,6 +12663,7 @@ observations:
   value:
     kind: point
     point: '0.0154'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12568,7 +12698,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:4
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12632,6 +12762,7 @@ observations:
   value:
     kind: point
     point: '0.0127'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12666,7 +12797,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:5
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12730,6 +12861,7 @@ observations:
   value:
     kind: point
     point: '0.00978'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12764,7 +12896,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:6
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12828,6 +12960,7 @@ observations:
   value:
     kind: point
     point: '0.00845'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12862,7 +12995,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:7
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -12926,6 +13059,7 @@ observations:
   value:
     kind: point
     point: '0.00646'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -12960,7 +13094,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:8
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -13024,6 +13158,7 @@ observations:
   value:
     kind: point
     point: '0.00581'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -13058,7 +13193,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm::point:9
-  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: value
@@ -13122,6 +13257,7 @@ observations:
   value:
     kind: point
     point: '0.00398'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -13156,7 +13292,7 @@ observations:
     parameters: []
     output_unit: dimensionless
 - observation_id: kems-137-bischof-2023::bischof_2023_kems_geometry_and_calibration
-  experiment_id: 10.1016/j.gca.2023.08.027::2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -13193,6 +13329,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
       a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -13215,7 +13352,7 @@ observations:
     note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
-  experiment_id: 10.1016/j.gca.2023.08.027::9
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -13237,6 +13374,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -13256,7 +13394,7 @@ observations:
     note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
-  experiment_id: 10.1016/j.gca.2023.08.027::9
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -13278,6 +13416,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
+    approximate: false
   uncertainty:
     kind: none
   evidence:
@@ -13297,7 +13436,7 @@ observations:
     note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_table8_x_gao15
-  experiment_id: 10.1016/j.gca.2023.08.027::8
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
       tag: unknown
@@ -13320,6 +13459,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'mole_fraction_for_activity_calculation'; refusing
       to pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

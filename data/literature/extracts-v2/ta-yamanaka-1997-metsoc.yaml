@@ -1,0 +1,269 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-yamanaka-1997-metsoc.yaml
+observations:
+- observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_alpha_figure_only
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_coefficient_alpha_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_oxygen_pressure does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure 1 has no printed uncertainty values; plotted coordinates were not digitised.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: ta-yamanaka-1997-metsoc
+  locator:
+    page: 1
+    figure: '1'
+    section: Results and discussion
+  read_from: unknown:ta-yamanaka-1997-metsoc
+- observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermodynamic_inputs_for_equilibrium_Na_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermodynamic_inputs_for_equilibrium_Na_pressure';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Numerical inputs are not printed in this abstract.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-yamanaka-1997-metsoc
+  locator:
+    page: 1
+    section: Results and discussion
+  read_from: unknown:ta-yamanaka-1997-metsoc
+- observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_hkl_and_least_squares_model
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, model_generator,
+      alpha_assumption, surface_area_assumption, alpha_pe_obtained_by, alpha_bound_as_printed, equilibrium_pressure_source,
+      reaction_as_printed, numerical_alpha_values_printed, numerical_activity_coefficients_printed, numerical_equilibrium_pressures_printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed; alpha is assumed constant within the fit.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-yamanaka-1997-metsoc
+  locator:
+    page: 1
+    section: Results and discussion
+    equation: '1'
+  read_from: unknown:ta-yamanaka-1997-metsoc
+- observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_measured_evaporation_mass_fit
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_mass_time_fit'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_mass_time_fit'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed; fitted zeta and eta are stated to come from least squares.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-yamanaka-1997-metsoc
+  locator:
+    page: 1
+    section: Results and discussion
+    equation: '4'
+  read_from: unknown:ta-yamanaka-1997-metsoc
+- observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_thermogravimetry_conditions
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_experiment_conditions'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_glass_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.2441229153990506254637715514'
+        - - SiO2
+          - '0.7558770846009493745362284485'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_experiment_conditions'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties are printed for the composition, mass, temperature, oxygen partial pressure, or vacuum.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-yamanaka-1997-metsoc
+  locator:
+    page: 1
+    section: Experiments
+  read_from: unknown:ta-yamanaka-1997-metsoc

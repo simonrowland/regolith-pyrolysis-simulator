@@ -26,6 +26,7 @@ observations:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxygen_yield_and_process_energy'; refusing to
       pick a number
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:
@@ -113,6 +114,7 @@ observations:
     unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, O2_3000K_P_atm,
       T_K, caption_as_published, order_of_magnitude_rule_as_printed, feedstock_as_printed, feedstock_composition_table, rows,
       vs_steurer_1985_table2_note'
+    approximate: false
   uncertainty:
     kind: printed
     verbatim:

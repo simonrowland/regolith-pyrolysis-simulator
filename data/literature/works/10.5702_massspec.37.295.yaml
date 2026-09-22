@@ -87,7 +87,10 @@ experiments:
       orifice_diameter_m:
         state:
           tag: value
-          value: '0.0005'
+          value:
+            kind: point
+            point: '0.0005'
+            approximate: false
         locator:
           published_page: 297
           pdf_page_index: 3

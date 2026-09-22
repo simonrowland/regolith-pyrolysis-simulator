@@ -1,0 +1,356 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-flemetakis-2024.yaml
+observations:
+- observation_id: ta-flemetakis-2024::flemetakis_2024_analytical_measurement_conditions
+  experiment_id: 10.5194/ejm-36-173-2024::/Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'post_run_composition_measurement'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'post_run_composition_measurement'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: The EMPA measurements were made at an acceleration voltage of 15 kV, a 60 nA beam current and a 10 micrometre
+      beam size; B was measured for 120 s on the peak and 60 s on the background.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 175
+    pdf_page_index: 3
+    section: 2.3 Analytical methods
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants
+  experiment_id: 10.5194/ejm-36-173-2024::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_rate_constant'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier constant does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_rate_constant'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated evaporation rate constants ki from t-series experiments, calculated by linear regression from
+      slopes (-3ki/r) of trend lines in Fig. 4.
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 176
+    pdf_page_index: 4
+    table: '3'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_hsc_boron_gas_speciation
+  experiment_id: 10.5194/ejm-36-173-2024::/Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'boron_gas_phase_speciation'
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'boron_gas_phase_speciation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Gibbs free energy minimization calculations used HSC Chemistry 9; the thermodynamic database is largely based
+      on NIST-JANAF data.
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 178
+    pdf_page_index: 6
+    section: 4.2 Evaporation reactions
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+  experiment_id: 10.5194/ejm-36-173-2024::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'time_to_boron_loss'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'time_to_boron_loss'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Evaporation rates of B2O3 from samples with different radii in oxidizing conditions in air and reducing conditions
+      at FMQ-4.
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 180
+    pdf_page_index: 8
+    table: '4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_sample_and_furnace_apparatus
+  experiment_id: 10.5194/ejm-36-173-2024::/Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'open_system_evaporation_apparatus'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_system_evaporation_apparatus'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Glass shards with diameters of approximately 2 mm and a mass of approximately 40 mg were hooked on Pt-wire
+      loops with a diameter of 0.1 mm; gases were introduced at the top of the tube furnace with an outflow at the lower end.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 174
+    pdf_page_index: 2
+    section: 2.2 Experimental techniques
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_starting_glass_composition
+  experiment_id: 10.5194/ejm-36-173-2024::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_glass_composition'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5035444240893955880757031244'
+        - - Al2O3
+          - '0.09066153980571208613705929129'
+        - - MgO
+          - '0.1584107226666308382693381248'
+        - - CaO
+          - '0.2473833134382614875178994594'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_glass_composition'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: The initial B2O3 concentration was 10.55 +/- 0.27 wt % (SD); median composition is given in Table 1.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 174
+    pdf_page_index: 2
+    table: '1'
+    section: 2.1 Starting material
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+  experiment_id: 10.5194/ejm-36-173-2024::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimental_run_results'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_run_results'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Experimental run conditions and B2O3 concentrations measured in weight percent (wt %).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 176
+    pdf_page_index: 4
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
+- observation_id: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+  experiment_id: 10.5194/ejm-36-173-2024::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'normalized_boron_retention_and_log_loss'
+    species:
+      formula: B
+      phase:
+        tag: unknown
+        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'normalized_boron_retention_and_log_loss'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-flemetakis-2024
+  locator:
+    published_page: 176
+    pdf_page_index: 4
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+  read_from: unknown:ta-flemetakis-2024
