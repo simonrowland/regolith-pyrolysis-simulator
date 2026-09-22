@@ -1,0 +1,34 @@
+diff --git a/tests/battery/test_janaf_generator.py b/tests/battery/test_janaf_generator.py
+index 9c6bd4333..5366f417f 100644
+--- a/tests/battery/test_janaf_generator.py
++++ b/tests/battery/test_janaf_generator.py
+@@ -512,6 +512,29 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
+         if segment["phase"]["tag"] != "value"
+     )
+     assert "EPSILON" in segment_reason(epsilon)
++    # Named attacks: GLASS must not become LIQUID; one unmapped side must not
++    # collapse onto the mapped side.
++    for table_id, slug, needle in (
++        ("Na-024", "glass-liquid", "(glass -> l)"),
++        ("W-003", "glass-liquid", "(glass -> l)"),  # printed GLASS <--> LIQ
++    ):
++        glass = next(
++            obs
++            for obs in _generation(table_id).observations
++            if obs.observation_id.endswith(f"transition_temperature:{slug}")
++        )
++        assert glass.identity.species.phase.is_unknown
++        assert needle in (glass.identity.species.phase.reason or "")
++        assert glass.identity.species.polymorph.is_unknown
++    for slug in ("delta-epsilon", "epsilon-liquid"):
++        eps = next(
++            obs
++            for obs in _generation("Al-051").observations
++            if obs.observation_id.endswith(f"transition_temperature:{slug}")
++        )
++        assert eps.identity.species.phase.is_unknown
++        assert "EPSILON" in (eps.identity.species.phase.reason or "")
++        assert eps.identity.species.phase.value is None
+     fluid = _generation("H-068").report["phase_segments"][0]["phase"]
+     assert fluid["tag"] == "unknown"
+     assert fluid["reason"] == "JANAF state 'fl' is not a schema v2.1 Phase token"

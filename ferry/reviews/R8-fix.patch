@@ -1,0 +1,84 @@
+--- a/simulator/battery/migrate.py
++++ b/simulator/battery/migrate.py
+@@ -8035,11 +8035,14 @@
+             require_rail_if_stated(point)
+             count.rows_in += 1
+             source_id = str(point.get("source_id") or path.stem)
+-            if source_id == "janaf" and path.name == "species_rail_differential_ledger.yaml":
+-                # The ledger's "janaf" token names the compilation compared
+-                # against, not a battery work; the work migrated here is the
+-                # differential ledger itself. works/ALIASES.yaml pins this
+-                # label to the existing work id so experiment ids are unchanged.
++            if path.name == "species_rail_differential_ledger.yaml":
++                # Every point's source_id names the compilation compared against
++                # (janaf, pankratz-1987-usbm-b689, …), not a battery work. The
++                # work migrated from this file is always the differential
++                # ledger. works/ALIASES.yaml pins species-rail-differential to
++                # citation_hash("janaf") so historical janaf-token experiment
++                # ids stay stable; pankratz-token ledger experiments move onto
++                # that same ledger work (off the real USBM B689 work).
+                 source_id = "species-rail-differential"
+             citation = source_id
+             index_row = self.index.get(source_id)
+--- a/tests/battery/test_migrate.py
++++ b/tests/battery/test_migrate.py
+@@ -4791,3 +4791,59 @@
+     assert "janaf" not in aliases
+     assert aliases["species-rail-differential"] == citation_hash("janaf")
+     assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
++
++
++def test_species_rail_pankratz_token_also_files_under_ledger_label(tmp_path: Path) -> None:
++    """Comparison-compilation tokens other than janaf must not land ledger
++    residuals on the real compilation work (USBM B689)."""
++    root = _write_min_tree(tmp_path)
++    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
++        yaml.safe_dump(
++            {
++                "schema_version": 1,
++                "metric_units": "kJ/mol",
++                "points": [
++                    {
++                        "key": "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol",
++                        "source_id": "pankratz-1987-usbm-b689",
++                        "observation_id": "page-0003",
++                        "species": "MgO",
++                        "comparison_quantity": "delta_fG_kJ_mol",
++                        "temperature_K": 298.15,
++                        "table_kJ_mol": -500.0,
++                    }
++                ],
++            },
++            sort_keys=False,
++        ),
++        encoding="utf-8",
++    )
++    result = migrate(root, write=False)
++    ledger_works = [
++        work for work in result.works.values()
++        if "species-rail-differential" in work.source_ids
++    ]
++    assert len(ledger_works) == 1
++    work = ledger_works[0]
++    assert all(
++        "pankratz-1987-usbm-b689" not in candidate.source_ids
++        for candidate in result.works.values()
++    )
++    observation = result.observations[
++        "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol"
++    ]
++    assert observation.source_id == "species-rail-differential"
++    assert result.experiments_by_work[work.work_id] == [f"{work.work_id}::page-0003"]
++
++
++def test_committed_species_rail_work_label_matches_alias_pin() -> None:
++    """After remigrate, the fc98… work must carry species-rail-differential
++    (not bare janaf) so ALIASES.yaml and the works store agree."""
++    from simulator.battery.migrate import load_migrated_store, citation_hash
++
++    works, _experiments, _obs = load_migrated_store()
++    work_id = citation_hash("janaf")
++    work = works[work_id]
++    assert work.source_ids == ("species-rail-differential",)
++    assert "janaf" not in work.source_ids
++    assert work.citation == "species-rail-differential"

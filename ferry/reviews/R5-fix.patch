@@ -1,0 +1,54 @@
+diff --git a/simulator/melt_backend/magemin.py b/simulator/melt_backend/magemin.py
+index c3b466e55..7081f1904 100644
+--- a/simulator/melt_backend/magemin.py
++++ b/simulator/melt_backend/magemin.py
+@@ -2186,9 +2186,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
+     #     atoms-per-formula, src/pp_min_function.c:117) is printed per phase:
+     #     for pure phases as the second column of the Verb=1 pure-phase table
+     #     line, for solution phases in the final "PHASE ASSEMBLAGE" table.
+-    #     Molar S = printed/factor; sanity anchor: forsterite-bulk ol at
+-    #     298.15 K prints S=31.708 J/K with factor 1/3 -> 95.13 J/K vs JANAF
+-    #     Mg2SiO4 S(298.15) = 95.14 J/K/mol.
++    #     Molar S = printed/factor*1000; sanity anchor: forsterite-bulk ol at
++    #     298.15 K prints S~0.031708 kJ/K (header says J/K) with factor 1/3
++    #     -> 95.13 J/K vs JANAF Mg2SiO4 S(298.15) = 95.14 J/K/mol.
+     #   * S/Cp/H exist ONLY when the phase is stable for the stoichiometric
+     #     bulk at the requested T,P (the table lists stable phases only).
+     #     A solution phase must additionally sit at its endmember (purity
+@@ -2243,8 +2243,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
+             )
+ 
+         temperature_C = temperature_K - 273.15
+-        # bar -> kbar: 1 kbar = 1000 bar (CLI --Pres takes kbar).
+-        pressure_kbar = float(pressure_bar) * 1.0e-4
++        # bar -> kbar via the same helpers as equilibrate/_call_magemin
++        # (bar/1e4 -> GPa, then *10 -> kbar) so 1 bar == 1e-3 kbar.
++        pressure_kbar = self._GPa_to_kbar(self._pressure_bar_to_GPa(pressure_bar))
+         stdout, matlab_text, warnings = self._run_pure_phase_probe(
+             bulk_wt_ig=dict(spec.bulk_wt_pct),
+             temperature_C=temperature_C,
+diff --git a/tests/test_pure_phase_access.py b/tests/test_pure_phase_access.py
+index b8a666fa7..f4953ffeb 100644
+--- a/tests/test_pure_phase_access.py
++++ b/tests/test_pure_phase_access.py
+@@ -88,8 +88,9 @@ def _magemin_backend() -> MAGEMinBackend:
+ def test_magemin_forsterite_full_property_row_298():
+     """fo at 298.15 K: full G/S/Cp/H against JANAF-anchored bands.
+ 
+-    The S assertion is the factor-correction catch: the raw matlab column is
+-    31.7 J/K (molar x factor 1/3); only the corrected value lands near 95.14.
++    The S assertion is the factor-correction catch: matlab prints ~0.0317
++    kJ/K (header mislabelled J/K) with factor 1/3; S = printed/factor*1000
++    lands near 95.14 J/(K mol). Dropping either /factor or *1000 fails.
+     """
+     backend = _magemin_backend()
+     try:
+@@ -274,7 +275,7 @@ def test_klb1_fallback_refused_live():
+         _stdout, matlab_text, _w = backend._run_pure_phase_probe(
+             bulk_wt_ig={"MgO": 100.0},
+             temperature_C=25.0,
+-            pressure_kbar=1.0e-4,
++            pressure_kbar=1.0e-3,  # 1 bar; CLI --Pres is kbar
+         )
+     finally:
+         backend.close()

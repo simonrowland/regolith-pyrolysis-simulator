@@ -1,12 +1,29 @@
-# Empirical reviews 2026-09-22
+# Empirical reviews / sweeps mailbox 2026-09-22
 
-Mailbox branch only — never merge. Base: `fbe3491b2` (`work-v064-green`).
+Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `review/janaf-batch-2026-09-22`.
 
-| Task | Verdict | Counts | Notes |
-| --- | --- | --- | --- |
-| R1 VapoRock commissioning notice (`ce8d6a7f6`, not landed) | LAND-WITH-FIXES | P0=0 P1=0 P2=1 P3=2 | notice stamped on typed forbidden-species refusals |
-| R2 readiness gap reporting (`924eea91e`+`f5b422d0e`) | LAND-WITH-FIXES | P0=0 P1=2 P2=2 P3=1 | f5b422d0e sound; 924eea91e over-counts “present” |
-| R3 printed fO2 waypoints (`e07ed3a92`+`5d9753eaf`) | LAND-WITH-FIXES | P0=0 P1=2 P2=2 P3=2 | `10^n` as log fO2; interval overwrite by point |
-| R4 migrate stale sibling + d-036 FK (`805b8db26`+`ea9cdfb63`) | DO-NOT-LAND | P0=1 P1=2 P2=0 P3=2 | cross-work equipment FK via `::` passthrough |
+## Reviews R1–R9
 
-Optional unapplied fixes: `R1-fix.patch` … `R4-fix.patch`.
+| Task | Verdict |
+| --- | --- |
+| R1 VapoRock commissioning | LAND-WITH-FIXES P0=0 P1=0 P2=1 P3=2 |
+| R2 readiness gaps | LAND-WITH-FIXES P0=0 P1=2 P2=2 P3=1 |
+| R3 printed fO2 | LAND-WITH-FIXES P0=0 P1=2 P2=2 P3=2 |
+| R4 migrate + d-036 FK | DO-NOT-LAND P0=1 P1=2 P2=0 P3=2 |
+| R5 pure-phase G/S/Cp/H | LAND-WITH-FIXES P0=0 P1=1 P2=2 P3=2 |
+| R6 JANAF provenance | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=1 |
+| R7 JANAF phase labels | LAND P0=0 P1=0 P2=0 P3=1 |
+| R8 alias double count | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=2 |
+| R9 interval printed conditions | LAND P0=0 P1=0 P2=0 P3=0 |
+
+## Class sweeps S1–S6
+
+| Sweep | Result |
+| --- | --- |
+| S1 cross-scope id refs | sites=9 live=0 P0=5 P1=3 P2=1 P3=0 |
+| S2 derived stamped printed | sites=6 live=4 P0=2 P1=2 P2=2 P3=0 |
+| S3 stale derived artifacts | sites=7 live=1 P0=0 P1=5 P2=0 P3=2 |
+| S4 untrue report claims | sites=11 live=2 P0=0 P1=5 P2=4 P3=2 |
+| S6 absence becomes number | sites=26 live=24 P0=9 P1=7 P2=8 P3=2 |
+
+Optional `R*-fix.patch` files sit beside write-ups. R10 / W1 / S5 / S7–S9 still in flight.
