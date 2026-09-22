@@ -34,6 +34,7 @@ from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
 )
+from simulator.melt_backend.pure_phase import PurePhaseProperties
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -243,6 +244,27 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
 
     def transport_closed_mid_run(self) -> bool:
         return self._transport_close_count > 0
+
+    def pure_phase_properties(
+        self,
+        symbol: str,
+        *,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> PurePhaseProperties:
+        """Berman-database pure-phase G/S/Cp/H via the warm worker.
+
+        Diagnostic accessor only: no equilibration, no ledger interaction.
+        ``symbol`` is a ThermoEngine database phase symbol (e.g. ``'Fo'``,
+        ``'Per'``, ``'Qz'``, ``'Crs'``, ``'Trd'``, ``'En'``/``'cEn'``).
+        """
+        if self._thermoengine_transport is None:
+            raise ImportError('ThermoEngine transport not initialized')
+        return self._thermoengine_transport.pure_phase_properties(
+            symbol,
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+        )
 
     def is_available(self) -> bool:
         return self._thermoengine_transport is not None and self._mode == 'thermoengine'

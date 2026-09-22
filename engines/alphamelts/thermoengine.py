@@ -37,6 +37,12 @@ from simulator.engine_pool import (
     EngineWorkerTimeout,
     WarmEngineWorker,
 )
+from simulator.melt_backend.pure_phase import (
+    GIBBS_CONVENTION_APPARENT_298,
+    PurePhaseAccessError,
+    PurePhaseProperties,
+    PurePhaseUnknownSymbolError,
+)
 
 
 ActivityConverter = Callable[[float, float, float], float]
@@ -690,6 +696,20 @@ _MODEL_TO_THERMOENGINE = {
     'pMELTS': ('5.6.1', 'pMELTS'),
 }
 
+# Polymorph labels for the Berman-database pure phases P4a queries. Used for
+# provenance only; the database symbol is the authoritative phase identity.
+_TE_PURE_PHASE_POLYMORPH = {
+    'Fo': 'forsterite',
+    'Fa': 'fayalite',
+    'Per': 'periclase',
+    'Qz': 'quartz',
+    'Crs': 'cristobalite',
+    'Trd': 'tridymite',
+    'En': 'orthoenstatite',
+    'cEn': 'clinoenstatite',
+    'pEn': 'protoenstatite',
+}
+
 
 def thermoengine_diagnostic_log_path(
     log_dir: str | os.PathLike[str] | None = None,
@@ -779,6 +799,28 @@ def _handle_thermoengine_request(
     return transport._equilibrate_in_process(**kwargs)
 
 
+def _handle_thermoengine_worker_request(
+    transport: 'ThermoEngineTransport',
+    request: Any,
+    errlog: Any,
+) -> Any:
+    """Worker entry point: dispatch pure-phase queries, else equilibrate.
+
+    Requests carrying ``request_kind == 'pure_phase'`` are answered by the
+    worker's initialized Berman database via ``get_phase`` — a read-only
+    standard-state property lookup, never an equilibration. Every other
+    request shape falls through to the legacy equilibrate handler unchanged
+    (legacy callers send bare equilibrate kwargs with no ``request_kind``).
+    """
+    if isinstance(request, Mapping) and request.get('request_kind') == 'pure_phase':
+        return transport._pure_phase_properties_in_process(
+            symbol=str(request['symbol']),
+            temperature_K=float(request['temperature_K']),
+            pressure_bar=float(request['pressure_bar']),
+        )
+    return _handle_thermoengine_request(transport, request, errlog)
+
+
 @dataclass(frozen=True)
 class ThermoEnginePayload:
     """Transport payload ready for ``AlphaMELTSBackend`` emission."""
@@ -861,7 +903,7 @@ class ThermoEngineTransport:
         self._worker = WarmEngineWorker(
             name='ThermoEngine equilibrium',
             bootstrap=_bootstrap_thermoengine_worker,
-            handler=_handle_thermoengine_request,
+            handler=_handle_thermoengine_worker_request,
             bootstrap_args=(self._model_name, self._activity_converter),
             startup_timeout_s=30.0,
             call_timeout_s=self._equilibrate_timeout_s,
@@ -1116,6 +1158,102 @@ print('ok')
         }.get(exc_name, RuntimeError)
         raise exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
+        )
+
+    def pure_phase_properties(
+        self,
+        symbol: str,
+        *,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> PurePhaseProperties:
+        """Per-formula standard-state G/S/Cp/H of one Berman-database phase.
+
+        Runs inside the isolated warm worker (same native-solver isolation
+        rule as equilibrate). Units: J/mol and J/(K mol) per formula unit;
+        G/H are Berman apparent-formation quantities (elements referenced at
+        298.15 K only), named by ``gibbs_convention``.
+        """
+        if self._worker.process is None and self._worker.start_count == 0:
+            raise ThermoEngineIsolationError(
+                'ThermoEngine pure-phase query requires an isolated worker; '
+                'in-process native access is forbidden'
+            )
+        if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+            raise ValueError(
+                f'pure_phase temperature_K must be finite and positive: '
+                f'{temperature_K!r}'
+            )
+        if not math.isfinite(pressure_bar) or pressure_bar <= 0.0:
+            raise ValueError(
+                f'pure_phase pressure_bar must be finite and positive: '
+                f'{pressure_bar!r}'
+            )
+        request = {
+            'request_kind': 'pure_phase',
+            'symbol': str(symbol),
+            'temperature_K': float(temperature_K),
+            'pressure_bar': float(pressure_bar),
+        }
+        try:
+            return self._worker.call(request)
+        except EngineWorkerRemoteError as exc:
+            if exc.exc_name == 'PurePhaseUnknownSymbolError':
+                raise PurePhaseUnknownSymbolError(exc.detail) from exc
+            raise PurePhaseAccessError(
+                f'ThermoEngine pure-phase query failed: {exc.detail}\n'
+                f'{exc.remote_traceback}'
+            ) from exc
+
+    def _pure_phase_properties_in_process(
+        self,
+        *,
+        symbol: str,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> PurePhaseProperties:
+        if self._database is None:
+            raise ImportError('ThermoEngine transport not initialized')
+        try:
+            phase = self._database.get_phase(str(symbol))
+        except Exception as exc:  # noqa: BLE001 - library boundary retype
+            raise PurePhaseUnknownSymbolError(
+                f'{symbol!r} is not a phase symbol in the ThermoEngine Berman '
+                f'database: {exc}'
+            ) from exc
+        formula = getattr(phase, 'formula', None)
+        if callable(formula):
+            formula = formula()
+        formula = str(formula) if formula else str(symbol)
+        values = {}
+        for field_name, method_name in (
+            ('G_J_mol', 'gibbs_energy'),
+            ('S_J_K_mol', 'entropy'),
+            ('Cp_J_K_mol', 'heat_capacity'),
+            ('H_J_mol', 'enthalpy'),
+        ):
+            raw = getattr(phase, method_name)(
+                float(temperature_K), float(pressure_bar)
+            )
+            values[field_name] = self._strict_finite_float(
+                raw,
+                context=f'ThermoEngine {symbol} {method_name}',
+            )
+        return PurePhaseProperties(
+            engine='thermoengine',
+            phase_id=str(symbol),
+            host_phase=None,
+            polymorph=_TE_PURE_PHASE_POLYMORPH.get(str(symbol)),
+            formula=formula,
+            formula_basis=f'per 1 mol {formula}',
+            database=(
+                f'Berman 1988 MELTS {self._melts_version} '
+                f'(liq_mod {self._liq_model}; calib=True)'
+            ),
+            gibbs_convention=GIBBS_CONVENTION_APPARENT_298,
+            temperature_K=float(temperature_K),
+            pressure_bar=float(pressure_bar),
+            **values,
         )
 
     @property
