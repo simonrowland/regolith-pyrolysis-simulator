@@ -15,7 +15,7 @@ Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `
 | R7 JANAF phase labels | LAND P0=0 P1=0 P2=0 P3=1 |
 | R8 alias double count | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=2 |
 | R9 interval printed conditions | LAND P0=0 P1=0 P2=0 P3=0 |
-| R10 JANAF p4a2 score (`7d11e6d60`) | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=3 |
+| R10 JANAF pure-phase score | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=3 |
 
 ## Class sweeps S1–S6
 

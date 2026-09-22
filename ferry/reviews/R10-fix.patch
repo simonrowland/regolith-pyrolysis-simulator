@@ -1,278 +1,169 @@
 diff --git a/scripts/janaf_pure_phase_score.py b/scripts/janaf_pure_phase_score.py
-index c25630450..b9e01f0d6 100644
+index c25630450..347e026ea 100644
 --- a/scripts/janaf_pure_phase_score.py
 +++ b/scripts/janaf_pure_phase_score.py
-@@ -40,6 +40,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
-     DEFAULT_PHASE_REQUESTS,
-     DEFAULT_TEMPERATURES_K,
-     ENGINES,
-+    JANAF_POLYMORPH_TRANSITION,
-     NO_JANAF_TABLE_FOR_POLYMORPH,
-     POLYMORPH_MISMATCH,
-     PRESSURE_BAR,
-@@ -53,6 +54,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
+@@ -53,6 +53,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
      load_janaf_table,
      preflight_phase_request,
      preflight_reaction,
-+    refuse_janaf_temperature,
++    mg012_clino_temperature_refusal,
  )
  
  DEFAULT_OUT = ROOT / 'docs-private' / 'research' / '2026-09-22-janaf-p4a2'
-@@ -147,6 +149,25 @@ def build_all_rows(
+@@ -147,6 +148,17 @@ def build_all_rows(
                  )
                  continue
              for T in DEFAULT_TEMPERATURES_K:
-+                temp_refusal = None
-+                for role, _nu in reaction.terms:
-+                    table_id = reaction.janaf_table_by_role[role]
-+                    temp_refusal = refuse_janaf_temperature(
-+                        table_id,
-+                        T,
-+                        context=f'{engine} {reaction.reaction_id} role {role}',
++                if (
++                    'Mg-012' in reaction.janaf_table_by_role.values()
++                ):
++                    t_refusal = mg012_clino_temperature_refusal(
++                        temperature_K=T,
++                        engine=engine,
++                        reaction_id=reaction.reaction_id,
 +                    )
-+                    if temp_refusal is not None:
-+                        break
-+                if temp_refusal is not None:
-+                    refusals.append(
-+                        replace(
-+                            temp_refusal,
-+                            engine=engine,
-+                            reaction_id=reaction.reaction_id,
-+                        )
-+                    )
-+                    continue
++                    if t_refusal is not None:
++                        refusals.append(t_refusal)
++                        continue
                  rows.append(
                      build_reaction_row(
                          reaction,
-@@ -166,6 +187,21 @@ def build_all_rows(
+@@ -166,6 +178,15 @@ def build_all_rows(
              )
              continue
          for T in request.temperatures_K:
-+            if request.janaf_table_id is not None:
-+                temp_refusal = refuse_janaf_temperature(
-+                    request.janaf_table_id,
-+                    T,
-+                    context=f'{request.engine} {request.phase_id}',
++            if request.janaf_table_id == 'Mg-012':
++                t_refusal = mg012_clino_temperature_refusal(
++                    temperature_K=T,
++                    engine=request.engine,
++                    phase_id=request.phase_id,
 +                )
-+                if temp_refusal is not None:
-+                    refusals.append(
-+                        replace(
-+                            temp_refusal,
-+                            engine=request.engine,
-+                            phase_id=request.phase_id,
-+                        )
-+                    )
++                if t_refusal is not None:
++                    refusals.append(t_refusal)
 +                    continue
              rows.append(
                  build_phase_row(
                      request,
-@@ -284,7 +320,11 @@ def summarize(rows, refusals) -> dict:
-         'polymorph_refusals': sum(
-             1
-             for r in refusals
--            if r.reason in (POLYMORPH_MISMATCH, NO_JANAF_TABLE_FOR_POLYMORPH)
-+            if r.reason in (
-+                POLYMORPH_MISMATCH,
-+                NO_JANAF_TABLE_FOR_POLYMORPH,
-+                JANAF_POLYMORPH_TRANSITION,
-+            )
-         ),
-         'max_abs_dRG_kJ': max_abs,
-         'max_abs_dRG_no_quartz_adjustment_kJ': {'thermoengine': max_abs_no_adj},
 diff --git a/simulator/melt_backend/pure_phase_janaf_score.py b/simulator/melt_backend/pure_phase_janaf_score.py
-index 73247417c..fba37a0c7 100644
+index 73247417c..f6d67ef29 100644
 --- a/simulator/melt_backend/pure_phase_janaf_score.py
 +++ b/simulator/melt_backend/pure_phase_janaf_score.py
-@@ -61,6 +61,7 @@ from simulator.melt_backend.magemin import _MAGEMIN_PURE_PHASES
+@@ -61,6 +61,10 @@ from simulator.melt_backend.magemin import _MAGEMIN_PURE_PHASES
  POLYMORPH_MISMATCH = 'polymorph_mismatch'
  NO_JANAF_TABLE_FOR_POLYMORPH = 'no_janaf_table_for_polymorph'
  NO_JANAF_ROW_AT_T = 'no_janaf_row_at_temperature'
-+JANAF_POLYMORPH_TRANSITION = 'janaf_polymorph_transition'
++# Mg-012 is labelled clinoenstatite from low-T scout Cp match, but the
++# printed table carries I<->II @ 903 K and II<->III @ 1258 K. Scoring the
++# clino label past I<->II is a fake residual (R10).
++JANAF_SOLID_SOLID_TRANSITION = 'janaf_solid_solid_transition'
  
  STATUS_SCORED = 'scored'
  STATUS_REFUSED = 'refused'
-@@ -74,6 +75,14 @@ PRESSURE_BAR = 1.0
+@@ -74,6 +78,11 @@ PRESSURE_BAR = 1.0
  # the row is flagged.
  QUARTZ_METASTABLE_ABOVE_K = 1143.0
  
-+# JANAF Mg-012 (MgSiO3 cr) is a multi-form table: printed I <-> II at 903 K
-+# and II <-> III at 1258 K (parse_ambiguities on the compilation).  Form I
-+# is the low-T clinoenstatite assessment the consumer pairs with TE cEn;
-+# above 903 K the printed row is a different solid form.  Scoring cEn
-+# (or any single polymorph label) across that boundary is a fake residual.
-+MG012_FORM_I_MAX_K = 903.0  # I <-> II (exclusive upper bound for form I)
-+MG012_FORM_II_MAX_K = 1258.0  # II <-> III
++# Upper bound (exclusive of the transition row) for treating Mg-012 as the
++# clinoenstatite (JANAF phase I) assessment. At/above 903 K the printed
++# table has switched to phase II (and at 1258 K to phase III).
++MG012_CLINOENSTATITE_MAX_K = 903.0
 +
  # ThermoEngine quartz includes the upstream MELTS quartz correction:
  # QUARTZ_ADJUSTMENT = -1291.0 J/mol (ThermoEngine src/
  # BermanStoichiometricPhases.m:14, added to quartz enthalpy -- and through
-@@ -298,6 +307,38 @@ def require_polymorph_match(
-         )
+@@ -363,7 +372,10 @@ DEFAULT_PHASE_REQUESTS: Tuple[PhaseScoreRequest, ...] = (
+     PhaseScoreRequest('thermoengine', 'Fo', 'Mg-028'),
+     PhaseScoreRequest('magemin', 'q', 'O-037'),
+     PhaseScoreRequest('thermoengine', 'Qz', 'O-037'),
+-    PhaseScoreRequest('thermoengine', 'cEn', 'Mg-012'),
++    # Clino window only: Mg-012 I<->II at 903 K (see MG012_CLINOENSTATITE_MAX_K).
++    PhaseScoreRequest(
++        'thermoengine', 'cEn', 'Mg-012', (298.15, 500.0)
++    ),
+     # Planned refusal demonstrations (typed, never scored):
+     # TE 'En' is orthoenstatite -- mismatched against clinoenstatite Mg-012.
+     PhaseScoreRequest('thermoengine', 'En', 'Mg-012'),
+@@ -446,6 +458,47 @@ def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalR
+     return None
  
  
-+def refuse_janaf_temperature(
-+    table_id: str, temperature_K: float, *, context: str
++def mg012_clino_temperature_refusal(
++    *,
++    temperature_K: float,
++    engine: Optional[str] = None,
++    phase_id: Optional[str] = None,
++    reaction_id: Optional[str] = None,
 +) -> Optional[RefusalRow]:
-+    """Refuse typed when the printed JANAF row is past a solid-solid split.
++    """Refuse Mg-012 / clino-labelled scores at/above JANAF I<->II (903 K).
 +
-+    Mg-012 form I (clinoenstatite pairing) holds only below the I <-> II
-+    transition at 903 K.  Rows at 1000 K / 1500 K are form II / III; the
-+    static ``clinoenstatite`` stamp would manufacture a fake residual.
++    The table is stamped ``clinoenstatite`` from a low-T scout Cp match, but
++    ``parse_ambiguities`` records solid-solid transitions at 903 K (I<->II)
++    and 1258 K (II<->III). Scoring TE cEn (or the TE enstatite reaction)
++    against post-transition rows while refusing ortho/proto is an inverted
++    polymorph gate -- a fake residual under the stated contract.
 +    """
 +
-+    if table_id == 'Mg-012' and float(temperature_K) >= MG012_FORM_I_MAX_K:
-+        form = (
-+            'III'
-+            if float(temperature_K) >= MG012_FORM_II_MAX_K
-+            else 'II'
-+        )
-+        return RefusalRow(
-+            reason=JANAF_POLYMORPH_TRANSITION,
-+            detail=(
-+                f'{context}: JANAF table Mg-012 at {temperature_K} K is '
-+                f'solid form {form} (I <-> II at {MG012_FORM_I_MAX_K:g} K, '
-+                f'II <-> III at {MG012_FORM_II_MAX_K:g} K); the consumer '
-+                f'pairs only form I with clinoenstatite -- refusing rather '
-+                f'than scoring a cross-form residual'
-+            ),
-+            janaf_table_id=table_id,
-+            temperature_K=float(temperature_K),
-+            janaf_polymorph=JANAF_TABLES[table_id].polymorph,
-+        )
-+    return None
-+
-+
- # ------------------------------------------------------------- the plan --
- 
- @dataclass(frozen=True)
-@@ -484,6 +525,13 @@ def build_reaction_row(
-         phase_id = phase_by_role[role]
-         table_id = reaction.janaf_table_by_role[role]
-         janaf_spec = JANAF_TABLES[table_id]
-+        temp_refusal = refuse_janaf_temperature(
-+            table_id,
-+            temperature_K,
-+            context=f'{engine} {reaction.reaction_id} role {role}',
-+        )
-+        if temp_refusal is not None:
-+            raise PolymorphMismatchError(temp_refusal.detail)
-         props = engine_query(phase_id, temperature_K)
-         # Live re-check: the RETURNED polymorph must match the JANAF table,
-         # not just the static map (drift in an engine map is caught here).
-@@ -567,6 +615,13 @@ def build_phase_row(
-     """
- 
-     janaf_spec = JANAF_TABLES[request.janaf_table_id or '']
-+    temp_refusal = refuse_janaf_temperature(
-+        janaf_spec.table_id,
-+        temperature_K,
-+        context=f'{request.engine} {request.phase_id}',
++    if float(temperature_K) < MG012_CLINOENSTATITE_MAX_K:
++        return None
++    return RefusalRow(
++        reason=JANAF_SOLID_SOLID_TRANSITION,
++        detail=(
++            f'Mg-012 is labelled clinoenstatite for T < '
++            f'{MG012_CLINOENSTATITE_MAX_K:g} K (JANAF phase I); at '
++            f'{temperature_K:g} K the printed table has crossed I<->II'
++            f'@903 K'
++            + (
++                ' and II<->III@1258 K'
++                if float(temperature_K) >= 1258.0
++                else ''
++            )
++            + ' -- refuse rather than score a fake residual'
++        ),
++        engine=engine,
++        phase_id=phase_id,
++        reaction_id=reaction_id,
++        janaf_table_id='Mg-012',
++        temperature_K=float(temperature_K),
++        janaf_polymorph='clinoenstatite',
 +    )
-+    if temp_refusal is not None:
-+        raise PolymorphMismatchError(temp_refusal.detail)
-     props = engine_query(request.phase_id, temperature_K)
-     require_polymorph_match(
-         props.polymorph,
++
++
+ # ----------------------------------------------------------- row builders --
+ 
+ EngineQuery = Callable[[str, float], PurePhaseProperties]
 diff --git a/tests/test_pure_phase_janaf_score.py b/tests/test_pure_phase_janaf_score.py
-index 448aafa23..020400f69 100644
+index 448aafa23..e9eb66247 100644
 --- a/tests/test_pure_phase_janaf_score.py
 +++ b/tests/test_pure_phase_janaf_score.py
-@@ -32,6 +32,8 @@ from simulator.melt_backend.pure_phase_janaf_score import (
-     DEFAULT_PHASE_REQUESTS,
-     DEFAULT_TEMPERATURES_K,
-     JANAF_TABLES,
-+    JANAF_POLYMORPH_TRANSITION,
-+    MG012_FORM_I_MAX_K,
-     NO_JANAF_TABLE_FOR_POLYMORPH,
-     POLYMORPH_MISMATCH,
-     PolymorphMismatchError,
-@@ -48,6 +50,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (
+@@ -47,6 +47,9 @@ from simulator.melt_backend.pure_phase_janaf_score import (
+     load_janaf_table,
      preflight_phase_request,
      preflight_reaction,
++    mg012_clino_temperature_refusal,
++    JANAF_SOLID_SOLID_TRANSITION,
++    MG012_CLINOENSTATITE_MAX_K,
      reaction_sum,
-+    refuse_janaf_temperature,
      require_polymorph_match,
  )
- 
-@@ -188,21 +191,20 @@ def test_build_reaction_row_thermoengine_apparent_sum_1000K():
-     assert any('QUARTZ_ADJUSTMENT' in note for note in row.notes)
- 
- 
--def test_build_reaction_row_thermoengine_clinoenstatite_1000K():
-+def test_build_reaction_row_thermoengine_clinoenstatite_1000K_refused():
-+    """1000 K is past Mg-012 I <-> II; must not score as clinoenstatite."""
-     fixtures = {
-         phase: _props('thermoengine', phase, TE_POLY[phase], G_J)
-         for phase, G_J in TE_G_1000_J.items()
-     }
--    row = build_reaction_row(
--        REACTION_ENSTATITE,
--        'thermoengine',
--        1000.0,
--        engine_query=lambda phase_id, T: fixtures[phase_id],
--        janaf_query=_janaf_stub,
--    )
--    # -1663150.6062 + 650763.6656 + 982731.2394 = -29655.7012 J -> -29.656 kJ
--    assert row.drG_engine_kJ_mol == pytest.approx(-29.6557012, abs=1e-6)
--    assert row.residual_kJ_mol == pytest.approx(5.0942988, abs=1e-6)
-+    with pytest.raises(PolymorphMismatchError):
-+        build_reaction_row(
-+            REACTION_ENSTATITE,
-+            'thermoengine',
-+            1000.0,
-+            engine_query=lambda phase_id, T: fixtures[phase_id],
-+            janaf_query=_janaf_stub,
-+        )
- 
- 
- def test_build_reaction_row_magemin_apparent_sum_1000K():
-@@ -406,3 +408,49 @@ def test_janaf_values_at_real_table_mgo_1000K():
+@@ -406,3 +409,21 @@ def test_janaf_values_at_real_table_mgo_1000K():
  def test_janaf_values_at_missing_temperature_returns_none():
      document = load_janaf_table('Mg-008')
      assert janaf_values_at(document, 999.0) is None
 +
 +
-+def test_mg012_refused_above_form_i_transition():
-+    """Mg-012 I <-> II at 903 K: form II/III rows must not score as clino."""
-+    assert refuse_janaf_temperature('Mg-012', 500.0, context='t') is None
-+    assert refuse_janaf_temperature('Mg-008', 1000.0, context='t') is None
-+    refusal = refuse_janaf_temperature('Mg-012', 1000.0, context='t')
-+    assert refusal is not None
-+    assert refusal.reason == JANAF_POLYMORPH_TRANSITION
-+    assert 'form II' in refusal.detail
-+    refusal_iii = refuse_janaf_temperature('Mg-012', 1500.0, context='t')
-+    assert refusal_iii is not None and 'form III' in refusal_iii.detail
-+    # Boundary: transition temperature itself is not form I.
-+    assert refuse_janaf_temperature(
-+        'Mg-012', MG012_FORM_I_MAX_K, context='t'
-+    ).reason == JANAF_POLYMORPH_TRANSITION
-+
-+
-+def test_build_phase_row_mg012_post_transition_raises():
-+    request = PhaseScoreRequest('thermoengine', 'cEn', 'Mg-012')
-+
-+    def query(phase_id, T):
-+        return _props(
-+            'thermoengine', 'cEn', 'clinoenstatite', TE_G_1000_J['cEn'],
-+            temperature_K=T, S_J_K_mol=190.0, Cp_J_K_mol=120.0, H_J_mol=-1.5e6,
-+        )
-+
-+    with pytest.raises(PolymorphMismatchError):
-+        build_phase_row(
-+            request, 1000.0, engine_query=query, janaf_query=_janaf_stub
-+        )
-+
-+
-+def test_build_reaction_enstatite_post_transition_raises():
-+    fixtures = {
-+        phase: _props('thermoengine', phase, TE_POLY[phase], G_J)
-+        for phase, G_J in TE_G_1000_J.items()
-+    }
-+    with pytest.raises(PolymorphMismatchError):
-+        build_reaction_row(
-+            REACTION_ENSTATITE,
-+            'thermoengine',
-+            1000.0,
-+            engine_query=lambda phase_id, T: fixtures[phase_id],
-+            janaf_query=_janaf_stub,
-+        )
++def test_mg012_clino_refused_at_and_above_I_II_transition():
++    """R10: do not score clino-labelled Mg-012 past JANAF I<->II @ 903 K."""
++    assert MG012_CLINOENSTATITE_MAX_K == 903.0
++    assert mg012_clino_temperature_refusal(temperature_K=500.0) is None
++    assert mg012_clino_temperature_refusal(temperature_K=902.999) is None
++    hit = mg012_clino_temperature_refusal(
++        temperature_K=1000.0, engine='thermoengine', phase_id='cEn'
++    )
++    assert hit is not None
++    assert hit.reason == JANAF_SOLID_SOLID_TRANSITION
++    assert hit.janaf_table_id == 'Mg-012'
++    hit1500 = mg012_clino_temperature_refusal(temperature_K=1500.0)
++    assert hit1500 is not None and 'II<->III' in hit1500.detail
++    # Default cEn plan stays inside the clino window.
++    cen = next(r for r in DEFAULT_PHASE_REQUESTS if r.phase_id == 'cEn')
++    assert max(cen.temperatures_K) < MG012_CLINOENSTATITE_MAX_K
