@@ -461,6 +461,64 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='tridymite',
         bulk_wt_pct={'SiO2': 100.0},
     ),
+    # W2 catalogue phases (CIAAW masses consistent with fo/per/en above:
+    # Al 26.9815, Mg 24.305, Si 28.085, O 15.999 -> Al2O3 101.961,
+    # MgAl2O4 142.2654, Al2SiO5 162.0453). Token SiO2 on Al/Mg-only bulks
+    # is the same retrieve_bulk_PT guard used for periclase.
+    'cor': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='cor',
+        assemblage_phase='cor',
+        formula='Al2O3',
+        formula_basis='per 1 mol Al2O3',
+        formula_divisor=1.0,
+        polymorph='corundum',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'Al2O3': 100.0},
+    ),
+    'sp': _MAGEMinPurePhaseSpec(
+        host_phase='spn',
+        endmember='sp',
+        assemblage_phase='spn',
+        formula='MgAl2O4',
+        formula_basis='per 1 mol MgAl2O4',
+        formula_divisor=1.0,
+        polymorph='spinel',
+        bulk_wt_pct={
+            'SiO2': 1.0e-6,
+            'Al2O3': 71.6697,
+            'MgO': 28.3303,
+        },
+    ),
+    'and': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='and',
+        assemblage_phase='and',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='andalusite',
+        bulk_wt_pct={'SiO2': 37.0781, 'Al2O3': 62.9219},
+    ),
+    'ky': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ky',
+        assemblage_phase='ky',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='kyanite',
+        bulk_wt_pct={'SiO2': 37.0781, 'Al2O3': 62.9219},
+    ),
+    'sill': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='sill',
+        assemblage_phase='sill',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='sillimanite',
+        bulk_wt_pct={'SiO2': 37.0781, 'Al2O3': 62.9219},
+    ),
 }
 
 _MAGEMIN_PP_GBASE_RE = re.compile(

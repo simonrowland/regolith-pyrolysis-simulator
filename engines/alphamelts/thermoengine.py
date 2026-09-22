@@ -708,6 +708,13 @@ _TE_PURE_PHASE_POLYMORPH = {
     'En': 'orthoenstatite',
     'cEn': 'clinoenstatite',
     'pEn': 'protoenstatite',
+    # W2 reaction catalogue (Berman stoichiometric abbreviations).
+    'Lm': 'lime',
+    'Co': 'corundum',
+    'Sp': 'spinel',
+    'a': 'andalusite',
+    'Ky': 'kyanite',
+    'Sil': 'sillimanite',
 }
 
 

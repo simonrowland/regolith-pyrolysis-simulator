@@ -31,12 +31,20 @@ from simulator.melt_backend.pure_phase import (
 from simulator.melt_backend.pure_phase_janaf_score import (
     DEFAULT_PHASE_REQUESTS,
     DEFAULT_TEMPERATURES_K,
+    JANAF_SOLID_SOLID_TRANSITION,
     JANAF_TABLES,
+    MG012_CLINOENSTATITE_MAX_K,
     NO_JANAF_TABLE_FOR_POLYMORPH,
     POLYMORPH_MISMATCH,
     PolymorphMismatchError,
+    REACTION_ANDALUSITE,
+    REACTION_CATALOGUE,
     REACTION_ENSTATITE,
     REACTION_FORSTERITE,
+    REACTION_KYANITE,
+    REACTION_SILLIMANITE,
+    REACTION_SPINEL,
+    REACTIONS,
     JanafValues,
     PhaseScoreRequest,
     build_phase_row,
@@ -45,10 +53,13 @@ from simulator.melt_backend.pure_phase_janaf_score import (
     enthalpy_increment_kJ_mol,
     janaf_values_at,
     load_janaf_table,
+    mg012_clino_temperature_refusal,
     preflight_phase_request,
     preflight_reaction,
     reaction_sum,
+    reaction_uses_janaf_table,
     require_polymorph_match,
+    sio2_polymorph_for_reaction,
 )
 
 # --- printed JANAF rows (data/literature/compilations/janaf/tables) --------
@@ -58,6 +69,11 @@ JANAF_DFG_1000 = {
     'O-037': -730.256,    # SiO2 quartz
     'Mg-012': -1257.958,  # MgSiO3(cr) clinoenstatite
     'Mg-028': -1778.598,  # Mg2SiO4(cr) forsterite
+    'Al-096': -1361.437,  # Al2O3(cr, alpha)
+    'Al-089': -1886.914,  # MgAl2O4(cr)
+    'Al-102': -2097.155,  # Al2SiO5 andalusite
+    'Al-103': -2090.0,    # Al2SiO5 kyanite
+    'Al-104': -2096.351,  # Al2SiO5 sillimanite
 }
 # 298.15 K:
 JANAF_DFG_298 = {
@@ -65,6 +81,11 @@ JANAF_DFG_298 = {
     'O-037': -856.443,
     'Mg-012': -1462.023,
     'Mg-028': -2057.879,
+    'Al-096': -1582.275,
+    'Al-089': -2176.621,
+    'Al-102': -2444.482,
+    'Al-103': -2443.937,
+    'Al-104': -2442.394,
 }
 
 # Engine probe fixtures (P4a scout probe_thermoengine.py, verbatim; J/mol):
@@ -265,17 +286,17 @@ def test_preflight_enstatite_reaction_refused_for_magemin_only():
 
 
 def test_preflight_phase_requests_refusals():
-    by_phase = {r.phase_id: r for r in DEFAULT_PHASE_REQUESTS}
-    en_te = preflight_phase_request(by_phase['En'])
+    by_key = {(r.engine, r.phase_id, r.janaf_table_id): r for r in DEFAULT_PHASE_REQUESTS}
+    en_te = preflight_phase_request(by_key[('thermoengine', 'En', 'Mg-012')])
     assert en_te is not None and en_te.reason == POLYMORPH_MISMATCH
-    en_mm = preflight_phase_request(by_phase['en'])
+    en_mm = preflight_phase_request(by_key[('magemin', 'en', 'Mg-012')])
     assert en_mm is not None and en_mm.reason == POLYMORPH_MISMATCH
-    trd = preflight_phase_request(by_phase['trd'])
+    trd = preflight_phase_request(by_key[('magemin', 'trd', None)])
     assert trd is not None
     assert trd.reason == NO_JANAF_TABLE_FOR_POLYMORPH
     assert trd.engine_polymorph == 'tridymite'
-    assert preflight_phase_request(by_phase['cEn']) is None
-    assert preflight_phase_request(by_phase['q']) is None
+    assert preflight_phase_request(by_key[('thermoengine', 'cEn', 'Mg-012')]) is None
+    assert preflight_phase_request(by_key[('magemin', 'q', 'O-037')]) is None
 
 
 def test_build_reaction_row_live_polymorph_recheck_refuses():
@@ -406,3 +427,162 @@ def test_janaf_values_at_real_table_mgo_1000K():
 def test_janaf_values_at_missing_temperature_returns_none():
     document = load_janaf_table('Mg-008')
     assert janaf_values_at(document, 999.0) is None
+
+
+
+# --- W2 reaction catalogue ---------------------------------------------------
+
+
+def test_reaction_catalogue_is_declarative_and_covers_w2_targets():
+    """Catalogue is data (ReactionSpec rows), not one function per reaction."""
+    assert REACTIONS is REACTION_CATALOGUE
+    ids = [r.reaction_id for r in REACTION_CATALOGUE]
+    assert ids == [
+        '2MgO+SiO2->Mg2SiO4',
+        'MgO+SiO2->MgSiO3',
+        'MgO+Al2O3->MgAl2O4',
+        'Al2O3+SiO2->Al2SiO5(andalusite)',
+        'Al2O3+SiO2->Al2SiO5(kyanite)',
+        'Al2O3+SiO2->Al2SiO5(sillimanite)',
+    ]
+    # Every term has a JANAF table and both-engine phase map.
+    for reaction in REACTION_CATALOGUE:
+        assert set(reaction.janaf_table_by_role) == {role for role, _ in reaction.terms}
+        assert set(reaction.engine_phase_by_role) == {'magemin', 'thermoengine'}
+        for engine_map in reaction.engine_phase_by_role.values():
+            assert set(engine_map) == set(reaction.janaf_table_by_role)
+        for table_id in reaction.janaf_table_by_role.values():
+            assert table_id in JANAF_TABLES
+
+
+def test_catalogue_omits_ca_silicates_and_feo_without_janaf_phase():
+    """CaSiO3/Ca2SiO4 absent from harvest; FeO is non-stoichiometric Fe0.947O."""
+    blob = ' '.join(r.reaction_id for r in REACTION_CATALOGUE)
+    assert 'CaSiO3' not in blob and 'Ca2SiO4' not in blob
+    assert 'FeO' not in blob
+    assert 'Ca-027' in JANAF_TABLES  # lime is tabulated for future use
+    assert 'Fe-030' in JANAF_TABLES  # hematite tabulated; no FeO partner
+
+
+def test_reaction_sum_janaf_spinel_1000K_hand_computed():
+    # -1886.914 - (-492.952) - (-1361.437) = -32.525 kJ/mol
+    terms = [
+        (1.0, JANAF_DFG_1000['Al-089']),
+        (-1.0, JANAF_DFG_1000['Mg-008']),
+        (-1.0, JANAF_DFG_1000['Al-096']),
+    ]
+    assert reaction_sum(terms) == pytest.approx(-32.525, abs=1e-9)
+
+
+def test_reaction_sum_janaf_andalusite_1000K_hand_computed():
+    # -2097.155 - (-1361.437) - (-730.256) = -5.462 kJ/mol
+    terms = [
+        (1.0, JANAF_DFG_1000['Al-102']),
+        (-1.0, JANAF_DFG_1000['Al-096']),
+        (-1.0, JANAF_DFG_1000['O-037']),
+    ]
+    assert reaction_sum(terms) == pytest.approx(-5.462, abs=1e-9)
+
+
+def test_build_reaction_row_spinel_janaf_side_1000K():
+    """JANAF side of the spinel catalogue row through the real builder."""
+    fixtures = {
+        'Per': _props('thermoengine', 'Per', 'periclase', -650763.6656),
+        'Co': _props('thermoengine', 'Co', 'corundum', -1670000.0),
+        'Sp': _props('thermoengine', 'Sp', 'spinel', -2350000.0),
+    }
+    row = build_reaction_row(
+        REACTION_SPINEL,
+        'thermoengine',
+        1000.0,
+        engine_query=lambda phase_id, T: fixtures[phase_id],
+        janaf_query=_janaf_stub,
+    )
+    assert row.reaction_id == 'MgO+Al2O3->MgAl2O4'
+    assert row.drG_janaf_kJ_mol == pytest.approx(-32.525, abs=1e-9)
+    assert row.sio2_polymorph == ''
+    assert sio2_polymorph_for_reaction(REACTION_SPINEL) == ''
+    assert sio2_polymorph_for_reaction(REACTION_ANDALUSITE) == 'quartz'
+    # No quartz term -> no MELTS quartz-adjustment variant.
+    assert row.drG_engine_no_quartz_adjustment_kJ_mol is None
+
+
+def test_build_reaction_row_andalusite_janaf_side_1000K():
+    fixtures = {
+        'Co': _props('thermoengine', 'Co', 'corundum', -1670000.0),
+        'Qz': _props('thermoengine', 'Qz', 'quartz', TE_G_1000_J['Qz']),
+        'a': _props('thermoengine', 'a', 'andalusite', -2400000.0),
+    }
+    row = build_reaction_row(
+        REACTION_ANDALUSITE,
+        'thermoengine',
+        1000.0,
+        engine_query=lambda phase_id, T: fixtures[phase_id],
+        janaf_query=_janaf_stub,
+    )
+    assert row.drG_janaf_kJ_mol == pytest.approx(-5.462, abs=1e-9)
+    assert row.sio2_polymorph == 'quartz'
+
+
+def test_preflight_catalogue_spinel_matches_both_engines():
+    assert preflight_reaction(REACTION_SPINEL, 'magemin') is None
+    assert preflight_reaction(REACTION_SPINEL, 'thermoengine') is None
+    assert preflight_reaction(REACTION_ANDALUSITE, 'magemin') is None
+    assert preflight_reaction(REACTION_ANDALUSITE, 'thermoengine') is None
+
+
+def test_preflight_al2sio5_polymorph_mismatch_refused():
+    """Andalusite engine vs kyanite/sillimanite JANAF product is refused."""
+    # Swap: feed andalusite reaction's engine phases against kyanite spec by
+    # using the kyanite catalogue row's TE map with a wrong live check is
+    # covered elsewhere; here static preflight of ky/sill rows must pass
+    # when maps match, and the deliberate DEFAULT_PHASE_REQUEST mismatch
+    # (a vs Al-104) must refuse.
+    assert preflight_reaction(REACTION_KYANITE, 'thermoengine') is None
+    assert preflight_reaction(REACTION_SILLIMANITE, 'magemin') is None
+    by_phase = {(r.engine, r.phase_id, r.janaf_table_id): r for r in DEFAULT_PHASE_REQUESTS}
+    refuse = preflight_phase_request(by_phase[('thermoengine', 'a', 'Al-104')])
+    assert refuse is not None and refuse.reason == POLYMORPH_MISMATCH
+    assert refuse.engine_polymorph == 'andalusite'
+    assert refuse.janaf_polymorph == 'sillimanite'
+
+
+def test_engine_phase_polymorph_catalogue_phases():
+    assert engine_phase_polymorph('thermoengine', 'Co') == 'corundum'
+    assert engine_phase_polymorph('thermoengine', 'Sp') == 'spinel'
+    assert engine_phase_polymorph('thermoengine', 'a') == 'andalusite'
+    assert engine_phase_polymorph('magemin', 'cor') == 'corundum'
+    assert engine_phase_polymorph('magemin', 'sp') == 'spinel'
+    assert engine_phase_polymorph('magemin', 'and') == 'andalusite'
+    assert engine_phase_polymorph('magemin', 'ky') == 'kyanite'
+    assert engine_phase_polymorph('magemin', 'sill') == 'sillimanite'
+
+
+def test_janaf_values_at_real_table_spinel_and_corundum_1000K():
+    spinel = janaf_values_at(load_janaf_table('Al-089'), 1000.0)
+    cor = janaf_values_at(load_janaf_table('Al-096'), 1000.0)
+    andal = janaf_values_at(load_janaf_table('Al-102'), 1000.0)
+    assert spinel is not None and spinel.formation_gibbs_kJ_mol == pytest.approx(-1886.914)
+    assert cor is not None and cor.formation_gibbs_kJ_mol == pytest.approx(-1361.437)
+    assert andal is not None and andal.formation_gibbs_kJ_mol == pytest.approx(-2097.155)
+
+
+def test_mg012_clino_refused_at_and_above_I_II_transition():
+    """R10: do not score clino-labelled Mg-012 past JANAF I<->II @ 903 K."""
+    assert MG012_CLINOENSTATITE_MAX_K == 903.0
+    assert mg012_clino_temperature_refusal(temperature_K=500.0) is None
+    assert mg012_clino_temperature_refusal(temperature_K=902.999) is None
+    hit = mg012_clino_temperature_refusal(
+        temperature_K=1000.0, engine='thermoengine', phase_id='cEn'
+    )
+    assert hit is not None
+    assert hit.reason == JANAF_SOLID_SOLID_TRANSITION
+    assert hit.janaf_table_id == 'Mg-012'
+    hit1500 = mg012_clino_temperature_refusal(temperature_K=1500.0)
+    assert hit1500 is not None and 'II<->III' in hit1500.detail
+    # Default cEn plan stays inside the clino window.
+    cen = next(r for r in DEFAULT_PHASE_REQUESTS if r.phase_id == 'cEn')
+    assert max(cen.temperatures_K) < MG012_CLINOENSTATITE_MAX_K
+    assert reaction_uses_janaf_table(REACTION_ENSTATITE, 'Mg-012')
+    assert not reaction_uses_janaf_table(REACTION_FORSTERITE, 'Mg-012')
+    assert not reaction_uses_janaf_table(REACTION_SPINEL, 'Mg-012')

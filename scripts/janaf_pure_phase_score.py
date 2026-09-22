@@ -43,6 +43,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
     NO_JANAF_TABLE_FOR_POLYMORPH,
     POLYMORPH_MISMATCH,
     PRESSURE_BAR,
+    REACTION_CATALOGUE,
     REACTIONS,
     PhaseRow,
     ReactionRow,
@@ -51,8 +52,10 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
     build_reaction_row,
     janaf_values_at,
     load_janaf_table,
+    mg012_clino_temperature_refusal,
     preflight_phase_request,
     preflight_reaction,
+    reaction_uses_janaf_table,
 )
 
 DEFAULT_OUT = ROOT / 'docs-private' / 'research' / '2026-09-22-janaf-p4a2'
@@ -137,7 +140,7 @@ def build_all_rows(
     def engine_query(engine):
         return lambda phase_id, T: querier(engine, phase_id, T)
 
-    for reaction in REACTIONS:
+    for reaction in REACTION_CATALOGUE:
         for engine in engines:
             refusal = preflight_reaction(reaction, engine)
             if refusal is not None:
@@ -147,6 +150,15 @@ def build_all_rows(
                 )
                 continue
             for T in DEFAULT_TEMPERATURES_K:
+                if reaction_uses_janaf_table(reaction, 'Mg-012'):
+                    t_refusal = mg012_clino_temperature_refusal(
+                        temperature_K=T,
+                        engine=engine,
+                        reaction_id=reaction.reaction_id,
+                    )
+                    if t_refusal is not None:
+                        refusals.append(t_refusal)
+                        continue
                 rows.append(
                     build_reaction_row(
                         reaction,
@@ -166,6 +178,15 @@ def build_all_rows(
             )
             continue
         for T in request.temperatures_K:
+            if request.janaf_table_id == 'Mg-012':
+                t_refusal = mg012_clino_temperature_refusal(
+                    temperature_K=T,
+                    engine=request.engine,
+                    phase_id=request.phase_id,
+                )
+                if t_refusal is not None:
+                    refusals.append(t_refusal)
+                    continue
             rows.append(
                 build_phase_row(
                     request,

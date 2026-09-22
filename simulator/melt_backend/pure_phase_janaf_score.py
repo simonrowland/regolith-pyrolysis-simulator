@@ -29,12 +29,20 @@ the element offsets do not cancel there.
 
 Polymorph contract: a residual is only meaningful when the engine phase
 and the JANAF table are the same polymorph.  JANAF MgSiO3(cr) (Mg-012) is
-the clinoenstatite assessment; the SiO2 tables are per-polymorph (O-037
-quartz, O-035/O-036 cristobalite high/low; this compilation has NO
-tridymite table).  A mismatched polymorph is a fake residual: the row is
-refused, typed, and never scored.  MAGEMin S/Cp/H exist only for phases
-stable at (T, P); an unreachable property stays a typed absence, never a
-zero.
+labelled clinoenstatite from a low-T scout Cp match, but the printed table
+carries I<->II @ 903 K and II<->III @ 1258 K -- scores at/above 903 K are
+refused typed (janaf_solid_solid_transition), never treated as monolithic
+clinoenstatite.  The SiO2 tables are per-polymorph (O-037 quartz,
+O-035/O-036 cristobalite high/low; this compilation has NO tridymite
+table).  A mismatched polymorph is a fake residual: the row is refused,
+typed, and never scored.  MAGEMin S/Cp/H exist only for phases stable at
+(T, P); an unreachable property stays a typed absence, never a zero.
+
+Reaction catalogue: ``REACTION_CATALOGUE`` is declarative data (ReactionSpec
+rows), not one code path per reaction.  Entries require a JANAF table for
+every term and engine phase ids both engines carry; FeO is omitted because
+this compilation tabulates non-stoichiometric wustite (Fe0.947O), and Ca
+silicates (CaSiO3 / Ca2SiO4) are absent from the harvested tables.
 
 This module is the pure arithmetic/plan half.  The engine/JANAF IO and
 report rendering live in ``scripts/janaf_pure_phase_score.py``.
@@ -61,6 +69,10 @@ from simulator.melt_backend.magemin import _MAGEMIN_PURE_PHASES
 POLYMORPH_MISMATCH = 'polymorph_mismatch'
 NO_JANAF_TABLE_FOR_POLYMORPH = 'no_janaf_table_for_polymorph'
 NO_JANAF_ROW_AT_T = 'no_janaf_row_at_temperature'
+# Mg-012 is labelled clinoenstatite from low-T scout Cp match, but the
+# printed table carries I<->II @ 903 K and II<->III @ 1258 K. Scoring the
+# clino label past I<->II is a fake residual (R10).
+JANAF_SOLID_SOLID_TRANSITION = 'janaf_solid_solid_transition'
 
 STATUS_SCORED = 'scored'
 STATUS_REFUSED = 'refused'
@@ -73,6 +85,11 @@ PRESSURE_BAR = 1.0
 # JANAF quartz table row are metastable extensions.  Matched polymorphs, but
 # the row is flagged.
 QUARTZ_METASTABLE_ABOVE_K = 1143.0
+
+# Upper bound (exclusive of the transition row) for treating Mg-012 as the
+# clinoenstatite (JANAF phase I) assessment. At/above 903 K the printed
+# table has switched to phase II (and at 1258 K to phase III).
+MG012_CLINOENSTATITE_MAX_K = 903.0
 
 # ThermoEngine quartz includes the upstream MELTS quartz correction:
 # QUARTZ_ADJUSTMENT = -1291.0 J/mol (ThermoEngine src/
@@ -109,10 +126,18 @@ JANAF_TABLES: Mapping[str, JanafTableSpec] = {
     'O-035': JanafTableSpec(
         'O-035', 'cristobalite', 'SiO2(cr, cristobalite-high)'
     ),
-    # JANAF MgSiO3(cr) is the clinoenstatite assessment (scout P4a finding:
-    # TE cEn Cp matches Mg-012 at +0.03/+2.4 %, TE En is +5/+10 % off).
+    # JANAF MgSiO3(cr) labelled clinoenstatite for T < 903 K only (R10);
+    # I<->II @ 903 K / II<->III @ 1258 K refuse typed past the clino window.
     'Mg-012': JanafTableSpec('Mg-012', 'clinoenstatite', 'MgSiO3(cr, clinoenstatite)'),
     'Mg-028': JanafTableSpec('Mg-028', 'forsterite', 'Mg2SiO4(cr, forsterite)'),
+    'Ca-027': JanafTableSpec('Ca-027', 'lime', 'CaO(cr)'),
+    'Al-096': JanafTableSpec('Al-096', 'corundum', 'Al2O3(cr, alpha)'),
+    'Al-089': JanafTableSpec('Al-089', 'spinel', 'MgAl2O4(cr)'),
+    'Al-102': JanafTableSpec('Al-102', 'andalusite', 'Al2SiO5(cr, andalusite)'),
+    'Al-103': JanafTableSpec('Al-103', 'kyanite', 'Al2SiO5(cr, kyanite)'),
+    'Al-104': JanafTableSpec('Al-104', 'sillimanite', 'Al2SiO5(cr, sillimanite)'),
+    # Hematite is tabulated; stoichiometric FeO is not (Fe-001 is Fe0.947O).
+    'Fe-030': JanafTableSpec('Fe-030', 'hematite', 'Fe2O3(cr, hematite)'),
 }
 
 
@@ -329,6 +354,7 @@ REACTION_FORSTERITE = ReactionSpec(
 # MgO(cr) + SiO2(cr) -> MgSiO3(cr).  JANAF MgSiO3(cr) = clinoenstatite, so
 # only TE cEn matches; MAGEMin's opx 'en' endmember is ORTHOenstatite ->
 # the MAGEMin rows of this reaction are refused typed (fake residual).
+# High-T Mg-012 rows (T >= 903 K) are refused separately (R10).
 REACTION_ENSTATITE = ReactionSpec(
     reaction_id='MgO+SiO2->MgSiO3',
     equation='MgO(cr) + SiO2(cr, quartz) -> MgSiO3(cr, clinoenstatite)',
@@ -344,7 +370,84 @@ REACTION_ENSTATITE = ReactionSpec(
     },
 )
 
-REACTIONS = (REACTION_FORSTERITE, REACTION_ENSTATITE)
+# MgO(cr) + Al2O3(cr, alpha) -> MgAl2O4(cr). Both engines carry periclase /
+# corundum / spinel (TE Berman Co/Sp; MAGEMin cor/sp).
+REACTION_SPINEL = ReactionSpec(
+    reaction_id='MgO+Al2O3->MgAl2O4',
+    equation='MgO(cr) + Al2O3(cr, alpha) -> MgAl2O4(cr, spinel)',
+    terms=(('MgAl2O4', 1.0), ('MgO', -1.0), ('Al2O3', -1.0)),
+    janaf_table_by_role={
+        'MgO': 'Mg-008',
+        'Al2O3': 'Al-096',
+        'MgAl2O4': 'Al-089',
+    },
+    engine_phase_by_role={
+        'magemin': {'MgO': 'per', 'Al2O3': 'cor', 'MgAl2O4': 'sp'},
+        'thermoengine': {'MgO': 'Per', 'Al2O3': 'Co', 'MgAl2O4': 'Sp'},
+    },
+)
+
+# Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5. One catalogue row per
+# product polymorph: mismatched engine phases refuse typed.
+REACTION_ANDALUSITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(andalusite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, andalusite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-102',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'and'},
+        'thermoengine': {'Al2O3': 'Co', 'SiO2': 'Qz', 'Al2SiO5': 'a'},
+    },
+)
+
+REACTION_KYANITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(kyanite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, kyanite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-103',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'ky'},
+        'thermoengine': {'Al2O3': 'Co', 'SiO2': 'Qz', 'Al2SiO5': 'Ky'},
+    },
+)
+
+REACTION_SILLIMANITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(sillimanite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, sillimanite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-104',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'sill'},
+        'thermoengine': {'Al2O3': 'Co', 'SiO2': 'Qz', 'Al2SiO5': 'Sil'},
+    },
+)
+
+# Declarative catalogue (data, not one code path per reaction). CaO+SiO2 ->
+# CaSiO3 / 2CaO+SiO2 -> Ca2SiO4 omitted: this compilation has CaO (Ca-027)
+# but no CaSiO3 / Ca2SiO4 tables. FeO/Fe2O3 omitted: Fe-001 is non-
+# stoichiometric Fe0.947O; hematite (Fe-030) alone is not a balanced
+# condensed-only reaction both engines expose as pure FeO + Fe2O3.
+REACTION_CATALOGUE: Tuple[ReactionSpec, ...] = (
+    REACTION_FORSTERITE,
+    REACTION_ENSTATITE,
+    REACTION_SPINEL,
+    REACTION_ANDALUSITE,
+    REACTION_KYANITE,
+    REACTION_SILLIMANITE,
+)
+REACTIONS = REACTION_CATALOGUE  # alias for existing runners/tests
 ENGINES = ('magemin', 'thermoengine')
 
 
@@ -363,12 +466,24 @@ DEFAULT_PHASE_REQUESTS: Tuple[PhaseScoreRequest, ...] = (
     PhaseScoreRequest('thermoengine', 'Fo', 'Mg-028'),
     PhaseScoreRequest('magemin', 'q', 'O-037'),
     PhaseScoreRequest('thermoengine', 'Qz', 'O-037'),
-    PhaseScoreRequest('thermoengine', 'cEn', 'Mg-012'),
+    # Clino window only: Mg-012 I<->II at 903 K (see MG012_CLINOENSTATITE_MAX_K).
+    PhaseScoreRequest(
+        'thermoengine', 'cEn', 'Mg-012', (298.15, 500.0)
+    ),
+    PhaseScoreRequest('magemin', 'cor', 'Al-096'),
+    PhaseScoreRequest('thermoengine', 'Co', 'Al-096'),
+    PhaseScoreRequest('magemin', 'sp', 'Al-089'),
+    PhaseScoreRequest('thermoengine', 'Sp', 'Al-089'),
+    PhaseScoreRequest('magemin', 'and', 'Al-102'),
+    PhaseScoreRequest('thermoengine', 'a', 'Al-102'),
     # Planned refusal demonstrations (typed, never scored):
     # TE 'En' is orthoenstatite -- mismatched against clinoenstatite Mg-012.
     PhaseScoreRequest('thermoengine', 'En', 'Mg-012'),
     # MAGEMin opx 'en' is orthoenstatite -- same mismatch.
     PhaseScoreRequest('magemin', 'en', 'Mg-012'),
+    # Andalusite engine vs sillimanite JANAF table: polymorph refuse.
+    PhaseScoreRequest('thermoengine', 'a', 'Al-104'),
+    PhaseScoreRequest('magemin', 'and', 'Al-104'),
     # This JANAF compilation has no tridymite table; trd is the stable
     # MAGEMin silica polymorph at 1500 K, so the gap is real and typed.
     PhaseScoreRequest('magemin', 'trd', None, (1500.0,)),
@@ -444,6 +559,62 @@ def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalR
                 janaf_polymorph=janaf.polymorph,
             )
     return None
+
+
+def mg012_clino_temperature_refusal(
+    *,
+    temperature_K: float,
+    engine: Optional[str] = None,
+    phase_id: Optional[str] = None,
+    reaction_id: Optional[str] = None,
+) -> Optional[RefusalRow]:
+    """Refuse Mg-012 / clino-labelled scores at/above JANAF I<->II (903 K).
+
+    The table is stamped ``clinoenstatite`` from a low-T scout Cp match, but
+    ``parse_ambiguities`` records solid-solid transitions at 903 K (I<->II)
+    and 1258 K (II<->III). Scoring TE cEn (or the TE enstatite reaction)
+    against post-transition rows while refusing ortho/proto is an inverted
+    polymorph gate -- a fake residual under the stated contract.
+    """
+
+    if float(temperature_K) < MG012_CLINOENSTATITE_MAX_K:
+        return None
+    return RefusalRow(
+        reason=JANAF_SOLID_SOLID_TRANSITION,
+        detail=(
+            f'Mg-012 is labelled clinoenstatite for T < '
+            f'{MG012_CLINOENSTATITE_MAX_K:g} K (JANAF phase I); at '
+            f'{temperature_K:g} K the printed table has crossed I<->II'
+            f'@903 K'
+            + (
+                ' and II<->III@1258 K'
+                if float(temperature_K) >= 1258.0
+                else ''
+            )
+            + ' -- refuse rather than score a fake residual'
+        ),
+        engine=engine,
+        phase_id=phase_id,
+        reaction_id=reaction_id,
+        janaf_table_id='Mg-012',
+        temperature_K=float(temperature_K),
+        janaf_polymorph='clinoenstatite',
+    )
+
+
+def reaction_uses_janaf_table(reaction: ReactionSpec, table_id: str) -> bool:
+    """True when any catalogue term's JANAF table id equals ``table_id``."""
+
+    return table_id in reaction.janaf_table_by_role.values()
+
+
+def sio2_polymorph_for_reaction(reaction: ReactionSpec) -> str:
+    """JANAF SiO2 polymorph token for the reaction, or '' when no SiO2 term."""
+
+    table_id = reaction.janaf_table_by_role.get('SiO2')
+    if table_id is None:
+        return ''
+    return JANAF_TABLES[table_id].polymorph
 
 
 # ----------------------------------------------------------- row builders --
@@ -542,7 +713,7 @@ def build_reaction_row(
         temperature_K=temperature_K,
         reaction_id=reaction.reaction_id,
         equation=reaction.equation,
-        sio2_polymorph='quartz',
+        sio2_polymorph=sio2_polymorph_for_reaction(reaction),
         drG_engine_kJ_mol=drg_engine,
         drG_janaf_kJ_mol=drg_janaf,
         residual_kJ_mol=drg_engine - drg_janaf,
