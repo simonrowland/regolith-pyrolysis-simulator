@@ -5448,8 +5448,11 @@ def _pressure_located(
             parameters=base.parameters,
             output_unit=base.output_unit,
         )
+    # Point pressures are built only inside _point_selection. This caller
+    # supplies the already-converted pascal amount; it does not construct Value.
+    point = _point_selection(si, printed_key, trail, {}, ())
     return Located(
-        State.of(Value.point_of(si)),
+        State.of(point.value),
         locator=_locator_with_note(locator, f"quote={quote}" if quote else None),
         inference=inference,
     )
