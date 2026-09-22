@@ -6662,6 +6662,12 @@ class Migrator:
             phase, unmapped_phase = State.unknown(transition_reason), None
         else:
             phase, unmapped_phase = map_phase(phase_raw)
+            if unmapped_phase and source_id == "janaf-4th":
+                from simulator.battery.generators.janaf import janaf_extract_phase
+
+                token = janaf_extract_phase(source_id, unmapped_phase)
+                if token is not None:
+                    phase, unmapped_phase = State.of(token), None
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
             self.result.add_queue(

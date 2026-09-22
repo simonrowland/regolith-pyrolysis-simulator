@@ -443,6 +443,129 @@ def test_transition_observations_reports_and_vocabulary_gaps() -> None:
         )
 
 
+def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> None:
+    from simulator.battery.generators.janaf import janaf_extract_phase
+    from simulator.battery.migrate import map_phase
+
+    barium = _generation("Ba-001")
+    alpha_beta = next(
+        obs
+        for obs in barium.observations
+        if obs.observation_id.endswith("transition_temperature:alpha-beta")
+    )
+    assert alpha_beta.identity.species.phase.is_value
+    assert alpha_beta.identity.species.phase.value is Phase.CR
+    assert alpha_beta.identity.species.polymorph.is_unknown
+    assert "alpha -> beta" in (alpha_beta.identity.species.polymorph.reason or "")
+    assert alpha_beta.value.point == Decimal("582.530")
+
+    crystal_liquid = next(
+        obs
+        for obs in _generation("Al-001").observations
+        if obs.observation_id.endswith("transition_temperature:crystal-liquid")
+    )
+    assert crystal_liquid.identity.species.phase.is_unknown
+    assert crystal_liquid.identity.species.phase.reason == (
+        'transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); '
+        "v2.1 species.phase has one phase axis and cannot hold both"
+    )
+    assert crystal_liquid.value.point == Decimal("933.450")
+
+    sodium = _generation("Na-020")
+    cp = _quantity_observations(sodium, Quantity.CP)
+    assert [obs.observation_id for obs in cp] == [
+        "nist-janaf-4th:Na-020:cp:segment-0"
+    ]
+    temperatures = [point[0] for point in cp[0].value.series or ()]
+    assert Decimal("514.000") in temperatures
+    assert Decimal("1157.000") in temperatures
+    roman = next(
+        obs
+        for obs in sodium.observations
+        if obs.observation_id.endswith("transition_temperature:iv-i")
+    )
+    assert roman.identity.species.phase.value is Phase.CR
+    assert "iv -> i" in (roman.identity.species.polymorph.reason or "")
+    melting = next(
+        obs
+        for obs in sodium.observations
+        if obs.observation_id.endswith("transition_temperature:i-liquid")
+    )
+    assert melting.identity.species.phase.is_unknown
+    assert "(cr -> l)" in (melting.identity.species.phase.reason or "")
+
+    sulfate = _generation("Na-025")
+    segments = sulfate.report["phase_segments"]
+    assert segments[0]["phase"]["value"] == "cr"
+    assert segments[0]["polymorph"]["value"] == "v"
+    assert segments[1]["phase"]["value"] == "cr"
+    assert segments[1]["polymorph"]["value"] == "iv"
+    sulfate_cp = _quantity_observations(sulfate, Quantity.CP)
+    assert sulfate_cp[0].observation_id == "nist-janaf-4th:Na-025:cp:segment-0"
+    assert sulfate_cp[1].observation_id == "nist-janaf-4th:Na-025:cp:segment-1"
+    assert (Decimal("458.000"), Decimal("153.331")) in (sulfate_cp[0].value.series or ())
+    assert (Decimal("514.000"), Decimal("160.712")) in (sulfate_cp[1].value.series or ())
+
+    epsilon = next(
+        segment
+        for segment in _generation("Al-051").report["phase_segments"]
+        if segment["phase"]["tag"] != "value"
+    )
+    assert "EPSILON" in segment_reason(epsilon)
+    fluid = _generation("H-068").report["phase_segments"][0]["phase"]
+    assert fluid["tag"] == "unknown"
+    assert fluid["reason"] == "JANAF state 'fl' is not a schema v2.1 Phase token"
+
+    refused, spelling = map_phase("ideal_gas")
+    assert refused.is_unknown and spelling == "ideal_gas"
+    assert janaf_extract_phase("janaf-4th", "ideal_gas") is Phase.G
+    assert janaf_extract_phase("kems-041-sossi-fegley-2018", "ideal_gas") is None
+    assert janaf_extract_phase("janaf-4th", "solid") is None
+    assert janaf_extract_phase("janaf-4th", "phosphate_melt_to_PO_g") is None
+
+
+def segment_reason(segment: dict) -> str:
+    return str(segment["phase"].get("reason") or "")
+
+
+def test_janaf_extract_ideal_gas_maps_only_for_that_source(tmp_path: Path) -> None:
+    import copy
+
+    from simulator.battery.migrate import Migrator
+    from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+    def run(source_id: str):
+        doc = copy.deepcopy(FIXTURE_EXTRACT)
+        doc["source_id"] = source_id
+        doc["species"]["Na"]["observations"][0]["phase"] = "ideal_gas"
+        doc["species"]["Na"]["observations"][0]["observation_id"] = "ideal_gas_row"
+        root = tmp_path / source_id
+        _write_min_tree(root, doc)
+        index = yaml.safe_load((root / "data/literature/INDEX.yaml").read_text())
+        index["sources"][0]["source_id"] = source_id
+        (root / "data/literature/INDEX.yaml").write_text(yaml.safe_dump(index))
+        return Migrator(root=root).run()
+
+    janaf = run("janaf-4th")
+    rows = [obs for obs in janaf.observations.values() if obs.observation_id.endswith("ideal_gas_row::point:0")]
+    assert len(rows) == 1
+    assert rows[0].identity.species.phase.value is Phase.G
+    assert not any(
+        "ideal_gas_row" in entry.observation_id and "phase" in entry.axes
+        for entry in janaf.queue
+    )
+    other = run("fixture-source")
+    other_rows = [
+        obs for obs in other.observations.values() if "ideal_gas_row" in obs.observation_id
+    ]
+    assert other_rows
+    assert all(obs.identity.species.phase.is_unknown for obs in other_rows)
+    assert any(
+        "ideal_gas_row" in entry.observation_id and "phase" in entry.axes
+        for entry in other.queue
+    )
+
+
 def test_concatenated_transition_temperature_and_cp_rows_are_recovered() -> None:
     for table_id, expected_polymorphs in {
         "C-083": ["i", "ii", "iii"],
@@ -1460,9 +1583,9 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         "log10_Kf": 2117,
         "transition_temperature": 979,
     }
-    assert phases == {"cr": 794, "l": 444, "g": 874, "unknown": 5}
+    assert phases == {"cr": 796, "l": 444, "g": 874, "unknown": 3}
     assert polymorphs == {
-        "unknown": 417,
+        "unknown": 415,
         "not_applicable": 1320,
         "alpha": 99,
         "beta": 99,
@@ -1471,8 +1594,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         "i": 54,
         "ii": 52,
         "iii": 18,
-        "iv": 1,
-        "v": 1,
+        "iv": 2,
+        "v": 2,
         "kappa": 1,
         "corundum": 1,
         "andalusite": 1,

@@ -29,6 +29,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
+    JANAF_LABEL_POLYMORPHS,
     JANAF_TRANSITION_POLYMORPHS,
     canonicalize_janaf_transition,
     resolve_janaf_polymorph,
@@ -581,18 +582,102 @@ def _phase_change(label: str | None) -> tuple[str, str] | None:
     return match.group(1).strip(), match.group(2).strip()
 
 
+def _canonical_side(side: str) -> str:
+    return " ".join(side.upper().split())
+
+
+def _label_polymorph(side: str) -> Polymorph | None:
+    canonical = _canonical_side(side)
+    return _CRYSTAL_POLYMORPHS.get(canonical) or JANAF_LABEL_POLYMORPHS.get(canonical)
+
+
 def _side_phase(side: str) -> Phase | None:
-    canonical = " ".join(side.upper().split())
-    if canonical in _CRYSTAL_POLYMORPHS:
+    if _label_polymorph(side) is not None:
         return Phase.CR
-    return _PHASE_SIDE.get(canonical)
+    return _PHASE_SIDE.get(_canonical_side(side))
 
 
 def _side_polymorph(side: str, formula: str = "") -> Polymorph | None:
-    token = _CRYSTAL_POLYMORPHS.get(" ".join(side.upper().split()))
+    token = _label_polymorph(side)
     if token is None:
         return None
     return canonicalize_janaf_transition(formula, token) if formula else token
+
+
+def _transition_species_phase(
+    label: str, formula: str
+) -> tuple[State[Phase], State[Polymorph] | None]:
+    """Phase of a labelled transition row.
+
+    Both sides the same closed phase: that token. A crystal-crystal row does
+    not pick one polymorph. Two different phases, or a side with no token,
+    stay unknown — species.phase holds one phase.
+    """
+
+    parts = _phase_change(label)
+    if parts is None:
+        return State.unknown(f'transition spans phases named by "{label}"'), None
+    left, right = parts
+    left_phase, right_phase = _side_phase(left), _side_phase(right)
+    unmapped = [
+        side
+        for side, phase in ((left, left_phase), (right, right_phase))
+        if phase is None
+    ]
+    if unmapped:
+        if len(unmapped) == 1:
+            detail = (
+                f"side {unmapped[0].strip()!r} is not a closed Phase or Polymorph token"
+            )
+        else:
+            quoted = ", ".join(repr(side.strip()) for side in unmapped)
+            detail = f"sides {quoted} are not closed Phase or Polymorph tokens"
+        return (
+            State.unknown(
+                f'transition spans phases named by "{label}"; {detail}'
+            ),
+            None,
+        )
+    assert left_phase is not None and right_phase is not None
+    if left_phase is not right_phase:
+        return (
+            State.unknown(
+                f'transition spans phases named by "{label}" '
+                f"({left_phase.value} -> {right_phase.value}); "
+                "v2.1 species.phase has one phase axis and cannot hold both"
+            ),
+            None,
+        )
+    if left_phase is not Phase.CR:
+        return State.of(left_phase), None
+    left_poly = _side_polymorph(left, formula)
+    right_poly = _side_polymorph(right, formula)
+    if left_poly is not None and left_poly == right_poly:
+        return State.of(left_phase), State.of(left_poly)
+    left_name = left_poly.value if left_poly is not None else left.strip().lower()
+    right_name = right_poly.value if right_poly is not None else right.strip().lower()
+    return (
+        State.of(left_phase),
+        State.unknown(
+            f"transition spans polymorphs {left_name} -> {right_name} "
+            f'named by "{label}"; species.polymorph holds one token'
+        ),
+    )
+
+
+def janaf_extract_phase(source_id: str, spelling: object) -> Phase | None:
+    """JANAF-extract spelling of a printed phase, outside the global PHASE_MAP.
+
+    ``ideal_gas`` is JANAF's IDEAL GAS / g. The same spelling is used by
+    non-JANAF extracts; those stay unmapped. ``solid`` is not mapped: JANAF
+    prints CRYSTAL and GLASS as different tokens.
+    """
+
+    if source_id != "janaf-4th":
+        return None
+    if str(spelling or "").strip().lower() == "ideal_gas":
+        return Phase.G
+    return None
 
 
 def _phase_state(phase: Phase | None, reason: str) -> State[Phase]:
@@ -1340,8 +1425,8 @@ def generate_table(
         parts = _phase_change(row.label)
         is_named_crystal_transition = (
             parts is not None
-            and _side_polymorph(parts[0]) is not None
-            and _side_polymorph(parts[1]) is not None
+            and _canonical_side(parts[0]) in _CRYSTAL_POLYMORPHS
+            and _canonical_side(parts[1]) in _CRYSTAL_POLYMORPHS
         )
         if parts is not None and (
             state in _COMBINED_STATES
@@ -1629,12 +1714,15 @@ def generate_table(
                 "total_pressure_basis": pressure_basis,
             }
         )
+        transition_phase, transition_polymorph = _transition_species_phase(
+            row.label or "", formula
+        )
         observations.append(
             _observation(
                 table_id=table_id,
                 formula=formula,
-                phase=State.unknown(f'transition spans phases named by "{row.label}"'),
-                polymorph=None,
+                phase=transition_phase,
+                polymorph=transition_polymorph,
                 charge=charge,
                 quantity=Quantity.TRANSITION_TEMPERATURE,
                 value=Value.point_of(row.temperature),

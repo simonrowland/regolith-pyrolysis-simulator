@@ -115,6 +115,14 @@ JANAF_TRANSITION_POLYMORPHS: dict[str, Polymorph] = {
     "III": Polymorph.III,
 }
 
+# Printed sides that name a closed polymorph but must not create a crystal-table
+# boundary. Na-020/022/023 are single `cr` tables; treating IV/V as split points
+# would invent segment observation ids. Labelling only.
+JANAF_LABEL_POLYMORPHS: dict[str, Polymorph] = {
+    "IV": Polymorph.IV,
+    "V": Polymorph.V,
+}
+
 # (formula, transition-label token) → canonical token.
 # JANAF O-037 prints "Silicon Oxide, Quartz" and splits on "I <--> II".
 # B1544 prints Alpha quartz / Beta quartz. Roman I/II are JANAF's generic
