@@ -3,6 +3,7 @@
 
 PARTIAL means heterogeneous per-experiment statuses, not partial completeness.
 Per-experiment rows remain available so callers can select a usable experiment.
+A work with no scoreable observations is still listed, as a gap.
 """
 
 from __future__ import annotations
@@ -261,6 +262,55 @@ def _aggregate(
     }
 
 
+def _sources_without_scoreable_observations(works, listed: set[str]) -> tuple[str, ...]:
+    """Canonical source ids that the experiment walk never reaches.
+
+    Readiness attributes each experiment to ``Work.source_ids[0]``. A work
+    whose observations live only in ``context[]`` (or that has no experiments
+    at all) has nothing to score and would otherwise disappear.
+    """
+
+    missing: list[str] = []
+    seen = set(listed)
+    for work in works.values():
+        source_id = work.source_ids[0]
+        if source_id in seen:
+            continue
+        seen.add(source_id)
+        missing.append(source_id)
+    return tuple(sorted(missing))
+
+
+def _no_scoreable_observations_row(source_id: str) -> dict[str, object]:
+    gap = {
+        "waypoint": "observations",
+        "reason": GapReason.NO_SCOREABLE_OBSERVATIONS.value,
+        "missing": ["scoreable observations"],
+        "count": 0,
+        "experiment_ids": [],
+    }
+    consumers = [
+        {"consumer": name, "status": ReadinessStatus.GAP.value, "gaps": [gap]}
+        for name in ("kems", "rps", "engine_point")
+    ]
+    engines = [
+        {
+            "consumer": "engine_point",
+            "engine": engine,
+            "status": ReadinessStatus.GAP.value,
+            "gaps": [gap],
+        }
+        for engine in ENGINE_POINT_CONSUMERS
+    ]
+    return {
+        "source_id": source_id,
+        "consumers": consumers,
+        "engines": engines,
+        "informational_gaps": [dict(gap)],
+        "experiments": [],
+    }
+
+
 def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness:
     engines = [item for item in group if item.engine is not None]
     gaps = []
@@ -393,6 +443,9 @@ def report(root: Path) -> dict[str, object]:
                 source_information.setdefault(source_id, set()).add(
                     experiment.experiment_id
                 )
+    for source_id in _sources_without_scoreable_observations(works, set(by_source)):
+        by_source.setdefault(source_id, [])
+        source_readiness.setdefault(source_id, [])
     rows: list[dict[str, object]] = []
     empty_counts = {status.value: 0 for status in ReadinessStatus}
     by_consumer: dict[str, dict[str, int]] = {
@@ -404,6 +457,22 @@ def report(root: Path) -> dict[str, object]:
     blockers: dict[tuple[str, str], dict[str, set[str]]] = {}
     for source_id in sorted(by_source):
         source_items = source_readiness[source_id]
+        if not source_items:
+            row = _no_scoreable_observations_row(source_id)
+            rows.append(row)
+            for item in row["consumers"]:
+                counts = by_consumer[str(item["consumer"])]
+                status = str(item["status"])
+                counts[status] = counts.get(status, 0) + 1
+            for item in row["engines"]:
+                counts = by_engine[str(item["engine"])]
+                status = str(item["status"])
+                counts[status] = counts.get(status, 0) + 1
+            blockers.setdefault(
+                ("observations", GapReason.NO_SCOREABLE_OBSERVATIONS.value),
+                {"sources": set(), "experiments": set()},
+            )["sources"].add(source_id)
+            continue
         consumer_rows = []
         for consumer in ("kems", "rps"):
             subset = [
