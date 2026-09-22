@@ -29,6 +29,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EquilibrateCell,
     Po2Request,
     _refusal_matrix,
+    cell_score_authority,
+    cell_score_notice_kinds,
     reclassify_projected_composition_cells,
 )
 from simulator.diagnostic_helpers.extract_reproduction import (
@@ -1176,6 +1178,14 @@ def score_scoring_arm(
     return rows
 
 
+def _envelope_notices(cell) -> tuple[str, ...]:
+    notices: list[str] = []
+    if cell.engine_reason:
+        notices.append(cell.engine_reason)
+    notices.extend(cell_score_notice_kinds(cell))
+    return tuple(notices)
+
+
 def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, Any]:
     refused = cell.status == "refusal"
     status = (cell.refusal_reason or "refused") if refused else "ok"
@@ -1205,8 +1215,10 @@ def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, An
         rail=rail_for(species, "activity_coefficient"),
         evidence="direct experiment",
         source_doi=pot.doi,
-        notices=[cell.engine_reason] if cell.engine_reason else (),
-        authority="refused" if refused or predicted is None else "bridge",
+        notices=_envelope_notices(cell),
+        authority=cell_score_authority(
+            cell, refused=refused or predicted is None
+        ),
         selected=False,
         score_allowed=False,
         run_id=f"{pot.pot_id}:{cell.engine}",
@@ -1231,9 +1243,7 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         status = "unsupported-observable"
     else:
         status = "ok"
-    notices = []
-    if cell.engine_reason:
-        notices.append(cell.engine_reason)
+    notices = list(_envelope_notices(cell))
     if conversion_note:
         notices.append(conversion_note)
     if admission_reason:
@@ -1280,7 +1290,7 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         evidence="direct experiment" if scored_method else "derived measurement",
         source_doi=comparator.doi,
         notices=tuple(notices),
-        authority="refused" if refused else "bridge",
+        authority=cell_score_authority(cell, refused=refused),
         selected=scored_method,
         score_allowed=scored_method,
         run_id=f"{pot.pot_id}:{cell.engine}",
