@@ -68,6 +68,59 @@ observations:
         table: '2'
         paragraph: delta 25Mg, Advective (this study), 2SD
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   derived_from:
   - ta-badro-2021::badro_2021_vp1_delta25mg
   - ta-badro-2021::badro_2021_vp2_delta25mg
@@ -141,6 +194,59 @@ observations:
         table: '2'
         paragraph: delta 26Mg, Advective (this study), 2SD
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   derived_from:
   - ta-badro-2021::badro_2021_vp1_delta26mg
   - ta-badro-2021::badro_2021_vp2_delta26mg
@@ -214,6 +320,59 @@ observations:
         table: '2'
         paragraph: delta 29Si, Advective (this study), 2SD
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   derived_from:
   - ta-badro-2021::badro_2021_vp1_delta29si
   - ta-badro-2021::badro_2021_vp2_delta29si
@@ -287,6 +446,59 @@ observations:
         table: '2'
         paragraph: delta 30Si, Advective (this study), 2SD
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   derived_from:
   - ta-badro-2021::badro_2021_vp1_delta30si
   - ta-badro-2021::badro_2021_vp2_delta30si
@@ -401,6 +613,59 @@ observations:
         table: '1'
         paragraph: VP1, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp1_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp1
   identity:
@@ -508,6 +773,59 @@ observations:
         table: '1'
         paragraph: VP1, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp1_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp1
   identity:
@@ -615,6 +933,59 @@ observations:
         table: '1'
         paragraph: VP1, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp1_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp1
   identity:
@@ -722,6 +1093,59 @@ observations:
         table: '1'
         paragraph: VP1, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp2_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp2
   identity:
@@ -829,6 +1253,59 @@ observations:
         table: '1'
         paragraph: VP2, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp2_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp2
   identity:
@@ -936,6 +1413,59 @@ observations:
         table: '1'
         paragraph: VP2, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp2_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp2
   identity:
@@ -1043,6 +1573,59 @@ observations:
         table: '1'
         paragraph: VP2, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp2_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp2
   identity:
@@ -1150,6 +1733,59 @@ observations:
         table: '1'
         paragraph: VP2, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp3_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp3
   identity:
@@ -1257,6 +1893,59 @@ observations:
         table: '1'
         paragraph: VP3, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp3_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp3
   identity:
@@ -1364,6 +2053,59 @@ observations:
         table: '1'
         paragraph: VP3, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp3_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp3
   identity:
@@ -1471,6 +2213,59 @@ observations:
         table: '1'
         paragraph: VP3, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp3_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp3
   identity:
@@ -1578,6 +2373,59 @@ observations:
         table: '1'
         paragraph: VP3, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp4_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp4
   identity:
@@ -1685,6 +2533,59 @@ observations:
         table: '1'
         paragraph: VP4, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp4_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp4
   identity:
@@ -1792,6 +2693,59 @@ observations:
         table: '1'
         paragraph: VP4, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp4_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp4
   identity:
@@ -1899,6 +2853,59 @@ observations:
         table: '1'
         paragraph: VP4, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp4_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp4
   identity:
@@ -2006,6 +3013,59 @@ observations:
         table: '1'
         paragraph: VP4, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp5_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp5
   identity:
@@ -2113,6 +3173,59 @@ observations:
         table: '1'
         paragraph: VP5, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp5_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp5
   identity:
@@ -2220,6 +3333,59 @@ observations:
         table: '1'
         paragraph: VP5, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp5_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp5
   identity:
@@ -2327,6 +3493,59 @@ observations:
         table: '1'
         paragraph: VP5, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp5_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp5
   identity:
@@ -2434,6 +3653,59 @@ observations:
         table: '1'
         paragraph: VP5, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp6_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp6
   identity:
@@ -2541,6 +3813,59 @@ observations:
         table: '1'
         paragraph: VP6, d25Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp6_delta26mg
   experiment_id: 10.5802/crgeos.56::experiment::vp6
   identity:
@@ -2648,6 +3973,59 @@ observations:
         table: '1'
         paragraph: VP6, d26Mg-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp6_delta29si
   experiment_id: 10.5802/crgeos.56::experiment::vp6
   identity:
@@ -2755,6 +4133,59 @@ observations:
         table: '1'
         paragraph: VP6, d29Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp6_delta30si
   experiment_id: 10.5802/crgeos.56::experiment::vp6
   identity:
@@ -2862,3 +4293,56 @@ observations:
         table: '1'
         paragraph: VP6, d30Si-BHVO-2G and adjacent 2se
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        section: 3. Experiments and analyses
+        note: quote=At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1; printed log kept as stated; log10(fO2/bar)=log10(p_Pa/100000)=-9.094283387586269361822994981
+          = printed_log + log10(101325/100000) (offset 0.005716612413730638177005018752 dex) because the companion pressure
+          is in atm, not bar
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa

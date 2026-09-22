@@ -223,6 +223,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -447,6 +488,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -661,6 +743,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -875,6 +998,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -1089,6 +1253,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -1303,6 +1508,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
@@ -1517,6 +1763,47 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
   bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   thermal_schedule:
     total_duration_s:
