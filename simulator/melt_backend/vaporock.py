@@ -119,6 +119,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
+from engines.engine_commissioning import assess_engine_commissioning
 from simulator.engine_pool import (
     EngineWorkerPool,
     EngineWorkerRemoteError,
@@ -1774,6 +1775,26 @@ class VapoRockBackend(MeltBackend):
                     'empty inventory',
                 ],
                 diagnostics=diagnostics,
+            )
+
+        # VapoRock rides the MELTS liquid model, so its default commissioning
+        # band is the MELTS band until battery qualification re-sets it.
+        commissioning = assess_engine_commissioning(
+            self.name,
+            sio2_wt_pct=comp_wt.get('SiO2', 0.0),
+            temperature_K=temperature_K,
+        )
+        if commissioning.notice is not None:
+            notice = dict(commissioning.notice)
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics.update({
+                'commissioning_notice': notice,
+                'authority': notice['authority'],
+                'certified_band': notice['certified_band'],
+            })
+            prior_warnings.append(
+                'CommissioningNotice: out of certified band; '
+                f"authority={notice['authority']}; engine will run"
             )
         if (
             projection.dropped_mass_kg_by_species

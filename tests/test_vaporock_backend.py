@@ -305,6 +305,53 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert "input_composition_projection" not in result.diagnostics
 
 
+def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
+    def calc_vapor_pressures(**_kwargs):
+        return {"Na": 1e-4, "SiO": 1e-6}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({'warm_worker': False}) is True
+
+    cases = {
+        'in_band': ({'SiO2': 50.0, 'Na2O': 50.0}, None),
+        'low': ({'SiO2': 20.0, 'Na2O': 80.0}, 'silicate_window'),
+        'high': ({'SiO2': 90.0, 'Na2O': 10.0}, 'silicate_window'),
+    }
+    observed = {}
+    for label, (composition_kg, reason) in cases.items():
+        result = backend.equilibrate(
+            1400.0,
+            composition_kg=composition_kg,
+            fO2_log=-8.25,
+            pressure_bar=2e-6,
+        )
+        observed[label] = dict(
+            getattr(result, 'vaporock_full_speciation_Pa', {})
+        )
+        notice = result.diagnostics.get('commissioning_notice')
+        if reason is None:
+            assert notice is None
+            assert 'authority' not in result.diagnostics
+        else:
+            assert notice['reason'] == reason
+            assert notice['authority'] == 'extrapolated'
+            assert notice['certified_band'] == {
+                'sio2_wt_pct': [30.0, 80.0],
+                'temperature_K': [1073.15, 1700.0],
+            }
+            assert result.diagnostics['authority'] == 'extrapolated'
+    assert observed['in_band'] == {
+        'Na': 10.0,
+        'SiO': 0.09999999999999999,
+    }
+    assert observed['low'] == observed['in_band']
+    assert observed['high'] == observed['in_band']
+
+
 def test_vaporock_non_basis_projection_is_out_of_domain(monkeypatch):
     seen = {}
 
