@@ -22,90 +22,6 @@ evidence_policy:
 species:
   CO2:
     observations:
-    - observation_id: mogul_2023_lnms_operations_and_sampling
-      type: apparatus_characterisation
-      locator:
-        published_page: 2
-        pdf_page_index: 2
-        section: 2.1
-        note: LNMS operations and inlet description
-      phase: Venus_atmosphere
-      regime: magnetic_sector_neutral_mass_spectrometry
-      units: as published
-      values:
-        quantity: instrument_sampling_conditions
-        method_class: measured_direct
-        instrument: Pioneer Venus Large Probe Neutral Mass Spectrometer (LNMS)
-        mass_range_mz: '1-208'
-        preselected_mass_positions: 232
-        mass_channels: 'm/z 1-16 and 15-208'
-        inlet_tubes: 2
-        inlet_material: ceramic-coated tantalum
-        inlet_diameter_mm: 3.2
-        primary_inlet_rate_nL_per_s: 0.1
-        secondary_inlet_rate_nL_per_s: 1
-        secondary_inlet_control: Valve 1
-        valve_1_closure_altitude_km: '~47'
-        variable_conductance_valve_getter: zirconium-aluminum getter G1
-        getter_material: zirconium-aluminum
-        electron_energy_eV: [70, 30, 22]
-        complete_spectra_at_70_eV: 39
-        incomplete_spectra_at_70_eV: 1
-        spectra_at_30_eV: 3
-        spectra_at_22_eV: 3
-        total_spectra: 46
-        sweep_duration_s: 64
-        stepped_measurement_duration_s: 59
-        recalibration_duration_s: 5
-        ion_acceleration_tolerance: '~0.02%'
-        internal_calibrants: 'CH4 and 136Xe'
-        note: Inlet flow and transmission changed with valve configuration; do not treat this as a constant-pressure experiment.
-    - observation_id: mogul_2023_presampling_internal_counts
-      type: calibration_series
-      locator:
-        table: '1'
-        published_page: 6
-        pdf_page_index: 6
-        section: 3.3
-        note: averaged pre-sampling counts from four mass sweeps; fitted values are identified as fitted in the paper
-      phase: LNMS_internal_calibrant_and_fragmentation_standards
-      regime: electron_ionization_mass_spectrometry
-      units: raw ion counts as published; mean ± standard deviation
-      values:
-        quantity: presampling_counts
-        method_class: measured_direct
-        spectra: 3-4
-        rows:
-        - {species: 13CH4+, counts: '127 ± 18', representation: raw}
-        - {species: CH4+, counts: '15707 ± 355', representation: fitted}
-        - {species: CH3+, counts: '12613 ± 454', representation: fitted}
-        - {species: CH2+, counts: '3571 ± 110', representation: fitted}
-        - {species: C+, counts: '613 ± 9', representation: fitted}
-        - {species: H+, counts: '1952 ± 69', representation: fitted}
-        - {species: 136Xe+, counts: '8671 ± 137', representation: fitted}
-        - {species: 136Xe2+, counts: '3840 ± 111', representation: fitted}
-        - {species: 136Xe3+, counts: '32 ± 2', representation: fitted}
-        uncertainty_note: Combined standard deviations were 1.4-3.6% for fitted species; the authors applied a minimum 3.6% error to higher-count descent species and reported 6.3-14.2% for one-point low-count species.
-    - observation_id: mogul_2023_table3_internal_peak_standards
-      type: calibration_series
-      locator:
-        table: '3'
-        published_page: 7
-        pdf_page_index: 7
-        section: 3.3
-        note: fitted internal standards across descent profile
-      phase: LNMS_internal_standards
-      regime: electron_ionization_mass_spectrometry
-      units: Da or m/z as published; mean ± standard deviation; FWHM ranges as published
-      values:
-        quantity: fitted_mass_and_peak_width
-        method_class: measured_reduced
-        rows:
-        - {standard: CH3+, averaged_mass_mz: '15.023 ± 0.001', mass_error_range_mz: '-0.003 to 0.001', averaged_FWHM_mz: '0.018 ± 0.001', FWHM_range_mz: '0.015-0.020'}
-        - {standard: CO+, averaged_mass_mz: '27.995 ± 0.001', mass_error_range_mz: '-0.017 to 0.001', averaged_FWHM_mz: '0.040 ± 0.003', FWHM_range_mz: '0.033-0.042'}
-        - {standard: N2+, averaged_mass_mz: '28.006 ± 0.003', mass_error_range_mz: '-0.019 to 0.009', averaged_FWHM_mz: '0.041 ± 0.004', FWHM_range_mz: '0.033-0.042'}
-        - {standard: 40Ar+, averaged_mass_mz: '39.967 ± 0.002', mass_error_range_mz: '-0.001 to 0.012', averaged_FWHM_mz: '0.065 ± 0.005', FWHM_range_mz: '0.058-0.081'}
-        - {standard: 136Xe+, averaged_mass_mz: '135.934 ± 0.027', mass_error_range_mz: '-0.046 to 0.086', averaged_FWHM_mz: '0.277 ± 0.031', FWHM_range_mz: '0.214-0.327'}
     - observation_id: mogul_2023_co2_isotope_ratios
       type: concentration_series
       locator:
@@ -153,24 +69,6 @@ species:
         averaged_profile_standard_deviation: '96.3 ± 1.6% w/w, n=12'
         full_profile: '14 measures between 55.4 and 0.9 km; numeric values in Figure 9 not digitized'
         calibration_uncertainty: '15.6% clouds; 5.9% lower atmosphere'
-    - observation_id: mogul_2023_lnms_haze_clog_observations
-      type: anomaly_profile
-      locator:
-        published_page: 17
-        pdf_page_index: 17
-        section: 3.13
-        note: printed prose describing count spikes and partial-clog altitudes
-      phase: Venus_atmosphere_aerosol_instrument_interaction
-      regime: LNMS_descent_sampling
-      units: km, fold change, and km^-1 as published
-      values:
-        quantity: inlet_clog_and_mass_signal_anomalies
-        method_class: measured_reduced
-        partial_clog_altitudes_km: ['~15 ± 2', '~10 ± 3', '~3 ± 1']
-        affected_mass_positions: '>37 between m/z 10-208'
-        count_spike_range: '~5-500-fold'
-        extinction_coefficients_km_minus_1: 'V13/V14 comparison values ~0.6-2.0; V13/V14 spikes ~2.24-2.30 near ~2 km'
-        interpretation: authors interpret the spikes as chemical signatures of a deep atmospheric haze, not as furnace vaporization.
     - observation_id: mogul_2023_ch4_mixing_ratio_model
       type: gas_speciation
       locator:
@@ -191,6 +89,109 @@ species:
         - {altitude_km: 0.9, value: '~1200 ± 1000 ppm'}
         quoted_comparison: 'Donahue and Hodges (1993): ~980 ppm at 51.3 km and ~2800 ppm at 0.9 km; quoted_attributed, not this model'
         missing_control: PVGC and VeNeRa upper limits are cited as ~10 ppm, ~0.6 ppm, and ~0.5 ppm at stated altitudes; these are quoted comparisons, not new LNMS measurements.
+    context:
+    - observation_id: mogul_2023_lnms_operations_and_sampling
+      type: apparatus
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        section: 2.1
+        note: LNMS operations and inlet description
+      phase: Venus_atmosphere
+      regime: magnetic_sector_neutral_mass_spectrometry
+      units: as published
+      values:
+        quantity: instrument_sampling_conditions
+        method_class: measured_direct
+        instrument: Pioneer Venus Large Probe Neutral Mass Spectrometer (LNMS)
+        mass_range_mz: '1-208'
+        preselected_mass_positions: 232
+        mass_channels: 'm/z 1-16 and 15-208'
+        inlet_tubes: 2
+        inlet_material: ceramic-coated tantalum
+        inlet_diameter_mm: 3.2
+        primary_inlet_rate_nL_per_s: 0.1
+        secondary_inlet_rate_nL_per_s: 1
+        secondary_inlet_control: Valve 1
+        valve_1_closure_altitude_km: '~47'
+        variable_conductance_valve_getter: zirconium-aluminum getter G1
+        getter_material: zirconium-aluminum
+        electron_energy_eV: [70, 30, 22]
+        complete_spectra_at_70_eV: 39
+        incomplete_spectra_at_70_eV: 1
+        spectra_at_30_eV: 3
+        spectra_at_22_eV: 3
+        total_spectra: 46
+        sweep_duration_s: 64
+        stepped_measurement_duration_s: 59
+        recalibration_duration_s: 5
+        ion_acceleration_tolerance: '~0.02%'
+        internal_calibrants: 'CH4 and 136Xe'
+        note: Inlet flow and transmission changed with valve configuration; do not treat this as a constant-pressure experiment.
+    - observation_id: mogul_2023_presampling_internal_counts
+      type: calibration
+      locator:
+        table: '1'
+        published_page: 6
+        pdf_page_index: 6
+        section: 3.3
+        note: averaged pre-sampling counts from four mass sweeps; fitted values are identified as fitted in the paper
+      phase: LNMS_internal_calibrant_and_fragmentation_standards
+      regime: electron_ionization_mass_spectrometry
+      units: raw ion counts as published; mean ± standard deviation
+      values:
+        quantity: presampling_counts
+        method_class: measured_direct
+        spectra: 3-4
+        rows:
+        - {species: 13CH4+, counts: '127 ± 18', representation: raw}
+        - {species: CH4+, counts: '15707 ± 355', representation: fitted}
+        - {species: CH3+, counts: '12613 ± 454', representation: fitted}
+        - {species: CH2+, counts: '3571 ± 110', representation: fitted}
+        - {species: C+, counts: '613 ± 9', representation: fitted}
+        - {species: H+, counts: '1952 ± 69', representation: fitted}
+        - {species: 136Xe+, counts: '8671 ± 137', representation: fitted}
+        - {species: 136Xe2+, counts: '3840 ± 111', representation: fitted}
+        - {species: 136Xe3+, counts: '32 ± 2', representation: fitted}
+        uncertainty_note: Combined standard deviations were 1.4-3.6% for fitted species; the authors applied a minimum 3.6% error to higher-count descent species and reported 6.3-14.2% for one-point low-count species.
+    - observation_id: mogul_2023_table3_internal_peak_standards
+      type: calibration
+      locator:
+        table: '3'
+        published_page: 7
+        pdf_page_index: 7
+        section: 3.3
+        note: fitted internal standards across descent profile
+      phase: LNMS_internal_standards
+      regime: electron_ionization_mass_spectrometry
+      units: Da or m/z as published; mean ± standard deviation; FWHM ranges as published
+      values:
+        quantity: fitted_mass_and_peak_width
+        method_class: measured_reduced
+        rows:
+        - {standard: CH3+, averaged_mass_mz: '15.023 ± 0.001', mass_error_range_mz: '-0.003 to 0.001', averaged_FWHM_mz: '0.018 ± 0.001', FWHM_range_mz: '0.015-0.020'}
+        - {standard: CO+, averaged_mass_mz: '27.995 ± 0.001', mass_error_range_mz: '-0.017 to 0.001', averaged_FWHM_mz: '0.040 ± 0.003', FWHM_range_mz: '0.033-0.042'}
+        - {standard: N2+, averaged_mass_mz: '28.006 ± 0.003', mass_error_range_mz: '-0.019 to 0.009', averaged_FWHM_mz: '0.041 ± 0.004', FWHM_range_mz: '0.033-0.042'}
+        - {standard: 40Ar+, averaged_mass_mz: '39.967 ± 0.002', mass_error_range_mz: '-0.001 to 0.012', averaged_FWHM_mz: '0.065 ± 0.005', FWHM_range_mz: '0.058-0.081'}
+        - {standard: 136Xe+, averaged_mass_mz: '135.934 ± 0.027', mass_error_range_mz: '-0.046 to 0.086', averaged_FWHM_mz: '0.277 ± 0.031', FWHM_range_mz: '0.214-0.327'}
+    - observation_id: mogul_2023_lnms_haze_clog_observations
+      type: instrument_anomaly
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+        section: 3.13
+        note: printed prose describing count spikes and partial-clog altitudes
+      phase: Venus_atmosphere_aerosol_instrument_interaction
+      regime: LNMS_descent_sampling
+      units: km, fold change, and km^-1 as published
+      values:
+        quantity: inlet_clog_and_mass_signal_anomalies
+        method_class: measured_reduced
+        partial_clog_altitudes_km: ['~15 ± 2', '~10 ± 3', '~3 ± 1']
+        affected_mass_positions: '>37 between m/z 10-208'
+        count_spike_range: '~5-500-fold'
+        extinction_coefficients_km_minus_1: 'V13/V14 comparison values ~0.6-2.0; V13/V14 spikes ~2.24-2.30 near ~2 km'
+        interpretation: authors interpret the spikes as chemical signatures of a deep atmospheric haze, not as furnace vaporization.
     - observation_id: mogul_2023_lnms_model_scope_and_fit_quality
       type: model_diagnostics
       locator:

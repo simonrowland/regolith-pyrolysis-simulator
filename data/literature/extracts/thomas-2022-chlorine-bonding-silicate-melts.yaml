@@ -59,6 +59,74 @@ species:
         - CMAS+Brucite-0.5 | 40 | 47.55(0.48), 0.02(0.03), 16.20(0.24), 0.14(0.03), 0.01(0.03), 15.17(0.18), 15.01(0.24), 0.00(0.01), 0.02(0.01), 2.22(0.30), 0.04(0.04), 0.36(0.20), H2O 3.23a | Total 100.00
         - CMAS+Brucite-1 | 40 | 43.84(0.94), 0.02(0.04), 16.34(0.64), 0.12(0.03), 0.02(0.03), 15.51(0.56), 14.51(0.74), 0.00(0.01), 0.01(0.02), 2.52(0.04), 0.03(0.03), 0.30(0.07), H2O 6.74a | Total 100.00
         note: The remaining Table 1 rows are retained verbatim in the PDF table; dashes mean not detected/reported, never zero. This observation preserves the measured series and its complete source locator without inventing absent components.
+    - observation_id: thomas_2022_table1_chlorine_concentrations_all_rows
+      type: composition_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
+      phase: experimentally_quenched_silicate_glass
+      regime: quench_equilibration
+      units: Cl wt%; parenthetical uncertainties are 2 standard deviations of n analyses
+      values:
+        quantity: chlorine_concentration_EPMA
+        method_class: measured
+        evidence_class: authors_own_EPMA
+        rows:
+        - {experiment: Ab/Fo-1, Cl_wt_pct: 0.56, uncertainty_wt_pct: 0.02}
+        - {experiment: Ab/Fo-2, Cl_wt_pct: 1.41, uncertainty_wt_pct: 0.06}
+        - {experiment: Ab/Fo-3, Cl_wt_pct: 2.75, uncertainty_wt_pct: 0.05}
+        - {experiment: Ab/Fo-5, Cl_wt_pct: 4.09, uncertainty_wt_pct: 0.14}
+        - {experiment: AgI/Cl-27, Cl_wt_pct: 1.60, uncertainty_wt_pct: 0.03}
+        - {experiment: AgI/Cl-024, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.06}
+        - {experiment: AgI/Cl-025, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.19}
+        - {experiment: AgI/Cl-026, Cl_wt_pct: 3.49, uncertainty_wt_pct: 0.28}
+        - {experiment: Dacite-1, Cl_wt_pct: 0.46, uncertainty_wt_pct: 0.06}
+        - {experiment: TNR14-1, Cl_wt_pct: 2.23, uncertainty_wt_pct: 0.12}
+        - {experiment: HA3_Redo, Cl_wt_pct: 1.62, uncertainty_wt_pct: 0.16}
+        - {experiment: HA4-1, Cl_wt_pct: 1.75, uncertainty_wt_pct: 0.20}
+        - {experiment: Rhyolite-1, Cl_wt_pct: 0.27, uncertainty_wt_pct: 0.03}
+        - {experiment: LIP17714, Cl_wt_pct: 0.27, uncertainty_wt_pct: 0.03}
+        - {experiment: AN-2, Cl_wt_pct: 0.90, uncertainty_wt_pct: 0.05}
+        - {experiment: SM_Redo, Cl_wt_pct: 3.05, uncertainty_wt_pct: 0.16}
+        - {experiment: HiMgAnd, Cl_wt_pct: 1.71, uncertainty_wt_pct: 0.03}
+        - {experiment: HAW-16095, Cl_wt_pct: 1.90, uncertainty_wt_pct: 0.14}
+        - {experiment: EGT17-1, Cl_wt_pct: 1.40, uncertainty_wt_pct: 0.02}
+        - {experiment: KK3b-2, Cl_wt_pct: 1.70, uncertainty_wt_pct: 0.04}
+        - {experiment: Mars-1, Cl_wt_pct: 2.02, uncertainty_wt_pct: 0.20}
+        - {experiment: Neph-1, Cl_wt_pct: 1.91, uncertainty_wt_pct: 0.03}
+        - {experiment: Basanite-1, Cl_wt_pct: 2.06, uncertainty_wt_pct: 0.03}
+        - {experiment: Lunar-1, Cl_wt_pct: 2.03, uncertainty_wt_pct: 0.09}
+        - {experiment: KK-Rhy-1, Cl_wt_pct: 0.15, uncertainty_wt_pct: 0.02}
+        - {experiment: JB-Phono-1, Cl_wt_pct: 0.83, uncertainty_wt_pct: 0.02}
+        - {experiment: Phono-1, Cl_wt_pct: 0.68, uncertainty_wt_pct: 0.07}
+        - {experiment: CMAS+Na+2, Cl_wt_pct: 2.32, uncertainty_wt_pct: 0.10}
+        - {experiment: CNMAS-1, Cl_wt_pct: 2.41, uncertainty_wt_pct: 0.14}
+        - {experiment: CNMAS-2, Cl_wt_pct: 2.60, uncertainty_wt_pct: 0.13}
+        - {experiment: Granite-2, Cl_wt_pct: 0.31, uncertainty_wt_pct: 0.10}
+        - {experiment: Gran+Mg-1, Cl_wt_pct: 0.61, uncertainty_wt_pct: 0.10}
+        - {experiment: Gran+Mg-2, Cl_wt_pct: 0.67, uncertainty_wt_pct: 0.14}
+        - {experiment: Gran+Mg-3, Cl_wt_pct: 0.78, uncertainty_wt_pct: 0.10}
+        - {experiment: AgI/Cl-020, Cl_wt_pct: 2.41, uncertainty_wt_pct: 0.16}
+        - {experiment: AgI/Cl-032, Cl_wt_pct: 3.39, uncertainty_wt_pct: 0.04}
+        - {experiment: AgI/Cl-021, Cl_wt_pct: 2.12, uncertainty_wt_pct: 0.03}
+        - {experiment: AgI/Cl-09, Cl_wt_pct: 0.50, uncertainty_wt_pct: 0.03}
+        - {experiment: AgI/Cl-013, Cl_wt_pct: 3.59, uncertainty_wt_pct: 0.09}
+        - {experiment: AgI/Cl-18, Cl_wt_pct: 0.18, uncertainty_wt_pct: 0.01}
+        - {experiment: CMAS-0, Cl_wt_pct: 2.31, uncertainty_wt_pct: 0.19}
+        - {experiment: CMAS+Brucite-0.5, Cl_wt_pct: 2.22, uncertainty_wt_pct: 0.30}
+        - {experiment: CMAS+Brucite-1, Cl_wt_pct: 2.52, uncertainty_wt_pct: 0.04}
+    - observation_id: thomas_2022_author_chloride_capacity_model
+      type: model_comparison
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 1.1 Chlorine incorporation in silicate melts and glasses, equation: '3'}
+      phase: silicate_melt
+      regime: author_regression
+      units: log CCl dimensionless; T K; P GPa; X terms oxide mole fractions on single-cation basis
+      values:
+        quantity: chloride_capacity_model
+        method_class: model_derived
+        evidence_class: author_multiple_linear_regression
+        generator: Thomas and Wood (2022) multiple linear regression; insignificant terms removed at alpha=0.05
+        equation: logCCl = 1.601 + (4470 XCa - 3430 XSi + 2592 XFe - 4092 XK - 849 P) / T
+        source_basis: 25 natural and synthetic silicate melt compositions from Thomas and Wood (2022); not a direct measurement in this paper
+    context:
     - observation_id: thomas_2022_table2_experimental_conditions_and_xaf
       type: experiment_series
       locator:
@@ -119,60 +187,6 @@ species:
         - {experiment: CNMAS-1, T_C: 1400, P_GPa: 1.5, duration_h: 2, log_fO2: -7.17, fCl2_as_printed: 3.52E-04, CCl: 2.24, E0_eV: 2824.80, Emax_eV: 2827.60, R_A: 2.28}
         - {experiment: CNMAS-2, T_C: 1400, P_GPa: 1.5, duration_h: 2, log_fO2: -7.17, fCl2_as_printed: 2.92E-04, CCl: 2.27, E0_eV: 2824.90, Emax_eV: 2827.60, R_A: 2.27}
         note: "Rows with no pre-edge centroid show an en dash in the printed table. The wrapped f(Cl2) cells were assigned by PDF bounding-box y alignment: 1.20E-03 is AgI/Cl-021, 1.59E-05 is AgI/Cl-09, 1.38E-03 is AgI/Cl-013, and 1.66E-06 is AgI/Cl-18."
-    - observation_id: thomas_2022_table1_chlorine_concentrations_all_rows
-      type: composition_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
-      phase: experimentally_quenched_silicate_glass
-      regime: quench_equilibration
-      units: Cl wt%; parenthetical uncertainties are 2 standard deviations of n analyses
-      values:
-        quantity: chlorine_concentration_EPMA
-        method_class: measured
-        evidence_class: authors_own_EPMA
-        rows:
-        - {experiment: Ab/Fo-1, Cl_wt_pct: 0.56, uncertainty_wt_pct: 0.02}
-        - {experiment: Ab/Fo-2, Cl_wt_pct: 1.41, uncertainty_wt_pct: 0.06}
-        - {experiment: Ab/Fo-3, Cl_wt_pct: 2.75, uncertainty_wt_pct: 0.05}
-        - {experiment: Ab/Fo-5, Cl_wt_pct: 4.09, uncertainty_wt_pct: 0.14}
-        - {experiment: AgI/Cl-27, Cl_wt_pct: 1.60, uncertainty_wt_pct: 0.03}
-        - {experiment: AgI/Cl-024, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.06}
-        - {experiment: AgI/Cl-025, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.19}
-        - {experiment: AgI/Cl-026, Cl_wt_pct: 3.49, uncertainty_wt_pct: 0.28}
-        - {experiment: Dacite-1, Cl_wt_pct: 0.46, uncertainty_wt_pct: 0.06}
-        - {experiment: TNR14-1, Cl_wt_pct: 2.23, uncertainty_wt_pct: 0.12}
-        - {experiment: HA3_Redo, Cl_wt_pct: 1.62, uncertainty_wt_pct: 0.16}
-        - {experiment: HA4-1, Cl_wt_pct: 1.75, uncertainty_wt_pct: 0.20}
-        - {experiment: Rhyolite-1, Cl_wt_pct: 0.27, uncertainty_wt_pct: 0.03}
-        - {experiment: LIP17714, Cl_wt_pct: 0.27, uncertainty_wt_pct: 0.03}
-        - {experiment: AN-2, Cl_wt_pct: 0.90, uncertainty_wt_pct: 0.05}
-        - {experiment: SM_Redo, Cl_wt_pct: 3.05, uncertainty_wt_pct: 0.16}
-        - {experiment: HiMgAnd, Cl_wt_pct: 1.71, uncertainty_wt_pct: 0.03}
-        - {experiment: HAW-16095, Cl_wt_pct: 1.90, uncertainty_wt_pct: 0.14}
-        - {experiment: EGT17-1, Cl_wt_pct: 1.40, uncertainty_wt_pct: 0.02}
-        - {experiment: KK3b-2, Cl_wt_pct: 1.70, uncertainty_wt_pct: 0.04}
-        - {experiment: Mars-1, Cl_wt_pct: 2.02, uncertainty_wt_pct: 0.20}
-        - {experiment: Neph-1, Cl_wt_pct: 1.91, uncertainty_wt_pct: 0.03}
-        - {experiment: Basanite-1, Cl_wt_pct: 2.06, uncertainty_wt_pct: 0.03}
-        - {experiment: Lunar-1, Cl_wt_pct: 2.03, uncertainty_wt_pct: 0.09}
-        - {experiment: KK-Rhy-1, Cl_wt_pct: 0.15, uncertainty_wt_pct: 0.02}
-        - {experiment: JB-Phono-1, Cl_wt_pct: 0.83, uncertainty_wt_pct: 0.02}
-        - {experiment: Phono-1, Cl_wt_pct: 0.68, uncertainty_wt_pct: 0.07}
-        - {experiment: CMAS+Na+2, Cl_wt_pct: 2.32, uncertainty_wt_pct: 0.10}
-        - {experiment: CNMAS-1, Cl_wt_pct: 2.41, uncertainty_wt_pct: 0.14}
-        - {experiment: CNMAS-2, Cl_wt_pct: 2.60, uncertainty_wt_pct: 0.13}
-        - {experiment: Granite-2, Cl_wt_pct: 0.31, uncertainty_wt_pct: 0.10}
-        - {experiment: Gran+Mg-1, Cl_wt_pct: 0.61, uncertainty_wt_pct: 0.10}
-        - {experiment: Gran+Mg-2, Cl_wt_pct: 0.67, uncertainty_wt_pct: 0.14}
-        - {experiment: Gran+Mg-3, Cl_wt_pct: 0.78, uncertainty_wt_pct: 0.10}
-        - {experiment: AgI/Cl-020, Cl_wt_pct: 2.41, uncertainty_wt_pct: 0.16}
-        - {experiment: AgI/Cl-032, Cl_wt_pct: 3.39, uncertainty_wt_pct: 0.04}
-        - {experiment: AgI/Cl-021, Cl_wt_pct: 2.12, uncertainty_wt_pct: 0.03}
-        - {experiment: AgI/Cl-09, Cl_wt_pct: 0.50, uncertainty_wt_pct: 0.03}
-        - {experiment: AgI/Cl-013, Cl_wt_pct: 3.59, uncertainty_wt_pct: 0.09}
-        - {experiment: AgI/Cl-18, Cl_wt_pct: 0.18, uncertainty_wt_pct: 0.01}
-        - {experiment: CMAS-0, Cl_wt_pct: 2.31, uncertainty_wt_pct: 0.19}
-        - {experiment: CMAS+Brucite-0.5, Cl_wt_pct: 2.22, uncertainty_wt_pct: 0.30}
-        - {experiment: CMAS+Brucite-1, Cl_wt_pct: 2.52, uncertainty_wt_pct: 0.04}
     - observation_id: thomas_2022_apparatus_and_analytical_conditions
       type: apparatus
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 2.1 Starting compositions and experimental conditions}
@@ -197,7 +211,7 @@ species:
         XAS_scan: 2700-3200 eV; 5 eV pre-edge, 1 eV and 0.5 eV XANES steps, 1 eV then 2 eV EXAFS steps; dwell times as printed in Section 2.2
         absent_not_printed: [sample mass, exposed area, vacuum level, pumping rate, run pressure medium, run duration beyond Table 2, thermocouple/calibration details]
     - observation_id: thomas_2022_salt_standard_xaf_measurements
-      type: standard_series
+      type: calibration
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121275, pdf_page_index: 7, section: 3.1 Salt standard spectra, table: '2'}
       phase: compressed_crystalline_chloride_salt
       regime: XAFS_fluorescence
@@ -215,21 +229,8 @@ species:
         - {standard: KCl, E0_eV: 2824.80, Emax_eV: 2825.82, Shannon_R_A: 2.83}
         - {standard: NaCl, E0_eV: 2824.90, Emax_eV: 2825.94, Shannon_R_A: 2.80}
         - {standard: AgCl, E0_eV: 2823.40, Emax_eV: 2823.99, Shannon_R_A: 2.48}
-    - observation_id: thomas_2022_author_chloride_capacity_model
-      type: model_comparison
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 1.1 Chlorine incorporation in silicate melts and glasses, equation: '3'}
-      phase: silicate_melt
-      regime: author_regression
-      units: log CCl dimensionless; T K; P GPa; X terms oxide mole fractions on single-cation basis
-      values:
-        quantity: chloride_capacity_model
-        method_class: model_derived
-        evidence_class: author_multiple_linear_regression
-        generator: Thomas and Wood (2022) multiple linear regression; insignificant terms removed at alpha=0.05
-        equation: logCCl = 1.601 + (4470 XCa - 3430 XSi + 2592 XFe - 4092 XK - 849 P) / T
-        source_basis: 25 natural and synthetic silicate melt compositions from Thomas and Wood (2022); not a direct measurement in this paper
     - observation_id: thomas_2022_qualitative_xafs_conclusions
-      type: qualitative_measurement
+      type: characterization
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121279, pdf_page_index: 11, section: 4 Conclusions}
       phase: silicate_glass
       regime: XAFS_fluorescence

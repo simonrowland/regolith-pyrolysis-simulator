@@ -21,7 +21,8 @@ absent_from_source:
 - numerical uncertainties for the printed mass ranges, isotope ranges, and ages
 species:
   Ryugu_sample:
-    observations:
+    observations: []
+    context:
     - observation_id: busemann_2024_ryugu_particle_allocation_and_mass
       type: characterization
       locator:
@@ -76,7 +77,8 @@ species:
         crystalline_residue_status: only particle that retained a crystalline structure after lasering contained detectable Ryugu noble gases
         glassy_residue_status: all other particles turned immediately into glassy spheres and lacked any gas
   Bennu_sample:
-    observations:
+    observations: []
+    context:
     - observation_id: busemann_2024_bennu_particle_mass_and_handling
       type: characterization
       locator:
@@ -123,7 +125,8 @@ species:
         smallest_bennu_particle_interpretation: mixing of Ne from presolar diamonds and SiC or graphite
         third_bennu_particle_interpretation: mixing of, for example, Q and HL
   Xe:
-    observations:
+    observations: []
+    context:
     - observation_id: busemann_2024_xenon_isotope_composition_and_contamination_check
       type: characterization
       locator:
@@ -165,6 +168,7 @@ species:
         exposure_age_range_Ma: 5 to 8
         scope: all particles examined here
         status: preliminary
+    context:
     - observation_id: busemann_2024_noble_gas_abundance_and_component_comparison
       type: characterization
       locator:
