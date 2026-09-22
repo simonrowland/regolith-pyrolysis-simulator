@@ -229,6 +229,10 @@ class DuplicateObservationIdError(ValueError):
     """A second source row reused an observation id with a different payload."""
 
 
+class DuplicateContextIdError(ValueError):
+    """A second context row under a work reused a context_id."""
+
+
 # ---------------------------------------------------------------------------
 # Maps (v2.1 §Evidence classes / §Migration / guard_09_05)
 # ---------------------------------------------------------------------------
@@ -6483,8 +6487,16 @@ class Migrator:
                     raise ValueError(
                         "extract context entry requires an observation_id"
                     )
+                context_id = f"{source_id}::context::{raw_id}"
+                if any(
+                    str(existing.get("context_id")) == context_id
+                    for existing in self.result.context_by_work[work.work_id]
+                ):
+                    raise DuplicateContextIdError(
+                        f"duplicate context_id {context_id!r} under work {work.work_id!r}"
+                    )
                 record = dict(row)
-                record["context_id"] = f"{source_id}::context::{raw_id}"
+                record["context_id"] = context_id
                 record["work_id"] = work.work_id
                 record["source_id"] = source_id
                 record["species"] = str(formula)
@@ -6515,6 +6527,19 @@ class Migrator:
             self._registry_id(work.work_id, "experiment", raw_experiment),
         )
         experiment = self.result.experiments.get(experiment_id)
+        if experiment is not None and experiment.work_id != work.work_id:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"context[{record['context_id']}].experiment",
+                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                    detail=(
+                        f"equipment context row names experiment {experiment_id!r} "
+                        f"owned by work {experiment.work_id!r}, not {work.work_id!r}; "
+                        "no equipment_context_id written"
+                    ),
+                )
+            )
+            return
         if experiment is None:
             self.result.registry_issues.append(
                 ValidationIssue(
@@ -8883,6 +8908,15 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
             path.unlink()
 
     extract_stems = {p.stem for p in discover_extracts(root / "data" / "literature" / "extracts")}
+    # extracts-v2 has no wipe-all path (unlike observations-v2). Unlink
+    # siblings whose stem is no longer a live extract (delete / rename) so an
+    # orphan cannot re-enter the store — a renamed extract's stale sibling
+    # would double-count the same printed data. Runs before any extracts-v2
+    # write; zero-observation extracts that still exist are empty-rewritten
+    # below, not unlinked.
+    for stale in list(extracts_v2.glob("*.yaml")):
+        if stale.stem not in extract_stems:
+            stale.unlink()
     source_of: dict[str, str] = {}
     for src, ids in result.observations_by_source.items():
         for oid in ids:

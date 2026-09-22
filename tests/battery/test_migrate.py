@@ -32,6 +32,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
+    DuplicateContextIdError,
     DuplicateObservationIdError,
     Migrator,
     UnknownRailSpellingError,
@@ -4791,3 +4792,242 @@ def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
     assert "janaf" not in aliases
     assert aliases["species-rail-differential"] == citation_hash("janaf")
     assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
+
+# ---------------------------------------------------------------------------
+# 2026-09-22 hardening (latent, none live in the corpus): cross-work
+# equipment FK refusal, extracts-v2 orphan siblings on delete/rename, and a
+# typed error for duplicate context ids.
+# ---------------------------------------------------------------------------
+
+
+def _named_extract(source_id: str, doi: str) -> dict:
+    doc = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    doc["source_id"] = source_id
+    doc["source"]["doi"] = doi
+    doc["source"]["citation"] = f"{source_id}, A. (2026), J 1:1, DOI {doi}"
+    return doc
+
+
+def _write_multi_extract_tree(root: Path, extracts: list[tuple[str, dict]]) -> Path:
+    """_write_min_tree with several named extracts, each declared in INDEX."""
+    _write_min_tree(root, extracts[0][1])
+    extracts_dir = root / "data" / "literature" / "extracts"
+    (extracts_dir / "fixture-source.yaml").unlink()
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    template = index["sources"].pop(0)
+    index["sources"] = []
+    for stem, doc in extracts:
+        (extracts_dir / f"{stem}.yaml").write_text(
+            yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
+        )
+        entry = yaml.safe_load(yaml.safe_dump(template))
+        entry["source_id"] = doc["source_id"]
+        entry["doi"] = doc["source"]["doi"]
+        entry["citation"] = doc["source"]["citation"]
+        index["sources"].append(entry)
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    return root
+
+
+def _equipment_context_row(observation_id: str, experiment: object) -> dict:
+    return {
+        "observation_id": observation_id,
+        "experiment": experiment,
+        "type": "apparatus",
+        "locator": {"page": 3, "section": "experimental"},
+        "units": "as printed",
+        "equipment": {"cell_material": "alumina"},
+        "values": {"quantity": "apparatus_note", "method_class": "method_only"},
+    }
+
+
+def test_equipment_fk_refuses_a_cross_work_context_row(tmp_path: Path) -> None:
+    """An equipment-bearing context row naming another work's experiment
+    through a qualified ``::`` id must not set that experiment's FK. The
+    registry records a typed referential_integrity refusal instead."""
+    victim = _named_extract("aaa-victim", "10.1234/VICTIM")
+    victim["experiments"] = [
+        {
+            "experiment_id": "vic-series",
+            "method": "knudsen_effusion",
+            "locator": {"page": 2, "section": "experimental"},
+        }
+    ]
+    root = _write_multi_extract_tree(tmp_path, [("aaa-victim", victim)])
+    victim_experiment_id = next(
+        eid
+        for eid in migrate(root, write=False).experiments
+        if eid.endswith("::experiment::vic-series")
+    )
+    attacker = _named_extract("zzz-attacker", "10.1234/ATTACK")
+    attacker["species"]["Na"]["context"] = [
+        _equipment_context_row("evil_eq", victim_experiment_id)
+    ]
+    root = _write_multi_extract_tree(
+        tmp_path / "run", [("aaa-victim", victim), ("zzz-attacker", attacker)]
+    )
+    result = migrate(root, write=True)
+    experiment = result.experiments[victim_experiment_id]
+    assert experiment.equipment_context_id is None
+    issues = [
+        issue
+        for issue in result.registry_issues
+        if issue.path == "context[zzz-attacker::context::evil_eq].experiment"
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert victim_experiment_id in issues[0].detail
+    assert experiment.work_id in issues[0].detail
+    # No FK means nothing resolves to the foreign row.
+    assert resolve_equipment_context(experiment, load_migrated_context(root)) is None
+
+
+def test_equipment_fk_allows_a_same_work_qualified_reference(tmp_path: Path) -> None:
+    """The cross-work refusal must not over-fire: two extracts aliasing one
+    work (same DOI) may share an experiment through its qualified id."""
+    first = _named_extract("aaa-first", "10.1234/SHARED")
+    first["experiments"] = [
+        {
+            "experiment_id": "shared-series",
+            "method": "knudsen_effusion",
+            "locator": {"page": 2, "section": "experimental"},
+        }
+    ]
+    root = _write_multi_extract_tree(tmp_path, [("aaa-first", first)])
+    experiment_id = next(
+        eid
+        for eid in migrate(root, write=False).experiments
+        if eid.endswith("::experiment::shared-series")
+    )
+    second = _named_extract("bbb-second", "10.1234/SHARED")
+    second["species"]["Na"]["context"] = [
+        _equipment_context_row("shared_apparatus", experiment_id)
+    ]
+    root = _write_multi_extract_tree(
+        tmp_path / "run", [("aaa-first", first), ("bbb-second", second)]
+    )
+    result = migrate(root, write=True)
+    experiment = result.experiments[experiment_id]
+    assert experiment.equipment_context_id == "bbb-second::context::shared_apparatus"
+    row = resolve_equipment_context(experiment, load_migrated_context(root))
+    assert row["equipment"]["cell_material"] == "alumina"
+
+
+def test_validate_flags_equipment_fk_work_mismatch(tmp_path: Path) -> None:
+    """validate_corpus reports a stored FK whose context row belongs to a
+    different work — the same invariant the migrator refuses to write."""
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True)
+    works, experiments, observations = load_migrated_store(root)
+    experiment = next(iter(experiments.values()))
+    fk = "other-source::context::foreign_equipment"
+    ghost = replace(experiment, equipment_context_id=fk)
+    foreign_row = {
+        "context_id": fk,
+        "work_id": "10.9999/OTHER",
+        "equipment": {"cell_material": "alumina"},
+    }
+    report = validate_corpus(
+        works, [ghost], observations, residuals=None, context_rows={fk: foreign_row}
+    )
+    issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith(".equipment_context_id")
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert "10.9999/OTHER" in issues[0].detail
+    assert experiment.work_id in issues[0].detail
+    # A same-work row stays clean.
+    own_row = dict(foreign_row, work_id=experiment.work_id)
+    report = validate_corpus(
+        works, [ghost], observations, residuals=None, context_rows={fk: own_row}
+    )
+    assert not any(
+        issue.path.endswith(".equipment_context_id") for issue in report.issues
+    )
+
+
+def test_write_outputs_unlinks_extracts_v2_orphan_on_delete(tmp_path: Path) -> None:
+    """Deleting an extract must remove its extracts-v2 sibling: extracts-v2
+    has no wipe-all path, so a stale sibling would re-enter the store on
+    every load."""
+    keep = _named_extract("aaa-keep", "10.1234/KEEP")
+    gone = _named_extract("bbb-gone", "10.1234/GONE")
+    root = _write_multi_extract_tree(
+        tmp_path, [("aaa-keep", keep), ("bbb-gone", gone)]
+    )
+    migrate(root, write=True)
+    extracts_v2 = root / "data" / "literature" / "extracts-v2"
+    assert (extracts_v2 / "aaa-keep.yaml").is_file()
+    assert (extracts_v2 / "bbb-gone.yaml").is_file()
+    (root / "data" / "literature" / "extracts" / "bbb-gone.yaml").unlink()
+    migrate(root, write=True)
+    assert not (extracts_v2 / "bbb-gone.yaml").exists()
+    assert (extracts_v2 / "aaa-keep.yaml").is_file()
+    _, _, observations = load_migrated_store(root)
+    assert not any(oid.startswith("bbb-gone") for oid in observations)
+    assert sum(1 for oid in observations if oid.startswith("aaa-keep")) == 2
+
+
+def test_write_outputs_unlinks_extracts_v2_orphan_on_rename(tmp_path: Path) -> None:
+    """Renaming an extract (same DOI, new stem and source_id) must remove the
+    old extracts-v2 sibling. Experiment ids are work-scoped, so a surviving
+    sibling would load the same printed data twice under two source ids."""
+    old = _named_extract("bbb-old", "10.1234/SAME")
+    root = _write_multi_extract_tree(tmp_path, [("bbb-old", old)])
+    migrate(root, write=True)
+    extracts_v2 = root / "data" / "literature" / "extracts-v2"
+    assert (extracts_v2 / "bbb-old.yaml").is_file()
+    (root / "data" / "literature" / "extracts" / "bbb-old.yaml").unlink()
+    new = _named_extract("ccc-new", "10.1234/SAME")
+    (root / "data" / "literature" / "extracts" / "ccc-new.yaml").write_text(
+        yaml.safe_dump(new, sort_keys=False), encoding="utf-8"
+    )
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    for source in index["sources"]:
+        if source["source_id"] == "bbb-old":
+            source["source_id"] = "ccc-new"
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    migrate(root, write=True)
+    assert not (extracts_v2 / "bbb-old.yaml").exists()
+    assert (extracts_v2 / "ccc-new.yaml").is_file()
+    _, experiments, observations = load_migrated_store(root)
+    old_obs = [oid for oid in observations if oid.startswith("bbb-old")]
+    new_obs = [oid for oid in observations if oid.startswith("ccc-new")]
+    assert old_obs == []
+    assert len(new_obs) == 2
+    # No double count: each loaded row resolves to a live experiment.
+    assert all(observations[oid].experiment_id in experiments for oid in new_obs)
+
+
+def test_duplicate_context_id_raises_typed(tmp_path: Path) -> None:
+    """Two context rows under one work reusing an observation_id abort the
+    run with a typed DuplicateContextIdError — never a silent last-wins row
+    loss that could point an equipment FK at the wrong row."""
+    extract = _named_extract("dup-ctx", "10.1234/DUP")
+    extract["experiments"] = [
+        {
+            "experiment_id": "s",
+            "method": "knudsen_effusion",
+            "locator": {"page": 2, "section": "experimental"},
+        }
+    ]
+    extract["species"]["Na"]["context"] = [_equipment_context_row("same_id", "s")]
+    extract["species"]["K"] = {
+        "context": [
+            {
+                "observation_id": "same_id",
+                "type": "characterization",
+                "locator": {"page": 4, "section": "experimental"},
+                "units": "as printed",
+                "values": {"quantity": "sample_note", "method_class": "method_only"},
+            }
+        ]
+    }
+    root = _write_multi_extract_tree(tmp_path, [("dup-ctx", extract)])
+    with pytest.raises(DuplicateContextIdError, match="dup-ctx::context::same_id"):
+        migrate(root, write=False)

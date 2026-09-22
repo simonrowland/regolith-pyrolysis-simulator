@@ -727,18 +727,31 @@ def validate_experiment(
                 f"bench_id {experiment.bench_id!r} does not resolve",
             )
         )
-    if (
-        context_rows is not None
-        and experiment.equipment_context_id is not None
-        and experiment.equipment_context_id not in context_rows
-    ):
-        issues.append(
-            _issue(
-                f"{path}.equipment_context_id",
-                RefusalReason.REFERENTIAL_INTEGRITY,
-                f"equipment_context_id {experiment.equipment_context_id!r} does not resolve",
+    if context_rows is not None and experiment.equipment_context_id is not None:
+        row = context_rows.get(experiment.equipment_context_id)
+        if row is None:
+            issues.append(
+                _issue(
+                    f"{path}.equipment_context_id",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"equipment_context_id {experiment.equipment_context_id!r} does not resolve",
+                )
             )
-        )
+        elif (
+            isinstance(row, Mapping)
+            and row.get("work_id") is not None
+            and str(row.get("work_id")) != experiment.work_id
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.equipment_context_id",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    (
+                        f"equipment_context_id {experiment.equipment_context_id!r} "
+                        f"belongs to work {row.get('work_id')!r}, not {experiment.work_id!r}"
+                    ),
+                )
+            )
     sweep = experiment.pressure_environment.sweep_gas.state
     if sweep.is_value:
         issues.extend(validate_sweep_gas(sweep.value, f"{path}.pressure_environment.sweep_gas"))
