@@ -1,0 +1,37 @@
+diff --git a/simulator/battery/waypoints.py b/simulator/battery/waypoints.py
+index 937f53c8e..98c172df3 100644
+--- a/simulator/battery/waypoints.py
++++ b/simulator/battery/waypoints.py
+@@ -987,19 +987,27 @@ def oxygen_condition(
+         )
+     # No route fired, so observation fO2_log already failed _point_condition.
+     # experiment.conditions.fO2_log is not an oxygen input. A located pO2 that
+-    # _log_pressure accepts would already have fired oxygen_partial_pressure_to_log_fO2,
+-    # so control is present here only when the buffer name is a published buffer.
++    # _log_pressure accepts would already have fired oxygen_partial_pressure_to_log_fO2.
++    # A published buffer name is "present" only while thermal or pressure still
++    # blocks the buffer_relation route; once both resolve and the route still
++    # did not fire (out-of-domain T, multi-T series, non-point P), the control
++    # is located-but-unusable and must stay in the gap.
+     buffer_known = False
+     if control is not None and control.buffer is not None and control.buffer.state.is_value:
+         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
+ 
+         buffer_known = str(control.buffer.state.value).upper() in PUBLISHED_BUFFERS
+-    control_present = buffer_known
++    thermal_selected = thermal_path(experiment, bench, observation).selected
++    pressure_selected = pressure_boundary(experiment, bench, observation).selected
++    if buffer_known and (thermal_selected is None or pressure_selected is None):
++        control_present = True
++    else:
++        control_present = False
+     oxygen_inputs = {
+         "fO2_log": False,
+         "experiment.fO2_control": control_present,
+-        "temperature_K": thermal_path(experiment, bench, observation).selected is not None,
+-        "total_pressure_Pa": pressure_boundary(experiment, bench, observation).selected is not None,
++        "temperature_K": thermal_selected is not None,
++        "total_pressure_Pa": pressure_selected is not None,
+     }
+     return _result(
+         "oxygen_condition",
