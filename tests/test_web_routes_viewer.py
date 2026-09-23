@@ -237,6 +237,16 @@ def test_report_viewer_zero_step_inventory_is_not_terminal_ceramic() -> None:
     assert "<h2><span class=\"sect\">07</span>Cleaned-melt inventory" in html
 
 
+def test_report_viewer_unclassified_taxonomy_keeps_neutral_inventory_title() -> None:
+    for taxonomy in ({"product_class": "unclassified", "match_status": "no_match"}, {}):
+        html = _run_viewer_expression(
+            "report-viewer.js",
+            f"ceramicSection({{final_state:{{'process.cleaned_melt':{{FeO:2}}}},terminal_product_taxonomy:{json.dumps(taxonomy)}}},true)",
+        )
+        assert "Terminal ceramic" not in html
+        assert "Cleaned-melt inventory" in html
+
+
 def test_report_viewer_money_preserves_nonzero_subcent_cost() -> None:
     rendered = _run_viewer_expression("report-viewer.js", "money(0.000128)")
 
