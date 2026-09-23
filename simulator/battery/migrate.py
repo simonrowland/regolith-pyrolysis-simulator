@@ -323,6 +323,9 @@ PHASE_MAP: dict[str, Phase] = {
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
+    # Published parenthetical spellings (Kelley / Pankratz tables).
+    "(g)": Phase.G,
+    "(c)": Phase.CR,
 }
 
 TYPE_QUANTITY = {

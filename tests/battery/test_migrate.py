@@ -1437,6 +1437,64 @@ def test_g01_map_phase_refuses_heuristics() -> None:
     assert mapped.is_unknown
 
 
+def test_g2_paren_phase_aliases_map_gas_and_condensed() -> None:
+    mapped, why = map_phase("(g)")
+    assert mapped.is_value and mapped.value is Phase.G and why is None
+    mapped, why = map_phase("(c)")
+    assert mapped.is_value and mapped.value is Phase.CR and why is None
+    # Multi-phase spans stay unknown in this lane.
+    mapped, why = map_phase("(c,l)")
+    assert mapped.is_unknown and why == "(c,l)"
+    mapped, why = map_phase("(c, l)")
+    assert mapped.is_unknown and why == "(c, l)"
+
+
+def test_g2_paren_phase_alias_mutation_proof() -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    live_g, _ = map_phase("(g)")
+    live_c, _ = map_phase("(c)")
+    assert live_g.is_value and live_g.value is Phase.G
+    assert live_c.is_value and live_c.value is Phase.CR
+
+    saved_g = migrate_mod.PHASE_MAP.pop("(g)", None)
+    saved_c = migrate_mod.PHASE_MAP.pop("(c)", None)
+    try:
+        mutant_g, why_g = map_phase("(g)")
+        mutant_c, why_c = map_phase("(c)")
+        assert mutant_g.is_unknown and "not in the closed automatic map" in (mutant_g.reason or "")
+        assert mutant_c.is_unknown and "not in the closed automatic map" in (mutant_c.reason or "")
+        assert why_g == "(g)" and why_c == "(c)"
+    finally:
+        if saved_g is not None:
+            migrate_mod.PHASE_MAP["(g)"] = saved_g
+        if saved_c is not None:
+            migrate_mod.PHASE_MAP["(c)"] = saved_c
+
+    restored_g, _ = map_phase("(g)")
+    restored_c, _ = map_phase("(c)")
+    assert restored_g.is_value and restored_g.value is Phase.G
+    assert restored_c.is_value and restored_c.value is Phase.CR
+
+
+def test_g2_paren_phase_migrate_kelley_record(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "kelley-1960-usbm-b584", "table-332.json")
+    result = migrate(root, write=False)
+    obs_list = [
+        obs
+        for oid, obs in result.observations.items()
+        if "table-332" in oid or "kelley-1960-usbm-b584" in oid
+    ]
+    assert obs_list
+    phases = [obs.identity.species.phase for obs in obs_list]
+    assert all(phase.is_value and phase.value is Phase.G for phase in phases)
+    assert all(
+        "not in the closed automatic map" not in (phase.reason or "")
+        for phase in phases
+    )
+
+
 def test_h01_bare_series_T_P_without_units_stay_unknown(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
