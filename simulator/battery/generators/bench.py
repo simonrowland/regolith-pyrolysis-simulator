@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
 from simulator.battery.enums import ValueKind
 from simulator.battery.records import Value
-from simulator.battery.migrate import _dec_str, to_plain
+from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
     ENGINE_POINT_CONSUMERS, WaypointFlag,
@@ -62,13 +62,6 @@ class UnsupportedValue(ValueError):
     pass
 
 
-
-
-def _dec_payload(value: Decimal) -> str:
-    """Durable decimal string for bench artifacts (never float())."""
-
-    return _dec_str(value if isinstance(value, Decimal) else Decimal(value))
-
 def _point(inputs, name):
     value = inputs.waypoints[name].selected.value
     if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
@@ -101,7 +94,7 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             for species, value in inputs.waypoints["normalized_composition"].selected.value.items():
                 if not value.is_finite() or value < 0:
                     raise UnsupportedValue("normalized_composition." + species)
-                composition[species] = _dec_payload(value)
+                composition[species] = float(value)
             temperature = _point(inputs, "temperature_K")
             pressure = _point(inputs, "pressure_boundary")
             oxygen = _point(inputs, "oxygen_condition")
@@ -110,8 +103,8 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             # Definitions: Celsius = kelvin - 273.15; 1 bar = 100000 Pa.
             # Units: K -> degC, Pa/(Pa/bar) -> bar. 1500 K -> 1226.85 C;
             # 1 Pa -> 1e-5 bar. These projections are DERIVED, never PRINTED.
-            payload = {"engine": engine, "temperature_C": _dec_payload(temperature - Decimal("273.15")),
-                       "pressure_bar": _dec_payload(pressure / Decimal(100000)), "fO2_log": _dec_payload(oxygen),
+            payload = {"engine": engine, "temperature_C": float(temperature - Decimal("273.15")),
+                       "pressure_bar": float(pressure / Decimal(100000)), "fO2_log": float(oxygen),
                        "composition_mol": composition}
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": {
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
@@ -168,7 +161,7 @@ def kems_case(inputs: ConsumerInputs) -> GeneratedInput:
         program = _document(inputs, "temperature_program")
         for field, name in (("temperature_uncertainty_K", "temperature_uncertainty_K"),
                             ("repeat_count", "repeat_count"), ("hold_s", "hold_duration_s")):
-            program[field] = _dec_payload(_point(inputs, name))
+            program[field] = float(_point(inputs, name))
         pressure = inputs.waypoints["pressure_boundary"].selected.value
         if pressure.kind is ValueKind.POINT:
             operator, pressure_value = "=", pressure.point
@@ -185,19 +178,19 @@ def kems_case(inputs: ConsumerInputs) -> GeneratedInput:
         case = {"schema_version": 1, "case_id": inputs.observation_id or inputs.experiment_id,
             "source_id": inputs.source_id,
             "oxide": {"formula": formula, "identity": formula,
-                      "purity_fraction": _dec_payload(_point(inputs, "purity_fraction")), "purity_source": provenance},
+                      "purity_fraction": float(_point(inputs, "purity_fraction")), "purity_source": provenance},
             "samples": [{"measurement_id": inputs.observation_id or inputs.experiment_id,
-                         "initial_mass_mg": _dec_payload(_point(inputs, "mass_kg") * Decimal(1000000)),
-                         "post_mass_mg": _dec_payload(_point(inputs, "post_mass_kg") * Decimal(1000000))}],
+                         "initial_mass_mg": float(_point(inputs, "mass_kg") * Decimal(1000000)),
+                         "post_mass_mg": float(_point(inputs, "post_mass_kg") * Decimal(1000000))}],
             "cell": {"material": material.categorical,
-                     "orifice_diameter_m": _dec_payload(_point(inputs, "orifice_diameter_m")),
-                     "orifice_area_m2": _dec_payload(_point(inputs, "orifice_area_m2")),
+                     "orifice_diameter_m": float(_point(inputs, "orifice_diameter_m")),
+                     "orifice_area_m2": float(_point(inputs, "orifice_area_m2")),
                      "transmission_factor": {"status": "reported" if inputs.waypoints["clausing_factor"].selected.authority.value == "printed" else "derived",
-                         "value": _dec_payload(_point(inputs, "clausing_factor")), "derivation": provenance,
+                         "value": float(_point(inputs, "clausing_factor")), "derivation": provenance,
                          "source_locator": provenance}},
             "temperature_program": program,
-            "exterior_chamber_pressure": {"operator": operator, "value_pa": _dec_payload(pressure_value), "source_locator": provenance},
-            "provider_inputs": {"pO2_bar": _dec_payload(Decimal(10) ** _point(inputs, "oxygen_condition")),
+            "exterior_chamber_pressure": {"operator": operator, "value_pa": float(pressure_value), "source_locator": provenance},
+            "provider_inputs": {"pO2_bar": float(Decimal(10) ** _point(inputs, "oxygen_condition")),
                                 "status": "derived", "rationale": provenance},
             "calibration": _document(inputs, "calibration"), "measurement_selectors": to_plain(selectors),
             "citations": [{"source_id": inputs.source_id, "citation": inputs.source_id, "doi": None,
@@ -243,12 +236,12 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
         # Definitions: 3600 s/h, Celsius=K-273.15, 100 Pa/mbar, 1000 g/kg.
         # Algebra: t_h=t_s/3600, T_C=T_K-273.15, P_mbar=P_Pa/100, m_g=1000*m_kg.
         # Sanity: 3600 s=1 h; 1500 K=1226.85 C; .1 Pa=.001 mbar; .001 kg=1 g.
-        points = [{"t_h": _dec_payload(t / Decimal(3600)), "value": _dec_payload(T - Decimal("273.15")), "unit": "C"}
+        points = [{"t_h": float(t / Decimal(3600)), "value": float(T - Decimal("273.15")), "unit": "C"}
                   for t, T in thermal.series]
         duration = points[-1]["t_h"]
         if not duration.is_integer():
             raise UnsupportedValue("thermal_path.integer_duration_h_required_by_runner")
-        pressure = _dec_payload(_point(inputs, "run_pressure_boundary") / Decimal(100))
+        pressure = float(_point(inputs, "run_pressure_boundary") / Decimal(100))
         surfaces = []
         physical_surfaces = inputs.waypoints["surfaces"].selected.value
         if not isinstance(physical_surfaces, (tuple, list)):
@@ -267,7 +260,7 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
                 "sensitivity_marker": "operator_geometry", "extraction_note": "Operator modelling input; not extracted literature evidence."})
         geometry = {"id": inputs.experiment_id + ".geometry", "scale": "gram_lab",
                     "equipment_sizing": "lab_fixed_geometry", "surfaces": surfaces,
-                    "sample": {"mass_g": _dec_payload(_point(inputs, "run_mass_kg") * Decimal(1000))}}
+                    "sample": {"mass_g": float(_point(inputs, "run_mass_kg") * Decimal(1000))}}
         schedule = {"id": inputs.experiment_id + ".schedule", "duration_h": duration,
             "interpolation": "piecewise_linear", "interpolation_source_class": "assumption_with_sensitivity_marker",
             "interpolation_citation_id": "operator_modelling",
