@@ -57,6 +57,21 @@ def test_norris_starting_composition_is_pinned_to_online_extended_table() -> Non
         assert composition["locator"].get("pdf_page_index") is None
         assert "PMC6485635 online" in composition["locator"]["note"]
 
+
+def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
+    )
+    experiments = doc["experiments"]
+    baseline = experiments[0]
+    for experiment in experiments[1:]:
+        for field in ("mass_kg", "form", "pretreatment"):
+            assert experiment["sample"][field] == baseline["sample"][field]
+        assert (
+            experiment["thermal_schedule"]["cooling_or_quench"]
+            == baseline["thermal_schedule"]["cooling_or_quench"]
+        )
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.

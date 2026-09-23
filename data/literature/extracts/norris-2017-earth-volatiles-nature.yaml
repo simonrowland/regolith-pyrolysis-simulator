@@ -119,6 +119,12 @@ experiments:
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
       locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
@@ -141,14 +147,26 @@ experiments:
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '3600'}}
       locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
 - experiment_id: volatile-loss-logfo2-neg11
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator: {pdf_page_index: 11, section: Methods}
   sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
       locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
@@ -171,14 +189,26 @@ experiments:
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '3600'}}
       locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
 - experiment_id: volatile-loss-logfo2-neg13
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator: {pdf_page_index: 11, section: Methods}
   sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
       locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
@@ -201,6 +231,9 @@ experiments:
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '3600'}}
       locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
 species:
   basaltic_silicate_melt:
     observations:
