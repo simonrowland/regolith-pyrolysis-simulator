@@ -674,9 +674,31 @@ def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:
         ) == pytest.approx(0.0)
 
 
-def test_wall_deposition_reactivity_class_fails_loud(monkeypatch):
-    with pytest.raises(ValueError, match="missing reactivity_class.*Unobtanium"):
-        _sticking_reactivity_class("Unobtanium")
+def test_missing_wall_reactivity_class_refuses_only_that_route(monkeypatch):
+    assert _sticking_reactivity_class("Unobtanium") is None
+
+    for reactive_product_backstop in (False, True):
+        diagnostic = {}
+        telemetry = {}
+        assert _wall_deposition_driving_pressure_pa(
+            "Unobtanium",
+            P_local_pa=100.0,
+            T_surface_K=1000.0,
+            vapor_pressure_data={},
+            reactive_product_backstop=reactive_product_backstop,
+            antoine_extrapolations=telemetry,
+            diagnostic_out=diagnostic,
+        ) == 0.0
+        assert diagnostic["wall_saturation_pressure_refused"] is True
+        assert diagnostic["wall_saturation_pressure_refusal_reason"] == (
+            "missing_reactivity_class"
+        )
+        assert diagnostic["wall_saturation_pressure_refusal_type"] == (
+            "MissingReactivityClassRefusal"
+        )
+        refusal = telemetry["Unobtanium#wall:1000.0"]
+        assert refusal["reason"] == "missing_reactivity_class"
+        assert refusal["refusal_type"] == "MissingReactivityClassRefusal"
 
     monkeypatch.setitem(
         condensation_module.STICKING_DATA["reactivity_class_by_species"],

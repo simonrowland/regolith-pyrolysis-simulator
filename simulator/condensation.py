@@ -802,16 +802,13 @@ def _sticking_alpha_s(species: str, T_K: float) -> float:
     return _condensation_alpha_s(species, T_K, context)
 
 
-def _sticking_reactivity_class(species: str) -> str:
+def _sticking_reactivity_class(species: str) -> str | None:
     classes = STICKING_DATA.get('reactivity_class_by_species')
     if not isinstance(classes, Mapping):
         raise ValueError(f'{STICKING_DATA_PATH}: missing reactivity_class_by_species')
     species_name = str(species)
     if species_name not in classes:
-        raise ValueError(
-            f'{STICKING_DATA_PATH}: missing reactivity_class for '
-            f'species {species_name}'
-        )
+        return None
     reactivity_class = classes.get(species_name)
     _validate_sticking_reactivity_class(
         STICKING_DATA_PATH,
@@ -3120,13 +3117,28 @@ class CondensationModel:
                     {},
                 )[str(segment_name)] = {
                     'status': 'refused',
-                    'reason': 'wall_saturation_pressure_out_of_domain',
+                    'reason': (
+                        rate_diagnostic.get(
+                            'wall_saturation_pressure_refusal_reason'
+                        )
+                        if rate_diagnostic.get(
+                            'wall_saturation_pressure_refusal_type'
+                        ) == 'MissingReactivityClassRefusal'
+                        else 'wall_saturation_pressure_out_of_domain'
+                    ),
                     'output_status': 'status_bearing',
                     'wall_temperature_K': wall_temperature_K,
                     'wall_saturation_pressure_pa': rate_diagnostic.get(
                         'wall_saturation_pressure_pa'
                     ),
                 }
+                refusal_type = rate_diagnostic.get(
+                    'wall_saturation_pressure_refusal_type'
+                )
+                if refusal_type is not None:
+                    wall_saturation_pressure_refusals_by_species[
+                        str(species)
+                    ][str(segment_name)]['refusal_type'] = refusal_type
 
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
 
@@ -3461,6 +3473,15 @@ class CondensationModel:
                     copy.deepcopy(dict(by_segment))
                 )
             wall_saturation_pressure_refusals_by_species = accumulated_refusals
+        for by_segment in wall_saturation_pressure_refusals_by_species.values():
+            if not isinstance(by_segment, Mapping):
+                continue
+            for record in by_segment.values():
+                if (
+                    isinstance(record, dict)
+                    and record.get('reason') == 'missing_reactivity_class'
+                ):
+                    record['refusal_type'] = 'MissingReactivityClassRefusal'
         if wall_saturation_pressure_refusals_by_species:
             sticking_notice = dict(sticking_notice)
             sticking_notice['severity'] = 'warning'
@@ -6474,6 +6495,26 @@ def _wall_deposition_driving_pressure_pa(
     )
     if antoine_extrapolations is None:
         antoine_extrapolations = {}
+    declared_reactivity_class = _sticking_reactivity_class(species)
+    if declared_reactivity_class is None:
+        refusal_reason = "missing_reactivity_class"
+        antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = {
+            "temperature_K": T_surface_K,
+            "status": "refused",
+            "reason": refusal_reason,
+            "authority_level": "unavailable",
+            "valid_range_K": None,
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "MissingReactivityClassRefusal",
+        }
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = None
+            diagnostic_out["wall_saturation_pressure_refused"] = True
+            diagnostic_out["wall_saturation_pressure_refusal_reason"] = refusal_reason
+            diagnostic_out["wall_saturation_pressure_refusal_type"] = (
+                "MissingReactivityClassRefusal"
+            )
+        return 0.0
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,
@@ -6494,9 +6535,9 @@ def _wall_deposition_driving_pressure_pa(
                 "stable_condensation_product_backstop"
             )
         return max(0.0, local_pressure_pa)
-    reactivity_class = None
-    if reactive_product_backstop:
-        reactivity_class = _sticking_reactivity_class(species)
+    reactivity_class = (
+        declared_reactivity_class if reactive_product_backstop else None
+    )
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
             # SiO has a melt standard-reaction pressure, not a stable pure-SiO
@@ -6515,7 +6556,10 @@ def _wall_deposition_driving_pressure_pa(
             vapor_pressure_data=vapor_pressure_data,
         )
         refusal_record = (antoine_extrapolations or {}).get(f"{species}#wall:{T_surface_K}", {})
-        if admission_refusal is not None and refusal_record.get("refusal_type") != "DepositionInputRefusal":
+        if (
+            admission_refusal is not None
+            and refusal_record.get("refusal_type") != "DepositionInputRefusal"
+        ):
             raise WallSaturationPressureRefusal(
                 species,
                 T_surface_K,

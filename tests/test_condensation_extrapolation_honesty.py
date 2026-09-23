@@ -313,8 +313,18 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
         assert {"Na", "Al2"} <= refused.keys()
-        assert all(any("no extrapolation available" in record["reason"]
-                       for record in refused[species].values()) for species in ("Na", "Al2"))
+        assert any(
+            "no extrapolation available" in record["reason"]
+            for record in refused["Na"].values()
+        )
+        assert any(
+            record["reason"] == "missing_reactivity_class"
+            and record.get("refusal_type") == "MissingReactivityClassRefusal"
+            for record in refused["Al2"].values()
+        ), [
+            (record["reason"], record.get("refusal_type"))
+            for record in refused["Al2"].values()
+        ]
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
