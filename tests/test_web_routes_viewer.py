@@ -833,6 +833,7 @@ def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
     assert "Pumping energy</span><b>not computed — no rows" in html
     assert "Pumping status</span><b>no_rows" in html
     assert 'Pumping energy</span><b><span title="0 kWh">0 kWh' not in html
+    assert "pumping_diagnostic.pumping_electrical_kWh not emitted" in html
 
 
 def test_library_pretty_prints_feedstock_ids() -> None:

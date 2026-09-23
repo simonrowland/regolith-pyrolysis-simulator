@@ -396,8 +396,11 @@
     const path = "terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic";
     if (!isRecord(value)) return structuredProblem(value, path, "an object");
     const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !["status", "pumping_electrical_kWh"].includes(key)));
+    const energy = value.status === "no_rows"
+      ? `<div class="sec-p8-field"><span>Emitted pumping diagnostic energy</span><b>${pendingInline(`${path}.pumping_electrical_kWh`)}</b></div>`
+      : expectedLeaf(value, "pumping_electrical_kWh", "Emitted pumping diagnostic energy", "kWh", path);
     return expectedScalar(value, "status", "Emitted pumping status", path) +
-      expectedLeaf(value, "pumping_electrical_kWh", "Emitted pumping diagnostic energy", "kWh", path) +
+      energy +
       `<div class="note">Pumping is a rough diagnostic, not a validated pump design. Canonical pumping treatment is emitted only by terminal.cost_totals: pumping_electrical_energy_kWh and pumping_electrical_cost_usd record inclusion; optional basis_note records exclusion or status. Diagnostic status is not reinterpreted here.</div>` +
       (Object.keys(rest).length ? renderTree(rest, path) : "");
   }
