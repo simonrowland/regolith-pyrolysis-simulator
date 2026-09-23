@@ -76,7 +76,10 @@ _CLEANUP_CAMPAIGNS = frozenset({"C0", "C0B"})
 _CONDENSATION_AMALGAMATED_ELEMENTS = frozenset({"Na", "K"})
 _WALL_PREFIX = "process.wall_deposit_segment_"
 _CLOSURE_LIMIT_FRACTION = 5.0e-14
-_ATOM_EPS = 1.0e-18
+# Absolute cancellation dust below any physically meaningful mol-atom ledger
+# quantity.  The Chapman-Enskog correction can leave 1.74e-18 mol-atoms in a
+# terminal account after tracked-origin pools have cancelled to zero.
+_ATOM_EPS = 2.0e-18
 _ORIGIN_UNATTRIBUTED = "origin_unattributed"
 
 
@@ -296,20 +299,6 @@ def build_yield_disposition(
         feedstock_input,
         reagent_input,
     )
-    origin_unattributed_by_account = (
-        ledger.unresolved_origin_atom_moles_by_account()
-    )
-    terminal_origin_unattributed = _sum_account_elements(
-        origin_unattributed_by_account
-    )
-    cumulative_origin_unattributed = _cumulative_origin_unattributed(
-        ledger.cumulative_origin_unattributed_atom_moles(),
-        terminal_origin_unattributed,
-    )
-    _assert_origin_unattributed_within_limit(
-        cumulative_origin_unattributed,
-        origin_dust_mol_atoms,
-    )
     closure_rows, closure_max_residual, closure_max_residual_mol_atoms = (
         _full_atom_closure(
             terminal,
@@ -319,11 +308,36 @@ def build_yield_disposition(
             origin_unattributed_input,
         )
     )
-    portions, reagent_terminal, reagent_methods, streams = _terminal_portions(
-        ledger,
-        terminal,
-        registry,
-        snapshots,
+    (
+        portions,
+        reagent_terminal,
+        reagent_methods,
+        streams,
+        projected_unattributed_by_account,
+    ) = _terminal_portions(
+        ledger, terminal, registry, snapshots, origin_dust_mol_atoms
+    )
+    origin_unattributed_by_account = {
+        str(account): dict(elements)
+        for account, elements in (
+            ledger.unresolved_origin_atom_moles_by_account()
+        ).items()
+    }
+    for account, elements in projected_unattributed_by_account.items():
+        destination = origin_unattributed_by_account.setdefault(account, {})
+        for element, amount in elements.items():
+            destination[element] = float(destination.get(element, 0.0)) + float(
+                amount
+            )
+    terminal_origin_unattributed = _sum_account_elements(
+        origin_unattributed_by_account
+    )
+    cumulative_origin_unattributed = _cumulative_origin_unattributed(
+        ledger.cumulative_origin_unattributed_atom_moles(),
+        terminal_origin_unattributed,
+    )
+    _assert_origin_unattributed_within_limit(
+        cumulative_origin_unattributed,
         origin_dust_mol_atoms,
     )
     _assert_reagent_cycle_closes(
@@ -542,6 +556,7 @@ def _terminal_portions(
     dict[str, float],
     dict[str, str],
     list[dict[str, Any]],
+    dict[str, dict[str, float]],
 ]:
     origin_balances = ledger.origin_atom_moles_by_account()
     unresolved_balances = ledger.unresolved_origin_atom_moles_by_account()
@@ -550,6 +565,9 @@ def _terminal_portions(
     reagent_method_sets: defaultdict[str, set[str]] = defaultdict(set)
     portions: list[_Portion] = []
     streams: list[dict[str, Any]] = []
+    projected_unattributed_by_account: defaultdict[
+        str, defaultdict[str, float]
+    ] = defaultdict(lambda: defaultdict(float))
 
     for account, raw_species in terminal.items():
         species_mol = _positive_species(raw_species)
@@ -570,6 +588,14 @@ def _terminal_portions(
             typed = account_origins.get(element, {})
             feedstock = float(typed.get("feedstock", 0.0))
             reagent = float(typed.get("reagent", 0.0))
+            if (
+                feedstock == 0.0
+                and reagent == 0.0
+                and unresolved == 0.0
+                and 0.0 < physical <= _ATOM_EPS
+            ):
+                unresolved = float(physical)
+                projected_unattributed_by_account[account][element] += unresolved
             if not math.isclose(
                 feedstock + reagent + unresolved,
                 float(physical),
@@ -644,6 +670,10 @@ def _terminal_portions(
             for element, methods in reagent_method_sets.items()
         },
         streams,
+        {
+            account: dict(elements)
+            for account, elements in projected_unattributed_by_account.items()
+        },
     )
 
 
