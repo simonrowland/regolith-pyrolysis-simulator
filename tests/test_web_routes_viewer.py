@@ -207,6 +207,16 @@ def test_report_viewer_sparse_stage_purity_stays_pending() -> None:
     assert "100.0000%" not in html
 
 
+def test_report_viewer_zero_step_inventory_is_not_terminal_ceramic() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "ceramicSection({final_state:{'process.cleaned_melt':{FeO:1}},terminal_product_taxonomy:null},false)",
+    )
+
+    assert "Initial or unprocessed inventory is not presented as terminal product" in html
+    assert "<h2><span class=\"sect\">07</span>Cleaned-melt inventory" in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""

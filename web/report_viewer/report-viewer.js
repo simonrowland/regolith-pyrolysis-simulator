@@ -587,7 +587,13 @@ function taxonomyEntity(entity) {
     `${taxonomyMatchedNodes(entity)}${taxonomyPhysicalComposition(entity)}`;
 }
 
-function ceramicSection(terminal) {
+function ceramicSection(terminal, hasTimesteps = true) {
+  const classified = isRecord(terminal.terminal_product_taxonomy);
+  const title = classified ? "Terminal ceramic" : "Cleaned-melt inventory";
+  if (!hasTimesteps) {
+    return section(7, title, "Product composition requires timestep evidence from an advanced run.",
+      `<div class="pending"><strong>Not emitted</strong><p>Terminal ceramic is unavailable because this execution emitted zero timesteps. Initial or unprocessed inventory is not presented as terminal product.</p></div>`);
+  }
   const melt = terminal.final_state?.["process.cleaned_melt"] || {};
   const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">not emitted</td></tr>`).join("");
   const hasTaxonomy = Object.prototype.hasOwnProperty.call(
@@ -604,7 +610,7 @@ function ceramicSection(terminal) {
   } else {
     taxonomy = taxonomyEntity(terminal.terminal_product_taxonomy);
   }
-  return section(7, "Terminal ceramic — cleaned melt", "Cleaned-melt ledger context plus the backend-owned terminal-product taxonomy entity.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol% · emitted</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">No mol% denominator or projection was emitted; none is derived in the viewer. The mol-native ledger remains visible; kg conversion is a backend (W-A0) step.</div>${taxonomy}`);
+  return section(7, `${title} — cleaned melt`, "Cleaned-melt ledger context plus the backend-owned terminal-product taxonomy entity.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol% · emitted</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">No mol% denominator or projection was emitted; none is derived in the viewer. The mol-native ledger remains visible; kg conversion is a backend (W-A0) step.</div>${taxonomy}`);
 }
 
 function costSection(artifact, energy) {
@@ -790,7 +796,7 @@ function render(artifact) {
   $("#report").innerHTML = makeHeader(artifact, rows, energy) + timestepSections +
     ledgerSection(artifact.terminal.final_state) +
     tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) +
-    vapourRailSection(artifact.terminal) + ceramicSection(artifact.terminal) +
+    vapourRailSection(artifact.terminal) + ceramicSection(artifact.terminal, rows.length > 0) +
     panelSectionsHtml(artifact, rows, spans, energy) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
