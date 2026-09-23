@@ -346,13 +346,33 @@ function wallAndOxygenSection(artifact, rows) {
   const last = rows.at(-1) || {};
   const wallDeposits = last.wall_deposit_cumulative_kg;
   const wallSpecies = {};
-  let wallComplete = wallDeposits !== undefined && wallDeposits !== null && typeof wallDeposits === "object";
-  if (wallDeposits && typeof wallDeposits === "object") {
-    Object.values(wallDeposits).forEach((segment) => Object.entries(segment || {}).forEach(([species, value]) => {
-      if (hasNumber(value)) wallSpecies[species] = (wallSpecies[species] || 0) + Number(value);
-      else wallComplete = false;
-    }));
+  const wallSegments = wallDeposits && typeof wallDeposits === "object" && !Array.isArray(wallDeposits)
+    ? Object.entries(wallDeposits)
+    : null;
+  let wallComplete = Boolean(wallSegments?.length);
+  if (wallSegments) {
+    wallSegments.forEach(([segment, species]) => {
+      if (!species || typeof species !== "object" || Array.isArray(species)) {
+        wallComplete = false;
+        return;
+      }
+      Object.entries(species).forEach(([name, value]) => {
+        if (hasNumber(value)) {
+          wallSpecies[name] = (wallSpecies[name] || 0) + value;
+        } else {
+          wallComplete = false;
+        }
+      });
+    });
   }
+  const wallEvidence = wallSegments
+    ? wallSegments.map(([segment, species]) => {
+      const rendered = species && typeof species === "object" && !Array.isArray(species)
+        ? Object.entries(species).map(([name, value]) => `${esc(name)} ${hasNumber(value) ? exactKg(value) : "not emitted"}`).join(" · ") || "none emitted"
+        : "malformed species map";
+      return `<tr><td class="mono">${esc(segment)}</td><td>${rendered}</td></tr>`;
+    }).join("")
+    : "";
   const wallTotal = wallComplete && Object.keys(wallSpecies).length ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const pumpingEnergy = pumping?.status === "no_rows"
@@ -362,7 +382,7 @@ function wallAndOxygenSection(artifact, rows) {
       : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted"));
   const o2 = sourceSideO2(last);
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div>${wallSegments ? `<div class="table-wrap"><table><thead><tr><th>Emitted segment</th><th>Species · kg</th></tr></thead><tbody>${wallEvidence}</tbody></table></div>` : ""}<div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
   const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${esc(pumpingEnergy)}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
