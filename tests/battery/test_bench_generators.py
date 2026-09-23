@@ -128,19 +128,41 @@ def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
 
 def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
     experiment, bench, observation = case(pressure="1e-4")
-    printed = oxygen_condition(experiment, bench, observation).selected
-    assert printed is not None
-    assert printed.authority is WaypointAuthority.PRINTED
-    assert printed.route == "observation_fO2_log"
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator="<",
+                    bound_value=Decimal("1e-4"),
+                ),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    printed_result = oxygen_condition(experiment, bench, observation)
+    assert {route.route for route in printed_result.routes} == {
+        "observation_fO2_log",
+        "vacuum_total_pressure_upper_bound",
+    }
+    assert printed_result.selected is not None
+    assert printed_result.selected.authority is WaypointAuthority.PRINTED
+    assert printed_result.selected.route == "observation_fO2_log"
 
     derived_observation = replace(observation, point_conditions={
         "temperature_K": f.located(Decimal(1400)),
         "fO2_Pa": f.located(Value.point_of("1e-5")),
     })
-    derived = oxygen_condition(experiment, bench, derived_observation).selected
-    assert derived is not None
-    assert derived.authority is WaypointAuthority.DERIVED
-    assert derived.route == "observation_fO2_Pa_to_log_fO2"
+    derived_result = oxygen_condition(experiment, bench, derived_observation)
+    assert {route.route for route in derived_result.routes} == {
+        "observation_fO2_Pa_to_log_fO2",
+        "vacuum_total_pressure_upper_bound",
+    }
+    assert derived_result.selected is not None
+    assert derived_result.selected.authority is WaypointAuthority.DERIVED
+    assert derived_result.selected.route == "observation_fO2_Pa_to_log_fO2"
 
 
 def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
