@@ -441,6 +441,25 @@ def test_product_ledger_rejects_non_numeric_product_evidence(product_value):
     assert "12 kg" not in content
 
 
+def test_ancillary_mass_quantities_reject_coercion_and_keep_real_values():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "oxygen_kg": "12",
+            "mass_out_kg": [],
+            "products": {"consumed_H2_reagent": "12", "Fe": 0, "SiO": 0.0001},
+        },
+    )
+    content = rendered["text"]["product-ledger-content"]
+    assert "oxygen kg: unavailable" in content
+    assert "mass out kg: unavailable" in content
+    assert "consumed H2 reagent: unavailable" in content
+    assert "Fe: 0 kg" in content
+    assert "SiO: 1.00e-4 kg" in content
+
+
 def test_product_ledger_preserves_incomplete_story_status():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     rendered = _render_advisory_dom(

@@ -361,12 +361,18 @@ function advisoryNestedValue(value, unit, strictNumeric = false) {
         if (nestedPayload) {
             const inner = advisoryEntries(nestedPayload)
                 .map(([innerKey, innerValue]) => {
-                    return `${advisoryPrettyKey(innerKey)} ${advisoryFormatValue(innerValue, unit, strictNumeric)}`;
+                    const innerUnit = strictNumeric && (innerKey === 'account' || innerKey === 'disposition')
+                        ? undefined
+                        : unit;
+                    return `${advisoryPrettyKey(innerKey)} ${advisoryFormatValue(innerValue, innerUnit, strictNumeric)}`;
                 })
                 .join(', ');
             return `${advisoryPrettyKey(key)} (${inner || 'n/a'})`;
         }
-        return `${advisoryPrettyKey(key)} ${advisoryFormatValue(nested, unit, strictNumeric)}`;
+        const valueUnit = strictNumeric && (key === 'account' || key === 'disposition')
+            ? undefined
+            : unit;
+        return `${advisoryPrettyKey(key)} ${advisoryFormatValue(nested, valueUnit, strictNumeric)}`;
     });
     return parts.length ? parts.join('; ') : unit ? 'unavailable' : 'n/a';
 }
@@ -379,7 +385,10 @@ function appendAdvisorySection(parent, title, mapping, unit, strictNumeric = fal
     heading.textContent = title;
     parent.appendChild(heading);
     for (const [key, value] of entries) {
-        appendCeramicLine(parent, advisoryPrettyKey(key), advisoryNestedValue(value, unit, strictNumeric));
+        const valueUnit = strictNumeric && (key === 'account' || key === 'disposition')
+            ? undefined
+            : unit;
+        appendCeramicLine(parent, advisoryPrettyKey(key), advisoryNestedValue(value, valueUnit, strictNumeric));
     }
     return true;
 }
@@ -480,24 +489,24 @@ function renderProductLedgerPanel(payload) {
         target[key] = value;
     }
     if (appendAdvisorySection(content, 'Products', extractedFlatProducts, 'kg', true)) sections += 1;
-    if (appendAdvisorySection(content, 'Reagent bookkeeping residue', reagentBookkeepingResidue, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Reagent bookkeeping residue', reagentBookkeepingResidue, 'kg', true)) sections += 1;
 
     const oxygen = {};
     for (const key of ['oxygen_kg', 'oxygen_stored_kg', 'oxygen_vented_kg']) {
         if (data[key] !== undefined && data[key] !== null) oxygen[key] = data[key];
     }
-    if (appendAdvisorySection(content, 'Oxygen', oxygen, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Oxygen', oxygen, 'kg', true)) sections += 1;
 
     const mass = {};
     for (const key of ['mass_in_kg', 'mass_out_kg', 'terminal_slag_kg', 'terminal_rump_kg']) {
         if (data[key] !== undefined && data[key] !== null) mass[key] = data[key];
     }
-    if (appendAdvisorySection(content, 'Mass ledger', mass, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Mass ledger', mass, 'kg', true)) sections += 1;
 
-    if (appendAdvisorySection(content, 'Terminal rump by class', data.terminal_rump_by_class, 'kg')) sections += 1;
-    if (appendAdvisorySection(content, 'Terminal rump by species', data.terminal_rump_by_species, 'kg')) sections += 1;
-    if (appendAdvisorySection(content, 'Residual inventory', data.residual_inventory_kg, 'kg')) sections += 1;
-    if (appendAdvisorySection(content, 'Terminal residual buckets', data.terminal_residual_buckets, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Terminal rump by class', data.terminal_rump_by_class, 'kg', true)) sections += 1;
+    if (appendAdvisorySection(content, 'Terminal rump by species', data.terminal_rump_by_species, 'kg', true)) sections += 1;
+    if (appendAdvisorySection(content, 'Residual inventory', data.residual_inventory_kg, 'kg', true)) sections += 1;
+    if (appendAdvisorySection(content, 'Terminal residual buckets', data.terminal_residual_buckets, 'kg', true)) sections += 1;
 
     const spent = advisoryObject(data.process_inventory_spent_reductant);
     if (spent) {
@@ -506,7 +515,7 @@ function renderProductLedgerPanel(payload) {
         if (spent.account) spentRows.account = spent.account;
         if (spent.disposition) spentRows.disposition = spent.disposition;
         if (spent.kg_by_species) spentRows.kg_by_species = spent.kg_by_species;
-        if (appendAdvisorySection(content, 'Spent reductant residue', spentRows, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Spent reductant residue', spentRows, 'kg', true)) sections += 1;
     }
 
     if (!sections) {
@@ -559,7 +568,7 @@ function renderOverlapEvaporationPanel(payload) {
     appendCeramicLine(content, 'Temperature', advisoryFormatValue(data.temperature_C, 'C'));
     appendCeramicLine(content, 'Completion targets', advisoryFormatValue(data.completion_target_species));
     appendCeramicLine(content, 'Endpoint watch', advisoryFormatValue(data.endpoint_species_monitored));
-    appendCeramicLine(content, 'Off-target total', advisoryFormatValue(data.off_target_total_kg_hr, 'kg/hr'));
+    appendCeramicLine(content, 'Off-target total', advisoryFormatValue(data.off_target_total_kg_hr, 'kg/hr', true));
 
     const offTarget = advisoryEntries(data.off_target_evaporation);
     if (!offTarget.length) {
@@ -577,7 +586,7 @@ function renderOverlapEvaporationPanel(payload) {
             content,
             species,
             [
-                `rate ${advisoryFormatValue(detail.rate_kg_hr, 'kg/hr')}`,
+                `rate ${advisoryFormatValue(detail.rate_kg_hr, 'kg/hr', true)}`,
                 `stage ${advisoryFormatValue(detail.designated_stage_number)}`,
                 `future targets ${advisoryFormatValue(detail.future_campaign_stage_targets)}`,
                 `endpoint watch ${advisoryFormatValue(detail.listed_in_endpoint_watch)}`,
@@ -871,8 +880,8 @@ function renderCondensationRefusalsPanel(payload) {
 }
 
 function thermalTrainHeadlineMetric(value, unit) {
-    const number = Number(value);
-    if (!Number.isFinite(number)) return 'n/a';
+    const number = typeof value === 'number' && Number.isFinite(value) ? value : null;
+    if (number === null) return 'n/a';
     const absolute = Math.abs(number);
     const formatted = absolute > 0 && (absolute < 0.01 || absolute >= 1000000)
         ? number.toPrecision(4)
