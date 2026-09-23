@@ -1,0 +1,374 @@
+schema_version: literature_extract.v1
+source_id: ueshima-1982-fe-mo-thermal
+source:
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1982), "Thermal Analysis of Fe-Mo Alloys by the Use of
+    Knudsen Cell Mass Spectrometry", Tetsu-to-Hagané 68(16):2569–2577, DOI 10.2355/tetsutohagane1955.68.16_2569
+  doi: 10.2355/tetsutohagane1955.68.16_2569
+  url: https://doi.org/10.2355/tetsutohagane1955.68.16_2569
+  year: 1982
+extraction:
+  method: Official J-STAGE OA PDF. English Synopsis on published p.2569 (PDF page 1) and Japanese experimental
+    section (published pp.2569–2571) transcribed from pdftotext -layout and 150 dpi pdftoppm PNG. Invariant
+    temperatures taken from the English Synopsis (author summary of this work's results). Apparatus geometry
+    from section 2.1. Table 4 per-heat heating/cooling series not fully re-keyed this lane; Synopsis invariants
+    are the scored transition_point payload. T_K companions are T_C + 273.15 with derived stamp.
+  date: '2026-09-22'
+  worker: n6-thomas-ueshima-jaggi
+review_status: draft
+corrections: []
+benches:
+- id: hitachi-rm6k-knudsen
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hitachi RM-6K Knudsen cell mass spectrometer
+    locator:
+      published_page: 2569
+      pdf_page_index: 1
+      section: 2.1 Apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container
+    locator:
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2.1 Apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.009'
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed ID 9 mm; SI conversion only
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.012'
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed height 12 mm; SI conversion only
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Two pairs of W/W-Re 26% thermocouples (cell-bottom centre and cell-side upper)
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+  heating_method:
+    state:
+      tag: value
+      value: Electron bombardment from upper and lower W ring filaments; applied voltage 0.5-1.8 kV
+    locator:
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2.1 Apparatus
+  other_facts:
+  - name: orifice_diameter
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed orifice diameter 0.5 mm
+  - name: crucible_outer_diameter
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11'
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed OD 11 mm
+  - name: lid_thickness
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+  - name: measured_ion
+    value:
+      state:
+        tag: value
+        value: 56Fe ion intensity I_Fe only (Mo vapour pressure too low)
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+experiments:
+- experiment_id: femo-thermal-analysis-series
+  bench_id: hitachi-rm6k-knudsen
+  method: knudsen_effusion_thermal_analysis
+  locator:
+    published_page: 2569-2571
+    section: 2. Experimental method
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002'
+          approximate: true
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed sample volume 0.25 cm3 (~2 g for Fe-Mo); SI conversion of ~2 g only
+    printed_composition:
+      state:
+        tag: value
+        value: Fe-Mo alloys, 25 to 67 at% Mo
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        note: English Synopsis composition range; section 2.2 also states 25-67 at% Mo
+    form:
+      state:
+        tag: value
+        value: Vacuum arc-melted or levitation-melted alloys from pure Fe and pure Mo
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.2 Samples
+    pretreatment:
+      state:
+        tag: value
+        value: Degas and melt-in under 10^-6 to 10^-7 Torr at >=1300 C before measurement
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.3 Measurement method
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0005'
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed 0.5 mm orifice; SI conversion only
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Lid thickness 1 mm printed; orifice channel length not separately stated
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1573.15'
+          interval_high: '1923.15'
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        note: Synopsis 1300-1650 C; T_K = T_C + 273.15 derived
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Heating/cooling rates typically 3-5 C/min printed; total duration not a single series value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Degas vacuum 10^-6 to 10^-7 Torr printed; run chamber total pressure not a single scored
+          value
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Vacuum Knudsen effusion; no sweep gas
+    regime:
+      regime_class:
+        tag: value
+        value: knudsen_effusion
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '0.000133'
+            interval_high: '0.00133'
+            approximate: true
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed 10^-6 to 10^-7 Torr degas vacuum; Pa conversion 1 Torr = 133.322 Pa
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+fidelity_samples:
+- species: Fe
+  observation_id: ueshima_1982_synopsis_sigma_decomposition
+  field: T_C
+  value: 1610
+  locator:
+    published_page: 2569
+    pdf_page_index: 1
+    section: Synopsis
+    note: 'English Synopsis: sigma = L + (Mo) at 1610 +/- 1 C'
+- species: Fe
+  observation_id: ueshima_1982_synopsis_alpha_decomposition
+  field: T_C
+  value: 1454
+  locator:
+    published_page: 2569
+    pdf_page_index: 1
+    section: Synopsis
+    note: 'English Synopsis: alpha = L + delta at 1454 +/- 2 C'
+species:
+  Fe:
+    observations:
+    - observation_id: ueshima_1982_synopsis_alpha_decomposition
+      experiment: femo-thermal-analysis-series
+      type: transition_point
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        note: 'English Synopsis invariant: alpha = L + delta'
+      phase: Fe-Mo_alpha
+      regime: kems_thermal_analysis
+      units: C as printed; T_K derived
+      uncertainty:
+        note: +/- 2 C as printed in English Synopsis
+      values:
+        quantity: invariant_transformation_temperature
+        method_class: measured_direct
+        evidence_class: authors_own_kems_thermal_analysis
+        reaction_as_printed: alpha = L + delta
+        T_C: 1454
+        T_C_uncertainty: 2
+        T_K: 1727.15
+        T_K_provenance: derived
+        T_K_formula: T_C + 273.15
+        composition_range_at_pct_Mo:
+          low: 25
+          high: 67
+    - observation_id: ueshima_1982_synopsis_delta_decomposition
+      experiment: femo-thermal-analysis-series
+      type: transition_point
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        note: 'English Synopsis invariant: delta = L + sigma; range as printed'
+      phase: Fe-Mo_delta
+      regime: kems_thermal_analysis
+      units: C as printed; T_K derived
+      uncertainty:
+        note: Printed as a range 1503 ~ 1521 C rather than a single +/- interval
+      values:
+        quantity: invariant_transformation_temperature_range
+        method_class: measured_direct
+        evidence_class: authors_own_kems_thermal_analysis
+        reaction_as_printed: delta = L + sigma
+        T_C_low: 1503
+        T_C_high: 1521
+        T_K_low: 1776.15
+        T_K_high: 1794.15
+        T_K_provenance: derived
+        T_K_formula: T_C + 273.15
+        composition_range_at_pct_Mo:
+          low: 25
+          high: 67
+        note: Japanese body also quotes x_Mo=0.340 -> 1504 C and x_Mo=0.427 -> 1521 C; Synopsis range
+          retained as the author English summary
+    - observation_id: ueshima_1982_synopsis_sigma_decomposition
+      experiment: femo-thermal-analysis-series
+      type: transition_point
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        note: 'English Synopsis invariant: sigma = L + (Mo); about 70 C higher than prior reports'
+      phase: Fe-Mo_sigma
+      regime: kems_thermal_analysis
+      units: C as printed; T_K derived
+      uncertainty:
+        note: +/- 1 C as printed in English Synopsis
+      values:
+        quantity: invariant_transformation_temperature
+        method_class: measured_direct
+        evidence_class: authors_own_kems_thermal_analysis
+        reaction_as_printed: sigma = L + (Mo)
+        T_C: 1610
+        T_C_uncertainty: 1
+        T_K: 1883.15
+        T_K_provenance: derived
+        T_K_formula: T_C + 273.15
+        composition_range_at_pct_Mo:
+          low: 25
+          high: 67
+        comparison_as_printed: about 70 C higher than previously reported values
+    context:
+    - observation_id: ueshima_1982_apparatus_and_protocol
+      type: apparatus
+      locator:
+        published_page: 2569-2571
+        section: 2. Experimental method
+      units: as printed
+      values:
+        quantity: kems_thermal_analysis_protocol
+        method_class: method_only
+        evidence_class: authors_methods_prose
+        instrument: Hitachi RM-6K Knudsen cell mass spectrometer
+        cell: Al2O3 SSA-S, OD 11 mm, ID 9 mm, height 12 mm, lid 1 mm, orifice 0.5 mm, in Ta container
+        heating_cooling_rate_C_per_min: typically 3-5
+        delta_t_control_C: 30 +/- 0.5
+        measured_ion: 56Fe (I_Fe)
+        mo_vapour_pressure_note: Mo vapour pressure approx 10^-11 atm at 1600 C; Mo ion intensity not
+          measured
