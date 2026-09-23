@@ -138,8 +138,11 @@ def test_series_row_log10_fO2_lands_on_the_exploded_point(tmp_path: Path) -> Non
         },
     }
     result = migrate(_write_min_tree(tmp_path, doc), write=False)
-    first = result.observations["fixture-source::na_psat::point:0"]
-    second = result.observations["fixture-source::na_psat::point:1"]
+    first, second = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith("fixture-source::na_psat::")
+    ]
     assert first.point_conditions["fO2_log"].state.value == Decimal("-3.5")
     assert first.point_conditions["fO2_log"].inference is None
     assert second.point_conditions["fO2_log"].state.value == Decimal("-4.25")
@@ -151,9 +154,14 @@ def test_series_row_log10_fO2_lands_on_the_exploded_point(tmp_path: Path) -> Non
 
 def test_sossi_table_row_keeps_its_printed_log(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019")
-    obs = result.observations[
-        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm::point:0"
-    ]
+    obs = next(
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(
+            "kems-012-sossi-2019::"
+            "sossi_2019_mn_table2_open_furnace_residue_ppm::"
+        )
+    )
     assert obs.point_conditions["fO2_log"].state.value == Decimal("-0.68")
     assert obs.point_conditions["fO2_log"].inference is None
     assert isinstance(obs.point_conditions["fO2_log"].state.value, Decimal)
@@ -192,12 +200,11 @@ def test_author_ratio_po2_is_derived_not_printed() -> None:
 
 
 def _exploded_points(result: object, parent: str) -> list:
-    points = [
+    return [
         obs
         for oid, obs in result.observations.items()
-        if oid.startswith(parent + "::point:")
+        if oid.startswith(parent + "::")
     ]
-    return sorted(points, key=lambda obs: obs.observation_id)
 
 
 def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
@@ -221,8 +228,8 @@ def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
     # Every run of the five Table 3 panels carries its printed log.
     landed = [
         obs
-        for oid, obs in result.observations.items()
-        if "::point:" in oid and "fO2_log" in (obs.point_conditions or {})
+        for obs in result.observations.values()
+        if "fO2_log" in (obs.point_conditions or {})
     ]
     assert len(landed) == 33
     # The printed log resolves the oxygen_condition waypoint as PRINTED.
@@ -249,9 +256,14 @@ def test_sossi_2020_table1_rows_land_printed_log_and_celsius(tmp_path: Path) -> 
     assert located.inference is None
     # Run P 31/07/18a is series index 10 and prints -2.74, not the air value.
     # No bar/atm shift. Look up the id, not a lexicographic sort of point:N.
-    run = result.observations[
-        f"{stem}::sossi_2020_cu_table1_measured_runs::point:10"
-    ]
+    run = next(
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(
+            f"{stem}::sossi_2020_cu_table1_measured_runs::"
+        )
+        and "row=p-31/07/18a:" in oid
+    )
     assert run.point_conditions["fO2_log"].state.value == Decimal("-2.74")
     assert run.point_conditions["fO2_log"].inference is None
     assert first.value.kind is not ValueKind.POINT or first.value.point != Decimal("-0.68")

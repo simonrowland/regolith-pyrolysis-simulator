@@ -36,8 +36,8 @@ _MARKOVA_VI_PREFIX = (
     "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
 )
 _MLS_BULK_IDS = {
-    "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:11",
-    "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::point:11",
+    "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=7bb710cb23de",
+    "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=23d3c0f9125e",
     "pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction",
 }
 
@@ -170,11 +170,12 @@ def _markova_vi_extract() -> dict:
 def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path, _markova_vi_extract())
     result = migrate(root, write=False)
-    t0 = result.observations[
-        "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::point:0"
-    ]
-    later = result.observations[
-        "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::point:1"
+    t0, later = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(
+            "fixture-source::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
     ]
     assert t0.identity.species.formula == "unknown"
     printed = t0.point_conditions["printed_composition"].state.value
@@ -242,8 +243,11 @@ def test_migrate_keeps_ilmenite_and_drops_sample_code(tmp_path: Path) -> None:
     }
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
-    ilmenite = result.observations["fixture-source::table1::point:0"]
-    mls = result.observations["fixture-source::table1::point:1"]
+    ilmenite, mls = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith("fixture-source::table1::")
+    ]
     assert ilmenite.identity.species.formula == "FeTiO3"
     assert mls.identity.species.formula == "unknown"
 
@@ -293,11 +297,18 @@ def test_markova_vi_lherzolite_carries_printed_five_oxide_composition() -> None:
     expected_ratio = (printed["SiO2"] / m_sio2) / (printed["MgO"] / m_mgo)
     got_ratio = mole["SiO2"] / mole["MgO"]
     assert abs(got_ratio - expected_ratio) < as_decimal("1e-12")
-    later = next(
-        (obs for obs in rows if str(obs.get("observation_id") or "").endswith("::point:10")),
-        None,
+    later = max(
+        rows,
+        key=lambda obs: Decimal(
+            re.search(
+                r"::T=([0-9.]+):",
+                str(obs.get("observation_id") or ""),
+            ).group(1)
+        )
+        if re.search(r"::T=([0-9.]+):", str(obs.get("observation_id") or ""))
+        else Decimal("-1"),
     )
-    assert later is not None
+    assert later is not t0
     later_printed = _printed_wt_map(later)
     assert later_printed
     assert later_printed != printed, "ramp residual composition was collapsed into one map"

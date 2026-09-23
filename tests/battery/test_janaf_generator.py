@@ -552,7 +552,7 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
         if quantity_token(observation.identity) is not Quantity.TRANSITION_TEMPERATURE
     ]
     assert [observation.observation_id for observation in series] == [
-        f"nist-janaf-4th:Mg-013:{quantity}:segment-0"
+        f"nist-janaf-4th:Mg-013:{quantity}:phase-window:whole"
         for quantity in (
             "cp",
             "S",
@@ -583,7 +583,9 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
     glass_liquid = next(
         observation
         for observation in magnesium.observations
-        if observation.observation_id.endswith("transition_temperature:glass-liquid")
+        if "transition_temperature:T=" in observation.observation_id
+        and getattr(observation.identity.subtype, "is_value", False)
+        and observation.identity.subtype.value == "glass-liquid"
     )
     assert glass_liquid.identity.species.phase.is_unknown
     assert glass_liquid.identity.species.phase.reason == (
@@ -593,7 +595,9 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
     crystal_liquid = next(
         observation
         for observation in magnesium.observations
-        if observation.observation_id.endswith("transition_temperature:iii-liquid")
+        if "transition_temperature:T=" in observation.observation_id
+        and getattr(observation.identity.subtype, "is_value", False)
+        and observation.identity.subtype.value == "iii-liquid"
     )
     assert crystal_liquid.identity.species.phase.is_unknown
     assert "(cr -> l)" in (crystal_liquid.identity.species.phase.reason or "")
@@ -601,7 +605,7 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
     tungstate = _generation("W-003")
     tungstate_cp = _quantity_observations(tungstate, Quantity.CP)
     assert [observation.observation_id for observation in tungstate_cp] == [
-        "nist-janaf-4th:W-003:cp:segment-0"
+        "nist-janaf-4th:W-003:cp:phase-window:whole"
     ]
     tungstate_reason = tungstate_cp[0].identity.species.phase.reason or ""
     assert tungstate_cp[0].identity.species.phase.is_unknown
@@ -632,7 +636,11 @@ def test_janaf_extract_ideal_gas_maps_only_for_that_source(tmp_path: Path) -> No
         return Migrator(root=root).run()
 
     janaf = run("janaf-4th")
-    rows = [obs for obs in janaf.observations.values() if obs.observation_id.endswith("ideal_gas_row::point:0")]
+    rows = [
+        obs
+        for obs in janaf.observations.values()
+        if obs.observation_id.startswith("janaf-4th::ideal_gas_row::T=1200.0:")
+    ]
     assert len(rows) == 1
     assert rows[0].identity.species.phase.value is Phase.G
     assert not any(
@@ -1789,4 +1797,3 @@ def test_janaf_raw_table_gate_skips_without_private_corpus(tmp_path, monkeypatch
     assert not (mod.RAW_FIXTURES / "Ba-001.txt").is_file()
     with pytest.raises(pytest.skip.Exception):
         mod._require_raw_table("Ba-001")
-

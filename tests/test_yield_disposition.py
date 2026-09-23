@@ -1376,7 +1376,10 @@ def test_ledger_pool_overdraw_preserves_gross_counters() -> None:
             },
         )
 
-    assert isinstance(exc_info.value.__cause__, PoolWithdrawalError)
+    # 574800443 validates the normal-account policy before origin-pool
+    # allocation, so the public overdraft is direct rather than wrapping an
+    # implementation-order PoolWithdrawalError.
+    assert exc_info.value.__cause__ is None
     assert ledger.gross_account_flows() == before
 
 
@@ -1785,3 +1788,48 @@ def test_project_account_dust_clamp_mutation_proof() -> None:
     )
     assert "FeO" not in silent and "FeO" not in visible
     assert dust.get("FeO", 0.0) < 0.0
+
+
+def test_terminal_species_filter_does_not_apply_atom_epsilon_to_species_moles() -> None:
+    from simulator.accounting.yield_disposition import _positive_species
+
+    species_mol = {"Na": 1.0e-18, "SiO2": 1.0e-18}
+    assert _positive_species(species_mol) == species_mol
+
+
+def test_terminal_origin_dust_streams_and_summary_agree() -> None:
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"SiO2": 1.0},
+        material_origin="feedstock",
+    )
+    ledger._balances["process.overhead_gas"] = {
+        "Na": 1.5e-18,
+        "SiO2": 0.5e-18,
+    }
+
+    payload = build_yield_disposition(_sim(ledger))
+    unattributed = payload["origin_unattributed"]
+    assert unattributed["terminal_mol_atoms_by_element"] == {
+        "Na": pytest.approx(1.5e-18),
+        "O": pytest.approx(1.0e-18),
+        "Si": pytest.approx(0.5e-18),
+    }
+    assert unattributed["terminal_mol_atoms_by_account"] == {
+        "process.overhead_gas": {
+            "Na": pytest.approx(1.5e-18),
+            "O": pytest.approx(1.0e-18),
+            "Si": pytest.approx(0.5e-18),
+        }
+    }
+    overhead_streams = [
+        row
+        for row in payload["terminal_species_streams"]
+        if row["account"] == "process.overhead_gas"
+    ]
+    assert overhead_streams
+    assert all(
+        row["origin_scope"] == "origin_unattributed"
+        for row in overhead_streams
+    )

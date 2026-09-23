@@ -56,7 +56,7 @@ def _bases(path: Path) -> list[str]:
     for obs in (doc or {}).get("observations") or []:
         oid = str(obs["observation_id"])
         local = oid.split("::", 1)[1] if "::" in oid else oid
-        bases.append(local.split("::point:")[0])
+        bases.append(local.split("::", 1)[0])
     return bases
 
 
@@ -134,7 +134,8 @@ def test_zero_observation_extract_does_not_emit_context_rows(tmp_path: Path) -> 
         assert context_id not in bases, (source_id, bases)
         assert all(context_id not in base for base in bases)
     mixed_bases = _bases(v2 / f"{mixed_id}.yaml")
-    assert "na_psat" in mixed_bases
+    assert set(mixed_bases) == {"na_psat"}
+    assert len(mixed_bases) == 2
 
     carried = {
         str(row["context_id"])

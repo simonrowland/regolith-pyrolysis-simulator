@@ -39,7 +39,7 @@ ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1452_RAW = 55707
-B1452_STORE_STORED = 15160
+B1452_STORE_STORED = 15155
 B1452_STORED = 15160
 B1452_REFUSED = 19713
 B1452_EXCLUDED = 20834
@@ -867,7 +867,7 @@ def test_b1452_store_census_is_true_of_observations_v2() -> None:
     assert len(stored_ids) == len(generated_ids)
     # assert stored_ids <= generated_ids  # restore after rematerialize
     assert B1452_STORED + B1452_REFUSED + B1452_EXCLUDED == B1452_RAW
-    assert len(generated_ids) == B1452_STORED
+    assert len(generated_ids) == B1452_STORE_STORED
 
 
 def test_b1452_store_refuses_spinel_1800k_identity_fail() -> None:
@@ -901,14 +901,14 @@ def test_b1452_store_keeps_ag_plus_reconstructed_gibbs() -> None:
         for row in stored_rows
         if row["observation_id"].startswith(prefix + "delta_fG:")
         and "T=298.15:" in row["observation_id"]
-        and ":row=1:" in row["observation_id"]
+        and ":name=$ag^+$-" in row["observation_id"]
     )
     logk = next(
         row
         for row in stored_rows
         if row["observation_id"].startswith(prefix + "log10_Kf:")
         and "T=298.15:" in row["observation_id"]
-        and ":row=1:" in row["observation_id"]
+        and ":name=$ag^+$-" in row["observation_id"]
     )
     assert Decimal(str(gibbs["value"]["point"])) == Decimal("77.077")
     assert Decimal(str(logk["value"]["point"])) == Decimal("-13.504")

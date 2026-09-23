@@ -645,13 +645,6 @@ class AtomLedger:
             transition,
             terminal_debit_capability=_terminal_debit_capability,
         )
-        (
-            transition,
-            projected_origin_atoms,
-            projected_unresolved_atoms,
-            projected_origin_methods,
-            projected_external_origin_atoms,
-        ) = self._project_origin_transition(transition)
         transition.validate_conservation(
             self.registry,
             mass_tolerance_kg=self.mass_tolerance_kg,
@@ -663,12 +656,24 @@ class AtomLedger:
         for lot in (*transition.debits, *transition.credits):
             self._record_lot_movement_scale(movement_scale, lot)
         self._validate_account_policies(projected, movement_scale)
+        (
+            transition,
+            projected_origin_atoms,
+            projected_unresolved_atoms,
+            projected_origin_methods,
+            projected_external_origin_atoms,
+        ) = self._project_origin_transition(transition)
         _reconcile_origin_projection(
             projected_origin_atoms,
             projected_unresolved_atoms,
             projected_origin_methods,
             projected,
             self.registry,
+            skip_negative_accounts={
+                account
+                for account, policy in self._policies.items()
+                if policy.allow_negative
+            },
         )
         (
             projected_unattributed_debt,
@@ -2101,6 +2106,8 @@ def _reconcile_origin_projection(
     methods: dict[str, dict[str, str]],
     physical_species_mol: Mapping[str, Mapping[str, float]],
     registry: Mapping[str, Any],
+    *,
+    skip_negative_accounts: set[str] | frozenset[str] = frozenset(),
 ) -> None:
     # ★ SORTED, and the sort is load-bearing rather than cosmetic (b-302).
     # This function mutates the projection dicts IN PLACE before they are
@@ -2130,6 +2137,10 @@ def _reconcile_origin_projection(
             physical_species_mol.get(account, {}),
             registry,
         )
+        if account in skip_negative_accounts and any(
+            amount < 0.0 for amount in physical_atoms.values()
+        ):
+            continue
         elements = sorted(
             set(physical_atoms)
             | set(origins.get(account, {}))
