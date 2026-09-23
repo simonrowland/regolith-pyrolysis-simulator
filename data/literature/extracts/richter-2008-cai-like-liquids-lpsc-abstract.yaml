@@ -13,16 +13,17 @@ extraction:
   method: >-
     Corpus PDF raw/richter-2008-cai-like-liquids-lpsc-abstract/richter-2008-cai-like-liquids-lpsc-abstract.pdf
     (2-page LPSC abstract 1385). Clean text layer via pdftotext -layout; no OCR
-    and no figure digitisation. SIDECAR NOTE: corpus sidecar citation title
+    and no figure curve digitisation. SIDECAR NOTE: corpus sidecar citation title
     appends "in hydrogen gas and in vacuum" and lists Wadhwa; PDF p1 title is
     "...EVAPORATION IN LOW PRESSURE H2" and authors are Richter, Teng,
-    Mendybaev, Davis, Georg (no Wadhwa). Extract follows the PDF. Figures 1-3
-    not digitized. New high-precision Mg isotope residues at 1.87x10^-4 bar H2
-    are reported only via figures; no prose numeric alpha for that arm.
+    Mendybaev, Davis, Georg (no Wadhwa). Extract follows the PDF. N4b FILL
+    (Y4 P1): Fig. 2 printed text-box annotation alpha=0.98797±0.00022 landed as
+    figure_only (readable without digitising curves); ideal comparator annotation
+    alpha=0.97980 retained on the same row. Curve points themselves not digitized.
     Printed pressure thresholds and qualitative "about two orders of magnitude"
-    kinetics claim retained as context / figure_only, not as scored points.
+    kinetics claim retained as context / figure_only.
   date: '2026-09-22'
-  worker: n4-cai-liquid-evaporation
+  worker: n4b-y4-omissions
   provenance_path: data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml
 review_status: draft
 corrections: []
@@ -30,11 +31,11 @@ scope_assessment:
   document_type: 2-page LPSC conference abstract (CAI-like liquid evaporation H2 vs vacuum)
   measured_direct_observations: 0
   method_observations: 2
-  figure_only_observations: 3
+  figure_only_observations: 2
   quoted_attributed_observations: 0
   absent_from_source:
   - digitized Fig. 1 evaporation-rate vs T points
-  - digitized Fig. 2 Mg isotope Rayleigh plot points / slope alpha
+  - digitized Fig. 2 Mg isotope Rayleigh plot curve points (annotation alpha landed)
   - digitized Fig. 3 alpha vs T points
   - starting melt oxide assay printed in this abstract
   - sample masses, loop diameters, run durations
@@ -46,9 +47,9 @@ scope_assessment:
     not duplicated.
   note: >-
     Abstract contrasts vacuum vs low-P H2 evaporation kinetics and Mg kinetic
-    isotope fractionation. Most numeric results live only in figures attributed
-    partly to prior work [2],[3]; this extract refuses figure digitisation and
-    scores no new measured points.
+    isotope fractionation. N4 refused prose alpha (none printed). N4b lands the
+    Fig. 2 printed text-box annotation alpha=0.98797±0.00022 as figure_only;
+    curve points remain undigitized.
 benches:
 - id: chicago-cai-evaporation-lab
   identity: {basis: described_in_this_work}
@@ -126,6 +127,15 @@ fidelity_samples:
   locator:
     pdf_page_index: 1
     figure: '1'
+- species: Mg
+  observable: alpha
+  observation_id: richter_2008_fig2_mg_isotope_alpha_annotation
+  field: alpha_as_printed
+  value: '0.98797±0.00022'
+  locator:
+    pdf_page_index: 2
+    figure: '2'
+    note: 'printed text-box annotation on Fig. 2; fit to this-work + [2] residues'
 species:
   CAI_like_liquid:
     observations:
@@ -191,7 +201,8 @@ species:
         fig2_status: >-
           Magnesium isotopic composition of residues plotted for Rayleigh slope
           1-alpha; open symbols earlier [2], small solid symbols new
-          high-precision data; numeric alpha not printed in prose
+          high-precision data. N4b: printed Fig. 2 text-box annotation
+          alpha=0.98797±0.00022 landed as figure_only; curve points not digitized
         fig3_status: >-
           Kinetic isotope fractionation factor for H2 arm (blue) compared to
           vacuum trend (red) and inverse-sqrt-mass ideal line; authors state
@@ -250,3 +261,49 @@ species:
           Corpus sidecar title appends "in hydrogen gas and in vacuum" and lists
           Wadhwa; PDF has Low Pressure H2 title and Teng/Georg (no Wadhwa).
           Extract citation follows the PDF.
+
+  Mg:
+    observations:
+    - observation_id: richter_2008_fig2_mg_isotope_alpha_annotation
+      experiment: cai-like-h2-1p87e-4-bar-residues
+      type: alpha
+      locator:
+        pdf_page_index: 2
+        figure: '2'
+        note: >-
+          Printed text-box annotation on Fig. 2 (readable without curve
+          digitisation). Fit line through this-work solid symbols + Richter et
+          al. [2] open symbols.
+      T_range_K: [1773.15, 1773.15]
+      phase: CAI_like_silicate_liquid_residues
+      regime: Rayleigh_distillation_low_pressure_H2
+      units: dimensionless
+      uncertainty:
+        note: >-
+          Printed ±0.00022 on alpha=0.98797±0.00022 in the Fig. 2 annotation
+          box. No separate prose uncertainty.
+      values:
+        quantity: kinetic_isotope_fractionation_factor_Mg
+        method_class: figure_only
+        evidence_class: printed_figure_annotation
+        alpha_as_printed: '0.98797±0.00022'
+        alpha: 0.98797
+        alpha_uncertainty: 0.00022
+        isotope_pair_as_printed: Mg (Rayleigh; slope = 1-alpha on 1000 ln(R/Ro) vs -ln f)
+        H2_pressure_bars_as_printed: '1.87x10^-4'
+        temperature_C_as_printed_fig3: 1500
+        temperature_K_derived:
+          value: 1773.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1500
+        fit_population_as_printed: this work (solid) + Richter et al. [2] (open)
+        ideal_comparator_alpha_as_printed: '0.97980'
+        ideal_comparator_status: printed_figure_annotation_same_panel
+        curve_points: not_digitized
+        note: >-
+          Landed from readable Fig. 2 text boxes only. Body prose states H2
+          alpha is approximately the same / slightly above vacuum with no
+          numeric alpha; this annotation supplies the numeric value. Ideal
+          comparator annotation alpha=0.97980 is recorded here as printed
+          context, not as a measured alpha.
