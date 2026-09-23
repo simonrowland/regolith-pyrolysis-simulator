@@ -1,0 +1,1170 @@
+schema_version: literature_extract.v1
+source_id: knight-gca2009
+source:
+  citation: Knight, K. B., Kita, N. T., Mendybaev, R. A., Richter, F. M., Davis, A. M. & Valley, J. W.
+    (2009), "Silicon isotopic fractionation of CAI-like vacuum evaporation residues", Geochimica et Cosmochimica
+    Acta, 73(20), 6390–6401, doi:10.1016/j.gca.2009.07.008.
+  year: 2009
+  doi: 10.1016/j.gca.2009.07.008
+  doi_status: crossref_confirmed
+  corpus_pdf_note: Corpus file is LLNL preprint LLNL-JRNL-414068 (37 PDF pages, WiscSIMS OA mirror path
+    in sidecar). Title/authors/DOI match Crossref VOR; journal pagination 6390–6401. Locators below use
+    this PDF's page index.
+extraction:
+  method: Manual transcription from pdftotext -layout of LLNL OA PDF plus visual checks of 200 dpi page-25
+    render. Table 1 chemical + Si-isotope columns landed. δ25Mg column is Richter et al. (2007) reprint
+    (footnote 4) — stamped attributed. Rayleigh-fit α29Si / α30Si (combined and per-T) landed as derived.
+    Inverse-sqrt-of-mass model α curves and CAI-precursor reconstructions typed as model absence. Figures
+    not digitized. Oxide compositions of residues are reprinted from Richter et al. (2007a) as stated
+    by authors; Si isotopes are this work's SIMS measurements. Absence is never zero.
+  date: '2026-09-23'
+  worker: n15-aq-oa-batch-a
+  null_hypothesis_check: 'No prior extract for Knight et al. 2009 or DOI 10.1016/j.gca.2009.07.008. Related
+    but distinct: kems-010-richter-2007 (same residue campaign; Mg isotopes + evaporation kinetics; NO
+    Si isotope α table), kems-037-richter-2002, N4 LPSC abstracts. SOURCE_STATUS lists knight-gca2009
+    as located / no document (pre-AQ).'
+review_status: draft
+fidelity_samples:
+- species: Si
+  observable: alpha
+  observation_id: knight_2009_alpha29Si_combined
+  field: alpha
+  value: 0.98985
+  locator:
+    pdf_page_index: 13
+    section: '3'
+    note: Combined-T Rayleigh slope; also Abstract
+- species: Si
+  observable: alpha
+  observation_id: knight_2009_alpha30Si_combined
+  field: alpha
+  value: 0.98045
+  locator:
+    pdf_page_index: 13
+    section: '3'
+- species: CMAS_glass
+  observable: composition_series
+  observation_id: knight_2009_table1_compositions_and_si_isotopes
+  field: quantity
+  value: chemical_and_si_isotopic_compositions_table1
+  locator:
+    pdf_page_index: 25
+    table: '1'
+- species: CMAS_glass
+  observable: composition_series
+  observation_id: knight_2009_table1_compositions_and_si_isotopes
+  field: external_reproducibility_delta29Si_per_mil_2sigma
+  value: 0.32
+  locator:
+    pdf_page_index: 10
+    note: External reproducibility from 146 CMAS-0 spots
+benches:
+- id: chicago-hashimoto-vacuum-furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hashimoto (1990) vacuum furnace; free evaporation from Ir wire loops
+    locator:
+      pdf_page_index: 8
+      section: 2. Experimental and Analytical Techniques
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: 2.5 mm diameter iridium wire loops
+    locator:
+      pdf_page_index: 8
+      section: '2'
+  heating_method:
+    state:
+      tag: value
+      value: Vacuum furnace; ramp to 1400 C, then to run T; quench by cutting heater power
+    locator:
+      pdf_page_index: 8
+      section: '2'
+  detector:
+    state:
+      tag: value
+      value: JEOL JSM-5800LV SEM + Oxford/Link ISIS-300 EDS for chemistry (15 keV, ~0.5 nA)
+    locator:
+      pdf_page_index: 8
+      section: '2'
+  other_facts:
+  - name: total_pressure_upper_bound_bar
+    unit: bar
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 1e-9
+      locator:
+        pdf_page_index: 8
+        note: Total pressures less than 10^-9 bars (Richter et al., 2007a)
+  - name: preheat_before_run_C
+    unit: C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+      locator:
+        pdf_page_index: 8
+        note: Temperature slowly raised to 1400 C until P < 10^-9 bar
+  - name: ramp_rate_to_1600_or_1800_C_per_min
+    unit: C_per_min
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+      locator:
+        pdf_page_index: 8
+  - name: ramp_rate_1600_to_1900_C_per_min
+    unit: C_per_min
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '40'
+      locator:
+        pdf_page_index: 8
+        note: 1900 C at 40 C/min from 1600 C
+- id: wiscsims-ims1280
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Cameca IMS-1280 multicollector ion microprobe (WiscSIMS, University of Wisconsin)
+    locator:
+      pdf_page_index: 8
+      section: '2'
+  detector:
+    state:
+      tag: value
+      value: Cs+ primary beam; negative secondary ions for Si isotopes; Faraday cups
+    locator:
+      pdf_page_index: 8
+      section: '2'
+  other_facts:
+  - name: external_reproducibility_delta29Si_per_mil_2sigma
+    unit: per_mil
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.32'
+      locator:
+        pdf_page_index: 10
+        note: 2σ from 146 CMAS-0 spot analyses
+  - name: external_reproducibility_delta30Si_per_mil_2sigma
+    unit: per_mil
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.52'
+      locator:
+        pdf_page_index: 10
+  - name: external_reproducibility_Delta29Si_per_mil_2sigma
+    unit: per_mil
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.25'
+      locator:
+        pdf_page_index: 10
+        note: Delta29Si = delta29Si - 0.5*delta30Si
+experiments:
+- experiment_id: cai-like-cmas-vacuum-evaporation-si-isotope
+  bench_id: chicago-hashimoto-vacuum-furnace
+  method: vacuum_free_evaporation_then_sims_si_isotopes
+  locator:
+    pdf_page_index: 8
+    section: '2'
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: wt_percent_oxides_as_printed
+          components:
+            SiO2: 46.0
+            Al2O3: 19.39
+            MgO: 11.48
+            CaO: 23.12
+      locator:
+        pdf_page_index: 8
+        note: Starting glass richer in MgO+SiO2 than typical Type B CAI
+    form:
+      state:
+        tag: value
+        value: CMAS glass on 2.5 mm Ir wire loops; quenched to glass (except R3-09 microcrystalline, not
+          analyzed)
+      locator:
+        pdf_page_index: 8
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: set
+          set:
+          - '1873.15'
+          - '2073.15'
+          - '2173.15'
+      locator:
+        pdf_page_index: 8
+        note: DERIVED companions for printed 1600 / 1800 / 1900 C run temperatures
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0'
+          interval_high: '0.0001'
+      locator:
+        pdf_page_index: 8
+        note: Printed <10^-9 bar (= <1e-4 Pa). Interval upper bound is unit conversion of 1e-9 bar.
+    regime:
+      regime_class:
+        tag: value
+        value: high_vacuum_free_evaporation
+observation_classifications:
+  knight_2009_table1_compositions_and_si_isotopes:
+    class_tag: measured
+  knight_2009_table1_delta25Mg_richter2007_reprint:
+    class_tag: attributed
+  knight_2009_alpha29Si_combined:
+    class_tag: derived
+  knight_2009_alpha30Si_combined:
+    class_tag: derived
+  knight_2009_alpha29Si_per_temperature:
+    class_tag: derived
+  knight_2009_alpha30Si_per_temperature:
+    class_tag: derived
+  knight_2009_inverse_sqrt_mass_model_alpha:
+    class_tag: model
+  knight_2009_cai_precursor_reconstructions:
+    class_tag: model
+  knight_2009_figures_ledger:
+    class_tag: figure_only
+species:
+  CMAS_glass:
+    observations:
+    - observation_id: knight_2009_table1_compositions_and_si_isotopes
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: composition_series
+      locator:
+        pdf_page_index: 25
+        table: '1'
+        note: Table 1 — Chemical and isotopic compositions of evaporation residues and matrix correction
+          standards. Uncertainties 2σ.
+      phase: CMAS_silicate_glass_residue_or_standard
+      regime: vacuum_evaporation_residue_plus_sims
+      units: wt% oxides; Si loss %; Al27/Si28 ion ratio; delta Si and Mg in per mil
+      values:
+        quantity: chemical_and_si_isotopic_compositions_table1
+        method_class: measured_direct
+        oxide_composition_provenance: Residues originally reported in Richter et al. (2007a); reprinted
+          in this Table 1 as stated by authors.
+        si_isotope_provenance: This work — WiscSIMS Cameca IMS-1280; matrix-corrected values are the analysis
+          product used for alpha fits.
+        external_reproducibility_delta29Si_per_mil_2sigma: 0.32
+        external_reproducibility_delta30Si_per_mil_2sigma: 0.52
+        external_reproducibility_Delta29Si_per_mil_2sigma: 0.25
+        starting_composition_row:
+          sample: Starting composition
+          row_class: starting_glass
+          MgO_wt_pct: 11.48
+          SiO2_wt_pct: 46.0
+          Al2O3_wt_pct: 19.39
+          CaO_wt_pct: 23.12
+          Si_loss_pct: 0.0
+          note: Printed starting glass; oxide recipe also stated in Experimental (46.00 SiO2 / 19.39 Al2O3
+            / 11.48 MgO / 23.12 CaO wt%). Residue oxide compositions originally reported in Richter et
+            al. (2007a) and reprinted here.
+        standard_rows:
+        - sample: CMAS-0
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 10.79
+          SiO2_wt_pct: 46.82
+          Al2O3_wt_pct: 19.09
+          CaO_wt_pct: 23.3
+          n_spots: 146
+          Al27_over_Si28: 1.0
+          delta29Si_measured_per_mil: 0.0
+          delta30Si_measured_per_mil: 0.0
+          delta29Si_matrix_corrected_per_mil: 0.0
+          delta30Si_matrix_corrected_per_mil: 0.0
+          note: running_standard; ratios defined as 1 / 0
+        - sample: CMAS-1
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 0.33
+          SiO2_wt_pct: 17.41
+          Al2O3_wt_pct: 35.98
+          CaO_wt_pct: 46.28
+          n_spots: 9
+          Al27_over_Si28: 3.97
+          delta29Si_measured_per_mil: 3.01
+          delta30Si_measured_per_mil: 6.05
+          delta29Si_matrix_corrected_per_mil: -0.19
+          delta30Si_matrix_corrected_per_mil: -0.22
+          Al27_over_Si28_unc: 0.033
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_unc: 0.21
+          delta30Si_matrix_corrected_unc: 0.35
+        - sample: CMAS-2
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 1.07
+          SiO2_wt_pct: 22.05
+          Al2O3_wt_pct: 32.56
+          CaO_wt_pct: 44.32
+          n_spots: 9
+          Al27_over_Si28: 2.976
+          delta29Si_measured_per_mil: 2.6
+          delta30Si_measured_per_mil: 5.15
+          delta29Si_matrix_corrected_per_mil: 0.05
+          delta30Si_matrix_corrected_per_mil: 0.14
+          Al27_over_Si28_unc: 0.025
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.18
+          delta30Si_matrix_corrected_unc: 0.3
+        - sample: CMAS-3
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 5.05
+          SiO2_wt_pct: 26.35
+          Al2O3_wt_pct: 28.81
+          CaO_wt_pct: 39.8
+          n_spots: 9
+          Al27_over_Si28: 2.381
+          delta29Si_measured_per_mil: 1.73
+          delta30Si_measured_per_mil: 3.33
+          delta29Si_matrix_corrected_per_mil: -0.21
+          delta30Si_matrix_corrected_per_mil: -0.47
+          Al27_over_Si28_unc: 0.02
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.16
+          delta30Si_matrix_corrected_unc: 0.26
+        - sample: CMAS-4
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 8.78
+          SiO2_wt_pct: 32.27
+          Al2O3_wt_pct: 26.09
+          CaO_wt_pct: 32.86
+          n_spots: 9
+          Al27_over_Si28: 1.836
+          delta29Si_measured_per_mil: 1.5
+          delta30Si_measured_per_mil: 2.83
+          delta29Si_matrix_corrected_per_mil: 0.19
+          delta30Si_matrix_corrected_per_mil: 0.26
+          Al27_over_Si28_unc: 0.015
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_unc: 0.24
+        - sample: CMAS-4+5
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 10.58
+          SiO2_wt_pct: 38.43
+          Al2O3_wt_pct: 21.61
+          CaO_wt_pct: 29.39
+          n_spots: 9
+          Al27_over_Si28: 1.347
+          delta29Si_measured_per_mil: 0.91
+          delta30Si_measured_per_mil: 1.76
+          delta29Si_matrix_corrected_per_mil: 0.33
+          delta30Si_matrix_corrected_per_mil: 0.61
+          Al27_over_Si28_unc: 0.011
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_unc: 0.23
+        - sample: CMAS-5
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 11.9
+          SiO2_wt_pct: 45.41
+          Al2O3_wt_pct: 18.51
+          CaO_wt_pct: 24.18
+          n_spots: 9
+          Al27_over_Si28: 1.005
+          delta29Si_measured_per_mil: 0.26
+          delta30Si_measured_per_mil: 0.4
+          delta29Si_matrix_corrected_per_mil: 0.26
+          delta30Si_matrix_corrected_per_mil: 0.4
+          Al27_over_Si28_unc: 0.008
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.15
+          delta30Si_matrix_corrected_unc: 0.24
+        - sample: CMAS-6
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 11.34
+          SiO2_wt_pct: 38.98
+          Al2O3_wt_pct: 21.91
+          CaO_wt_pct: 27.77
+          n_spots: 9
+          Al27_over_Si28: 1.366
+          delta29Si_measured_per_mil: 0.88
+          delta30Si_measured_per_mil: 1.27
+          delta29Si_matrix_corrected_per_mil: 0.3
+          delta30Si_matrix_corrected_per_mil: 0.13
+          Al27_over_Si28_unc: 0.011
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_unc: 0.23
+        - sample: CMAS-7
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 0.05
+          SiO2_wt_pct: 10.64
+          Al2O3_wt_pct: 40.35
+          CaO_wt_pct: 48.96
+          n_spots: 8
+          Al27_over_Si28: 7.88
+          delta29Si_measured_per_mil: 4.1
+          delta30Si_measured_per_mil: 7.08
+          delta29Si_matrix_corrected_per_mil: -0.08
+          delta30Si_matrix_corrected_per_mil: -1.1
+          Al27_over_Si28_unc: 0.07
+          delta29Si_measured_unc: 0.19
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_unc: 0.31
+          delta30Si_matrix_corrected_unc: 0.43
+          note: footnote5_outlier_excluded_from_matrix_correction
+        - sample: CMAS-8
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 0.15
+          SiO2_wt_pct: 20.97
+          Al2O3_wt_pct: 35.32
+          CaO_wt_pct: 43.56
+          n_spots: 9
+          Al27_over_Si28: 3.474
+          delta29Si_measured_per_mil: 3.02
+          delta30Si_measured_per_mil: 5.7
+          delta29Si_matrix_corrected_per_mil: 0.2
+          delta30Si_matrix_corrected_per_mil: 0.19
+          Al27_over_Si28_unc: 0.029
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.19
+          delta30Si_matrix_corrected_unc: 0.32
+        - sample: CMAS-9
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 9.07
+          SiO2_wt_pct: 35.29
+          Al2O3_wt_pct: 24.77
+          CaO_wt_pct: 30.86
+          n_spots: 9
+          Al27_over_Si28: 1.683
+          delta29Si_measured_per_mil: 1.0
+          delta30Si_measured_per_mil: 1.92
+          delta29Si_matrix_corrected_per_mil: -0.02
+          delta30Si_matrix_corrected_per_mil: -0.08
+          Al27_over_Si28_unc: 0.014
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.21
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_unc: 0.26
+        - sample: CMAS-10
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 10.22
+          SiO2_wt_pct: 41.24
+          Al2O3_wt_pct: 21.71
+          CaO_wt_pct: 26.83
+          n_spots: 9
+          Al27_over_Si28: 1.295
+          delta29Si_measured_per_mil: 0.55
+          delta30Si_measured_per_mil: 1.02
+          delta29Si_matrix_corrected_per_mil: 0.09
+          delta30Si_matrix_corrected_per_mil: 0.12
+          Al27_over_Si28_unc: 0.011
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_unc: 0.23
+        - sample: CMAS-12
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 4.09
+          SiO2_wt_pct: 30.08
+          Al2O3_wt_pct: 29.37
+          CaO_wt_pct: 36.46
+          n_spots: 9
+          Al27_over_Si28: 2.204
+          delta29Si_measured_per_mil: 2.01
+          delta30Si_measured_per_mil: 3.86
+          delta29Si_matrix_corrected_per_mil: 0.31
+          delta30Si_matrix_corrected_per_mil: 0.52
+          Al27_over_Si28_unc: 0.018
+          delta29Si_measured_unc: 0.14
+          delta30Si_measured_unc: 0.25
+          delta29Si_matrix_corrected_unc: 0.18
+          delta30Si_matrix_corrected_unc: 0.31
+        - sample: CMAS-13
+          row_class: matrix_correction_standard
+          MgO_wt_pct: 9.78
+          SiO2_wt_pct: 46.6
+          Al2O3_wt_pct: 19.54
+          CaO_wt_pct: 24.08
+          n_spots: 8
+          Al27_over_Si28: 1.03
+          delta29Si_measured_per_mil: 0.17
+          delta30Si_measured_per_mil: 0.05
+          delta29Si_matrix_corrected_per_mil: 0.12
+          delta30Si_matrix_corrected_per_mil: -0.04
+          Al27_over_Si28_unc: 0.009
+          delta29Si_measured_unc: 0.19
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_unc: 0.15
+          delta30Si_matrix_corrected_unc: 0.24
+        residue_rows:
+        - sample: R3-2
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 12.22
+          SiO2_wt_pct: 46.36
+          Al2O3_wt_pct: 19.31
+          CaO_wt_pct: 22.11
+          Si_loss_pct: -1.21
+          Si_loss_pct_unc: 0.1
+          n_spots: 8
+          Al27_over_Si28: 1.053
+          Al27_over_Si28_unc: 0.009
+          delta29Si_measured_per_mil: -0.38
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_per_mil: -0.69
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_per_mil: -0.42
+          delta29Si_matrix_corrected_unc: 0.15
+          delta30Si_matrix_corrected_per_mil: -0.76
+          delta30Si_matrix_corrected_unc: 0.24
+          delta25Mg_per_mil: -0.105
+          delta25Mg_unc: 0.014
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-1
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 9.62
+          SiO2_wt_pct: 33.93
+          Al2O3_wt_pct: 26.24
+          CaO_wt_pct: 30.21
+          Si_loss_pct: 45.53
+          Si_loss_pct_unc: 0.3
+          n_spots: 4
+          Al27_over_Si28: 1.833
+          Al27_over_Si28_unc: 0.023
+          delta29Si_measured_per_mil: 6.51
+          delta29Si_measured_unc: 0.16
+          delta30Si_measured_per_mil: 13.06
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 5.29
+          delta29Si_matrix_corrected_unc: 0.19
+          delta30Si_matrix_corrected_per_mil: 10.67
+          delta30Si_matrix_corrected_unc: 0.3
+          delta25Mg_per_mil: 6.188
+          delta25Mg_unc: 0.006
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-21
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 9.44
+          SiO2_wt_pct: 33.69
+          Al2O3_wt_pct: 26.32
+          CaO_wt_pct: 30.54
+          Si_loss_pct: 46.08
+          Si_loss_pct_unc: 0.34
+          n_spots: 4
+          Al27_over_Si28: 1.877
+          Al27_over_Si28_unc: 0.024
+          delta29Si_measured_per_mil: 6.83
+          delta29Si_measured_unc: 0.23
+          delta30Si_measured_per_mil: 13.18
+          delta30Si_measured_unc: 0.31
+          delta29Si_matrix_corrected_per_mil: 5.59
+          delta29Si_matrix_corrected_unc: 0.25
+          delta30Si_matrix_corrected_per_mil: 10.75
+          delta30Si_matrix_corrected_unc: 0.35
+        - sample: R3-19
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 6.7
+          SiO2_wt_pct: 31.34
+          Al2O3_wt_pct: 28.86
+          CaO_wt_pct: 33.11
+          Si_loss_pct: 54.26
+          Si_loss_pct_unc: 0.25
+          n_spots: 4
+          Al27_over_Si28: 2.162
+          Al27_over_Si28_unc: 0.027
+          delta29Si_measured_per_mil: 8.39
+          delta29Si_measured_unc: 0.16
+          delta30Si_measured_per_mil: 16.9
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 6.8
+          delta29Si_matrix_corrected_unc: 0.19
+          delta30Si_matrix_corrected_per_mil: 13.8
+          delta30Si_matrix_corrected_unc: 0.31
+          delta25Mg_per_mil: 11.887
+          delta25Mg_unc: 0.042
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-20
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 6.43
+          SiO2_wt_pct: 31.01
+          Al2O3_wt_pct: 29.11
+          CaO_wt_pct: 33.45
+          Si_loss_pct: 55.13
+          Si_loss_pct_unc: 0.24
+          n_spots: 4
+          Al27_over_Si28: 2.179
+          Al27_over_Si28_unc: 0.027
+          delta29Si_measured_per_mil: 8.84
+          delta29Si_measured_unc: 0.19
+          delta30Si_measured_per_mil: 17.46
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 7.22
+          delta29Si_matrix_corrected_unc: 0.22
+          delta30Si_matrix_corrected_per_mil: 14.29
+          delta30Si_matrix_corrected_unc: 0.31
+          delta25Mg_per_mil: 12.337
+          delta25Mg_unc: 0.053
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-18
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 4.34
+          SiO2_wt_pct: 29.39
+          Al2O3_wt_pct: 30.81
+          CaO_wt_pct: 35.46
+          Si_loss_pct: 59.83
+          Si_loss_pct_unc: 0.21
+          n_spots: 8
+          Al27_over_Si28: 2.327
+          Al27_over_Si28_unc: 0.021
+          delta29Si_measured_per_mil: 10.53
+          delta29Si_measured_unc: 0.14
+          delta30Si_measured_per_mil: 20.89
+          delta30Si_measured_unc: 0.24
+          delta29Si_matrix_corrected_per_mil: 8.68
+          delta29Si_matrix_corrected_unc: 0.18
+          delta30Si_matrix_corrected_per_mil: 17.27
+          delta30Si_matrix_corrected_unc: 0.31
+          delta25Mg_per_mil: 17.946
+          delta25Mg_unc: 0.023
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-4
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 4.6
+          SiO2_wt_pct: 30.84
+          Al2O3_wt_pct: 30.2
+          CaO_wt_pct: 34.36
+          Si_loss_pct: 56.99
+          Si_loss_pct_unc: 0.24
+          n_spots: 12
+          Al27_over_Si28: 2.159
+          Al27_over_Si28_unc: 0.016
+          delta29Si_measured_per_mil: 10.52
+          delta29Si_measured_unc: 0.15
+          delta30Si_measured_per_mil: 20.66
+          delta30Si_measured_unc: 0.19
+          delta29Si_matrix_corrected_per_mil: 8.81
+          delta29Si_matrix_corrected_unc: 0.18
+          delta30Si_matrix_corrected_per_mil: 17.31
+          delta30Si_matrix_corrected_unc: 0.26
+          delta25Mg_per_mil: 19.861
+          delta25Mg_unc: 0.023
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-8
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 1.65
+          SiO2_wt_pct: 26.73
+          Al2O3_wt_pct: 33.21
+          CaO_wt_pct: 38.4
+          Si_loss_pct: 66.11
+          Si_loss_pct_unc: 0.19
+          n_spots: 4
+          Al27_over_Si28: 2.612
+          Al27_over_Si28_unc: 0.033
+          delta29Si_measured_per_mil: 12.88
+          delta29Si_measured_unc: 0.16
+          delta30Si_measured_per_mil: 25.22
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 10.67
+          delta29Si_matrix_corrected_unc: 0.21
+          delta30Si_matrix_corrected_per_mil: 20.91
+          delta30Si_matrix_corrected_unc: 0.34
+          delta25Mg_per_mil: 32.359
+          delta25Mg_unc: 0.016
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-7
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 0.2
+          SiO2_wt_pct: 22.4
+          Al2O3_wt_pct: 36.01
+          CaO_wt_pct: 41.39
+          Si_loss_pct: 73.82
+          Si_loss_pct_unc: 0.16
+          n_spots: 4
+          Al27_over_Si28: 3.402
+          Al27_over_Si28_unc: 0.043
+          delta29Si_measured_per_mil: 15.96
+          delta29Si_measured_unc: 0.2
+          delta30Si_measured_per_mil: 31.01
+          delta30Si_measured_unc: 0.32
+          delta29Si_matrix_corrected_per_mil: 13.23
+          delta29Si_matrix_corrected_unc: 0.25
+          delta30Si_matrix_corrected_per_mil: 25.68
+          delta30Si_matrix_corrected_unc: 0.41
+        - sample: R3-5
+          row_class: evaporation_residue
+          T_C: 1600
+          MgO_wt_pct: 0.12
+          SiO2_wt_pct: 17.74
+          Al2O3_wt_pct: 38.36
+          CaO_wt_pct: 43.78
+          Si_loss_pct: 80.54
+          Si_loss_pct_unc: 0.16
+          n_spots: 4
+          Al27_over_Si28: 4.501
+          Al27_over_Si28_unc: 0.057
+          delta29Si_measured_per_mil: 19.5
+          delta29Si_measured_unc: 0.24
+          delta30Si_measured_per_mil: 37.98
+          delta30Si_measured_unc: 0.39
+          delta29Si_matrix_corrected_per_mil: 16.22
+          delta29Si_matrix_corrected_unc: 0.31
+          delta30Si_matrix_corrected_per_mil: 31.55
+          delta30Si_matrix_corrected_unc: 0.5
+        - sample: R-3
+          row_class: evaporation_residue
+          T_C: 1800
+          MgO_wt_pct: 11.82
+          SiO2_wt_pct: 38.87
+          Al2O3_wt_pct: 22.55
+          CaO_wt_pct: 26.76
+          Si_loss_pct: 27.36
+          Si_loss_pct_unc: 0.34
+          n_spots: 8
+          Al27_over_Si28: 1.433
+          Al27_over_Si28_unc: 0.013
+          delta29Si_measured_per_mil: 3.36
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_per_mil: 6.8
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_per_mil: 2.71
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_per_mil: 5.54
+          delta30Si_matrix_corrected_unc: 0.23
+          delta25Mg_per_mil: 1.723
+          delta25Mg_unc: 0.009
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R-2
+          row_class: evaporation_residue
+          T_C: 1800
+          MgO_wt_pct: 10.07
+          SiO2_wt_pct: 33.58
+          Al2O3_wt_pct: 25.72
+          CaO_wt_pct: 30.63
+          Si_loss_pct: 45.01
+          Si_loss_pct_unc: 0.25
+          n_spots: 7
+          Al27_over_Si28: 1.834
+          Al27_over_Si28_unc: 0.017
+          delta29Si_measured_per_mil: 6.51
+          delta29Si_measured_unc: 0.12
+          delta30Si_measured_per_mil: 12.92
+          delta30Si_measured_unc: 0.2
+          delta29Si_matrix_corrected_per_mil: 5.31
+          delta29Si_matrix_corrected_unc: 0.15
+          delta30Si_matrix_corrected_per_mil: 10.57
+          delta30Si_matrix_corrected_unc: 0.25
+          delta25Mg_per_mil: 5.494
+          delta25Mg_unc: 0.044
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R-18
+          row_class: evaporation_residue
+          T_C: 1800
+          MgO_wt_pct: 5.2
+          SiO2_wt_pct: 28.05
+          Al2O3_wt_pct: 30.51
+          CaO_wt_pct: 36.24
+          Si_loss_pct: 61.28
+          Si_loss_pct_unc: 0.24
+          n_spots: 8
+          Al27_over_Si28: 2.457
+          Al27_over_Si28_unc: 0.022
+          delta29Si_measured_per_mil: 10.99
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_per_mil: 21.44
+          delta30Si_measured_unc: 0.22
+          delta29Si_matrix_corrected_per_mil: 9.06
+          delta29Si_matrix_corrected_unc: 0.16
+          delta30Si_matrix_corrected_per_mil: 17.67
+          delta30Si_matrix_corrected_unc: 0.29
+          delta25Mg_per_mil: 17.059
+          delta25Mg_unc: 0.032
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-14
+          row_class: evaporation_residue
+          T_C: 1800
+          MgO_wt_pct: 3.12
+          SiO2_wt_pct: 26.13
+          Al2O3_wt_pct: 31.76
+          CaO_wt_pct: 38.98
+          Si_loss_pct: 65.36
+          Si_loss_pct_unc: 0.29
+          n_spots: 7
+          Al27_over_Si28: 2.649
+          Al27_over_Si28_unc: 0.025
+          delta29Si_measured_per_mil: 13.03
+          delta29Si_measured_unc: 0.12
+          delta30Si_measured_per_mil: 25.11
+          delta30Si_measured_unc: 0.24
+          delta29Si_matrix_corrected_per_mil: 10.88
+          delta29Si_matrix_corrected_unc: 0.18
+          delta30Si_matrix_corrected_per_mil: 20.88
+          delta30Si_matrix_corrected_unc: 0.32
+          delta25Mg_per_mil: 25.372
+          delta25Mg_unc: 0.031
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R2-1
+          row_class: evaporation_residue
+          T_C: 1800
+          MgO_wt_pct: 0.19
+          SiO2_wt_pct: 19.91
+          Al2O3_wt_pct: 36.53
+          CaO_wt_pct: 43.38
+          Si_loss_pct: 77.06
+          Si_loss_pct_unc: 0.15
+          n_spots: 9
+          Al27_over_Si28: 3.744
+          Al27_over_Si28_unc: 0.031
+          delta29Si_measured_per_mil: 17.62
+          delta29Si_measured_unc: 0.13
+          delta30Si_measured_per_mil: 34.67
+          delta30Si_measured_unc: 0.17
+          delta29Si_matrix_corrected_per_mil: 14.64
+          delta29Si_matrix_corrected_unc: 0.22
+          delta30Si_matrix_corrected_per_mil: 28.83
+          delta30Si_matrix_corrected_unc: 0.33
+          delta25Mg_per_mil: 69.148
+          delta25Mg_unc: 0.063
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-12
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 11.37
+          SiO2_wt_pct: 44.53
+          Al2O3_wt_pct: 19.26
+          CaO_wt_pct: 24.84
+          Si_loss_pct: 2.55
+          Si_loss_pct_unc: 0.56
+          n_spots: 8
+          Al27_over_Si28: 1.109
+          Al27_over_Si28_unc: 0.01
+          delta29Si_measured_per_mil: 0.92
+          delta29Si_measured_unc: 0.11
+          delta30Si_measured_per_mil: 1.78
+          delta30Si_measured_unc: 0.18
+          delta29Si_matrix_corrected_per_mil: 0.82
+          delta29Si_matrix_corrected_unc: 0.15
+          delta30Si_matrix_corrected_per_mil: 1.58
+          delta30Si_matrix_corrected_unc: 0.24
+        - sample: R3-10
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 9.13
+          SiO2_wt_pct: 31.52
+          Al2O3_wt_pct: 26.86
+          CaO_wt_pct: 32.48
+          Si_loss_pct: 50.57
+          Si_loss_pct_unc: 0.29
+          n_spots: 11
+          Al27_over_Si28: 2.027
+          Al27_over_Si28_unc: 0.015
+          delta29Si_measured_per_mil: 8.36
+          delta29Si_measured_unc: 0.1
+          delta30Si_measured_per_mil: 16.31
+          delta30Si_measured_unc: 0.16
+          delta29Si_matrix_corrected_per_mil: 6.94
+          delta29Si_matrix_corrected_unc: 0.14
+          delta30Si_matrix_corrected_per_mil: 13.53
+          delta30Si_matrix_corrected_unc: 0.23
+          delta25Mg_per_mil: 8.135
+          delta25Mg_unc: 0.007
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-11
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 3.33
+          SiO2_wt_pct: 25.24
+          Al2O3_wt_pct: 32.35
+          CaO_wt_pct: 39.09
+          Si_loss_pct: 67.15
+          Si_loss_pct_unc: 0.19
+          n_spots: 4
+          Al27_over_Si28: 2.48
+          Al27_over_Si28_unc: 0.031
+          delta29Si_measured_per_mil: 13.61
+          delta29Si_measured_unc: 0.12
+          delta30Si_measured_per_mil: 26.27
+          delta30Si_measured_unc: 0.35
+          delta29Si_matrix_corrected_per_mil: 11.34
+          delta29Si_matrix_corrected_unc: 0.21
+          delta30Si_matrix_corrected_per_mil: 21.84
+          delta30Si_matrix_corrected_unc: 0.41
+          delta25Mg_per_mil: 25.81
+          delta25Mg_unc: 0.02
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-9
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 1.04
+          SiO2_wt_pct: 21.81
+          Al2O3_wt_pct: 35.06
+          CaO_wt_pct: 42.08
+          Si_loss_pct: 73.81
+          Si_loss_pct_unc: 0.23
+          n_spots: 9
+          Al27_over_Si28: 3.339
+          Al27_over_Si28_unc: 0.028
+          delta29Si_measured_per_mil: 15.85
+          delta29Si_measured_unc: 0.12
+          delta30Si_measured_per_mil: 31.3
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 13.13
+          delta29Si_matrix_corrected_unc: 0.2
+          delta30Si_matrix_corrected_per_mil: 25.97
+          delta30Si_matrix_corrected_unc: 0.36
+          delta25Mg_per_mil: 43.265
+          delta25Mg_unc: 0.017
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-15
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 0.8
+          SiO2_wt_pct: 21.1
+          Al2O3_wt_pct: 35.1
+          CaO_wt_pct: 43.1
+          Si_loss_pct: 74.7
+          Si_loss_pct_unc: 0.1
+          n_spots: 4
+          Al27_over_Si28: 3.104
+          Al27_over_Si28_unc: 0.039
+          delta29Si_measured_per_mil: 17.31
+          delta29Si_measured_unc: 0.17
+          delta30Si_measured_per_mil: 33.65
+          delta30Si_measured_unc: 0.26
+          delta29Si_matrix_corrected_per_mil: 14.52
+          delta29Si_matrix_corrected_unc: 0.23
+          delta30Si_matrix_corrected_per_mil: 28.18
+          delta30Si_matrix_corrected_unc: 0.37
+          delta25Mg_per_mil: 47.733
+          delta25Mg_unc: 0.023
+          delta25Mg_provenance: Richter_et_al_2007_footnote_4
+        - sample: R3-13
+          row_class: evaporation_residue
+          T_C: 1900
+          MgO_wt_pct: 0.09
+          SiO2_wt_pct: 17.76
+          Al2O3_wt_pct: 37.08
+          CaO_wt_pct: 45.05
+          Si_loss_pct: 79.84
+          Si_loss_pct_unc: 0.13
+          n_spots: 4
+          Al27_over_Si28: 4.132
+          Al27_over_Si28_unc: 0.052
+          delta29Si_measured_per_mil: 19.02
+          delta29Si_measured_unc: 0.24
+          delta30Si_measured_per_mil: 37.21
+          delta30Si_measured_unc: 0.38
+          delta29Si_matrix_corrected_per_mil: 15.8
+          delta29Si_matrix_corrected_unc: 0.3
+          delta30Si_matrix_corrected_per_mil: 30.91
+          delta30Si_matrix_corrected_unc: 0.48
+        not_analyzed:
+          sample: R3-09
+          T_C: 1900
+          reason: Microcrystalline; reliable analyses could not be obtained (Experimental text).
+    - observation_id: knight_2009_table1_delta25Mg_richter2007_reprint
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: composition_series
+      locator:
+        pdf_page_index: 25
+        table: '1'
+        note: Footnote 4 — delta25Mg from Richter et al. (2007)
+      phase: CMAS_silicate_glass_residue
+      regime: vacuum_evaporation_residue
+      units: per mil
+      values:
+        quantity: delta25Mg_reprinted_from_richter_2007
+        method_class: attributed
+        note: Not a new measurement of this paper. Values appear in residue_rows of knight_2009_table1_compositions_and_si_isotopes
+          where printed; stamped attributed.
+  Si:
+    observations:
+    - observation_id: knight_2009_alpha29Si_combined
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: alpha
+      locator:
+        pdf_page_index: 13
+        section: '3'
+        note: Combined all-T Isoplot Model-2 Rayleigh slope for 29Si/28Si; also Abstract αSi=0.98985±0.00044
+          (2σ)
+      phase: CAI_like_CMAS_liquid
+      regime: Rayleigh_vacuum_evaporation
+      T_range_K:
+      - 1873.15
+      - 2173.15
+      units: dimensionless kinetic isotope fractionation factor α = (29Si/28Si)_flux / (29Si/28Si)_residue
+      uncertainty:
+        note: 2σ as printed; Isoplot Model 2 (scatter-controlled) because Model-1 MSWD > 20
+      values:
+        quantity: kinetic_isotope_fractionation_factor_alpha
+        method_class: derived
+        isotope_pair: 29Si/28Si
+        alpha: 0.98985
+        alpha_unc_2sigma: 0.00044
+        regression: ln(R/R0) vs -ln(f_28Si); slope = 1-α; not forced through origin; intercept within
+          error of origin
+    - observation_id: knight_2009_alpha30Si_combined
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: alpha
+      locator:
+        pdf_page_index: 13
+        section: '3'
+      phase: CAI_like_CMAS_liquid
+      regime: Rayleigh_vacuum_evaporation
+      T_range_K:
+      - 1873.15
+      - 2173.15
+      units: dimensionless; α for 30Si/28Si
+      uncertainty:
+        note: 2σ as printed
+      values:
+        quantity: kinetic_isotope_fractionation_factor_alpha
+        method_class: derived
+        isotope_pair: 30Si/28Si
+        alpha: 0.98045
+        alpha_unc_2sigma: 0.00074
+        regression: Isoplot Model 2 Rayleigh slope; combined temperatures
+    - observation_id: knight_2009_alpha29Si_per_temperature
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: alpha
+      locator:
+        pdf_page_index: 13
+        section: '3'
+        note: Per-temperature slopes for delta29Si regressions
+      phase: CAI_like_CMAS_liquid
+      regime: Rayleigh_vacuum_evaporation
+      units: dimensionless
+      values:
+        quantity: kinetic_isotope_fractionation_factor_alpha_per_T
+        method_class: derived
+        isotope_pair: 29Si/28Si
+        rows:
+        - T_C: 1600
+          alpha: 0.98978
+          alpha_unc_2sigma: 0.00062
+        - T_C: 1800
+          alpha: 0.98952
+          alpha_unc_2sigma: 0.00074
+        - T_C: 1900
+          alpha: 0.99032
+          alpha_unc_2sigma: 0.0007
+        note: Authors state per-T slopes are indistinguishable; no resolvable T dependence over 1600–1900
+          C.
+    - observation_id: knight_2009_alpha30Si_per_temperature
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: alpha
+      locator:
+        pdf_page_index: 13
+        section: '3'
+      phase: CAI_like_CMAS_liquid
+      regime: Rayleigh_vacuum_evaporation
+      units: dimensionless
+      values:
+        quantity: kinetic_isotope_fractionation_factor_alpha_per_T
+        method_class: derived
+        isotope_pair: 30Si/28Si
+        rows:
+        - T_C: 1600
+          alpha: 0.98037
+          alpha_unc_2sigma: 0.00106
+        - T_C: 1800
+          alpha: 0.97986
+          alpha_unc_2sigma: 0.00102
+        - T_C: 1900
+          alpha: 0.98122
+          alpha_unc_2sigma: 0.00114
+    - observation_id: knight_2009_inverse_sqrt_mass_model_alpha
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: alpha
+      locator:
+        pdf_page_index: 12
+        section: '3'
+        note: Reference curves α = sqrt(M_light/M_heavy) for SiO gas
+      phase: CAI_like_CMAS_liquid
+      regime: ideal_kinetic_theory_comparator
+      units: dimensionless
+      values:
+        quantity: inverse_sqrt_mass_alpha_comparator
+        method_class: model
+        note: Typed model absence for scored use. Authors plot α29=sqrt(M(28SiO)/M(29SiO)) and α30=sqrt(M(28SiO)/M(30SiO))
+          as common no-data estimators; measured α are closer to 1 than these curves.
+    - observation_id: knight_2009_cai_precursor_reconstructions
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: composition_series
+      locator:
+        pdf_page_index: 15
+        section: '4'
+        note: Application to CV CAI precursors
+      phase: natural_CAI
+      regime: model_application
+      units: model
+      values:
+        quantity: unevaporated_CAI_precursor_compositions
+        method_class: model
+        note: Typed model absence. Uses measured αSi with literature αMg and natural CAI analyses to back-calculate
+          precursors — not laboratory observations.
+    - observation_id: knight_2009_figures_ledger
+      experiment: cai-like-cmas-vacuum-evaporation-si-isotope
+      type: composition_series
+      locator:
+        pdf_page_index: 26
+        note: Figure captions page
+      phase: CMAS_silicate_glass_residue
+      regime: vacuum_evaporation_residue_plus_sims
+      units: figure_only
+      values:
+        quantity: figures_not_digitized
+        method_class: figure_only
+        figures:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        note: Matrix-correction plots, Rayleigh plots, zoning profiles, α vs T comparisons, CAI applications
+          — not digitized.

@@ -1,0 +1,696 @@
+schema_version: literature_extract.v1
+source_id: kems-178-riekert-1981
+source:
+  citation: Riekert, G., Lamparter, P. & Steeb, S. (1981), "The Determination of Thermodynamic Properties
+    of melts from the Cu-Si-System by Mass Spectrometry", Zeitschrift für Naturforschung A, 36(5), 447–453,
+    doi:10.1515/zna-1981-0505.
+  year: 1981
+  doi: 10.1515/zna-1981-0505
+  doi_status: crossref_confirmed
+extraction:
+  method: Manual visual transcription from 200–300 dpi pdftoppm renders of the corpus OA PDF (De Gruyter
+    Z. Naturforsch. A). Printed Tables 1–4 only. Figures 1–9 not digitized. Section 6 Regular / Schmid–Schürmann
+    model outputs typed as model absence. Table 1 = measured ion-current ratios; Table 2 = least-squares
+    fit coefficients (derived); Tables 3–4 = Belton–Fruehan integration / excess Gibbs products at 1700
+    K (derived). Absence is never zero.
+  date: '2026-09-23'
+  worker: n15-aq-oa-batch-a
+  null_hypothesis_check: No prior extract for Riekert/Lamparter/Steeb 1981 or DOI 10.1515/zna-1981-0505.
+    kems-049-kato-1993-ms-review cites this paper as a Cu-Si reference only (not a primary extract). SOURCE_STATUS
+    lists kems-178-riekert-1981 as located / no document (pre-AQ).
+review_status: draft
+fidelity_samples:
+- species: Cu-Si_melt
+  observable: rate_series
+  observation_id: riekert_1981_table1_ln_ICu_ISi
+  field: quantity
+  value: ln_I_Cu_plus_over_I_Si_plus
+  locator:
+    published_page: 449
+    pdf_page_index: 3
+    table: '1'
+- species: Cu-Si_melt
+  observable: rate_series
+  observation_id: riekert_1981_table1_ln_ICu_ISi
+  field: electron_energy_eV
+  value: 18
+  locator:
+    published_page: 449
+    pdf_page_index: 3
+    table: '1'
+    note: 'Procedure: E=18 eV for all concentrations'
+- species: Cu
+  observable: activity_coefficient
+  observation_id: riekert_1981_table3_activities_1700K
+  field: T_K
+  value: 1700
+  locator:
+    published_page: 450
+    pdf_page_index: 4
+    table: '3'
+- species: Cu-Si_melt
+  observable: gibbs_table
+  observation_id: riekert_1981_table4_excess_gibbs_1700K
+  field: T_K
+  value: 1700
+  locator:
+    published_page: 450
+    pdf_page_index: 4
+    table: '4'
+benches:
+- id: mpi-stuttgart-ms702-knudsen
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Double-focusing mass spectrometer MS 702 (AEI, Manchester) with reconstructed high-T Knudsen
+        cell / heating assembly
+    locator:
+      published_page: 448
+      pdf_page_index: 2
+      section: 3. Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Graphite Knudsen cell coated with SiC (pure Si annealed 4 h at 1500 C yields 0.8–0.9 mm SiC
+        layer); Ta tube support; W-wire heater 1.5 mm
+    locator:
+      published_page: 449
+      pdf_page_index: 3
+      section: 3. Experimental
+      figure: '3'
+  heating_method:
+    state:
+      tag: value
+      value: Tungsten-wire heater; EUROTHERM controller via W-Re 3%–W-Re 25% thermocouple in cell bottom
+        (Heraeus); T calibration vs Ag mp 960 C and Cu mp 1083 C
+    locator:
+      published_page: 448
+      pdf_page_index: 2
+      section: 3. Experimental
+  detector:
+    state:
+      tag: value
+      value: Secondary-electron multiplier + multichannel analyzer ion counting; movable shutter between
+        cell and ion source
+    locator:
+      published_page: 448
+      pdf_page_index: 2
+      section: 3. Experimental
+  other_facts:
+  - name: electron_energy_eV
+    unit: eV
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        section: 4. Experimental Procedure
+  - name: acceleration_voltage_kV
+    unit: kV
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        section: 4. Experimental Procedure
+  - name: electron_trap_current_uA
+    unit: uA
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        section: 4. Experimental Procedure
+  - name: mass_resolution_M_over_DeltaM
+    unit: dimensionless
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '960'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        note: 28Si+ vs 28N2+ separation
+  - name: ion_source_vacuum_torr
+    unit: torr
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 2e-8
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        note: Heating started when ion-source vacuum ~2e-8 torr
+  - name: isotopes_measured
+    unit: as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 28Si+ and 63Cu+
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+  - name: ionization_cross_section_Cu_A2_at_18eV
+    unit: A2
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.29'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        note: From Mann [12] at 18 eV
+  - name: ionization_cross_section_Si_A2_at_18eV
+    unit: A2
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4.18'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        note: From Mann [12] at 18 eV
+  - name: isotope_abundance_63Cu_pct
+    unit: percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '69.09'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+  - name: isotope_abundance_28Si_pct
+    unit: percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '92.21'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+experiments:
+- experiment_id: cu-si-knudsen-ms-belton-fruehan
+  bench_id: mpi-stuttgart-ms702-knudsen
+  method: knudsen_effusion_mass_spectrometry_belton_fruehan_integration
+  locator:
+    published_page: 449
+    pdf_page_index: 3
+    section: 5. Evaluation and Results
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: atomic_fraction_x_Cu_as_printed
+          components_note: 'Binary Cu-Si melts; x_Cu compositions in Table 1: 0.098, 0.282, 0.484, 0.590,
+            0.700, 0.800, 0.885'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: 0.5–1.5 g alloy from 99.99% Cu and Si, induction-melted and cast; arithmetic mean of initial
+          and final composition after vaporization loss
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        section: 4. Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1250'
+          interval_high: '1800'
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        note: Cu-rich samples ~1250–1700 K; Si-rich samples ~1650–1800 K. Activities reported at intersection
+          T=1700 K.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Knudsen effusion into MS vacuum; ion-source vacuum printed as ~2e-8 torr but cell interior
+          pressure not tabulated
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+    regime:
+      regime_class:
+        tag: value
+        value: knudsen_effusion_ms
+observation_classifications:
+  riekert_1981_table1_ln_ICu_ISi:
+    class_tag: measured
+  riekert_1981_table2_linear_fit_coefficients:
+    class_tag: derived
+  riekert_1981_table3_activities_1700K:
+    class_tag: derived
+  riekert_1981_table4_excess_gibbs_1700K:
+    class_tag: derived
+  riekert_1981_figures_1_to_9:
+    class_tag: figure_only
+  riekert_1981_section6_regular_and_schmid_schuermann_models:
+    class_tag: model
+  riekert_1981_table3_activities_1700K_si_pointer:
+    class_tag: derived
+species:
+  Cu-Si_melt:
+    observations:
+    - observation_id: riekert_1981_table1_ln_ICu_ISi
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: rate_series
+      locator:
+        published_page: 449
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 — Experimental values of the ratios of ion currents ln(I+_Cu/I+_Si)
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      units: ln(I+_Cu/I+_Si) dimensionless; T in K; x_Cu atomic fraction
+      values:
+        quantity: ln_I_Cu_plus_over_I_Si_plus
+        method_class: measured_direct
+        isotopes: 63Cu+ / 28Si+
+        electron_energy_eV: 18
+        rows:
+        - x_Cu: 0.098
+          T_K: 1694
+          ln_ICu_over_ISi: 0.57
+        - x_Cu: 0.098
+          T_K: 1721
+          ln_ICu_over_ISi: 0.33
+        - x_Cu: 0.098
+          T_K: 1748
+          ln_ICu_over_ISi: 0.02
+        - x_Cu: 0.098
+          T_K: 1776
+          ln_ICu_over_ISi: -0.05
+        - x_Cu: 0.282
+          T_K: 1694
+          ln_ICu_over_ISi: 1.53
+        - x_Cu: 0.282
+          T_K: 1710
+          ln_ICu_over_ISi: 1.24
+        - x_Cu: 0.282
+          T_K: 1748
+          ln_ICu_over_ISi: 1.17
+        - x_Cu: 0.282
+          T_K: 1776
+          ln_ICu_over_ISi: 0.9
+        - x_Cu: 0.484
+          T_K: 1532
+          ln_ICu_over_ISi: 3.19
+        - x_Cu: 0.484
+          T_K: 1559
+          ln_ICu_over_ISi: 2.8
+        - x_Cu: 0.484
+          T_K: 1586
+          ln_ICu_over_ISi: 2.67
+        - x_Cu: 0.484
+          T_K: 1613
+          ln_ICu_over_ISi: 2.23
+        - x_Cu: 0.484
+          T_K: 1639
+          ln_ICu_over_ISi: 2.21
+        - x_Cu: 0.484
+          T_K: 1666
+          ln_ICu_over_ISi: 1.95
+        - x_Cu: 0.59
+          T_K: 1614
+          ln_ICu_over_ISi: 2.32
+        - x_Cu: 0.59
+          T_K: 1641
+          ln_ICu_over_ISi: 2.25
+        - x_Cu: 0.59
+          T_K: 1668
+          ln_ICu_over_ISi: 1.79
+        - x_Cu: 0.59
+          T_K: 1695
+          ln_ICu_over_ISi: 1.68
+        - x_Cu: 0.59
+          T_K: 1722
+          ln_ICu_over_ISi: 1.48
+        - x_Cu: 0.7
+          T_K: 1561
+          ln_ICu_over_ISi: 1.55
+        - x_Cu: 0.7
+          T_K: 1582
+          ln_ICu_over_ISi: 2.15
+        - x_Cu: 0.7
+          T_K: 1587
+          ln_ICu_over_ISi: 1.7
+        - x_Cu: 0.7
+          T_K: 1614
+          ln_ICu_over_ISi: 1.57
+        - x_Cu: 0.7
+          T_K: 1641
+          ln_ICu_over_ISi: 2.0
+        - x_Cu: 0.7
+          T_K: 1668
+          ln_ICu_over_ISi: 1.43
+        - x_Cu: 0.8
+          T_K: 1587
+          ln_ICu_over_ISi: 3.42
+        - x_Cu: 0.8
+          T_K: 1614
+          ln_ICu_over_ISi: 3.16
+        - x_Cu: 0.8
+          T_K: 1641
+          ln_ICu_over_ISi: 2.73
+        - x_Cu: 0.8
+          T_K: 1668
+          ln_ICu_over_ISi: 2.62
+        - x_Cu: 0.885
+          T_K: 1534
+          ln_ICu_over_ISi: 4.56
+        - x_Cu: 0.885
+          T_K: 1561
+          ln_ICu_over_ISi: 4.09
+        - x_Cu: 0.885
+          T_K: 1603
+          ln_ICu_over_ISi: 3.77
+        - x_Cu: 0.885
+          T_K: 1614
+          ln_ICu_over_ISi: 3.81
+        - x_Cu: 0.885
+          T_K: 1641
+          ln_ICu_over_ISi: 3.61
+        - x_Cu: 0.885
+          T_K: 1695
+          ln_ICu_over_ISi: 3.04
+    - observation_id: riekert_1981_table2_linear_fit_coefficients
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: rate_series
+      locator:
+        published_page: 450
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 — Coefficients of straight lines ln(I+_Cu/I+_Si)=A*(10^4/T)+B by least squares
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      units: A dimensionless relative to 10^4/T; B dimensionless
+      values:
+        quantity: linear_fit_coefficients_ln_ICu_ISi_vs_1_over_T
+        method_class: derived
+        fit_form_as_printed: ln(I+_Cu/I+_Si) = A *(10^4/T) + B
+        rows:
+        - x_Cu: 0.098
+          A: 2.39
+          B: -13.58
+        - x_Cu: 0.282
+          A: 1.98
+          B: -10.23
+        - x_Cu: 0.484
+          A: 2.3
+          B: -11.88
+        - x_Cu: 0.59
+          A: 2.32
+          B: -11.99
+        - x_Cu: 0.7
+          A: 0.37
+          B: -0.51
+        - x_Cu: 0.8
+          A: 2.78
+          B: -14.1
+        - x_Cu: 0.885
+          A: 2.25
+          B: -10.19
+    - observation_id: riekert_1981_table4_excess_gibbs_1700K
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: gibbs_table
+      locator:
+        published_page: 450
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 — Chemical potentials and excess Gibbs energy in kJ/mol at T=1700 K (from Eq. 8)
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      T_range_K:
+      - 1700.0
+      - 1700.0
+      units: kJ/mol
+      values:
+        quantity: excess_chemical_potentials_and_Delta_G_E
+        method_class: derived
+        T_K: 1700
+        equation_as_printed: Delta_G^E = x_Cu*R*T*ln(gamma_Cu) + x_Si*R*T*ln(gamma_Si)
+        overall_error_note: Authors estimate overall error about +/-5% at 50 at.% (p.451)
+        column_header_note: Table header columns transcribed as mu^E_Cu, mu^E_Si, Delta_G^E vs x_Si (as
+          printed)
+        rows:
+        - x_Si: 0.0
+          mu_E_Cu_kJ_per_mol: 0.0
+          mu_E_Si_kJ_per_mol: 6.785
+          Delta_G_E_kJ_per_mol: 0.0
+        - x_Si: 0.1
+          mu_E_Cu_kJ_per_mol: -0.254
+          mu_E_Si_kJ_per_mol: 7.279
+          Delta_G_E_kJ_per_mol: 0.499
+        - x_Si: 0.2
+          mu_E_Cu_kJ_per_mol: -0.989
+          mu_E_Si_kJ_per_mol: 10.869
+          Delta_G_E_kJ_per_mol: 1.383
+        - x_Si: 0.3
+          mu_E_Cu_kJ_per_mol: -0.792
+          mu_E_Si_kJ_per_mol: 10.94
+          Delta_G_E_kJ_per_mol: 2.728
+        - x_Si: 0.4
+          mu_E_Cu_kJ_per_mol: 0.905
+          mu_E_Si_kJ_per_mol: 7.717
+          Delta_G_E_kJ_per_mol: 3.63
+        - x_Si: 0.5
+          mu_E_Cu_kJ_per_mol: 3.166
+          mu_E_Si_kJ_per_mol: 4.989
+          Delta_G_E_kJ_per_mol: 4.078
+        - x_Si: 0.6
+          mu_E_Cu_kJ_per_mol: 6.219
+          mu_E_Si_kJ_per_mol: 2.756
+          Delta_G_E_kJ_per_mol: 4.141
+        - x_Si: 0.7
+          mu_E_Cu_kJ_per_mol: 9.145
+          mu_E_Si_kJ_per_mol: 1.272
+          Delta_G_E_kJ_per_mol: 3.634
+        - x_Si: 0.8
+          mu_E_Cu_kJ_per_mol: 11.802
+          mu_E_Si_kJ_per_mol: 0.495
+          Delta_G_E_kJ_per_mol: 2.756
+        - x_Si: 0.9
+          mu_E_Cu_kJ_per_mol: 14.205
+          mu_E_Si_kJ_per_mol: 0.113
+          Delta_G_E_kJ_per_mol: 1.522
+        - x_Si: 1.0
+          mu_E_Cu_kJ_per_mol: 16.354
+          mu_E_Si_kJ_per_mol: 0.0
+          Delta_G_E_kJ_per_mol: 0.0
+    - observation_id: riekert_1981_figures_1_to_9
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: rate_series
+      locator:
+        published_page: 448
+        pdf_page_index: 2
+        note: Figs 1–9 ledger; not digitized
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      units: figure_only
+      values:
+        quantity: figures_not_digitized
+        method_class: figure_only
+        figures:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        note: Apparatus schematics, ln(I) vs 1/T plots, integration plot, activity curves, excess Gibbs,
+          Regular-model beta, Schmid–Schürmann model activities — not digitized.
+    - observation_id: riekert_1981_section6_regular_and_schmid_schuermann_models
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: activity_coefficient
+      locator:
+        published_page: 451
+        pdf_page_index: 5
+        section: 6. Discussion
+      phase: Cu-Si_binary_liquid
+      regime: solution_model
+      units: model parameters as printed
+      values:
+        quantity: regular_and_schmid_schuermann_model_outputs
+        method_class: model
+        note: Typed absence for scored use. Regular Model (Hildebrand) and Schmid–Schürmann agglomerate
+          model (Si4, Cu4, Cu4Si) with printed ML-constants 18.86 / 1.67 / 10.07 — model fits to measured
+          activities, not independent observations.
+        ML_constants_as_printed:
+          Si4: 18.86
+          Cu4: 1.67
+          Cu4Si: 10.07
+  Cu:
+    observations:
+    - observation_id: riekert_1981_table3_activities_1700K
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: activity_coefficient
+      locator:
+        published_page: 450
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 — Activities and activity coefficients of Cu and Si at T=1700 K from Belton–Fruehan
+          numerical integration (Eq. 6)
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      T_range_K:
+      - 1700.0
+      - 1700.0
+      standard_state: Raoultian pure liquid Cu / Si at 1700 K (as implied by a_i = gamma_i * x_i)
+      units: dimensionless activities and activity coefficients; x atomic fraction
+      values:
+        quantity: activities_and_activity_coefficients_Cu_and_Si
+        method_class: derived
+        T_K: 1700
+        derivation: Numerical integration of Belton–Fruehan relation (Eq. 6) using 1700 K intercepts of
+          Table 1/2 ion-current ratio lines (Fig. 5).
+        rows:
+        - x_Cu: 1.0
+          ln_gamma_Cu: 0.0
+          gamma_Cu: 1.0
+          a_Cu: 1.0
+          x_Si: 0.0
+          ln_gamma_Si: 0.48
+          gamma_Si: 1.615
+          a_Si: 0.0
+        - x_Cu: 0.9
+          ln_gamma_Cu: -0.018
+          gamma_Cu: 0.983
+          a_Cu: 0.88
+          x_Si: 0.1
+          ln_gamma_Si: 0.515
+          gamma_Si: 1.673
+          a_Si: 0.17
+        - x_Cu: 0.8
+          ln_gamma_Cu: -0.07
+          gamma_Cu: 0.932
+          a_Cu: 0.75
+          x_Si: 0.2
+          ln_gamma_Si: 0.769
+          gamma_Si: 2.158
+          a_Si: 0.43
+        - x_Cu: 0.7
+          ln_gamma_Cu: -0.056
+          gamma_Cu: 0.946
+          a_Cu: 0.66
+          x_Si: 0.3
+          ln_gamma_Si: 0.774
+          gamma_Si: 2.167
+          a_Si: 0.65
+        - x_Cu: 0.6
+          ln_gamma_Cu: 0.064
+          gamma_Cu: 1.066
+          a_Cu: 0.64
+          x_Si: 0.4
+          ln_gamma_Si: 0.546
+          gamma_Si: 1.725
+          a_Si: 0.69
+        - x_Cu: 0.5
+          ln_gamma_Cu: 0.224
+          gamma_Cu: 1.251
+          a_Cu: 0.63
+          x_Si: 0.5
+          ln_gamma_Si: 0.353
+          gamma_Si: 1.423
+          a_Si: 0.71
+        - x_Cu: 0.4
+          ln_gamma_Cu: 0.44
+          gamma_Cu: 1.552
+          a_Cu: 0.62
+          x_Si: 0.6
+          ln_gamma_Si: 0.195
+          gamma_Si: 1.215
+          a_Si: 0.73
+        - x_Cu: 0.3
+          ln_gamma_Cu: 0.647
+          gamma_Cu: 1.91
+          a_Cu: 0.57
+          x_Si: 0.7
+          ln_gamma_Si: 0.09
+          gamma_Si: 1.094
+          a_Si: 0.77
+        - x_Cu: 0.2
+          ln_gamma_Cu: 0.835
+          gamma_Cu: 2.304
+          a_Cu: 0.46
+          x_Si: 0.8
+          ln_gamma_Si: 0.035
+          gamma_Si: 1.036
+          a_Si: 0.83
+        - x_Cu: 0.1
+          ln_gamma_Cu: 1.005
+          gamma_Cu: 2.732
+          a_Cu: 0.27
+          x_Si: 0.9
+          ln_gamma_Si: 0.008
+          gamma_Si: 1.008
+          a_Si: 0.91
+        - x_Cu: 0.0
+          ln_gamma_Cu: 1.157
+          gamma_Cu: 3.18
+          a_Cu: 0.0
+          x_Si: 1.0
+          ln_gamma_Si: 0.0
+          gamma_Si: 1.0
+          a_Si: 1.0
+  Si:
+    observations:
+    - observation_id: riekert_1981_table3_activities_1700K_si_pointer
+      experiment: cu-si-knudsen-ms-belton-fruehan
+      type: activity_coefficient
+      locator:
+        published_page: 450
+        pdf_page_index: 4
+        table: '3'
+      phase: Cu-Si_binary_liquid
+      regime: knudsen_effusion_ms
+      T_range_K:
+      - 1700.0
+      - 1700.0
+      units: see paired Cu observation
+      values:
+        quantity: activities_and_activity_coefficients_Cu_and_Si
+        method_class: derived
+        note: Si columns are co-tabulated with Cu in observation riekert_1981_table3_activities_1700K;
+          not duplicated here.
+        see_observation_id: riekert_1981_table3_activities_1700K
