@@ -1,12 +1,14 @@
 schema_version: literature_extract.v1
 source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
 source:
-  citation: Rusiecka, M. K. & Wood, B. J. (2025), "Chlorine and NaCl in hydrous basaltic melts", Geochimica et Cosmochimica Acta 393:208-218, DOI 10.1016/j.gca.2025.01.020
+  citation: Rusiecka, M. K. & Wood, B. J. (2025), "Chlorine and NaCl in hydrous basaltic melts", Geochimica et Cosmochimica
+    Acta 393:208-218, DOI 10.1016/j.gca.2025.01.020
   doi: 10.1016/j.gca.2025.01.020
   url: https://doi.org/10.1016/j.gca.2025.01.020
   year: 2025
 extraction:
-  method: pdftotext -layout with visual verification of Table 1 and Table 2; printed values retained in printed units and bounds
+  method: pdftotext -layout with visual verification of Table 1 and Table 2; printed values retained in printed units and
+    bounds
   date: '2026-09-19'
   worker: w3-rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/
@@ -14,61 +16,864 @@ review_status: draft
 corrections: []
 benches:
 - id: oxford-piston-cylinder
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: End-loaded half-inch piston-cylinder apparatus at the University of Oxford}
-    locator: &rusiecka_experiment_locator {published_page: 210, section: '2. Experimental procedure'}
+    state:
+      tag: value
+      value: End-loaded half-inch piston-cylinder apparatus at the University of Oxford
+    locator: &id001
+      published_page: 210
+      section: 2. Experimental procedure
   heating_method:
-    state: {tag: value, value: Graphite furnace}
-    locator: *rusiecka_experiment_locator
+    state:
+      tag: value
+      value: Graphite furnace
+    locator: *id001
   temperature_measurement:
     sensor:
-      state: {tag: value, value: Alumina-sheathed C-type thermocouple at 1.0 and 1.5 GPa; S-type thermocouple at 0.5 GPa}
-      locator: *rusiecka_experiment_locator
+      state:
+        tag: value
+        value: Alumina-sheathed C-type thermocouple at 1.0 and 1.5 GPa; S-type thermocouple at 0.5 GPa
+      locator: *id001
   detector:
-    state: {tag: value, value: CAMECA SXFive-FE electron microprobe and CAMECA IMS-7f GEO SIMS}
-    locator: {published_page: 210, section: '3. Analytical procedures'}
+    state:
+      tag: value
+      value: CAMECA SXFive-FE electron microprobe and CAMECA IMS-7f GEO SIMS
+    locator:
+      published_page: 210
+      section: 3. Analytical procedures
 experiments:
-- experiment_id: icb-series
+- experiment_id: icb-1
   bench_id: oxford-piston-cylinder
   method: melt_equilibration_quench
-  locator: *rusiecka_experiment_locator
+  locator: &id002
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-1
   sample:
     printed_composition:
-      state: {tag: value, value: Hydrous Icelandic Reykjanes Ridge basalt with AgI-AgCl buffer}
-      locator: {published_page: 210, table: '1'}
+      state:
+        tag: value
+        value:
+          SiO2: 51.17
+          TiO2: 1.02
+          Al2O3: 14.55
+          FeO: 5.13
+          MgO: 9.28
+          CaO: 12.49
+          Na2O: 1.37
+          K2O: 0.03
+          H2O: 1.0
+          CO2: 0.9
+          Cl: 1.6
+      locator: *id002
     form:
-      state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
-      locator: *rusiecka_experiment_locator
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id003
+        published_page: 210
+        section: 2. Experimental procedure
     pretreatment:
-      state: {tag: value, value: Ground under ethanol for 2 h, decarbonated overnight at 400-800 C at 2 C/min, then ground under ethanol at least 2 h}
-      locator: *rusiecka_experiment_locator
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id003
   apparatus:
     geometry:
       orifice_diameter_m:
-        state: {tag: not_applicable, reason: not_applicable}
-        locator: *rusiecka_experiment_locator
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id003
       orifice_channel_length_m:
-        state: {tag: not_applicable, reason: not_applicable}
-        locator: *rusiecka_experiment_locator
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id003
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 212, table: '2', note: Individual ICB rows span multiple pressure-temperature conditions; no single series setpoint is assigned here}
+      state:
+        tag: value
+        value: '1573.15'
+      locator: *id002
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 212, table: '2', note: Individual ICB rows span 0.5-1.5 GPa; no single series pressure is assigned here}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500000000.0'
+      locator: *id002
     sweep_gas:
-      state: {tag: not_applicable, reason: not_applicable}
-      locator: *rusiecka_experiment_locator
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id003
     regime:
-      regime_class: {tag: unknown, reason: not_published}
+      regime_class:
+        tag: unknown
+        reason: not_published
   fO2_control:
-    channel: {tag: unknown, reason: not_published}
+    channel:
+      tag: value
+      value: buffer
     buffer:
-      state: {tag: value, value: Close to C-CO-CO2 buffer}
-      locator: {published_page: 210, section: '2. Experimental procedure'}
+      state:
+        tag: value
+        value: fO2=1.1e-08; fCl2=0.00021
+      locator: *id002
+- experiment_id: icb-2
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id004
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-2
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 48.4
+          TiO2: 0.96
+          Al2O3: 12.7
+          FeO: 7.92
+          MgO: 8.92
+          CaO: 11.99
+          Na2O: 1.24
+          K2O: 0.02
+          H2O: 1.21
+          CO2: 0.9
+          Cl: 2.0
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id005
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id005
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id005
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id005
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator: *id004
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500000000.0'
+      locator: *id004
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id005
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=1.1e-08; fCl2=0.000201
+      locator: *id004
+- experiment_id: icb-3
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id006
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-3
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 46.79
+          TiO2: 0.95
+          Al2O3: 12.32
+          FeO: 7.74
+          MgO: 8.65
+          CaO: 11.71
+          Na2O: 1.23
+          K2O: 0.03
+          H2O: 3.92
+          CO2: 0.9
+          Cl: 2.57
+      locator: *id006
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id007
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id007
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id007
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id007
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator: *id006
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500000000.0'
+      locator: *id006
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id007
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=1.29e-08; fCl2=0.000195
+      locator: *id006
+- experiment_id: icb-4
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id008
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-4
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 48.39
+          TiO2: 1.01
+          Al2O3: 13.78
+          FeO: 8.57
+          MgO: 8.79
+          CaO: 12.02
+          Na2O: 1.03
+          K2O: 0.02
+          H2O: 1.94
+          CO2: 0.4
+          Cl: 2.64
+      locator: *id008
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id009
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id009
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id009
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id009
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id008
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000000000.0'
+      locator: *id008
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id009
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=4.92e-10; fCl2=2.29e-05
+      locator: *id008
+- experiment_id: icb-5
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id010
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-5
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 48.45
+          TiO2: 1.0
+          Al2O3: 14.03
+          FeO: 8.46
+          MgO: 8.57
+          CaO: 11.79
+          Na2O: 1.05
+          K2O: 0.02
+          H2O: 2.47
+          CO2: 0.4
+          Cl: 2.68
+      locator: *id010
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id011
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id011
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id011
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id011
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id010
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000000000.0'
+      locator: *id010
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id011
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=4.59e-10; fCl2=2.27e-05
+      locator: *id010
+- experiment_id: icb-6
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id012
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-6
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 48.28
+          TiO2: 0.98
+          Al2O3: 13.26
+          FeO: 8.41
+          MgO: 8.45
+          CaO: 11.66
+          Na2O: 1.06
+          K2O: 0.02
+          H2O: 3.75
+          CO2: 0.4
+          Cl: 2.85
+      locator: *id012
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id013
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id013
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id013
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id013
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id012
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000000000.0'
+      locator: *id012
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id013
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=3.89e-10; fCl2=2.27e-05
+      locator: *id012
+- experiment_id: icb-7
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id014
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-7
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 47.51
+          TiO2: 0.98
+          Al2O3: 12.71
+          FeO: 8.13
+          MgO: 8.45
+          CaO: 11.72
+          Na2O: 0.99
+          K2O: 0.02
+          H2O: 3.87
+          CO2: 0.4
+          Cl: 3.13
+      locator: *id014
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id015
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id015
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id015
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id015
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id014
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000000000.0'
+      locator: *id014
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id015
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=3.83e-10; fCl2=2.25e-05
+      locator: *id014
+- experiment_id: icb-8
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id016
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-8
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 49.6
+          TiO2: 1.02
+          Al2O3: 13.59
+          FeO: 8.13
+          MgO: 8.97
+          CaO: 12.12
+          Na2O: 0.79
+          K2O: 0.01
+          H2O: 1.41
+          CO2: 0.1
+          Cl: 2.93
+      locator: *id016
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id017
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id017
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id017
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id017
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id016
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500000000.0'
+      locator: *id016
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id017
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=7.31e-11; fCl2=5.31e-06
+      locator: *id016
+- experiment_id: icb-9
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id018
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-9
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 50.26
+          TiO2: 1.03
+          Al2O3: 13.8
+          FeO: 6.04
+          MgO: 8.78
+          CaO: 11.88
+          Na2O: 1.2
+          K2O: 0.03
+          H2O: 3.1
+          CO2: 0.1
+          Cl: 3.25
+      locator: *id018
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id019
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id019
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id019
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id019
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id018
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500000000.0'
+      locator: *id018
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id019
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=5.57e-11; fCl2=5.15e-06
+      locator: *id018
+- experiment_id: icb-10
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: &id020
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+    record: ICB-10
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 49.34
+          TiO2: 1.01
+          Al2O3: 12.71
+          FeO: 6.52
+          MgO: 9.34
+          CaO: 11.81
+          Na2O: 0.7
+          K2O: 0.02
+          H2O: 3.18
+          CO2: 0.1
+          Cl: 3.37
+      locator: *id020
+    form:
+      state:
+        tag: value
+        value: Powder mixed with AgI-AgCl buffer
+      locator: &id021
+        published_page: 210
+        section: 2. Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Ground under ethanol for 2 h
+        decarbonated overnight at 400-800 C at 2 C/min: null
+        then ground under ethanol at least 2 h: null
+      locator: *id021
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id021
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id021
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator: *id020
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500000000.0'
+      locator: *id020
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator: *id021
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2=5.5e-11; fCl2=5.11e-06
+      locator: *id020
 fidelity_samples:
 - observation_id: rusiecka_wood_2025_table2_experiments
   field: experiments
@@ -127,7 +932,7 @@ species:
           MgO_wt_pct: 9.36
           MgO_uncertainty_wt_pct: 0.08
           CaO_wt_pct: 12.87
-          CaO_uncertainty_wt_pct: 0.10
+          CaO_uncertainty_wt_pct: 0.1
           Na2O_wt_pct: 2.17
           Na2O_uncertainty_wt_pct: 0.12
           K2O_wt_pct: 0.08
@@ -139,16 +944,16 @@ species:
           SiO2_uncertainty_wt_pct: 0.23
           TiO2_wt_pct: 1.01
           TiO2_uncertainty_wt_pct: 0.04
-          Al2O3_wt_pct: 13.20
+          Al2O3_wt_pct: 13.2
           Al2O3_uncertainty_wt_pct: 0.13
           FeO_wt_pct: 9.61
           FeO_uncertainty_wt_pct: 0.13
           MgO_wt_pct: 9.46
-          MgO_uncertainty_wt_pct: 0.10
+          MgO_uncertainty_wt_pct: 0.1
           CaO_wt_pct: 12.93
           CaO_uncertainty_wt_pct: 0.19
           Na2O_wt_pct: 2.31
-          Na2O_uncertainty_wt_pct: 0.10
+          Na2O_uncertainty_wt_pct: 0.1
           K2O_wt_pct: 0.06
           K2O_uncertainty_wt_pct: 0.02
           H2O_wt_pct: 6.29
@@ -168,79 +973,475 @@ species:
         quantity: chloride_capacity_model
         method_class: model_derived
         evidence_class: author_stepwise_linear_regression
-        generator: author stepwise linear regression fitted to 70 results (60 anhydrous from Thomas and Wood 2021, 2023 plus 10 hydrous experiments here); SPSS; F-test alpha=0.05
+        generator: author stepwise linear regression fitted to 70 results (60 anhydrous from Thomas and Wood 2021, 2023 plus
+          10 hydrous experiments here); SPSS; F-test alpha=0.05
         equation_8: logCCl = 1.492 + (4331XCa - 3508XSi + 2440XFe - 3921XK - 741P)/T
         R2: 0.963
         standard_error_68_percent: 0.083
         water_treatment: HO0.5 treated as ideal diluent; no significant fitted HO0.5 term at alpha=0.05
         equation_16: log(aNaCl) = log(Cl-) + 0.23 + (-4331XCa + 3508XSi + 5694XFe + 7484XMg + 4726XNa + 3921XK - 3160)/T
-        equation_16_generator: author model combining chloride capacities with Na2SiO3 and SiO2 partial molar free energies from Rhyolite-MELTS 1.2.0 for MATLAB; NIST-JANAF for gas and liquid NaCl standard-state free energies; Marcus NaCl volume data
+        equation_16_generator: author model combining chloride capacities with Na2SiO3 and SiO2 partial molar free energies
+          from Rhyolite-MELTS 1.2.0 for MATLAB; NIST-JANAF for gas and liquid NaCl standard-state free energies; Marcus NaCl
+          volume data
         melT_outputs: calculated NaCl activities for experimental melts; individual values not printed in main-paper table
-        figure_only_outputs: Figures 1-9 include plotted comparisons and calculated activities/salinities; coordinates not digitized
-        fO2_generator: author calculation using Jakobsson and Oskarsson 1994 at 1.0 and 1.5 GPa; Modified Redlich-Kwong equation of state after Holloway 1977 at 0.5 GPa; NIST-JANAF 1-bar free energies; H2O correction from Moore et al. 1998
+        figure_only_outputs: Figures 1-9 include plotted comparisons and calculated activities/salinities; coordinates not
+          digitized
+        fO2_generator: author calculation using Jakobsson and Oskarsson 1994 at 1.0 and 1.5 GPa; Modified Redlich-Kwong equation
+          of state after Holloway 1977 at 0.5 GPa; NIST-JANAF 1-bar free energies; H2O correction from Moore et al. 1998
         fCl2_generator: Thomas and Wood 2021 chlorine-fugacity control equation from AgI/AgCl buffer
         uncertainty:
           standard_error_68_percent: 0.083
+    - observation_id: rusiecka_wood_2025_table2_icb-1
+      experiment: icb-1
+      type: transition_point
+      locator: *id002
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-1
+          T_C: 1300
+          n: 43
+          P_GPa: 1.5
+          fO2_as_printed: 1.1e-08
+          fCl2_as_printed: 0.00021
+          SiO2_wt_pct: 51.17
+          SiO2_uncertainty: 0.86
+          TiO2_wt_pct: 1.02
+          TiO2_uncertainty: 0.04
+          Al2O3_wt_pct: 14.55
+          Al2O3_uncertainty: 0.38
+          FeO_wt_pct: 5.13
+          FeO_uncertainty: 0.24
+          MgO_wt_pct: 9.28
+          MgO_uncertainty: 0.3
+          CaO_wt_pct: 12.49
+          CaO_uncertainty: 0.3
+          Na2O_wt_pct: 1.37
+          Na2O_uncertainty: 0.2
+          K2O_wt_pct: 0.03
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 1.0
+          H2O_uncertainty: 0.4
+          H2O_basis: estimated_from_EPMA
+          CO2_wt_pct: 0.9
+          CO2_uncertainty: 0.04
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 1.6
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.27
+          final_Ag_over_Ag_plus_Pt: 0.98
+    - observation_id: rusiecka_wood_2025_table2_icb-2
+      experiment: icb-2
+      type: transition_point
+      locator: *id004
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-2
+          T_C: 1300
+          n: 21
+          P_GPa: 1.5
+          fO2_as_printed: 1.1e-08
+          fCl2_as_printed: 0.000201
+          SiO2_wt_pct: 48.4
+          SiO2_uncertainty: 0.76
+          TiO2_wt_pct: 0.96
+          TiO2_uncertainty: 0.04
+          Al2O3_wt_pct: 12.7
+          Al2O3_uncertainty: 0.44
+          FeO_wt_pct: 7.92
+          FeO_uncertainty: 0.3
+          MgO_wt_pct: 8.92
+          MgO_uncertainty: 0.32
+          CaO_wt_pct: 11.99
+          CaO_uncertainty: 0.3
+          Na2O_wt_pct: 1.24
+          Na2O_uncertainty: 0.18
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 1.21
+          H2O_uncertainty: 0.06
+          H2O_basis: measured_by_SIMS
+          CO2_wt_pct: 0.9
+          CO2_uncertainty: 0.04
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.0
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.27
+          final_Ag_over_Ag_plus_Pt: 0.98
+    - observation_id: rusiecka_wood_2025_table2_icb-3
+      experiment: icb-3
+      type: transition_point
+      locator: *id006
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-3
+          T_C: 1300
+          n: 32
+          P_GPa: 1.5
+          fO2_as_printed: 1.29e-08
+          fCl2_as_printed: 0.000195
+          SiO2_wt_pct: 46.79
+          SiO2_uncertainty: 0.74
+          TiO2_wt_pct: 0.95
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 12.32
+          Al2O3_uncertainty: 0.3
+          FeO_wt_pct: 7.74
+          FeO_uncertainty: 0.28
+          MgO_wt_pct: 8.65
+          MgO_uncertainty: 0.28
+          CaO_wt_pct: 11.71
+          CaO_uncertainty: 0.34
+          Na2O_wt_pct: 1.23
+          Na2O_uncertainty: 0.14
+          K2O_wt_pct: 0.03
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 3.92
+          H2O_uncertainty: 0.1
+          H2O_basis: measured_by_SIMS
+          CO2_wt_pct: 0.9
+          CO2_uncertainty: 0.04
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.57
+          Cl_uncertainty: 0.16
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.98
+    - observation_id: rusiecka_wood_2025_table2_icb-4
+      experiment: icb-4
+      type: transition_point
+      locator: *id008
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-4
+          T_C: 1200
+          n: 28
+          P_GPa: 1.0
+          fO2_as_printed: 4.92e-10
+          fCl2_as_printed: 2.29e-05
+          SiO2_wt_pct: 48.39
+          SiO2_uncertainty: 1.42
+          TiO2_wt_pct: 1.01
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 13.78
+          Al2O3_uncertainty: 0.4
+          FeO_wt_pct: 8.57
+          FeO_uncertainty: 0.28
+          MgO_wt_pct: 8.79
+          MgO_uncertainty: 0.44
+          CaO_wt_pct: 12.02
+          CaO_uncertainty: 0.28
+          Na2O_wt_pct: 1.03
+          Na2O_uncertainty: 0.14
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 1.94
+          H2O_uncertainty: 0.4
+          H2O_basis: estimated_from_EPMA
+          CO2_wt_pct: 0.4
+          CO2_uncertainty: 0.04
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.64
+          Cl_uncertainty: 0.06
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-5
+      experiment: icb-5
+      type: transition_point
+      locator: *id010
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-5
+          T_C: 1200
+          n: 22
+          P_GPa: 1.0
+          fO2_as_printed: 4.59e-10
+          fCl2_as_printed: 2.27e-05
+          SiO2_wt_pct: 48.45
+          SiO2_uncertainty: 0.92
+          TiO2_wt_pct: 1.0
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 14.03
+          Al2O3_uncertainty: 0.36
+          FeO_wt_pct: 8.46
+          FeO_uncertainty: 0.36
+          MgO_wt_pct: 8.57
+          MgO_uncertainty: 0.2
+          CaO_wt_pct: 11.79
+          CaO_uncertainty: 0.36
+          Na2O_wt_pct: 1.05
+          Na2O_uncertainty: 0.2
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 2.47
+          H2O_uncertainty: 0.4
+          H2O_basis: estimated_from_EPMA
+          CO2_wt_pct: 0.4
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.68
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-6
+      experiment: icb-6
+      type: transition_point
+      locator: *id012
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-6
+          T_C: 1200
+          n: 41
+          P_GPa: 1.0
+          fO2_as_printed: 3.89e-10
+          fCl2_as_printed: 2.27e-05
+          SiO2_wt_pct: 48.28
+          SiO2_uncertainty: 0.72
+          TiO2_wt_pct: 0.98
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 13.26
+          Al2O3_uncertainty: 0.32
+          FeO_wt_pct: 8.41
+          FeO_uncertainty: 0.28
+          MgO_wt_pct: 8.45
+          MgO_uncertainty: 0.22
+          CaO_wt_pct: 11.66
+          CaO_uncertainty: 0.22
+          Na2O_wt_pct: 1.06
+          Na2O_uncertainty: 0.16
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 3.75
+          H2O_uncertainty: 0.4
+          H2O_basis: estimated_from_EPMA
+          CO2_wt_pct: 0.4
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.85
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-7
+      experiment: icb-7
+      type: transition_point
+      locator: *id014
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-7
+          T_C: 1200
+          n: 36
+          P_GPa: 1.0
+          fO2_as_printed: 3.83e-10
+          fCl2_as_printed: 2.25e-05
+          SiO2_wt_pct: 47.51
+          SiO2_uncertainty: 1.02
+          TiO2_wt_pct: 0.98
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 12.71
+          Al2O3_uncertainty: 0.4
+          FeO_wt_pct: 8.13
+          FeO_uncertainty: 0.34
+          MgO_wt_pct: 8.45
+          MgO_uncertainty: 0.32
+          CaO_wt_pct: 11.72
+          CaO_uncertainty: 0.28
+          Na2O_wt_pct: 0.99
+          Na2O_uncertainty: 0.16
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 3.87
+          H2O_uncertainty: 0.06
+          H2O_basis: measured_by_SIMS
+          CO2_wt_pct: 0.4
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 3.13
+          Cl_uncertainty: 0.18
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-8
+      experiment: icb-8
+      type: transition_point
+      locator: *id016
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-8
+          T_C: 1200
+          n: 37
+          P_GPa: 0.5
+          fO2_as_printed: 7.31e-11
+          fCl2_as_printed: 5.31e-06
+          SiO2_wt_pct: 49.6
+          SiO2_uncertainty: 1.08
+          TiO2_wt_pct: 1.02
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 13.59
+          Al2O3_uncertainty: 0.38
+          FeO_wt_pct: 8.13
+          FeO_uncertainty: 0.44
+          MgO_wt_pct: 8.97
+          MgO_uncertainty: 0.32
+          CaO_wt_pct: 12.12
+          CaO_uncertainty: 0.28
+          Na2O_wt_pct: 0.79
+          Na2O_uncertainty: 0.14
+          K2O_wt_pct: 0.01
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 1.41
+          H2O_uncertainty: 0.04
+          H2O_basis: measured_by_SIMS
+          CO2_wt_pct: 0.1
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 2.93
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.26
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-9
+      experiment: icb-9
+      type: transition_point
+      locator: *id018
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-9
+          T_C: 1200
+          n: 34
+          P_GPa: 0.5
+          fO2_as_printed: 5.57e-11
+          fCl2_as_printed: 5.15e-06
+          SiO2_wt_pct: 50.26
+          SiO2_uncertainty: 0.72
+          TiO2_wt_pct: 1.03
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 13.8
+          Al2O3_uncertainty: 0.32
+          FeO_wt_pct: 6.04
+          FeO_uncertainty: 0.4
+          MgO_wt_pct: 8.78
+          MgO_uncertainty: 0.24
+          CaO_wt_pct: 11.88
+          CaO_uncertainty: 0.32
+          Na2O_wt_pct: 1.2
+          Na2O_uncertainty: 0.16
+          K2O_wt_pct: 0.03
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 3.1
+          H2O_uncertainty: 0.4
+          H2O_basis: estimated_from_EPMA
+          CO2_wt_pct: 0.1
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 3.25
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.25
+          final_Ag_over_Ag_plus_Pt: 0.99
+    - observation_id: rusiecka_wood_2025_table2_icb-10
+      experiment: icb-10
+      type: transition_point
+      locator: *id020
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
+      values:
+        quantity: experimental_conditions_and_melt_composition
+        method_class: measured_tabulated
+        evidence_class: authors_own_experiment
+        row:
+          sample: ICB-10
+          T_C: 1200
+          n: 29
+          P_GPa: 0.5
+          fO2_as_printed: 5.5e-11
+          fCl2_as_printed: 5.11e-06
+          SiO2_wt_pct: 49.34
+          SiO2_uncertainty: 1.42
+          TiO2_wt_pct: 1.01
+          TiO2_uncertainty: 0.06
+          Al2O3_wt_pct: 12.71
+          Al2O3_uncertainty: 0.4
+          FeO_wt_pct: 6.52
+          FeO_uncertainty: 0.28
+          MgO_wt_pct: 9.34
+          MgO_uncertainty: 0.34
+          CaO_wt_pct: 11.81
+          CaO_uncertainty: 0.36
+          Na2O_wt_pct: 0.7
+          Na2O_uncertainty: 0.18
+          K2O_wt_pct: 0.02
+          K2O_uncertainty: 0.02
+          H2O_wt_pct: 3.18
+          H2O_uncertainty: 0.09
+          H2O_basis: measured_by_SIMS
+          CO2_wt_pct: 0.1
+          CO2_uncertainty: 0.02
+          CO2_basis: estimated_from_EPMA
+          Cl_wt_pct: 3.37
+          Cl_uncertainty: 0.08
+          initial_Cl_over_Cl_plus_I: 0.29
+          final_Cl_over_Cl_plus_I: 0.25
+          final_Ag_over_Ag_plus_Pt: 0.99
     context:
-    - observation_id: rusiecka_wood_2025_table2_icb1
-      experiment: icb-series
-      type: experiment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-1}
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
-      values:
-        quantity: experimental_conditions_and_melt_composition
-        method_class: measured_tabulated
-        evidence_class: authors_own_experiment
-        row: {sample: ICB-1, T_C: 1300, n: 43, P_GPa: 1.5, fO2_as_printed: 1.10E-08, fCl2_as_printed: 2.10E-04, SiO2_wt_pct: 51.17, SiO2_uncertainty: 0.86, TiO2_wt_pct: 1.02, TiO2_uncertainty: 0.04, Al2O3_wt_pct: 14.55, Al2O3_uncertainty: 0.38, FeO_wt_pct: 5.13, FeO_uncertainty: 0.24, MgO_wt_pct: 9.28, MgO_uncertainty: 0.30, CaO_wt_pct: 12.49, CaO_uncertainty: 0.30, Na2O_wt_pct: 1.37, Na2O_uncertainty: 0.20, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 1.0, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 1.6, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.27, final_Ag_over_Ag_plus_Pt: 0.98}
-    - observation_id: rusiecka_wood_2025_table2_icb2
-      experiment: icb-series
-      type: experiment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-2}
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
-      values: {quantity: experimental_conditions_and_melt_composition, method_class: measured_tabulated, evidence_class: authors_own_experiment, row: {sample: ICB-2, T_C: 1300, n: 21, P_GPa: 1.5, fO2_as_printed: 1.10E-08, fCl2_as_printed: 2.01E-04, SiO2_wt_pct: 48.4, SiO2_uncertainty: 0.76, TiO2_wt_pct: 0.96, TiO2_uncertainty: 0.04, Al2O3_wt_pct: 12.7, Al2O3_uncertainty: 0.44, FeO_wt_pct: 7.92, FeO_uncertainty: 0.30, MgO_wt_pct: 8.92, MgO_uncertainty: 0.32, CaO_wt_pct: 11.99, CaO_uncertainty: 0.30, Na2O_wt_pct: 1.24, Na2O_uncertainty: 0.18, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 1.21, H2O_uncertainty: 0.06, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.0, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.27, final_Ag_over_Ag_plus_Pt: 0.98}}
-    - observation_id: rusiecka_wood_2025_table2_icb3
-      experiment: icb-series
-      type: experiment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-3}
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
-      values: {quantity: experimental_conditions_and_melt_composition, method_class: measured_tabulated, evidence_class: authors_own_experiment, row: {sample: ICB-3, T_C: 1300, n: 32, P_GPa: 1.5, fO2_as_printed: 1.29E-08, fCl2_as_printed: 1.95E-04, SiO2_wt_pct: 46.79, SiO2_uncertainty: 0.74, TiO2_wt_pct: 0.95, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.32, Al2O3_uncertainty: 0.30, FeO_wt_pct: 7.74, FeO_uncertainty: 0.28, MgO_wt_pct: 8.65, MgO_uncertainty: 0.28, CaO_wt_pct: 11.71, CaO_uncertainty: 0.34, Na2O_wt_pct: 1.23, Na2O_uncertainty: 0.14, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 3.92, H2O_uncertainty: 0.1, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.57, Cl_uncertainty: 0.16, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.98}}
-    - observation_id: rusiecka_wood_2025_table2_icb4_to_icb7
-      experiment: icb-series
-      type: experiment_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-4_to_ICB-7}
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
-      values:
-        quantity: experimental_conditions_and_melt_composition
-        method_class: measured_tabulated
-        evidence_class: authors_own_experiment
-        rows:
-        - {sample: ICB-4, T_C: 1200, n: 28, P_GPa: 1.0, fO2_as_printed: 4.92E-10, fCl2_as_printed: 2.29E-05, SiO2_wt_pct: 48.39, SiO2_uncertainty: 1.42, TiO2_wt_pct: 1.01, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.78, Al2O3_uncertainty: 0.40, FeO_wt_pct: 8.57, FeO_uncertainty: 0.28, MgO_wt_pct: 8.79, MgO_uncertainty: 0.44, CaO_wt_pct: 12.02, CaO_uncertainty: 0.28, Na2O_wt_pct: 1.03, Na2O_uncertainty: 0.14, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 1.94, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.4, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.64, Cl_uncertainty: 0.06, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
-        - {sample: ICB-5, T_C: 1200, n: 22, P_GPa: 1.0, fO2_as_printed: 4.59E-10, fCl2_as_printed: 2.27E-05, SiO2_wt_pct: 48.45, SiO2_uncertainty: 0.92, TiO2_wt_pct: 1.0, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 14.03, Al2O3_uncertainty: 0.36, FeO_wt_pct: 8.46, FeO_uncertainty: 0.36, MgO_wt_pct: 8.57, MgO_uncertainty: 0.20, CaO_wt_pct: 11.79, CaO_uncertainty: 0.36, Na2O_wt_pct: 1.05, Na2O_uncertainty: 0.20, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 2.47, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.4, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.68, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
-        - {sample: ICB-6, T_C: 1200, n: 41, P_GPa: 1.0, fO2_as_printed: 3.89E-10, fCl2_as_printed: 2.27E-05, SiO2_wt_pct: 48.28, SiO2_uncertainty: 0.72, TiO2_wt_pct: 0.98, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.26, Al2O3_uncertainty: 0.32, FeO_wt_pct: 8.41, FeO_uncertainty: 0.28, MgO_wt_pct: 8.45, MgO_uncertainty: 0.22, CaO_wt_pct: 11.66, CaO_uncertainty: 0.22, Na2O_wt_pct: 1.06, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.75, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.4, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.85, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
-        - {sample: ICB-7, T_C: 1200, n: 36, P_GPa: 1.0, fO2_as_printed: 3.83E-10, fCl2_as_printed: 2.25E-05, SiO2_wt_pct: 47.51, SiO2_uncertainty: 1.02, TiO2_wt_pct: 0.98, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.71, Al2O3_uncertainty: 0.40, FeO_wt_pct: 8.13, FeO_uncertainty: 0.34, MgO_wt_pct: 8.45, MgO_uncertainty: 0.32, CaO_wt_pct: 11.72, CaO_uncertainty: 0.28, Na2O_wt_pct: 0.99, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.87, H2O_uncertainty: 0.06, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.4, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.13, Cl_uncertainty: 0.18, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
-    - observation_id: rusiecka_wood_2025_table2_icb8_to_icb10
-      experiment: icb-series
-      type: experiment_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-8_to_ICB-10}
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
-      values:
-        quantity: experimental_conditions_and_melt_composition
-        method_class: measured_tabulated
-        evidence_class: authors_own_experiment
-        rows:
-        - {sample: ICB-8, T_C: 1200, n: 37, P_GPa: 0.5, fO2_as_printed: 7.31E-11, fCl2_as_printed: 5.31E-06, SiO2_wt_pct: 49.6, SiO2_uncertainty: 1.08, TiO2_wt_pct: 1.02, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.59, Al2O3_uncertainty: 0.38, FeO_wt_pct: 8.13, FeO_uncertainty: 0.44, MgO_wt_pct: 8.97, MgO_uncertainty: 0.32, CaO_wt_pct: 12.12, CaO_uncertainty: 0.28, Na2O_wt_pct: 0.79, Na2O_uncertainty: 0.14, K2O_wt_pct: 0.01, K2O_uncertainty: 0.02, H2O_wt_pct: 1.41, H2O_uncertainty: 0.04, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.1, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.93, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
-        - {sample: ICB-9, T_C: 1200, n: 34, P_GPa: 0.5, fO2_as_printed: 5.57E-11, fCl2_as_printed: 5.15E-06, SiO2_wt_pct: 50.26, SiO2_uncertainty: 0.72, TiO2_wt_pct: 1.03, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.8, Al2O3_uncertainty: 0.32, FeO_wt_pct: 6.04, FeO_uncertainty: 0.40, MgO_wt_pct: 8.78, MgO_uncertainty: 0.24, CaO_wt_pct: 11.88, CaO_uncertainty: 0.32, Na2O_wt_pct: 1.2, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 3.1, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.1, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.25, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.25, final_Ag_over_Ag_plus_Pt: 0.99}
-        - {sample: ICB-10, T_C: 1200, n: 29, P_GPa: 0.5, fO2_as_printed: 5.50E-11, fCl2_as_printed: 5.11E-06, SiO2_wt_pct: 49.34, SiO2_uncertainty: 1.42, TiO2_wt_pct: 1.01, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.71, Al2O3_uncertainty: 0.40, FeO_wt_pct: 6.52, FeO_uncertainty: 0.28, MgO_wt_pct: 9.34, MgO_uncertainty: 0.34, CaO_wt_pct: 11.81, CaO_uncertainty: 0.36, Na2O_wt_pct: 0.7, Na2O_uncertainty: 0.18, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.18, H2O_uncertainty: 0.09, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.1, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.37, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.25, final_Ag_over_Ag_plus_Pt: 0.99}
     - observation_id: rusiecka_wood_2025_apparatus_and_conditions
       experiment: icb-series
       type: apparatus
@@ -256,10 +1457,11 @@ species:
         method_class: measured_direct
         evidence_class: authors_own_experiment
         starting_material: Reykjanes Ridge Iceland basalt; analytical-grade oxides and carbonates; water added as Al(OH)3
-        powder_preparation: ground under ethanol 2 h, decarbonated overnight 400-800 degC at 2 degC/min, ground under ethanol at least 2 h
+        powder_preparation: ground under ethanol 2 h, decarbonated overnight 400-800 degC at 2 degC/min, ground under ethanol
+          at least 2 h
         verification_melt: 1400 degC in air at 1 atm
         inner_capsule: graphite, 2.5 mm OD, 1 mm ID
-        buffer_to_silicate_ratio: 75:25
+        buffer_to_silicate_ratio: 4525
         outer_capsule: Au80Pd20, 4 mm OD, packed around inner capsule
         intermediate_capsule: Pt, 3 mm OD, containing Ag2CO3 layer and graphite capsule/lid
         oxygen_buffer: graphite with predominantly C-O fluid, close to C-CO-CO2
@@ -267,9 +1469,11 @@ species:
         apparatus: end-loaded half-inch piston cylinder at University of Oxford
         pressure_medium: CaF2 at 1.0 and 1.5 GPa; NaCl-borosilicate glass assembly at 0.5 GPa
         furnace: graphite furnace
-        thermocouple: alumina-sheathed C-type thermocouple; at 0.5 GPa introduced through MgO hole and separated from capsule by 0.5 mm alumina disc
+        thermocouple: alumina-sheathed C-type thermocouple; at 0.5 GPa introduced through MgO hole and separated from capsule
+          by 0.5 mm alumina disc
         temperature_program: 0.5 and 1 GPa at 1200 degC; 1.5 GPa at 1300 degC after partial crystallization at 1200 degC
-        analysis_epma: Cameca SXFive-FE, 15 kV; 4 nA and 20 um defocused beam for glass/chloride-iodide, 20 nA and 1 um focused beam for metal blobs
+        analysis_epma: Cameca SXFive-FE, 15 kV; 4 nA and 20 um defocused beam for glass/chloride-iodide, 20 nA and 1 um focused
+          beam for metal blobs
         analysis_sims: Cameca IMS-7f GEO; 16O- primary beam, 5 nA, 18 kV, approximately 10 um spot
         run_duration: absent_not_printed
         sample_mass: absent_not_printed
