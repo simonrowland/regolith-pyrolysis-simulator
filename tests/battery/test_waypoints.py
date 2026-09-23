@@ -132,6 +132,36 @@ def test_bench_knudsen_method_selects_cell_when_experiment_method_unknown() -> N
     assert result.selected.value.point == Decimal("0.001")
 
 
+def test_steady_pressure_does_not_require_volume() -> None:
+    """P = Q/S at steady state. Chamber volume cancels, so a missing volume
+    is not a gap and does not block the derived pressure."""
+    base = factories.tabulation_experiment()
+    experiment = replace(
+        base,
+        method=factories.State.of(MethodToken.VACUUM_CHAMBER_PYROLYSIS),
+        pressure_environment=replace(
+            base.pressure_environment,
+            total_pressure_Pa=factories.Located(factories.State.unknown("not printed")),
+        ),
+    )
+    bench = _bench(
+        pumping_speed_m3_s=factories.located(Value.point_of("1e-2")),
+        other_facts=(
+            BenchFact(
+                "gas_load_Pa_m3_s",
+                factories.located(Value.point_of("1e-5")),
+                "Pa m3/s",
+            ),
+        ),
+    )
+    result = pressure_boundary(experiment, bench)
+    assert result.selected is not None
+    assert result.selected.route == "steady_gas_load_over_pump_speed"
+    assert result.selected.value.point == Decimal("1e-3")
+    assert "relevant_volume" not in result.selected.inputs
+    assert result.absence is None
+
+
 def test_pressure_keeps_printed_and_derived_routes() -> None:
     experiment = replace(
         factories.tabulation_experiment(total_P=Decimal("2e-3")),
