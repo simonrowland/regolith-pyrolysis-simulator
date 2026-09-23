@@ -21,8 +21,10 @@ const unavailableText = (value) => {
   const reason = typeof value.reason === "string" && value.reason.trim() ? value.reason.trim() : "unspecified";
   return `unavailable · ${reason}`;
 };
-const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
-const n = (value) => hasNumber(value) ? Number(value) : null;
+// Accept ONLY a real finite number — never coerce. JS Number() turns true→1, false→0, []→0,
+// "  "→0, "12"→12, so the old gate fabricated kg/energy values.
+const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
+const n = (value) => hasNumber(value) ? value : null;
 const sum = (values) => values.reduce((total, value) => total + (n(value) ?? 0), 0);
 const sumPresent = (values) => values.length && values.every(hasNumber) ? sum(values) : null;
 const sumObject = (object) => {

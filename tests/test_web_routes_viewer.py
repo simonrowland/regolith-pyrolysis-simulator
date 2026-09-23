@@ -70,6 +70,66 @@ def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
     assert "_provenance" not in sample["header"]["cost_block"]
 
 
+def test_report_viewer_kg_energy_paths_reject_non_numeric_coercion() -> None:
+    """Regression (O1 / L3-F2): booleans/arrays/blank strings in kg/energy fields must render honest
+    'not emitted', never a coerced number. The old `Number.isFinite(Number(v))` gate let true→1, false→0,
+    []→0 through kg/energy/sum paths (the kg twin of the mol path's strictMol guard)."""
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "header": {"run_id": "poison-run", "name": "poison", "feedstock_id": "lunar_mare_low_ti"},
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "metal_yields_kg": {"Fe": True},
+                    "O2_source_side_potential_kg_cumulative": False,
+                    "energy_electrical_kWh": True,
+                    "energy_evaporation_thermal_kWh": [],
+                },
+                "ledger": {"process.cleaned_melt": {"SiO2": 10.0}},
+            },
+        ],
+        "terminal": {"final_state": {"process.cleaned_melt": {"SiO2": 10.0}}, "stage_purity": {}},
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const els = {};
+function mockEl() {
+  return { _html: "", value: "", disabled: false, textContent: "",
+    get innerHTML() { return this._html; }, set innerHTML(v) { this._html = v; },
+    addEventListener() {}, setAttribute() {}, removeAttribute() {}, focus() {},
+    classList: { add() {}, remove() {}, toggle() {} }, dataset: {} };
+}
+const context = {
+  window: { location: { search: "" } },
+  document: { title: "",
+    querySelector: (s) => (els[s] = els[s] || mockEl()),
+    querySelectorAll: () => [] },
+  URLSearchParams, encodeURIComponent, setTimeout,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(Object.values(els).map((e) => e._html).join("\n")));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "report-viewer.js"), json.dumps(artifact)],
+        input=harness, text=True, capture_output=True, check=True,
+    )
+    html = completed.stdout
+    assert "Report unavailable" not in html
+    assert "1 kg" not in html
+    assert "0 kg" not in html
+    assert "1 kWh" not in html and "1.0 kWh" not in html
+    assert "not emitted" in html
+
+
 def _render_library_yield_chips(payload: dict) -> str:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/library.js"
     harness = r"""
