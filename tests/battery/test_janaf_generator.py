@@ -524,6 +524,79 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     assert janaf_extract_phase("janaf-4th", "phosphate_melt_to_PO_g") is None
 
 
+def test_liquid_glass_region_is_not_stamped_liquid() -> None:
+    """Glass-side rows of a liquid table are not labelled phase l.
+
+    The printed GLASS <--> LIQUID temperature is the only boundary. The
+    series stays one observation (no new segment id). A two-phase transition
+    row stays unknown.
+    """
+
+    label = "supercooled liquid / glass-transition region"
+    magnesium = _generation("Mg-013")
+    series = [
+        observation
+        for observation in magnesium.observations
+        if quantity_token(observation.identity) is not Quantity.TRANSITION_TEMPERATURE
+    ]
+    assert [observation.observation_id for observation in series] == [
+        f"nist-janaf-4th:Mg-013:{quantity}:segment-0"
+        for quantity in (
+            "cp",
+            "S",
+            "H_minus_H298",
+            "delta_fH",
+            "delta_fG",
+            "log10_Kf",
+        )
+    ]
+    assert len(magnesium.report["phase_segments"]) == 1
+    for observation in series:
+        phase = observation.identity.species.phase
+        assert phase.is_unknown
+        assert phase.value is None
+        reason = phase.reason or ""
+        assert label in reason
+        assert 'printed "GLASS <--> LIQUID" at 900.000 K' in reason
+        assert "not stamped liquid" in reason
+        assert label in observation.derivation.relation
+        assert observation.identity.species.polymorph.is_not_applicable
+    heat_capacity = _quantity_observations(magnesium, Quantity.CP)[0]
+    assert [point for point in heat_capacity.value.series or () if point[0] == Decimal("900")] == [
+        (Decimal("900"), Decimal("119.675")),
+        (Decimal("900.000"), Decimal("119.675")),
+        (Decimal("900.000"), Decimal("146.440")),
+    ]
+    assert (Decimal("3000"), Decimal("146.440")) in (heat_capacity.value.series or ())
+    glass_liquid = next(
+        observation
+        for observation in magnesium.observations
+        if observation.observation_id.endswith("transition_temperature:glass-liquid")
+    )
+    assert glass_liquid.identity.species.phase.is_unknown
+    assert glass_liquid.identity.species.phase.reason == (
+        'transition spans phases named by "GLASS <--> LIQUID" (glass -> l); '
+        "v2.1 species.phase has one phase axis and cannot hold both"
+    )
+    crystal_liquid = next(
+        observation
+        for observation in magnesium.observations
+        if observation.observation_id.endswith("transition_temperature:iii-liquid")
+    )
+    assert crystal_liquid.identity.species.phase.is_unknown
+    assert "(cr -> l)" in (crystal_liquid.identity.species.phase.reason or "")
+
+    tungstate = _generation("W-003")
+    tungstate_cp = _quantity_observations(tungstate, Quantity.CP)
+    assert [observation.observation_id for observation in tungstate_cp] == [
+        "nist-janaf-4th:W-003:cp:segment-0"
+    ]
+    tungstate_reason = tungstate_cp[0].identity.species.phase.reason or ""
+    assert tungstate_cp[0].identity.species.phase.is_unknown
+    assert label in tungstate_reason
+    assert 'printed "GLASS <--> LIQ" at ' in tungstate_reason
+
+
 def segment_reason(segment: dict) -> str:
     return str(segment["phase"].get("reason") or "")
 
@@ -1583,7 +1656,9 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         "log10_Kf": 2117,
         "transition_temperature": 979,
     }
-    assert phases == {"cr": 796, "l": 444, "g": 874, "unknown": 3}
+    # 128 liquid tables store a printed GLASS <--> LIQUID/LIQ row. Those series
+    # are not stamped l (one phase axis cannot hold glass and liquid).
+    assert phases == {"cr": 796, "l": 316, "g": 874, "unknown": 131}
     assert polymorphs == {
         "unknown": 415,
         "not_applicable": 1320,
