@@ -168,6 +168,9 @@ function makeHeader(artifact, rows, energy) {
   const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
     ? header.cost_block.provenance.trim()
     : null;
+  const costEstimateNote = header.cost_block && !energy.canonicalCostTotals && hasNumber(energy.totalCost)
+    ? `<small>viewer-computed estimate (no emitted cost total)</small>`
+    : "";
   return `<header>
     <div class="masthead">
       <svg class="mark" viewBox="0 0 42 42" aria-hidden="true"><circle cx="16" cy="27" r="11" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="16" cy="27" rx="4.8" ry="11" fill="none" stroke="currentColor"/><path d="M6 23q10-4 20 0M6 31q10 4 20 0M29 7l-4 8 8 4 5-2M25 15l-6 2-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="5" r="2.6" fill="currentColor"/></svg>
@@ -190,7 +193,7 @@ function makeHeader(artifact, rows, energy) {
       <div class="metric"><div class="k">Fe product-ledger projection</div><div class="v">${kg(finalMetal.Fe, 2)}</div></div>
       <div class="metric"><div class="k">${esc(o2Label)}</div><div class="v">${exactKg(o2)}</div></div>
       <div class="metric"><div class="k">Reported energy</div><div class="v">${hasNumber(reportedEnergy) ? `${Number(reportedEnergy).toFixed(1)} <small>kWh electrical + evaporation thermal</small>` : "not emitted"}</div></div>
-      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}</div></div>
+      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}${costEstimateNote}</div></div>
     </div>
   </header>`;
 }

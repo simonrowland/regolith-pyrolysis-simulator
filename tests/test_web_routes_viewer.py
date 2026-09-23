@@ -188,6 +188,15 @@ def test_report_viewer_does_not_derive_account_totals_or_mol_percentages() -> No
     assert "75.0000%" not in html
 
 
+def test_report_viewer_headline_cost_marks_viewer_estimate() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "makeHeader({header:{cost_block:{},run_id:'r'}},[],{electrical:1,thermal:2,totalCost:14,canonicalCostTotals:false})",
+    )
+
+    assert "viewer-computed estimate (no emitted cost total)" in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
