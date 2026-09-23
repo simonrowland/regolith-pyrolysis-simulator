@@ -515,6 +515,8 @@ def normalized_composition(
                 locator = located.locator
                 locator_text = str(locator) if locator is not None else "source locator unavailable"
                 origins = {
+                    "wt_pct_to_mole_fraction":
+                        "printed oxide wt% composition",
                     "calculated_from_printed_recipe_or_aimed_target":
                         "printed recipe/aimed target",
                     "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":

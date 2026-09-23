@@ -422,6 +422,21 @@ def test_unknown_composition_relation_refuses_loudly():
         engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))
 
 
+def test_production_wt_pct_relation_reaches_engine_notice():
+    experiment, bench, observation = case()
+    composition = Composition("printed_oxides", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation="wt_pct_to_mole_fraction", inputs=("original_unit=wt_pct",), parameters=(), output_unit="mole_fraction"),
+    ))
+    result = engine_point_requests(
+        collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    )[0]
+    assert result.payload["composition_method_class"] == "calculated"
+    assert "calculated from printed oxide wt% composition" in result.payload["composition_notice"]
+    assert result.provenance["output_routes"]["composition_mol"]["notice"] == result.payload["composition_notice"]
+
+
 @pytest.mark.parametrize("name", ["temperature_K", "total_pressure_Pa", "fO2_log"])
 def test_engine_bounds_are_preserved_and_refused_without_midpoint(name):
     experiment, bench, observation = case()
