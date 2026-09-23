@@ -120,10 +120,18 @@ experiments:
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel: {tag: value, value: commanded}
+    channel: {tag: value, value: buffer}
     buffer:
-      state: {tag: value, value: CO partial pressure controlled by CO/Ar mixing}
-      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+      state: {tag: value, value: C-CO}
+      locator:
+        published_page: 816
+        pdf_page_index: 2
+        section: '2. Experimental principle / synopsis'
+        note: >-
+          Graphite crucible under one atmosphere of carbon monoxide
+          (synopsis: graphite crucible, CO 1 atm; p.816 「CO 分圧は 1 atm」).
+          Token C-CO selects the graphite/C–CO oxygen_condition derivation;
+          numeric fO2 is never stamped printed.
   thermal_schedule:
     method:
       state: {tag: value, value: 'Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant'}
