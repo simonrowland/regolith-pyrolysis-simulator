@@ -1,0 +1,157 @@
+schema_version: literature_extract.v1
+source_id: metsoc-2024-6397
+source:
+  citation: >-
+    Russell, S. S., Hamilton, V. E., King, A. J., Salge, T., Almeida, N. V.,
+    Harrison, C., Bates, H. C., Schofield, P. J., Zega, T. J., McCoy, T. J.,
+    Connolly Jr., H. C. & Lauretta, D. S. (2024), "Mineralogy of Bennu: evidence
+    from space and laboratory", 86th Annual Meeting of the Meteoritical Society,
+    LPI Contribution No. 3036, abstract 6397.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/metsoc2024/pdf/6397.pdf
+  year: 2024
+  conference: 86th Annual Meeting of the Meteoritical Society
+extraction:
+  method: >-
+    Official one-page MetSoc abstract PDF (corpus raw/metsoc-2024-6397). Text
+    transcribed with pdftotext -layout. Printed numbers retained with locators
+    only; Figures 1–2 were not digitized beyond caption labels.
+  date: '2026-09-22'
+  worker: n9-lpsc-metsoc-abstracts
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 1-page MetSoc conference abstract (SEM/EDX/TIR mineralogy of returned Bennu particles)
+  scored_observations: 0
+  note: >-
+    No vaporization, evaporation, partial-pressure, melt-thermodynamic, or mass-loss
+    series. All landed rows are unscored d-032 context (method / characterization)
+    with printed numbers and locators only.
+fidelity_samples:
+- species: Bennu_sample
+  observable: method
+  observation_id: metsoc_2024_6397_techniques
+  field: particle_size_mm_approx
+  value: 1
+  locator:
+    pdf_page_index: 1
+    section: Techniques
+- species: Bennu_sample
+  observable: characterization
+  observation_id: metsoc_2024_6397_sem_mineralogy
+  field: phyllosilicates_pct_approx
+  value: 80
+  locator:
+    pdf_page_index: 1
+    section: Results
+- species: Bennu_sample
+  observable: characterization
+  observation_id: metsoc_2024_6397_sem_mineralogy
+  field: sulfides_pct_approx
+  value: 9
+  locator:
+    pdf_page_index: 1
+    section: Results
+- species: Bennu_sample
+  observable: characterization
+  observation_id: metsoc_2024_6397_matrix_mg_number
+  field: average_matrix_Mg_number_pct_approx
+  value: 78
+  locator:
+    pdf_page_index: 1
+    section: Results
+species:
+  Bennu_sample:
+    observations: []
+    context:
+    - observation_id: metsoc_2024_6397_techniques
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Techniques
+      phase: Bennu_returned_particles
+      regime: SEM_EDX_TIR_characterization
+      units: as printed
+      values:
+        quantity: laboratory_techniques_and_sample_prep
+        method_class: method_only
+        particle_size_mm_approx: 1
+        particle_size_as_printed: "~1 mm across"
+        prep_note: mounted and polished following clay-rich carbonaceous chondrite protocols [5]
+        SEM_mapping: high resolution as described in [6]
+        EDX_instrument: Zeiss Evo 15LS
+        TIR_wavelength_um_range_as_printed: "2.5–25"
+        TIR_instrument: Thermo Scientific Nicolet iN10 FTIR microscope
+      uncertainty:
+        note: "none printed for technique setpoints"
+    - observation_id: metsoc_2024_6397_sem_mineralogy
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Results
+      phase: Bennu_returned_sample
+      regime: SEM_derived_mineralogy
+      units: percent as printed
+      values:
+        quantity: SEM_bulk_mineralogy_percentages
+        method_class: measured_direct
+        evidence_class: authors_own_SEM
+        phyllosilicates_pct_approx: 80
+        sulfides_pct_approx: 9
+        magnetite_pct_approx: 5
+        carbonates_pct_approx: 4
+        as_printed: "~80% phyllosilicates, ~9% sulfides, ~5% magnetite, and ~4% carbonates, plus minor phases including anhydrous silicates"
+        matches_bulk_XRD: true
+        note: "Percentages from SEM analysis; ≈ retained as approximate as printed."
+      uncertainty:
+        note: "approximate (~) values as printed; no numeric uncertainty stated"
+    - observation_id: metsoc_2024_6397_matrix_mg_number
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Results
+      phase: Bennu_phyllosilicate_matrix
+      regime: EDX_point_analyses
+      units: as printed
+      values:
+        quantity: phyllosilicate_matrix_Mg_number
+        method_class: measured_direct
+        Si_over_Fe_plus_Mg_note: indicates mixture of saponite and serpentine compositions
+        average_matrix_Mg_number_pct_approx: 78
+        average_matrix_Mg_number_as_printed: "average matrix Mg # ~78%"
+        comparison_as_printed: like CI1 and CM1 chondrites; significantly higher than typical CM2
+      uncertainty:
+        note: '~78% approximate as printed; variability noted but not quantified'
+    - observation_id: metsoc_2024_6397_phosphate_and_silicate_bounds
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Results
+      phase: Bennu_accessory_phases
+      regime: SEM_EDX_characterization
+      units: as printed
+      values:
+        quantity: phosphate_grain_size_and_anhydrous_silicate_bound
+        method_class: measured_direct
+        Ca_phosphate_grain_size_um_bound_as_printed: "≤10"
+        Mg_Na_phosphate: larger sheets
+        primordial_disk_grains: olivine, pyroxenes, and spinel in minor abundances
+        remote_sensing_anhydrous_silicate_vol_pct_bound_as_printed: "≤10"
+        note: '≤10 vol% anhydrous silicates is the spacecraft/spectral prediction match claim [2]'
+      uncertainty:
+        note: "bounds retained as printed"
+    - observation_id: metsoc_2024_6397_returned_sample_mass
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+      phase: OSIRIS-REx_returned_sample
+      regime: mission_sample_mass_as_printed
+      units: g as printed
+      values:
+        quantity: returned_sample_mass
+        method_class: mission_reported
+        returned_sample_mass_g_approx: 120
+        as_printed: "~120 g sample returned by OSIRIS-REx"
+      uncertainty:
+        note: "approximate (~) as printed"

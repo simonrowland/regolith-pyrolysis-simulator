@@ -1,0 +1,189 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2020-1883
+source:
+  citation: >-
+    King, A. J., Zulmahilan, N. N. B., Schofield, P. F. & Russell, S. S. (2020),
+    "CM chondrites from multiple parent bodies: evidence from correlated mineralogy
+    and cosmic-ray exposure ages", 51st Lunar and Planetary Science Conference,
+    abstract 1883.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/lpsc2020/pdf/1883.pdf
+  year: 2020
+  conference: 51st Lunar and Planetary Science Conference
+extraction:
+  method: >-
+    Official two-page LPSC abstract PDF (corpus raw/lpsc-2020-1883). Text transcribed
+    with pdftotext -layout. Printed numbers retained with locators only; Fig. 1 and
+    Fig. 2 curves/points were not digitized beyond values printed in prose/captions.
+  date: '2026-09-22'
+  worker: n9-lpsc-metsoc-abstracts
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 2-page LPSC conference abstract (XRD/TGA mineralogy + CRE ages of CM chondrites)
+  scored_observations: 0
+  note: >-
+    No vaporization, evaporation, partial-pressure, or melt-thermodynamic measurements.
+    All landed rows are unscored d-032 context (method / characterization) with printed
+    numbers and locators only.
+fidelity_samples:
+- species: CM_chondrite_bulk
+  observable: method
+  observation_id: lpsc_2020_1883_psd_xrd_method
+  field: sample_mass_mg_range_as_printed
+  value: "~50‒200"
+  locator:
+    pdf_page_index: 1
+    section: Experimental
+- species: CM_chondrite_bulk
+  observable: method
+  observation_id: lpsc_2020_1883_tga_method
+  field: heating_rate_C_per_min
+  value: 10
+  locator:
+    pdf_page_index: 1
+    section: Experimental
+- species: CM_chondrite_bulk
+  observable: characterization
+  observation_id: lpsc_2020_1883_sample_statistics
+  field: samples_with_both_PSF_and_H2O
+  value: 35
+  locator:
+    pdf_page_index: 1
+    section: Experimental
+- species: CM_chondrite_bulk
+  observable: characterization
+  observation_id: lpsc_2020_1883_cre_bin_averages
+  field: CM1_H2O_wt_pct_approx
+  value: 10
+  locator:
+    pdf_page_index: 2
+    section: Is there a correlation?
+    note: "highly altered CM1s (PSF >0.8, H2O ~10 wt%)"
+species:
+  CM_chondrite_bulk:
+    observations: []
+    context:
+    - observation_id: lpsc_2020_1883_literature_cm_mineralogy_ranges
+      type: composition
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+      phase: CM_carbonaceous_chondrite
+      regime: literature_summary_as_printed
+      units: vol% as printed
+      values:
+        quantity: literature_CM_bulk_mineralogy_ranges
+        method_class: quoted_literature
+        phyllosilicates_vol_pct_range_as_printed: "70‒80"
+        unaltered_olivine_and_pyroxene_vol_pct_range_as_printed: "0‒20"
+        oxides_sulphides_carbonates_vol_pct_bound_as_printed: "<5"
+        note: "Ranges attributed to citations [1, 2]; not new measurements in this abstract."
+      uncertainty:
+        note: "none printed beyond the stated ranges/bound"
+    - observation_id: lpsc_2020_1883_psd_xrd_method
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Experimental
+      phase: powdered_CM_meteorite
+      regime: PSD_XRD_phase_quantification
+      units: as printed
+      values:
+        quantity: PSD_XRD_sample_and_quantification_parameters
+        method_class: method_only
+        instrument: position-sensitive-detector (PSD) XRD at NHM London
+        sample_mass_mg_range_as_printed: "~50‒200"
+        packing: aluminum wells
+        analysis_duration_hours: 16
+        mineral_standards_analysis_duration_minutes: 30
+        quantification_method: profile-stripping
+        phase_quantification_uncertainty_vol_pct_bound_as_printed: "<5"
+        PSF_definition_as_printed: >-
+          PSF = total phyllosilicate abundance / (total anhydrous silicate + total phyllosilicate abundance)
+      uncertainty:
+        note: 'Phase quantification uncertainties of <5 vol% as printed'
+    - observation_id: lpsc_2020_1883_tga_method
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Experimental
+      phase: powdered_CM_meteorite
+      regime: TGA_H2O_abundance
+      units: as printed
+      values:
+        quantity: TGA_mass_loss_H2O_method_parameters
+        method_class: method_only
+        instrument: TA Instruments SDT Q600 TGA at NHM
+        sample_mass_mg_approx: 10
+        crucible: alumina
+        heating_rate_C_per_min: 10
+        atmosphere: N2 flow
+        T_start_C: 25
+        T_end_C: 1000
+        H2O_mass_loss_interval_C_as_printed: "400‒770"
+        H2O_mass_loss_attribution: dehydration and dehydroxylation of the phyllosilicates
+      uncertainty:
+        note: "none printed for TGA setpoints"
+    - observation_id: lpsc_2020_1883_sample_statistics
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Experimental
+        paragraph: CRE age / PSF / H2O overlap counts
+      phase: CM_chondrite_population
+      regime: compilation_counts_as_printed
+      units: count as printed
+      values:
+        quantity: CM_chondrite_CRE_PSF_H2O_sample_counts
+        method_class: measured_direct
+        CM_with_CRE_age_approx: 135
+        heated_CM_fraction_of_CRE_set_pct_approx: 20
+        PSF_available_count: 53
+        H2O_abundance_available_count: 64
+        samples_with_both_PSF_and_H2O: 35
+        Takenouchi_et_al_thin_sections_count: 125
+      uncertainty:
+        note: '~135 and ~20% retained as approximate as printed'
+    - observation_id: lpsc_2020_1883_cre_bin_averages
+      type: characterization
+      locator:
+        pdf_page_index: 2
+        section: Is there a correlation?
+        figure: "2"
+      phase: CM_chondrite_CRE_age_bins
+      regime: XRD_TGA_population_averages
+      units: as printed
+      values:
+        quantity: average_PSF_and_H2O_by_CRE_age_bin
+        method_class: measured_direct
+        evidence_class: authors_own_average
+        CM1_PSF_bound_as_printed: ">0.8"
+        CM1_H2O_wt_pct_approx: 10
+        CM1_CRE_age_Myr_approx: 0.2
+        CM2_PSF_range_as_printed: "~0.7‒0.75"
+        CM2_H2O_wt_pct_range_as_printed: "~7‒8"
+        CM2_CRE_age_Myr_range_as_printed: "~0.6‒2"
+        poorly_constrained_CRE_gt_3_Myr_PSF_approx: 0.77
+        poorly_constrained_CRE_gt_3_Myr_H2O_wt_pct_approx: 8
+        figure_error_bar_order_pct_as_printed: "5‒10"
+        note: >-
+          Fig. 2 averages for CRE bins ~0.2, ~0.6, ~2 and >3 Myr; heated CMs excluded
+          for H2O abundances due to dehydration (caption). Curve points not digitized.
+      uncertainty:
+        note: 'error bars on the order of 5-10% as printed in Fig. 2 caption; n not tabulated in prose'
+    - observation_id: lpsc_2020_1883_cm1_alteration_temperature_claim
+      type: characterization
+      locator:
+        pdf_page_index: 2
+        section: How many CM parent bodies?
+      phase: CM1_chondrite
+      regime: prior_author_claim_as_printed
+      units: as printed
+      values:
+        quantity: CM1_alteration_temperature_bound
+        method_class: quoted_literature
+        T_C_bound_as_printed: ">120"
+        basis: low abundance of tochilinite (prior suggestion [2])
+      uncertainty:
+        note: "bound retained as printed; not a new measurement in this abstract"
