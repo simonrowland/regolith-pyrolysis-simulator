@@ -423,6 +423,27 @@ def test_unavailable_product_story_never_renders_as_ok():
     assert empty_fallback["text"]["product-ledger-content"] == "n/a"
 
 
+def test_canonical_extraction_evidence_decides_badge_and_keeps_story_status_visible():
+    # extracted_product_kg is computed server-side from the atom ledger, so it answers
+    # "did this run extract anything" even when the structured story is unavailable;
+    # the story status must then still be shown rather than dropped.
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    for extracted_kg, expected_state in ((1.0, "ok"), (0.0, "no-products")):
+        rendered = _render_advisory_dom(
+            html=html,
+            event="simulation_complete",
+            payload={
+                "product_story": None,
+                "product_story_status": "unavailable",
+                "extracted_product_kg": extracted_kg,
+                "mass_in_kg": 10.0,
+            },
+        )
+        assert rendered["text"]["product-ledger-state"] == expected_state
+        content = rendered["text"]["product-ledger-content"]
+        assert "Product story" in content and "unavailable" in content
+
+
 @pytest.mark.parametrize("product_value", [True, "12", [], {}])
 def test_product_ledger_rejects_non_numeric_product_evidence(product_value):
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)

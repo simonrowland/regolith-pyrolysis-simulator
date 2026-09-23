@@ -463,6 +463,13 @@ function renderProductLedgerPanel(payload) {
     advisoryClear(content);
     content.className = 'advisory-result';
     let sections = 0;
+    const hasCanonicalEvidence = typeof data.extracted_product_kg === 'number'
+        && Number.isFinite(data.extracted_product_kg);
+    // When canonical evidence decides the badge (below), the badge no longer carries a
+    // non-ok story status, so surface that status in the body instead of dropping it.
+    if (hasCanonicalEvidence && storyStatus && storyStatus !== 'ok') {
+        if (appendAdvisorySection(content, 'Product story', { status: storyStatus })) sections += 1;
+    }
     const story = advisoryObject(data.product_story);
     if (story) {
         if (appendAdvisorySection(content, 'Pot of regolith in', story.input)) sections += 1;
@@ -542,13 +549,18 @@ function renderProductLedgerPanel(payload) {
     // about the DATA and is reserved for a ledger we could not read at all.
     // Mid-run this is honest too: nothing HAS been extracted yet, and it
     // flips to ok the moment any product class becomes non-zero.
+    //
+    // Canonical server-side extraction evidence (extracted_product_kg, computed from the
+    // atom ledger) answers "did this run extract anything" even when the structured
+    // product story is degraded or unavailable: that is the single predicate every
+    // surface uses. Only without canonical evidence does a non-ok story status decide
+    // the badge, because story-derived or flat product values are not trustworthy then.
+    // A non-ok story status is then shown in the panel body (above), never swallowed.
     updateAdvisoryState(
         'product-ledger-state',
-        panelStatus === 'ok' && didRunExtractAnything(data, story, extractedFlatProducts)
-            ? 'ok'
-            : panelStatus === 'ok'
-                ? 'no-products'
-                : panelStatus,
+        panelStatus === 'ok' || hasCanonicalEvidence
+            ? (didRunExtractAnything(data, story, extractedFlatProducts) ? 'ok' : 'no-products')
+            : panelStatus,
     );
 }
 
