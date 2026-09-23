@@ -93,7 +93,11 @@ def test_every_timestep_and_terminal_ledger_render_true_finite_mol_only():
         ):
             assert fabricated not in html
     assert "4.5 mol" in rendered["terminal"]
-    assert "not numeric" in rendered["terminal"]
+    # Account totals are not emitted by the producer, so the viewer no longer sums
+    # species into a per-account total (it used to print a derived sum, or
+    # "not numeric" when an account held a malformed entry). It must say so.
+    assert "Account totals were not emitted; none are summed in the viewer." in rendered["terminal"]
+    assert "not numeric" not in rendered["terminal"]
 
 
 def test_terminal_taxonomy_present_object_renders_entity_contract():

@@ -1,5 +1,8 @@
 "use strict";
 
+if (!globalThis.ReportLabels) {
+  throw new Error("report-viewer.js requires labels.js (globalThis.ReportLabels) to be loaded first");
+}
 const { scalarText, esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
@@ -385,8 +388,12 @@ function wallAndOxygenSection(artifact, rows) {
     : "";
   const wallTotal = wallComplete && Object.keys(wallSpecies).length ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
-  const pumpingEnergy = pumping?.status === "no_rows"
+  // status "no_rows" is a computed zero when hours were simulated (the producer evaluates every hour and only
+  // skips hours whose vented O2 needs no sub-ambient pumping); with zero simulated hours it is absence.
+  const pumpingEnergy = pumping?.status === "no_rows" && rows.length === 0
     ? "not computed — no rows"
+    : pumping?.status === "no_rows" && pumping.pumping_electrical_kWh === 0
+      ? "0 kWh · no simulated hour needed sub-ambient pumping"
     : (pumping && hasNumber(pumping.pumping_electrical_kWh)
       ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh`
       : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted"));

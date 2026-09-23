@@ -1,8 +1,12 @@
 import fs from "node:fs";
+import path from "node:path";
 import vm from "node:vm";
 
 const input = JSON.parse(fs.readFileSync(0, "utf8"));
 const source = fs.readFileSync(input.script_path, "utf8");
+// index.html loads labels.js before report-viewer.js; the viewer reads the shared
+// scalar/escape helpers from globalThis.ReportLabels, so load it first here too.
+const labelsSource = fs.readFileSync(path.join(path.dirname(input.script_path), "labels.js"), "utf8");
 const taxonomyTerminalSections = input.taxonomy_terminal_sections;
 const context = {
   __taxonomyTerminalSections: taxonomyTerminalSections,
@@ -14,6 +18,7 @@ const context = {
 };
 context.globalThis = context;
 vm.createContext(context);
+vm.runInContext(labelsSource, context);
 vm.runInContext(
   `${source}\n` +
   `globalThis.__qaResult = {\n` +
