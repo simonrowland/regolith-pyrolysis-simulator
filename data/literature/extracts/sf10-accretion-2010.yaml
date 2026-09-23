@@ -1,0 +1,153 @@
+schema_version: literature_extract.v1
+source_id: sf10-accretion-2010
+source:
+  citation: >-
+    Schaefer, L. & Fegley, B., Jr. (2010), "Chemistry of atmospheres formed during
+    accretion of the Earth and other terrestrial planets", Icarus 208:438–448,
+    DOI 10.1016/j.icarus.2010.01.026
+  doi: 10.1016/j.icarus.2010.01.026
+  url: https://solarsystem.wustl.edu/wp-content/uploads/2010/06/SF10-accretion.pdf
+  year: 2010
+extraction:
+  method: >-
+    Corpus PDF from ferry inbox
+    from-main-B3-20260923T024400Z/pdfs/sf10-accretion-2010.pdf (sha256
+    b1fe339f3780967dfe165c79b6d7a228ac06e374815978edb7520a6b8307a023 matches
+    sidecar). Clean text layer via pdftotext -layout; no figure digitisation.
+    This paper is a Gibbs-energy chemical-equilibrium MODEL of impact-outgassed
+    atmospheres. Per BACKLOG 3 / N7 owner ruling for model papers: only printed
+    MEASURED or TABULATED non-model data may land as scored observations; model
+    outputs (Table 1; Figs 1–7 and derived linear combinations) are the
+    model-derived cohort and are recorded as typed absence, not ingested as
+    observations. Input bulk compositions are cited from Lodders (2003),
+    Schaefer & Fegley (2007), and METBASE (Koblitz 2005) but are not reprinted
+    as numeric tables in this PDF — composition numbers are therefore absent
+    here (not invented from the citations). Printed method nominals (1500 K,
+    100 bars), the stated P–T grid, the Lodders (2000) Earth mixing fractions,
+    and the composition-source list are retained as context (d-032 Option A).
+  date: '2026-09-22'
+  worker: n10-sf10-tenkate
+  provenance_path: data/literature/extracts/sf10-accretion-2010.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: peer-reviewed modeling paper (chemical equilibrium / kinetics of impact outgassing)
+  measured_direct_observations: 0
+  method_observations: 1
+  figure_only_observations: 0
+  absent_from_source:
+  - measured laboratory vapour-pressure / KEMS / pyrolysis series from this work
+  - reprinted numeric bulk compositions of CI/CM/CV/H/L/LL/EH/EL inputs (cited only)
+  typed_absence_model_derived_blocked:
+  - Table 1 major gas vol% at 1500 K and 100 bars (Gibbs-minimization model output)
+  - Figs 1–7 predicted gas chemistry vs T/P (model output; not digitised)
+  - prose linear combinations of Table 1 for Lodders (2000) / Lodders & Fegley (1997) Earth mixes (model-derived)
+  note: >-
+    STEP 0: no prior extract under Schaefer/Fegley 2010 accretion DOI or corpus
+    stem. PDF p1 title/authors match sidecar citation (Schaefer & Fegley, Icarus
+    208, 2010). Distinct from schaefer-and-fegley-2007-icarus-outgassing-of-oc
+    and kems-008-schaefer-fegley-2004.
+fidelity_samples:
+- species: impact_outgassing_model
+  observable: laboratory_conditions
+  observation_id: sf10_2010_nominal_model_conditions
+  field: nominal_temperature_K_as_printed
+  value: 1500
+  locator:
+    pdf_page_index: 2
+    published_page: 439
+    section: '2. Methods'
+    note: Nominal model temperature 1500 K as printed (Abe and Matsui 1987 basis)
+- species: impact_outgassing_model
+  observable: laboratory_conditions
+  observation_id: sf10_2010_nominal_model_conditions
+  field: nominal_pressure_bars_as_printed
+  value: 100
+  locator:
+    pdf_page_index: 2
+    published_page: 439
+    section: '2. Methods'
+    note: Nominal model pressure 100 bars as printed
+species:
+  impact_outgassing_model:
+    observations: []
+    context:
+    - observation_id: sf10_2010_nominal_model_conditions
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 2
+        published_page: 439
+        section: '2. Methods'
+        note: Gibbs energy minimization setup; not a laboratory measurement
+      phase: chondritic_impact_outgassing_chemical_equilibrium_model
+      regime: gibbs_energy_minimization_model
+      units: as published
+      values:
+        quantity: nominal_P_T_grid_and_input_composition_sources
+        method_class: method_only
+        evidence_class: authors_model_setup_prose_not_a_measurement
+        code_family_as_printed: Gibbs energy minimization code of the type described by van Zeggern and Storey (1970)
+        thermodynamic_database_as_printed: same database as Schaefer and Fegley (2007); ~930 condensed and gaseous compounds of 20 elements
+        elements_as_printed:
+        - Al
+        - C
+        - Ca
+        - Cl
+        - Co
+        - Cr
+        - F
+        - Fe
+        - H
+        - K
+        - Mg
+        - Mn
+        - N
+        - Na
+        - Ni
+        - O
+        - P
+        - S
+        - Si
+        - Ti
+        pressure_grid_log10_P_bars_as_printed: from -4 to +4
+        temperature_grid_K_as_printed:
+          min: 300
+          max: 2500
+        nominal_pressure_bars_as_printed: 100
+        nominal_temperature_K_as_printed: 1500
+        nominal_basis_as_printed: Abe and Matsui (1987)
+        chondrite_groups_modeled_as_printed:
+        - CI
+        - CM
+        - CV
+        - H
+        - L
+        - LL
+        - EH
+        - EL
+        input_composition_sources_as_printed:
+          CI_Orgueil: Lodders (2003)
+          average_H_L_LL: Schaefer and Fegley (2007)
+          CM_Murchison_CV_Allende_average_EH_EL: METBASE database (Koblitz, 2005)
+        lodders_2000_earth_mixing_fractions_as_printed:
+          EH_pct: 70
+          H_pct: 21
+          CV_pct: 5
+          CI_pct: 4
+          note: >-
+            Printed oxygen-isotope mixing model prediction (Lodders 2000) used
+            in discussion; not a measurement from this work.
+        table1_caption_as_printed: >-
+          Major gas compositions of impact generated atmospheres from chondritic
+          planetesimals at 1500 K and 100 bars.
+        table1_disposition: >-
+          TYPED ABSENCE — model-derived Gibbs-minimization output; not ingested
+          as scored observations (BACKLOG 3 model-paper ruling).
+        figures_1_to_7_disposition: >-
+          TYPED ABSENCE — predicted gas chemistry plots; figure-only / model
+          output; not digitised.
+      uncertainty:
+        note: >-
+          No laboratory measurement uncertainty. Nominal 1500 K / 100 bars are
+          model setpoints taken from Abe and Matsui (1987), not measured run
+          conditions of this paper.

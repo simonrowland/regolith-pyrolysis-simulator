@@ -1,0 +1,412 @@
+schema_version: literature_extract.v1
+source_id: tenkate-2010-vapor-instrument
+source:
+  citation: >-
+    ten Kate, I.L., Cardiff, E.H., Dworkin, J.P., Feng, S.H., Holmes, V.,
+    Malespin, C., Stern, J.G., Swindle, T.D. & Glavin, D.P. (2010), "VAPoR –
+    Volatile Analysis by Pyrolysis of Regolith – an instrument for in situ
+    detection of water, noble gases, and organics on the Moon", Planetary and
+    Space Science 58:1007–1017, DOI 10.1016/j.pss.2010.03.006
+  doi: 10.1016/j.pss.2010.03.006
+  url: http://dx.doi.org/10.1016/j.pss.2010.03.006
+  year: 2010
+extraction:
+  method: >-
+    Corpus PDF from ferry inbox
+    from-main-B3-20260923T024400Z/pdfs/tenkate-2010-vapor-instrument.pdf
+    (sha256 cad604c54f8982d5eb6f91f122ca1b257252d6994b220333226220b86154df5f
+    matches sidecar). Clean text layer via pdftotext -layout; Table 4 and method
+    prose transcribed; Figs 5–9 EGA traces are figure-only and were NOT digitised
+    (authors state the work was not calibrated and no attempt was made to
+    quantify evolved-gas amounts). Printed protocol numbers (sample masses,
+    ramp 5 °C/min, 25–1200 °C, chamber pressures) and qualitative Table 4
+    detection lists for this work are landed. Kelvin companions carry DERIVED
+    stamps (T_K = T_C + 273.15). Modelled on pyrolysis / instrument extracts
+    (cardiff-2007-vacuum-pyrolysis-gsfc; N1 lpsc-2024 style benches/experiments).
+  date: '2026-09-22'
+  worker: n10-sf10-tenkate
+  provenance_path: data/literature/extracts/tenkate-2010-vapor-instrument.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: instrument / breadboard validation paper (vacuum pyrolysis–MS evolved gas analysis)
+  measured_direct_observations: 2
+  method_observations: 2
+  figure_only_observations: 5
+  absent_from_source:
+  - calibrated absolute evolved-gas abundances or partial-pressure calibrations
+  - digitised axis readings from Figs 5–9 (explicitly not extracted)
+  - flight TOF-MS performance numbers beyond design-goal Table 3 prose
+  note: >-
+    STEP 0: no prior extract for DOI 10.1016/j.pss.2010.03.006 or ten Kate /
+    VAPoR under another stem. PDF p1 title/authors match sidecar. Instrument
+    paper with breadboard bench data on Apollo 16 64801,53 and Murchison.
+benches:
+- id: vapor-breadboard-knudsen-rga
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state:
+      tag: value
+      value: VAPoR laboratory breadboard — modified Knudsen-cell pyrolysis oven with line-of-sight RGA
+    locator: &bb_loc {pdf_page_index: 4, published_page: 1010, section: '3. The VAPoR breadboard and the analytical protocol'}
+  heating_method:
+    state:
+      tag: value
+      value: Modified Knudsen cell (WA Technology); quartz sample holder in graphite crucible; alumina heater with tungsten wire; Watlow controller / SSR / Variac; Pt-10%Rh thermocouple
+    locator: *bb_loc
+  detector:
+    state:
+      tag: value
+      value: Residual gas analyzer (RGA); breadboard scanning quadrupole (see Table 3)
+    locator: *bb_loc
+  vacuum_system:
+    state:
+      tag: value
+      value: Stainless steel vacuum chamber with turbo-diaphragm pumping station; direct line of sight from heated sample to RGA ion source
+    locator: *bb_loc
+experiments:
+- experiment_id: apollo16-64801-53-ega
+  bench_id: vapor-breadboard-knudsen-rga
+  method: vacuum_pyrolysis_evolved_gas_analysis_rga
+  locator:
+    pdf_page_index: 5
+    published_page: 1011
+    section: '4.1. Apollo 16 sample 64801,53'
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: {kind: point, point: '0.000060', approximate: true}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '3. The VAPoR breadboard and the analytical protocol'
+        note: Approximately 60 mg Apollo regolith; DERIVED kg = 60e-6 kg
+    printed_composition:
+      state:
+        tag: value
+        value: Apollo 16 lunar regolith 64801,53 (station 4, Descartes; <1 mm sieve fraction)
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '4.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: {kind: range, low: '298.15', high: '1473.15'}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        note: 'DERIVED from printed 25 °C start to 1200 °C at 5 °C/min'
+- experiment_id: murchison-8mg-ega
+  bench_id: vapor-breadboard-knudsen-rga
+  method: vacuum_pyrolysis_evolved_gas_analysis_rga
+  locator:
+    pdf_page_index: 5
+    published_page: 1011
+    section: '4.2. Murchison meteorite'
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: {kind: point, point: '0.000008', approximate: false}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        note: 8 mg Murchison aliquot (profiles shown); DERIVED kg = 8e-6 kg
+    printed_composition:
+      state:
+        tag: value
+        value: Murchison CM2 (USNM 6650,2); crushed and sieved <150 µm
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '4.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: {kind: range, low: '298.15', high: '1473.15'}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        note: Same printed ramp 25 °C to 1200 °C at 5 °C/min
+- experiment_id: murchison-60mg-ega-saturated
+  bench_id: vapor-breadboard-knudsen-rga
+  method: vacuum_pyrolysis_evolved_gas_analysis_rga
+  locator:
+    pdf_page_index: 6
+    published_page: 1012
+    section: '5. VAPoR breadboard results and discussion'
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: {kind: point, point: '0.000060', approximate: false}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        note: 60 mg Murchison aliquot; caused RGA saturation; DERIVED kg = 60e-6 kg
+    printed_composition:
+      state:
+        tag: value
+        value: Murchison CM2 powdered aliquot (60 mg)
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: {kind: range, low: '298.15', high: '1473.15'}
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+fidelity_samples:
+- species: Apollo16_64801_53
+  observable: gas_speciation
+  observation_id: tenkate_2010_apollo16_64801_53_detected_gases
+  field: detected_species_as_printed
+  value:
+  - H2O
+  - CO/N2
+  - CO2
+  - CH4
+  - SO2
+  - H2S
+  - S/O2
+  - COS
+  - CS2
+  - He
+  locator:
+    pdf_page_index: 9
+    published_page: 1015
+    table: '4'
+    note: Table 4 row Apollo 16, 64801,53 (this work) — qualitative detection list
+- species: Apollo16_64801_53
+  observable: laboratory_conditions
+  observation_id: tenkate_2010_breadboard_protocol
+  field: ramp_rate_C_per_min_as_printed
+  value: 5
+  locator:
+    pdf_page_index: 5
+    published_page: 1011
+    section: '3'
+- species: Murchison_CM2
+  observable: gas_speciation
+  observation_id: tenkate_2010_murchison_detected_gases
+  field: detected_species_as_printed
+  value:
+  - H2O
+  - CO/N2
+  - CO2
+  - CH4
+  - SO2
+  - H2S
+  - S/O2
+  - CS2
+  - Organics
+  locator:
+    pdf_page_index: 9
+    published_page: 1015
+    table: '4'
+    note: Table 4 row Murchison (this work) — qualitative detection list
+species:
+  Apollo16_64801_53:
+    observations:
+    - observation_id: tenkate_2010_apollo16_64801_53_detected_gases
+      experiment: apollo16-64801-53-ega
+      type: gas_speciation
+      locator:
+        pdf_page_index: 9
+        published_page: 1015
+        table: '4'
+        note: Qualitative evolved-gas detection list for this work; not quantified
+      T_range_K: [298.15, 1473.15]
+      phase: Apollo_16_lunar_regolith_64801_53
+      standard_state: qualitative detection list as published in Table 4
+      regime: vacuum_pyrolysis_ega_rga_breadboard
+      units: as published (species detections; no calibrated abundance)
+      uncertainty:
+        note: >-
+          Authors state the purpose was not to calibrate the instrument and no
+          attempt was made to quantify evolved-gas amounts. Table 4 is a
+          presence-style comparison, not a concentration table.
+      values:
+        quantity: evolved_gas_species_detected
+        method_class: measured_direct
+        evidence_class: authors_own_breadboard_ega_qualitative
+        sample_id_as_printed: Apollo 16, 64801,53 (this work)
+        sample_mass_mg_as_printed: approximately 60
+        sample_mass_kg_derived:
+          value: 6.0e-5
+          stamp: DERIVED
+          formula: m_kg = m_mg * 1e-6
+          from_printed_mg: 60
+          approximate: true
+        temperature_start_C_as_printed: 25
+        temperature_end_C_as_printed: 1200
+        temperature_ramp_C_per_min_as_printed: 5
+        temperature_start_K_derived:
+          value: 298.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 25
+        temperature_end_K_derived:
+          value: 1473.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1200
+        detected_species_as_printed:
+        - H2O
+        - CO/N2
+        - CO2
+        - CH4
+        - SO2
+        - H2S
+        - S/O2
+        - COS
+        - CS2
+        - He
+        quantification_as_printed: >-
+          The purpose of this work was not to calibrate the instrument; therefore,
+          no attempt has been made to quantify the amount of evolved gases
+        cos_cs2_note_as_printed: >-
+          neither CS2+ nor COS+ have been reported for Apollo samples and are
+          only present in very minor amounts in our sample
+        figures_supporting_but_not_digitised: ['5', '6', '7', '8']
+    context:
+    - observation_id: tenkate_2010_breadboard_protocol
+      type: laboratory_conditions
+      experiment: apollo16-64801-53-ega
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '3. The VAPoR breadboard and the analytical protocol'
+      phase: VAPoR_breadboard_analytical_protocol
+      regime: vacuum_pyrolysis_ega
+      units: as published
+      values:
+        quantity: breadboard_pumpdown_and_heating_protocol
+        method_class: method_only
+        chamber_pressure_before_heating_mbar_as_printed: ~1e-8
+        chamber_pressure_with_filament_on_mbar_as_printed: ~1e-7
+        filament_warmup_duration_as_printed: 1 hour
+        temperature_start_C_as_printed: 25
+        temperature_end_C_as_printed: 1200
+        ramp_rate_C_per_min_as_printed: 5
+        temperature_start_K_derived:
+          value: 298.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 25
+        temperature_end_K_derived:
+          value: 1473.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1200
+        max_breadboard_oven_design_C_as_printed: 1200
+        flight_oven_goal_C_as_printed: 1400
+        quartz_holder_cleaning_as_printed: >-
+          ultrasonic 10 min deionized water, 10 min 95% HPLC hexane, 10 min
+          99.5% ethanol; bake 2 h at 500 °C in air
+    - observation_id: tenkate_2010_apollo16_sample_characterization
+      type: characterization
+      experiment: apollo16-64801-53-ega
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '4.1. Apollo 16 sample 64801,53'
+      phase: Apollo_16_64801_53
+      regime: sample_description
+      units: as published
+      values:
+        quantity: apollo16_regolith_sample_identity
+        method_class: method_only
+        sample_id_as_printed: 64801,53
+        parent_sample_as_printed: 64801
+        mission_station_as_printed: Apollo 16 station 4, Descartes highlands
+        sieve_fraction_as_printed: <1 mm
+        crushing_as_printed: very fine-grained; did not require crushing
+        cosmic_ray_exposure_age_Ma_as_printed: 310
+        cosmic_ray_exposure_basis_as_printed: cosmogenic 21Ne (Walton et al., 1973)
+  Murchison_CM2:
+    observations:
+    - observation_id: tenkate_2010_murchison_detected_gases
+      experiment: murchison-8mg-ega
+      type: gas_speciation
+      locator:
+        pdf_page_index: 9
+        published_page: 1015
+        table: '4'
+        note: Qualitative evolved-gas detection list for this work; profiles shown for 8 mg aliquot
+      T_range_K: [298.15, 1473.15]
+      phase: Murchison_CM2_USNM_6650_2
+      standard_state: qualitative detection list as published in Table 4
+      regime: vacuum_pyrolysis_ega_rga_breadboard
+      units: as published (species detections; no calibrated abundance)
+      uncertainty:
+        note: >-
+          Not quantified. 60 mg aliquot saturated the RGA (predominantly H2O+);
+          only 8 mg profiles are shown in Figs 5–8.
+      values:
+        quantity: evolved_gas_species_detected
+        method_class: measured_direct
+        evidence_class: authors_own_breadboard_ega_qualitative
+        sample_id_as_printed: Murchison (this work)
+        museum_number_as_printed: USNM 6650,2
+        aliquot_masses_mg_as_printed: [8, 60]
+        aliquot_shown_in_figures_mg_as_printed: 8
+        aliquot_saturated_rga_mg_as_printed: 60
+        temperature_start_C_as_printed: 25
+        temperature_end_C_as_printed: 1200
+        temperature_ramp_C_per_min_as_printed: 5
+        temperature_start_K_derived:
+          value: 298.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 25
+        temperature_end_K_derived:
+          value: 1473.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1200
+        detected_species_as_printed:
+        - H2O
+        - CO/N2
+        - CO2
+        - CH4
+        - SO2
+        - H2S
+        - S/O2
+        - CS2
+        - Organics
+        quantification_as_printed: >-
+          The purpose of this work was not to calibrate the instrument; therefore,
+          no attempt has been made to quantify the amount of evolved gases
+        figures_supporting_but_not_digitised: ['5', '6', '7', '8']
+    context:
+    - observation_id: tenkate_2010_murchison_sample_characterization
+      type: characterization
+      experiment: murchison-8mg-ega
+      locator:
+        pdf_page_index: 5
+        published_page: 1011
+        section: '4.2. Murchison meteorite'
+      phase: Murchison_CM2
+      regime: sample_description
+      units: as published
+      values:
+        quantity: murchison_sample_identity_and_prep
+        method_class: method_only
+        meteorite_as_printed: Murchison CM2-type carbonaceous chondrite
+        fall_date_as_printed: September 28, 1969
+        museum_number_as_printed: USNM 6650,2
+        allocated_mass_mg_as_printed: 68
+        interior_fragment_mass_g_as_printed: 6
+        prep_as_printed: crushed with clean mortar and pestle; passed through stainless steel 150 µm sieve
+        mineralogy_summary_as_printed: >-
+          XRD-PSD (Bland et al., 2004): tochilinite/cronstedtite 58.5%, serpentine
+          22.8%, olivine Fo100 7.4%, Fo80 2.2%, Fo50 2%, plus minor Fe–Ni metal,
+          enstatite, pyrrhotite, pentlandite, magnetite, calcite
