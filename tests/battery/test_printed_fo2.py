@@ -154,3 +154,95 @@ def test_sossi_table_row_keeps_its_printed_log(tmp_path: Path) -> None:
     assert obs.point_conditions["fO2_log"].state.value == Decimal("-0.68")
     assert obs.point_conditions["fO2_log"].inference is None
     assert isinstance(obs.point_conditions["fO2_log"].state.value, Decimal)
+
+
+def test_author_ratio_po2_lands_derived_not_printed() -> None:
+    from simulator.battery.migrate import collect_author_ratio_oxygen
+
+    located = collect_author_ratio_oxygen(
+        [{
+            "po2_over_pK_as_published": 0.226,
+            "P_K_atm_as_published": 6.91e-7,
+            "P_O2_atm": 1.56166e-7,
+        }],
+        _page(279),
+    )
+    assert located is not None
+    assert located.inference is not None
+    assert "author_ratio_P_O2_atm" in located.inference.relation
+    assert located.state.value.point == atm_to_pa(Decimal("1.56166e-7"))
+
+    # Engine-inferred sibling must not land as author-ratio oxygen.
+    refused = collect_author_ratio_oxygen(
+        [{
+            "po2_over_pK_as_published": 0.226,
+            "P_K_atm_as_published": 6.91e-7,
+            "P_O2_atm": 1.56166e-7,
+            "pO2_inference": "cco_redox_buffer",
+        }],
+        _page(279),
+    )
+    assert refused is None
+
+    # Arithmetic disagreement refuses rather than inventing.
+    disagreed = collect_author_ratio_oxygen(
+        [{
+            "po2_over_pK_as_published": 0.226,
+            "P_K_atm_as_published": 6.91e-7,
+            "P_O2_atm": 9.99e-7,
+        }],
+        _page(279),
+    )
+    assert disagreed is None
+
+
+def test_plante_1979_ratio_oxygen_fires_derived_waypoint(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979")
+    obs = result.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1104_000_1302K"
+    ]
+    experiment = result.experiments[obs.experiment_id]
+    bench = result.benches[experiment.bench_id]
+
+    located = (obs.point_conditions or {}).get("fO2_Pa")
+    assert located is not None and located.state.is_value
+    assert located.inference is not None
+    assert "author_ratio_P_O2_atm" in located.inference.relation
+    expected_pa = atm_to_pa(Decimal("1.561660e-07"))
+    assert located.state.value.point == expected_pa
+
+    # Distinct per-row products must not collapse onto experiment control.
+    assert (
+        experiment.fO2_control is None
+        or experiment.fO2_control.oxygen_partial_pressure_Pa is None
+        or not experiment.fO2_control.oxygen_partial_pressure_Pa.state.is_value
+    )
+
+    oxygen = oxygen_condition(experiment, bench, obs)
+    assert oxygen.selected is not None
+    assert oxygen.selected.route == "observation_fO2_Pa_to_log_fO2"
+    assert oxygen.selected.authority is WaypointAuthority.DERIVED
+    # log10(fO2/bar) = log10(P_O2_Pa / 1e5)
+    assert oxygen.selected.value.point == (expected_pa / _BAR_PA).log10()
+
+    # Every K2O activity row with the ratio keys gets a derived fO2_Pa.
+    ratio_rows = [
+        o for o in result.observations.values()
+        if (o.point_conditions or {}).get("fO2_Pa") is not None
+    ]
+    assert len(ratio_rows) == 162
+    authorities = {
+        oxygen_condition(experiment, bench, o).selected.authority
+        for o in ratio_rows
+    }
+    assert authorities == {WaypointAuthority.DERIVED}
+
+
+def test_mendybaev_2017_has_no_invented_oxygen(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "mendybaev-2017-fun-cai-lab-evaporation")
+    for obs in result.observations.values():
+        pc = obs.point_conditions or {}
+        assert "fO2_log" not in pc
+        assert "fO2_Pa" not in pc
+    for experiment in result.experiments.values():
+        assert experiment.fO2_control is None
