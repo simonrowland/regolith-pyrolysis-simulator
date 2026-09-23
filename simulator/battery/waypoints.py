@@ -1118,15 +1118,18 @@ def oxygen_condition(
             if boundary.route == "observation_total_pressure_Pa" and observation is not None:
                 located = (observation.point_conditions or {}).get("total_pressure_Pa")
                 locator_text = repr(located.locator) if located is not None and located.locator is not None else boundary.inputs[0]
-            value = _log_pressure(Value.point_of(upper_pa))
+            value = _log_pressure(
+                Value(ValueKind.POINT, point=upper_pa, approximate=pressure.approximate)
+            )
             if value is not None:
+                qualification = "approximate " if pressure.approximate else ""
                 routes.append(Waypoint(
                     "oxygen_condition",
                     value,
                     "vacuum_total_pressure_upper_bound",
                     WaypointAuthority.EXTRAPOLATED,
                     (*boundary.inputs, "Dalton: pO2 <= P_total"),
-                    notice=f"upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
+                    notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
                 ))
     if routes:
         # A fired route is the decision. The OR-set is consulted only for the gap text.

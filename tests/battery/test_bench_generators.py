@@ -150,6 +150,26 @@ def test_converted_printed_run_vacuum_supplies_oxygen_bound():
     assert selected.value.point == pytest.approx(Decimal("-6.8750969798670607"))
 
 
+def test_approximate_printed_run_vacuum_stays_approximate():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value(ValueKind.POINT, point=Decimal("1e-5"), approximate=True),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    selected = oxygen_condition(experiment, bench, observation).selected
+    assert selected is not None
+    assert selected.route == "vacuum_total_pressure_upper_bound"
+    assert selected.value.approximate is True
+    assert selected.notice is not None
+    assert "approximate upper bound from printed vacuum 0.00001 Pa" in selected.notice
+
+
 def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
     experiment, bench, observation = case(pressure="1e-4")
     experiment = replace(
