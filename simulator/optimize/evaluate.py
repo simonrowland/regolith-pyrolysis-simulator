@@ -5806,6 +5806,13 @@ def _cache_trace_payload(
             payload["sulfur_saturation_notice"] = _compact_jsonable(
                 dict(sulfsat_notice)
             )
+    rump_reader = getattr(simulator, "rump_expectation_run_notice", None)
+    if callable(rump_reader):
+        rump_notice = rump_reader()
+        if isinstance(rump_notice, MappingABC) and rump_notice:
+            payload["rump_expectation_notice"] = _compact_jsonable(
+                dict(rump_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
