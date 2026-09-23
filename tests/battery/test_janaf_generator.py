@@ -451,7 +451,9 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     alpha_beta = next(
         obs
         for obs in barium.observations
-        if obs.observation_id.endswith("transition_temperature:alpha-beta")
+        if "transition_temperature:T=" in obs.observation_id
+        and getattr(obs.identity.subtype, "is_value", False)
+        and obs.identity.subtype.value == "alpha-beta"
     )
     assert alpha_beta.identity.species.phase.is_value
     assert alpha_beta.identity.species.phase.value is Phase.CR
@@ -462,7 +464,9 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     crystal_liquid = next(
         obs
         for obs in _generation("Al-001").observations
-        if obs.observation_id.endswith("transition_temperature:crystal-liquid")
+        if "transition_temperature:T=" in obs.observation_id
+        and getattr(obs.identity.subtype, "is_value", False)
+        and obs.identity.subtype.value == "crystal-liquid"
     )
     assert crystal_liquid.identity.species.phase.is_unknown
     assert crystal_liquid.identity.species.phase.reason == (
@@ -482,14 +486,18 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     roman = next(
         obs
         for obs in sodium.observations
-        if obs.observation_id.endswith("transition_temperature:iv-i")
+        if "transition_temperature:T=" in obs.observation_id
+        and getattr(obs.identity.subtype, "is_value", False)
+        and obs.identity.subtype.value == "iv-i"
     )
     assert roman.identity.species.phase.value is Phase.CR
     assert "iv -> i" in (roman.identity.species.polymorph.reason or "")
     melting = next(
         obs
         for obs in sodium.observations
-        if obs.observation_id.endswith("transition_temperature:i-liquid")
+        if "transition_temperature:T=" in obs.observation_id
+        and getattr(obs.identity.subtype, "is_value", False)
+        and obs.identity.subtype.value == "i-liquid"
     )
     assert melting.identity.species.phase.is_unknown
     assert "(cr -> l)" in (melting.identity.species.phase.reason or "")
