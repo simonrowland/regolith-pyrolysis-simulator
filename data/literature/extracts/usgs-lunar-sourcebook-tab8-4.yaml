@@ -79,11 +79,11 @@ species:
         evidence_class: compilation_assessed
         sample_group: Apollo 12 MBAS
         rows:
-        - {statistic: N, Fe: '21', Co: '31', Ni: '23', Ge: '17', Mo: '4', W: '11', Re: '11', Os: '2917'}
-        - {statistic: average, Fe: '15.7', Co: '45.3', Ni: '46.7', Ge: '31.8', Mo: '42.5', W: '161', Re: '0.0098', Os: '0.060', Ir: '0.024'}
-        - {statistic: standard_deviation, Fe: '1.0', Co: '12.9', Ni: '39.7', Ge: '40.5', Mo: '8.3', W: '55', Re: '0.0151', Os: '0.051', Ir: '0.019'}
-        - {statistic: minimum, Fe: '13.4', Co: '25', Ni: '1', Ge: '0.7', Mo: '30', W: '104', Re: '0.0004', Os: '0.00190.', Ir: '.0046'}
-        - {statistic: maximum, Fe: '17.2', Co: '69', Ni: '150', Ge: '100', Mo: '50', W: '290', Re: '0.056', Os: '0.20', Ir: '0.072'}
+        - {statistic: N, Fe: '21', Co: '31', Ni: '23', Ge: '17', Mo: '4', W: '11', Re: '11', Ir: '29', Au: '17'}
+        - {statistic: average, Fe: '15.7', Co: '45.3', Ni: '46.7', Ge: '31.8', Mo: '42.5', W: '161', Re: '0.0098', Ir: '0.060', Au: '0.024'}
+        - {statistic: standard_deviation, Fe: '1.0', Co: '12.9', Ni: '39.7', Ge: '40.5', Mo: '8.3', W: '55', Re: '0.0151', Ir: '0.051', Au: '0.019'}
+        - {statistic: minimum, Fe: '13.4', Co: '25', Ni: '1', Ge: '0.7', Mo: '30', W: '104', Re: '0.0004', Ir: '0.00190', Au: '.0046'}
+        - {statistic: maximum, Fe: '17.2', Co: '69', Ni: '150', Ge: '100', Mo: '50', W: '290', Re: '0.056', Ir: '0.20', Au: '0.072'}
     - observation_id: usgs_tab8_4_apollo14_mbas
       type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 14 MBAS'}
@@ -175,8 +175,8 @@ species:
         evidence_class: compilation_assessed
         sample_group: Luna 24 MBAS
         rows:
-        - {statistic: N, Fe: '12', Co: '12', Ni: '5', Ir: '1'}
-        - {statistic: average, Fe: '16.3', Co: '40.7', Ni: '43.0', Ir: '30'}
+        - {statistic: N, Fe: '12', Co: '12', Ni: '5', W: '1'}
+        - {statistic: average, Fe: '16.3', Co: '40.7', Ni: '43.0', W: '30'}
         - {statistic: standard_deviation, Fe: '0.9', Co: '6.3', Ni: '26.8'}
         - {statistic: minimum, Fe: '14.7', Co: '36.0', Ni: '15'}
         - {statistic: maximum, Fe: '17.4', Co: '59.3', Ni: '80'}
@@ -191,11 +191,11 @@ species:
         evidence_class: compilation_assessed
         sample_group: Apollo 11 S&RB
         rows:
-        - {statistic: N, Co: '7', Ni: '5', Ge: '7', W: '1', Ru: '4', Pd: '4', Re: '3', Os: '9', Ir: '11'}
-        - {statistic: average, Co: '31.0', Ni: '199', Ge: '511', W: '220', Ru: '10.5', Pd: '0.74', Re: '7.83', Os: '8.6', Ir: '2.9'}
-        - {statistic: standard_deviation, Co: '3.0', Ni: '48', Ge: '367', Pd: '2.3', Re: '0.21', Os: '1.9', Ir: '1.9'}
-        - {statistic: minimum, Co: '27.2', Ni: '150', Ge: '240', Pd: '7', Re: '7.6', Os: '5.4', Ir: '1.4'}
-        - {statistic: maximum, Co: '34.8', Ni: '280', Ge: '1400', Pd: '13', Re: '8.1', Os: '11.6', Ir: '8.5'}
+        - {statistic: N, Co: '7', Ni: '5', Ge: '7', W: '1', Pd: '4', Re: '4', Os: '3', Ir: '9', Au: '11'}
+        - {statistic: average, Co: '31.0', Ni: '199', Ge: '511', W: '220', Pd: '10.5', Re: '0.74', Os: '7.83', Ir: '8.6', Au: '2.9'}
+        - {statistic: standard_deviation, Co: '3.0', Ni: '48', Ge: '367', Pd: '2.3', Re: '0.07', Os: '0.21', Ir: '1.9', Au: '1.9'}
+        - {statistic: minimum, Co: '27.2', Ni: '150', Ge: '240', Pd: '7', Re: '0.67', Os: '7.6', Ir: '5.4', Au: '1.4'}
+        - {statistic: maximum, Co: '34.8', Ni: '280', Ge: '1400', Pd: '13', Re: '0.85', Os: '8.1', Ir: '11.6', Au: '8.5'}
     - observation_id: usgs_tab8_4_apollo12_srb
       type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 12 S&RB'}
@@ -225,7 +225,7 @@ species:
         rows:
         - {statistic: N, Co: '25', Ni: '29', Ge: '8', Sb: '8', W: '8', Ru: '2', Pd: '2', Re: '12', Os: '1', Ir: '19', Au: '18'}
         - {statistic: average, Co: '34.6', Ni: '411', Ge: '671', Sb: '3.01', W: '1331', Ru: '19.5', Pd: '24', Re: '1.13', Os: '12.0', Ir: '12.5', Au: '6.2'}
-        - {statistic: standard_deviation, Co: '3.3', Ni: '101', Ge: '68', Sb: '1.13', W: '509', Pd: '0.14', Ir: '2.8', Au: '2.0'}
+        - {statistic: standard_deviation, Co: '3.3', Ni: '101', Ge: '68', Sb: '1.13', W: '509', Re: '0.14', Ir: '2.8', Au: '2.0'}
         - {statistic: minimum, Co: '27.5', Ni: '273', Ge: '590', Sb: '2', W: '500', Ru: '17', Pd: '20', Re: '0.86', Ir: '7.3', Au: '2.3'}
         - {statistic: maximum, Co: '43.5', Ni: '700', Ge: '790', Sb: '5.7', W: '1950', Ru: '22', Pd: '28', Re: '1.34', Ir: '19', Au: '11'}
     - observation_id: usgs_tab8_4_apollo15_srb
@@ -289,9 +289,9 @@ species:
         rows:
         - {statistic: N, Co: '7', Ni: '3', Ge: '2', Sb: '2', Ru: '1', Pd: '1', Re: '2', Ir: '2', Au: '4'}
         - {statistic: average, Co: '35.2', Ni: '174', Ge: '1300', Sb: '3.8', Ru: '20', Pd: '10.2', Re: '3.6', Ir: '9.7', Au: '2.5'}
-        - {statistic: standard_deviation, Co: '10.3', Ni: '30', Ir: '0.5'}
-        - {statistic: minimum, Co: '26', Ni: '132', Ge: '1300', Sb: '3.3', Pd: '3.4', Ir: '9.6', Au: '1.7'}
-        - {statistic: maximum, Co: '57.3', Ni: '200', Ge: '1300', Sb: '4.2', Pd: '3.7', Ir: '9.8', Au: '2.9'}
+        - {statistic: standard_deviation, Co: '10.3', Ni: '30', Au: '0.5'}
+        - {statistic: minimum, Co: '26', Ni: '132', Ge: '1300', Sb: '3.3', Re: '3.4', Ir: '9.6', Au: '1.7'}
+        - {statistic: maximum, Co: '57.3', Ni: '200', Ge: '1300', Sb: '4.2', Re: '3.7', Ir: '9.8', Au: '2.9'}
     - observation_id: usgs_tab8_4_luna20_srb
       type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Luna 20 S&RB'}
@@ -303,11 +303,11 @@ species:
         evidence_class: compilation_assessed
         sample_group: Luna 20 S&RB
         rows:
-        - {statistic: N, Co: '3', Ni: '3', Ge: '3', Sb: '2', W: '1', Pd: '2', Ir: '3', Au: '5'}
-        - {statistic: average, Co: '30.0', Ni: '252', Ge: '448', Sb: '5.7', W: '100', Pd: '1.04', Ir: '9.51', Au: '5.4'}
+        - {statistic: N, Co: '3', Ni: '3', Ge: '3', Sb: '2', W: '1', Re: '2', Ir: '3', Au: '5'}
+        - {statistic: average, Co: '30.0', Ni: '252', Ge: '448', Sb: '5.7', W: '100', Re: '1.04', Ir: '9.51', Au: '5.4'}
         - {statistic: standard_deviation, Co: '2.9', Ni: '16', Ge: '26', Ir: '0.01', Au: '2.0'}
-        - {statistic: minimum, Co: '27', Ni: '230', Ge: '430', Sb: '1.5', Pd: '1.04', Ir: '9.5', Au: '3.29'}
-        - {statistic: maximum, Co: '34', Ni: '267', Ge: '485', Sb: '9.8', Pd: '1.04', Ir: '9.52', Au: '7.8'}
+        - {statistic: minimum, Co: '27', Ni: '230', Ge: '430', Sb: '1.5', Re: '1.04', Ir: '9.5', Au: '3.29'}
+        - {statistic: maximum, Co: '34', Ni: '267', Ge: '485', Sb: '9.8', Re: '1.04', Ir: '9.52', Au: '7.8'}
     - observation_id: usgs_tab8_4_luna24_srb
       type: concentration_series
       locator: {page: 3, table: A8.4, row_group: 'Luna 24 S&RB'}
@@ -319,8 +319,8 @@ species:
         evidence_class: compilation_assessed
         sample_group: Luna 24 S&RB
         rows:
-        - {statistic: N, Co: '14', Ni: '13', W: '1', Ru: '1', Ir: '2', Au: '2'}
-        - {statistic: average, Co: '49.4', Ni: '158', W: '53', Ru: '6.2', Ir: '7.7', Au: '7.0'}
+        - {statistic: N, Co: '14', Ni: '13', W: '1', Ru: '1', Os: '1', Ir: '2', Au: '2'}
+        - {statistic: average, Co: '49.4', Ni: '158', W: '53', Ru: '6.2', Os: '7.7', Ir: '6.9', Au: '7.0'}
         - {statistic: standard_deviation, Co: '4.1', Ni: '65'}
         - {statistic: minimum, Co: '42', Ni: '90', Ir: '5.7', Au: '5.9'}
         - {statistic: maximum, Co: '60', Ni: '350', Ir: '8', Au: '8'}
@@ -339,7 +339,7 @@ species:
         - {statistic: average, Co: '18.6', Ni: '159', Ge: '291', W: '<130', Re: '0.53', Os: '8.1', Ir: '6.1', Au: '2.8'}
         - {statistic: standard_deviation, Co: '1.5', Ni: '29', Ge: '83', Re: '0.10', Os: '0.8', Ir: '0.7', Au: '1.5'}
         - {statistic: minimum, Co: '17', Ni: '121', Ge: '200', Re: '0.42', Os: '7', Ir: '5', Au: '1.07'}
-        - {statistic: maximum, Co: '21', Ni: '198', Ge: '402', Re: '0.66', Os: '9', Ir: '6.8', Au: '5.1'}
+        - {statistic: maximum, Co: '21', Ni: '198', Ge: '402', W: '<130', Re: '0.66', Os: '9', Ir: '6.8', Au: '5.1'}
 notes:
 - 'The source is a compiled statistical table, not a primary apparatus or run report; no apparatus parameters are attached to these compiled rows.'
 - 'The table note states g/g means micrograms per gram (parts per million), ng/g means nanograms per gram (parts per billion), N means number of samples, and standard deviations are not given when N < 3.'
