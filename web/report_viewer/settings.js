@@ -54,7 +54,14 @@ function effectiveConfig(config) {
 
 function yamlScalar(value) {
   if (value === null) return "null";
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (typeof value === "boolean") return String(value);
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return JSON.stringify(String(value));
+    let text = String(value);
+    const exponential = text.match(/^(-?)(\d+)(e[-+]?\d+)$/i);
+    if (exponential) text = `${exponential[1]}${exponential[2]}.0${exponential[3]}`;
+    return text;
+  }
   return JSON.stringify(String(value));
 }
 

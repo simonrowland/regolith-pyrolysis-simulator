@@ -822,6 +822,27 @@ vm.runInContext("render([{run_id:'focus-run',name:'Focus',feedstock_id:'lunar_ma
     assert json.loads(completed.stdout) == {"folderFocus": "Favorites", "starFocus": "focus-run"}
 
 
+def test_settings_yaml_export_preserves_numbers_through_pyyaml() -> None:
+    settings_js = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    cases = {"small": 1e-9, "neg_small": -1e-9, "big": 1e21, "mantissa": 1.5e-7, "plain_float": 0.001, "with_frac": 1234.5, "zero": 0, "int": 42}
+    harness = r"""
+const fs = require("fs"), vm = require("vm");
+const src = fs.readFileSync(process.argv[2], "utf8");
+const ctx = { globalThis: {} }; ctx.globalThis = ctx; vm.createContext(ctx);
+const slice = src.match(/function yamlScalar[\s\S]*?\n}\n\nfunction toYaml[\s\S]*?\n}\n/);
+vm.runInContext(slice[0], ctx);
+const cases = JSON.parse(process.argv[3]); const out = {};
+for (const [key, value] of Object.entries(cases)) out[key] = ctx.yamlScalar(value);
+process.stdout.write(JSON.stringify(out));
+"""
+    completed = subprocess.run(["node", "-", str(settings_js), json.dumps(cases)], input=harness, text=True, capture_output=True, check=True)
+    emitted = json.loads(completed.stdout)
+    for key, original in cases.items():
+        parsed = yaml.safe_load(emitted[key])
+        assert isinstance(parsed, (int, float)) and not isinstance(parsed, bool)
+        assert abs(parsed - original) <= abs(original) * 1e-12 + 1e-18, (key, emitted[key], parsed)
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 
