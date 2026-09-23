@@ -1,17 +1,20 @@
 schema_version: literature_extract.v1
 source_id: norris-2017-earth-volatiles-nature
 source:
-  citation: Norris, C. Ashley & Wood, Bernard J. (2017), "Earth's volatile contents established by melting and vaporization", Nature, DOI 10.1038/nature23645
+  citation: Norris, C. Ashley & Wood, Bernard J. (2017), "Earth's volatile contents established by melting
+    and vaporization", Nature, DOI 10.1038/nature23645
   doi: 10.1038/nature23645
   year: 2017
 extraction:
-  method: pdftotext -layout transcription of the 18-page publisher PDF; plotted results retained as figure-only because the PDF contains no readable extended-data table cells
+  method: pdftotext -layout transcription of the 18-page publisher PDF; plotted results retained as figure-only
+    because the PDF contains no readable extended-data table cells
   date: '2026-09-19'
   worker: w3-norris-2017-earth-volatiles-nature
   source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/norris-2017-earth-volatiles-nature/norris-2017-earth-volatiles-nature.pdf
 review_status: draft
 corrections:
-- The paper states a 4.5 cm3 crucible in the apparatus description and Methods, but says 4.5 mm2 in the later sample-description paragraph; both are retained below.
+- The paper states a 4.5 cm3 crucible in the apparatus description and Methods, but says 4.5 mm2 in the
+  later sample-description paragraph; both are retained below.
 fidelity_samples:
 - species: basaltic_silicate_melt
   observable: apparatus
@@ -33,82 +36,160 @@ fidelity_samples:
     note: Figure 3 plots volatility factors at 1300 C; values are not digitised.
 benches:
 - id: stirred-gas-mixing-furnace
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: One-atmosphere gas-mixing furnace with stirring apparatus}
-    locator: {pdf_page_index: 3, section: 'Experimental apparatus'}
+    state:
+      tag: value
+      value: One-atmosphere gas-mixing furnace with stirring apparatus
+    locator:
+      pdf_page_index: 3
+      section: Experimental apparatus
   cell_material_and_liner:
-    state: {tag: value, value: High-purity nickel crucible and stirrer mechanism}
-    locator: {pdf_page_index: 11, section: Methods}
+    state:
+      tag: value
+      value: High-purity nickel crucible and stirrer mechanism
+    locator:
+      pdf_page_index: 11
+      section: Methods
   geometry:
     cell_internal_dimensions:
       volume_m3:
-        state: {tag: value, value: {kind: point, point: '0.0000045'}}
-        locator: {pdf_page_index: 11, section: Methods, note: Printed 4.5 cm3 crucible capacity; unit conversion only}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000045'
+        locator:
+          pdf_page_index: 11
+          section: Methods
+          note: Printed 4.5 cm3 crucible capacity; unit conversion only
   heating_method:
-    state: {tag: value, value: Molybdenum-disilicide heating elements}
-    locator: {pdf_page_index: 11, section: Methods}
+    state:
+      tag: value
+      value: Molybdenum-disilicide heating elements
+    locator:
+      pdf_page_index: 11
+      section: Methods
   detector:
-    state: {tag: value, value: EDS and LA-ICP-MS}
-    locator: {pdf_page_index: 12, section: Analysis}
+    state:
+      tag: value
+      value: EDS and LA-ICP-MS
+    locator:
+      pdf_page_index: 12
+      section: Analysis
 experiments:
 - experiment_id: volatile-loss-series
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
-  locator: {pdf_page_index: 11, section: Methods}
+  locator:
+    pdf_page_index: 11
+    section: Methods
   sample:
     mass_kg:
-      state: {tag: value, value: {kind: point, point: '0.003'}}
-      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
-    printed_composition:
-      state: {tag: value, value: Natural Reykjanes Ridge basalt plus trace-element oxide mixture}
-      locator: {pdf_page_index: 11, section: Methods}
-    form:
-      state: {tag: value, value: 12 mm diameter pressed pellet}
-      locator: {pdf_page_index: 11, section: Methods}
-    pretreatment:
-      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
-      locator: {pdf_page_index: 11, section: Methods}
-  conditions:
-    temperature_K:
-      state: {tag: value, value: '1573.15'}
-      locator: {pdf_page_index: 11, section: Methods, note: Printed 1300 C; unit conversion only}
-  pressure_environment:
-    total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '101325'}}
-      locator: {pdf_page_index: 3, section: 'Experimental apparatus', note: Printed one atmosphere; unit conversion only}
-    sweep_gas:
-      state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 11, section: Methods, note: Flowing CO/CO2 mixture printed, but component flow and partial pressures required by this typed field are not}
-    regime:
-      regime_class: {tag: unknown, reason: not_published}
-  fO2_control:
-    channel: {tag: value, value: gas_mix}
-    buffer:
-      state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 11, section: Methods}
-    oxygen_partial_pressure_Pa:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '1.01325e-8'
-          interval_high: '1.01325e-2'
+          kind: point
+          point: '0.003'
+      locator:
+        pdf_page_index: 11
+        section: Methods
+        note: Printed 3 g; unit conversion only
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
+      locator:
+        pdf_page_index: 11
+        table: Extended Data Table 1
+        note: Starting material EBT1 major-element wt% (N=5) from Extended Data Table 1 (Europe PMC author
+          manuscript). NiO printed 0 and Total 99.8 omitted; 1σ columns not folded in.
+    form:
+      state:
+        tag: value
+        value: 12 mm diameter pressed pellet
+      locator:
+        pdf_page_index: 11
+        section: Methods
+    pretreatment:
+      state:
+        tag: value
+        value: Basalt crushed and ground; 60 g stored in desiccator
+      locator:
+        pdf_page_index: 11
+        section: Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 11
+        section: Methods
+        note: Printed 1300 C; unit conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
       locator:
         pdf_page_index: 3
-        section: Experimental vaporisation experiments
-        note: >-
-          Printed log fO2 range -7 to -13 with fO2 in atm (values.log_fO2_range;
-          fidelity_samples.log_fO2_range_as_printed). Landed as pO2_Pa interval
-          by SI conversion only: pO2_Pa = 10^(log_fO2) * 101325. Range preserved;
-          not collapsed to a point. Author log remains in observation values.
+        section: Experimental apparatus
+        note: Printed one atmosphere; unit conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Methods
+        note: Flowing CO/CO2 mixture printed
+        but component flow and partial pressures required by this typed field are not: null
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 11
+        section: Methods
   thermal_schedule:
     total_duration_s:
-      state: {tag: value, value: {kind: point, point: '3600'}}
-      locator: {pdf_page_index: 4, section: 'Experimental vaporisation experiments', note: Printed 60 min; unit conversion only}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+      locator:
+        pdf_page_index: 4
+        section: Experimental vaporisation experiments
+        note: Printed 60 min; unit conversion only
     cooling_or_quench:
-      state: {tag: value, value: Drop quench into water bath}
-      locator: {pdf_page_index: 11, section: Methods}
+      state:
+        tag: value
+        value: Drop quench into water bath
+      locator:
+        pdf_page_index: 11
+        section: Methods
 species:
   basaltic_silicate_melt:
     observations:
@@ -151,6 +232,8 @@ species:
         stirring_rate_RPM: 30
         stirrer_drive: DC motor via PWM controller at 20% output power
         quench: free-fall through a trapdoor into a water bath
+        log_fO2: -7
+        log_fO2_source: time_series_fO2_log as printed for the time series
       uncertainty:
         fO2_verification: before and after each experiment; no numeric sensor uncertainty stated
     context:
@@ -160,7 +243,8 @@ species:
       locator:
         pdf_page_index: 3
         section: Experimental apparatus
-        note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described again in Methods on PDF page 11.
+        note: Main text apparatus description; the same one-atmosphere, gas-tight assembly is described
+          again in Methods on PDF page 11.
       phase: natural_Reykjanes_Ridge_basalt_trace_element_doped_silicate_melt
       regime: stirred_one_atmosphere_gas_mixing_furnace
       units: as printed
@@ -186,7 +270,8 @@ species:
         basalt_preparation: crushed and ground, then mixed with reagent-grade trace-element oxide powders
         target_trace_element_concentration_ug_per_g: 300-500
         measured_product_form: homogeneous black glass with no observable gas bubbles
-        composition_measurement: SEM with energy-dispersive detector for major elements; LA-ICP-MS for trace elements
+        composition_measurement: SEM with energy-dispersive detector for major elements; LA-ICP-MS for
+          trace elements
         homogeneity_checks: SEM BSE imaging, X-ray mapping, and repeated EDS spot analysis
       uncertainty:
         major_element_homogeneity_RSD_percent: approximately 2
@@ -213,7 +298,8 @@ species:
         final_prepared_mass_g: 60
         trace_powders: reagent-grade oxide powders
         storage: desiccator to maintain dryness
-        starting_composition_characterisation: melted and quenched to glass in a high-pressure piston-cylinder experiment
+        starting_composition_characterisation: melted and quenched to glass in a high-pressure piston-cylinder
+          experiment
         piston_cylinder_pressure_GPa: 1.5
         piston_cylinder_temperature_C: 1500
         piston_cylinder_duration_min: 5
@@ -294,7 +380,8 @@ species:
       locator:
         pdf_page_index: 13
         section: Analysis
-        note: Later sample-description paragraph prints 4.5 mm2; this conflicts with 4.5 cm3 on PDF pages 3 and 11.
+        note: Later sample-description paragraph prints 4.5 mm2; this conflicts with 4.5 cm3 on PDF pages
+          3 and 11.
       phase: quenched_basaltic_glass
       regime: post_experiment_sample_description
       units: as printed
@@ -303,7 +390,8 @@ species:
         method_class: measured_direct
         evidence_class: measured_direct
         crucible_capacity_mm2_as_printed: 4.5
-        disagreement: printed unit/value is inconsistent with the apparatus descriptions' 4.5 cm3; not reconciled
+        disagreement: printed unit/value is inconsistent with the apparatus descriptions' 4.5 cm3; not
+          reconciled
       uncertainty: {}
   trace_elements:
     observations:
@@ -313,7 +401,8 @@ species:
       locator:
         pdf_page_index: 15
         figure: '2'
-        note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values
+          digitised.
       phase: product_silicate_glass
       regime: stirred_one_atmosphere_CO_CO2_vaporisation
       units: concentration normalized to starting concentration, minutes, C, log fO2
@@ -366,15 +455,17 @@ species:
         - Sn
         - Tl
         - Zn
-        figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
+        figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and
+          conditions
         digitised: false
-    - observation_id: norris_2017_figure4_bse_vs_volatility
+    - observation_id: norris_2017_figure4_bse_vs_volatility_logfo2_m11
       experiment: volatile-loss-series
       type: gibbs_table
       locator:
         pdf_page_index: 17
         figure: 4a,b
-        note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+        note: Figure 4 at log fO2=-11 (atm). BSE/CI abundance plotted against measured volatility factors;
+          values retained as figure-only and not digitised.
       phase: silicate_Earth_comparison
       regime: comparison_of_measured_volatility_with_BSE_abundance
       units: BSE/CI chondrite abundance normalized to Mg=1; volatility factor
@@ -384,9 +475,28 @@ species:
         evidence_class: figure_only
         T_C: 1300
         temperature_C: 1300
-        log_fO2:
-        - -11
-        - -13
+        log_fO2: -11
+        plotted_elements: Ag, Bi, Cd, Cr, Cu, Ga, Ge, In, Pb, Sb, Sn, Tl, Zn
+        horizontal_error_bars: 2 standard errors
+        digitised: false
+    - observation_id: norris_2017_figure4_bse_vs_volatility_logfo2_m13
+      experiment: volatile-loss-series
+      type: gibbs_table
+      locator:
+        pdf_page_index: 17
+        figure: 4a,b
+        note: Figure 4 at log fO2=-13 (atm). BSE/CI abundance plotted against measured volatility factors;
+          values retained as figure-only and not digitised.
+      phase: silicate_Earth_comparison
+      regime: comparison_of_measured_volatility_with_BSE_abundance
+      units: BSE/CI chondrite abundance normalized to Mg=1; volatility factor
+      values:
+        quantity: BSE_CI_abundance_vs_measured_volatility_factor
+        method_class: figure_only
+        evidence_class: figure_only
+        T_C: 1300
+        temperature_C: 1300
+        log_fO2: -13
         plotted_elements: Ag, Bi, Cd, Cr, Cu, Ga, Ge, In, Pb, Sb, Sn, Tl, Zn
         horizontal_error_bars: 2 standard errors
         digitised: false
@@ -405,7 +515,8 @@ species:
         method_class: model_derived
         evidence_class: model_derived
         generator: author's volatility-factor calculation from measured concentrations
-        expression_as_printed: F_M = final concentration of trace element M divided by initial concentration in the starting mixture
+        expression_as_printed: F_M = final concentration of trace element M divided by initial concentration
+          in the starting mixture
         inputs: measured initial and final trace-element concentrations
         interpretation: low values correspond to high volatility
         comparison_duration_min: 60
