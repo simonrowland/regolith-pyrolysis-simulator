@@ -3092,7 +3092,11 @@ def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
         },
     )
     result = migrate(root, write=False)
-    obs = result.observations["robie-hemingway-1995-usgs-b2131:al-ht"]
+    obs = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("robie-hemingway-1995-usgs-b2131:al-ht")
+    )
     token, _reason = _quantity_state(obs)
     assert token is Quantity.DELTA_FG
 
@@ -3247,7 +3251,7 @@ def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
     state, reason = compilation_quantity_from_record(nasa)
     assert state.is_value and state.value is Quantity.DELTA_FH and reason is None
     sel = select_declared_source(state, None, nasa)
-    assert sel.amount == as_decimal("-393510.0")
+    assert sel.amount == as_decimal("-393.51")
     assert sel.value.kind is ValueKind.POINT
     assert sel.field_name == "delta_f_H_298_15"
 
@@ -3276,7 +3280,7 @@ def test_g1_delta_fh_migrate_admits_point_without_token_queue(tmp_path: Path) ->
     assert ng_obs
     assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in ng_obs)
     assert all(obs.value.kind is ValueKind.POINT for obs in ng_obs)
-    assert all(obs.value.point == as_decimal("-103772.885") for obs in ng_obs)
+    assert all(obs.value.point == as_decimal("-103.772885") for obs in ng_obs)
 
     for entry in result.queue:
         assert "not a v2.1 Quantity token" not in (entry.why or "")
@@ -3335,7 +3339,7 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     # Never first-numeric-cell: T column stays out of the emitted quantities.
     assert Quantity.TRANSITION_TEMPERATURE not in quantities
     cp = next(item for item in series if item.quantity is Quantity.CP)
-    assert cp.value.series[0] == (as_decimal("298"), as_decimal("76.0"))
+    assert cp.value.series[0] == (as_decimal("298"), as_decimal("317.984"))
 
     kelley = json.loads(
         (
@@ -3351,8 +3355,8 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert len(k_by_key["cp_temperature_grid"].value.series or ()) == 7
     assert k_by_key["entropy_third_law"].quantity is Quantity.S
     assert k_by_key["entropy_third_law"].value.kind is ValueKind.POINT
-    assert k_by_key["entropy_third_law"].value.point == as_decimal("26.58")
-    assert k_by_key["entropy_recommended"].value.point == as_decimal("26.58")
+    assert k_by_key["entropy_third_law"].value.point == as_decimal("111.21072")
+    assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
 
 
 def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
@@ -3380,7 +3384,7 @@ def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
     dh = next(obs for obs in pank if quantity_token(obs.identity) is Quantity.DELTA_FH)
     assert dh.value.series is not None
     # table-1447 row0 ΔHf is column index 4, not the first numeric cell (T=298 or Cp=76).
-    assert dh.value.series[0] == (as_decimal("298"), as_decimal("-692.045"))
+    assert dh.value.series[0] == (as_decimal("298"), as_decimal("-2895.516280"))
 
     kel = [
         obs

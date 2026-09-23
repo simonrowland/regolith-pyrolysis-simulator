@@ -3605,9 +3605,9 @@ def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     return [row for row in rows if isinstance(row, Mapping)]
 
 
-def _heading_columns(doc: Mapping[str, Any]) -> list[tuple[int, str, Quantity | None]]:
+def _heading_columns(doc: Mapping[str, Any]) -> list[tuple[int, str, Quantity | None, str | None]]:
     columns = doc.get("columns") or []
-    out: list[tuple[int, str, Quantity | None]] = []
+    out: list[tuple[int, str, Quantity | None, str | None]] = []
     if not isinstance(columns, list):
         return out
     for index, col in enumerate(columns):
@@ -3621,7 +3621,8 @@ def _heading_columns(doc: Mapping[str, Any]) -> list[tuple[int, str, Quantity | 
         else:
             heading = str(col)
         quantity = _quantity_for_compilation_column_label(heading)
-        out.append((index, heading, quantity))
+        unit = col.get("units_as_published") if isinstance(col, Mapping) else None
+        out.append((index, heading, quantity, str(unit) if unit else None))
     return out
 
 
@@ -3662,12 +3663,12 @@ def _column_series_from_list_cells(
     if not headings:
         return ()
     temp_index = next(
-        (i for i, heading, _q in headings if _is_temperature_column_label(heading)),
+        (i for i, heading, _q, _unit in headings if _is_temperature_column_label(heading)),
         None,
     )
     # Group value column indices by quantity; retain first heading as series_key.
     by_quantity: dict[Quantity, list[tuple[int, str]]] = {}
-    for index, heading, quantity in headings:
+    for index, heading, quantity, _unit in headings:
         if quantity is None or index == temp_index:
             continue
         by_quantity.setdefault(quantity, []).append((index, heading))
@@ -3682,6 +3683,7 @@ def _column_series_from_list_cells(
         if len(cols) != 1:
             continue
         index, heading = cols[0]
+        unit = next(item[3] for item in headings if item[0] == index)
         points: list[tuple[Decimal, Decimal]] = []
         for row in rows:
             cells = row.get("cells")
@@ -3693,6 +3695,11 @@ def _column_series_from_list_cells(
             v_amt = _cell_numeric_amount(cells[index])
             if t_amt is None or v_amt is None:
                 continue
+            converted = _convert_compilation_amount(v_amt, quantity, unit)
+            if converted is None:
+                points = []
+                break
+            v_amt, _trail = converted
             points.append((t_amt, v_amt))
         series = _emit_series_or_point(quantity, heading, points)
         if series is not None:
@@ -3748,13 +3755,22 @@ def _column_series_from_named_cells(
                 continue
             cp_t = _temperature_from_cp_column_key(key)
             if cp_t is not None:
-                cp_points.append((cp_t, amount))
+                converted = _convert_compilation_amount(
+                    amount, Quantity.CP, _printed_unit_for_field(doc, key)
+                )
+                if converted is not None:
+                    cp_points.append((cp_t, converted[0]))
                 continue
             if key in _KELLEY_ENTROPY_COLUMNS:
+                converted = _convert_compilation_amount(
+                    amount, Quantity.S, _printed_unit_for_field(doc, key)
+                )
+                if converted is None:
+                    continue
                 series = _emit_series_or_point(
                     Quantity.S,
                     key,
-                    [( _KELLEY_ENTROPY_T_K, amount)],
+                    [(_KELLEY_ENTROPY_T_K, converted[0])],
                     point_temperature=_KELLEY_ENTROPY_T_K,
                 )
                 if series is not None:
@@ -3765,7 +3781,11 @@ def _column_series_from_named_cells(
             )
             if quantity is None or t_amt is None:
                 continue
-            grid_points.setdefault(quantity, []).append((t_amt, amount))
+            converted = _convert_compilation_amount(
+                amount, quantity, _printed_unit_for_field(doc, key)
+            )
+            if converted is not None:
+                grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
             grid_keys.setdefault(quantity, key)
 
     emitted: list[CompilationColumnSeries] = []
@@ -4539,6 +4559,48 @@ def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
     return _as_dec_or_none(raw)
 
 
+def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
+    units = payload.get("units_as_published")
+    if isinstance(units, Mapping):
+        unit = units.get(key)
+        return str(unit) if unit not in (None, "") else None
+    raw = payload.get(key)
+    if isinstance(raw, Mapping):
+        unit = raw.get("units") or raw.get("unit") or raw.get("units_as_published")
+        return str(unit) if unit not in (None, "") else None
+    return None
+
+
+def _convert_compilation_amount(
+    amount: Decimal, quantity: Quantity, unit: str | None
+) -> tuple[Decimal, str] | None:
+    """Normalize explicit thermochemical compilation units to ledger units.
+
+    Pankratz and Kelley print the thermochemical calorie (4.184 J exactly),
+    the calorie convention used by their tabulated cal/mol units. The
+    conversion is derived from the printed unit and is never printed evidence.
+    """
+    if unit is None:
+        return amount, "as_published"
+    token = re.sub(r"\s+", "", str(unit).lower()).replace("·", "")
+    token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
+    energy = quantity in {Quantity.H_MINUS_H298, Quantity.DELTA_FH, Quantity.DELTA_FG}
+    heat = quantity in {Quantity.CP, Quantity.S}
+    if not energy and not heat:
+        return amount, "as_published"
+    with localcontext() as ctx:
+        ctx.prec = 80
+        if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
+            return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
+        if energy and token in {"kcal/mol", "kcal/mole"}:
+            return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
+        if energy and token in {"j/mol", "j/mole"}:
+            return amount / Decimal("1000"), "J_to_kJ_exact"
+        if energy and token in {"kj/mol", "kj/mole", "kjpermol"}:
+            return amount, "identity:kJ_per_mol"
+    return None
+
+
 def _formation_gibbs_cell_flags(cell: object) -> tuple[bool, bool, bool]:
     """Return (numeric, printed, ocr_suspect_with_no_parsed_value)."""
 
@@ -4888,7 +4950,17 @@ def _selection_from_named_field(
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
-        trail = "as_published"
+        converted = _convert_compilation_amount(
+            amount, q_token, _printed_unit_for_field(payload, key) or units
+        )
+        if converted is None:
+            return _unavailable_selection(
+                f"unsupported printed unit for {key}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        amount, trail = converted
         if q_token is Quantity.LOG10_KF and key == "value":
             trail = "identity"
         if q_token in {
@@ -4911,7 +4983,17 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
-        trail = "as_published"
+        converted = _convert_compilation_amount(
+            amount, q_token, _printed_unit_for_field(payload, key) or units
+        )
+        if converted is None:
+            return _unavailable_selection(
+                f"unsupported printed unit for {key}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        amount, trail = converted
         if q_token in {
             Quantity.MASS_LOSS_FRACTION,
             Quantity.MASS_LOSS_FRACTION_VS_T,
