@@ -252,6 +252,25 @@ def test_accepts_equipment_with_per_field_locator():
     assert errs == []
 
 
+def test_r16_extract_ids_resolve_and_preserve_unavailable_queue_links():
+    """Rewritten observation IDs must retain experiment and queue ownership."""
+    root = REPO_ROOT / "data" / "literature"
+    pairs = (
+        ("kems-140-heck-2025", "10.1016_j.gca.2025.05.007"),
+        ("holzheid-1997-feo-nio-coo-activity-metal-saturated", "10.1016_s0009-2541(97)00030-2"),
+        ("thomas-2022-chlorine-bonding-silicate-melts", "10.1016_j.chemgeo.2022.121269"),
+    )
+    queue = (root.parent / "battery" / "migration-queue.yaml").read_text()
+    for name, work_id in pairs:
+        extract = yaml.safe_load((root / "extracts-v2" / f"{name}.yaml").read_text())
+        work = yaml.safe_load((root / "works" / f"{work_id}.yaml").read_text())
+        experiment_ids = {row["experiment_id"] for row in work["experiments"]}
+        assert all(row["experiment_id"] in experiment_ids for row in extract["observations"])
+        assert all(
+            row["observation_id"] in queue
+            for row in extract["observations"]
+            if row["value"]["kind"] == "unavailable"
+        )
 def test_inferred_equipment_requires_derivation_note():
     doc = _minimal_extract()
     doc["species"]["Fe"]["observations"][0]["equipment"] = {
