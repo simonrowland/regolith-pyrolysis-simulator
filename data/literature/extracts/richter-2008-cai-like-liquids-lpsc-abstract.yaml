@@ -1,0 +1,252 @@
+schema_version: literature_extract.v1
+source_id: richter-2008-cai-like-liquids-lpsc-abstract
+source:
+  citation: >-
+    Richter, F. M., Teng, F.-Z., Mendybaev, R. A., Davis, A. M. & Georg, R. B.
+    (2008), "Elemental and Isotope Fractionation of CAI-like Liquids by
+    Evaporation in Low Pressure H2", Lunar and Planetary Science XXXIX,
+    abstract 1385.
+  url: https://www.lpi.usra.edu/meetings/lpsc2008/pdf/1385.pdf
+  year: 2008
+  conference: Lunar and Planetary Science XXXIX
+extraction:
+  method: >-
+    Corpus PDF raw/richter-2008-cai-like-liquids-lpsc-abstract/richter-2008-cai-like-liquids-lpsc-abstract.pdf
+    (2-page LPSC abstract 1385). Clean text layer via pdftotext -layout; no OCR
+    and no figure digitisation. SIDECAR NOTE: corpus sidecar citation title
+    appends "in hydrogen gas and in vacuum" and lists Wadhwa; PDF p1 title is
+    "...EVAPORATION IN LOW PRESSURE H2" and authors are Richter, Teng,
+    Mendybaev, Davis, Georg (no Wadhwa). Extract follows the PDF. Figures 1-3
+    not digitized. New high-precision Mg isotope residues at 1.87x10^-4 bar H2
+    are reported only via figures; no prose numeric alpha for that arm.
+    Printed pressure thresholds and qualitative "about two orders of magnitude"
+    kinetics claim retained as context / figure_only, not as scored points.
+  date: '2026-09-22'
+  worker: n4-cai-liquid-evaporation
+  provenance_path: data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 2-page LPSC conference abstract (CAI-like liquid evaporation H2 vs vacuum)
+  measured_direct_observations: 0
+  method_observations: 2
+  figure_only_observations: 3
+  quoted_attributed_observations: 0
+  absent_from_source:
+  - digitized Fig. 1 evaporation-rate vs T points
+  - digitized Fig. 2 Mg isotope Rayleigh plot points / slope alpha
+  - digitized Fig. 3 alpha vs T points
+  - starting melt oxide assay printed in this abstract
+  - sample masses, loop diameters, run durations
+  - absolute evaporation rates in prose (only figure + "about two orders of magnitude")
+  corpus_identity_note: >-
+    Distinct from kems-010-richter-2007 (GCA full paper) and kems-037-richter-2002;
+    this is LPSC 2008 abstract 1385. STEP 0 confirmed no prior extract under this
+    source_id or DOI (none). Related full-paper extracts already exist and are
+    not duplicated.
+  note: >-
+    Abstract contrasts vacuum vs low-P H2 evaporation kinetics and Mg kinetic
+    isotope fractionation. Most numeric results live only in figures attributed
+    partly to prior work [2],[3]; this extract refuses figure digitisation and
+    scores no new measured points.
+benches:
+- id: chicago-cai-evaporation-lab
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Laboratory evaporation of CAI-like liquids in vacuum and low-pressure H2 (furnace details deferred to cited works)}
+    locator: &intro_loc {pdf_page_index: 1, section: Introduction}
+  analytical_instruments:
+    state: {tag: value, value: "GV Instruments Isoprobe multicollector ICPMS at University of Chicago for Mg isotopes; Al/Mg by multicollector ICPMS as in [3]"}
+    locator: {pdf_page_index: 1, section: Isotopic Fractionations}
+experiments:
+- experiment_id: cai-like-h2-1p87e-4-bar-residues
+  bench_id: chicago-cai-evaporation-lab
+  method: low_pressure_hydrogen_evaporation
+  locator: {pdf_page_index: 1, section: Isotopic Fractionations}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: starting oxide assay not printed in this abstract}
+      locator: {pdf_page_index: 1, note: CAI-like liquid; composition deferred to cited vacuum/H2 runs}
+    form:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 1}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '1773.15'}}
+      locator: {pdf_page_index: 2, figure: '3', note: 'DERIVED: 1500 C + 273.15 = 1773.15 K; Fig. 3 caption states residues evaporated at 1500 C into 1.87x10^-4 bars hydrogen'}
+  pressure_environment:
+    total_pressure_as_printed:
+      state: {tag: value, value: '1.87x10^-4 bars hydrogen'}
+      locator: {pdf_page_index: 1, section: Isotopic Fractionations}
+    sweep_gas:
+      state: {tag: value, value: {species: hydrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {pdf_page_index: 1, section: Isotopic Fractionations}
+- experiment_id: cai-like-vacuum-vs-h2-kinetics-comparison
+  bench_id: chicago-cai-evaporation-lab
+  method: vacuum_and_hydrogen_evaporation_comparison
+  locator: {pdf_page_index: 1, section: Elemental Fractionations, figure: '1'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: CAI-like liquid (assay not printed here)}
+      locator: {pdf_page_index: 1, figure: '1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '1773.15'}}
+      locator: {pdf_page_index: 1, figure: '1', note: 'DERIVED companion for caption claim T=1500 C hydrogen rate vs vacuum extrapolated to 1500 C'}
+  pressure_environment:
+    total_pressure_as_printed:
+      state: {tag: value, value: 'vacuum vs 2x10^-4 bars hydrogen'}
+      locator: {pdf_page_index: 1, figure: '1'}
+    sweep_gas:
+      state: {tag: value, value: {species: hydrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {pdf_page_index: 1, figure: '1'}
+fidelity_samples:
+- species: CAI_like_liquid
+  observable: laboratory_conditions
+  observation_id: richter_2008_h2_isotope_arm_conditions
+  field: H2_pressure_bars_as_printed
+  value: '1.87x10^-4'
+  locator:
+    pdf_page_index: 1
+    section: Isotopic Fractionations
+    note: residues evaporated in 1.87x10^-4 bars of hydrogen
+- species: CAI_like_liquid
+  observable: laboratory_conditions
+  observation_id: richter_2008_pressure_regime_thresholds
+  field: vacuum_like_H2_upper_bound_bars_as_printed
+  value: '10^-7'
+  locator:
+    pdf_page_index: 1
+    section: Elemental Fractionations
+- species: CAI_like_liquid
+  observable: rate_series
+  observation_id: richter_2008_fig1_h2_vs_vacuum_kinetics
+  field: relative_rate_claim_as_printed
+  value: about two orders of magnitude larger
+  locator:
+    pdf_page_index: 1
+    figure: '1'
+species:
+  CAI_like_liquid:
+    observations:
+    - observation_id: richter_2008_fig1_h2_vs_vacuum_kinetics
+      experiment: cai-like-vacuum-vs-h2-kinetics-comparison
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        figure: '1'
+        section: Elemental Fractionations
+      T_range_K: [1773.15, 1773.15]
+      phase: CAI_like_silicate_liquid
+      regime: vacuum_vs_low_pressure_H2
+      units: figure_only; relative claim as printed
+      uncertainty:
+        note: >-
+          Caption qualitative claim only; curve points not digitized. Data
+          attributed to [2] and [3] in the figure caption.
+      values:
+        quantity: evaporation_rate_vs_temperature
+        method_class: figure_only
+        evidence_class: figure_caption_plus_cited_prior_data
+        temperature_C_comparison_as_printed: 1500
+        temperature_K_derived:
+          value: 1773.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1500
+        H2_pressure_bars_as_printed: '2x10^-4'
+        relative_rate_claim_as_printed: about two orders of magnitude larger
+        relative_rate_definition_as_printed: >-
+          evaporation rate in hydrogen (T=1500 C) is about two orders of
+          magnitude larger than the vacuum rate extrapolated to 1500 C
+        numeric_points: not_digitized
+        data_attribution_as_printed: Data from [2] and [3]
+        note: >-
+          Scored as figure_only / bound-style relative claim from the caption;
+          no absolute rates printed in prose.
+    context:
+    - observation_id: richter_2008_h2_isotope_arm_conditions
+      type: laboratory_conditions
+      experiment: cai-like-h2-1p87e-4-bar-residues
+      locator:
+        pdf_page_index: 1
+        section: Isotopic Fractionations
+      phase: CAI_like_silicate_liquid_residues
+      regime: low_pressure_hydrogen_evaporation
+      units: as published
+      values:
+        quantity: H2_isotope_remeasurement_arm
+        method_class: method_only
+        H2_pressure_bars_as_printed: '1.87x10^-4'
+        temperature_C_as_printed_fig3: 1500
+        temperature_K_derived:
+          value: 1773.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1500
+        isotope_instrument_as_printed: GV Instruments Isoprobe multicollector ICPMS (University of Chicago)
+        Al_Mg_method_as_printed: multicollector ICPMS as described in [3]
+        vacuum_experiment_deferred_to: '[2]'
+        Mg_isotope_method_deferred_to: '[3]'
+        fig2_status: >-
+          Magnesium isotopic composition of residues plotted for Rayleigh slope
+          1-alpha; open symbols earlier [2], small solid symbols new
+          high-precision data; numeric alpha not printed in prose
+        fig3_status: >-
+          Kinetic isotope fractionation factor for H2 arm (blue) compared to
+          vacuum trend (red) and inverse-sqrt-mass ideal line; authors state
+          factors are approximately the same, H2 value slightly above vacuum
+          trend; no prose numeric alpha extracted
+    - observation_id: richter_2008_pressure_regime_thresholds
+      type: laboratory_conditions
+      experiment: cai-like-vacuum-vs-h2-kinetics-comparison
+      locator:
+        pdf_page_index: 1
+        section: Elemental Fractionations
+      phase: CAI_like_silicate_liquid
+      regime: vacuum_to_hydrogen_transition
+      units: bars as printed
+      values:
+        quantity: H2_pressure_regime_thresholds
+        method_class: method_only
+        vacuum_like_H2_upper_bound_bars_as_printed: '10^-7'
+        vacuum_like_claim_as_printed: >-
+          For pressures less than about 10^-7 bars H2, the evaporation kinetics
+          is effectively that in vacuum
+        hydrogen_enhanced_claim_as_printed: >-
+          For hydrogen pressures greater than 10^-7 bars the evaporation kinetics
+          increases in proportion to square root of the hydrogen pressure [2]
+        comparison_H2_pressure_bars_as_printed: '2x10^-4'
+        mechanism_as_printed: >-
+          Increase attributed to hydrogen effect on saturation vapor pressure of
+          Mg and SiO; evaporation coefficients much less sensitive to T than the
+          rates and similar in H2 vs vacuum at comparable T (see Fig. 3 in [3])
+        Hertz_Knudsen_as_printed: 'Ji = gamma_i * Pi_sat / sqrt(2 * pi * mi * R * T)'
+    - observation_id: richter_2008_summary_and_sidecar_mismatch
+      type: method
+      locator:
+        pdf_page_index: 2
+        section: Summary
+      phase: abstract_summary
+      regime: low_pressure_hydrogen_vs_vacuum
+      units: as published
+      values:
+        quantity: author_summary_and_identity_notes
+        method_class: method_only
+        summary_as_printed: >-
+          Hydrogen (P>10^-7 bars) significantly increases the evaporation rate
+          at a given temperature because of its effect on the saturation vapor
+          pressure of Mg and SiO. In contrast, the effect of hydrogen on the
+          kinetic isotope fractionation factor for magnesium is quite small.
+        silicon_isotope_status_as_printed: in progress (vacuum [5] vs new low-P H2 residues)
+        pdf_title_as_printed: Elemental and Isotope Fractionation of CAI-like Liquids by Evaporation in Low Pressure H2
+        pdf_authors_as_printed:
+        - F. M. Richter
+        - F.-Z. Teng
+        - R. A. Mendybaev
+        - A. M. Davis
+        - R. B. Georg
+        sidecar_citation_mismatch_note: >-
+          Corpus sidecar title appends "in hydrogen gas and in vacuum" and lists
+          Wadhwa; PDF has Low Pressure H2 title and Teng/Georg (no Wadhwa).
+          Extract citation follows the PDF.
