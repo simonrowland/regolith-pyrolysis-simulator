@@ -11,6 +11,7 @@ from simulator import condensation as condensation_module
 from simulator.condensation import (
     CondensationModel,
     CondensationTrain,
+    WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _flowing_species_partial_pressures_pa,
     _hkl_impingement_flux_mol_m2_s,
@@ -677,28 +678,37 @@ def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:
 def test_missing_wall_reactivity_class_refuses_only_that_route(monkeypatch):
     assert _sticking_reactivity_class("Unobtanium") is None
 
-    for reactive_product_backstop in (False, True):
-        diagnostic = {}
-        telemetry = {}
-        assert _wall_deposition_driving_pressure_pa(
+    diagnostic = {}
+    telemetry = {}
+    assert _wall_deposition_driving_pressure_pa(
+        "Unobtanium",
+        P_local_pa=100.0,
+        T_surface_K=1000.0,
+        vapor_pressure_data={},
+        reactive_product_backstop=True,
+        antoine_extrapolations=telemetry,
+        diagnostic_out=diagnostic,
+    ) == 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is True
+    assert diagnostic["wall_saturation_pressure_refusal_reason"] == (
+        "missing_reactivity_class"
+    )
+    assert diagnostic["wall_saturation_pressure_refusal_type"] == (
+        "MissingReactivityClassRefusal"
+    )
+    refusal = telemetry["Unobtanium#wall:1000.0"]
+    assert refusal["reason"] == "missing_reactivity_class"
+    assert refusal["refusal_type"] == "MissingReactivityClassRefusal"
+
+    with pytest.raises(WallSaturationPressureRefusal) as exc_info:
+        _wall_deposition_driving_pressure_pa(
             "Unobtanium",
             P_local_pa=100.0,
             T_surface_K=1000.0,
             vapor_pressure_data={},
-            reactive_product_backstop=reactive_product_backstop,
-            antoine_extrapolations=telemetry,
-            diagnostic_out=diagnostic,
-        ) == 0.0
-        assert diagnostic["wall_saturation_pressure_refused"] is True
-        assert diagnostic["wall_saturation_pressure_refusal_reason"] == (
-            "missing_reactivity_class"
+            reactive_product_backstop=True,
         )
-        assert diagnostic["wall_saturation_pressure_refusal_type"] == (
-            "MissingReactivityClassRefusal"
-        )
-        refusal = telemetry["Unobtanium#wall:1000.0"]
-        assert refusal["reason"] == "missing_reactivity_class"
-        assert refusal["refusal_type"] == "MissingReactivityClassRefusal"
+    assert exc_info.value.reason == "missing_reactivity_class"
 
     monkeypatch.setitem(
         condensation_module.STICKING_DATA["reactivity_class_by_species"],
@@ -714,25 +724,17 @@ def test_missing_wall_reactivity_class_refuses_only_that_route(monkeypatch):
         )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "missing authority: WallSaturationPressureRefusal "
-        "reason=source_certified_range_refused; "
-        "reactive_product_backstop=False removes the only remaining "
-        "saturation authority, so the path must refuse rather than return "
-        "an unqualified 0.0 clean-wall claim"
-    ),
-)
 def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch):
     monkeypatch.delitem(
         condensation_module.STICKING_DATA["reactivity_class_by_species"],
         "SiO",
     )
-    assert _hkl_surface_deposition_flux_mol_m2_s(
-        "SiO",
-        P_local_pa=1.0,
-        T_surface_K=1700.0 + 273.15,
-        alpha_s=1.0,
-        reactive_product_backstop=False,
-    ) == 0.0
+    with pytest.raises(WallSaturationPressureRefusal) as exc_info:
+        _hkl_surface_deposition_flux_mol_m2_s(
+            "SiO",
+            P_local_pa=1.0,
+            T_surface_K=1700.0 + 273.15,
+            alpha_s=1.0,
+            reactive_product_backstop=False,
+        )
+    assert exc_info.value.reason == "source_certified_range_refused"

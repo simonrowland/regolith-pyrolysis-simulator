@@ -1225,6 +1225,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
+    # Disabling the reactive-product backstop must not make reversible Si
+    # condensation depend on reactivity metadata. Its ledger transition is
+    # the single-transition regression guard for 149df2858.
+    assert "condense_Si" in ca_ti_reasons
     assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"} <= ca_ti_reasons
     assert {
         "condense_SiO", "condense_Al2O", "condense_AlO", "condense_CaO_gas",

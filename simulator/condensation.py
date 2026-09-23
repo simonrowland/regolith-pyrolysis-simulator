@@ -6495,8 +6495,12 @@ def _wall_deposition_driving_pressure_pa(
     )
     if antoine_extrapolations is None:
         antoine_extrapolations = {}
-    declared_reactivity_class = _sticking_reactivity_class(species)
-    if declared_reactivity_class is None:
+    declared_reactivity_class = (
+        _sticking_reactivity_class(species)
+        if reactive_product_backstop
+        else None
+    )
+    if reactive_product_backstop and declared_reactivity_class is None:
         refusal_reason = "missing_reactivity_class"
         antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = {
             "temperature_K": T_surface_K,
@@ -6507,13 +6511,18 @@ def _wall_deposition_driving_pressure_pa(
             "band_scope": "wall_saturation_pressure",
             "refusal_type": "MissingReactivityClassRefusal",
         }
-        if diagnostic_out is not None:
-            diagnostic_out["wall_saturation_pressure_pa"] = None
-            diagnostic_out["wall_saturation_pressure_refused"] = True
-            diagnostic_out["wall_saturation_pressure_refusal_reason"] = refusal_reason
-            diagnostic_out["wall_saturation_pressure_refusal_type"] = (
-                "MissingReactivityClassRefusal"
+        if diagnostic_out is None:
+            raise WallSaturationPressureRefusal(
+                species,
+                T_surface_K,
+                refusal_reason,
             )
+        diagnostic_out["wall_saturation_pressure_pa"] = None
+        diagnostic_out["wall_saturation_pressure_refused"] = True
+        diagnostic_out["wall_saturation_pressure_refusal_reason"] = refusal_reason
+        diagnostic_out["wall_saturation_pressure_refusal_type"] = (
+            "MissingReactivityClassRefusal"
+        )
         return 0.0
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
@@ -6535,9 +6544,7 @@ def _wall_deposition_driving_pressure_pa(
                 "stable_condensation_product_backstop"
             )
         return max(0.0, local_pressure_pa)
-    reactivity_class = (
-        declared_reactivity_class if reactive_product_backstop else None
-    )
+    reactivity_class = declared_reactivity_class
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
             # SiO has a melt standard-reaction pressure, not a stable pure-SiO
