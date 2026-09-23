@@ -811,6 +811,64 @@ def qualification_battery_notice(
     )
 
 
+def _row_out_of_certified_band(kind: str, row: Mapping[str, object]) -> bool:
+    """Engine rows that are an out-of-band flag, not a new notice kind."""
+
+    if kind in {"melts_domain_gate", "out_of_certified_band"}:
+        return True
+    if str(row.get("authority") or "") == "extrapolated":
+        return True
+    return kind.startswith("imcc_") and (
+        "extrapolated" in kind or "outside" in kind
+    )
+
+
+def _interval_certified_band(
+    band: object,
+) -> dict[str, tuple[float, float]] | None:
+    """Project an engine band onto EnginePrediction's interval-pair schema.
+
+    Qualification bands also carry a crash floor and citations. Those are
+    not intervals; copying them makes Observation reject the prediction.
+    """
+
+    if not isinstance(band, Mapping):
+        return None
+    out: dict[str, tuple[float, float]] = {}
+    for key, value in band.items():
+        if not isinstance(value, (list, tuple)) or len(value) != 2:
+            continue
+        try:
+            lo = float(value[0])
+            hi = float(value[1])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(lo) and math.isfinite(hi):
+            out[str(key)] = (lo, hi)
+    return out or None
+
+
+def _flags_from_scored_cell(
+    cell: object,
+    authority: Authority,
+    certified_band: Mapping[str, tuple[float, float]] | None,
+) -> tuple[Authority, Mapping[str, tuple[float, float]] | None]:
+    """Upgrade a bridge default from the cell. Never downgrades a flag."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        AUTHORITY_EXTRAPOLATED,
+        cell_score_authority,
+    )
+
+    if cell_score_authority(cell, refused=False) == AUTHORITY_EXTRAPOLATED:
+        authority = Authority.EXTRAPOLATED
+    if certified_band is None:
+        band = _interval_certified_band(getattr(cell, "certified_band", None))
+        if band is not None:
+            certified_band = band
+    return authority, certified_band
+
+
 def cell_notices(
     quantity: Quantity,
     engine: Engine,
@@ -827,7 +885,7 @@ def cell_notices(
         if not isinstance(row, Mapping):
             continue
         kind = str(row.get("kind") or "")
-        if kind in {"melts_domain_gate", "out_of_certified_band"}:
+        if _row_out_of_certified_band(kind, row):
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -1088,6 +1146,7 @@ def predict_with_engine(
         arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
     )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
+    authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
     call_evidence = (
@@ -1193,9 +1252,6 @@ def predict_with_engine(
             identity=identity,
             requested_composition=requested,
         )
-    cell_authority = getattr(cell, "authority", None)
-    if cell_authority == "extrapolated":
-        authority = Authority.EXTRAPOLATED
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
         engine=engine,
