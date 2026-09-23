@@ -468,6 +468,8 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-4);
     font-size: 13px;
+    overflow-wrap: anywhere;
+    min-width: 0;
 }
 
 /* Disclosure triangles */

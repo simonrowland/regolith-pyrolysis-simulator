@@ -107,6 +107,16 @@ emitEvent('decision_required', {
   recommendation: 'A',
   options: ['A', 'B'],
 });
+const decisionModal = findById(body, 'decision-modal');
+const decisionPanel = decisionModal.children[0];
+const decisionModalStyles = {
+  modal: decisionPanel.style.cssText,
+  title: decisionPanel.children[0].style.cssText,
+  context: decisionPanel.children[1].style.cssText,
+  recommendation: decisionPanel.children[2].style.cssText,
+  recommendedButton: decisionPanel.children[3].children[0].style.cssText,
+  otherButton: decisionPanel.children[3].children[1].style.cssText,
+};
 emitEvent('disconnect', 'transport close');
 
 const afterDisconnect = {
@@ -124,4 +134,4 @@ const afterReconnect = {
   decisionModalPresent: Boolean(findById(body, 'decision-modal')),
 };
 
-console.log(JSON.stringify({ afterDisconnect, afterReconnect }));
+console.log(JSON.stringify({ afterDisconnect, afterReconnect, decisionModalStyles }));

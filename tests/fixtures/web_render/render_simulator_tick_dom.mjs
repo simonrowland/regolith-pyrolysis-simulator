@@ -207,6 +207,7 @@ for (const tickPayload of payloads) handlers.simulation_tick(tickPayload);
 
 const output = {
   text: {},
+  title: {},
   dataset: {},
   style: {},
   classes: {},
@@ -216,6 +217,7 @@ const output = {
 for (const id of requestedIds) {
   const element = elements.get(id);
   output.text[id] = element ? element.textContent : null;
+  output.title[id] = element ? (element.title || null) : null;
   output.dataset[id] = element ? element.dataset : null;
   output.style[id] = element ? element.style : null;
   output.classes[id] = element ? element.classList.toArray() : null;

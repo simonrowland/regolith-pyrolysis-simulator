@@ -227,8 +227,9 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
         f"{payload['energy_evaporation_thermal_kWh']:.3f} kWh"
     )
     assert rendered["text"]["energy-scope"] == (
-        "electrical_plus_known_evaporation_enthalpy"
+        "Electrical plus known evaporation enthalpy"
     )
+    assert rendered["title"]["energy-scope"] == payload["energy_scope"]
     assert rendered["text"]["furnace-heat-status"] == (
         "partial; feed sensible, fusion, radiation, full furnace heat omitted"
     )
@@ -487,6 +488,14 @@ def test_evaporation_flux_chart_admits_species_that_appear_later(
 
 def test_disconnect_reconnect_resets_controls_and_decision_modal():
     rendered = _render_socket_lifecycle()
+    assert rendered["decisionModalStyles"] == {
+        "modal": "background:var(--surface);color:var(--text);border:1px solid var(--border);padding:24px;border-radius:12px;max-width:500px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);",
+        "title": "margin:0 0 12px 0;font-size:16px;color:var(--text);",
+        "context": "font-size:13px;color:var(--text-secondary);margin:0 0 16px 0;line-height:1.5;",
+        "recommendation": "font-size:12px;color:var(--primary);font-weight:600;margin:0 0 16px 0;",
+        "recommendedButton": "padding:8px 20px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:14px;background:var(--surface);color:var(--text);background:var(--primary);color:#fff;border-color:var(--primary);",
+        "otherButton": "padding:8px 20px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:14px;background:var(--surface);color:var(--text);",
+    }
     assert rendered["afterDisconnect"] == {
         "startDisabled": True,
         "pauseDisabled": True,

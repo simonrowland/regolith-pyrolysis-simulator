@@ -155,7 +155,17 @@ socket.on('simulation_tick', (data) => {
     setEl('energy-electrical', data.energy_electrical_kWh.toFixed(3) + ' kWh');
     setEl('energy-evaporation',
         data.energy_evaporation_thermal_kWh.toFixed(3) + ' kWh');
-    setEl('energy-scope', data.energy_scope);
+    const scopeEl = document.getElementById('energy-scope');
+    if (scopeEl) {
+        const raw = data.energy_scope;
+        if (typeof raw === 'string' && raw) {
+            scopeEl.textContent = raw.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
+            scopeEl.title = raw;
+        } else {
+            scopeEl.textContent = 'not emitted';
+            scopeEl.removeAttribute('title');
+        }
+    }
     setEl('furnace-heat-status',
         data.furnace_heat_status
             + '; feed sensible, fusion, radiation, full furnace heat omitted');
