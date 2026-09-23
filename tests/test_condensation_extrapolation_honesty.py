@@ -317,9 +317,12 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
             "no extrapolation available" in record["reason"]
             for record in refused["Na"].values()
         )
+        # Al2 has no reactive-product backstop, so reactivity metadata is not
+        # applicable.  Its real reversible wall route instead refuses because
+        # the available reaction-term source is not a wall saturation curve.
         assert any(
-            record["reason"] == "missing_reactivity_class"
-            and record.get("refusal_type") == "MissingReactivityClassRefusal"
+            "no extrapolation available" in record["reason"]
+            and record.get("refusal_type") == "WallSaturationPressureRefusal"
             for record in refused["Al2"].values()
         ), [
             (record["reason"], record.get("refusal_type"))
