@@ -34,7 +34,10 @@ from simulator.battery.polymorph_dictionary import (
     canonicalize_janaf_transition,
     resolve_janaf_polymorph,
 )
-from simulator.battery.stable_ids import phase_window_suffix
+from simulator.battery.stable_ids import (
+    phase_window_suffix,
+    temperature_token as format_temperature_token,
+)
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -1355,7 +1358,13 @@ def _observation(
         note=f"NIST download_url: {download_url}",
     )
     if quantity is Quantity.TRANSITION_TEMPERATURE:
-        suffix = f"transition_temperature:{subtype}"
+        # Content-stable: printed T, not the mutable subtype label (F4 R-label).
+        t_tok = (
+            format_temperature_token(value.point)
+            if value.point is not None
+            else (subtype or "phase-transition")
+        )
+        suffix = f"transition_temperature:T={t_tok}"
     else:
         assert segment is not None
         suffix = phase_window_suffix(

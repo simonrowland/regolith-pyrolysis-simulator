@@ -6103,16 +6103,14 @@ class Migrator:
         fallback: str,
         distinguisher: str | None = None,
     ) -> str:
-        if locator is not None:
-            key = locator.table or locator.record or locator.figure
-            if not key and locator.source_path:
-                loc_path = str(locator.source_path)
-                if not loc_path.startswith("data/literature/compilations/"):
-                    key = locator.source_path
-            if key:
-                if distinguisher:
-                    return f"{work_id}::{key}::{distinguisher}"
-                return f"{work_id}::{key}"
+        """Mint experiment_id without printed locator labels (F4 R-label).
+
+        Locator table/figure/record strings are display metadata. Identity comes
+        from a declared experiment id at the call site, else ``fallback`` (and
+        optional distinguisher). ``locator`` is kept for call compatibility.
+        """
+
+        _ = locator  # display only; not part of durable identity
         if distinguisher:
             return f"{work_id}::{fallback}::{distinguisher}"
         return f"{work_id}::{fallback}"
