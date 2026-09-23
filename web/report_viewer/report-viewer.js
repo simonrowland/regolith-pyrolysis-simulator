@@ -599,8 +599,7 @@ function taxonomyEntity(entity) {
 function ceramicSection(terminal, hasTimesteps = true) {
   const classified = isRecord(terminal.terminal_product_taxonomy)
     && ["matched_single", "matched_mixture"].includes(terminal.terminal_product_taxonomy.match_status)
-    && typeof terminal.terminal_product_taxonomy.product_class === "string"
-    && terminal.terminal_product_taxonomy.product_class !== "unclassified_concentrate";
+    && terminal.terminal_product_taxonomy.product_class === "oxide_ceramic";
   const title = classified ? "Terminal ceramic" : "Cleaned-melt inventory";
   if (!hasTimesteps) {
     return section(7, title, "Product composition requires timestep evidence from an advanced run.",

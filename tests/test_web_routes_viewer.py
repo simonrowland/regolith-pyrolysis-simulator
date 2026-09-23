@@ -247,6 +247,33 @@ def test_report_viewer_unclassified_taxonomy_keeps_neutral_inventory_title() -> 
         assert "Cleaned-melt inventory" in html
 
 
+def test_report_viewer_ceramic_title_requires_matched_oxide_ceramic_class() -> None:
+    # The producer emits product_class "mixed" when matched nodes span classes
+    # (e.g. dolime CaO-MgO), and "metallic" for metallic nodes; neither is a
+    # ceramic, so only a matched "oxide_ceramic" earns the ceramic title.
+    def title_for(taxonomy: dict) -> str:
+        return _run_viewer_expression(
+            "report-viewer.js",
+            f"ceramicSection({{final_state:{{'process.cleaned_melt':{{CaO:2,MgO:1}}}},terminal_product_taxonomy:{json.dumps(taxonomy)}}},true)",
+        )
+
+    for taxonomy in (
+        {"product_class": "oxide_ceramic", "match_status": "matched_single"},
+        {"product_class": "oxide_ceramic", "match_status": "matched_mixture"},
+    ):
+        assert "Terminal ceramic" in title_for(taxonomy), taxonomy
+    for taxonomy in (
+        {"product_class": "mixed", "match_status": "matched_single"},
+        {"product_class": "metallic", "match_status": "matched_single"},
+        {"product_class": "", "match_status": "matched_single"},
+        {"product_class": "unknown_class", "match_status": "matched_mixture"},
+        {"product_class": "oxide_ceramic", "match_status": "no_match"},
+    ):
+        html = title_for(taxonomy)
+        assert "Terminal ceramic" not in html, taxonomy
+        assert "Cleaned-melt inventory" in html, taxonomy
+
+
 def test_report_viewer_money_preserves_nonzero_subcent_cost() -> None:
     rendered = _run_viewer_expression("report-viewer.js", "money(0.000128)")
 
