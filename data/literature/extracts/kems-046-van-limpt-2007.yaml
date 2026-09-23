@@ -243,9 +243,28 @@ species:
         - {temperature_C: 1300, p_Na_Pa_approx: 3.0}
         - {temperature_C: 1300, p_Na_Pa_approx: 4.0}
         - {temperature_C: 1400, p_Na_Pa_approx: 11.5}
-        - {temperature_C: 1450, p_Na_Pa_approx: 3.0}
-        - {temperature_C: 1450, p_Na_Pa_approx: 3.5}
-        - {temperature_C: 1450, p_Na_Pa_approx: 4.0}
+        - {temperature_C: 1462, p_Na_Pa_approx: 3.5}
+      method_class: figure_only_measured_kems
+    - observation_id: van_limpt_2007_fig46_elemental_sodium_model_output
+      experiment: glass-transpiration-series
+      type: psat_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 156
+        figure: '4.6'
+        note: figure reading; thermochemical-model marker kept separate from measured marker
+      phase: sodium_disilicate_melt
+      regime: transpiration_evaporation
+      units: Pa
+      method_class: model_derived
+      evidence_class: thermochemical_model_output
+      values:
+        quantity: modeled_Na_saturation_pressure
+        measurement_status: model_output_not_measurement
+        rows:
+        - {temperature_C: 1462, p_Na_Pa_approx: 3.0}
+      admission_status: rejected_model_output_not_measurement
+      refusal_reason: model_output_not_measurement
   K:
     observations:
     - observation_id: van_limpt_2007_table42_potassium_bearing_glasses
