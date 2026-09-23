@@ -27,6 +27,7 @@ from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_
 class WaypointAuthority(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
+    EXTRAPOLATED = "extrapolated"
     ASSUMED = "assumed"
 
 
@@ -74,6 +75,7 @@ class Waypoint:
     authority: WaypointAuthority
     inputs: tuple[str, ...]
     flags: tuple[WaypointFlag, ...] = ()
+    notice: str | None = None
 
 
 @dataclass(frozen=True)
@@ -144,6 +146,7 @@ class ConsumerReadiness:
 _AUTHORITY_RANK = {
     WaypointAuthority.PRINTED: 3,
     WaypointAuthority.DERIVED: 2,
+    WaypointAuthority.EXTRAPOLATED: 1,
     WaypointAuthority.ASSUMED: 1,
 }
 _PI = Decimal("3.141592653589793238462643383279502884197")
@@ -1060,6 +1063,46 @@ def oxygen_condition(
                     routes.append(Waypoint("oxygen_condition", Value.point_of(value),
                         "buffer_relation", WaypointAuthority.DERIVED,
                         ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+    # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
+    # bound is therefore a usable engine point only at its bound, with an
+    # extrapolation notice. The bound is method_class calculated, never printed:
+    # pO2 [bar] <= P_total [Pa] / 100000 Pa/bar, so log10(fO2/bar) <= log10(...).
+    # Sanity: P_total=1e-4 Pa=1e-9 bar gives log10(fO2/bar) <= -9.
+    # Only the run pressure waypoint is inspected. Apparatus ultimate vacuum is
+    # deliberately absent from pressure_boundary and cannot create this route.
+    boundary = pressure_boundary(experiment, bench, observation).selected
+    if boundary is not None and boundary.route in {"printed_run_pressure", "observation_total_pressure_Pa"}:
+        pressure = boundary.value
+        located_pressure = experiment.pressure_environment.total_pressure_Pa
+        if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+            located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
+        locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
+        vacuum_evidence = (
+            any(token in locator_note for token in ("vacuum", "residual", "chamber pressure", "during evaporation"))
+            or (located_pressure is not None and located_pressure.inference is not None)
+        )
+        upper_pa: Decimal | None = None
+        if pressure.kind is ValueKind.POINT:
+            upper_pa = pressure.point
+        elif (pressure.kind is ValueKind.BOUND
+              and pressure.bound_operator in {"<", "<=", "≤"}):
+            upper_pa = pressure.bound_value
+        if vacuum_evidence and upper_pa is not None and upper_pa >= 0 and upper_pa <= Decimal("1"):
+            locator = experiment.pressure_environment.total_pressure_Pa.locator
+            locator_text = repr(locator) if locator is not None else boundary.inputs[0]
+            if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+                located = (observation.point_conditions or {}).get("total_pressure_Pa")
+                locator_text = repr(located.locator) if located is not None and located.locator is not None else boundary.inputs[0]
+            value = _log_pressure(Value.point_of(upper_pa))
+            if value is not None:
+                routes.append(Waypoint(
+                    "oxygen_condition",
+                    value,
+                    "vacuum_total_pressure_upper_bound",
+                    WaypointAuthority.EXTRAPOLATED,
+                    (*boundary.inputs, "Dalton: pO2 <= P_total"),
+                    notice=f"upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
+                ))
     if routes:
         # A fired route is the decision. The OR-set is consulted only for the gap text.
         return _result(

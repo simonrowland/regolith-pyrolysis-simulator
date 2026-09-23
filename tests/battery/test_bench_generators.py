@@ -98,6 +98,63 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
 
 
+def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = replace(experiment, pressure_environment=replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=f.located(
+            Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("1e-4")),
+            note="printed vacuum during run",
+        ),
+    ))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    oxygen = inputs.waypoints["oxygen_condition"].selected
+    assert oxygen is not None
+    assert oxygen.route == "vacuum_total_pressure_upper_bound"
+    assert oxygen.authority is WaypointAuthority.EXTRAPOLATED
+    assert oxygen.value.point == Decimal("-9")
+    assert oxygen.notice is not None
+    assert "upper bound from printed vacuum 0.0001 Pa" in oxygen.notice
+    assert "bound, not a measurement" in oxygen.notice
+    results = engine_point_requests(inputs)
+    assert all(result.payload is not None for result in results)
+    for result in results:
+        output = result.provenance["output_routes"]["fO2_log"]
+        assert output["authority"] == "extrapolated"
+        assert output["method_class"] == "calculated"
+        assert output["notice"] == oxygen.notice
+
+
+def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
+    experiment, bench, observation = case(pressure="1e-4")
+    printed = oxygen_condition(experiment, bench, observation).selected
+    assert printed is not None
+    assert printed.authority is WaypointAuthority.PRINTED
+    assert printed.route == "observation_fO2_log"
+
+    derived_observation = replace(observation, point_conditions={
+        "temperature_K": f.located(Decimal(1400)),
+        "fO2_Pa": f.located(Value.point_of("1e-5")),
+    })
+    derived = oxygen_condition(experiment, bench, derived_observation).selected
+    assert derived is not None
+    assert derived.authority is WaypointAuthority.DERIVED
+    assert derived.route == "observation_fO2_Pa_to_log_fO2"
+
+
+def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False)
+    pressure = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=Located(State.unknown("apparatus-only ultimate vacuum")),
+        pumping={"base_pressure_Pa": f.located(Value.point_of("1e-4"))},
+    )
+    experiment = replace(experiment, pressure_environment=pressure)
+    result = oxygen_condition(experiment, bench, observation)
+    assert result.selected is None
+    assert not any(route.route == "vacuum_total_pressure_upper_bound" for route in result.routes)
+
+
 def test_buffer_derivation_and_domain():
     experiment, bench, observation = case(oxygen=False, pressure="100000")
     experiment = replace(experiment, fO2_control=FO2Control(State.unknown("buffer"), buffer=f.located("IW")))

@@ -45,6 +45,13 @@ def _requirements(inputs, consumer, engine=None):
             missing = waypoint.absence.missing if waypoint.absence else ()
             if not absent and consumer == "engine_point" and name != "normalized_composition":
                 selected = waypoint.selected.value
+                if (name == "pressure_boundary"
+                        and isinstance(selected, Value)
+                        and selected.kind is ValueKind.BOUND
+                        and selected.bound_operator in {"<", "<=", "≤"}
+                        and inputs.waypoints["oxygen_condition"].selected is not None
+                        and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+                    continue
                 if not isinstance(selected, Value) or selected.kind is not ValueKind.POINT:
                     reason = (GapReason.INTERVAL_NEEDS_POINT
                               if isinstance(selected, Value) and selected.kind is ValueKind.INTERVAL
@@ -76,6 +83,15 @@ def _point(inputs, name):
     return value.point
 
 
+def _engine_pressure_point(inputs):
+    value = inputs.waypoints["pressure_boundary"].selected.value
+    if (value.kind is ValueKind.BOUND
+            and value.bound_operator in {"<", "<=", "≤"}
+            and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+        return value.bound_value
+    return _point(inputs, "pressure_boundary")
+
+
 def _document(inputs, name):
     value = inputs.waypoints[name].selected.value
     if not isinstance(value, Mapping):
@@ -103,8 +119,10 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                     raise UnsupportedValue("normalized_composition." + species)
                 composition[species] = _dec_payload(value)
             temperature = _point(inputs, "temperature_K")
-            pressure = _point(inputs, "pressure_boundary")
+            pressure = _engine_pressure_point(inputs)
             oxygen = _point(inputs, "oxygen_condition")
+            oxygen_route = inputs.waypoints["oxygen_condition"].selected
+            assert oxygen_route is not None
             if temperature <= 0 or pressure < 0 or not any(composition.values()):
                 raise UnsupportedValue("physical_inputs")
             # Definitions: Celsius = kelvin - 273.15; 1 bar = 100000 Pa.
@@ -113,10 +131,16 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             payload = {"engine": engine, "temperature_C": _dec_payload(temperature - Decimal("273.15")),
                        "pressure_bar": _dec_payload(pressure / Decimal(100000)), "fO2_log": _dec_payload(oxygen),
                        "composition_mol": composition}
+            oxygen_output = {
+                "waypoint": "oxygen_condition",
+                "authority": oxygen_route.authority.value,
+            }
+            if oxygen_route.notice is not None:
+                oxygen_output.update({"notice": oxygen_route.notice, "method_class": "calculated"})
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": {
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
                 "pressure_bar": {"authority": "derived", "waypoint": "pressure_boundary", "formula": "Pa / 100000"},
-                "fO2_log": {"waypoint": "oxygen_condition"},
+                "fO2_log": oxygen_output,
                 "composition_mol": {"waypoint": "normalized_composition", "authority": "derived",
                                     "formula": "x_i * 1 mol reference charge"},
             }}))
