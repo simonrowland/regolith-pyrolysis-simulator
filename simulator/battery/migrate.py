@@ -6925,6 +6925,58 @@ def iter_extract_observations(
                     yield str(formula), dict(obs)
 
 
+# b-555: absence may be correct; silence is not. Extract-level typed refusal
+# reasons for the migration-queue (never ingested as observations).
+SILENT_REASON_TABLE_SHAPED = "table-shaped extract not consumed"
+SILENT_REASON_MODEL_COHORT = "model-derived cohort excluded by ruling"
+SILENT_REASON_NO_OBSERVATIONS = "extract yielded no observations"
+
+
+def silent_extract_reason(doc: Mapping[str, Any]) -> str:
+    """Why a zero-observation extract must still leave a typed queue record.
+
+    Table-shaped sidecars the migrator does not walk, and model-derived
+    cohort extracts excluded by owner ruling, keep their specific reasons.
+    Every other silent extract still gets a catch-all so the class is
+    impossible (zero observations AND zero typed records).
+    """
+    schema = str(doc.get("schema_version") or "")
+    has_obs = any(True for _ in iter_extract_observations(doc))
+    if schema == "literature_extract_table.v1" or (
+        isinstance(doc.get("rows"), (list, tuple)) and not has_obs
+    ):
+        return SILENT_REASON_TABLE_SHAPED
+
+    policy = doc.get("evidence_policy")
+    classification = ""
+    if isinstance(policy, Mapping):
+        classification = str(policy.get("classification") or "").strip().lower()
+    if (
+        classification == "model"
+        or classification.startswith("model_")
+        or classification.startswith("mixed_model")
+        or "model_derived" in classification
+        or isinstance(doc.get("model_tables"), (list, tuple))
+        or isinstance(doc.get("model_conditions"), (list, tuple))
+    ):
+        return SILENT_REASON_MODEL_COHORT
+
+    return SILENT_REASON_NO_OBSERVATIONS
+
+
+def _silent_extract_locator(
+    doc: Mapping[str, Any], rel: str
+) -> dict[str, object]:
+    raw = doc.get("locator")
+    if isinstance(raw, Mapping) and raw:
+        return {k: v for k, v in raw.items() if v is not None}
+    extraction = doc.get("extraction")
+    note = "extract-level typed absence"
+    if isinstance(extraction, Mapping) and extraction.get("source_pdf"):
+        note = f"{note}; source_pdf={extraction['source_pdf']}"
+    return {"source_path": rel, "note": note}
+
+
 def _is_nist_janaf_table(path: Path, doc: Mapping[str, Any]) -> bool:
     if not isinstance(doc.get("table"), Mapping):
         return False
@@ -7762,6 +7814,37 @@ class Migrator:
                 local_ids=local_ids,
                 declared_experiment_id=declared_experiment_id,
             )
+        # b-555: do not leave a silent extract — absence is fine, silence is not.
+        self._record_silent_extract_if_needed(
+            doc=doc, work=work, source_key=rel, path_stem=path.stem
+        )
+
+    def _record_silent_extract_if_needed(
+        self,
+        *,
+        doc: Mapping[str, Any],
+        work: Work,
+        source_key: str,
+        path_stem: str,
+    ) -> None:
+        """Emit one typed queue record when an extract lands nothing.
+
+        Correct outcomes for the named b-555 cohort are zero observations
+        (not ingested). The migrator must still leave a typed refusal so
+        check_store_freshness / migration-report cannot show silence.
+        """
+        if self._count(source_key).observations_out > 0:
+            return
+        if any(entry.source == source_key for entry in self.result.queue):
+            return
+        self.result.add_queue(
+            work_id=work.work_id,
+            locator=_silent_extract_locator(doc, source_key),
+            axes=["document"],
+            why=silent_extract_reason(doc),
+            source=source_key,
+            observation_id=f"{path_stem}::typed_absence",
+        )
 
     def _migrate_extract_observation(
         self,

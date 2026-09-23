@@ -1,0 +1,153 @@
+schema_version: literature_extract.v1
+source_id: senior-1992-vacuum-pyrolysis
+source:
+  citation: >-
+    Intended corpus target: Senior, Constance L. (1991), "Lunar oxygen
+    production by pyrolysis of regolith", 10th Princeton/AIAA/SSI Conference on
+    Space Manufacturing, May 15–18, 1991, Princeton, NJ (NASA accession
+    19920035166 / NAS9-18102 / NAS9-19356). Held PDF is NOT that paper — see
+    extraction.method and typed_absences.
+  year: 1991
+extraction:
+  method: >-
+    STEP 0 refuse. Ferry PDF
+    /workspace/ferry-inbox/from-main-B3-20260923T024400Z/pdfs/senior-1992-vacuum-pyrolysis.pdf
+    (sha256 526fc4262ccb23a9fdd156b67c93fd9f2c04f6be9bb03c4f439e99de14811cd3;
+    208 pages; pdfinfo Title "Microsoft Word - bibcover.doc", Author debbie,
+    CreationDate 2004-01-21). pdftotext page 1 opens: "Recovery and Utilization
+    of Extraterrestrial Resources / A Special Bibliography From the NASA
+    Scientific and Technical Information Program / January 2004". Sidecar
+    CORRECTION 2026-09-19 matches: this is a NASA STI special bibliography that
+    CITES Senior; it is not by Senior. String "vacuum pyrolysis" appears 0 times
+    in the decoded text (~1.26e6 characters). No measurement tables or
+    experimental series of any kind. Directory token "1992" is NASA accession
+    19920035166, not a publication year. Real Senior abstract already landed as
+    senior-1991-vacuum-pyrolysis.yaml from the NTRS abstract booklet; do not
+    re-home bibliography citation abstracts as measurements of this source_id.
+    Paper itself was never obtained (sidecar: access held of wrong file).
+    NTRS AQ re-check 2026-09-23 (BACKLOG-5 / REPLY-senior-1992):
+    GET https://ntrs.nasa.gov/api/citations/19920035166 returns
+    disseminated=METADATA_ONLY, downloadsAvailable=false, downloads=[];
+    GET .../downloads returns []. Citation page states there are no
+    available downloads. No legal OA PDF to fetch; do not invent
+    measurements from the NTRS abstract prose alone.
+  date: '2026-09-23'
+  worker: na-senior-ntrs-1991
+  provenance_path: data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml
+review_status: rejected
+corrections:
+- date: '2026-09-19'
+  note: >-
+    Sidecar CORRECTION: held PDF is the January 2004 NASA STI special
+    bibliography "Recovery and Utilization of Extraterrestrial Resources", not
+    Senior's pyrolysis paper. access:held referred to the wrong file.
+- date: '2026-09-22'
+  note: >-
+    N1 STEP 0: confirmed no prior extract under another name for Senior 1992 /
+    accession 19920035166; sha256 matches sidecar; title/authors are the 2004
+    bibliography; refuse measurement extract.
+- date: '2026-09-23'
+  note: >-
+    NTRS AQ (accession 19920035166): Public metadata record only
+    (METADATA_ONLY; downloadsAvailable=false; 0 downloads). Confirms paper
+    never obtained as PDF via NTRS OA. Sibling accession 19920033574 (JBIS)
+    likewise METADATA_ONLY — see senior-1991-solar-heating-jbis.yaml.
+    senior-1991-vacuum-pyrolysis.yaml remains the only real Senior abstract
+    extract (Arizona booklet 19910016719 / N91-26033).
+typed_absences:
+- kind: wrong_held_pdf
+  reason: not_the_cited_paper
+  item: Senior Constance L. Lunar oxygen production by pyrolysis of regolith (1991)
+  locator:
+    note: ferry PDF cover + sidecar CORRECTION 2026-09-19
+  note: >-
+    Held file is NASA STI special bibliography January 2004 (208 pp). Not by
+    Senior; cites Senior under accession 19920035166.
+- kind: no_printed_measurement_tables
+  reason: not_published
+  item: numeric pyrolysis / oxygen-yield / mass-loss measurement tables
+  locator:
+    note: full-PDF pdftotext inventory; vacuum pyrolysis count 0
+  note: Bibliography of abstracts only; no laboratory data to land.
+- kind: secondary_citation_abstracts_not_rehomed
+  reason: already_extracted_elsewhere
+  item: bibliography entries 19920035166 and 19920033574 (Senior 1991 abstracts)
+  locator:
+    note: pdftotext near accession 19920035166 / 19920033574
+  note: >-
+    Abstracts appear as citation-index entries only. Primary Senior abstract
+    extract is senior-1991-vacuum-pyrolysis.yaml; do not duplicate here.
+- kind: ntrs_citation_only_no_pdf
+  reason: not_published_as_downloadable_oa
+  item: NTRS PDF payload for accession 19920035166
+  locator:
+    note: >-
+      https://ntrs.nasa.gov/citations/19920035166 ;
+      api/citations/19920035166 ; api/citations/19920035166/downloads
+  note: >-
+    Live API 2026-09-23 ~00:22 ET: disseminated=METADATA_ONLY,
+    downloadsAvailable=false, downloads=[]. No legal OA full text to extract.
+scope_assessment:
+  document_type: nasa_sti_special_bibliography_wrong_file_for_source_id
+  measured_direct_observations: 0
+  method_observations: 0
+  figure_only_observations: 0
+  absent_from_source:
+  - Senior-authored paper text
+  - vacuum pyrolysis measurements
+  - apparatus / run conditions
+  - tabulated yields or pressures
+  note: >-
+    STEP 0 skip with proof. source_id retained as rejected audit record so the
+    inbox slot is closed without inventing data.
+fidelity_samples:
+- species: held_pdf_identity
+  observable: laboratory_conditions
+  observation_id: senior_1992_held_pdf_is_nasa_bibliography
+  field: document_type
+  value: nasa_sti_special_bibliography_january_2004_not_senior
+  locator:
+    pdf_page_index: 1
+    note: Cover title page of held ferry PDF
+species:
+  held_pdf_identity:
+    observations: []
+    context:
+    - observation_id: senior_1992_held_pdf_is_nasa_bibliography
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: cover_title_page
+        note: >-
+          pdftotext -f 1 -l 1; pdfinfo Title/Author/CreationDate; sha256 matches
+          sidecar
+      phase: corpus_held_pdf_identity
+      regime: wrong_file_for_source_id
+      units: as published
+      values:
+        quantity: held_pdf_identity_and_typed_absence_summary
+        method_class: method_only
+        evidence_class: wrong_held_pdf_not_a_measurement_table
+        document_type: nasa_sti_special_bibliography_january_2004_not_senior
+        title_as_printed: Recovery and Utilization of Extraterrestrial Resources
+        subtitle_as_printed: >-
+          A Special Bibliography From the NASA Scientific and Technical
+          Information Program
+        month_year_as_printed: January 2004
+        pdfinfo_title_as_printed: Microsoft Word - bibcover.doc
+        pdfinfo_author_as_printed: debbie
+        page_count_as_printed: 208
+        sha256_as_sidecar: 526fc4262ccb23a9fdd156b67c93fd9f2c04f6be9bb03c4f439e99de14811cd3
+        vacuum_pyrolysis_string_count: 0
+        cites_senior_accession_as_printed: '19920035166'
+        cites_senior_title_as_printed: Lunar oxygen production by pyrolysis of regolith
+        cites_senior_author_as_printed: Senior, Constance L.
+        cites_senior_venue_as_printed: >-
+          10th Princeton/AIAA/SSI Conference, May 15-18, 1991, Princeton, NJ, USA
+        n1_policy: >-
+          Wrong held PDF = typed absence; do not invent measurements. Real
+          Senior abstract is senior-1991-vacuum-pyrolysis.yaml.
+      uncertainty:
+        note: >-
+          No measurement uncertainty applicable; no scored observations in this
+          extract.

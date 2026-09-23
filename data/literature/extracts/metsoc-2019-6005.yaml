@@ -1,0 +1,187 @@
+schema_version: literature_extract.v1
+source_id: metsoc-2019-6005
+source:
+  citation: >-
+    Shornikov, S. I. & Yakovlev, O. I. (2019), "Mass spectrometric study of
+    perovskite evaporation from Knudsen cell", 82nd Annual Meeting of The
+    Meteoritical Society, LPI Contrib. No. 2157, abstract 6005.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/metsoc2019/pdf/6005.pdf
+  year: 2019
+  conference: 82nd Annual Meeting of The Meteoritical Society
+extraction:
+  method: >-
+    AQ-acquired OA PDF ferry-inbox/acquired/metsoc-2019-6005.pdf
+    (sha256 c09c421f62accbed788a44e15e17c42caed290a500c45503d154a44d7efe3c67;
+    1-page MetSoc abstract). pdftotext -layout + 300 dpi render of Table 1 and
+    printed ΔfH/ΔfS/ΔHfus values. N16 / N7 ruling: Table 1 gas-phase mol% is
+    explicitly "calculated from the values of the oxide activity" → typed_absence
+    (model/derived cohort; numbers not ingested). Figs 1–2 (lg pi and activities)
+    are figure-only and were not digitized. Printed formation enthalpy/entropy and
+    melting enthalpy/temperature landed as gibbs_table / transition_point.
+  date: '2026-09-23'
+  worker: n16-aq-oa-batch-b
+  provenance_path: data/literature/extracts/metsoc-2019-6005.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 1-page MetSoc abstract (KEMS perovskite / CaO–TiO2 evaporation)
+  scored_observations: 3
+  note: >-
+    STEP 0: prior Shornikov extracts kems-033-shornikov-2010 (CAI melt LPSC 2010
+    #1408) and kems-029-yakovlev-shornikov-2011 (Vestnik CAI) are different papers.
+    No prior metsoc-2019-6005 / perovskite Knudsen CaTiO3 extract.
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Table 1 gas-phase composition over perovskite (mol %) at 1700 / 2241 / 2400 K
+  locator:
+    pdf_page_index: 1
+    table: '1'
+  note: >-
+    Abstract states Table 1 is "calculated from the values of the oxide activity"
+    (citing Shornikov & Yakovlev 2015). Not a direct measurement table. Numeric
+    mol% cells deliberately not ingested under measured-only rule.
+- kind: figure_only
+  reason: not_digitized
+  item: Fig. 1 partial pressures lg pi (atm) vs T over perovskite (species Ca, CaO, Ti, TiO, TiO2, O, O2, CaTiO3)
+  locator:
+    pdf_page_index: 1
+    figure: '1'
+  note: Measured via Hertz–Knudsen but printed only as figure curves; not digitized.
+- kind: figure_only
+  reason: not_digitized
+  item: Fig. 2 activities of CaO, TiO2, CaTiO3 in CaO–TiO2 at 2250 K
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+  note: Activity curves figure-only; not digitized.
+fidelity_samples:
+- species: CaTiO3
+  observable: gibbs_table
+  observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
+  field: delta_fH_kJ_mol_as_printed
+  value: -39.88
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: "enthalpy … of perovskite formation equal to −39.88±0.54 kJ/mol"
+- species: CaTiO3
+  observable: gibbs_table
+  observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
+  field: delta_fS_J_mol_K_as_printed
+  value: 3.15
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: "entropy of perovskite formation equal to … 3.15±0.28 J/(mol×K)"
+- species: CaTiO3
+  observable: transition_point
+  observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
+  field: melting_enthalpy_kJ_mol_as_printed
+  value: 47.61
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: "melting enthalpy of perovskite at 2241±10 K, equal to 47.61±1.84 kJ/mol"
+species:
+  CaTiO3:
+    observations:
+    - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
+      type: gibbs_table
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: formation enthalpy from oxide activities / partial pressures
+      phase: solid_perovskite
+      standard_state: enthalpy of perovskite formation as printed (per 1 mol compound)
+      regime: knudsen_cell_mass_spectrometry_CaO_TiO2
+      units: kJ/mol as printed
+      uncertainty:
+        delta_fH_kJ_mol: 0.54
+        as_printed: −39.88±0.54 kJ/mol
+      values:
+        quantity: enthalpy_of_formation
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        delta_fH_kJ_mol_as_printed: -39.88
+        delta_fH_uncertainty_kJ_mol_as_printed: 0.54
+        basis_as_printed: per 1 mol compound
+        note: >-
+          Derived by authors from CaO, TiO2, CaTiO3 activities calculated from
+          measured partial pressures; central printed value retained.
+    - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
+      type: gibbs_table
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: formation entropy from oxide activities / partial pressures
+      phase: solid_perovskite
+      standard_state: entropy of perovskite formation as printed (per 1 mol compound)
+      regime: knudsen_cell_mass_spectrometry_CaO_TiO2
+      units: J/(mol·K) as printed
+      uncertainty:
+        delta_fS_J_mol_K: 0.28
+        as_printed: 3.15±0.28 J/(mol×K)
+      values:
+        quantity: entropy_of_formation
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        delta_fS_J_mol_K_as_printed: 3.15
+        delta_fS_uncertainty_J_mol_K_as_printed: 0.28
+        basis_as_printed: per 1 mol compound
+    - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
+      type: transition_point
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: melting enthalpy at printed melting temperature
+      T_range_K:
+      - 2241
+      - 2241
+      phase: solid_to_liquid_perovskite
+      standard_state: melting of perovskite as printed (per 1 mol compound)
+      regime: knudsen_cell_mass_spectrometry_CaO_TiO2
+      units: kJ/mol and K as printed
+      uncertainty:
+        melting_T_K: 10
+        melting_enthalpy_kJ_mol: 1.84
+        as_printed: 2241±10 K; 47.61±1.84 kJ/mol
+      values:
+        quantity: melting_enthalpy_and_temperature
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        melting_T_K_as_printed: 2241
+        melting_T_uncertainty_K_as_printed: 10
+        melting_enthalpy_kJ_mol_as_printed: 47.61
+        melting_enthalpy_uncertainty_kJ_mol_as_printed: 1.84
+        basis_as_printed: per 1 mol compound
+        T_K: 2241
+    context:
+    - observation_id: shornikov_yakovlev_2019_metsoc6005_method_T_ranges
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+      phase: perovskite_and_CaO_TiO2_melts
+      regime: Knudsen_molybdenum_effusion_cell_mass_spectrometry
+      units: K as printed
+      values:
+        quantity: evaporation_temperature_windows_and_cell
+        method_class: method_only
+        perovskite_T_range_K_as_printed: "1791–2241"
+        CaO_TiO2_melt_T_range_K_as_printed: "2241–2441"
+        cell_as_printed: Knudsen molybdenum effusion cell
+        pressure_method_as_printed: Hertz-Knudsen equation
+        vapor_species_as_printed:
+        - Ca
+        - CaO
+        - Ti
+        - TiO
+        - TiO2
+        - O
+        - O2
+        - CaTiO3
+        heterogeneous_reaction_as_printed: "[CaTiO3] = (CaTiO3)"
+      uncertainty:
+        note: none printed beyond stated T windows

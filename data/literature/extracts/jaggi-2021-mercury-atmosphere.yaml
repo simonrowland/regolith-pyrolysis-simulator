@@ -1,0 +1,266 @@
+schema_version: literature_extract.v1
+source_id: jaggi-2021-mercury-atmosphere
+source:
+  citation: Jäggi, N., Gamborino, D., Bower, D. J., Sossi, P. A., Wolf, A. S., Oza, A. V., Vorburger,
+    A., Galli, A. & Wurz, P. (2021), "Evolution of Mercury's Earliest Atmosphere", The Planetary Science
+    Journal 2:230, DOI 10.3847/PSJ/ac2dfb
+  doi: 10.3847/PSJ/ac2dfb
+  url: https://doi.org/10.3847/PSJ/ac2dfb
+  year: 2021
+extraction:
+  method: arXiv/PSJ PDF (Draft version October 18, 2021; arXiv:2110.08093v1). pdftotext -layout plus 120
+    dpi pdftoppm of Tables 1-2. This is a coupled interior-atmosphere MODEL paper. Only printed tabulated
+    INPUT compositions (Table 2 literature compilations) are scored. Table 1 case parameters retained
+    as unscored context. Tables 3-5 and all escape/mass-loss/atmosphere-evolution outputs are model-derived
+    cohort — recorded as typed absence, not ingested as observations (BACKLOG N7 ruling applied to this
+    model paper).
+  date: '2026-09-22'
+  worker: n6-thomas-ueshima-jaggi
+  audited_by: y6-audit-n6-2026-09-22
+review_status: draft
+corrections:
+- note: 'Y6 cross-audit 2026-09-22: Table 2 magma-ocean input compositions and Table 1 case parameters spot-checked PASS vs B3 PDF. Model outputs remain typed_absence (not observations).'
+  locators:
+  - pdf_page_index 5 Table 2
+benches:
+- id: spider-vaporock-vulcan-model-stack
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Coupled SPIDER (interior) + VapoRock (evaporation) + VULCAN/FactSage (atmospheric chemistry)
+        model stack — not a laboratory instrument
+    locator:
+      pdf_page_index: 3
+      section: 2. Methods
+experiments:
+- experiment_id: mercury-magma-ocean-model-cases
+  bench_id: spider-vaporock-vulcan-model-stack
+  method: coupled_interior_atmosphere_model
+  locator:
+    pdf_page_index: 3
+    section: 2. Methods
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: EH4, CB, NSP source, and NSP lava compositions as printed in Table 2
+      locator:
+        pdf_page_index: 5
+        table: '2'
+    form:
+      state:
+        tag: value
+        value: Model magma-ocean surface compositions (literature compilations)
+      locator:
+        pdf_page_index: 5
+        table: '2'
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 3
+          note: Numerical model; no Knudsen orifice
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 3
+          note: Numerical model; no effusion channel
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        table: '1'
+        note: Case parameters quote pressures at 2000 K; no single laboratory setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 lists species partial pressures at 2000 K per model case; not a lab total pressure
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        pdf_page_index: 3
+        note: Model atmosphere; no laboratory sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  fO2_control:
+    channel:
+      tag: value
+      value: model_buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2 set to IW-1 in the evaporation model (O'Neill & Eggins 2002)
+      locator:
+        pdf_page_index: 4
+        section: 2.3 Evaporation from the magma ocean
+fidelity_samples:
+- path: species.Mercury_magma_ocean.observations[jaggi_2021_table2_magma_ocean_compositions].values.rows[0].SiO2_wt_pct
+  value: 62.73
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    note: EH4 SiO2 wt% from Table 2
+- path: species.Mercury_magma_ocean.observations[jaggi_2021_table2_magma_ocean_compositions].values.rows[3].Na2O_wt_pct
+  value: 7.0
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    note: NSP lava Na2O wt% from Table 2
+species:
+  Mercury_magma_ocean:
+    observations:
+    - observation_id: jaggi_2021_table2_magma_ocean_compositions
+      experiment: mercury-magma-ocean-model-cases
+      type: composition_series
+      locator:
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Magma ocean surface composition. Literature compilations used as model inputs,
+          not measurements by these authors.
+      phase: model_magma_ocean_surface
+      regime: mercury_magma_ocean_model_input
+      units: wt% oxide as printed
+      values:
+        quantity: magma_ocean_surface_composition
+        method_class: secondary_compilation
+        evidence_class: literature_compilation_model_input
+        caption_as_printed: Table 2. Magma ocean surface composition.
+        note_as_printed: Compositions based on Enstatite chondrites (EH4) (Wiik 1956); CB chondrite chondrule
+          data with bulk CB Na and K mass balanced for chondrules to fit bulk meteorite iron-silicate
+          ratio (Lauretta et al. 2007; Weisberg et al. 2000, 1990); and northern smooth plains (NSP) composition
+          for the lava and source (Nittler & Weider 2019; Namur et al. 2016).
+        rows:
+        - sample: EH4
+          SiO2_wt_pct: 62.73
+          Al2O3_wt_pct: 2.58
+          MgO_wt_pct: 30.24
+          CaO_wt_pct: 1.99
+          FeO_wt_pct: 0.0
+          Na2O_wt_pct: 1.71
+          K2O_wt_pct: 0.2
+          Total_wt_pct: 99.45
+        - sample: CB
+          SiO2_wt_pct: 50.7
+          Al2O3_wt_pct: 4.6
+          MgO_wt_pct: 36.9
+          CaO_wt_pct: 3.3
+          FeO_wt_pct: 3.5
+          Na2O_wt_pct: 0.19
+          K2O_wt_pct: 0.05
+          Total_wt_pct: 99.24
+        - sample: NSP source
+          SiO2_wt_pct: 53.67
+          Al2O3_wt_pct: 4.75
+          MgO_wt_pct: 36.89
+          CaO_wt_pct: 2.26
+          FeO_wt_pct: 0.02
+          Na2O_wt_pct: 1.97
+          K2O_wt_pct: 0.05
+          Total_wt_pct: 99.61
+        - sample: NSP lava
+          SiO2_wt_pct: 58.7
+          Al2O3_wt_pct: 13.8
+          MgO_wt_pct: 13.9
+          CaO_wt_pct: 5.81
+          FeO_wt_pct: 0.04
+          Na2O_wt_pct: 7.0
+          K2O_wt_pct: 0.2
+          Total_wt_pct: 99.45
+    context:
+    - observation_id: jaggi_2021_table1_case_parameters
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 4
+        table: '1'
+      units: R_P in km; g in m/s^2; species pressures in bar at 2000 K
+      values:
+        quantity: magma_ocean_model_case_parameters
+        method_class: model_input
+        evidence_class: author_model_setup_not_scored
+        caption_as_printed: Table 1. Parameters for the magma ocean cases.
+        rows_as_printed:
+        - case: SN5
+          R_P_km: 2440
+          g_m_s2: 3.7
+          SiO_bar_at_2000K: '1.4E-4'
+        - case: SN3
+          R_P_km: 2440
+          g_m_s2: 3.7
+          SiO_bar_at_2000K: '1.4E-4'
+        - case: SV
+          R_P_km: 2440
+          g_m_s2: 3.7
+          H2O_bar: 0.7
+          H2_bar: 3.2
+          CO2_bar: 0.05
+          CO_bar: 1.1
+        - case: LN5
+          R_P_km: 3290
+          g_m_s2: 4.0
+          SiO_bar_at_2000K: '1.4E-4'
+        - case: LN3
+          R_P_km: 3290
+          g_m_s2: 4.0
+          SiO_bar_at_2000K: '1.4E-4'
+        - case: LV
+          R_P_km: 3290
+          g_m_s2: 4.0
+          H2O_bar: 1.2
+          H2_bar: 5.8
+          CO2_bar: 0.2
+          CO_bar: 4.9
+        naming_note: S/L = small/large Mercury; V/N = with/without volatiles; 5/3 = SiO opacity 1e-5 /
+          1e-3 m2 kg^-1 for non-volatile cases
+    - observation_id: jaggi_2021_model_outputs_typed_absence
+      type: scope_note
+      locator:
+        pdf_page_index: 5
+        note: Tables 3-5 and figures of escape/mass-loss
+      units: not applicable
+      values:
+        quantity: model_derived_outputs_not_extracted
+        method_class: typed_absence
+        evidence_class: model_derived_cohort_blocked
+        absent_tables:
+        - Table 3 surface element ratios at 2000 K (SPIDER/VapoRock)
+        - Table 4 escape parameters
+        - Table 5 time-averaged mass loss rates
+        absent_observables:
+        - photoevaporation and plasma-heating mass-loss rates
+        - homopause/exobase altitudes
+        - atmospheric mixing-ratio profiles
+        - integrated cumulative atmospheric loss
+        ruling: 'BACKLOG 3 N7 model-paper rule applied: model outputs are the model-derived cohort the
+          owner BLOCKED — typed absence, not observations.'
+    - observation_id: jaggi_2021_messenger_na_quote
+      type: quoted_comparator
+      locator:
+        pdf_page_index: 2
+        section: 1. Introduction
+      units: wt% Na as printed
+      values:
+        quantity: messenger_surface_sodium_abundance_quote
+        method_class: quoted_from_prior_work
+        evidence_class: quoted_comparator_not_this_works_measurement
+        as_printed: element Na (3-5 wt%) is detected on Mercury's surface
+        note: MESSENGER observation cited in introduction; not a measurement of this paper. Retained as
+          unscored context.
