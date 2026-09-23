@@ -211,8 +211,12 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # Rebaselined on the shipping tree after f7bcbf79 removed fabricated
     # stage pressure and 090d0481/a34318c debited live SiO2(g) from the same
     # SiO2 pool. The wall budget closes within its guard on this contract.
+    # 2026-09-22 Chapman-Enskog prefactor: 0.00266 (bar form) with P in atm
+    # overstated D_AB by 1.216%. SiO/N2 at 1973.15 K and 1000 Pa moves
+    # 0.0496927555 -> 0.0490955656 m^2/s. The 1050 C cold-liner Si+SiO2
+    # deposit follows: 8.452523682217e-06 -> 8.191796266986e-06 (−3.085%).
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.452523682217e-06, rel=1e-9
+        8.191796266986e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9

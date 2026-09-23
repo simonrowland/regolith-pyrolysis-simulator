@@ -203,8 +203,8 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 # pressure-inverse and weakly T-dependent. Premise: Chapman-Enskog
 # D_AB ∝ T^{1.5}/P. At the C2A point used as the historical fallback
 # anchor (10 mbar = 1000 Pa, 1700 C = 1973.15 K, N2 carrier), this
-# module's ``_chapman_enskog_d_ab_m2_s`` returns D_AB = 0.0497 (SiO),
-# 0.0430 (Na), 0.0341 (K) m^2/s — several times
+# module's ``_chapman_enskog_d_ab_m2_s`` returns D_AB = 0.0491 (SiO),
+# 0.0425 (Na), 0.0336 (K) m^2/s — several times
 # DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2 m^2/s. Unit check: the helper
 # returns m^2/s. Sanity: 100x drop from 1 bar to 10 mbar scales a
 # ~1e-4 m^2/s atmospheric diffusivity to ~1e-2 m^2/s; the live
@@ -261,7 +261,7 @@ def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
 # to ε (collision integral Ω_D varies <30% across the simulator's T
 # range). At the typical C2A operating point (10 mbar = 1000 Pa,
 # 1973.15 K) ``_chapman_enskog_d_ab_m2_s('SiO', ...)`` returns
-# 0.0497 m²/s vs the legacy 0.01 constant (about 5×). The previously
+# 0.0491 m²/s vs the legacy 0.01 constant (about 5×). The previously
 # quoted ~0.042 m²/s is the same formula at 1773 K (1500 C), not at
 # 1973 K.
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
@@ -1569,6 +1569,16 @@ def _neufeld_collision_integral_omega_d(T_star: float) -> float:
     )
 
 
+# Bird, Stewart & Lightfoot, Transport Phenomena, 2nd ed., the working
+# Chapman–Enskog equation (their Eq. 17.3-10): D_AB in cm²/s with the
+# sqrt(1/M_A + 1/M_B) mass grouping and P in atm. The reduced-mass form
+# below multiplies by √2. See _chapman_enskog_d_ab_m2_s.
+_CHAPMAN_ENSKOG_BSL_SQRT_MASS_PREFACTOR = 0.0018583
+_CHAPMAN_ENSKOG_REDUCED_MASS_PREFACTOR = (
+    _CHAPMAN_ENSKOG_BSL_SQRT_MASS_PREFACTOR * math.sqrt(2.0)
+)
+
+
 def _chapman_enskog_d_ab_m2_s(
     species: str,
     T_K: float,
@@ -1580,32 +1590,51 @@ def _chapman_enskog_d_ab_m2_s(
     """Binary diffusion coefficient ``D_AB`` for ``species`` in
     ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
 
-    The algebra evaluated here is:
+    Premise. Bird, Stewart & Lightfoot, *Transport Phenomena*, 2nd ed.,
+    Eq. 17.3-10 (the Hirschfelder / Chapman–Enskog working equation):
 
-        D_AB [cm²/s] = 0.00266 * T^1.5 / (P[atm] * M_AB^0.5 * σ_AB² * Ω_D)
+        D_AB [cm²/s] = 0.0018583 * T[K]^{3/2} * sqrt(1/M_A + 1/M_B)
+                       / (P[atm] * σ_AB[Å]² * Ω_D)
+
+    M_A and M_B are g/mol. Ω_D is the dimensionless Neufeld collision
+    integral (Neufeld, Janzen & Aziz, J. Chem. Phys. 57, 1100, 1972).
+    The constant 0.0018583 is defined for pressure in atmospheres, not bar.
+
+    Algebra. This function groups the mass as the Reid reduced mass
+
+        M_AB = 2 / (1/M_A + 1/M_B)          [g/mol]
+
+    so sqrt(1/M_A + 1/M_B) = sqrt(2/M_AB) = √2 / sqrt(M_AB). Substituting:
+
+        D_AB [cm²/s] = (0.0018583 * √2) * T^{3/2}
+                       / (P[atm] * sqrt(M_AB) * σ_AB² * Ω_D)
+
+        prefactor = 0.0018583 * √2 = 0.002628033
+
         P[atm] = P[Pa] / 101325
         D_AB [m²/s] = D_AB [cm²/s] * 1e-4
 
-    where:
-        T in Kelvin
-        M_AB = 2 / (1/M_A + 1/M_B)   (reduced molecular mass, g/mol)
-        σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
-        Ω_D  = Neufeld collision integral at T* = T / ε_AB
+    σ_AB = (σ_A + σ_B) / 2 in Å. Ω_D is evaluated at T* = T / ε_AB.
 
-    This is not Bird/Stewart/Lightfoot Eq 17.3-10. BSL's working
-    equation is ``D_AB = 0.0018583 * T^{3/2} * sqrt(1/M_A + 1/M_B)
-    / (P[atm] * σ² * Ω_D)``. With this function's M_AB definition,
-    sqrt(1/M_A + 1/M_B) = √2 / sqrt(M_AB), so the BSL prefactor is
-    0.0018583 * √2 = 0.002628. The 0.00266 prefactor is the
-    Marrero-Mason / Reid form written for P in bar (Reid, Prausnitz &
-    Poling, *The Properties of Gases and Liquids*, Eq 11-3.2). Pairing
-    0.00266 with P in atm overstates D_AB by 0.00266/0.002628 ≈ 1.22%
-    vs BSL-equivalent, and by 101325/100000 ≈ 1.325% vs the bar form
-    used with bar. The prefactor is left unchanged here.
+    Unit check. With T in K, P in atm, M in g/mol and σ in Å, the
+    0.0018583 quotient is cm²/s. Multiplying by √2 only rewrites the
+    mass grouping; it does not change dimensions. The trailing ×1e-4
+    converts cm² to m² (1 m² = 10^4 cm²).
 
-    Sanity at SiO/N2, 1973.15 K, 1000 Pa: this helper returns
-    0.049693 m²/s; the BSL-equivalent prefactor on the same LJ
-    inputs returns 0.049096 m²/s.
+    The constant 0.00266 is that same prefactor rounded for pressure in
+    bar: 0.002628033 * (101325/100000) = 0.00266285 ≈ 0.00266 (Reid,
+    Prausnitz & Poling, *The Properties of Gases and Liquids*, Eq. 11-3.2).
+    Using 0.00266 together with P in atm overstated D_AB by
+    0.00266 / 0.002628033 = 1.216%.
+
+    Sanity. O2 self-diffusion at 1 atm from these BSL Table E.1 Lennard-Jones
+    parameters (σ = 3.467 Å, ε/k = 106.7 K, M = 31.998 g/mol): 0.2054 cm²/s
+    at 298.15 K and 1.630 cm²/s at 1000 K. NIST TN 2279 (Burgess 2024),
+    ln(D/cm² s⁻¹) = −10.787 − 44.220/T + 1.649 ln(T), fit to Hellmann's
+    O2–O2 ab initio values over 55–2000 K, gives 0.2144 cm²/s and
+    1.750 cm²/s. The helper is 4.2% and 6.9% low. That is inside
+    Chapman–Enskog accuracy for a Lennard-Jones pair; the collision
+    diameter is not adjusted to close the gap.
 
     ``species_params`` lets a caller supply a path-local proxy without adding
     it to the shared condensation table. Returns 0 on unknown species (caller
@@ -1630,9 +1659,9 @@ def _chapman_enskog_d_ab_m2_s(
     pressure_atm = pressure_pa / 101325.0
     if pressure_atm <= 0.0:
         return 0.0
-    # cm²/s by formula, then convert to m²/s (1 cm² = 1e-4 m²)
+    # cm²/s by the reduced-mass BSL form, then convert to m²/s (1 cm² = 1e-4 m²)
     D_AB_cm2_s = (
-        0.00266 * (T_K ** 1.5)
+        _CHAPMAN_ENSKOG_REDUCED_MASS_PREFACTOR * (T_K ** 1.5)
         / (pressure_atm * math.sqrt(M_ab_reduced)
            * (sigma_ab ** 2) * omega_d)
     )
