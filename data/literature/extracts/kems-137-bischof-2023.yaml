@@ -223,6 +223,68 @@ benches:
       state: {tag: value, value: W97Re3/W75Re25 thermocouple and IGA-12 single-wavelength pyrometer}
       locator: *b137_apparatus
 experiments:
+- experiment_id: an-di-1-low
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Physical run 1_low; Table 2 and S1/S2 label this charge explicitly'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.0000791'}}
+      locator: {page: 5, table: '2', note: 'Printed initial weight 79.1 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In/Tl addition 1000 ppm'}
+      locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_07-11-19_Ga-In-Tl_1000'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
+    regime: {regime_class: {tag: value, value: molecular}}
+  fO2_control:
+    channel: {tag: value, value: oxygen fugacity relative to iron-wüstite}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+  conditions:
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
+- experiment_id: an-di-2-low
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Physical run 2_low; Table 2 and S3 label this charge explicitly'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.00007292'}}
+      locator: {page: 5, table: '2', note: 'Printed initial weight 72.92 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In addition 1000 ppm'}
+      locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_06_03_20_Ga_In_1000'}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
+    regime: {regime_class: {tag: value, value: molecular}}
+  fO2_control:
+    channel: {tag: value, value: oxygen fugacity relative to iron-wüstite}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+  conditions:
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
+- experiment_id: an-di-3-high
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Physical run 3_high; Table 2 and S4 label this charge explicitly'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.00003869'}}
+      locator: {page: 5, table: '2', note: 'Printed initial weight 38.69 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In addition 10000 ppm'}
+      locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_28_02_20_Ga_In_10000'}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
+    regime: {regime_class: {tag: value, value: molecular}}
+  fO2_control:
+    channel: {tag: value, value: oxygen fugacity relative to iron-wüstite}
+    buffer: {state: {tag: value, value: 'ΔIW'}, locator: {page: 6, table: 'S1'}}
+  conditions:
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, table: '2', note: 'Run-specific temperatures are retained in the attached observations'}}
 - experiment_id: an-di-series
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
@@ -585,7 +647,7 @@ species:
         x_GaO1.5_3_high_polytherm: 0.0589
         note: 1_low polytherm uses x from 2_low (same starting glass). Gamma itself is not this row.
     - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S1
@@ -705,7 +767,7 @@ species:
           p_O2_calc_Pa: 0.00106
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s2_1low_isotherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S2
@@ -865,7 +927,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s3_2low_polytherm
-      experiment: an-di-series
+      experiment: an-di-2-low
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -1054,7 +1116,7 @@ species:
           K_Ga_SD: 5.0e-13
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s4_3high_polytherm
-      experiment: an-di-series
+      experiment: an-di-3-high
       type: activity_coefficient
       locator:
         table: S4-gamma
@@ -1145,7 +1207,7 @@ species:
           K_Ga_SD: 1.05e-14
       equipment: *id001
     - observation_id: bischof_2023_ga_psat_s1_1low_polytherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: psat_series
       locator:
         table: S1
@@ -2213,7 +2275,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s3_2low_polytherm
-      experiment: an-di-series
+      experiment: an-di-2-low
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -2412,7 +2474,7 @@ species:
           K_In_SD: 6.19e-12
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s4_3high_polytherm
-      experiment: an-di-series
+      experiment: an-di-3-high
       type: activity_coefficient
       locator:
         table: S4-gamma
