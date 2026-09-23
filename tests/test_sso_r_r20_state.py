@@ -2107,7 +2107,16 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     assert reservoir.melt_intrinsic_fO2_log < before_fO2
 
 
-def test_managed_o2_floor_relaxes_reducing_melt_without_real_o2_inventory() -> None:
+def test_managed_o2_floor_holds_fo2_without_real_o2_inventory() -> None:
+    """Managed CONTROLLED_O2 floor must not advance fO2 without ledger O2.
+
+    Before R1 the path labelled managed_headspace_to_melt moved
+    melt_intrinsic_fO2_log while booking dn_ledger=0 (invented oxidizing
+    potential). After R1 fO2 is held; direction + exchange_unbacked_o2_mol
+    still surface the refused managed claim.
+    """
+    from simulator.accounting.ledger import _signed_atom_moles_from_species_mol
+
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
@@ -2121,20 +2130,137 @@ def test_managed_o2_floor_relaxes_reducing_melt_without_real_o2_inventory() -> N
         "O2",
         0.0,
     )
+    before_kg = sum(sim.atom_ledger.total_kg_by_account().values())
+    before_o_atoms = sum(
+        float(
+            _signed_atom_moles_from_species_mol(
+                sim.atom_ledger.mol_by_account(acct),
+                sim.atom_ledger.registry,
+            ).get("O", 0.0)
+        )
+        for acct in sim.atom_ledger.total_kg_by_account()
+    )
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
+    after_kg = sum(sim.atom_ledger.total_kg_by_account().values())
+    after_o_atoms = sum(
+        float(
+            _signed_atom_moles_from_species_mol(
+                sim.atom_ledger.mol_by_account(acct),
+                sim.atom_ledger.registry,
+            ).get("O", 0.0)
+        )
+        for acct in sim.atom_ledger.total_kg_by_account()
+    )
     assert before_o2 == pytest.approx(0.0)
     assert reservoir.exchange_direction == "managed_headspace_to_melt"
-    assert reservoir.melt_intrinsic_fO2_log > before_fO2
-    assert reservoir.melt_intrinsic_fO2_log < math.log10(
-        sim.melt.pO2_mbar / 1000.0
-    )
+    # Hold fO2: no ledger-backed O2 to absorb.
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+    assert reservoir.exchange_o2_mol == pytest.approx(0.0)
+    assert reservoir.exchange_unbacked_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
     after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2",
         0.0,
     )
     assert after_o2 == pytest.approx(before_o2)
+    assert after_kg == pytest.approx(before_kg, abs=1e-15)
+    assert after_o_atoms == pytest.approx(before_o_atoms, abs=1e-12)
+
+
+def test_managed_o2_floor_mutation_proof_unbacked_dn_would_move_fo2() -> None:
+    """Mutation proof: advancing fO2 with dn_desired (not dn_ledger) fails.
+
+    Reconstructs the pre-R1 algebra on the same capacities and shows that
+    feeding dn_to_headspace into Δln fO2 would raise melt fO2 while the
+    live path (ledger-backed) holds it.
+    """
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    C_m = reservoir.melt_redox_capacity_mol_per_ln_fO2
+    unbacked = reservoir.exchange_unbacked_o2_mol
+    assert unbacked < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert C_m > OXYGEN_RESERVOIR_NOOP_MOL
+    # Counterfactual pre-R1 update: x_m_after = x_m - dn_desired/C_m with
+    # dn_desired = dn_ledger + unbacked = unbacked (ledger was 0).
+    mutant_fO2 = before_fO2 - (unbacked / C_m) / math.log(10.0)
+    assert mutant_fO2 > before_fO2 + 1e-8
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+
+
+def test_headspace_to_melt_clamp_advances_fo2_only_with_ledger_o2() -> None:
+    """Partial real O2 + large managed claim: fO2 follows dn_ledger only."""
+    from simulator.accounting.ledger import _signed_atom_moles_from_species_mol
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0e-6},
+        source="test tiny headspace O2 for clamp split",
+        material_origin="feedstock",
+    )
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_kg = sum(sim.atom_ledger.total_kg_by_account().values())
+    before_o_atoms = sum(
+        float(
+            _signed_atom_moles_from_species_mol(
+                sim.atom_ledger.mol_by_account(acct),
+                sim.atom_ledger.registry,
+            ).get("O", 0.0)
+        )
+        for acct in sim.atom_ledger.total_kg_by_account()
+    )
+    before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    )
+    after_kg = sum(sim.atom_ledger.total_kg_by_account().values())
+    after_o_atoms = sum(
+        float(
+            _signed_atom_moles_from_species_mol(
+                sim.atom_ledger.mol_by_account(acct),
+                sim.atom_ledger.registry,
+            ).get("O", 0.0)
+        )
+        for acct in sim.atom_ledger.total_kg_by_account()
+    )
+    assert reservoir.exchange_clamped is True
+    assert reservoir.exchange_direction == "headspace_to_melt"
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.exchange_unbacked_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    # Ledger mass moves with absorbed O2; total kg conserved via melt credit.
+    assert after_o2 < before_o2
+    assert after_kg == pytest.approx(before_kg, abs=1e-12)
+    assert after_o_atoms == pytest.approx(before_o_atoms, abs=1e-9)
+    C_m = reservoir.melt_redox_capacity_mol_per_ln_fO2
+    expected_fO2 = before_fO2 - (
+        reservoir.exchange_o2_mol / C_m
+    ) / math.log(10.0)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(expected_fO2)
+    # Mutation proof: applying unbacked remainder as well would overshoot.
+    mutant = expected_fO2 - (
+        reservoir.exchange_unbacked_o2_mol / C_m
+    ) / math.log(10.0)
+    assert mutant > reservoir.melt_intrinsic_fO2_log + 1e-8
 
 
 def test_fe_redox_respeciation_closes_scalar_ledger_divergence_with_real_o2() -> None:

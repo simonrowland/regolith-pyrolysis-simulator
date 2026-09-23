@@ -464,6 +464,9 @@ class OxygenReservoirState:
     headspace_capacity_mol_per_ln_pO2: float = 0.0
     exchange_o2_mol: float = 0.0
     exchange_o2_kg: float = 0.0
+    # Requested headspace Δn that lacked ledger O₂ inventory (managed floor /
+    # clamp remainder). Zero when every mol of exchange_o2_mol is backed.
+    exchange_unbacked_o2_mol: float = 0.0
     exchange_direction: str = ""
     exchange_clamped: bool = False
     exchange_transition_name: str = ""
