@@ -447,7 +447,9 @@ function renderProductLedgerPanel(payload) {
         ? 'ok'
         : storyStatus === 'degraded'
             ? 'degraded'
-            : 'unavailable';
+            : ['incomplete', 'invalid'].includes(storyStatus)
+                ? storyStatus
+                : 'unavailable';
 
     advisoryClear(content);
     content.className = 'advisory-result';

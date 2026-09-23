@@ -441,6 +441,19 @@ def test_product_ledger_rejects_non_numeric_product_evidence(product_value):
     assert "12 kg" not in content
 
 
+def test_product_ledger_preserves_incomplete_story_status():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "product_story": {"input": {"batch_mass_kg": 10}},
+            "product_story_status": "incomplete",
+        },
+    )
+    assert rendered["text"]["product-ledger-state"] == "incomplete"
+
+
 def test_started_status_clears_completion_bound_advisory_panels():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     rendered = _render_advisory_sequence(
