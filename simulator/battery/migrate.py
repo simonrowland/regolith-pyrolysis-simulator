@@ -3441,10 +3441,32 @@ _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
     "deltafH": Quantity.DELTA_FH,
     "formation_enthalpy": Quantity.DELTA_FH,
     "formation_enthalpy_298_15_K_as_published": Quantity.DELTA_FH,
+    "delta_g": Quantity.DELTA_FG,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "delta_h": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "cp": Quantity.CP,
+    "heat_capacity": Quantity.CP,
+    "cp_10_k": Quantity.CP,
+    "cp_25_k": Quantity.CP,
+    "cp_50_k": Quantity.CP,
+    "cp_100_k": Quantity.CP,
+    "cp_150_k": Quantity.CP,
+    "cp_200_k": Quantity.CP,
+    "cp_298_15_k": Quantity.CP,
+    "entropy": Quantity.S,
+    "entropy_third_law": Quantity.S,
+    "entropy_spectrographic_or_molecular_constants": Quantity.S,
+    "entropy_other_sources": Quantity.S,
+    "entropy_recommended": Quantity.S,
+    "enthalpy_increment": Quantity.H_MINUS_H298,
     "log_kf": Quantity.LOG10_KF,
     "log_Kf": Quantity.LOG10_KF,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
+    "log_k": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
 }
 _COMPILATION_KIND_NOT_QUANTITY = frozenset(
@@ -3464,6 +3486,347 @@ _COMPILATION_KIND_NOT_QUANTITY = frozenset(
     }
 )
 _COMPILATION_UNKNOWN_REASON = "printed compilation columns are not mapped to a closed quantity"
+
+# Published multi-column census labels (Pankratz-style headings) → closed Quantity.
+# Keys are normalized by _normalize_compilation_column_label.
+_COMPILATION_HEADING_QUANTITY: dict[str, Quantity] = {
+    "cp": Quantity.CP,
+    "cpo": Quantity.CP,
+    "heat_capacity": Quantity.CP,
+    "s": Quantity.S,
+    "so": Quantity.S,
+    "entropy": Quantity.S,
+    "h-h298": Quantity.H_MINUS_H298,
+    "ho-h298o": Quantity.H_MINUS_H298,
+    "enthalpy_increment": Quantity.H_MINUS_H298,
+    "deltahf": Quantity.DELTA_FH,
+    "deltahfo": Quantity.DELTA_FH,
+    "delta_h": Quantity.DELTA_FH,
+    "deltagf": Quantity.DELTA_FG,
+    "deltagfo": Quantity.DELTA_FG,
+    "delta_g": Quantity.DELTA_FG,
+    "log_k": Quantity.LOG10_KF,
+    "logk": Quantity.LOG10_KF,
+    "log10_kf": Quantity.LOG10_KF,
+}
+
+# Kelley low-T Cp columns encode the temperature in the key (cp_10_k → 10 K).
+_CP_COLUMN_TEMPERATURE_RE = re.compile(r"^cp_(\d+)(?:_(\d+))?_k$", re.IGNORECASE)
+_KELLEY_ENTROPY_COLUMNS = (
+    "entropy_third_law",
+    "entropy_spectrographic_or_molecular_constants",
+    "entropy_other_sources",
+    "entropy_recommended",
+)
+_KELLEY_ENTROPY_T_K = Decimal("298.15")
+_TEMPERATURE_COLUMN_KEYS = frozenset({"t", "temperature", "temperature_k", "t_k"})
+
+
+@dataclass(frozen=True)
+class CompilationColumnSeries:
+    """One declared compilation column/series projected onto a closed Quantity."""
+
+    quantity: Quantity
+    series_key: str
+    value: Value
+    temperature_K: State[Decimal]
+
+
+def _normalize_compilation_column_label(label: str) -> str:
+    """Collapse published heading spellings (LaTeX / unicode) to a map key."""
+
+    raw = str(label).strip()
+    lowered = raw.lower().replace(" ", "")
+    # Prefer already-canonical cell/column ids (underscores retained).
+    if lowered in _COMPILATION_CELL_QUANTITY or lowered in {
+        "enthalpy_increment",
+        "heat_capacity",
+        "delta_h",
+        "delta_g",
+        "log_k",
+        "log10_kf",
+        "temperature",
+        "temperature_k",
+        "t_k",
+    }:
+        return lowered
+    s = raw.lower()
+    s = s.replace("\\\\", "\\")
+    s = s.replace("\\delta", "delta").replace("\\Delta", "delta")
+    s = s.replace("δ", "delta").replace("Δ", "delta")
+    s = s.replace("\\circ", "o")
+    s = s.replace("°", "o").replace("^{o}", "o").replace("^o", "o")
+    s = s.replace("$", "").replace("{", "").replace("}", "").replace("\\", "")
+    s = s.replace(" ", "").replace("_", "")
+    return s
+
+def _quantity_for_compilation_column_label(label: str) -> Quantity | None:
+    raw = str(label).strip()
+    if raw in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[raw]
+    lowered = raw.lower()
+    if lowered in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[lowered]
+    norm = _normalize_compilation_column_label(raw)
+    if norm in _COMPILATION_HEADING_QUANTITY:
+        return _COMPILATION_HEADING_QUANTITY[norm]
+    if norm in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[norm]
+    return None
+
+
+def _temperature_from_cp_column_key(key: str) -> Decimal | None:
+    match = _CP_COLUMN_TEMPERATURE_RE.fullmatch(str(key).strip())
+    if match is None:
+        return None
+    whole, frac = match.group(1), match.group(2)
+    if frac is None:
+        return Decimal(whole)
+    return Decimal(f"{whole}.{frac}")
+
+
+def _series_temperature_state(label: str) -> State[Decimal]:
+    return State.unknown(
+        f"source prints a temperature grid ({label}); "
+        "series coordinate, not a single identity temperature_K"
+    )
+
+
+def _cell_numeric_amount(cell: object) -> Decimal | None:
+    if isinstance(cell, Mapping):
+        return _as_dec_or_none(cell.get("value"))
+    return _as_dec_or_none(cell)
+
+
+def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    rows = doc.get("rows")
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if isinstance(row, Mapping)]
+
+
+def _heading_columns(doc: Mapping[str, Any]) -> list[tuple[int, str, Quantity | None]]:
+    columns = doc.get("columns") or []
+    out: list[tuple[int, str, Quantity | None]] = []
+    if not isinstance(columns, list):
+        return out
+    for index, col in enumerate(columns):
+        if isinstance(col, Mapping):
+            heading = str(
+                col.get("heading_as_published")
+                or col.get("heading_raw")
+                or col.get("id")
+                or index
+            )
+        else:
+            heading = str(col)
+        quantity = _quantity_for_compilation_column_label(heading)
+        out.append((index, heading, quantity))
+    return out
+
+
+def _is_temperature_column_label(label: str) -> bool:
+    norm = _normalize_compilation_column_label(label)
+    compact = norm.replace("_", "")
+    return compact in _TEMPERATURE_COLUMN_KEYS or compact == "t"
+
+
+def _emit_series_or_point(
+    quantity: Quantity,
+    series_key: str,
+    points: list[tuple[Decimal, Decimal]],
+    *,
+    point_temperature: Decimal | None = None,
+) -> CompilationColumnSeries | None:
+    if not points:
+        return None
+    if len(points) == 1 and point_temperature is not None:
+        return CompilationColumnSeries(
+            quantity=quantity,
+            series_key=series_key,
+            value=Value.point_of(points[0][1]),
+            temperature_K=State.of(point_temperature),
+        )
+    return CompilationColumnSeries(
+        quantity=quantity,
+        series_key=series_key,
+        value=Value(ValueKind.SERIES, series=tuple(points)),
+        temperature_K=_series_temperature_state(series_key),
+    )
+
+
+def _column_series_from_list_cells(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    headings = _heading_columns(doc)
+    if not headings:
+        return ()
+    temp_index = next(
+        (i for i, heading, _q in headings if _is_temperature_column_label(heading)),
+        None,
+    )
+    # Group value column indices by quantity; retain first heading as series_key.
+    by_quantity: dict[Quantity, list[tuple[int, str]]] = {}
+    for index, heading, quantity in headings:
+        if quantity is None or index == temp_index:
+            continue
+        by_quantity.setdefault(quantity, []).append((index, heading))
+    if not by_quantity or temp_index is None:
+        return ()
+    emitted: list[CompilationColumnSeries] = []
+    rows = _compilation_rows(doc)
+    for quantity, cols in by_quantity.items():
+        # One observation per quantity for T-grid tables (Cp/S/H/ΔHf/ΔGf).
+        # Multiple columns mapping to the same quantity are refused rather than
+        # silently merged or first-column-picked.
+        if len(cols) != 1:
+            continue
+        index, heading = cols[0]
+        points: list[tuple[Decimal, Decimal]] = []
+        for row in rows:
+            cells = row.get("cells")
+            if not isinstance(cells, list):
+                continue
+            if temp_index >= len(cells) or index >= len(cells):
+                continue
+            t_amt = _cell_numeric_amount(cells[temp_index])
+            v_amt = _cell_numeric_amount(cells[index])
+            if t_amt is None or v_amt is None:
+                continue
+            points.append((t_amt, v_amt))
+        series = _emit_series_or_point(quantity, heading, points)
+        if series is not None:
+            emitted.append(series)
+    return tuple(emitted)
+
+
+def _column_series_from_named_cells(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    rows = _compilation_rows(doc)
+    if not rows:
+        return ()
+    # Detect named-cell shape (Kelley / Pankratz-1987).
+    sample_cells = rows[0].get("cells")
+    if not isinstance(sample_cells, Mapping):
+        # Some records put named fields directly on the row.
+        if not any(
+            key in rows[0] and key in _COMPILATION_CELL_QUANTITY for key in rows[0]
+        ):
+            return ()
+
+    def row_cells(row: Mapping[str, Any]) -> Mapping[str, Any]:
+        cells = row.get("cells")
+        if isinstance(cells, Mapping):
+            return cells
+        return row
+
+    # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
+    cp_points: list[tuple[Decimal, Decimal]] = []
+    entropy_series: list[CompilationColumnSeries] = []
+    grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
+    grid_keys: dict[Quantity, str] = {}
+
+    for row in rows:
+        cells = row_cells(row)
+        t_amt = None
+        for t_key in ("temperature", "T_K", "T", "temperature_K"):
+            if t_key in cells:
+                t_amt = _cell_numeric_amount(cells.get(t_key))
+                if t_amt is not None:
+                    break
+            if t_key in row:
+                t_amt = _cell_numeric_amount(row.get(t_key))
+                if t_amt is not None:
+                    break
+
+        for key, cell in cells.items():
+            if key in {"substance", "raw", "source_row_index", "index", "locator"}:
+                continue
+            amount = _cell_numeric_amount(cell)
+            if amount is None:
+                continue
+            cp_t = _temperature_from_cp_column_key(key)
+            if cp_t is not None:
+                cp_points.append((cp_t, amount))
+                continue
+            if key in _KELLEY_ENTROPY_COLUMNS:
+                series = _emit_series_or_point(
+                    Quantity.S,
+                    key,
+                    [( _KELLEY_ENTROPY_T_K, amount)],
+                    point_temperature=_KELLEY_ENTROPY_T_K,
+                )
+                if series is not None:
+                    entropy_series.append(series)
+                continue
+            quantity = _COMPILATION_CELL_QUANTITY.get(key) or _quantity_for_compilation_column_label(
+                key
+            )
+            if quantity is None or t_amt is None:
+                continue
+            grid_points.setdefault(quantity, []).append((t_amt, amount))
+            grid_keys.setdefault(quantity, key)
+
+    emitted: list[CompilationColumnSeries] = []
+    if cp_points:
+        # Stable order by printed temperature.
+        cp_points.sort(key=lambda item: item[0])
+        series = _emit_series_or_point(Quantity.CP, "cp_temperature_grid", cp_points)
+        if series is not None:
+            emitted.append(series)
+    emitted.extend(entropy_series)
+    for quantity, points in grid_points.items():
+        series = _emit_series_or_point(
+            quantity, grid_keys.get(quantity, quantity.value), points
+        )
+        if series is not None:
+            emitted.append(series)
+    return tuple(emitted)
+
+
+def _compilation_series_obs_suffix(series: CompilationColumnSeries) -> str:
+    """Stable observation-id suffix from quantity + declared series key."""
+
+    key = str(series.series_key).strip()
+    q = series.quantity.value
+    compact = (
+        key.lower()
+        .replace(" ", "_")
+        .replace("$", "")
+        .replace("\\", "")
+        .replace("{", "")
+        .replace("}", "")
+        .replace("^", "")
+    )
+    if not compact or compact in {q.lower(), q.lower().replace("_", "")}:
+        return q
+    if series.quantity is Quantity.S and compact.startswith("entropy"):
+        return f"{q}:{compact}"
+    if series.quantity is Quantity.CP and compact.startswith("cp_"):
+        return f"{q}:{compact}"
+    return q
+
+
+
+def compilation_column_series_from_record(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    """Map multi-column Cp/S/H/ΔHf/ΔGf censuses to one series per closed Quantity.
+
+    Never selects the first numeric cell. Unmapped or ambiguous columns are
+    omitted; the caller falls back to the single-quantity refusal path when
+    this returns empty.
+    """
+
+    kind = str(doc.get("record_kind") or "")
+    table_kind = str(doc.get("table_kind") or "")
+    if kind in _COMPILATION_KIND_NOT_QUANTITY or table_kind in _COMPILATION_KIND_NOT_QUANTITY:
+        return ()
+    named = _column_series_from_named_cells(doc)
+    if named:
+        return named
+    return _column_series_from_list_cells(doc)
 
 
 def _compilation_cell_quantities(payload: Mapping[str, Any]) -> set[Quantity]:
@@ -3972,12 +4335,46 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha",),
+    Quantity.CP: (
+        "cp",
+        "heat_capacity",
+        "cp_10_k",
+        "cp_25_k",
+        "cp_50_k",
+        "cp_100_k",
+        "cp_150_k",
+        "cp_200_k",
+        "cp_298_15_k",
+        "value",
+    ),
+    Quantity.S: (
+        "entropy",
+        "entropy_recommended",
+        "entropy_third_law",
+        "entropy_spectrographic_or_molecular_constants",
+        "entropy_other_sources",
+        "value",
+    ),
+    Quantity.H_MINUS_H298: (
+        "enthalpy_increment",
+        "H_minus_H298",
+        "value",
+    ),
+    Quantity.DELTA_FH: (
+        "delta_h",
+        "delta_f_H",
+        "delta_fH",
+        "deltafH",
+        "formation_enthalpy",
+        "value",
+    ),
     Quantity.DELTA_FG: (
         "delta_fG",
         "delta_fG_298_kJ_mol",
         "Delta_f_G_298_kJ_mol",
         "deltafG",
         "delta_fG_kJ_mol",
+        "delta_g",
         "table_kJ_mol",
         "Gf",
         "formation_gibbs_energy",
@@ -3996,6 +4393,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "table_log10_Kf",
         "log10_Kf",
         "log10_kf",
+        "log_k",
         "log10_formation_equilibrium_constant",
         "value",
     ),
@@ -9144,7 +9542,9 @@ class Migrator:
             return
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
-        formula = str(doc.get("formula") or record_id)
+        formula = str(
+            doc.get("formula") or doc.get("formula_as_published") or record_id
+        )
         phase, _unmapped = map_phase(compilation_phase_text(doc))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
@@ -9152,6 +9552,26 @@ class Migrator:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)
         p_std = None
+        column_series = compilation_column_series_from_record(doc)
+        if column_series:
+            # One observation per declared mapped series; never first-numeric-cell.
+            for series in column_series:
+                suffix = _compilation_series_obs_suffix(series)
+                self._generic_obs(
+                    work=work,
+                    source_id=source_id,
+                    source_key=rel,
+                    observation_id=f"{source_id}:{record_id}:{suffix}",
+                    locator=locator,
+                    quantity=State.of(series.quantity),
+                    species=make_species(formula, phase),
+                    value=series.value,
+                    evidence=evidence,
+                    temperature_K=series.temperature_K,
+                    standard_pressure_Pa=p_std,
+                    method=State.of(MethodToken.TABULATION),
+                )
+            return
         rows = doc.get("rows")
         series_items: list[dict[str, Any]] = []
         if isinstance(rows, list):
