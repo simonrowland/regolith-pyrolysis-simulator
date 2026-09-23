@@ -8,7 +8,7 @@ source:
   year: 2021
 extraction:
   method: pdftotext -layout of publisher article-in-press PDF (GCA 11993; encrypted, text layer present)
-    cross-checked against 150 dpi pdftoppm PNG of Table 1 (PDF p.3) and Table 2 (PDF p.6). Verbatim numbers
+    cross-checked against 150 dpi pdftoppm PNG of Table 1 (PDF p.4) and Table 2 (PDF p.7). Verbatim numbers
     retained. Parenthetical Clglass uncertainties as printed. Unit companions T_K = T_C + 273.15 and P_Pa
     = P_GPa * 1e9 carry derived stamps. Author Henry-region logClmelt regressions stay in context (model_derived
     cohort not scored). Supplementary Table 1 glass majors not present as numbers in the supplied PDF
@@ -21,7 +21,7 @@ corrections:
     the same experiment ID is printed as 2.55 (0.04) in the time, f(Cl2), and temperature series blocks.
     Both spellings retained without reconciliation.
   locators:
-  - pdf_page_index 6 Table 2
+  - pdf_page_index 7 Table 2
 benches:
 - id: oxford-boyd-england-piston-cylinder
   identity:
@@ -31,31 +31,30 @@ benches:
       tag: value
       value: End-loaded Boyd and England type 1/2 inch piston-cylinder apparatus
     locator:
-      pdf_page_index: 3
+      pdf_page_index: 4
       section: 2. Experimental methods
   temperature_measurement:
     sensor:
       state:
         tag: value
-        value: Thermocouple as used in Oxford piston-cylinder assembly (type not further specified in
-          body text)
+        value: Alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
       locator:
-        pdf_page_index: 3
+        pdf_page_index: 4
         section: 2. Experimental methods
-        note: Exact thermocouple type not printed in the methods prose extracted here
+        note: Methods prose prints the alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
   detector:
     state:
       tag: value
       value: CAMECA SX-Five-FE and JEOL-8600 electron microprobes (University of Oxford)
     locator:
-      pdf_page_index: 5
+      pdf_page_index: 6
       section: 2.3. Analytical techniques
 experiments:
 - experiment_id: cl-solubility-cmas-icb-series
   bench_id: oxford-boyd-england-piston-cylinder
   method: melt_equilibration_quench
   locator:
-    pdf_page_index: 3
+    pdf_page_index: 4
     section: 2. Experimental methods
   sample:
     printed_composition:
@@ -63,14 +62,14 @@ experiments:
         tag: value
         value: CMAS An50Di28Fo22 haplobasalt and Icelandic basalt (ICB); Ag-AgCl-AgI chlorine buffer
       locator:
-        pdf_page_index: 3
+        pdf_page_index: 4
         table: '1'
     form:
       state:
         tag: value
         value: Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies
       locator:
-        pdf_page_index: 3
+        pdf_page_index: 4
         section: 2. Experimental methods
   apparatus:
     geometry:
@@ -79,14 +78,14 @@ experiments:
           tag: not_applicable
           reason: not_applicable
         locator:
-          pdf_page_index: 3
+          pdf_page_index: 4
           note: Piston-cylinder capsule; no Knudsen orifice
       orifice_channel_length_m:
         state:
           tag: not_applicable
           reason: not_applicable
         locator:
-          pdf_page_index: 3
+          pdf_page_index: 4
           note: Piston-cylinder capsule; no effusion channel
   conditions:
     temperature_K:
@@ -94,7 +93,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 6
+        pdf_page_index: 7
         table: '2'
         note: Per-row T_C in Table 2; no single series setpoint
   pressure_environment:
@@ -103,7 +102,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 6
+        pdf_page_index: 7
         table: '2'
         note: Per-row P_GPa in Table 2; no single series pressure
     sweep_gas:
@@ -111,7 +110,7 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        pdf_page_index: 3
+        pdf_page_index: 4
         note: Solid-media piston-cylinder; no sweep gas
     regime:
       regime_class:
@@ -126,19 +125,19 @@ experiments:
         tag: value
         value: CCO (C-CO-CO2) or RRO (Re-ReO2) as printed per Table 2 row
       locator:
-        pdf_page_index: 6
+        pdf_page_index: 7
         table: '2'
 fidelity_samples:
 - path: species.Cl.observations[thomas_wood_2021_table1_starting_compositions].values.rows[0].SiO2_wt_pct
   value: 46.53
   locator:
-    pdf_page_index: 3
+    pdf_page_index: 4
     table: '1'
     note: CMAS (An50Di28Fo22) SiO2 wt%
 - path: species.Cl.observations[thomas_wood_2021_table2_clglass].values.rows[2].Clglass_wt_pct
   value: 2.55
   locator:
-    pdf_page_index: 6
+    pdf_page_index: 7
     table: '2'
     note: AgI/Cl-005 time-series Measured Clglass wt%
 species:
@@ -148,7 +147,7 @@ species:
       experiment: cl-solubility-cmas-icb-series
       type: composition_series
       locator:
-        pdf_page_index: 3
+        pdf_page_index: 4
         table: '1'
         section: 2. Experimental methods
         note: Table 1. Silicate melt compositions used for measuring chlorine solubility.
@@ -181,7 +180,7 @@ species:
       experiment: cl-solubility-cmas-icb-series
       type: composition_series
       locator:
-        pdf_page_index: 6
+        pdf_page_index: 7
         table: '2'
         note: Table 2 Experimental conditions and compositions; Measured Clglass wt% is EPMA of quench
           glass. f(Cl2) column is author-calculated from the Ag-AgCl-AgI buffer equilibrium, not a direct
@@ -720,7 +719,7 @@ species:
     - observation_id: thomas_wood_2021_henry_region_logCl_regressions
       type: thermodynamic_example
       locator:
-        pdf_page_index: 1
+        pdf_page_index: 2
         section: Abstract
         note: Also restated in Results; author regressions over own data
       units: logClmelt with Cl in wt%; P in GPa; T in K; f(O2) and f(Cl2) standard state pure gas at 0.1
