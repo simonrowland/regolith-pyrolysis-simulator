@@ -270,7 +270,7 @@ species:
     - observation_id: van_limpt_2007_table42_potassium_bearing_glasses
       experiment: glass-transpiration-series
       type: gibbs_table
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.2'}
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 172, section: '4.4.2', figure: '4.15'}
       phase: alkali_lime_silicate_melt
       regime: transpiration_evaporation
       units: mass_pct
@@ -278,7 +278,9 @@ species:
         quantity: measured_K2O_composition_range_used_for_activity_tests
         measurement_status: measured_direct
         K2O_mass_pct_range: [4.8, 7.8]
-        source_rows: [tableware_glass_A, tableware_glass_C]
+        source_locators:
+          '4.8': {page: 172, section: '4.4.2', figure: '4.15'}
+          '7.8': {page: 172, section: '4.4.2', figure: '4.15'}
         main_measured_species_under_oxidized_humid_conditions: KOH
     - observation_id: van_limpt_2007_fig15_potassium_activity_measured
       experiment: glass-transpiration-series

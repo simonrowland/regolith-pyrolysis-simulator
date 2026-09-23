@@ -72,6 +72,24 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
             == baseline["thermal_schedule"]["cooling_or_quench"]
         )
 
+
+def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
+    observation = next(
+        item
+        for item in doc["species"]["K"]["observations"]
+        if item["observation_id"]
+        == "van_limpt_2007_table42_potassium_bearing_glasses"
+    )
+    assert observation["locator"]["section"] == "4.4.2"
+    assert observation["locator"]["figure"] == "4.15"
+    assert "table" not in observation["locator"]
+    assert observation["values"]["K2O_mass_pct_range"] == [4.8, 7.8]
+    assert observation["values"]["source_locators"] == {
+        "4.8": {"page": 172, "section": "4.4.2", "figure": "4.15"},
+        "7.8": {"page": 172, "section": "4.4.2", "figure": "4.15"},
+    }
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.
