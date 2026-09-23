@@ -24,14 +24,32 @@ benches:
     state: {tag: value, value: ThermoStar quadrupole mass spectrometer}
     locator: *tga_locator
 experiments:
-- experiment_id: tga-ega-simulant-series
+- &tga_ega_common
+  experiment_id: ci-tga-ega
   bench_id: labsys-evo-thermostar
   method: thermogravimetry_evolved_gas_analysis
-  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI, CM, and CR prototype simulants measured at NASA JSC ARES}
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI prototype simulant measured at NASA JSC ARES under the common TG/EGA protocol}
   sample:
     printed_composition:
-      state: {tag: value, value: CI, CM, and CR asteroid-simulant prototypes}
-      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+      state:
+        tag: value
+        value:
+          SiO2: 25.0
+          TiO2: 0.5
+          Al2O3: 3.1
+          FeOT: 25.8
+          MnO: 0.3
+          MgO: 30.2
+          CaO: 3.0
+          Na2O: 6.4
+          K2O: 0.4
+          P2O5: 0.4
+          Cr2O3: 0.2
+          SO3: 4.9
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: 'CI Simulant column; XRF major-element bulk oxide wt% as printed; label CI Asteroid Simulant; FeOT and SO3 retained as printed; Total row omitted; Table 2 mineral-recipe wt% is not the sample bulk analysis'
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '3000'}}
@@ -57,6 +75,54 @@ experiments:
     total_duration_s:
       state: {tag: unknown, reason: not_published}
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
+- <<: *tga_ega_common
+  experiment_id: cm-tga-ega
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CM prototype simulant measured at NASA JSC ARES under the common TG/EGA protocol}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 32.5
+          TiO2: 0.3
+          Al2O3: 3.1
+          FeOT: 20.2
+          MnO: 0.2
+          MgO: 32.1
+          CaO: 3.1
+          Na2O: 6.2
+          K2O: 0.2
+          P2O5: 0.4
+          Cr2O3: 0.2
+          SO3: 1.5
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: 'CM Simulant column; XRF major-element bulk oxide wt% as printed; label CM Asteroid Simulant; FeOT and SO3 retained as printed; Total row omitted; Table 2 mineral-recipe wt% is not the sample bulk analysis'
+- <<: *tga_ega_common
+  experiment_id: cr-tga-ega
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CR prototype simulant measured at NASA JSC ARES under the common TG/EGA protocol}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 19.3
+          TiO2: 0.4
+          Al2O3: 1.2
+          FeOT: 42.9
+          MnO: 0.3
+          MgO: 30.1
+          CaO: 0.8
+          Na2O: 3.3
+          K2O: 0.1
+          P2O5: 0.4
+          Cr2O3: 0.1
+          SO3: 0.9
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: 'CR Simulant column; XRF major-element bulk oxide wt% as printed; label CR Asteroid Simulant; FeOT and SO3 retained as printed; Total row omitted; Table 2 mineral-recipe wt% is not the sample bulk analysis'
 fidelity_samples:
 - species: CI_Asteroid_Simulant
   observable: gibbs_table
@@ -161,7 +227,6 @@ species:
             Nickel metal: 0.5
         note: The table also prints future-update recipes; they are retained only as quoted recipe data, not treated as measurements of the prototype samples.
     - observation_id: britt_2019_tga_ega_thermal_program
-      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -203,7 +268,6 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed for the TG/EGA conditions or total integrated mass losses.
     - observation_id: britt_2019_tga_ega_release_patterns
-      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -236,6 +300,7 @@ species:
   CI_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_ci_table3_xrf_major_oxide_composition
+      experiment: ci-tga-ega
       type: gibbs_table
       locator:
         pdf_page_index: 9
@@ -271,7 +336,7 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed in Table 3.
     - observation_id: britt_2019_ci_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: ci-tga-ega
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -297,6 +362,7 @@ species:
   CM_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_cm_table3_xrf_major_oxide_composition
+      experiment: cm-tga-ega
       type: gibbs_table
       locator:
         pdf_page_index: 9
@@ -318,7 +384,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cm_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: cm-tga-ega
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CM total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]
@@ -331,6 +397,7 @@ species:
   CR_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_cr_table3_xrf_major_oxide_composition
+      experiment: cr-tga-ega
       type: gibbs_table
       locator: {pdf_page_index: 9, table: '3', note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.}
       phase: CR_asteroid_simulant_prototype_crushed_powder
@@ -349,7 +416,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cr_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: cr-tga-ega
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CR total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]
