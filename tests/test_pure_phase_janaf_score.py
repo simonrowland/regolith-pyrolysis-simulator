@@ -37,13 +37,16 @@ from simulator.melt_backend.pure_phase_janaf_score import (
     REACTION_SILLIMANITE,
     REACTION_SPINEL,
     REACTIONS,
+    ELEMENT_REFERENCE_TABLES,
     JanafValues,
     PhaseScoreRequest,
     bands_for_table_id,
     build_phase_row,
     build_reaction_row,
+    element_reference_g_kJ_mol,
     engine_phase_polymorph,
     enthalpy_increment_kJ_mol,
+    formation_g_from_apparent_kJ_mol,
     janaf_values_at,
     load_janaf_table,
     preflight_phase_request,
@@ -928,3 +931,222 @@ def test_catalogue_magemin_endmembers_resolve_in_the_verb1_table():
                 assert phase.endmember in solutions[phase.host_phase]
     for endmember in ('cor', 'and', 'ky', 'sill'):
         assert endmember in pure_phases
+
+
+# --- apparent G -> Delta_fG (element reference at T) -----------------------
+
+# Element counts in the JANAF formation reaction. Oxygen is O2, not O.
+_ELEMENT_COUNTS = {
+    'MgO': {'Mg': 1.0, 'O2': 0.5},
+    'SiO2': {'Si': 1.0, 'O2': 1.0},
+    'Al2O3': {'Al': 2.0, 'O2': 1.5},
+    'Mg2SiO4': {'Mg': 2.0, 'Si': 1.0, 'O2': 2.0},
+    'MgAl2O4': {'Mg': 1.0, 'Al': 2.0, 'O2': 2.0},
+    'Al2SiO5': {'Al': 2.0, 'Si': 1.0, 'O2': 2.5},
+}
+
+
+def _element_reference_g(temperature_K: float) -> dict:
+    """g_ref from the JANAF ref tables at one printed temperature."""
+
+    references = {}
+    for element, table_id in ELEMENT_REFERENCE_TABLES.items():
+        values = janaf_values_at(load_janaf_table(table_id), temperature_K)
+        assert values is not None
+        assert values.enthalpy_increment_kJ_mol is not None
+        assert values.S_J_K_mol is not None
+        references[element] = element_reference_g_kJ_mol(
+            values.enthalpy_increment_kJ_mol,
+            values.S_J_K_mol,
+            temperature_K,
+        )
+    return references
+
+
+def _apparent_g_from_janaf_phase(table_id: str, temperature_K: float) -> float:
+    """G_a(T) = dfH(298.15) + [H(T)-H(298.15)] - T*S(T), from one phase table."""
+
+    phase = janaf_values_at(load_janaf_table(table_id), temperature_K)
+    reference = janaf_values_at(load_janaf_table(table_id), 298.15)
+    assert phase is not None and reference is not None
+    return (
+        reference.formation_enthalpy_kJ_mol
+        + phase.enthalpy_increment_kJ_mol
+        - temperature_K * phase.S_J_K_mol / 1000.0
+    )
+
+
+def test_formation_g_at_298_reduces_to_the_enthalpy_entropy_identity():
+    """dfG(298.15) = dfH298 - 298.15*(S_phase - sum n_el S_el)."""
+
+    temperature_K = 298.15
+    references = {
+        element: janaf_values_at(load_janaf_table(table_id), temperature_K)
+        for element, table_id in ELEMENT_REFERENCE_TABLES.items()
+    }
+    g_ref = _element_reference_g(temperature_K)
+    for element in ('Mg', 'Al', 'Si', 'O2'):
+        assert references[element].enthalpy_increment_kJ_mol == 0.0
+    cases = (
+        ('Mg-008', 'MgO'),
+        ('Mg-028', 'Mg2SiO4'),
+        ('Al-096', 'Al2O3'),
+    )
+    for table_id, formula in cases:
+        phase = janaf_values_at(load_janaf_table(table_id), temperature_K)
+        counts = _ELEMENT_COUNTS[formula]
+        apparent = (
+            phase.formation_enthalpy_kJ_mol
+            - temperature_K * phase.S_J_K_mol / 1000.0
+        )
+        converted = formation_g_from_apparent_kJ_mol(apparent, counts, g_ref)
+        element_entropy = sum(
+            counts[element] * references[element].S_J_K_mol for element in counts
+        )
+        identity = phase.formation_enthalpy_kJ_mol - temperature_K * (
+            phase.S_J_K_mol - element_entropy
+        ) / 1000.0
+        assert converted == pytest.approx(identity, abs=1e-9)
+        assert converted == pytest.approx(phase.formation_gibbs_kJ_mol, abs=0.001)
+    # Counting each oxygen atom as one O2 does not reproduce printed dfG.
+    mgo = janaf_values_at(load_janaf_table('Mg-008'), temperature_K)
+    wrong = formation_g_from_apparent_kJ_mol(
+        mgo.formation_enthalpy_kJ_mol - temperature_K * mgo.S_J_K_mol / 1000.0,
+        {'Mg': 1.0, 'O2': 1.0},
+        g_ref,
+    )
+    assert abs(wrong - mgo.formation_gibbs_kJ_mol) > 10.0
+
+
+def test_ref_tables_reproduce_printed_dfG_across_element_phase_changes():
+    """1000 K is liquid Mg and Al; 1500 K is Mg gas. Separate liquid tables are not the reference."""
+
+    cases = (
+        ('Mg-008', 'MgO', 1000.0),
+        ('Mg-008', 'MgO', 1500.0),
+        ('Al-096', 'Al2O3', 1000.0),
+        ('Al-096', 'Al2O3', 1500.0),
+        ('Mg-028', 'Mg2SiO4', 1500.0),
+        ('O-037', 'SiO2', 1500.0),
+    )
+    for table_id, formula, temperature_K in cases:
+        phase = janaf_values_at(load_janaf_table(table_id), temperature_K)
+        converted = formation_g_from_apparent_kJ_mol(
+            _apparent_g_from_janaf_phase(table_id, temperature_K),
+            _ELEMENT_COUNTS[formula],
+            _element_reference_g(temperature_K),
+        )
+        assert converted == pytest.approx(phase.formation_gibbs_kJ_mol, abs=0.003)
+
+    # Mg-003 liquid at 1500 K is not the reference: Mg-001 has already
+    # switched to the ideal gas (boiling point 1366.104 K).
+    liquid = janaf_values_at(load_janaf_table('Mg-003'), 1500.0)
+    wrong_reference = _element_reference_g(1500.0)
+    wrong_reference['Mg'] = element_reference_g_kJ_mol(
+        liquid.enthalpy_increment_kJ_mol, liquid.S_J_K_mol, 1500.0
+    )
+    phase = janaf_values_at(load_janaf_table('Mg-008'), 1500.0)
+    wrong = formation_g_from_apparent_kJ_mol(
+        _apparent_g_from_janaf_phase('Mg-008', 1500.0),
+        _ELEMENT_COUNTS['MgO'],
+        wrong_reference,
+    )
+    assert abs(wrong - phase.formation_gibbs_kJ_mol) > 5.0
+
+
+def test_formation_g_refuses_a_missing_element():
+    with pytest.raises(KeyError):
+        formation_g_from_apparent_kJ_mol(
+            -600.0, {'Mg': 1.0, 'O2': 0.5}, {'Mg': -9.741}
+        )
+
+
+# Verbatim apparent G and printed Delta_fG from the scored reaction rows
+# (kJ/mol). Order is product, then the two reactant oxides.
+_REACTION_CONSISTENCY_ROWS = (
+    # 2 MgO + SiO2 -> Mg2SiO4
+    (
+        'magemin', 298.15, (1.0, -2.0, -1.0),
+        ('Mg2SiO4', 'MgO', 'SiO2'),
+        (-2200.83007, -609.48298, -923.046355),
+        (-2057.879, -568.945, -856.443),
+        4.728244999999788,
+    ),
+    (
+        'magemin', 1500.0, (1.0, -2.0, -1.0),
+        ('Mg2SiO4', 'MgO', 'SiO2'),
+        (-2498.17017, -696.63306, -1047.25787),
+        (-1550.56, -422.752, -643.681),
+        3.728819999999928,
+    ),
+    (
+        'thermoengine', 298.15, (1.0, -2.0, -1.0),
+        ('Mg2SiO4', 'MgO', 'SiO2'),
+        (-2202.4490815, -609.53544065, -924.352460356055),
+        (-2057.879, -568.945, -856.443),
+        4.520260156054974,
+    ),
+    (
+        'thermoengine', 1000.0, (1.0, -2.0, -1.0),
+        ('Mg2SiO4', 'MgO', 'SiO2'),
+        (-2341.132872947331, -650.7636656379934, -982.7312394215585),
+        (-1778.598, -492.952, -730.256),
+        5.563697750214146,
+    ),
+    (
+        'thermoengine', 1500.0, (1.0, -2.0, -1.0),
+        ('Mg2SiO4', 'MgO', 'SiO2'),
+        (-2498.6244570788194, -697.4864835252936, -1048.4808618282902),
+        (-1550.56, -422.752, -643.681),
+        6.2043718000578565,
+    ),
+    # MgO + Al2O3 -> MgAl2O4. 1500 K uses Mg gas and Al liquid.
+    (
+        'thermoengine', 1500.0, (1.0, -1.0, -1.0),
+        ('MgAl2O4', 'MgO', 'Al2O3'),
+        (-2612.3056099264713, -697.4864835252936, -1881.631769182536),
+        (-1657.458, -422.752, -1196.617),
+        4.901642781358305,
+    ),
+    # Al2O3 + SiO2 -> andalusite. 1000 K uses Al liquid, Si crystal.
+    (
+        'magemin', 1000.0, (1.0, -1.0, -1.0),
+        ('Al2SiO5', 'Al2O3', 'SiO2'),
+        (-2760.925567, -1777.252553, -981.509065),
+        (-2097.155, -1361.437, -730.256),
+        3.298051000000555,
+    ),
+)
+
+
+def test_converted_phase_residuals_sum_to_the_reaction_residual():
+    """Stoichiometric sum of converted phase residuals equals the reaction residual.
+
+    The unconverted apparent-G minus Delta_fG gap is the element offset
+    (about 40 kJ for MgO at 298.15 K, hundreds of kJ once more atoms or
+    a higher T are in the term). A converted phase residual on these
+    rows is the assessment-scale gap.
+    """
+
+    for (
+        _engine, temperature_K, nus, roles, engine_g, janaf_dfg, stored_residual
+    ) in _REACTION_CONSISTENCY_ROWS:
+        g_ref = _element_reference_g(temperature_K)
+        phase_residuals = []
+        for role, apparent_g, formation_g in zip(roles, engine_g, janaf_dfg):
+            converted = formation_g_from_apparent_kJ_mol(
+                apparent_g, _ELEMENT_COUNTS[role], g_ref
+            )
+            phase_residuals.append(converted - formation_g)
+            # MgO at 298.15 is the smallest raw gap in this fixture (~40 kJ).
+            # A skipped conversion leaves that gap; the converted residual
+            # on these rows stays inside 15 kJ.
+            assert abs(apparent_g - formation_g) > 30.0
+            assert abs(phase_residuals[-1]) < 15.0
+        reaction_residual = reaction_sum(zip(nus, engine_g)) - reaction_sum(
+            zip(nus, janaf_dfg)
+        )
+        assert reaction_residual == pytest.approx(stored_residual, abs=1e-9)
+        assert reaction_sum(zip(nus, phase_residuals)) == pytest.approx(
+            reaction_residual, abs=1e-9
+        )

@@ -24,8 +24,9 @@ the element reference offsets cancel exactly in the reaction sum:
 
 The engine apparent-G reaction sum and the JANAF Delta_fG reaction sum are
 therefore the same physical quantity and may be differenced directly.  A
-SINGLE-phase apparent G must never be compared against JANAF Delta_fG(T):
-the element offsets do not cancel there.
+single-phase apparent G is not a Delta_fG until the element term is removed
+(``formation_g_from_apparent_kJ_mol``).  Element H and S come from the JANAF
+``ref`` tables, which switch crystal, liquid, and gas at the printed markers.
 
 Polymorph contract: a residual is only meaningful inside the temperature
 band of one polymorph.  Each JANAF table's bands are read from its own
@@ -124,6 +125,18 @@ AL2SIO5_MULLITE_ABOVE_K = 1473.0
 # the term, labelled.  S and Cp are not adjusted; H(T)-H(298.15) cancels
 # the constant, so per-phase rows are unaffected.
 MELTS_QUARTZ_ADJUSTMENT_KJ_MOL = -1.291
+
+# JANAF formation-reaction reference state for each element.  The ``ref``
+# table already switches crystal -> liquid -> gas at the printed markers
+# and keeps H-H(298.15) on the 298.15 K element zero.  The separate cr and
+# l tables do not share that zero (Mg boils at 1366.104 K, so the 1500 K
+# reference is the gas row of Mg-001, not Mg-003 liquid).
+ELEMENT_REFERENCE_TABLES: Mapping[str, str] = {
+    'Mg': 'Mg-001',
+    'Al': 'Al-001',
+    'Si': 'Si-001',
+    'O2': 'O-029',
+}
 
 
 class PolymorphMismatchError(ValueError):
@@ -411,6 +424,61 @@ def reaction_sum(terms: Iterable[Tuple[float, float]]) -> float:
     for nu, value in terms:
         total += nu * value
     return total
+
+
+def element_reference_g_kJ_mol(
+    enthalpy_increment_kJ_mol: float,
+    entropy_J_K_mol: float,
+    temperature_K: float,
+) -> float:
+    """Element reference Gibbs energy on the H(298.15) = 0 convention.
+
+    g_ref(T) = [H(T) - H(298.15)] - T*S(T), in kJ/mol.  H increment is
+    kJ/mol as printed by JANAF; S is J/(K mol).  At 298.15 K the enthalpy
+    increment is 0, so g_ref = -T*S.
+    """
+
+    return enthalpy_increment_kJ_mol - temperature_K * entropy_J_K_mol / 1000.0
+
+
+def formation_g_from_apparent_kJ_mol(
+    apparent_g_kJ_mol: float,
+    element_counts: Mapping[str, float],
+    element_reference_g_kJ_mol_by_element: Mapping[str, float],
+) -> float:
+    """JANAF Delta_fG(T) from an apparent Gibbs energy, kJ/mol.
+
+    DERIVATION.  Engines return the apparent Gibbs energy, with the
+    elements referenced only at 298.15 K:
+
+        G_a(T) = dfH(298.15) + int_298.15^T Cp dT - T*S(T)
+               = H_phase(T) - T*S_phase(T)
+
+    because H_el(298.15) = 0, so H_phase(298.15) = dfH(298.15).
+
+    JANAF Delta_fG(T) references each element in its reference state at
+    T (ELEMENT_REFERENCE_TABLES: crystal, liquid, or gas):
+
+        dfG(T) = G_a(T)
+                 - sum_el n_el * ([H_el(T) - H_el(298.15)] - T*S_el(T))
+               = G_a(T) - sum_el n_el * g_ref_el(T)
+
+    Oxygen's reference species is O2, so n_O2 is half the oxygen-atom
+    count.  A missing element is a KeyError, never a zero.
+
+    At T = 298.15 the element enthalpy increments are zero and
+    G_a = dfH(298.15) - T*S_phase, so the expression reduces to
+
+        dfG(298.15) = dfH(298.15) - 298.15*(S_phase - sum_el n_el*S_el)
+
+    For a balanced reaction the element sum cancels, and the stoichiometric
+    sum of (dfG_engine - dfG_JANAF) equals the apparent-G reaction residual.
+    """
+
+    correction = 0.0
+    for element, count in element_counts.items():
+        correction += count * element_reference_g_kJ_mol_by_element[element]
+    return apparent_g_kJ_mol - correction
 
 
 def enthalpy_increment_kJ_mol(H_T_J_mol: float, H_298_J_mol: float) -> float:
