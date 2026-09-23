@@ -197,6 +197,16 @@ def test_report_viewer_headline_cost_marks_viewer_estimate() -> None:
     assert "viewer-computed estimate (no emitted cost total)" in html
 
 
+def test_report_viewer_sparse_stage_purity_stays_pending() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "tapsAndPuritySection({stage_purity:{stage_0:{verdict:'PURE',purity_fraction:1}}})",
+    )
+
+    assert "PENDING" in html
+    assert "100.0000%" not in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
