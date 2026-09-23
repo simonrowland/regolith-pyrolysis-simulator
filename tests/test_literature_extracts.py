@@ -110,6 +110,21 @@ def test_van_limpt_fig46_keeps_measured_markers_separate_from_model() -> None:
     assert model["values"]["measurement_status"] == "model_output_not_measurement"
     assert model["admission_status"] == "rejected_model_output_not_measurement"
 
+
+def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
+    doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
+    experiments = [
+        item
+        for item in doc["experiments"]
+        if item["experiment_id"].startswith("na2o-sio2-xna2o-")
+    ]
+    assert len(experiments) == 12
+    for experiment in experiments:
+        locator = experiment["conditions"]["temperature_K"]["locator"]
+        assert locator["figure"] == "7"
+        assert "table" not in locator
+        assert locator["note"].startswith("Figure 7 isotherm at ")
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.
