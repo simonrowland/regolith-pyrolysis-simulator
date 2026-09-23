@@ -119,7 +119,7 @@ socket.on('simulation_tick', (data) => {
     // Evaporation flux chart
     const evap = data.evap_species || {};
     const evapKeys = Object.keys(evap);
-    if (evapKeys.length > 0 && !flowInitialized) initFlowChart(evapKeys);
+    ensureFlowChartSpecies(evapKeys);
     if (flowInitialized) {
         const flowUpdate = { x: [], y: [] };
         const flowIndices = [];

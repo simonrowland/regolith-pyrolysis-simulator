@@ -4,7 +4,9 @@ import vm from 'node:vm';
 const input = JSON.parse(fs.readFileSync(0, 'utf8'));
 const html = String(input.html || '');
 const payload = input.payload || {};
+const payloads = Array.isArray(input.payloads) ? input.payloads : [payload];
 const scriptPath = input.script_path;
+const chartScriptPath = input.chart_script_path;
 const requestedIds = input.ids || [];
 
 if (!scriptPath) {
@@ -96,12 +98,14 @@ function plotlyCall(method, args) {
     method,
     target: args[0],
     traceCount: Array.isArray(args[1]) ? args[1].length : undefined,
+    traceNames: Array.isArray(args[1]) ? args[1].map(trace => trace.name) : undefined,
     indices: Array.isArray(args[2]) ? args[2] : undefined,
   });
 }
 
 const context = {
   console,
+  window: { matchMedia: () => ({ matches: false }) },
   document: {
     getElementById(id) {
       return elements.get(id) || null;
@@ -186,6 +190,11 @@ context.initMeltInventoryChart = () => {
 context.updateBackendBadge = () => {};
 
 vm.createContext(context);
+if (chartScriptPath) {
+  vm.runInContext(fs.readFileSync(chartScriptPath, 'utf8'), context, {
+    filename: chartScriptPath,
+  });
+}
 vm.runInContext(fs.readFileSync(scriptPath, 'utf8'), context, {
   filename: scriptPath,
 });
@@ -194,7 +203,7 @@ if (typeof handlers.simulation_tick !== 'function') {
   throw new Error('simulation_tick handler was not registered');
 }
 
-handlers.simulation_tick(payload);
+for (const tickPayload of payloads) handlers.simulation_tick(tickPayload);
 
 const output = {
   text: {},

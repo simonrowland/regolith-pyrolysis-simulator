@@ -24,6 +24,13 @@ _ADVISORY_HARNESS = (
     / "web_render"
     / "render_simulator_advisory_dom.mjs"
 )
+_SOCKET_HARNESS = (
+    _REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "web_render"
+    / "render_simulator_socket_dom.mjs"
+)
 _STATUS_STRIP_HARNESS = (
     _REPO_ROOT
     / "tests"
@@ -77,6 +84,12 @@ _ADVISORY_IDS = [
     "overlap-evaporation-content",
     "knudsen-regime-state",
     "knudsen-regime-content",
+    "ceramic-rump-state",
+    "ceramic-rump-content",
+    "industrial-glass-state",
+    "industrial-glass-content",
+    "vapor-pressure-authority-state",
+    "vapor-pressure-authority-content",
 ]
 
 
@@ -374,6 +387,118 @@ def test_simulation_tick_renders_overlap_evaporation_diagnostic():
     assert "SiO: rate 0.012 kg/hr; stage 3" in content
     assert "endpoint watch false" in content
     assert "gates completion false" in content
+
+
+def test_unavailable_product_story_never_renders_as_ok():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "product_story": None,
+            "product_story_status": "unavailable",
+            "products": {"Fe": 1.0},
+        },
+    )
+    assert rendered["text"]["product-ledger-state"] == "unavailable"
+    assert "ProductsFe: 1 kg" in rendered["text"]["product-ledger-content"]
+
+    empty_fallback = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "product_story": None,
+            "product_story_status": "unavailable",
+        },
+    )
+    assert empty_fallback["text"]["product-ledger-state"] == "unavailable"
+    assert empty_fallback["text"]["product-ledger-content"] == "n/a"
+
+
+def test_started_status_clears_completion_bound_advisory_panels():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_sequence(
+        html=html,
+        events=[
+            {
+                "event": "simulation_complete",
+                "payload": {
+                    "run_id": "run-a",
+                    "product_story_status": "ok",
+                    "products": {"Fe": 1.0},
+                    "ceramic_rump_panel": {
+                        "status": "match",
+                        "match": {"label": "ceramic A"},
+                    },
+                    "vapor_pressure_authority_panel": {
+                        "status": "authoritative",
+                        "message": "source A",
+                    },
+                    "knudsen_regime_diagnostic": {
+                        "status": "warning",
+                        "regime": "transitional",
+                    },
+                },
+            },
+            {
+                "event": "simulation_status",
+                "payload": {"status": "started", "run_id": "run-b"},
+            },
+        ],
+    )
+    for panel in [
+        "product-ledger",
+        "ceramic-rump",
+        "industrial-glass",
+        "vapor-pressure-authority",
+        "knudsen-regime",
+    ]:
+        assert rendered["text"][f"{panel}-state"] == "n/a"
+        assert rendered["text"][f"{panel}-content"] == "n/a"
+
+
+def test_evaporation_flux_chart_admits_species_that_appear_later(
+    producer_backed_operator_tick,
+):
+    first = {**producer_backed_operator_tick["payload"], "evap_species": {"Fe": 0.1}}
+    second = {
+        **producer_backed_operator_tick["payload"],
+        "hour": 2,
+        "evap_species": {"Fe": 0.2, "SiO": 0.05},
+    }
+    rendered = _render_tick_sequence(
+        html=producer_backed_operator_tick["html"],
+        payloads=[first, second],
+    )
+    additions = [
+        call
+        for call in rendered["plotlyCalls"]
+        if call["method"] == "addTraces" and call["target"] == "chart-massflow"
+    ]
+    assert additions == [
+        {
+            "method": "addTraces",
+            "target": "chart-massflow",
+            "traceCount": 1,
+            "traceNames": ["SiO"],
+        }
+    ]
+
+
+def test_disconnect_reconnect_resets_controls_and_decision_modal():
+    rendered = _render_socket_lifecycle()
+    assert rendered["afterDisconnect"] == {
+        "startDisabled": True,
+        "pauseDisabled": True,
+        "resumeDisabled": True,
+        "decisionModalPresent": False,
+    }
+    assert rendered["afterReconnect"] == {
+        "startDisabled": False,
+        "pauseDisabled": True,
+        "resumeDisabled": True,
+        "decisionModalPresent": False,
+    }
 
 
 def _minimal_tick_payload(**overrides):
@@ -1140,6 +1265,28 @@ def _render_tick_dom(*, html, payload):
                 "html": html,
                 "payload": payload,
                 "script_path": str(_SIMULATOR_TICKS_JS),
+                "chart_script_path": str(_SIMULATOR_CHARTS_JS),
+                "ids": _RENDER_IDS,
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_tick_sequence(*, html, payloads):
+    completed = subprocess.run(
+        ["node", str(_DOM_HARNESS)],
+        input=json.dumps(
+            {
+                "html": html,
+                "payloads": payloads,
+                "script_path": str(_SIMULATOR_TICKS_JS),
+                "chart_script_path": str(_SIMULATOR_CHARTS_JS),
                 "ids": _RENDER_IDS,
             }
         ),
@@ -1165,6 +1312,44 @@ def _render_advisory_dom(*, html, event, payload):
                 "payload": payload,
                 "script_path": str(_SIMULATOR_ADVISORY_JS),
                 "ids": _ADVISORY_IDS,
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_advisory_sequence(*, html, events):
+    completed = subprocess.run(
+        ["node", str(_ADVISORY_HARNESS)],
+        input=json.dumps(
+            {
+                "html": html,
+                "events": events,
+                "script_path": str(_SIMULATOR_ADVISORY_JS),
+                "ids": _ADVISORY_IDS,
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_socket_lifecycle():
+    completed = subprocess.run(
+        ["node", str(_SOCKET_HARNESS)],
+        input=json.dumps(
+            {
+                "socket_script_path": str(_SIMULATOR_SOCKET_JS),
+                "decisions_script_path": str(_SIMULATOR_DECISIONS_JS),
             }
         ),
         text=True,

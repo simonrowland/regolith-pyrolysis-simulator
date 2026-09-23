@@ -15,12 +15,19 @@ const socket = io({
 });
 window.socket = socket;
 
+function resetDecisionModal() {
+    const modal = document.getElementById('decision-modal');
+    if (modal) modal.remove();
+}
+
 function setConnectionReady(ready) {
     const startBtn = document.getElementById('btn-start');
     const pauseBtn = document.getElementById('btn-pause');
-    if (startBtn && (!pauseBtn || pauseBtn.disabled)) {
-        startBtn.disabled = !ready;
-    }
+    const resumeBtn = document.getElementById('btn-resume');
+    if (startBtn) startBtn.disabled = !ready;
+    if (pauseBtn) pauseBtn.disabled = true;
+    if (resumeBtn) resumeBtn.disabled = true;
+    resetDecisionModal();
 }
 
 setConnectionReady(false);

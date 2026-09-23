@@ -437,6 +437,15 @@ function renderProductLedgerPanel(payload) {
         return;
     }
 
+    const storyStatus = typeof data.product_story_status === 'string'
+        ? data.product_story_status
+        : null;
+    const panelStatus = !storyStatus || storyStatus === 'ok'
+        ? 'ok'
+        : storyStatus === 'degraded'
+            ? 'degraded'
+            : 'unavailable';
+
     advisoryClear(content);
     content.className = 'advisory-result';
     let sections = 0;
@@ -497,6 +506,9 @@ function renderProductLedgerPanel(payload) {
 
     if (!sections) {
         setAdvisoryEmpty(content, 'product-ledger-state');
+        if (panelStatus !== 'ok') {
+            updateAdvisoryState('product-ledger-state', panelStatus);
+        }
         return;
     }
     // "ok" USED TO MEAN "I DREW A TABLE", NOT "THIS RUN PRODUCED ANYTHING".
@@ -518,9 +530,11 @@ function renderProductLedgerPanel(payload) {
     // flips to ok the moment any product class becomes non-zero.
     updateAdvisoryState(
         'product-ledger-state',
-        didRunExtractAnything(data, story, extractedFlatProducts)
+        panelStatus === 'ok' && didRunExtractAnything(data, story, extractedFlatProducts)
             ? 'ok'
-            : 'no-products',
+            : panelStatus === 'ok'
+                ? 'no-products'
+                : panelStatus,
     );
 }
 
@@ -865,6 +879,23 @@ function thermalTrainHeadlineMetric(value, unit) {
 // acknowledgement from a PREVIOUS run cannot repopulate a cleared strip
 // (stale-ack race — a completed run's read can land after 'started').
 let thermalTrainHeadlineGeneration = 0;
+let completionPanelGeneration = 0;
+let completionPanelRunId = null;
+
+function clearCompletionBoundAdvisoryPanels() {
+    renderProductLedgerPanel(null);
+    renderCeramicRumpPanel(null);
+    renderIndustrialGlassPanel(null);
+    renderVaporPressureAuthorityPanel(null);
+    renderKnudsenRegimePanelFromDiagnostic(null);
+}
+
+function completionPayloadMatchesGeneration(payload) {
+    return !completionPanelRunId
+        || !payload
+        || !payload.run_id
+        || payload.run_id === completionPanelRunId;
+}
 
 function clearThermalTrainHeadline(label) {
     const panel = document.getElementById('thermal-train-headline');
@@ -974,6 +1005,7 @@ socket.on('simulation_tick', (data) => {
 });
 
 socket.on('simulation_complete', (data) => {
+    if (!completionPayloadMatchesGeneration(data)) return;
     renderProductLedgerPanel(data);
     renderCeramicRumpPanel(data.ceramic_rump_panel);
     renderIndustrialGlassPanel(data.glass_panel);
@@ -990,6 +1022,9 @@ socket.on('simulation_complete', (data) => {
 socket.on('simulation_status', (data) => {
     if (data && data.status === 'started') {
         thermalTrainHeadlineGeneration += 1;
+        completionPanelGeneration += 1;
+        completionPanelRunId = data.run_id || `generation-${completionPanelGeneration}`;
+        clearCompletionBoundAdvisoryPanels();
         clearThermalTrainHeadline();
     }
     if (data && data.knudsen_regime_diagnostic) {
