@@ -1,0 +1,225 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20210022801
+source:
+  citation: >-
+    Olson, Aaron D.S. (2021), "Lunar Helium-3: Mining Concepts, Extraction
+    Research, and Potential ISRU Synergies", AIAA ASCEND 2021, NASA NTRS
+    20210022801 (AIAA ASCEND 2021 Paper_211018.pdf).
+  url: https://ntrs.nasa.gov/citations/20210022801
+  year: 2021
+  related_sources:
+  - document: ntrs-20210012628
+    relation: companion_ascend_abstract
+    note: >-
+      NTRS 20210012628 is the two-page ASCEND abstract of the same Olson 2021
+      talk; residual-He numeric results below are printed only in this full paper.
+extraction:
+  method: >-
+    Corpus PDF
+    ferry-inbox/from-main-B3-20260923T024400Z/pdfs/ntrs-20210022801.pdf
+    (private; not committed). Born-digital 15-page ASCEND paper. pdftotext
+    -layout cross-checked against PDF page 1 title/authors and pages 4 / 9–13
+    experimental prose. SHA-256 matches sidecar
+    935bbe2269b04c30bcc35255c13ef14125f4d0e501842190e08b36a38fbb666a.
+    Measured residual-4He concentrations and removal fractions for two HEAT
+    HPHX flow rates landed as concentration_series. SWIM/HEAT/SCAN apparatus
+    and Mark-III design/Table 1 Apollo design-basis volatiles kept in context
+    (d-032 Option A). Figs 16–18 curves figure-only; no axis digitisation.
+    Kelvin companions from printed °C carry DERIVED stamps (T_K = T_C + 273.15).
+  date: '2026-09-22'
+  worker: n8-ntrs-reports
+  provenance_path: data/literature/extracts/ntrs-20210022801.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 15-page AIAA ASCEND full paper (He-3 mining review + FTI/KSC agitation-extraction experiment)
+  measured_direct_observations: 1
+  method_observations: 3
+  figure_only_observations: 3
+  absent_from_source:
+  - absolute implanted 4He inventories in atoms or moles
+  - tabulated SCAN RGA partial-pressure series (Fig. 16 plotted only)
+  - digitised cumulative-release curves (Fig. 17) or retained-fraction bars (Fig. 18)
+  - HEAT HPHX peak regolith temperature during the two agitation runs (stated not heated above room temperature)
+  note: >-
+    Table 1 volatiles are Apollo 11 sample 10086.16 design-basis values for the
+    Mark-III miner, not measurements from the SWIM/HEAT campaign.
+fidelity_samples:
+- species: He
+  observable: concentration_series
+  observation_id: olson_2021_heat_hphx_he4_agitation_two_flow_rates
+  field: implanted_4He_ppb_after_implantation_1p5_g_s
+  value: 2.7
+  locator:
+    pdf_page_index: 13
+    published_page: 13
+    section: 'III.C Helium Release Experimental Results'
+    note: remaining 4He after implantation for 1.5 g/s sample = 2.7 ppb
+- species: He
+  observable: concentration_series
+  observation_id: olson_2021_heat_hphx_he4_agitation_two_flow_rates
+  field: fraction_implanted_4He_removed_percent_9_g_s_as_printed
+  value: 96
+  locator:
+    pdf_page_index: 13
+    published_page: 13
+    section: 'III.C Helium Release Experimental Results'
+    note: 96% of implanted 4He removed at 9 g/s as printed
+- species: He
+  observable: laboratory_conditions
+  observation_id: olson_2021_swim_heat_scan_apparatus
+  field: swim_batch_mass_kg_as_printed
+  value: 2
+  locator:
+    pdf_page_index: 9
+    published_page: 9
+    section: 'III.A Solar Wind Implanter'
+    note: SWIM implants batches of up to 2 kg
+species:
+  He:
+    observations:
+    - observation_id: olson_2021_heat_hphx_he4_agitation_two_flow_rates
+      type: concentration_series
+      locator:
+        pdf_page_index: 13
+        published_page: 13
+        section: 'III.C Helium Release Experimental Results'
+        figure: '18'
+        note: >-
+          Prose numbers for two SWIM-implanted JSC-1A batches run through HEAT
+          HPHX at 1.5 g/s and 9.0 g/s; Fig. 18 illustrates retained fraction only.
+      T_range_K:
+      - 298.15
+      - 298.15
+      phase: JSC-1A_lunar_regolith_simulant_less_than_100_um
+      standard_state: residual 4He concentration in simulant as printed (ppb); removal as printed percent
+      regime: flow_induced_agitation_in_heat_pipe_heat_exchanger_room_temperature
+      units: ppb as printed for concentrations; percent as printed for removal/retention
+      uncertainty:
+        note: >-
+          No numeric uncertainty printed on the residual-ppb or percent-removed
+          values. Post-HEAT concentrations stated as corrected for the average
+          control 4He concentration (control value itself not printed here).
+      values:
+        quantity: residual_and_removed_implanted_4He_after_HEAT_HPHX_agitation
+        method_class: measured_direct
+        evidence_class: authors_own_SWIM_HEAT_SCAN_campaign
+        feedstock_as_printed: JSC-1A lunar regolith simulant
+        implant_species_as_printed: 4He
+        analysis_as_printed: vacuum heating and mass spectrometer system (SCAN)
+        not_heated_above_room_temperature_as_printed: true
+        flow_rate_g_s_1p5_as_printed: 1.5
+        flow_rate_g_s_9_as_printed: 9.0
+        implanted_4He_ppb_after_implantation_1p5_g_s: 2.7
+        implanted_4He_ppb_after_implantation_9_g_s: 2.1
+        residual_4He_ppb_after_HEAT_control_corrected_1p5_g_s: 0.7
+        residual_4He_ppb_after_HEAT_control_corrected_9_g_s: 0.1
+        fraction_implanted_4He_remaining_percent_1p5_g_s_as_printed: 29
+        fraction_implanted_4He_remaining_percent_9_g_s_as_printed: 4
+        fraction_implanted_4He_removed_percent_1p5_g_s_as_printed: 70
+        fraction_implanted_4He_removed_percent_9_g_s_as_printed: 96
+        author_comparison_as_printed: >-
+          Agitation release at room temperature corresponds to 3He evolution
+          during heating of lunar soil samples to about 500 °C.
+        caveats_as_printed: >-
+          SWIM implantation only replicates a portion of the solar wind energy
+          spectrum; JSC-1A surface structure cannot fully replicate real lunar
+          regolith.
+        omitted:
+          fig16_rga_partial_pressure_trace: figure_only_not_digitised
+          fig17_cumulative_release_curve: figure_only_not_digitised
+          fig18_retained_fraction_bars: figure_only_prose_numbers_used
+    context:
+    - observation_id: olson_2021_swim_heat_scan_apparatus
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 9
+        published_page: 9
+        section: 'III. Helium Extraction Experiments'
+        note: Apparatus across §III.A–III.C (PDF pages 9–12)
+      phase: FTI_KSC_SWIM_HEAT_SCAN_bench
+      regime: implantation_then_agitation_extraction_then_vacuum_MS_assay
+      units: as published
+      values:
+        quantity: SWIM_HEAT_SCAN_apparatus_and_campaign_setup
+        method_class: method_only
+        collaboration_as_printed: FTI with NASA KSC Swamp Works (2018 experiments)
+        swim_batch_mass_kg_as_printed: 2
+        swim_size_cut_as_printed: <100 µm lunar regolith simulant
+        swim_implant_species_as_printed: 4He
+        swim_target_speed_range_km_s_as_printed: 300-900
+        swim_target_speed_average_km_s_as_printed: ~450
+        swim_example_run_as_printed: 0.6 mTorr 4He and -8 kV cathode potential
+        heat_hphx_stages_as_printed: 5-stage counter flow heat exchanger
+        heat_instrumentation_as_printed: 14 type K thermocouple probes and an infrared thermopile array camera
+        scan_crucible_volume_cm3_as_printed: 100
+        scan_sample_mass_g_as_printed: 20
+        scan_heater_as_printed: 300-watt 8 mm outer diameter cartridge heater
+        scan_isochronal_steps_up_to_C_as_printed: 600
+        scan_isochronal_steps_up_to_K_derived:
+          value: 873.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 600
+        detector_as_printed: Residual Gas Analyzer (RGA)
+    - observation_id: olson_2021_mark_iii_design_claims
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 4
+        published_page: 4
+        section: 'II.B Mark Series'
+      phase: Mark_III_M-3_miner_design
+      regime: design_concept_not_laboratory_measurement
+      units: as published
+      values:
+        quantity: Mark_III_miner_design_throughput_and_He3_collection_claims
+        method_class: method_only
+        evidence_class: design_study_cited_not_this_work_measurement
+        excavate_tonnes_per_hr_as_printed: 1258
+        heat_tonnes_per_hr_as_printed: 556
+        move_m_per_hr_as_printed: 23
+        electrical_power_kW_as_printed: ~350
+        He3_collection_kg_per_yr_at_10_ppb_as_printed: 33
+        He3_collection_kg_per_yr_at_20_ppb_as_printed: ~66
+        HPHX_peak_regolith_C_as_printed: 700
+        HPHX_peak_regolith_K_derived:
+          value: 973.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 700
+        HPHX_inlet_C_as_printed: 30
+        HPHX_heat_recuperation_percent_as_printed: 85
+        size_cut_um_as_printed: <100
+    - observation_id: olson_2021_table1_apollo_design_basis_volatiles
+      type: composition
+      locator:
+        pdf_page_index: 4
+        published_page: 4
+        table: '1'
+        note: >-
+          Table 1 — Volatiles released from heating lunar mare regolith
+          (Apollo 11 sample 10086.16) to 700 °C; design basis for Mark-III,
+          not SWIM/HEAT measurements.
+      phase: Apollo_11_10086_16_mare_regolith
+      regime: quoted_design_basis_compilation
+      units: g per tonne regolith mined (after beneficiation note) as printed
+      values:
+        quantity: design_basis_volatiles_table_quoted_from_Apollo_heating
+        method_class: review_compilation
+        evidence_class: cited_Apollo_sample_not_authors_measurement
+        heat_temperature_C_as_printed: 700
+        heat_temperature_K_derived:
+          value: 973.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 700
+        footnote_beneficiation_as_printed: After beneficiation, 450 kg of regolith is heated
+        footnote_excavation_as_printed: With 20 ppb and 1258 tonnes/hr excavation
+        H2_g_per_tonne_as_printed: 43
+        He4_g_per_tonne_as_printed: 22
+        He3_g_per_tonne_as_printed: 0.007
+        H2O_g_per_tonne_as_printed: 23
+        N2_g_per_tonne_as_printed: 4.0
+        CH4_g_per_tonne_as_printed: 11
+        CO_g_per_tonne_as_printed: 13.5
+        CO2_g_per_tonne_as_printed: 12

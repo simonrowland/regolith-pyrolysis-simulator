@@ -1,0 +1,181 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20120000846
+source:
+  citation: >-
+    Jacobson, Nathan S. & Myers, Dwight L. (2011), "The Vaporization of B2O3(l)
+    to B2O3(g) and B2O2(g)" (Poster), 220th Meeting of the Electrochemical
+    Society, High Temperature Corrosion and Materials Chemistry, Boston, MA,
+    10–11 October 2011. NASA NTRS 20120000846 / PS–00625–1011.
+  url: https://ntrs.nasa.gov/citations/20120000846
+  year: 2011
+extraction:
+  method: >-
+    Corpus PDF
+    ferry-inbox/from-main-B3-20260923T024400Z/pdfs/ntrs-20120000846.pdf
+    (private; not committed). 2-page ECS poster (title strip + full poster).
+    pdftotext -layout; poster body is graphics-heavy and column OCR is
+    unreliable for run-by-run table cells, so only clearly printed abstract-strip
+    and Conclusions ΔfH°(298.15 K) values are scored. SHA-256 matches sidecar
+    467b6d0b29c5fae81b9927e1d839473cbae9fcf9a33ff3f0f3061c3ecaaf6a67.
+    FeB/Fe2B activity-fix method and KEMS/W1BD notes kept in context.
+    Internal poster inconsistency on B2O2(g) uncertainty (±41.5 kJ/mol on the
+    title strip vs ±25.7 kJ/mol in Conclusions) retained as two separate
+    observations — never averaged. Journal paper cited as "J. Phys. Chem. 2011,
+    in press" is not this PDF and is not extracted here.
+  date: '2026-09-22'
+  worker: n8-ntrs-reports
+  provenance_path: data/literature/extracts/ntrs-20120000846.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: two-page ECS meeting poster (KEMS ΔfH of B2O2(g) and B2O3(g))
+  measured_direct_observations: 3
+  method_observations: 1
+  figure_only_observations: 0
+  absent_from_source:
+  - reliably OCR'd per-run second/third-law table cells (poster columns garbled)
+  - Knudsen-cell orifice geometry / ionization energy / multiplier settings
+  - raw ion-current vs T series
+  note: >-
+    STEP 0: other Jacobson extracts exist (costa-jacobson-2015, kems-032,
+    kems-139) but none is this B2O3/B2O2 poster or NTRS 20120000846.
+fidelity_samples:
+- species: B2O2
+  observable: gibbs_table
+  observation_id: jacobson_myers_2011_poster_b2o2_deltafH_298_conclusions
+  field: delta_fH_298_15_kJ_mol_as_printed
+  value: -479.9
+  locator:
+    pdf_page_index: 2
+    published_page: 2
+    section: Conclusions
+    note: Conclusions bullet For B2O2(g) = –479.9 ± 25.7 kJ/mol
+- species: B2O3
+  observable: gibbs_table
+  observation_id: jacobson_myers_2011_poster_b2o3_deltafH_298
+  field: delta_fH_298_15_kJ_mol_as_printed
+  value: -833.4
+  locator:
+    pdf_page_index: 1
+    published_page: 1
+    note: Title-strip and Conclusions both print -833.4 ± 13.1 kJ/mol for B2O3(g)
+- species: B2O2
+  observable: gibbs_table
+  observation_id: jacobson_myers_2011_poster_b2o2_deltafH_298_title_strip
+  field: delta_fH_298_15_uncertainty_kJ_mol_as_printed
+  value: 41.5
+  locator:
+    pdf_page_index: 1
+    published_page: 1
+    note: Title-strip uncertainty ±41.5 kJ/mol (differs from Conclusions ±25.7)
+species:
+  B2O2:
+    observations:
+    - observation_id: jacobson_myers_2011_poster_b2o2_deltafH_298_conclusions
+      type: gibbs_table
+      locator:
+        pdf_page_index: 2
+        published_page: 2
+        section: Conclusions
+        note: Conclusions bullet preferred experimental ΔfH°(298.15 K) for B2O2(g)
+      T_range_K:
+      - 298.15
+      - 298.15
+      phase: gas
+      standard_state: ΔfH°(298.15 K) as printed for B2O2(g)
+      regime: kems_second_and_third_law_with_FeB_Fe2B_boron_activity_fix
+      units: kJ/mol as printed
+      uncertainty:
+        delta_fH_298_15_kJ_mol: 25.7
+        as_printed: –479.9 ± 25.7 kJ/mol
+        note: Conclusions uncertainty; title strip prints ±41.5 for the same central value
+      values:
+        quantity: enthalpy_of_formation_298_15K
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        reaction_path_as_printed: 2B(s) + O2(g) = B2O2(g) via FeB/Fe2B + B2O3 cycles
+        delta_fH_298_15_kJ_mol_as_printed: -479.9
+        delta_fH_298_15_uncertainty_kJ_mol_as_printed: 25.7
+        T_K_as_printed: 298.15
+        source_panel_as_printed: Conclusions
+    - observation_id: jacobson_myers_2011_poster_b2o2_deltafH_298_title_strip
+      type: gibbs_table
+      locator:
+        pdf_page_index: 1
+        published_page: 1
+        note: Title-strip abstract paragraph ΔfH°(298.15 K) for B2O2(g)
+      T_range_K:
+      - 298.15
+      - 298.15
+      phase: gas
+      standard_state: ΔfH°(298.15 K) as printed for B2O2(g)
+      regime: kems_second_and_third_law_with_FeB_Fe2B_boron_activity_fix
+      units: kJ/mol as printed
+      uncertainty:
+        delta_fH_298_15_kJ_mol: 41.5
+        as_printed: -479.9 ± 41.5 kJ/mol
+        note: >-
+          Same central value as Conclusions but larger printed uncertainty on the
+          title strip; both retained, not averaged.
+      values:
+        quantity: enthalpy_of_formation_298_15K
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        delta_fH_298_15_kJ_mol_as_printed: -479.9
+        delta_fH_298_15_uncertainty_kJ_mol_as_printed: 41.5
+        T_K_as_printed: 298.15
+        source_panel_as_printed: title_strip_abstract
+        inconsistency_note: Conclusions print ±25.7 kJ/mol for the same -479.9 central value
+    context:
+    - observation_id: jacobson_myers_2011_poster_method_FeB_Fe2B
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        published_page: 1
+        note: Title strip + poster method panels
+      phase: B2O3_liquid_with_FeB_Fe2B_two_phase_boron_activity_fix
+      regime: knudsen_effusion_mass_spectrometry
+      units: as published
+      values:
+        quantity: KEMS_method_and_boron_activity_fix
+        method_class: method_only
+        reductant_problem_as_printed: >-
+          After heating, B(s) and B2O3(l) appear to separate; contact-area
+          variations led to inconsistent B2O2(g) vapor pressures
+        activity_fix_as_printed: two-phase mixture of FeB and Fe2B
+        mixture_ratio_as_printed: 1:1:1 FeB:Fe2B:B2O3
+        vaporization_routes_as_printed:
+        - B2O3(l) = B2O3(g)
+        - 2/3 B (or other reductant) + 2/3 B2O3(l) = B2O2(g)
+        working_reaction_as_printed: 4/3 FeB(s) + 2/3 B2O3(l) = B2O2(g) + 2/3 Fe2B(s)
+        instrument_as_printed: Knudsen Effusion Mass Spectrometer
+        ab_initio_as_printed: W1BD composite method; good agreement claimed with experiment
+        related_journal_as_printed: Jacobson, N. S.; Myers, D. L. J. Phys. Chem. 2011, in press
+        poster_id_as_printed: PS–00625–1011
+  B2O3:
+    observations:
+    - observation_id: jacobson_myers_2011_poster_b2o3_deltafH_298
+      type: gibbs_table
+      locator:
+        pdf_page_index: 1
+        published_page: 1
+        note: Title strip; Conclusions on p2 repeat the same -833.4 ± 13.1 kJ/mol
+      T_range_K:
+      - 298.15
+      - 298.15
+      phase: gas
+      standard_state: ΔfH°(298.15 K) as printed for B2O3(g)
+      regime: kems_second_and_third_law
+      units: kJ/mol as printed
+      uncertainty:
+        delta_fH_298_15_kJ_mol: 13.1
+        as_printed: -833.4 ± 13.1 kJ/mol
+      values:
+        quantity: enthalpy_of_formation_298_15K
+        method_class: measured_reduced
+        evidence_class: authors_own_KEMS
+        reaction_as_printed: B2O3(l) = B2O3(g); also 2B(s) + 3/2 O2(g) = B2O3(g)
+        delta_fH_298_15_kJ_mol_as_printed: -833.4
+        delta_fH_298_15_uncertainty_kJ_mol_as_printed: 13.1
+        T_K_as_printed: 298.15
+        consistent_on_title_strip_and_conclusions: true

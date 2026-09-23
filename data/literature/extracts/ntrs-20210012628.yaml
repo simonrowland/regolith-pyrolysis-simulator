@@ -1,0 +1,113 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20210012628
+source:
+  citation: >-
+    Olson, Aaron D.S. (2021), "Lunar Helium-3: Mining Concepts, Extraction
+    Research, and Potential ISRU Synergies", AIAA ASCEND 2021 Abstract, NASA
+    NTRS 20210012628 (AIAA ASCEND 2021 Abstract_ADSOlson_210329.pdf).
+  url: https://ntrs.nasa.gov/citations/20210012628
+  year: 2021
+  related_sources:
+  - document: ntrs-20210022801
+    relation: companion_ascend_full_paper
+    note: >-
+      NTRS 20210022801 is the 15-page ASCEND full paper of the same talk; the
+      residual-He ppb / percent-removed numbers are printed there, not in this
+      abstract.
+extraction:
+  method: >-
+    Corpus PDF
+    ferry-inbox/from-main-B3-20260923T024400Z/pdfs/ntrs-20210012628.pdf
+    (private; not committed). Born-digital 2-page ASCEND abstract. pdftotext
+    -layout of both pages; SHA-256 matches sidecar
+    237048ffbdfeec79a4aa9f863021ae1c516cf7ff373e964fd3b035758c3b8f76.
+    Abstract prints Mark-III design claims and a qualitative description of the
+    FTI/KSC SWIM→HEAT→vacuum-furnace/MS campaign, but no residual-He ppb or
+    percent-removed numbers. Those live only in companion ntrs-20210022801.
+    All content landed as context (d-032 Option A); no scored observations.
+    Kelvin companions from printed °C carry DERIVED stamps.
+  date: '2026-09-22'
+  worker: n8-ntrs-reports
+  provenance_path: data/literature/extracts/ntrs-20210012628.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: two-page AIAA ASCEND conference abstract
+  measured_direct_observations: 0
+  method_observations: 2
+  figure_only_observations: 1
+  absent_from_source:
+  - residual 4He concentrations (ppb) after implantation or after HEAT
+  - percent 4He removed / retained at stated flow rates
+  - numeric SWIM chamber pressure / cathode voltage for the campaign summarized here
+  - digitised Fig. 1 schematic dimensions
+  note: >-
+    Session note on p2 states this abstract is the 5th of a 5-paper Space
+    Exploration track session on ISRU; not a measurement.
+fidelity_samples:
+- species: He
+  observable: laboratory_conditions
+  observation_id: olson_2021_abstract_mark_iii_and_experiment_claims
+  field: HPHX_peak_regolith_C_as_printed
+  value: 700
+  locator:
+    pdf_page_index: 1
+    published_page: 1
+    note: HPHX designed to heat regolith up to 700°C
+- species: He
+  observable: laboratory_conditions
+  observation_id: olson_2021_abstract_mark_iii_and_experiment_claims
+  field: He3_captured_kg_per_year_at_20_ppb_as_printed
+  value: 66
+  locator:
+    pdf_page_index: 1
+    published_page: 1
+    note: 66 kg of 3He captured over one year at 20 ppb
+species:
+  He:
+    observations: []
+    context:
+    - observation_id: olson_2021_abstract_mark_iii_and_experiment_claims
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        published_page: 1
+        note: Abstract body design claims and experiment summary; Fig. 1 on p2
+      phase: Mark_III_design_and_FTI_KSC_helium_extraction_campaign_abstract
+      regime: abstract_only_design_and_method_prose
+      units: as published
+      values:
+        quantity: mark_iii_design_claims_and_qualitative_experiment_summary
+        method_class: method_only
+        evidence_class: authors_abstract_prose_not_a_measurement_table
+        excavate_tonnes_per_hr_as_printed: 1258
+        process_tonnes_per_hr_daytime_as_printed: 556
+        size_cut_um_as_printed: <100
+        solar_concentrator_MW_as_printed: 12
+        HPHX_peak_regolith_C_as_printed: 700
+        HPHX_peak_regolith_K_derived:
+          value: 973.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 700
+        HPHX_heat_recuperation_percent_as_printed: 85
+        He3_feed_concentration_ppb_as_printed: 20
+        He3_captured_kg_per_year_at_20_ppb_as_printed: 66
+        near_term_water_demo_tonnes_as_printed: 15
+        near_term_water_rich_regolith_percent_as_printed: 5
+        near_term_regolith_excavated_tonnes_approx_as_printed: 400
+        near_term_He3_demo_g_approx_as_printed: 6
+        experiment_collab_as_printed: FTI in collaboration with NASA KSC Swamp Works
+        experiment_simulant_as_printed: JSC-1A lunar regolith simulant
+        experiment_implant_species_as_printed: helium-4
+        experiment_batch_mass_kg_as_printed: 2
+        experiment_process_as_printed: flow through a heat pipe heat exchanger
+        experiment_assay_as_printed: vacuum furnace and mass spectrometer system
+        experiment_claim_as_printed: >-
+          first measurements and quantification of the amount of agitation loss
+          from helium implanted regolith simulant in a heat pipe heat exchanger;
+          agitation loss increased with regolith simulant flow rate
+        figure_1_as_printed: >-
+          Primary components of the experimental helium implantation (left) and
+          heat pipe heat exchanger extraction (right) systems (figure-only)
+        numeric_residual_He_results: absent_from_this_abstract_see_ntrs-20210022801
