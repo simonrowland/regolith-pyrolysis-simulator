@@ -1,0 +1,47 @@
+--- a/simulator/battery/migrate.py
++++ b/simulator/battery/migrate.py
+@@ -6210,6 +6210,20 @@
+                     # Interval/bound already present (e.g. printed log range
+                     # landed as pO2_Pa). Do not collapse it to one point.
+                     self._oxygen_pressure_conflict.add(experiment_id)
++                    self.result.registry_issues.append(
++                        ValidationIssue(
++                            path=(
++                                f"experiment[{experiment_id}].fO2_control"
++                                ".oxygen_partial_pressure_Pa"
++                            ),
++                            reason=RefusalReason.REFERENTIAL_INTEGRITY,
++                            detail=(
++                                "printed pO2 point conflicts with an existing "
++                                f"{previous.kind.value}; interval/bound kept, "
++                                "point not applied to the experiment"
++                            ),
++                        )
++                    )
+                     return
+         if existing is not None and existing != raw.point:
+             self._oxygen_pressure_conflict.add(experiment_id)
+@@ -6389,6 +6403,23 @@
+             experiment_id = self._registry_id(
+                 work.work_id, "experiment", local_id
+             )
++            # A "::" token is returned unchanged by _registry_id. Allow
++            # same-work qualified declarations; refuse declaring another
++            # work's experiment id (would steal the global key and bypass
++            # the equipment cross-work gate once work_id matches).
++            token = str(local_id or "").strip()
++            if "::" in token and not experiment_id.startswith(f"{work.work_id}::"):
++                self.result.registry_issues.append(
++                    ValidationIssue(
++                        path=f"experiments[{token}]",
++                        reason=RefusalReason.REFERENTIAL_INTEGRITY,
++                        detail=(
++                            f"extract declares experiment id {experiment_id!r} "
++                            f"outside work {work.work_id!r}; not registered"
++                        ),
++                    )
++                )
++                continue
+             raw_bench_id = raw.get("bench_id") or raw.get("bench")
+             bench_id = None
+             if raw_bench_id is not None:

@@ -1,0 +1,10 @@
+--- a/simulator/battery/score.py
++++ b/simulator/battery/score.py
+@@ -814,7 +814,7 @@ def _row_out_of_certified_band(kind: str, row: Mapping[str, object]) -> bool:
+     """Engine rows that are an out-of-band flag, not a new notice kind."""
+ 
+-    if kind in {"melts_domain_gate", "out_of_certified_band"}:
++    if kind in {"melts_domain_gate", "out_of_certified_band", "engine_commissioning"}:
+         return True
+     if str(row.get("authority") or "") == "extrapolated":
+         return True
