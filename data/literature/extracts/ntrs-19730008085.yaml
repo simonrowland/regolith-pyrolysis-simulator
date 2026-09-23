@@ -1,0 +1,368 @@
+schema_version: literature_extract.v1
+source_id: ntrs-19730008085
+source:
+  citation: >-
+    Manuel, O. K.; Srinivasan, B.; Hennecke, E. W.; Sinclair, D. E. (1972),
+    "Noble Gases in the Moon", Annual Report to NASA, NASA-NGR-26-003-057,
+    University of Missouri–Rolla, Department of Chemistry, September 1972.
+    NASA NTRS 19730008085.
+  doi: null
+  url: https://ntrs.nasa.gov/citations/19730008085
+  year: 1972
+extraction:
+  method: >-
+    AQ-acquired OA PDF ferry-inbox/acquired/ntrs-19730008085.pdf
+    (sha256 e4d432b54a2a59968e3626f091a976bd6a9c7e92123fbf9d025833551ea04b79;
+    84-page scanned annual report). pdftotext -layout + 200 dpi renders of
+    Appendix I Tables 1 and 4 (PDF pages 35 and 38). Transcribed He/Ne/Ar
+    stepwise-heating Table 1 and cumulative-release Table 4 for lunar fines
+    15601.64 only. Tables 2–3 (Kr, Xe) OCR columns are unreliable on this scan
+    — not ingested (typed_absence). Appendix II (15271.65) and Appendix III
+    (Nature 1972 Xe in carbonaceous chondrites manuscript) not extracted in
+    this lane. Air reference row in Table 1 kept as comparator context only.
+  date: '2026-09-23'
+  worker: n16-aq-oa-batch-b
+  provenance_path: data/literature/extracts/ntrs-19730008085.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: NASA annual report (stepwise-heating noble-gas MS of lunar fines)
+  scored_observations: 2
+  note: >-
+    STEP 0: no prior Manuel / NGR-26-003-057 / ntrs-19730008085 / 15601.64 extract.
+    Related noble-gas extracts (busemann-2024, okazaki-2022) are Ryugu/Bennu papers.
+typed_absences:
+- kind: ocr_unreliable
+  reason: not_published_reliably_in_this_scan
+  item: Appendix I Table 2 Krypton stepwise heating of 15601.64
+  locator: {pdf_page_index: 36, table: '2'}
+  note: Scan/OCR columns garbled for several temperature rows; not transcribed.
+- kind: ocr_unreliable
+  reason: not_published_reliably_in_this_scan
+  item: Appendix I Table 3 Xenon stepwise heating of 15601.64
+  locator: {pdf_page_index: 37, table: '3'}
+  note: Scan/OCR columns garbled for early temperature rows; not transcribed.
+- kind: out_of_lane
+  reason: not_this_batch
+  item: Appendix II tables for lunar fines 15271.65; Appendix III Nature 1972 Xe manuscript tables
+  locator: {note: Appendix II from PDF p55; Appendix III from PDF p69}
+  note: Deferred; Appendix I 15601.64 He/Ne/Ar + cumulative release is the primary landing.
+fidelity_samples:
+- species: lunar_fines_15601_64
+  observable: concentration_series
+  observation_id: manuel_1972_15601_64_he_ne_ar_stepwise
+  field: fidelity_pin_700C_He4_content_x1e-8_ccSTP_per_g
+  value: 450000
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Table 1 700C 4He content 450000 x10^-8 cc STP/g
+- species: lunar_fines_15601_64
+  observable: concentration_series
+  observation_id: manuel_1972_15601_64_cumulative_release
+  field: fidelity_pin_700C_He4_cumulative_pct
+  value: 79.388
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Table 4 700C 4He cumulative 79.388 pct
+species:
+  lunar_fines_15601_64:
+    observations:
+    - observation_id: manuel_1972_15601_64_he_ne_ar_stepwise
+      type: concentration_series
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      phase: lunar_soil_fines
+      regime: stepwise_heating_noble_gas_mass_spectrometry
+      units: >-
+        isotope ratios dimensionless as printed; gas content ×10^-8 cc STP/g as printed
+      values:
+        quantity: stepwise_He_Ne_Ar_isotope_ratios_and_contents
+        method_class: measured_direct
+        evidence_class: authors_own_mass_spectrometry
+        sample_id_as_printed: '15601.64'
+        sample_mass_g_as_printed: 0.9861
+        gas_content_unit_as_printed: '× 10^-8 cc STP/g'
+        fidelity_pin_700C_He4_content_x1e-8_ccSTP_per_g: 450000
+        extraction_hold_min_as_printed: 30
+        T_step_C_as_printed: 100
+        T_range_C_as_printed: '100–1500'
+        headers_as_published: >-
+          Temp (°C) | 4He/3He | 20Ne/22Ne | 21Ne/22Ne | 38Ar/36Ar | 40Ar/36Ar |
+          4He | 22Ne | 36Ar (gas content)
+        rows:
+        - T_C: 100
+          Ar40_over_Ar36_as_printed: '215.8 ± 0.8'
+          He4_content_x1e-8_ccSTP_per_g: 1.8
+          Ne22_content_x1e-8_ccSTP_per_g: 0.2
+          Ar36_content_x1e-8_ccSTP_per_g: 0.015
+        - T_C: 200
+          He4_over_He3_as_printed: '1922 ± 7'
+          Ne20_over_Ne22_as_printed: '12.66 ± 0.03'
+          Ne21_over_Ne22_as_printed: '0.0307 ± 0.0004'
+          Ar40_over_Ar36_as_printed: '29.8 ± 0.1'
+          He4_content_x1e-8_ccSTP_per_g: 38
+          Ne22_content_x1e-8_ccSTP_per_g: 0.69
+          Ar36_content_x1e-8_ccSTP_per_g: 0.6
+        - T_C: 300
+          He4_over_He3_as_printed: '1838 ± 14'
+          Ne20_over_Ne22_as_printed: '13.49 ± 0.02'
+          Ne21_over_Ne22_as_printed: '0.0329 ± 0.0003'
+          Ar38_over_Ar36_as_printed: '0.185 ± 0.002'
+          Ar40_over_Ar36_as_printed: '28.2 ± 0.2'
+          He4_content_x1e-8_ccSTP_per_g: 300
+          Ne22_content_x1e-8_ccSTP_per_g: 3.2
+          Ar36_content_x1e-8_ccSTP_per_g: 1.5
+        - T_C: 400
+          He4_over_He3_as_printed: '1864 ± 23'
+          Ne20_over_Ne22_as_printed: '13.48 ± 0.05'
+          Ne21_over_Ne22_as_printed: '0.0325 ± 0.0012'
+          Ar38_over_Ar36_as_printed: '0.186 ± 0.001'
+          Ar40_over_Ar36_as_printed: '33.1 ± 0.2'
+          He4_content_x1e-8_ccSTP_per_g: 400
+          Ne22_content_x1e-8_ccSTP_per_g: 4.0
+          Ar36_content_x1e-8_ccSTP_per_g: 3.9
+        - T_C: 500
+          He4_over_He3_as_printed: '1911 ± 9'
+          Ne20_over_Ne22_as_printed: '13.70 ± 0.02'
+          Ne21_over_Ne22_as_printed: '0.0336 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.183 ± 0.001'
+          Ar40_over_Ar36_as_printed: '31.8 ± 0.2'
+          He4_content_x1e-8_ccSTP_per_g: 870
+          Ne22_content_x1e-8_ccSTP_per_g: 7.0
+          Ar36_content_x1e-8_ccSTP_per_g: 6.4
+        - T_C: 600
+          He4_over_He3_as_printed: '2273 ± 3'
+          Ne20_over_Ne22_as_printed: '13.47 ± 0.02'
+          Ne21_over_Ne22_as_printed: '0.0337 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.181 ± 0.001'
+          Ar40_over_Ar36_as_printed: '26.7 ± 0.1'
+          He4_content_x1e-8_ccSTP_per_g: 6400
+          Ne22_content_x1e-8_ccSTP_per_g: 60
+          Ar36_content_x1e-8_ccSTP_per_g: 15
+        - T_C: 700
+          He4_over_He3_as_printed: '2280 ± 10'
+          Ne20_over_Ne22_as_printed: '13.01 ± 0.02'
+          Ne21_over_Ne22_as_printed: '0.0327 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.178 ± 0.003'
+          Ar40_over_Ar36_as_printed: '4.14 ± 0.05'
+          He4_content_x1e-8_ccSTP_per_g: 450000
+          Ne22_content_x1e-8_ccSTP_per_g: 15000
+          Ar36_content_x1e-8_ccSTP_per_g: 5200
+        - T_C: 800
+          He4_over_He3_as_printed: '2093 ± 16'
+          Ne20_over_Ne22_as_printed: '12.76 ± 0.03'
+          Ne21_over_Ne22_as_printed: '0.0320 ± 0.0002'
+          Ar38_over_Ar36_as_printed: '0.177 ± 0.001'
+          Ar40_over_Ar36_as_printed: '2.50 ± 0.01'
+          He4_content_x1e-8_ccSTP_per_g: 28000
+          Ne22_content_x1e-8_ccSTP_per_g: 640
+          Ar36_content_x1e-8_ccSTP_per_g: 1400
+        - T_C: 900
+          He4_over_He3_as_printed: '2215 ± 12'
+          Ne20_over_Ne22_as_printed: '12.80 ± 0.05'
+          Ne21_over_Ne22_as_printed: '0.0337 ± 0.0002'
+          Ar38_over_Ar36_as_printed: '0.185 ± 0.001'
+          Ar40_over_Ar36_as_printed: '0.764 ± 0.001'
+          He4_content_x1e-8_ccSTP_per_g: 54000
+          Ne22_content_x1e-8_ccSTP_per_g: 2500
+          Ar36_content_x1e-8_ccSTP_per_g: 25000
+        - T_C: 1000
+          He4_over_He3_as_printed: '2268 ± 5'
+          Ne20_over_Ne22_as_printed: '12.82 ± 0.02'
+          Ne21_over_Ne22_as_printed: '0.0372 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.186 ± 0.001'
+          Ar40_over_Ar36_as_printed: '0.558 ± 0.001'
+          He4_content_x1e-8_ccSTP_per_g: 34000
+          Ne22_content_x1e-8_ccSTP_per_g: 2700
+          Ar36_content_x1e-8_ccSTP_per_g: 28000
+        - T_C: 1100
+          He4_over_He3_as_printed: '1355 ± 3'
+          Ne20_over_Ne22_as_printed: '11.91 ± 0.01'
+          Ne21_over_Ne22_as_printed: '0.0656 ± 0.0002'
+          Ar38_over_Ar36_as_printed: '0.194 ± 0.001'
+          Ar40_over_Ar36_as_printed: '0.835 ± 0.005'
+          He4_content_x1e-8_ccSTP_per_g: 260
+          Ne22_content_x1e-8_ccSTP_per_g: 260
+          Ar36_content_x1e-8_ccSTP_per_g: 2300
+        - T_C: 1200
+          He4_over_He3_as_printed: '2108 ± 23'
+          Ne20_over_Ne22_as_printed: '12.26 ± 0.01'
+          Ne21_over_Ne22_as_printed: '0.0557 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.204 ± 0.002'
+          Ar40_over_Ar36_as_printed: '0.811 ± 0.007'
+          He4_content_x1e-8_ccSTP_per_g: 950
+          Ne22_content_x1e-8_ccSTP_per_g: 270
+          Ar36_content_x1e-8_ccSTP_per_g: 1800
+        - T_C: 1300
+          He4_over_He3_as_printed: '1928 ± 27'
+          Ne20_over_Ne22_as_printed: '12.13 ± 0.01'
+          Ne21_over_Ne22_as_printed: '0.0673 ± 0.0003'
+          Ar38_over_Ar36_as_printed: '0.254 ± 0.002'
+          Ar40_over_Ar36_as_printed: '0.855 ± 0.001'
+          He4_content_x1e-8_ccSTP_per_g: 430
+          Ne22_content_x1e-8_ccSTP_per_g: 84
+          Ar36_content_x1e-8_ccSTP_per_g: 580
+        - T_C: 1400
+          He4_over_He3_as_printed: '2208 ± 18'
+          Ne20_over_Ne22_as_printed: '12.41 ± 0.01'
+          Ne21_over_Ne22_as_printed: '0.0461 ± 0.0001'
+          Ar38_over_Ar36_as_printed: '0.196 ± 0.001'
+          Ar40_over_Ar36_as_printed: '0.711 ± 0.001'
+          He4_content_x1e-8_ccSTP_per_g: 1300
+          Ne22_content_x1e-8_ccSTP_per_g: 290
+          Ar36_content_x1e-8_ccSTP_per_g: 3100
+        - T_C: 1500
+          He4_over_He3_as_printed: '2169 ± 22'
+          Ne20_over_Ne22_as_printed: '12.66 ± 0.08'
+          Ne21_over_Ne22_as_printed: '0.0434 ± 0.0004'
+          Ar38_over_Ar36_as_printed: '0.194 ± 0.001'
+          Ar40_over_Ar36_as_printed: '0.700 ± 0.001'
+          He4_content_x1e-8_ccSTP_per_g: 130
+          Ne22_content_x1e-8_ccSTP_per_g: 65
+          Ar36_content_x1e-8_ccSTP_per_g: 700
+        air_comparator_row_as_printed:
+          He4_over_He3: '7,700,000'
+          Ne20_over_Ne22: 9.81
+          Ne21_over_Ne22: 0.0290
+          Ar38_over_Ar36: 0.187
+          Ar40_over_Ar36: 296
+          note: Air reference ratios only; no gas-content cells
+      uncertainty:
+        note: >-
+          Per-row ± as printed on isotope ratios; gas-content cells printed without
+          explicit ± in Table 1.
+    - observation_id: manuel_1972_15601_64_cumulative_release
+      type: concentration_series
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      phase: lunar_soil_fines
+      regime: stepwise_heating_noble_gas_mass_spectrometry
+      units: cumulative percent of total released inventory as printed
+      values:
+        quantity: cumulative_percent_noble_gas_release_vs_T
+        method_class: measured_reduced
+        evidence_class: authors_own_mass_spectrometry
+        sample_id_as_printed: '15601.64'
+        headers_as_published: 'Temp (°C) | 4He | 22Ne | 36Ar | 84Kr | 132Xe'
+        fidelity_pin_700C_He4_cumulative_pct: 79.388
+        rows:
+        - T_C: 100
+          He4_cumulative_pct: 0.00031
+          Ne22_cumulative_pct: 0.0009
+          Ar36_cumulative_pct: 2.1e-05
+          Kr84_cumulative_pct: 0.0057
+          Xe132_cumulative_pct: 0.0094
+        - T_C: 200
+          He4_cumulative_pct: 0.0007
+          Ne22_cumulative_pct: 0.004
+          Ar36_cumulative_pct: 0.0009
+          Kr84_cumulative_pct: 0.026
+          Xe132_cumulative_pct: 0.085
+        - T_C: 300
+          He4_cumulative_pct: 0.059
+          Ne22_cumulative_pct: 0.018
+          Ar36_cumulative_pct: 0.003
+          Kr84_cumulative_pct: 0.111
+          Xe132_cumulative_pct: 0.157
+        - T_C: 400
+          He4_cumulative_pct: 0.128
+          Ne22_cumulative_pct: 0.036
+          Ar36_cumulative_pct: 0.0088
+          Kr84_cumulative_pct: 0.288
+          Xe132_cumulative_pct: 0.294
+        - T_C: 500
+          He4_cumulative_pct: 0.278
+          Ne22_cumulative_pct: 0.069
+          Ar36_cumulative_pct: 0.019
+          Kr84_cumulative_pct: 0.735
+          Xe132_cumulative_pct: 0.393
+        - T_C: 600
+          He4_cumulative_pct: 1.388
+          Ne22_cumulative_pct: 0.338
+          Ar36_cumulative_pct: 0.04
+          Kr84_cumulative_pct: 1.783
+          Xe132_cumulative_pct: 0.831
+        - T_C: 700
+          He4_cumulative_pct: 79.388
+          Ne22_cumulative_pct: 69.521
+          Ar36_cumulative_pct: 7.621
+          Kr84_cumulative_pct: 5.114
+          Xe132_cumulative_pct: 1.763
+        - T_C: 800
+          He4_cumulative_pct: 84.208
+          Ne22_cumulative_pct: 72.412
+          Ar36_cumulative_pct: 9.684
+          Kr84_cumulative_pct: 5.566
+          Xe132_cumulative_pct: 2.395
+        - T_C: 900
+          He4_cumulative_pct: 93.618
+          Ne22_cumulative_pct: 83.77
+          Ar36_cumulative_pct: 46.876
+          Kr84_cumulative_pct: 15.84
+          Xe132_cumulative_pct: 6.47
+        - T_C: 1000
+          He4_cumulative_pct: 99.488
+          Ne22_cumulative_pct: 95.835
+          Ar36_cumulative_pct: 87.585
+          Kr84_cumulative_pct: 48.363
+          Xe132_cumulative_pct: 29.992
+        - T_C: 1100
+          He4_cumulative_pct: 99.534
+          Ne22_cumulative_pct: 96.983
+          Ar36_cumulative_pct: 90.934
+          Kr84_cumulative_pct: 63.179
+          Xe132_cumulative_pct: 51.24
+        - T_C: 1200
+          He4_cumulative_pct: 99.698
+          Ne22_cumulative_pct: 98.138
+          Ar36_cumulative_pct: 93.533
+          Kr84_cumulative_pct: 73.67
+          Xe132_cumulative_pct: 67.958
+        - T_C: 1300
+          He4_cumulative_pct: 99.772
+          Ne22_cumulative_pct: 98.516
+          Ar36_cumulative_pct: 94.482
+          Kr84_cumulative_pct: 78.474
+          Xe132_cumulative_pct: 73.487
+        - T_C: 1400
+          He4_cumulative_pct: 99.993
+          Ne22_cumulative_pct: 99.809
+          Ar36_cumulative_pct: 98.981
+          Kr84_cumulative_pct: 95.893
+          Xe132_cumulative_pct: 94.318
+        - T_C: 1500
+          He4_cumulative_pct: 100
+          Ne22_cumulative_pct: 100
+          Ar36_cumulative_pct: 100
+          Kr84_cumulative_pct: 100
+          Xe132_cumulative_pct: 100
+      uncertainty:
+        note: none printed on cumulative-percent cells
+    context:
+    - observation_id: manuel_1972_15601_64_extraction_method
+      type: method
+      locator:
+        pdf_page_index: 8
+        section: Appendix I experimental
+        note: sample mass and stepwise schedule from Appendix I methods prose
+      phase: lunar_soil_fines
+      regime: quartz_sidearm_then_drop_into_hot_crucible
+      units: as printed
+      values:
+        quantity: stepwise_heating_extraction_method
+        method_class: method_only
+        sample_id_as_printed: '15601.64'
+        sample_mass_g: 0.9861
+        T_start_C: 100
+        T_end_C: 1500
+        T_step_C: 100
+        hold_duration_min: 30
+        cleanup_as_printed: Ti getters (approx. 550°C and 850°C stages as printed)
+      uncertainty:
+        note: none printed beyond stated setpoints

@@ -1,0 +1,150 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2024-bennu-pyrolysis-vandam
+source:
+  citation: >-
+    Mojarro, A.; Aponte, J. C.; Dworkin, J. P.; Glavin, D. P.; Elsila, J. E.;
+    Connolly Jr, H. C.; Lauretta, D. S. (2024), "Early OSIRIS-REx mission results
+    from standard and wet chemistry pyrolysis of samples returned from asteroid
+    Bennu", 55th Lunar and Planetary Science Conference, abstract 1219.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/lpsc2024/pdf/1219.pdf
+  year: 2024
+  conference: 55th Lunar and Planetary Science Conference
+extraction:
+  method: >-
+    AQ-acquired OA PDF ferry-inbox/acquired/lpsc-2024-bennu-pyrolysis-vandam.pdf
+    (sha256 9444343099d69f6e02b8671e679d20a118e59b03678bcd4d5fe727cbc008d69b;
+    1-page LPSC abstract; PDF internal title 1219.PDF). pdftotext -layout + 200 dpi
+    render. Corpus stem retains historical "vandam" label; PDF identity is Mojarro
+    et al. LPSC 2024 #1219 (no Van Dam author). Printed method/quantitation numbers
+    only; compound detection lists kept as characterization context. No scored
+    observation type fits qualitative PAH/amino-acid detection lists.
+  date: '2026-09-23'
+  worker: n16-aq-oa-batch-b
+  provenance_path: data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 1-page LPSC conference abstract (py-GC-QqQ-MS of Bennu organics)
+  scored_observations: 0
+  note: >-
+    STEP 0 identity: PDF p1 authors Mojarro/Aponte/Dworkin/Glavin/Elsila/Connolly/Lauretta;
+    abstract 1219; samples OREX-500002-0 (QL fines) and OREX-800031-0 (TAGSAM aggregate).
+    Filename stem "vandam" is a corpus mislabel — not a different paper. No prior
+    Mojarro / LPSC-2024-1219 / OREX-500002 extract under another source_id.
+typed_absences: []
+fidelity_samples:
+- species: Bennu_returned_organics
+  observable: laboratory_conditions
+  observation_id: mojarro_2024_lpsc1219_standard_pyrolysis_T
+  field: pyrolysis_T_C
+  value: 600
+  locator:
+    pdf_page_index: 1
+    section: Samples
+    note: "Two ~1 mg subsamples … for standard pyrolysis at 600°C"
+- species: Bennu_returned_organics
+  observable: laboratory_conditions
+  observation_id: mojarro_2024_lpsc1219_wet_chemistry_pyrolysis_T
+  field: wet_chemistry_pyrolysis_T_C
+  value: 250
+  locator:
+    pdf_page_index: 1
+    section: Samples
+    note: "wet chemistry pyrolysis at 250°C in the presence of a silylation reagent"
+species:
+  Bennu_returned_organics:
+    observations: []
+    context:
+    - observation_id: mojarro_2024_lpsc1219_samples_and_masses
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Samples
+      phase: Bennu_returned_sample_fines_and_aggregate
+      regime: OSIRIS-REx_coordinated_organics_pyrolysis
+      units: as printed
+      values:
+        quantity: sample_ids_masses_and_pyrolysis_modes
+        method_class: method_only
+        quick_look_fines_sample_id_as_printed: OREX-500002-0
+        tagsam_aggregate_sample_id_as_printed: OREX-800031-0
+        subsample_mass_mg_approx_as_printed: '~1'
+        subsamples_per_parent_as_printed: 2
+        standard_pyrolysis_T_C: 600
+        standard_pyrolysis_target_as_printed: insoluble organic matter
+        wet_chemistry_pyrolysis_T_C: 250
+        wet_chemistry_target_as_printed: soluble organic matter via silylation
+        parallel_reference_meteorite_as_printed: Murchison carbonaceous chondrite
+        blanks_as_printed: procedural and reagent blanks
+      uncertainty:
+        note: '~1 mg printed as approximate; no other mass uncertainty printed'
+    - observation_id: mojarro_2024_lpsc1219_standard_pyrolysis_T
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: Samples
+      phase: powdered_Bennu_subsample
+      regime: CDS_6200_standard_pyrolysis
+      units: deg_C as printed
+      values:
+        quantity: standard_pyrolysis_setpoint
+        method_class: method_only
+        pyrolysis_T_C: 600
+      uncertainty:
+        note: none printed
+    - observation_id: mojarro_2024_lpsc1219_wet_chemistry_pyrolysis_T
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: Samples
+      phase: powdered_Bennu_subsample_with_MTBSTFA
+      regime: wet_chemistry_silylation_pyrolysis
+      units: deg_C as printed
+      values:
+        quantity: wet_chemistry_pyrolysis_setpoint
+        method_class: method_only
+        wet_chemistry_pyrolysis_T_C: 250
+      uncertainty:
+        note: none printed
+    - observation_id: mojarro_2024_lpsc1219_instrument_and_derivatization
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Methods
+      phase: Bennu_organics_py_GC_QqQ_MS
+      regime: CDS_6200_TRACE1600_TSQ9610
+      units: as printed
+      values:
+        quantity: pyrolysis_GC_MS_and_silylation_parameters
+        method_class: method_only
+        pyroprobe_as_printed: CDS 6200
+        gc_as_printed: Thermo TRACE 1600 GC with 30 m Rtx-5ms column
+        ms_as_printed: TSQ 9610
+        ms_modes_as_printed: simultaneous MRM and full scan (50-500 m/z)
+        silylation_reagent_as_printed: MTBSTFA with DMF (4:1, v/v)
+        silylation_volume_uL: 5
+        incubation_T_C: 85
+        incubation_duration_hr: 1
+        incubation_vessel_as_printed: capped 2 mL vial on heating block
+      uncertainty:
+        note: none printed beyond stated setpoints
+    - observation_id: mojarro_2024_lpsc1219_ql_vs_murchison_quantitation
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+      phase: Bennu_QL_fines_vs_Murchison
+      regime: wet_chemistry_pyrolysis_MRM_quantitation
+      units: relative quantitation signal as printed
+      values:
+        quantity: QL_alanine_glycine_signal_vs_Murchison
+        method_class: measured_reduced
+        evidence_class: authors_own_py_GC_QqQ_MS
+        ql_alanine_and_glycine_signal_vs_murchison_as_printed: "more than 100x"
+        tagsam_vs_murchison_as_printed: comparable or slightly below
+        note: >-
+          Qualitative PAH / amino-acid / N-heterocycle detection lists printed
+          without absolute concentrations; not scored as concentration_series.
+      uncertainty:
+        note: 'more than 100x bound as printed; no absolute concentration printed'
