@@ -1,20 +1,18 @@
 schema_version: literature_extract.v1
 source_id: mendybaev-2017-fun-cai-lab-evaporation
 source:
-  citation: "Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin,
-    A. V. & Wadhwa, M. (2017), Thermal and chemical evolution in the early Solar System as recorded by
-    FUN CAIs: Part II - Laboratory evaporation of potential CMS-1 precursor material, Geochim. Cosmochim.
-    Acta 201:49-64, DOI 10.1016/j.gca.2016.08.034"
+  citation: 'Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin, A. V. & Wadhwa, M.
+    (2017), Thermal and chemical evolution in the early Solar System as recorded by FUN CAIs: Part II - Laboratory evaporation
+    of potential CMS-1 precursor material, Geochim. Cosmochim. Acta 201:49-64, DOI 10.1016/j.gca.2016.08.034'
   doi: 10.1016/j.gca.2016.08.034
   url: https://doi.org/10.1016/j.gca.2016.08.034
   year: 2017
 extraction:
-  method: Corpus PDF raw/mendybaev-2017-fun-cai-lab-evaporation/mendybaev-2017-fun-cai-lab-evaporation.pdf
-    is the submitted/revised manuscript (59 pages; March 28 2016 / July 25 2016), not the typeset GCA 201:49-64
-    article. Clean text layer. pdftotext -layout plus 300 dpi pdftoppm of PDF page 39 used to map Table 1
-    and Table 2 column headers (headers wrap across two printed lines). Experimental-section apparatus
-    transcribed from PDF pages 8–9. No OCR. No Hashimoto 1990 furnace dimensions copied; this paper cites
-    that work for furnace details and does not restate them.
+  method: Corpus PDF raw/mendybaev-2017-fun-cai-lab-evaporation/mendybaev-2017-fun-cai-lab-evaporation.pdf is the submitted/revised
+    manuscript (59 pages; March 28 2016 / July 25 2016), not the typeset GCA 201:49-64 article. Clean text layer. pdftotext
+    -layout plus 300 dpi pdftoppm of PDF page 39 used to map Table 1 and Table 2 column headers (headers wrap across two printed
+    lines). Experimental-section apparatus transcribed from PDF pages 8–9. No OCR. No Hashimoto 1990 furnace dimensions copied;
+    this paper cites that work for furnace details and does not restate them.
   date: '2026-09-19'
   worker: extract-mendybaev-2017
 review_status: draft
@@ -24,88 +22,955 @@ benches:
     basis: cited_by_author
     ref:
       work_id: null
-      cited_as: 'Hashimoto (1990)'
-      for_parameters: [geometry]
-      locator: {section: '3.1', pdf_page_index: 8, note: 'Furnace details deferred to Hashimoto (1990)'}
-  apparatus_family:
-    state: {tag: value, value: High-temperature high-vacuum furnace}
-    locator: &mendy_apparatus {section: '3.1', pdf_page_index: 8, note: 'University of Chicago high-temperature high-vacuum furnace'}
-  method:
-    state: {tag: value, value: Vacuum free evaporation}
-    locator: *mendy_apparatus
-  geometry:
-    state: {tag: unknown, reason: in_cited_source}
-    locator: {section: '3.1', pdf_page_index: 8, note: 'Furnace details deferred to Hashimoto (1990)'}
-  heating_method:
-    state: {tag: value, value: Furnace heating elements}
-    locator: {section: '3.1', pdf_page_index: 8, note: 'Experiment ended by cutting power to the heating elements'}
-  detector:
-    state: {tag: value, value: 'JEOL JSM-5800LV SEM with Oxford/Link ISIS-300 EDX; LA-MC-ICPMS'}
-    locator: {section: '3.2', pdf_page_index: 9, note: 'Residue chemical and isotopic analyses'}
-experiments:
-- experiment_id: func-evaporation-series
-  bench_id: chicago-high-vacuum-furnace
-  method: vacuum_pyrolysis
-  locator: {section: '3.1', pdf_page_index: 8, note: 'Individual evaporation experiments'}
-  sample:
-    mass_kg:
-      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000040'}}
-      locator: {section: '3.1', pdf_page_index: 8, note: '25-40 mg; unit conversion only'}
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '37.9'
-          Al2O3: '11.6'
-          SiO2: '42.9'
-          CaO: '7.6'
+      cited_as: Hashimoto (1990)
+      for_parameters:
+      - geometry
       locator:
         section: '3.1'
         pdf_page_index: 8
-        table: '1'
-        note: 'Starting FUNC row; oxide wt% as printed in §3.1 prose and Table 1 FUNC starting; label 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2, 7.6 wt% CaO retained in note; residue rows not used as start'
+        note: Furnace details deferred to Hashimoto (1990)
+  apparatus_family:
+    state:
+      tag: value
+      value: High-temperature high-vacuum furnace
+    locator: &id001
+      section: '3.1'
+      pdf_page_index: 8
+      note: University of Chicago high-temperature high-vacuum furnace
+  method:
+    state:
+      tag: value
+      value: Vacuum free evaporation
+    locator: *id001
+  geometry:
+    state:
+      tag: unknown
+      reason: in_cited_source
+    locator:
+      section: '3.1'
+      pdf_page_index: 8
+      note: Furnace details deferred to Hashimoto (1990)
+  heating_method:
+    state:
+      tag: value
+      value: Furnace heating elements
+    locator:
+      section: '3.1'
+      pdf_page_index: 8
+      note: Experiment ended by cutting power to the heating elements
+  detector:
+    state:
+      tag: value
+      value: JEOL JSM-5800LV SEM with Oxford/Link ISIS-300 EDX; LA-MC-ICPMS
+    locator:
+      section: '3.2'
+      pdf_page_index: 9
+      note: Residue chemical and isotopic analyses
+experiments:
+- experiment_id: func-5
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id002
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.85e-05'
+      locator: *id002
+    printed_composition:
+      state:
+        tag: value
+        value: &id011
+          MgO: 34.09
+          Al2O3: 13.93
+          SiO2: 42.93
+          CaO: 9.05
+      locator: *id002
     form:
-      state: {tag: value, value: 'Mixture loaded onto 2.5 mm diameter iridium wire loops'}
-      locator: {section: '3.1', pdf_page_index: 8}
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
     pretreatment:
-      state: {tag: value, value: 'Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2'}
-      locator: {section: '3.1', pdf_page_index: 8}
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
   apparatus:
     geometry:
       cell_or_crucible_material:
-        state: {tag: not_applicable, reason: not_applicable}
-        locator: {section: '3.1', pdf_page_index: 8, note: 'Sample was on an iridium wire loop, not in a cell or crucible during evaporation'}
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.0001'}}
-      locator: {section: '3.1', pdf_page_index: 8, note: 'Vacuum <10^-9 bars during evaporation; unit conversion only'}
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
     sweep_gas:
-      state: {tag: not_applicable, reason: not_applicable}
-      locator: {section: '3.1', pdf_page_index: 8, note: Vacuum evaporation}
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
     regime:
-      regime_class: {tag: unknown, reason: not_published}
+      regime_class:
+        tag: unknown
+        reason: not_published
     pumping:
       base_pressure_Pa:
-        state: {tag: value, value: {kind: point, point: '0.01', approximate: true}}
-        locator: {section: '3.1', pdf_page_index: 8, note: 'Pumped down to about 10^-7 bars before heating; unit conversion only'}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
   conditions:
     temperature_K:
-      state: {tag: value, value: '2173.15'}
-      locator: {section: '3.1', pdf_page_index: 8, note: '1900 C; unit conversion only'}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id002
   thermal_schedule:
-    method:
-      state: {tag: value, value: '1400 C at 20 C/min, about 20 min degas; then 1900 C at 40 C/min'}
-      locator: {section: '3.1', pdf_page_index: 8}
     total_duration_s:
-      state: {tag: unknown, reason: not_published}
-      locator: {section: '3.1', pdf_page_index: 8, note: '0-55 min applies only to the 1900 C evaporation interval, not a total run duration'}
-    cooling_or_quench:
-      state: {tag: value, value: Cutting power to heating elements}
-      locator: {section: '3.1', pdf_page_index: 8}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0'
+      locator: *id002
+- experiment_id: func-10
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id003
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-10
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.5e-05'
+      locator: *id003
+    printed_composition:
+      state:
+        tag: value
+        value: &id012
+          MgO: 33.53
+          Al2O3: 15.2
+          SiO2: 40.74
+          CaO: 10.48
+      locator: *id003
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id003
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300.0'
+      locator: *id003
+- experiment_id: func-1
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id004
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-1
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.34e-05'
+      locator: *id004
+    printed_composition:
+      state:
+        tag: value
+        value: &id013
+          MgO: 32.12
+          Al2O3: 18.16
+          SiO2: 37.16
+          CaO: 12.52
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id004
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '900.0'
+      locator: *id004
+- experiment_id: func-9
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id005
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-9
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.76e-05'
+      locator: *id005
+    printed_composition:
+      state:
+        tag: value
+        value: &id014
+          MgO: 29.92
+          Al2O3: 19.78
+          SiO2: 35.54
+          CaO: 14.77
+      locator: *id005
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id005
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1200.0'
+      locator: *id005
+- experiment_id: func-3
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id006
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-3
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.94e-05'
+      locator: *id006
+    printed_composition:
+      state:
+        tag: value
+        value: &id015
+          MgO: 27.36
+          Al2O3: 21.69
+          SiO2: 34.24
+          CaO: 16.72
+      locator: *id006
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id006
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800.0'
+      locator: *id006
+- experiment_id: func-7
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id007
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-7
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.42e-05'
+      locator: *id007
+    printed_composition:
+      state:
+        tag: value
+        value: &id016
+          MgO: 23.87
+          Al2O3: 25.3
+          SiO2: 31.63
+          CaO: 19.22
+      locator: *id007
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id007
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2100.0'
+      locator: *id007
+- experiment_id: func-8
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id008
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-8
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.61e-05'
+      locator: *id008
+    printed_composition:
+      state:
+        tag: value
+        value: &id017
+          MgO: 19.08
+          Al2O3: 31.35
+          SiO2: 28.21
+          CaO: 21.37
+      locator: *id008
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id008
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2400.0'
+      locator: *id008
+- experiment_id: func-4
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id009
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-4
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.4e-05'
+      locator: *id009
+    printed_composition:
+      state:
+        tag: value
+        value: &id018
+          MgO: 16.51
+          Al2O3: 32.15
+          SiO2: 27.32
+          CaO: 24.03
+      locator: *id009
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id009
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2700.0'
+      locator: *id009
+- experiment_id: func-6
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: &id010
+    table: '1'
+    pdf_page_index: 39
+    paragraph: FUNC-6
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.9e-05'
+      locator: *id010
+    printed_composition:
+      state:
+        tag: value
+        value: &id019
+          MgO: 10.95
+          Al2O3: 40.16
+          SiO2: 22.16
+          CaO: 26.75
+      locator: *id010
+    form:
+      state:
+        tag: value
+        value: Mixture loaded onto 2.5 mm diameter iridium wire loops
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+    pretreatment:
+      state:
+        tag: value
+        value: Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Sample was on an iridium wire loop, not in a cell or crucible during evaporation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum <10^-9 bars during evaporation; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        note: Vacuum evaporation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: true
+        locator:
+          section: '3.1'
+          pdf_page_index: 8
+          note: Pumped down to about 10^-7 bars before heating; unit conversion only
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+      locator: *id010
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3300.0'
+      locator: *id010
 fidelity_samples:
 - species: FUNC
   observable: rate_series
-  observation_id: mendybaev_2017_func_table1_mass_loss
+  observation_id: mendybaev_2017_func_table1_mass_loss::func-5
   field: FUNC5_mass_loss_pct
   value: 4.7
   locator:
@@ -115,7 +980,7 @@ fidelity_samples:
     note: Table 1 FUNC-5 weight loss 4.7 %
 - species: FUNC
   observable: rate_series
-  observation_id: mendybaev_2017_func_table1_mass_loss
+  observation_id: mendybaev_2017_func_table1_mass_loss::func-6
   field: FUNC6_mass_loss_pct
   value: 69.3
   locator:
@@ -125,7 +990,7 @@ fidelity_samples:
     note: Table 1 FUNC-6 weight loss 69.3 %
 - species: FUNC
   observable: rate_series
-  observation_id: mendybaev_2017_func_table1_mass_loss
+  observation_id: mendybaev_2017_func_shared_starting_and_standard
   field: starting_glass_wt_pct
   value:
     MgO: 37.9
@@ -139,7 +1004,7 @@ fidelity_samples:
     note: Table 1 FUNC starting oxide wt% (no 2-sigma printed)
 - species: FUNC
   observable: rate_series
-  observation_id: mendybaev_2017_func_table1_mass_loss
+  observation_id: mendybaev_2017_func_shared_starting_and_standard
   field: B133R10_MgO_wt_pct
   value: 11.48
   locator:
@@ -150,33 +1015,28 @@ fidelity_samples:
 species:
   FUNC:
     observations:
-    - observation_id: mendybaev_2017_func_table1_mass_loss
-      experiment: func-evaporation-series
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-5
+      experiment: func-5
       type: rate_series
       class_tag: measured
-      locator:
-        table: '1'
-        pdf_page_index: 39
-        note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
-      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions
-        of starting materials and FUNC evaporation residues.
+      locator: *id002
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
       T_C: 1900.0
       phase: silicate_melt_FUNC_forsterite_rich
       condensed_form:
         state: liquid_melt
         metastable: false
         basis: explicit_author
-        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C)
-          as printed. Forsterite in quenched residues is from slow quench (~1000 C/min), not crystallization
-          during the 1900 C hold.
-      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a
-        Knudsen cell)
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
       regime: langmuir_free_evaporation
       units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
       uncertainty:
         convention: 2σ
-        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma.
-          B133R-10 2-sigma is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
         locator:
           table: '1'
           pdf_page_index: 39
@@ -188,13 +1048,12 @@ species:
         FUNC6_mass_loss_pct: 69.3
         B133R10_MgO_wt_pct: 11.48
         T_C: 1900.0
-        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample
-          was evaporating at 1900 C (Table 1 footnote).
-        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct,
-          MgO_2sigma_wt_pct, Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct,
-          CaO_2sigma_wt_pct, SiO2_over_Al2O3, MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil,
-          delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil, delta30Si_2sigma_permil, delta29Si_permil,
-          delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
         starting_glass_wt_pct:
           MgO: 37.9
           Al2O3: 11.6
@@ -204,24 +1063,23 @@ species:
           table: '1'
           pdf_page_index: 39
           paragraph: FUNC starting
-        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2
-          and 7.6 wt% CaO was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
         starting_glass_section_locator:
           section: 3.1
           pdf_page_index: 8
           paragraph: starting material containing 37.9 wt% MgO
         starting_glass_weight_loss_pct: 0.0
-        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe
-          row. That row has no run duration and no initial/final weights. It is the unevaporated mixture,
-          not a furnace run. The zero-time run is FUNC-5 (4.7 % loss during ramp to 1900 C).
-        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900
-          C; run duration at 1900 C is zero minutes). About 5% weight loss occurred even in the zero-time
-          experiment. The authors use the zero-time residue as the effective starting composition for Table
-          2 remaining-fraction calculations.
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
         isotopic_standard_B133R10:
-          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et
-            al. 2007; Janney et al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with
-            2-sigma and delta values of 0.0 as the standard. No run duration, masses, or weight loss.
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
@@ -229,7 +1087,7 @@ species:
           composition_wt_pct:
             MgO: 11.48
             Al2O3: 19.39
-            SiO2: 46.00
+            SiO2: 46.0
             CaO: 23.12
           composition_wt_pct_2sigma:
             MgO: 0.09
@@ -253,8 +1111,8 @@ species:
             SiO2_over_Al2O3: blank_cell
             MgO_over_Al2O3: blank_cell
         sample_load_mg_range_as_printed: 25–40 mg
-        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run
-          initial/final weights are the Table 1 gram columns.
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
         sample_load_locator:
           section: 3.1
           pdf_page_index: 9
@@ -274,7 +1132,7 @@ species:
           pdf_page_index: 12
           paragraph: relatively slow quenching (~1000 C/min)
         vacuum_as_printed:
-          evaporation_condition: "<10^{-9} bars"
+          evaporation_condition: <10^{-9} bars
           evaporation_condition_kind: upper_bound
           pump_down: about 10^{-7} bars
           pump_down_kind: approximate
@@ -292,9 +1150,9 @@ species:
         kinetic_isotopic_fractionation_factors:
           method_class: model_derived
           admission_status: model_output_not_measurement
-          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors
-            α2,1 (vapor/melt isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties
-            as printed. The melilite-field oxygen value is printed with a tilde (approximate), not a 2-sigma.
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
           alpha_25_24: 0.98383
           alpha_25_24_2sigma: 0.00033
           alpha_25_24_locator:
@@ -302,7 +1160,7 @@ species:
             pdf_page_index: 17
             paragraph: α25,24 = 0.98383±0.00033
           alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
-          alpha_29_28: 0.99010
+          alpha_29_28: 0.9901
           alpha_29_28_2sigma: 0.00038
           alpha_29_28_locator:
             figure: '7'
@@ -325,8 +1183,8 @@ species:
           value: 2.1
           method_class: model_derived
           admission_status: model_output_not_measurement
-          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient
-            from this paper.
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
           locator:
             figure: '3'
             pdf_page_index: 21
@@ -335,8 +1193,8 @@ species:
         - orifice_area
         - clausing_factor
         - numeric_sample_surface_area_series
-        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated).
-          Not a Knudsen cell. Per-run melt free-surface area is not tabulated.
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
         looked_for_not_found:
         - numeric_sample_surface_area_m2
         - temperature_sensor_or_thermocouple_type
@@ -345,24 +1203,17 @@ species:
         - clausing_factor
         series:
         - sample: FUNC-5
-          locator:
-            table: '1'
-            pdf_page_index: 39
-            paragraph: FUNC-5
-          quote: FUNC-5 | 0 | 0.0285 | 0.0272 | 4.7 | 34.09 ± 0.10 | 13.93 ± 0.08 | 42.93 ± 0.05 | 9.05
-            ± 0.05 | 3.08 | 2.45 | 0.9 ± 0.6 | 0.5 ± 0.3 | -1.4 ± 0.2 | -0.6 ± 0.1 | 12.7 ± 0.1
+          locator: *id002
+          quote: FUNC-5 | 0 | 0.0285 | 0.0272 | 4.7 | 34.09 ± 0.10 | 13.93 ± 0.08 | 42.93 ± 0.05 | 9.05 ± 0.05 | 3.08 | 2.45
+            | 0.9 ± 0.6 | 0.5 ± 0.3 | -1.4 ± 0.2 | -0.6 ± 0.1 | 12.7 ± 0.1
           T_C: 1900.0
           time_min: 0.0
           initial_mass_g: 0.0285
           final_weight_g: 0.0272
           mass_loss_pct: 4.7
-          composition_wt_pct:
-            MgO: 34.09
-            Al2O3: 13.93
-            SiO2: 42.93
-            CaO: 9.05
+          composition_wt_pct: *id011
           composition_wt_pct_2sigma:
-            MgO: 0.10
+            MgO: 0.1
             Al2O3: 0.08
             SiO2: 0.05
             CaO: 0.05
@@ -383,44 +1234,255 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-5
-            quote: FUNC-5 | 0 | 1.000 | 0.0 ± 0.6 | 0.0 ± 0.3 | 1.000 | 0.0 ± 0.2 | 0.0 ± 0.1 | 1.000 |
-              0.0 ± 0.1 | 0.1 ± 0.1
-            f24Mg: 1.000
+            quote: FUNC-5 | 0 | 1.000 | 0.0 ± 0.6 | 0.0 ± 0.3 | 1.000 | 0.0 ± 0.2 | 0.0 ± 0.1 | 1.000 | 0.0 ± 0.1 | 0.1 ±
+              0.1
+            f24Mg: 1.0
             delta26Mg_t0_permil: 0.0
             delta26Mg_t0_2sigma_permil: 0.6
             delta25Mg_t0_permil: 0.0
             delta25Mg_t0_2sigma_permil: 0.3
-            f28Si: 1.000
+            f28Si: 1.0
             delta30Si_t0_permil: 0.0
             delta30Si_t0_2sigma_permil: 0.2
             delta29Si_t0_permil: 0.0
             delta29Si_t0_2sigma_permil: 0.1
-            f16O: 1.000
+            f16O: 1.0
             delta18O_t0_permil: 0.0
             delta18O_t0_2sigma_permil: 0.1
             delta17O_t0_permil: 0.1
             delta17O_t0_2sigma_permil: 0.1
-            delta17O_t0_note: Table 2 δ17O is calculated from the FUN1/FUN2 correlation δ17O = 0.515 ×
-              δ18O (section 3.2.3), not independently measured in this paper.
-        - sample: FUNC-10
+            delta17O_t0_note: Table 2 δ17O is calculated from the FUN1/FUN2 correlation δ17O = 0.515 × δ18O (section 3.2.3),
+              not independently measured in this paper.
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-10
+      experiment: func-10
+      type: rate_series
+      class_tag: measured
+      locator: *id003
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-10
-          quote: FUNC-10 | 5 | 0.0250 | 0.0208 | 16.6 | 33.53 ± 0.10 | 15.20 ± 0.12 | 40.74 ± 0.11 | 10.48
-            ± 0.06 | 2.68 | 2.21 | 3.2 ± 0.7 | 1.6 ± 0.4 | 1.6 ± 0.1 | 0.8 ± 0.1 | 16.2 ± 0.1
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-10
+          locator: *id003
+          quote: FUNC-10 | 5 | 0.0250 | 0.0208 | 16.6 | 33.53 ± 0.10 | 15.20 ± 0.12 | 40.74 ± 0.11 | 10.48 ± 0.06 | 2.68 |
+            2.21 | 3.2 ± 0.7 | 1.6 ± 0.4 | 1.6 ± 0.1 | 0.8 ± 0.1 | 16.2 ± 0.1
           T_C: 1900.0
           time_min: 5.0
-          initial_mass_g: 0.0250
+          initial_mass_g: 0.025
           final_weight_g: 0.0208
           mass_loss_pct: 16.6
-          composition_wt_pct:
-            MgO: 33.53
-            Al2O3: 15.20
-            SiO2: 40.74
-            CaO: 10.48
+          composition_wt_pct: *id012
           composition_wt_pct_2sigma:
-            MgO: 0.10
+            MgO: 0.1
             Al2O3: 0.12
             SiO2: 0.11
             CaO: 0.06
@@ -441,8 +1503,8 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-10
-            quote: FUNC-10 | 5 | 0.918 | 2.3 ± 0.7 | 1.2 ± 0.4 | 0.889 | 3.0 ± 0.1 | 1.4 ± 0.1 | 0.880 |
-              3.5 ± 0.1 | 1.9 ± 0.1
+            quote: FUNC-10 | 5 | 0.918 | 2.3 ± 0.7 | 1.2 ± 0.4 | 0.889 | 3.0 ± 0.1 | 1.4 ± 0.1 | 0.880 | 3.5 ± 0.1 | 1.9 ±
+              0.1
             f24Mg: 0.918
             delta26Mg_t0_permil: 2.3
             delta26Mg_t0_2sigma_permil: 0.7
@@ -453,28 +1515,239 @@ species:
             delta30Si_t0_2sigma_permil: 0.1
             delta29Si_t0_permil: 1.4
             delta29Si_t0_2sigma_permil: 0.1
-            f16O: 0.880
+            f16O: 0.88
             delta18O_t0_permil: 3.5
             delta18O_t0_2sigma_permil: 0.1
             delta17O_t0_permil: 1.9
             delta17O_t0_2sigma_permil: 0.1
-        - sample: FUNC-1
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-1
+      experiment: func-1
+      type: rate_series
+      class_tag: measured
+      locator: *id004
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-1
-          quote: FUNC-1 | 15 | 0.0334 | 0.0239 | 28.6 | 32.12 ± 0.24 | 18.16 ± 0.16 | 37.16 ± 0.11 | 12.52
-            ± 0.14 | 2.05 | 1.77 | 10.2 ± 0.6 | 5.2 ± 0.3 | 6.0 ± 0.2 | 3.0 ± 0.1 | [blank δ18O]
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-1
+          locator: *id004
+          quote: FUNC-1 | 15 | 0.0334 | 0.0239 | 28.6 | 32.12 ± 0.24 | 18.16 ± 0.16 | 37.16 ± 0.11 | 12.52 ± 0.14 | 2.05 |
+            1.77 | 10.2 ± 0.6 | 5.2 ± 0.3 | 6.0 ± 0.2 | 3.0 ± 0.1 | [blank δ18O]
           T_C: 1900.0
           time_min: 15.0
           initial_mass_g: 0.0334
           final_weight_g: 0.0239
           mass_loss_pct: 28.6
-          composition_wt_pct:
-            MgO: 32.12
-            Al2O3: 18.16
-            SiO2: 37.16
-            CaO: 12.52
+          composition_wt_pct: *id013
           composition_wt_pct_2sigma:
             MgO: 0.24
             Al2O3: 0.16
@@ -497,8 +1770,7 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-1
-            quote: FUNC-1 | 15 | 0.726 | 9.3 ± 0.6 | 4.8 ± 0.3 | 0.669 | 7.4 ± 0.2 | 3.7 ± 0.1 | 0.676 |
-              [blank O isotopes]
+            quote: FUNC-1 | 15 | 0.726 | 9.3 ± 0.6 | 4.8 ± 0.3 | 0.669 | 7.4 ± 0.2 | 3.7 ± 0.1 | 0.676 | [blank O isotopes]
             f24Mg: 0.726
             delta26Mg_t0_permil: 9.3
             delta26Mg_t0_2sigma_permil: 0.6
@@ -513,29 +1785,240 @@ species:
             omitted:
               delta18O_t0_permil: blank_cell
               delta17O_t0_permil: blank_cell
-        - sample: FUNC-9
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-9
+      experiment: func-9
+      type: rate_series
+      class_tag: measured
+      locator: *id005
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-9
-          quote: FUNC-9 | 20 | 0.0276 | 0.0167 | 39.7 | 29.92 ± 0.34 | 19.78 ± 0.19 | 35.54 ± 0.11 | 14.77
-            ± 0.22 | 1.80 | 1.51 | 16.6 ± 0.5 | 8.5 ± 0.3 | 10.4 ± 0.2 | 5.3 ± 0.1 | 23.6 ± 0.1
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-9
+          locator: *id005
+          quote: FUNC-9 | 20 | 0.0276 | 0.0167 | 39.7 | 29.92 ± 0.34 | 19.78 ± 0.19 | 35.54 ± 0.11 | 14.77 ± 0.22 | 1.80 |
+            1.51 | 16.6 ± 0.5 | 8.5 ± 0.3 | 10.4 ± 0.2 | 5.3 ± 0.1 | 23.6 ± 0.1
           T_C: 1900.0
           time_min: 20.0
           initial_mass_g: 0.0276
           final_weight_g: 0.0167
           mass_loss_pct: 39.7
-          composition_wt_pct:
-            MgO: 29.92
-            Al2O3: 19.78
-            SiO2: 35.54
-            CaO: 14.77
+          composition_wt_pct: *id014
           composition_wt_pct_2sigma:
             MgO: 0.34
             Al2O3: 0.19
             SiO2: 0.11
             CaO: 0.22
-          SiO2_over_Al2O3: 1.80
+          SiO2_over_Al2O3: 1.8
           MgO_over_Al2O3: 1.51
           delta26Mg_permil: 16.6
           delta26Mg_2sigma_permil: 0.5
@@ -552,8 +2035,8 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-9
-            quote: FUNC-9 | 20 | 0.626 | 15.7 ± 0.5 | 8.1 ± 0.3 | 0.592 | 11.8 ± 0.2 | 5.9 ± 0.1 | 0.578
-              | 10.9 ± 0.1 | 5.6 ± 0.1
+            quote: FUNC-9 | 20 | 0.626 | 15.7 ± 0.5 | 8.1 ± 0.3 | 0.592 | 11.8 ± 0.2 | 5.9 ± 0.1 | 0.578 | 10.9 ± 0.1 | 5.6
+              ± 0.1
             f24Mg: 0.626
             delta26Mg_t0_permil: 15.7
             delta26Mg_t0_2sigma_permil: 0.5
@@ -569,23 +2052,234 @@ species:
             delta18O_t0_2sigma_permil: 0.1
             delta17O_t0_permil: 5.6
             delta17O_t0_2sigma_permil: 0.1
-        - sample: FUNC-3
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-3
+      experiment: func-3
+      type: rate_series
+      class_tag: measured
+      locator: *id006
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-3
-          quote: FUNC-3 | 30 | 0.0294 | 0.0158 | 46.3 | 27.36 ± 0.34 | 21.69 ± 0.13 | 34.24 ± 0.11 | 16.72
-            ± 0.26 | 1.58 | 1.26 | 23.9 ± 0.5 | 12.2 ± 0.3 | 14.0 ± 0.2 | 7.1 ± 0.1 | [blank δ18O]
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-3
+          locator: *id006
+          quote: FUNC-3 | 30 | 0.0294 | 0.0158 | 46.3 | 27.36 ± 0.34 | 21.69 ± 0.13 | 34.24 ± 0.11 | 16.72 ± 0.26 | 1.58 |
+            1.26 | 23.9 ± 0.5 | 12.2 ± 0.3 | 14.0 ± 0.2 | 7.1 ± 0.1 | [blank δ18O]
           T_C: 1900.0
           time_min: 30.0
           initial_mass_g: 0.0294
           final_weight_g: 0.0158
           mass_loss_pct: 46.3
-          composition_wt_pct:
-            MgO: 27.36
-            Al2O3: 21.69
-            SiO2: 34.24
-            CaO: 16.72
+          composition_wt_pct: *id015
           composition_wt_pct_2sigma:
             MgO: 0.34
             Al2O3: 0.13
@@ -608,8 +2302,7 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-3
-            quote: FUNC-3 | 30 | 0.521 | 23.0 ± 0.5 | 11.8 ± 0.3 | 0.518 | 15.4 ± 0.2 | 7.7 ± 0.1 | 0.493
-              | [blank O isotopes]
+            quote: FUNC-3 | 30 | 0.521 | 23.0 ± 0.5 | 11.8 ± 0.3 | 0.518 | 15.4 ± 0.2 | 7.7 ± 0.1 | 0.493 | [blank O isotopes]
             f24Mg: 0.521
             delta26Mg_t0_permil: 23.0
             delta26Mg_t0_2sigma_permil: 0.5
@@ -624,27 +2317,238 @@ species:
             omitted:
               delta18O_t0_permil: blank_cell
               delta17O_t0_permil: blank_cell
-        - sample: FUNC-7
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-7
+      experiment: func-7
+      type: rate_series
+      class_tag: measured
+      locator: *id007
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-7
-          quote: FUNC-7 | 35 | 0.0342 | 0.0155 | 54.7 | 23.87 ± 0.07 | 25.30 ± 0.34 | 31.63 ± 0.20 | 19.22
-            ± 0.24 | 1.25 | 0.94 | 32.8 ± 0.4 | 16.8 ± 0.2 | 18.5 ± 0.2 | 9.4 ± 0.1 | 30.8 ± 0.1
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-7
+          locator: *id007
+          quote: FUNC-7 | 35 | 0.0342 | 0.0155 | 54.7 | 23.87 ± 0.07 | 25.30 ± 0.34 | 31.63 ± 0.20 | 19.22 ± 0.24 | 1.25 |
+            0.94 | 32.8 ± 0.4 | 16.8 ± 0.2 | 18.5 ± 0.2 | 9.4 ± 0.1 | 30.8 ± 0.1
           T_C: 1900.0
           time_min: 35.0
           initial_mass_g: 0.0342
           final_weight_g: 0.0155
           mass_loss_pct: 54.7
-          composition_wt_pct:
-            MgO: 23.87
-            Al2O3: 25.30
-            SiO2: 31.63
-            CaO: 19.22
+          composition_wt_pct: *id016
           composition_wt_pct_2sigma:
             MgO: 0.07
             Al2O3: 0.34
-            SiO2: 0.20
+            SiO2: 0.2
             CaO: 0.24
           SiO2_over_Al2O3: 1.25
           MgO_over_Al2O3: 0.94
@@ -663,14 +2567,14 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-7
-            quote: FUNC-7 | 35 | 0.387 | 31.9 ± 0.4 | 16.4 ± 0.2 | 0.410 | 19.9 ± 0.2 | 10.0 ± 0.1 | 0.383
-              | 18.1 ± 0.1 | 9.2 ± 0.1
+            quote: FUNC-7 | 35 | 0.387 | 31.9 ± 0.4 | 16.4 ± 0.2 | 0.410 | 19.9 ± 0.2 | 10.0 ± 0.1 | 0.383 | 18.1 ± 0.1 |
+              9.2 ± 0.1
             f24Mg: 0.387
             delta26Mg_t0_permil: 31.9
             delta26Mg_t0_2sigma_permil: 0.4
             delta25Mg_t0_permil: 16.4
             delta25Mg_t0_2sigma_permil: 0.2
-            f28Si: 0.410
+            f28Si: 0.41
             delta30Si_t0_permil: 19.9
             delta30Si_t0_2sigma_permil: 0.2
             delta29Si_t0_permil: 10.0
@@ -680,29 +2584,240 @@ species:
             delta18O_t0_2sigma_permil: 0.1
             delta17O_t0_permil: 9.2
             delta17O_t0_2sigma_permil: 0.1
-        - sample: FUNC-8
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-8
+      experiment: func-8
+      type: rate_series
+      class_tag: measured
+      locator: *id008
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-8
-          quote: FUNC-8 | 40 | 0.0361 | 0.0139 | 61.7 | 19.08 ± 0.09 | 31.35 ± 0.24 | 28.21 ± 0.21 | 21.37
-            ± 0.16 | 0.90 | 0.61 | 46.5 ± 0.4 | 23.9 ± 0.2 | 22.8 ± 0.1 | 11.7 ± 0.1 | [blank δ18O]
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-8
+          locator: *id008
+          quote: FUNC-8 | 40 | 0.0361 | 0.0139 | 61.7 | 19.08 ± 0.09 | 31.35 ± 0.24 | 28.21 ± 0.21 | 21.37 ± 0.16 | 0.90 |
+            0.61 | 46.5 ± 0.4 | 23.9 ± 0.2 | 22.8 ± 0.1 | 11.7 ± 0.1 | [blank δ18O]
           T_C: 1900.0
           time_min: 40.0
           initial_mass_g: 0.0361
           final_weight_g: 0.0139
           mass_loss_pct: 61.7
-          composition_wt_pct:
-            MgO: 19.08
-            Al2O3: 31.35
-            SiO2: 28.21
-            CaO: 21.37
+          composition_wt_pct: *id017
           composition_wt_pct_2sigma:
             MgO: 0.09
             Al2O3: 0.24
             SiO2: 0.21
             CaO: 0.16
-          SiO2_over_Al2O3: 0.90
+          SiO2_over_Al2O3: 0.9
           MgO_over_Al2O3: 0.61
           delta26Mg_permil: 46.5
           delta26Mg_2sigma_permil: 0.4
@@ -719,9 +2834,8 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-8
-            quote: FUNC-8 | 40 | 0.250 | 45.5 ± 0.4 | 23.4 ± 0.2 | 0.296 | 24.2 ± 0.1 | 12.3 ± 0.1 | 0.276
-              | [blank O isotopes]
-            f24Mg: 0.250
+            quote: FUNC-8 | 40 | 0.250 | 45.5 ± 0.4 | 23.4 ± 0.2 | 0.296 | 24.2 ± 0.1 | 12.3 ± 0.1 | 0.276 | [blank O isotopes]
+            f24Mg: 0.25
             delta26Mg_t0_permil: 45.5
             delta26Mg_t0_2sigma_permil: 0.4
             delta25Mg_t0_permil: 23.4
@@ -735,23 +2849,234 @@ species:
             omitted:
               delta18O_t0_permil: blank_cell
               delta17O_t0_permil: blank_cell
-        - sample: FUNC-4
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-4
+      experiment: func-4
+      type: rate_series
+      class_tag: measured
+      locator: *id009
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-4
-          quote: FUNC-4 | 45 | 0.0340 | 0.0123 | 63.9 | 16.51 ± 0.29 | 32.15 ± 0.54 | 27.32 ± 0.35 | 24.03
-            ± 0.47 | 0.85 | 0.51 | 50.4 ± 0.5 | 25.9 ± 0.2 | 25.4 ± 0.2 | 12.9 ± 0.1 | 36.8 ± 0.1
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-4
+          locator: *id009
+          quote: FUNC-4 | 45 | 0.0340 | 0.0123 | 63.9 | 16.51 ± 0.29 | 32.15 ± 0.54 | 27.32 ± 0.35 | 24.03 ± 0.47 | 0.85 |
+            0.51 | 50.4 ± 0.5 | 25.9 ± 0.2 | 25.4 ± 0.2 | 12.9 ± 0.1 | 36.8 ± 0.1
           T_C: 1900.0
           time_min: 45.0
-          initial_mass_g: 0.0340
+          initial_mass_g: 0.034
           final_weight_g: 0.0123
           mass_loss_pct: 63.9
-          composition_wt_pct:
-            MgO: 16.51
-            Al2O3: 32.15
-            SiO2: 27.32
-            CaO: 24.03
+          composition_wt_pct: *id018
           composition_wt_pct_2sigma:
             MgO: 0.29
             Al2O3: 0.54
@@ -774,8 +3099,8 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-4
-            quote: FUNC-4 | 45 | 0.211 | 49.5 ± 0.5 | 25.5 ± 0.2 | 0.279 | 26.8 ± 0.2 | 13.5 ± 0.1 | 0.244
-              | 24.2 ± 0.1 | 12.3 ± 0.1
+            quote: FUNC-4 | 45 | 0.211 | 49.5 ± 0.5 | 25.5 ± 0.2 | 0.279 | 26.8 ± 0.2 | 13.5 ± 0.1 | 0.244 | 24.2 ± 0.1 |
+              12.3 ± 0.1
             f24Mg: 0.211
             delta26Mg_t0_permil: 49.5
             delta26Mg_t0_2sigma_permil: 0.5
@@ -791,23 +3116,234 @@ species:
             delta18O_t0_2sigma_permil: 0.1
             delta17O_t0_permil: 12.3
             delta17O_t0_2sigma_permil: 0.1
-        - sample: FUNC-6
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_table1_mass_loss::func-6
+      experiment: func-6
+      type: rate_series
+      class_tag: measured
+      locator: *id010
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        system_class: silicate_melt
+        FUNC5_mass_loss_pct: 4.7
+        FUNC6_mass_loss_pct: 69.3
+        B133R10_MgO_wt_pct: 11.48
+        T_C: 1900.0
+        T_C_note: All FUNC evaporation holds are at 1900 C. Run duration is time during which the sample was evaporating at
+          1900 C (Table 1 footnote).
+        printed_column_order: sample, time_min, initial_mass_g, final_weight_g, mass_loss_pct, MgO_wt_pct, MgO_2sigma_wt_pct,
+          Al2O3_wt_pct, Al2O3_2sigma_wt_pct, SiO2_wt_pct, SiO2_2sigma_wt_pct, CaO_wt_pct, CaO_2sigma_wt_pct, SiO2_over_Al2O3,
+          MgO_over_Al2O3, delta26Mg_permil, delta26Mg_2sigma_permil, delta25Mg_permil, delta25Mg_2sigma_permil, delta30Si_permil,
+          delta30Si_2sigma_permil, delta29Si_permil, delta29Si_2sigma_permil, delta18O_permil, delta18O_2sigma_permil
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+        zero_time_note: FUNC-5 is the zero-time run (quenched immediately after the furnace reached 1900 C; run duration at
+          1900 C is zero minutes). About 5% weight loss occurred even in the zero-time experiment. The authors use the zero-time
+          residue as the effective starting composition for Table 2 remaining-fraction calculations.
+        isotopic_standard_B133R10:
+          note: Synthetic Type B CAI-like glass used as the LA-MC-ICPMS bracketing standard (Richter et al. 2007; Janney et
+            al. 2011). Not a FUNC evaporation residue. Table 1 prints oxide wt% with 2-sigma and delta values of 0.0 as the
+            standard. No run duration, masses, or weight loss.
           locator:
             table: '1'
             pdf_page_index: 39
-            paragraph: FUNC-6
-          quote: FUNC-6 | 55 | 0.0390 | 0.0120 | 69.3 | 10.95 ± 0.05 | 40.16 ± 0.06 | 22.16 ± 0.07 | 26.75
-            ± 0.08 | 0.55 | 0.27 | 69.0 ± 0.6 | 35.4 ± 0.3 | 31.5 ± 0.2 | 16.0 ± 0.1 | 41.8 ± 0.1
+            paragraph: B133R-10
+          composition_wt_pct:
+            MgO: 11.48
+            Al2O3: 19.39
+            SiO2: 46.0
+            CaO: 23.12
+          composition_wt_pct_2sigma:
+            MgO: 0.09
+            Al2O3: 0.11
+            SiO2: 0.13
+            CaO: 0.11
+          delta26Mg_permil: 0.0
+          delta26Mg_2sigma_permil: 0.3
+          delta25Mg_permil: 0.0
+          delta25Mg_2sigma_permil: 0.2
+          delta30Si_permil: 0.0
+          delta30Si_2sigma_permil: 0.3
+          delta29Si_permil: 0.0
+          delta29Si_2sigma_permil: 0.1
+          omitted:
+            delta18O_permil: blank_cell
+            run_duration: blank_cell
+            initial_mass_g: blank_cell
+            final_weight_g: blank_cell
+            mass_loss_pct: blank_cell
+            SiO2_over_Al2O3: blank_cell
+            MgO_over_Al2O3: blank_cell
+        sample_load_mg_range_as_printed: 25–40 mg
+        sample_load_note: Range of mixture loaded onto each Ir loop, not a per-run point mass. Per-run initial/final weights
+          are the Table 1 gram columns.
+        sample_load_locator:
+          section: 3.1
+          pdf_page_index: 9
+          paragraph: samples with 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        thermal_schedule_as_printed:
+          pump_down: about 10^{-7} bars at room temperature
+          degas: 1400 C at 20 C/min, held about 20 min
+          evaporation_ramp: after furnace pressure dropped to ~10^{-9} bars, raise to 1900 C at 40 C/min
+          hold: 1900 C for a predetermined time (0 to 55 minutes)
+          end: power to the heating elements cut
+          quench_rate_as_printed: ~1000 C/min
+        thermal_schedule_locator:
+          section: 3.1
+          pdf_page_index: 9
+        quench_rate_locator:
+          section: '4'
+          pdf_page_index: 12
+          paragraph: relatively slow quenching (~1000 C/min)
+        vacuum_as_printed:
+          evaporation_condition: <10^{-9} bars
+          evaporation_condition_kind: upper_bound
+          pump_down: about 10^{-7} bars
+          pump_down_kind: approximate
+          before_1900C_hold: ~10^{-9} bars
+          before_1900C_hold_kind: approximate
+        vacuum_locators:
+          evaporation_condition:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+          pump_sequence:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: pumped down to about 10^{-7} bars; furnace pressure had dropped to ~10^{-9} bars
+        kinetic_isotopic_fractionation_factors:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Rayleigh-plot slopes from Table 2 residues. These are kinetic isotopic fractionation factors α2,1 (vapor/melt
+            isotope ratio), not Hertz-Knudsen evaporation coefficients. Uncertainties as printed. The melilite-field oxygen
+            value is printed with a tilde (approximate), not a 2-sigma.
+          alpha_25_24: 0.98383
+          alpha_25_24_2sigma: 0.00033
+          alpha_25_24_locator:
+            figure: '6'
+            pdf_page_index: 17
+            paragraph: α25,24 = 0.98383±0.00033
+          alpha_25_24_quote: fall along a line with slope α25,24 – 1 corresponding to α25,24= 0.98383±0.00033
+          alpha_29_28: 0.9901
+          alpha_29_28_2sigma: 0.00038
+          alpha_29_28_locator:
+            figure: '7'
+            pdf_page_index: 18
+            paragraph: α29,28 = 0.99010±0.00038
+          alpha_29_28_quote: plot along a line with slope corresponding to α29,28 = 0.99010±0.00038
+          alpha_18_16_forsterite_field: 0.9815
+          alpha_18_16_forsterite_field_2sigma: 0.0016
+          alpha_18_16_forsterite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 = 0.9815±0.0016
+          alpha_18_16_melilite_field_as_printed: ~0.9911
+          alpha_18_16_melilite_field_kind: approximate
+          alpha_18_16_melilite_field_locator:
+            figure: '8'
+            pdf_page_index: 18
+            paragraph: α18,16 ~ 0.9911
+        gamma_SiO_over_gamma_Mg:
+          value: 2.1
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          note: Ratio used in Fig. 3 to fit the FUNC residue trajectory; not a measured Hertz-Knudsen coefficient from this
+            paper.
+          locator:
+            figure: '3'
+            pdf_page_index: 21
+            paragraph: γSiO / γMg = 2.1 which was the value used in Fig. 3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - numeric_sample_surface_area_series
+        missing_note: Free-evaporation Ir-wire-loop furnace (Hashimoto 1990 design, cited not restated). Not a Knudsen cell.
+          Per-run melt free-surface area is not tabulated.
+        looked_for_not_found:
+        - numeric_sample_surface_area_m2
+        - temperature_sensor_or_thermocouple_type
+        - pump_type
+        - orifice_area
+        - clausing_factor
+        series:
+        - sample: FUNC-6
+          locator: *id010
+          quote: FUNC-6 | 55 | 0.0390 | 0.0120 | 69.3 | 10.95 ± 0.05 | 40.16 ± 0.06 | 22.16 ± 0.07 | 26.75 ± 0.08 | 0.55 |
+            0.27 | 69.0 ± 0.6 | 35.4 ± 0.3 | 31.5 ± 0.2 | 16.0 ± 0.1 | 41.8 ± 0.1
           T_C: 1900.0
           time_min: 55.0
-          initial_mass_g: 0.0390
-          final_weight_g: 0.0120
+          initial_mass_g: 0.039
+          final_weight_g: 0.012
           mass_loss_pct: 69.3
-          composition_wt_pct:
-            MgO: 10.95
-            Al2O3: 40.16
-            SiO2: 22.16
-            CaO: 26.75
+          composition_wt_pct: *id019
           composition_wt_pct_2sigma:
             MgO: 0.05
             Al2O3: 0.06
@@ -830,8 +3366,8 @@ species:
               table: '2'
               pdf_page_index: 39
               paragraph: FUNC-6
-            quote: FUNC-6 | 55 | 0.112 | 68.1 ± 0.6 | 35.0 ± 0.3 | 0.181 | 32.9 ± 0.2 | 16.6 ± 0.1 | 0.155
-              | 29.1 ± 0.1 | 14.8 ± 0.1
+            quote: FUNC-6 | 55 | 0.112 | 68.1 ± 0.6 | 35.0 ± 0.3 | 0.181 | 32.9 ± 0.2 | 16.6 ± 0.1 | 0.155 | 29.1 ± 0.1 |
+              14.8 ± 0.1
             f24Mg: 0.112
             delta26Mg_t0_permil: 68.1
             delta26Mg_t0_2sigma_permil: 0.6
@@ -859,21 +3395,100 @@ species:
             form: molten_droplet_on_Ir_wire_loop
             loop_diameter_mm: 2.5
             numeric_m2_series: null
-            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt
-              free-surface area is not tabulated. Loop diameter is not converted into an area.
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
           locator:
             section: 3.1
             pdf_page_index: 9
             paragraph: 2.5 mm diameter iridium wire loops
         chamber_pressure:
           value:
-            as_printed: "<10^{-9} bars"
+            as_printed: <10^{-9} bars
             kind: upper_bound
             not_a_point: true
           units: bar
-          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7}
-            bars"; the 1900 C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound
-            and approximate values are recorded as printed and are not collapsed to a point.
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
+          locator:
+            section: 3.1
+            pdf_page_index: 8
+            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func_shared_starting_and_standard
+      type: rate_series
+      class_tag: measured
+      locator:
+        table: '1'
+        pdf_page_index: 39
+        paragraph: FUNC-5
+      quote: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+        materials and FUNC evaporation residues.
+      T_C: 1900.0
+      phase: silicate_melt_FUNC_forsterite_rich
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: Experimental temperature 1900 C is above the melting temperature of forsterite (1890 C) as printed. Forsterite
+          in quenched residues is from slow quench (~1000 C/min), not crystallization during the 1900 C hold.
+      standard_state: vacuum free evaporation of FUNC forsterite-rich CMAS melt on Ir wire loops (not a Knudsen cell)
+      regime: langmuir_free_evaporation
+      units: as published (run duration min; mass g; weight loss %; composition wt%; isotopes permil; 2-sigma)
+      uncertainty:
+        convention: 2σ
+        quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+          is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+        locator:
+          table: '1'
+          pdf_page_index: 39
+      values:
+        B133R10_MgO_wt_pct: 11.48
+        starting_glass_wt_pct:
+          MgO: 37.9
+          Al2O3: 11.6
+          SiO2: 42.9
+          CaO: 7.6
+        starting_glass_locator:
+          table: '1'
+          pdf_page_index: 39
+          paragraph: FUNC starting
+        starting_glass_quote: The starting material containing 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2 and 7.6 wt% CaO
+          was evaporated in vacuum (<10^{-9} bars) at 1900 C.
+        starting_glass_section_locator:
+          section: 3.1
+          pdf_page_index: 8
+          paragraph: starting material containing 37.9 wt% MgO
+        starting_glass_weight_loss_pct: 0.0
+        starting_glass_weight_loss_note: Table 1 prints 0.0 under weight loss for the FUNC starting recipe row. That row has
+          no run duration and no initial/final weights. It is the unevaporated mixture, not a furnace run. The zero-time run
+          is FUNC-5 (4.7 % loss during ramp to 1900 C).
+      equipment:
+        cell_material:
+          value: 2.5 mm diameter iridium wire loop
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        sample_surface_area:
+          value:
+            form: molten_droplet_on_Ir_wire_loop
+            loop_diameter_mm: 2.5
+            numeric_m2_series: null
+            note: Paper states samples were loaded onto 2.5 mm diameter iridium wire loops. Per-run melt free-surface area
+              is not tabulated. Loop diameter is not converted into an area.
+          locator:
+            section: 3.1
+            pdf_page_index: 9
+            paragraph: 2.5 mm diameter iridium wire loops
+        chamber_pressure:
+          value:
+            as_printed: <10^{-9} bars
+            kind: upper_bound
+            not_a_point: true
+          units: bar
+          note: Section 3.1 "evaporated in vacuum (<10^{-9} bars) at 1900°C". Pump-down is "about 10^{-7} bars"; the 1900
+            C ramp starts after furnace pressure "had dropped to ~10^{-9} bars". Bound and approximate values are recorded
+            as printed and are not collapsed to a point.
           locator:
             section: 3.1
             pdf_page_index: 8
@@ -888,9 +3503,8 @@ species:
         section: 4.1
         pdf_page_index: 13
         paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
-      quote: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments,
-        the plot of weight percents of SiO2 versus MgO can be used to fully characterize the evaporation
-        trajectory.
+      quote: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments, the plot of weight
+        percents of SiO2 versus MgO can be used to fully characterize the evaporation trajectory.
       T_C: 1900.0
       phase: silicate_melt_FUNC_forsterite_rich
       regime: langmuir_free_evaporation
@@ -913,7 +3527,7 @@ species:
             paragraph: 2.5 mm diameter iridium wire loops
         chamber_pressure:
           value:
-            as_printed: "<10^{-9} bars"
+            as_printed: <10^{-9} bars
             kind: upper_bound
             not_a_point: true
           units: bar
@@ -931,8 +3545,8 @@ species:
         section: 4.1
         pdf_page_index: 13
         paragraph: Because aluminum is very refractory and does not evaporate during the experiments
-      quote: Because aluminum is very refractory and does not evaporate during the experiments, the values
-        of ƒ24Mg were calculated as (MgO/Al2O3)residue/(MgO/Al2O3)zero-time run
+      quote: Because aluminum is very refractory and does not evaporate during the experiments, the values of ƒ24Mg were calculated
+        as (MgO/Al2O3)residue/(MgO/Al2O3)zero-time run
       T_C: 1900.0
       phase: silicate_melt_FUNC_forsterite_rich
       regime: langmuir_free_evaporation
@@ -955,7 +3569,7 @@ species:
             paragraph: 2.5 mm diameter iridium wire loops
         chamber_pressure:
           value:
-            as_printed: "<10^{-9} bars"
+            as_printed: <10^{-9} bars
             kind: upper_bound
             not_a_point: true
           units: bar
