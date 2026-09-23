@@ -881,7 +881,12 @@ def thermal_path(
 def oxygen_condition(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
-    """Numerical log10(fO2 / 1 bar), never an uncontrolled default."""
+    """log10(fO2), never an uncontrolled default. A landed printed log is
+    kept as the author stated it, never converted between pressure frames:
+    an atm-referenced print stays the author's number (~0.0057 dex from the
+    bar frame), and the frame offset is recorded in the locator note only
+    when a companion atm pressure lands. Derived routes are
+    log10(pO2 Pa / 1 bar)."""
     routes: list[Waypoint] = []
     printed = _point_condition(experiment, observation, "fO2_log", "oxygen_condition")
     if printed is not None:

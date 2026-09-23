@@ -10,6 +10,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import ValueKind
 from simulator.battery.identity import PA_PER_ATM_DEC, atm_to_pa
 from simulator.battery.migrate import (
@@ -291,3 +293,100 @@ def test_thomas_table2_log_fO2_lands_printed_per_run(tmp_path: Path) -> None:
     }
     for obs in points:
         assert "fO2_Pa" not in (obs.point_conditions or {})
+
+def test_oxygen_condition_doc_does_not_call_a_printed_log_a_bar_value() -> None:
+    """An atm-referenced printed log is kept as stated. The docstring must
+    not promise that selected number is log10(fO2 / 1 bar); only derived
+    pressure routes are that frame."""
+    doc = oxygen_condition.__doc__ or ""
+    assert "log10(fO2 / 1 bar)" not in doc
+    assert "kept as the author stated" in doc
+    assert "log10(pO2 Pa / 1 bar)" in doc
+
+
+def test_power_of_ten_string_is_not_a_log_value() -> None:
+    """A "10^-9.1" string is a pressure amount, never a log. On a log key the
+    linear amount would land ~1e-9 as fO2_log and stamp oxygen_condition near
+    zero; the key is skipped instead. Numeric and numeric-string logs land."""
+    mapping_form = collect_printed_oxygen(
+        [{
+            "log_fO2": {
+                "value": "10^-9.1",
+                "units": "log10",
+                "locator": {"published_page": 1},
+            }
+        }],
+        _page(),
+    )
+    assert mapping_form.log_fO2 is None
+
+    bare_scalar = collect_printed_oxygen([{"log_fO2": "10^-9.1"}], _page())
+    assert bare_scalar.log_fO2 is None
+
+    numeric = collect_printed_oxygen(
+        [{"log_fO2": {"value": -9.1, "units": "log10", "locator": {"published_page": 1}}}],
+        _page(),
+    )
+    assert numeric.log_fO2 is not None
+    assert numeric.log_fO2.state.value == Decimal("-9.1")
+    numeric_string = collect_printed_oxygen(
+        [{"log_fO2": {"value": "-9.1", "units": "log10", "locator": {"published_page": 1}}}],
+        _page(),
+    )
+    assert numeric_string.log_fO2 is not None
+    assert numeric_string.log_fO2.state.value == Decimal("-9.1")
+
+
+def test_printed_point_does_not_collapse_an_experiment_interval(tmp_path: Path) -> None:
+    """A printed pO2 point on one observation must not overwrite the
+    experiment's printed interval (Norris pattern: log range -7..-13 landed
+    as a pO2_Pa interval). The interval stays; the observation keeps its own
+    printed point in point_conditions."""
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["experiments"] = [
+        {
+            "experiment_id": "fixture-series",
+            "method": "knudsen_effusion",
+            "locator": {"page": 2, "section": "experimental"},
+            "fO2_control": {
+                "channel": {"tag": "value", "value": "gas_mix"},
+                "oxygen_partial_pressure_Pa": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "kind": "interval",
+                            "interval_low": "1.01325e-8",
+                            "interval_high": "1.01325e-2",
+                        },
+                    },
+                    "locator": {"page": 2, "section": "experimental"},
+                },
+            },
+        }
+    ]
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["experiment"] = "fixture-series"
+    observation["values"]["oxygen_partial_pressure"] = {
+        "value": "10^-9.1",
+        "units": "atm",
+        "locator": {"page": 2},
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    experiment_id = next(
+        eid for eid in result.experiments if eid.endswith("::experiment::fixture-series")
+    )
+    control = result.experiments[experiment_id].fO2_control
+    landed = control.oxygen_partial_pressure_Pa.state.value
+    assert landed.kind is ValueKind.INTERVAL
+    assert landed.interval_low == Decimal("1.01325e-8")
+    assert landed.interval_high == Decimal("1.01325e-2")
+    landed_points = [
+        obs
+        for obs in result.observations.values()
+        if obs.experiment_id == experiment_id and "fO2_Pa" in (obs.point_conditions or {})
+    ]
+    assert len(landed_points) == 2
+    for obs in landed_points:
+        point = obs.point_conditions["fO2_Pa"].state.value
+        assert point.kind is ValueKind.POINT
+        assert point.point == atm_to_pa(Decimal(10) ** Decimal("-9.1"))
