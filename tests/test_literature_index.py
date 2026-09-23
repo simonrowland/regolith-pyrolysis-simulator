@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -722,6 +723,21 @@ def test_compilation_manifest_identity_header_fixture(tmp_path):
     assert (sid_only, doi_only, raw_only) == ("fixture-compilation", "10.9999/fixture-compilation", ())
 
 
+def _nist_janaf_txt_corpus_absent() -> bool:
+    """The NIST .txt cache is an external snapshot, not a checked-in fixture."""
+    corpus = Path(
+        os.environ.get(
+            "REGOLITH_CORPUS_ROOT",
+            "/Users/simonrowland/Repos/regolith-corpus",
+        )
+    )
+    return not (corpus / "raw" / "janaf-nist-txt").is_dir()
+
+
+@pytest.mark.skipif(
+    _nist_janaf_txt_corpus_absent(),
+    reason="NIST-JANAF txt corpus is an external snapshot, not a checked-in fixture",
+)
 def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     """The compilation's INDEX tables asset is raw/janaf-nist-txt, not an empty convention path.
 
@@ -781,6 +797,39 @@ def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
     read_from = choose_read_from(work, locator)
     assert read_from == "tables:nist-janaf-4th"
     assert unmatched_read_from_reason(locator, read_from) is None
+
+
+def test_nist_janaf_txt_tables_refuses_stem_mismatch_and_content_drift(tmp_path):
+    """Stem equality alone must not advertise a directory whose bytes were not read.
+
+    Null hypothesis: same-named .txt with different bytes still registers the asset
+    and choose_read_from attaches every tables/ locator to it.
+    """
+    import hashlib
+
+    root = tmp_path / "root"
+    corpus = tmp_path / "corpus"
+    tables = root / "data/literature/compilations/janaf/tables"
+    txt_dir = corpus / "raw" / "janaf-nist-txt"
+    tables.mkdir(parents=True)
+    txt_dir.mkdir(parents=True)
+    body = b"NIST tab-delimited fixture\n"
+    digest = hashlib.sha256(body).hexdigest()
+    (tables / "A-001.yaml").write_text(
+        f"source_id: nist-janaf-4th\nextraction:\n  source_sha256: {digest}\n",
+        encoding="utf-8",
+    )
+    (txt_dir / "A-001.txt").write_bytes(body)
+    assert builder.nist_janaf_txt_tables(root, corpus)["path"] == "raw/janaf-nist-txt"
+
+    (txt_dir / "FOREIGN.txt").write_bytes(b"x")
+    assert builder.nist_janaf_txt_tables(root, corpus)["exists"] is False
+    (txt_dir / "FOREIGN.txt").unlink()
+
+    (txt_dir / "A-001.txt").write_bytes(b"ATTACKER_BYTES")
+    drifted = builder.nist_janaf_txt_tables(root, corpus)
+    assert drifted["path"] == ""
+    assert drifted["exists"] is False
 
 
 def test_source_status_regenerates_byte_identically(tmp_path, monkeypatch):

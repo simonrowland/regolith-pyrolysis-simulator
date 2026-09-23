@@ -453,22 +453,41 @@ _NIST_JANAF_SOURCE_ID = "nist-janaf-4th"
 _NIST_JANAF_TXT_RELATIVE = "raw/janaf-nist-txt"
 
 
+def _janaf_table_source_sha256(path: Path) -> str | None:
+    """extraction.source_sha256 from a compilation table header (YAML or JSON-in-YAML)."""
+    header = path.read_bytes()[:4096].decode("utf-8", "replace")
+    match = re.search(r'source_sha256["\']?\s*:\s*["\']?([0-9a-fA-F]{64})', header)
+    return match.group(1).lower() if match else None
+
+
 def nist_janaf_txt_tables(root: Path, corpus: Path) -> dict:
     """Tables asset for the NIST .txt files the compilation was parsed from.
 
     ``choose_read_from`` selects any tables path for a locator under ``tables/``.
     The conventional ``tables/nist-janaf-4th`` directory is not that download.
-    Point the asset at ``raw/janaf-nist-txt`` only when its stems are exactly
-    the compilation table ids; otherwise leave the path empty so a missing or
-    foreign directory is not registered as the source.
+    Point the asset at ``raw/janaf-nist-txt`` only when (1) its stems are exactly
+    the compilation table ids and (2) every table's recorded
+    ``extraction.source_sha256`` matches the corpus ``.txt`` bytes. Stem equality
+    alone is not identity: harvest ``source_cache_path`` values point at private
+    mirrors, not this corpus path — hash is the honest bridge. Otherwise leave
+    the path empty so a missing, foreign, or content-drifted directory is not
+    registered as the source.
     """
     directory = corpus / "raw" / "janaf-nist-txt"
     tables_dir = root / "data/literature/compilations/janaf/tables"
-    stems = {path.stem for path in tables_dir.glob("*.yaml")} if tables_dir.is_dir() else set()
+    table_paths = list(tables_dir.glob("*.yaml")) if tables_dir.is_dir() else []
+    stems = {path.stem for path in table_paths}
     txts = {path.stem for path in directory.glob("*.txt")} if directory.is_dir() else set()
-    if stems and stems == txts:
-        return {"path": _NIST_JANAF_TXT_RELATIVE, "exists": True, "file_count": len(txts)}
-    return {"path": "", "exists": False, "file_count": 0}
+    if not (stems and stems == txts):
+        return {"path": "", "exists": False, "file_count": 0}
+    for table_path in table_paths:
+        recorded = _janaf_table_source_sha256(table_path)
+        if not recorded:
+            return {"path": "", "exists": False, "file_count": 0}
+        digest = sha256_file(directory / f"{table_path.stem}.txt")
+        if digest != recorded:
+            return {"path": "", "exists": False, "file_count": 0}
+    return {"path": _NIST_JANAF_TXT_RELATIVE, "exists": True, "file_count": len(txts)}
 
 
 def _manifest_header_citation(header: str) -> str | None:
