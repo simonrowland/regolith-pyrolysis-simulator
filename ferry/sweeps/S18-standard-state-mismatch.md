@@ -1,0 +1,50 @@
+# S18 — standard / reference-state mismatch
+
+**Repo tip (audited):** `1f8df6cbe4cfbca526192b92e8adb2c1e1780dfc` (`origin/review/r6-r8-fix`).  
+**Green tip (compare):** `origin/work-v064-green` @ `2e9e17c3d`.  
+**Worktree:** `/workspace/repos/wt/slot-03` (detached @ `1f8df6cbe`). READ-ONLY on product code; writes only to `/workspace/ferry-inbox/sweeps/`. No push.  
+**Scope:** whole-repo as scoped — `simulator/`, `engines/`, `tools/`, `data/vapor_pressures.yaml`, `data/literature/extracts/` — for **standard/reference-state** mixes.  
+**Predicate:** values from **different** standard states are compared or combined without refuse/label/rewrite — 1 bar vs 1 atm, 298 vs 298.15 K, elemental reference-state switches (melt/boil), Pa vs bar in **log** quantities.  
+**Batch Y rank rule:** P0 only when a wrong number reaches a result/score/ledger **today**. Latent ≤ P1. Frame slips at the ~0.006 dex / ~few-K NBP scale are P1/P2, not P0.  
+**Method:** static audit + live YAML/catalog probes + Antoine inversion arithmetic on tip. Mode: **ran-tests** (Python probes) + static.
+
+| site (file:line) | predicate match | constructed trigger | live? | severity | P0? | fix direction |
+|---|---|---|---|---|---|---|
+| `simulator/diagnostic_helpers/extract_reproduction.py:1730-1758` (`_transition_point_target_pressure_pa`) + `data/literature/extracts/janaf-4th.yaml` Ti/Cr/Mn `*_normal_boiling_point` | JANAF **LIQUID IDEAL GAS** construction temperatures are **1-bar** (fugacity = 1). Helper defaults unnamed NBP to **101325 Pa**. Si is stamped `pressure_basis: JANAF 1 bar…` → 1e5 Pa; **Ti / Cr / Mn** omit `pressure_basis` / `pressure_basis_Pa` → default **1 atm**. Score path `_evaluate_transition_point` inverts pure-component Antoine at that wrong P°. Mn Antoine is atm-anchored through 2334.526 K so residual ≈ 0 at 1 atm and **~2.6 K** at 1 bar — wrong frame **false-agrees**. | Adopt Ti/Cr/Mn NBP from `janaf-4th.yaml`; `_transition_point_target_pressure_pa` → `(101325, normal_boiling_point_definition_101325_Pa)`. Probe: Mn invert(A,B,C,101325)−Tb ≈ 0; invert(...,100000)−Tb ≈ −2.59 K. | **live** | P1 | no | Stamp `pressure_basis: JANAF 1 bar…` (or `pressure_basis_Pa: 100000`) on every LIQUID IDEAL GAS row (mirror Si). Optionally refuse default-atm when citation text contains `LIQUID IDEAL GAS` / `FUGACITY=1`. |
+| `simulator/battery/migrate.py:5341-5350` (`_OXYGEN_LOG_UNITS`) + `:5608-5647` (`collect_printed_oxygen`) + `:5465-5494` (`_annotate_atm_bar_offset`) | `log10(atm)` and `log10(bar)` are the **same** accepted unit token set. Bare printed log is stored **as authored** with **no** `+log10(101325/100000)` rewrite. Offset annotation runs only when a companion absolute pressure is present and frames agree. Downstream consumers (`binary_pot_battery` `10**fO2_log` as bar; waypoints treating printed log as `log10(fO2/1 bar)`) therefore combine **atm-frame** logs with **bar-frame** algebra when units say atm or are silent. Live Badro: `log_fO2: -9.1` + `10^-9.1 atm` — selected printed −9.1 vs bar-frame −9.094… (R3). | `collect_printed_oxygen` on extract with `log_fO2: {value: -9.1, units: log10(atm)}` and no companion Pa → lands −9.1; consumer `pO2_bar = 10**-9.1`. Or Badro dual-write path: printed route keeps −9.1. | **live** | P1 | no | Split unit sets: `log10(atm)` → rewrite to bar with recorded Derivation, or stamp identity `fO2` frame explicitly and refuse cross-frame equality. Do not treat `log10(atm)` ≡ `log10(bar)`. |
+| `data/vapor_pressures.yaml` phosphorus `species_thermo` (`P2O5: *id001` @ `CEA_condensed_1_atm` / 101325) + gas rows @ `CEA_JANAF_1_bar` / 1e5 + `reference_pressure_Pa: 100000` + `activity_input.standard_state.reference_pressure_bar: 1.0` (e.g. `phosphorus_PO_family` ~L10887–10910; same pattern PO2/P4O6/P4O10/P2/P4) | Live ACTIVE CEA reaction models **combine** condensed G° (1 atm) with gas G° (1 bar) and interpret K at **model Pstd = 1 bar**, while Raoultian activity SS claims **1 bar** for the liquid endmember. CEA/TP-2002-211556 publishes this mixed gas/condensed convention; VΔP on condensed is ~0.07 J/mol (negligible vs RT). Label/identity mismatch remains: activity Pref bar vs thermo Pref atm on the same reactant. Catalog does not refuse Pref inhomogeneity among `species_thermo` members. | `compile_vapour_rail_catalog` → evaluate `PO` at 1600 K with `source_activity`/`pO2_bar` → finite `pressure_pa` (probe ~4.7 Pa at a=1e-6, pO2=1e-9). | **live** | P3 | no | Keep CEA G mix (intentional) but align activity `reference_pressure_*` with condensed record convention, or document “CEA mixed P°; activity Pref is V-negligible” on the model. Optional compile guard: warn when `species_thermo` Pref set size > 1. |
+| `simulator/vapour_rail/nasa_cea.py:443-448,559-597` (`NasaCeaPolynomial.reference_pressure_Pa` default + `pure_psat_over_Pstd`) + `simulator/vapour_rail/catalog.py:2963-2966,3455-3460` | Class defaults **every** standard_state (incl. condensed) to **1e5 Pa**; docstring notes CEA condensed is 1 atm but **does not switch**. `pure_psat_over_Pstd` never reads Pref / never requires gas Pref == condensed Pref; catalog multiplies `exp(-(G_g−G_c))` by a **single** model `reference_pressure_Pa`. Latent wrong absolute P_sat if a future row pairs polys whose coefficients assume different P° while model Pstd picks one. | Construct gas poly Pref=1e5 + condensed Pref=101325 (or defaults) and call `pure_psat_over_Pstd` / catalog pure-psat compile. | **latent** | P2 | no | Require matching `reference_pressure_Pa` (or explicit CEA mixed-convention flag) before combining; default condensed NasaCeaPolynomial Pref to 101325 when `standard_state` is condensed_*. |
+| `simulator/diagnostic_helpers/species_rail_differential.py:218-224,1010-1039,1690-1754` | Cross-compilation ΔfG / log10(Psat/P0) scoring keeps **per-source** P0 (JANAF 1e5, B689 101325) for the **ratio** axis, but **does not** apply `standard_pressure_delta_g_kJ_per_mol` when comparing absolute ΔfG across 1 atm vs 1 bar tables. Comment: slip ≈ 0.033 kJ/mol at 298 K per mol gas — inside 1 kJ band, “noted, not corrected.” Diagnostic residuals can absorb a silent P° frame mix. | Score B689 AgS(g) ΔfG against JANAF/CEA channel without Derivation rewrite of p°. | **live** (diagnostic harness) | P2 | no | When comparing absolute ΔfG across compilations, rewrite with recorded Δn_g RT ln(P2/P1) or refuse `standard_pressure_Pa` mismatch (mirror `identity_equal`). |
+| `simulator/chemistry/ellingham_thermo.py:40,131-132,422-445,920-929` (`MG_NORMAL_BOILING_POINT_K` vs Mg fit join 1366 K) | Runtime metal **standard-state** ownership switches to Mg(g) at **1363.15 K**, but gas/liquid coefficient join stays at **1366 K**. In `1363.15 ≤ T < 1366`, gas-basis ΔG is **back-extrapolated** from the post-join gas segment (documented sign inversion vs liquid on that slice). Phase kind and ΔG segment are both gas — not a silent l/g mix — but the physical boil boundary and the thermo-fit reference join disagree by 2.85 K. | `ellingham_delta_g_kj_per_mol_o2("Mg", 1364.0)` + `ellingham_metal_phase_kind("Mg", 1364.0)` → gas segment / `ELLINGHAM_METAL_PHASE_GAS`. | **live** | P3 | no | Retune gas/liquid join to 1363.15 K, or refuse/flag the 2.85 K window as `reference_join_extrapolation` in authority metadata consumed by equilibrium. |
+
+## Counts
+
+- Sites: **6**  
+- Live: **5** · Latent: **1**  
+- P0: **0** · P1: **2** · P2: **2** · P3: **2**  
+- P0 count: **0** (Batch Y: frame slips / labelled CEA mix / diagnostic notes — no invent-scale wrong ledger number beyond ~dex 0.006 / ~few K NBP)
+
+## No-hit areas (audited; not counted)
+
+- **`simulator/battery/identity.py`:** 1 bar (1e5) ≠ 1 atm (101325); `standard_pressure_delta_g_kJ_per_mol` exists; formation requires `formation_elements`; Decimal equality has no 298↔298.15 rounding band.  
+- **JANAF generator formation axis** (`simulator/battery/generators/janaf.py`): `reaction` / `formation_elements` stamped **unknown** with `FORMATION_BASIS_REASON` (T-specific elemental refs) — labelled, not a silent wrong concrete ref.  
+- **USGS generators:** B1259 `STANDARD_PRESSURE_PA = atm_to_pa(1)`; B1452/B1544/JANAF use 1e5 — stamped per source; `identity_equal` keeps them distinct.  
+- **`tools/vp_cea_ingest.py`:** correctly stamps gas 1e5 / condensed 101325; never rewrites condensed as 1 bar.  
+- **Na Pref (Lamoreaux):** atm K_r → Pa Pref uses `+ log10(1e5) + Δn_g·log10(1.01325)` (documented correct rewrite).  
+- **Antoine A conversions in yaml:** atm natives use `+log10(101325)`; bar natives use `+5` — no inverted factor found under this predicate (magnitude heuristic is S5).  
+- **298 vs 298.15 K:** no live thermo path that treats `298` and `298.15` as equal or evaluates at bare 298 instead of 298.15; `gibbs_battery` maps `delta_fG_298_*` → point at **298.15**. (°C→K `+273.0` is S5.)  
+- **Ellingham Na/K/Ca boil kinks:** segment `phase_basis` switches l→g at documented T_b; equilibrium uses `metal_phase_kind` to avoid double-counting P_sat.  
+- **`elemental_reference_mismatch_applies` / CEA condensed-metal vs Ellingham M(g):** diagnostic finding class only; does not silently rewrite production Ellingham pressures.  
+- **`gibbs_battery.elemental_phosphorus_polynomial`:** P_cr → P_L at shared CEA melt endpoint (correct condensed elemental switch).  
+- **Chapman–Enskog atm vs bar prefactor** (`condensation.py`): already S5 P3 — not re-scored.  
+- **S9 glass/`state:l` / polymorph pairing:** different class (phase identity), not P°/T° standard state.
+
+## Method notes
+
+- Detached `origin/review/r6-r8-fix` @ `1f8df6cbe`.  
+- Probed `_transition_point_target_pressure_pa` on all `janaf-4th` NBP rows; Si→1e5, Ti/Cr/Mn→101325 default.  
+- Antoine invert atm vs bar: Mn ΔT ≈ 2.59 K; atm residual ≈ 0 (false agreement).  
+- Compiled vapour-rail catalog; PO equilibrium_partial_pressure evaluates finite P with mixed Pref thermo.  
+- No product commits; no push.
+
+SWEEP: S18 | sites=6 | live=5 | P0=0 P1=2 P2=2 P3=2 | tip=1f8df6cbe4cfbca526192b92e8adb2c1e1780dfc | path=/workspace/ferry-inbox/sweeps/S18-standard-state-mismatch.md

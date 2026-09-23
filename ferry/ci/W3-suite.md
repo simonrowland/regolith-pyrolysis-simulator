@@ -1,0 +1,291 @@
+# W3 independent CI signal — regolith-empirical
+
+**Copy-ready target:** `ferry/ci/W3-suite.md`
+
+**Raw pytest log:** `/workspace/ferry-inbox/ci/W3-pytest.log`
+
+**Status:** INCOMPLETE — the full xdist run reached 99%, then `gw0` died (“node down: Not properly terminated”); the controller was interrupted after it stopped progressing. Counts below are pytest's executed-test summary at interruption.
+
+- **Worktree:** `/workspace/repos/wt/slot-08` (detached; restored to requested tip after the run)
+- **Command:** `.venv/bin/python -m pytest tests/ -q -n auto -p no:cacheprovider`
+- **Tip SHA:** `07ad01dae31da38f6c58ed6963c06963e7e41462`
+- **Python:** 3.12.14
+- **Started:** 2026-09-22 19:25:35 EDT
+- **Ended:** 2026-09-22 21:11:22 EDT
+- **Wall clock:** 6347 s (1:45:47)
+- **Suite completed:** No (KeyboardInterrupt after worker loss)
+- **Worktree changes:** clean; no product code fixed
+
+## Counts
+
+- **Passed:** 16,616
+- **Failed:** 234
+- **Skipped:** 1,984
+- **Xfailed:** 4
+- **Errors:** 17
+- **Warnings:** 799
+
+Classification legend: `ENV-CORPUS` = unavailable external corpus/provenance; `ENV-ENGINE` = expected missing optional engine/native artifact; `ENV-OPTIONAL` = undeclared-by-default optional dependency; `ENV-FIXTURE` = missing private fixture; `INFRA` = timeout/run infrastructure; `REAL` = observed product/data/test assertion mismatch.
+
+**Classification totals (failed + error):** `ENV-CORPUS` 36; `ENV-ENGINE` 54; `ENV-OPTIONAL` 52; `ENV-FIXTURE` 1; `INFRA` 5; `REAL` 103.
+
+## Failed tests (234)
+
+- **ENV-CORPUS** `tests/battery/test_janaf_generator.py::test_off_grid_temperature_with_intact_layout_is_refused` — external JANAF corpus file is missing
+- **ENV-CORPUS** `tests/battery/test_janaf_generator.py::test_grid_membership_is_distinct_from_field_count` — external JANAF corpus file is missing
+- **ENV-CORPUS** `tests/battery/test_janaf_generator.py::test_non_data_marker_lines_are_recorded` — external JANAF corpus file is missing
+- **REAL** `tests/battery/test_migrate.py::test_j01_store_census_series_numeric_matches_declared_field` — assert not ['missing stored point holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::p...ored point holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_...
+- **REAL** `tests/test_grind_scratch_reduction.py::test_read_only_base_attach_exact_hit@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_shard_holds_only_new_rows_after_write@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_base_not_written_by_job_store@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_seed_job_cache_creates_empty_shard_without_base_copy@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_prune_merged_shards_after_integrity_check@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_prune_merged_shards_unlinks_wal_sidecars@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_prune_merged_shards_succeeds_without_sidecars@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_merge_epoch_shards_and_prune_integration@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_multi_job_shard_scratch_bounded_not_n_times_base@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_shard_connect_sets_busy_timeout_and_wal_on_main_only@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_concurrent_process_shard_puts_without_database_locked@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_grind_scratch_reduction.py::test_concurrent_shard_puts_fail_without_busy_timeout_pragma@serial` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **INFRA** `tests/battery/test_migrate.py::test_validate_corpus_zero_hard_issues_on_migrated_store` — pytest-timeout after 300s
+- **REAL** `tests/test_mass_balance.py::test_c2a_staged_freeze_gate_on_closes_mass_balance[freeze_gate_off]@serial` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **ENV-ENGINE** `tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[lunar_mare_low_ti-None]@magemin_fullrun_c` — optional live engine/backend is unavailable in this box
+- **REAL** `tests/test_mass_balance.py::test_c2a_staged_freeze_gate_on_closes_mass_balance[freeze_gate_on]@serial` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_run_executor.py::test_c4_transitional_flux_refusal_is_visible_and_preserves_ledger_closure@serial` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **INFRA** `tests/test_run_executor.py::test_finite_capacity_preserves_transitional_evaporation_refusal@serial` — pytest-timeout after 300s
+- **ENV-ENGINE** `tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[mars_basalt-additives_kg1]@magemin_fullrun_c` — optional live engine/backend is unavailable in this box
+- **ENV-CORPUS** `tests/battery/test_migrate_r7.py::test_g1_whole_store_absence_claims_match_sources[robie-hemingway-fisher-1978-usgs-b1452-0003.yaml]` — external literature corpus PDF/source is missing
+- **REAL** `tests/test_sso_r_r20_state.py::test_c3_na_source_term_comes_from_committed_transition@serial` — AssertionError: assert 0.0 > 1e-15
+- **REAL** `tests/test_sso_r_r20_state.py::test_c3_na_source_terms_preserve_same_hour_exchange_observables@serial` — KeyError: 'redox_source:evaporative_metal_loss'
+- **ENV-ENGINE** `tests/chemistry/test_builtin_condensation_route_provider.py::test_split_path_end_state_matches_pre_flip_account_balances[s_type_asteroid_silicate-None]@magemin_fullrun_c` — optional live engine/backend is unavailable in this box
+- **REAL** `tests/test_sso_r_validation_map.py::test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity@serial` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_measured_rate_series_executes_hkl` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_wetzel_stale_duplicate_hits_system_class_and_form_gate` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_engine_value_mutation_moves_residual_outside_band_goes_red` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_numeric_activity_executes_melt_activity_model` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_hkl_assumption_diagnostic_is_not_promoted_or_pinned` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing[halwax_2024_cao_third_law_formation_enthalpy-typed-refusal:superseded]` — checked-in extract points to unavailable machine-local corpus provenance
+- **REAL** `tests/test_sso_r_validation_map.py::test_owner_pn2_anchor_reports_current_certification_state@serial` — assert 786.3400448197305 == 1576.0114767733974 ± 1.0e-09
+- **REAL** `tests/test_sso_r_validation_map.py::test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2@serial` — assert 0.0 > 700.0
+- **REAL** `tests/test_sso_r_validation_map.py::test_grind_ready_target_window_opens_with_live_parity@serial` — AssertionError: assert 'first_passing_T_C=1600.0' in 'first_passing_T_C=None; window under PN2 sweep transport semantics; live parity=confirmed'
+- **REAL** `tests/test_sso_r_validation_map.py::test_distilled_golden_fixture_matches_current_anchors@serial` — AssertionError: assert [{'mode': 'ma...': -9.5, ...}] == [{'diagnostic...anchor', ...}]
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_wetzel_model_tables_refuse_as_model_output` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_melting_point_is_typed_refusal_not_a_fabricated_psat` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing[stolyarova_1992_binary_wilson_model_parameters_table2-typed-refusal:model_output_not_measurement]` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing[halwax_2024_mgo_third_law_formation_enthalpy-typed-refusal:superseded]` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_normal_boiling_point_inverts_antoine_in_kelvin` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_tsukihashi_plante_activity_extracts.py::test_new_activity_rows_are_not_missing_numeric` — external literature corpus PDF/source is missing
+- **REAL** `tests/chemistry/test_sio_step_wall_deposit.py::test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux` — assert 5 == 20.0
+- **REAL** `tests/test_alphamelts_backend.py::test_alphamelts_subprocess_signal_exit_returns_typed_crash_without_mode_flip` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_alphamelts_backend.py::test_alphamelts_subprocess_timeout_returns_typed_status_without_mode_flip` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_alphamelts_backend.py::test_alphamelts_timeout_cleanup_oserror_is_secondary_to_typed_status` — PermissionError: [Errno 1] poisoned process-group kill
+- **REAL** `tests/test_alphamelts_backend.py::test_alphamelts_subprocess_operating_floor_is_inclusive` — +  where 2 = len([((['/tmp/fake-alphamelts', '1'],), {'cwd': '/tmp/regolith-pytest-worker-cache/slot-08/gw5-qdgn07t_/tmp/tmplffulukq', ... 'text': True, ...}), ((['/tmp/fake-alphamelts', '--version'],), {'capture_outp...
+- **REAL** `tests/test_alphamelts_backend.py::test_alphamelts_subprocess_uses_configured_timeout` — assert 5 == 37.5
+- **ENV-ENGINE** `tests/test_alphamelts_backend.py::test_thermoengine_transport_rejects_unpickleable_worker_converter` — ThermoEngine native dylibs are absent
+- **REAL** `tests/test_alphamelts_backend.py::test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_available` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_alphamelts_provider.py::test_domain_gate_rejects_low_sio2` — assert True is False
+- **REAL** `tests/test_alphamelts_volatility_diagnostic.py::test_composition_domain_violation_reuses_alphamelt_reason_flag` — assert False is True
+- **REAL** `tests/test_artifact_guards.py::test_no_direct_melt_regime_membership_comparisons_outside_helper` — assert not ['simulator/diagnostic_helpers/binary_pot_battery.py:1153: liquid_fraction <= 0.0']
+- **REAL** `tests/test_artifact_guards.py::test_pressure_channel_consumers_declare_intent` — assert not ['simulator/diagnostic_helpers/species_rail_differential.py:1133: compiled.evaluator', 'simulator/diagnostic_helpers/s...ifferential.py:2525: spec.evaluator', 'simulator/diagnostic_helpers/species_rail_diff...
+- **REAL** `tests/test_bughunt_phys_regressions.py::test_null_resinter_threshold_emits_finite_deposition_constraint` — AssertionError: assert not True
+- **REAL** `tests/chemistry/test_sio_chain_coherence.py::test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode` — assert 1.05259130098e-05 == 1.05260475258e-05 ± 5.0e-11
+- **REAL** `tests/chemistry/test_sio_step_wall_deposit.py::test_hot_wall_sio_reactive_deposit_uses_product_psat_floor` — simulator.condensation.WallSaturationPressureRefusal: wall_saturation_pressure_refused: species=SiO temperature_K=1973.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator ...
+- **REAL** `tests/test_burcat_compilation.py::test_formulas_absent_from_janaf_and_nasa_glenn` — AssertionError: assert {'AlB2', 'Ar2...1', 'Au', ...} == {'AlB2', 'Ar2...1', 'Au', ...}
+- **REAL** `tests/test_web_events_decision_pause.py::test_pause_resume_around_every_gate_is_ledger_identical@serial` — assert None is not None
+- **REAL** `tests/test_coating_rate.py::test_coating_diagnostic_default_output_is_byte_identical_to_golden` — AssertionError: assert 'dd70e07678bd...edcbe5e68cd2f' == 'a1cab1a260b1...0954d59823900'
+- **REAL** `tests/test_doc_anchors.py::test_doc_impl_anchors_resolve` — assert 1 == 0
+- **REAL** `tests/test_engine_local_config.py::test_config_absent_legacy_fallback_emits_warning` — assert False
+- **REAL** `tests/test_cost_ledger.py::test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_epoch_grind.py::test_run_driver_resume_after_sigterm_skips_done_job_and_retries_pending` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_epoch_grind.py::test_no_acquisition_prepare_job_run_keeps_empty_seed_baseline` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_epoch_grind.py::test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_epoch_grind.py::test_prepare_job_run_writes_seed_summary_and_actual_seed_rows` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_epoch_grind.py::test_seed_job_cache_rejects_stale_epoch_seed_without_counting_coverage` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_epoch_grind.py::test_concurrent_jobs_failure_drains_in_flight_siblings[failed]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_epoch_grind.py::test_concurrent_jobs_failure_drains_in_flight_siblings[timed_out]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_epoch_grind.py::test_concurrent_jobs_complete_with_isolated_shards` — sqlite3.OperationalError: unable to open database: file:///tmp/pytest
+- **REAL** `tests/test_fail_loud_h2_h3.py::test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite` — assert None is not None
+- **ENV-ENGINE** `tests/test_mass_balance.py::test_cumulative_transition_mass_closure_bounded_at_transitional_refusal@magemin_fullrun_b` — optional live engine/backend is unavailable in this box
+- **ENV-CORPUS** `tests/test_hemingway-haas-robinson-1982-usgs-b1544_compilation.py::test_parser_parity_is_secondary_to_image_fixtures` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_hemingway-haas-robinson-1982-usgs-b1544_compilation.py::test_round_trip_mutation_probe_rejects_any_nested_field[usgs-b1544-corundum-1-heat_capacity]` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_hemingway-haas-robinson-1982-usgs-b1544_compilation.py::test_round_trip_mutation_probe_rejects_any_nested_field[usgs-b1544-table-1-9-values.robie_1979]` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_hemingway-haas-robinson-1982-usgs-b1544_compilation.py::test_public_row_loaders_require_explicit_suspect_opt_in` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_imcc_rung3_fixture.py::test_imcc_rung3_fixture_grid_and_values_are_complete` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_hemingway-haas-robinson-1982-usgs-b1544_compilation.py::test_round_trip_mutation_probe_rejects_any_nested_field[usgs-b1544-prehnite-4-planck_function]` — external literature corpus PDF/source is missing
+- **INFRA** `tests/test_web_functional_qa.py::test_headless_full_run_ledgers_and_product_story_match_runner@serial` — pytest-timeout after 300s
+- **REAL** `tests/test_literature_extracts.py::test_every_extract_has_fidelity_sample` — assert None
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[ammin-75-781-hemingway-1990]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[arxiv-1602-00658-fegley-rock-steam-solubility]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[cooper-2007-sintering-lunar-simulant]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[deguzman-2026-simulant-physicochemical]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[hendrix-2024-reactivity-reduced-simulants]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[itoh-hino-banya-1997-mg-deoxidation]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_repo_extracts_validate_green` — assert ["/workspace/...arator'", ...] == []
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[kems-137-bischof-2023]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[norris-2017-earth-volatiles-nature]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[okazaki-2022-ryugu-gas-treasure-box]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_literature_extracts.py::test_fidelity_sample_matches_extract[rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **ENV-CORPUS** `tests/test_literature_index.py::test_nist_janaf_index_asset_is_the_corpus_txt_download` — external JANAF corpus file is missing
+- **REAL** `tests/test_literature_index.py::test_regenerated_index_matches_committed` — assert {'schema_vers...58, ...}, ...} == {'schema_vers...37, ...}, ...}
+- **ENV-CORPUS** `tests/test_literature_extracts.py::test_coverage_pending_stubs_not_found` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_literature_extracts.py::test_pilot_extract_count_exact_and_merge_smoke` — external literature corpus PDF/source is missing
+- **REAL** `tests/test_melt_activity_benchmark.py::test_coverage_map_records_melts_refusal_below_30_sio2` — assert False
+- **REAL** `tests/test_melt_activity_benchmark.py::test_coverage_silicate_band_is_rail_owned` — AssertionError: assert 'ok' == 'out_of_domain'
+- **REAL** `tests/test_melt_activity_benchmark.py::test_tracked_melt_activity_report_marks_thermoengine_narrative_stale` — AssertionError: assert 'STALE (t-681' in '# Melt-activity benchmark report\n\n## Evidence boundary\n\nLiteral SF04 basalt empirical points: **0**. The scored e...rt_exposes_no_activity_observable`), not a per-composit...
+- **REAL** `tests/test_melt_backend_result_contract.py::test_alphamelts_out_of_domain_result_carries_crash_point_inputs` — AssertionError: assert 'unavailable' == 'out_of_domain'
+- **ENV-ENGINE** `tests/test_staged_bakeout.py::test_c2a_staged_k_shuttle_and_conservation_remain_visible@magemin_fullrun_b` — optional live engine/backend is unavailable in this box
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_ask_returns_schema_valid_unique_deterministic_candidates` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_pressure_conditioning_updates_recorded_trial_params` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_multi_objective_directions_and_pareto_front_are_derived_from_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_directions_change_with_objective_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_single_objective_profile_round_trips` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_population_is_diverse_and_tell_history_changes_followup` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_constraints_rank_completed_trials_but_do_not_block_asks` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_constraints_do_not_block_infeasible_region_after_tell` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_constraint_feasible_margin_not_violated_and_reuses_tpe_contract` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_nonfinite_gate_margins_map_to_finite_constraint_values` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_nan_gate_margin_fails_loud` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_infeasible_result_uses_directional_worst_values_not_zero` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_strategy_implements_protocol_and_round_trips` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_missing_or_degraded_furnace_evidence_is_unscoreable[no-reference]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_feasible_unscoreable_result_fails_trial_without_bad_objective_values` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_missing_or_degraded_furnace_evidence_is_unscoreable[missing-status]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_missing_or_degraded_furnace_evidence_is_unscoreable[degraded-status]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_corrupted_available_furnace_evidence_propagates` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_scores_legacy_energy_cache_objective_against_canonical_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_tell_rejects_non_scored_result_and_non_pairs` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_tell_empty_batch_is_documented_noop` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_ask_edge_cases` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_strategy_implements_protocol_and_round_trips` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_ask_returns_schema_valid_unique_deterministic_candidates` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_pressure_conditioning_updates_recorded_trial_params` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_multi_objective_directions_and_pareto_front_are_derived_from_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_directions_change_with_objective_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_constraints_rank_completed_trials_but_do_not_block_asks` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_learns_toward_favored_region_after_tell_history` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_constraint_feasible_margin_not_violated` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_nonfinite_gate_margins_map_to_finite_constraint_values` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_same_seed_same_tells_same_followup` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_nan_gate_margin_fails_loud` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_single_objective_profile_round_trips` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_infeasible_result_uses_directional_worst_values_not_zero` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_constraints_do_not_prefilter_infeasible_region` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_missing_or_degraded_furnace_evidence_is_unscoreable[None]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_feasible_unscoreable_result_fails_trial_without_bad_objective_values` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_missing_or_degraded_furnace_evidence_is_unscoreable[batch_cost_unavailable]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_corrupted_available_furnace_evidence_propagates` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_scores_legacy_energy_cache_objective_against_canonical_profile` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_tell_rejects_non_scored_result` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_tell_empty_batch_is_documented_noop` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_ask_edge_cases` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_tell_contract_is_atomic_for_mismatch_duplicate_and_unknown` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_nsga2.py::test_nsga2_tell_rejects_patch_or_metadata_mismatch` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_tell_contract_is_atomic_for_mismatch_duplicate_and_unknown` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_strategy_tpe.py::test_tpe_tell_rejects_patch_or_metadata_mismatch` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_study.py::test_strategy_cache_hit_legacy_energy_scores_against_canonical_profile[bayes]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_study.py::test_strategy_cache_hit_legacy_energy_scores_against_canonical_profile[nsga2]` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_optimizer_study.py::test_two_phase_certification_records_parallel_for_adaptive_strategy` — optional Optuna dependency is not installed
+- **ENV-OPTIONAL** `tests/test_rail_conformance.py::test_demand_manifest_is_fresh` — demand-manifest subprocess reaches an unavailable optional Optuna path
+- **REAL** `tests/test_rail_conformance.py::test_harness_ledgers_are_not_simulation_runtime_inputs` — assert not {'simulator/battery/pins.py': ['vapour_rail_validation_pins.yaml'], 'simulator/battery/score.py': ['vapour_rail_validation_pins.yaml']}
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Al]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Al2O2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Al2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Al2O3_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[AlO2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Al2O]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[AlO]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Ca]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[CaO_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Cr]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Ca2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[CrO]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[CrO2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[CrO3]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[K]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Fe]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[K2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Mg]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[K2O_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Mn]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Na]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[MgO_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[P4]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[P2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Na2O_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[PO2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[PO]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[P4O6]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Si2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Si]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Mg2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[SiO]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Ti]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Na2]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[SiO2_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[TiO]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[Si3]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_t3_na2o_activity_pin_remains_admitted` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[TiO2_gas]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_c5_debit_route_alpha_and_source_metadata_are_executable[P4O10]` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **REAL** `tests/test_reduced_real_pt0_determinism.py::test_control_quantization_default_production_key_is_byte_identical` — AssertionError: assert 'e761a0f496cb...4e244c9e14317' == 'aa4dd3b20f35...2257fda19358b'
+- **REAL** `tests/test_recipe_io.py::test_no_recipe_run_matches_committed_golden_text` — assert '{\n  "schema...ssage": ""\n}' == '{\n  "schema...ssage": ""\n}'
+- **REAL** `tests/test_references_registry.py::test_build_references_check_passes` — {'shadow_trace': [{'event': 'shadow_error', 'provider_id': 'vaporock', 'intent': 'vapor_pressure', 'result': {'status'...LTS-v1.0', 'T_calib_max_K': 1700.0, 'melt_model_extrapolation_K': 0.0, 'melt_extrap_sigma_mu_J_m...
+- **REAL** `tests/test_runner_smoke.py::test_runner_golden_fixture_matches[ci_carbonaceous_chondrite_C2B_12h]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_runner_smoke.py::test_runner_golden_fixture_matches[lunar_mare_low_ti_C0_24h]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_runner_smoke.py::test_runner_golden_fixture_matches[mars_basalt_C2A_12h]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_stage0_harness.py::test_real_feedstock_stops_at_c0b_path_ab_pause` — assert {'Ca', 'Cr', ...3', 'Fe', ...} == {'Ca', 'Cr', ...K', 'K2', ...}
+- **REAL** `tests/test_stage0_harness_verdicts.py::test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate_when_backend_ok` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_stage0_harness_verdicts.py::test_domain_gate_reason_for_silicate_window_is_distinct[AlphaMELTSDomainGate]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_sio_yield_regression.py::test_sio_yield_cli_matches_golden[lunar_mare_low_ti-lunar_mare_low_ti_c2a.json]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **REAL** `tests/test_suite_shape_guard.py::test_suite_shape_heavy_tests_are_grouped_and_rostered` — assert not ['tests/test_mass_balance.py::test_cumulative_transition_mass_closure_bounded_at_transitional_refusal@magemin_fullrun_...atus_and_decisions') matches no collected test — phantom row (typo or removed test); ...
+- **REAL** `tests/test_sio_yield_regression.py::test_sio_yield_cli_matches_golden[mars_basalt-mars_basalt_c2a.json]` — observed assertion/behavior mismatch; detailed block lost when gw0 died
+- **ENV-ENGINE** `tests/test_vaporock_offline_boundaries.py::test_pseudo_antoine_refit_failure_preserves_validated_melt_envelope` — optional vaporock/ThermoEngine stack is not installed
+- **ENV-ENGINE** `tests/test_vaporock_offline_boundaries.py::test_pseudo_antoine_refit_consumes_complete_melt_envelope` — optional vaporock/ThermoEngine stack is not installed
+- **ENV-ENGINE** `tests/test_vaporock_offline_boundaries.py::test_pseudo_antoine_refit_diagnostics_do_not_change_fitted_rows` — optional vaporock/ThermoEngine stack is not installed
+- **REAL** `tests/test_vapour_batch_request.py::test_default_compile_production_warm_hit_budget` — assert 0.3141496980001648 < 0.22
+- **REAL** `tests/test_vapour_rail_catalog.py::test_t609_cross_revision_additivity_evidence_is_reproducible` — subprocess.CalledProcessError: Command '['/workspace/repos/wt/slot-08/.venv/bin/python', '/workspace/repos/wt/slot-08/scripts/prove_t609_cross_revision_additivity.py', '--check', '--output', '/workspace/repos/wt/slot-...
+- **REAL** `tests/test_vapour_rail_catalog.py::test_t622_cross_revision_additivity_evidence_is_reproducible` — subprocess.CalledProcessError: Command '['/workspace/repos/wt/slot-08/.venv/bin/python', '/workspace/repos/wt/slot-08/scripts/prove_t622_cross_revision_additivity.py', '--check', '--output', '/workspace/repos/wt/slot-...
+- **REAL** `tests/test_staged_bakeout.py::test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture` — assert 0.10246343391922452 == 0.10262754045813638 ± 1.0e-10
+- **REAL** `tests/test_vr11_instrumentation.py::test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa` — simulator.condensation.WallSaturationPressureRefusal: wall_saturation_pressure_refused: species=Na temperature_K=1000.000 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator b...
+- **REAL** `tests/test_w0_sens_screen.py::test_na_anchor_null_instrument_aborts_and_produces_no_ranking` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-RANKIN...STRUMENT-NULL'
+- **REAL** `tests/test_w0_sens_screen.py::test_synthetic_gate_failure_stops_before_any_chemical_evaluation` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-W-MUTATOR'
+- **REAL** `tests/test_w0_sens_screen.py::test_ranking_invalidated_is_recorded_as_a_typed_abort` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-RANKING-INVALIDATED'
+- **REAL** `tests/test_w0_sens_screen.py::test_public_aggregate_releases_only_the_restricted_fields` — IndexError: list index out of range
+- **REAL** `tests/test_w0_sens_screen.py::test_csv_header_is_the_frozen_schema` — AssertionError: assert [] == ['SA-SB', 'SA-SC', 'SB-SC']
+- **ENV-FIXTURE** `tests/test_w0_sens_screen.py::test_screen_refuses_a_quarantine_root_inside_the_repository` — required private wave-0 preregistration fixture is missing
+- **REAL** `tests/test_w0_sens_screen.py::test_screen_refuses_a_join_with_no_sealed_evidence_grade` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-EVIDENCE-GRADE'
+- **REAL** `tests/test_w0_sens_screen.py::test_readback_mismatch_never_discloses_the_observed_value` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-W-MUTATOR'
+- **REAL** `tests/test_w0_sens_screen.py::test_screen_runs_every_gate_before_any_candidate_is_screened` — assert 'ABORT-W0-SENS-PRECONDITION' is None
+- **REAL** `tests/test_w0_sens_screen.py::test_restoration_is_verified_even_when_the_screen_aborts` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-W-MUTATOR'
+- **REAL** `tests/test_w0_sens_screen.py::test_screen_writes_the_immutable_run_record` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' is None
+- **REAL** `tests/test_w0_sens_screen.py::test_restoration_failure_on_an_abort_path_is_recorded` — AssertionError: assert 'ABORT-W0-SENS-PRECONDITION' == 'ABORT-W-MUTATOR'
+- **REAL** `tests/test_wall_deposit_sticking_status.py::test_out_of_domain_wall_psat_refusal_is_status_bearing` — KeyError: 'wall_saturation_pressure_refusals_by_species'
+- **REAL** `tests/test_wall_deposit_sticking_status.py::test_wall_psat_refusal_survives_a_later_non_refusing_route` — KeyError: 'wall_saturation_pressure_refusals_by_species'
+- **REAL** `tests/test_web_panel_p14.py::test_p14_lunar_fixture_origin_tier_copies_all_emitted_links` — OSError: [Errno 7] Argument list too long: 'node'
+- **REAL** `tests/test_yield_disposition.py::test_session_multi_refusal_then_continue_matches_unattempted_hours` — AttributeError: 'PyrolysisSimulator' object has no attribute '_condensation_model'. Did you mean: 'condensation_model'?
+- **REAL** `tests/test_web_socket_trace.py::test_pre_refactor_socket_trace_matches_golden` — AssertionError: assert b'[\n  {\n   ...  }\n  }\n]\n' == b'[\n  {\n   ...  }\n  }\n]\n'
+- **ENV-ENGINE** `tests/test_yield_root_cause.py::test_pyrolysis_track_c5_reduces_feo_without_additives@magemin_fullrun_b` — optional live engine/backend is unavailable in this box
+
+## Error tests (17)
+
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_store_yields_adopted_target_type_observations` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_pinned_residuals_cover_all_live_comparable_points` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_transition_point_is_an_adopted_target_type` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_evaluate_all_covers_every_adopted_observation` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_live_qualitative_catch_all_is_split_by_payload_class` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_coverage_ledger_is_observation_first_and_exact` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-CORPUS** `tests/chemistry/test_extract_store_reproduction.py::test_battery_rollup_matches_committed_model_limitations` — checked-in extract points to unavailable machine-local corpus provenance
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_t2_vaporock_residual_pins_are_two_way` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_t3_unfixed_expected_set_names_na_without_mass_spec_record` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_t3_expected_species_come_from_mass_spec_type_pins_only` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **ENV-ENGINE** `tests/test_rail_conformance.py::test_t3_mass_spec_residual_pins_are_two_way` — vapour-rail engine crosscheck artifact/backend is unavailable
+- **INFRA** `tests/test_physics_ground_truth.py::test_mg_phase_correct_0p01_bar_threshold[moon-1.3e-12-1893-1892.647379974303]` — pytest-timeout after 300s during shared YAML/physics fixture setup
+- **INFRA** `tests/test_physics_ground_truth.py::test_mg_phase_correct_0p01_bar_threshold[asteroid-1e-14-1769-1768.703033642641]` — pytest-timeout after 300s during shared YAML/physics fixture setup
+- **ENV-CORPUS** `tests/test_robie-hemingway-fisher-1978-usgs-b1452_compilation.py::test_phase_records_have_strict_safe_grids_and_no_embedded_headers` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_robie-hemingway-fisher-1978-usgs-b1452_compilation.py::test_every_numeric_token_round_trips_to_page_layout` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_robie-hemingway-fisher-1978-usgs-b1452_compilation.py::test_phase_as_published_represented_per_record` — external literature corpus PDF/source is missing
+- **ENV-CORPUS** `tests/test_robie-hemingway-fisher-1978-usgs-b1452_compilation.py::test_source_round_trip_rejects_consistent_token_value_mutation` — external literature corpus PDF/source is missing
+
+## Installation note
+
+Installed `requirements.txt` into a worktree-local Python 3.12.14 virtual environment. Python 3.13 was initially incompatible with the declared `numpy<2` constraint because NumPy 1.26.4 had no wheel and the box lacked a C++ compiler; no product files were changed.
