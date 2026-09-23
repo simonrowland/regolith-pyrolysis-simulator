@@ -1,6 +1,6 @@
 "use strict";
 
-const { esc } = globalThis.ReportLabels;
+const { esc, prettyFeedstock } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
@@ -60,6 +60,19 @@ function yieldChips(run) {
   ).join("")}</div>`;
 }
 
+function runMetaLine(run) {
+  const feedstockId = typeof run.feedstock_id === "string" ? run.feedstock_id : "";
+  const summary = typeof run.summary === "string" && feedstockId
+    ? run.summary.split(feedstockId).join(prettyFeedstock(feedstockId))
+    : run.summary;
+  const parts = [];
+  if (feedstockId) parts.push(prettyFeedstock(feedstockId));
+  if (typeof summary === "string" && summary.trim()) parts.push(summary.trim());
+  if (hasNumber(run.hours)) parts.push(`${run.hours} h`);
+  if (hasNumber(run.peak_T_C)) parts.push(`peak ${run.peak_T_C} °C`);
+  return parts;
+}
+
 function runCard(run) {
   const runId = String(run.run_id);
   const isStarred = isRunStarred(run);
@@ -80,7 +93,7 @@ function runCard(run) {
       <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
     ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
-    <p class="run-summary">${esc(run.summary)}${hasNumber(run.hours) ? esc(` · ${run.hours} h`) : ""}${hasNumber(run.peak_T_C) ? esc(` · peak ${run.peak_T_C} °C`) : ""}</p>
+    <p class="run-summary">${runMetaLine(run).map((part) => esc(part)).join(" · ")}</p>
     ${yieldChips(run)}
     ${unavailable}
     <div class="run-actions"><span class="mono">${esc(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>

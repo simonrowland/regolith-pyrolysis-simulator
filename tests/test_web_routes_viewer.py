@@ -757,6 +757,39 @@ def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
     assert 'Pumping energy</span><b><span title="0 kWh">0 kWh' not in html
 
 
+def test_library_pretty_prints_feedstock_ids() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const context = {
+  window: { location: { href: "" } },
+  document: { querySelector() { return null; } },
+  encodeURIComponent,
+  fetch: () => new Promise(() => {}),
+  console
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(labelsSource, context);
+vm.runInContext(librarySource, context);
+context.testRun = { feedstock_id: "lunar_mare_low_ti" };
+process.stdout.write(JSON.stringify(vm.runInContext("runMetaLine(testRun)", context)));
+"""
+
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "library.js")],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    assert json.loads(completed.stdout) == ["Lunar Mare Low Ti"]
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 
