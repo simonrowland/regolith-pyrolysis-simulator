@@ -607,16 +607,17 @@ def pressure_boundary(
             ("experiment.pressure_environment.total_pressure_Pa",)))
     speed = _value(bench.pumping_speed_m3_s)
     gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
-    volume = relevant_volume(experiment, bench).selected
-    if speed is not None and gas_load is not None and volume is not None:
+    if speed is not None and gas_load is not None:
         load_value = _value(gas_load.value)
         if load_value is not None:
             derived = _divide(load_value, speed)
             if derived is not None:
                 # Premise: well-mixed vessel d(PV)/dt=Q-S*P at steady state.
-                # Algebra: 0=Q-S*P, so P=Q/S (V cancels). Units: Pa*m3/s /(m3/s)=Pa.
+                # Algebra: 0=Q-S*P, so P=Q/S. V cancels, and this route does
+                # not apply a dwell check (tau=V/S), so relevant_volume is not
+                # an input and is not a gap. Units: Pa*m3/s /(m3/s)=Pa.
                 # Sanity: Q=1e-5 Pa*m3/s and S=1e-2 m3/s gives 1e-3 Pa.
-                routes.append(Waypoint("pressure_boundary", derived, "steady_gas_load_over_pump_speed", WaypointAuthority.DERIVED, ("bench.other_facts.gas_load_Pa_m3_s", "bench.pumping_speed_m3_s", "relevant_volume")))
+                routes.append(Waypoint("pressure_boundary", derived, "steady_gas_load_over_pump_speed", WaypointAuthority.DERIVED, ("bench.other_facts.gas_load_Pa_m3_s", "bench.pumping_speed_m3_s")))
     pressure_inputs = {
         "experiment.pressure_environment.total_pressure_Pa": _value(
             experiment.pressure_environment.total_pressure_Pa
