@@ -202,6 +202,7 @@ function initCompositionChart(wt) {
 }
 
 function initFlowChart(species) {
+    for (const existing of Object.keys(flowTraces)) delete flowTraces[existing];
     const traces = species.map((sp, index) => {
         flowTraces[sp] = index;
         return {

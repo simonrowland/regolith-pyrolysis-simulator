@@ -52,6 +52,13 @@ _SIMULATOR_DECISIONS_JS = (
 _SIMULATOR_CONTROLS_JS = (
     _REPO_ROOT / "web" / "static" / "js" / "simulator-controls.js"
 )
+_FLOW_CHART_RESTART_HARNESS = (
+    _REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "web_render"
+    / "render_flow_chart_restart.mjs"
+)
 
 _RENDER_IDS = [
     "status-hour",
@@ -484,6 +491,21 @@ def test_evaporation_flux_chart_admits_species_that_appear_later(
             "traceNames": ["SiO"],
         }
     ]
+
+
+def test_evaporation_flux_chart_clears_species_between_runs():
+    completed = subprocess.run(
+        ["node", str(_FLOW_CHART_RESTART_HARNESS), str(_SIMULATOR_CHARTS_JS)],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout) == {
+        "traceNames": ["Fe", "SiO"],
+        "flowTraces": {"Fe": 0, "SiO": 1},
+    }
 
 
 def test_disconnect_reconnect_resets_controls_and_decision_modal():
