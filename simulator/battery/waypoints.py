@@ -922,6 +922,17 @@ def _c_co_pressure_Pa(
     return None
 
 
+def _is_pressure_unit_conversion(inference: object) -> bool:
+    return (
+        inference is not None
+        and str(getattr(inference, "relation", "")).endswith("_to_Pa")
+        and any(
+            str(item).startswith("original_unit=")
+            for item in getattr(inference, "inputs", ())
+        )
+    )
+
+
 def oxygen_condition(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
@@ -1081,7 +1092,10 @@ def oxygen_condition(
         locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
         vacuum_evidence = (
             located_pressure is not None
-            and located_pressure.inference is None
+            and (
+                located_pressure.inference is None
+                or _is_pressure_unit_conversion(located_pressure.inference)
+            )
             and any(
                 token in locator_note
                 for token in (

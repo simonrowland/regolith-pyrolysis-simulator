@@ -126,6 +126,30 @@ def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
         assert output["notice"] == oxygen.notice
 
 
+def test_converted_printed_run_vacuum_supplies_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    pressure = Located(
+        State.of(Value.point_of("0.01333223684210526315789473684")),
+        locator=f.loc(note="printed vacuum during run"),
+        inference=Derivation(
+            "Torr_to_Pa",
+            ("P_Pa = P_Torr × 101325 / 760", "original_unit=Torr"),
+            (),
+            "Pa",
+        ),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=pressure
+        ),
+    )
+    selected = oxygen_condition(experiment, bench, observation).selected
+    assert selected is not None
+    assert selected.route == "vacuum_total_pressure_upper_bound"
+    assert selected.value.point == pytest.approx(Decimal("-6.8750969798670607"))
+
+
 def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
     experiment, bench, observation = case(pressure="1e-4")
     experiment = replace(
