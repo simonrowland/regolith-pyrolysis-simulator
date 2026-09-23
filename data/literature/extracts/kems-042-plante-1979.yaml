@@ -163,6 +163,19 @@ experiments:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: Vacuum system}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+  fO2_control:
+    channel: {tag: value, value: intrinsic}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        page: 279
+        equation: 'P_O2 = 0.226 P_K'
+        note: >-
+          Author oxygen is stoichiometric from dissociative vaporization,
+          P_O2 = 0.226 P_K (printed). No commanded buffer or gas mix.
+          Per-row P_O2 is derived from printed P_K × printed ratio and
+          lands on observation point_conditions.fO2_Pa as DERIVED; no
+          single experiment oxygen_partial_pressure_Pa is asserted.
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
