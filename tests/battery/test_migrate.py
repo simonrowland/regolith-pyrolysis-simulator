@@ -50,6 +50,7 @@ from simulator.battery.migrate import (
     map_phase,
     map_quantity,
     compilation_quantity_from_record,
+    compilation_column_series_from_record,
     load_migrated_store,
     migrate,
     pressure_from_equipment,
@@ -3103,6 +3104,176 @@ def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
         }
     )
     assert state.is_value and state.value is Quantity.DELTA_FG
+
+
+def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
+    """Multi-column Cp/S/H/ΔHf/ΔGf censuses explode to one series per Quantity."""
+    pankratz = json.loads(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/pankratz-1984-usbm-b677/records/table-1447.json"
+        ).read_text(encoding="utf-8")
+    )
+    series = compilation_column_series_from_record(pankratz)
+    quantities = [item.quantity for item in series]
+    assert quantities == [
+        Quantity.CP,
+        Quantity.S,
+        Quantity.H_MINUS_H298,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+    ]
+    assert all(item.value.kind is ValueKind.SERIES for item in series)
+    assert all(len(item.value.series or ()) == 4 for item in series)
+    # Never first-numeric-cell: T column stays out of the emitted quantities.
+    assert Quantity.TRANSITION_TEMPERATURE not in quantities
+    cp = next(item for item in series if item.quantity is Quantity.CP)
+    assert cp.value.series[0] == (as_decimal("298"), as_decimal("76.0"))
+
+    kelley = json.loads(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0007.json"
+        ).read_text(encoding="utf-8")
+    )
+    k_series = compilation_column_series_from_record(kelley)
+    k_by_key = {item.series_key: item for item in k_series}
+    assert "cp_temperature_grid" in k_by_key
+    assert k_by_key["cp_temperature_grid"].quantity is Quantity.CP
+    assert k_by_key["cp_temperature_grid"].value.kind is ValueKind.SERIES
+    assert len(k_by_key["cp_temperature_grid"].value.series or ()) == 7
+    assert k_by_key["entropy_third_law"].quantity is Quantity.S
+    assert k_by_key["entropy_third_law"].value.kind is ValueKind.POINT
+    assert k_by_key["entropy_third_law"].value.point == as_decimal("26.58")
+    assert k_by_key["entropy_recommended"].value.point == as_decimal("26.58")
+
+
+def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-1447.json")
+    _copy_compilation_record(root, "kelley-king-1961-usbm-b592", "table-006-0007.json")
+    _copy_compilation_record(root, "kelley-king-1961-usbm-b592", "table-006-0923.json")
+    result = migrate(root, write=False)
+
+    pank = [
+        obs
+        for oid, obs in result.observations.items()
+        if "table-1447" in oid
+    ]
+    pank_q = {quantity_token(obs.identity) for obs in pank}
+    assert pank_q == {
+        Quantity.CP,
+        Quantity.S,
+        Quantity.H_MINUS_H298,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+    }
+    assert all(obs.value.kind is ValueKind.SERIES for obs in pank)
+    # Identity assertion: ΔHf series is not the first numeric column (T or Cp).
+    dh = next(obs for obs in pank if quantity_token(obs.identity) is Quantity.DELTA_FH)
+    assert dh.value.series is not None
+    # table-1447 row0 ΔHf is column index 4, not the first numeric cell (T=298 or Cp=76).
+    assert dh.value.series[0] == (as_decimal("298"), as_decimal("-692.045"))
+
+    kel = [
+        obs
+        for oid, obs in result.observations.items()
+        if "table-006-0007" in oid
+    ]
+    kel_q = {quantity_token(obs.identity) for obs in kel}
+    assert Quantity.CP in kel_q and Quantity.S in kel_q
+    assert any(
+        obs.value.kind is ValueKind.SERIES and quantity_token(obs.identity) is Quantity.CP
+        for obs in kel
+    )
+    assert sum(1 for obs in kel if quantity_token(obs.identity) is Quantity.S) == 2
+
+    kel19 = [
+        obs
+        for oid, obs in result.observations.items()
+        if "table-006-0923" in oid
+    ]
+    assert any(quantity_token(obs.identity) is Quantity.CP for obs in kel19)
+    assert any(
+        quantity_token(obs.identity) is Quantity.S and "entropy_spectrographic" in oid
+        for oid, obs in result.observations.items()
+        if "table-006-0923" in oid
+    )
+
+    for entry in result.queue:
+        why = entry.why or ""
+        if "table-1447" in (entry.observation_id or "") or "table-006-0007" in (
+            entry.observation_id or ""
+        ):
+            assert "source column census" not in why
+            assert "printed compilation columns are not mapped" not in why
+
+
+def test_g5_compilation_column_mapping_mutation_proof() -> None:
+    """Clearing label maps restores the pre-fix empty explode / census path."""
+    from simulator.battery import migrate as migrate_mod
+
+    doc = json.loads(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/pankratz-1984-usbm-b677/records/table-1447.json"
+        ).read_text(encoding="utf-8")
+    )
+    live = compilation_column_series_from_record(doc)
+    assert len(live) == 5
+    assert {item.quantity for item in live} == {
+        Quantity.CP,
+        Quantity.S,
+        Quantity.H_MINUS_H298,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+    }
+
+    saved_heading = dict(migrate_mod._COMPILATION_HEADING_QUANTITY)
+    saved_cell = dict(migrate_mod._COMPILATION_CELL_QUANTITY)
+    try:
+        migrate_mod._COMPILATION_HEADING_QUANTITY.clear()
+        # Keep non-G5 cell keys so unrelated paths stay intact; drop multi-column keys.
+        for key in list(migrate_mod._COMPILATION_CELL_QUANTITY):
+            if key in {
+                "cp",
+                "heat_capacity",
+                "entropy",
+                "enthalpy_increment",
+                "delta_h",
+                "delta_g",
+                "log_k",
+                "cp_10_k",
+                "cp_25_k",
+                "cp_50_k",
+                "cp_100_k",
+                "cp_150_k",
+                "cp_200_k",
+                "cp_298_15_k",
+                "entropy_third_law",
+                "entropy_spectrographic_or_molecular_constants",
+                "entropy_other_sources",
+                "entropy_recommended",
+                "delta_f_H",
+                "delta_fH",
+                "deltafH",
+                "formation_enthalpy",
+            }:
+                migrate_mod._COMPILATION_CELL_QUANTITY.pop(key, None)
+        mutant = compilation_column_series_from_record(doc)
+        assert mutant == ()
+        # First-numeric-cell mutant would invent a quantity from T/Cp; we require empty.
+        assert not any(item.quantity is Quantity.CP for item in mutant)
+    finally:
+        migrate_mod._COMPILATION_HEADING_QUANTITY.clear()
+        migrate_mod._COMPILATION_HEADING_QUANTITY.update(saved_heading)
+        migrate_mod._COMPILATION_CELL_QUANTITY.clear()
+        migrate_mod._COMPILATION_CELL_QUANTITY.update(saved_cell)
+
+    restored = compilation_column_series_from_record(doc)
+    assert len(restored) == 5
+
+
 
 
 def test_l05c1_costa_control_is_not_condensation() -> None:
