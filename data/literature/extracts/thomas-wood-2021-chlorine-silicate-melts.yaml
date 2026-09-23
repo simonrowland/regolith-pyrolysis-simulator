@@ -15,12 +15,17 @@ extraction:
     body and were not reconstructed.
   date: '2026-09-22'
   worker: n6-thomas-ueshima-jaggi
+  audited_by: y6-audit-n6-2026-09-22
 review_status: draft
 corrections:
 - note: Table 2 reprints AgI/Cl-005 in the pressure series with Measured Clglass wt% printed as 2.55 (0.4);
     the same experiment ID is printed as 2.55 (0.04) in the time, f(Cl2), and temperature series blocks.
     Both spellings retained without reconciliation.
   locators:
+  - pdf_page_index 7 Table 2
+- note: 'Y6 cross-audit 2026-09-22: fixed thermocouple (alumina-sheathed C-type W95Re5–W74Re26) and +1 cover-offset pdf_page_index locators. Table 1 majors and Table 2 Clglass/f(Cl2)/FeO/molar ratios spot-checked PASS vs B3 PDF; AgI/Cl-005 pressure-series (0.4) reprint retained as printed.'
+  locators:
+  - pdf_page_index 4 section 2 Experimental methods
   - pdf_page_index 7 Table 2
 benches:
 - id: oxford-boyd-england-piston-cylinder
