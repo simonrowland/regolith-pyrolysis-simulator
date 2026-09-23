@@ -23,6 +23,12 @@ const unavailableText = (value) => {
 // "  "→0, "12"→12, so the old gate fabricated kg/energy values.
 const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const n = (value) => hasNumber(value) ? value : null;
+const sourceSideO2 = (row) => {
+  const canonical = row?.O2_source_side_potential_kg_cumulative;
+  if (hasNumber(canonical)) return canonical;
+  const legacy = row?.O2_yield_kg_cumulative;
+  return hasNumber(legacy) ? legacy : null;
+};
 const sum = (values) => values.reduce((total, value) => total + (n(value) ?? 0), 0);
 const sumPresent = (values) => values.length && values.every(hasNumber) ? sum(values) : null;
 const sumObject = (object) => {
@@ -154,7 +160,7 @@ function makeHeader(artifact, rows, energy) {
   const header = artifact.header;
   const finalRow = rows.at(-1) || {};
   const finalMetal = finalRow.metal_yields_kg || {};
-  const o2 = finalRow.O2_source_side_potential_kg_cumulative ?? null;
+  const o2 = sourceSideO2(finalRow);
   const o2Label = finalRow.O2_metric_label || "O₂ metric label not emitted";
   const temperatures = rows.map((row) => row.T_C);
   const peakTemperature = temperatures.length && temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
@@ -349,7 +355,7 @@ function wallAndOxygenSection(artifact, rows) {
   }
   const wallTotal = wallComplete ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
-  const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
+  const o2 = sourceSideO2(last);
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
   const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
   const pumpingEnergy = pumping && hasNumber(pumping.pumping_electrical_kWh)
@@ -694,7 +700,7 @@ function renderCurrent(artifact, index) {
     ["Temperature", hasNumber(row.T_C) ? `${Number(row.T_C).toLocaleString()} °C` : "not emitted"], ["Total pressure", hasNumber(row.P_total_bar) ? `${Number(row.P_total_bar).toExponential(3)} bar` : "not emitted"],
     ["pO₂", hasNumber(row.pO2_bar) ? `${Number(row.pO2_bar).toExponential(3)} bar` : "not emitted"], ["Carrier pressure", hasNumber(row.p_carrier_bar) ? `${Number(row.p_carrier_bar).toExponential(3)} bar` : "not emitted"],
     ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", hasNumber(row.energy_electrical_kWh) ? `${Number(row.energy_electrical_kWh).toFixed(4)} kWh` : "not emitted"],
-    ["Evaporation thermal", hasNumber(row.energy_evaporation_thermal_kWh) ? `${Number(row.energy_evaporation_thermal_kWh).toFixed(4)} kWh` : "not emitted"], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative, 4)],
+    ["Evaporation thermal", hasNumber(row.energy_evaporation_thermal_kWh) ? `${Number(row.energy_evaporation_thermal_kWh).toFixed(4)} kWh` : "not emitted"], [row.O2_metric_label || "O₂ metric label not emitted", kg(sourceSideO2(row), 4)],
     ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
   ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
   $("#timestep-ledger").innerHTML = renderTimestepLedger(timestep);

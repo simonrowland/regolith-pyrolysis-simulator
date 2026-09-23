@@ -664,6 +664,40 @@ def test_report_viewer_renders_malformed_timestep_scalars_honestly() -> None:
     assert state["snapshots"][0]["step-output"] == "Hour malformed (object) · malformed (object)"
 
 
+def test_report_viewer_uses_legacy_source_side_o2_alias_with_metric_label() -> None:
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "legacy-o2", "feedstock_id": "lunar_mare_low_ti", "name": "legacy"},
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "O2_yield_kg_cumulative": 4.25,
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                },
+                "ledger": {},
+            }
+        ],
+        "terminal": {},
+    }
+
+    state = _render_report_state_with_panels(artifact)
+    fallback_cases = _run_viewer_expression(
+        "report-viewer.js",
+        "[sourceSideO2({O2_source_side_potential_kg_cumulative: 1.5, O2_yield_kg_cumulative: 2.5}), "
+        "sourceSideO2({O2_source_side_potential_kg_cumulative: ' ', O2_yield_kg_cumulative: 2.5}), "
+        "sourceSideO2({O2_source_side_potential_kg_cumulative: false, O2_yield_kg_cumulative: []})]",
+    )
+
+    assert state["html"].count("4.25 kg") >= 2
+    assert "source-side O2 potential (emitted; not recovered)" in state["html"]
+    assert "O2_yield_kg_cumulative" not in state["html"]
+    assert fallback_cases == [1.5, 2.5, None]
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 
