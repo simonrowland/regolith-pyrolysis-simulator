@@ -511,7 +511,7 @@ class RunArtifactStore:
         fe_kg = metal_yields.get("Fe")
         if RunArtifactStore._is_finite_number(fe_kg):
             headline_yields["Fe"] = fe_kg
-            headline_yield_semantics["Fe"] = "evolved_product"
+            headline_yield_semantics["Fe"] = "mixed_account_product_ledger_projection"
             summary_parts.append(f"Fe {fe_kg:g} kg")
         o2_kg = final_summary.get("O2_source_side_potential_kg_cumulative")
         if not RunArtifactStore._is_finite_number(o2_kg):
