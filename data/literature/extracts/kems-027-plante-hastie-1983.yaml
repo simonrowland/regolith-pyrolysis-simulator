@@ -206,8 +206,46 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 15, table: '3', note: 'Series I and II initial masses are separately printed; no single mass assigned to this aggregate series'}
     printed_composition:
-      state: {tag: value, value: Simulated nuclear-waste borosilicate glass; analytical and nominal compositions in Table 1}
-      locator: {published_page: 2, table: '1', note: 'ICP analysis except Cs, Ru, and Re by neutron activation analysis; nominal composition used for thermodynamic estimates'}
+      state:
+        tag: value
+        value:
+          nominal:
+            SiO2: 52.00
+            Fe2O3: 12.96
+            Al2O3: 4.86
+            B2O3: 7.29
+            Li2O: 5.10
+            Na2O: 10.13
+            MnO2: 3.25
+            NiO: 1.05
+            CaO: 1.59
+            MgO: 0.68
+            ZrO2: 0.70
+            SrO: 0.09
+            Cs2O: 0.10
+            RuO2: 0.09
+            Re2O7: 0.10
+          analytical:
+            SiO2: 53.76
+            Fe2O3: 11.49
+            Al2O3: 4.75
+            B2O3: 6.49
+            Li2O: 3.96
+            Na2O: 8.59
+            MnO2: 3.57
+            NiO: 1.80
+            CaO: 1.01
+            MgO: 0.54
+            ZrO2: 3.79
+            SrO: 0.05
+            Cs2O: 0.07
+            RuO2: 0.11
+            Re2O7: 0.03
+      locator:
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: 'SNW glass Table 1 Weight % columns; labels nominal and analytical as printed; Mole % columns not copied into printed_composition; title Simulated Nuclear Waste (SNW) Glass Composition; footnote a Soper 1982; footnote b see text for selection (nominal used for thermodynamic estimates)'
   apparatus:
     geometry:
       orifice_diameter_m:
@@ -242,8 +280,46 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 29, section: '3.5', note: Sample mass not printed for this series}
     printed_composition:
-      state: {tag: value, value: Simulated nuclear-waste borosilicate glass}
-      locator: {published_page: 29, section: '3.5'}
+      state:
+        tag: value
+        value:
+          nominal:
+            SiO2: 52.00
+            Fe2O3: 12.96
+            Al2O3: 4.86
+            B2O3: 7.29
+            Li2O: 5.10
+            Na2O: 10.13
+            MnO2: 3.25
+            NiO: 1.05
+            CaO: 1.59
+            MgO: 0.68
+            ZrO2: 0.70
+            SrO: 0.09
+            Cs2O: 0.10
+            RuO2: 0.09
+            Re2O7: 0.10
+          analytical:
+            SiO2: 53.76
+            Fe2O3: 11.49
+            Al2O3: 4.75
+            B2O3: 6.49
+            Li2O: 3.96
+            Na2O: 8.59
+            MnO2: 3.57
+            NiO: 1.80
+            CaO: 1.01
+            MgO: 0.54
+            ZrO2: 3.79
+            SrO: 0.05
+            Cs2O: 0.07
+            RuO2: 0.11
+            Re2O7: 0.03
+      locator:
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: 'SNW glass Table 1 Weight % columns; labels nominal and analytical as printed; Mole % columns not copied into printed_composition; title Simulated Nuclear Waste (SNW) Glass Composition; footnote a Soper 1982; footnote b see text for selection (nominal used for thermodynamic estimates)'
   apparatus:
     geometry:
       orifice_diameter_m:
