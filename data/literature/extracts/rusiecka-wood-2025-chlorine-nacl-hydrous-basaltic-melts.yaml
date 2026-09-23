@@ -29,14 +29,29 @@ benches:
     state: {tag: value, value: CAMECA SXFive-FE electron microprobe and CAMECA IMS-7f GEO SIMS}
     locator: {published_page: 210, section: '3. Analytical procedures'}
 experiments:
-- experiment_id: icb-series
+- &rusiecka_icb_common
+  experiment_id: icb-2-start
   bench_id: oxford-piston-cylinder
   method: melt_equilibration_quench
-  locator: *rusiecka_experiment_locator
+  locator: {published_page: 210, section: '2. Experimental procedure', note: 'Starting powder ICB-2 (Table 1); product-glass Table 2 rows are not this starting map'}
   sample:
     printed_composition:
-      state: {tag: value, value: Hydrous Icelandic Reykjanes Ridge basalt with AgI-AgCl buffer}
-      locator: {published_page: 210, table: '1'}
+      state:
+        tag: value
+        value:
+          SiO2: 50.66
+          TiO2: 1.01
+          Al2O3: 14.42
+          FeO: 9.74
+          MgO: 9.23
+          CaO: 12.73
+          Na2O: 2.15
+          K2O: 0.05
+      locator:
+        published_page: 210
+        pdf_page_index: 3
+        table: '1'
+        note: 'ICB-2 starting material on anhydrous basis as printed; label ICB-2 hydrous Icelandic Reykjanes Ridge basalt; analytical +/- uncertainties not folded into the oxide map; H2O 2.67+/-0.45 retained only in this note (anhydrous-basis oxide map); Table 2 product glasses and Table 3 calculation mixes not used as the charge'
     form:
       state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
       locator: *rusiecka_experiment_locator
@@ -54,11 +69,11 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 212, table: '2', note: Individual ICB rows span multiple pressure-temperature conditions; no single series setpoint is assigned here}
+      locator: {published_page: 212, table: '2', note: Per-run temperatures remain in Table 2 observation rows}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 212, table: '2', note: Individual ICB rows span 0.5-1.5 GPa; no single series pressure is assigned here}
+      locator: {published_page: 212, table: '2', note: Per-run pressures remain in Table 2 observation rows}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *rusiecka_experiment_locator
@@ -69,6 +84,73 @@ experiments:
     buffer:
       state: {tag: value, value: Close to C-CO-CO2 buffer}
       locator: {published_page: 210, section: '2. Experimental procedure'}
+- <<: *rusiecka_icb_common
+  experiment_id: icb-4-start
+  locator: {published_page: 210, section: '2. Experimental procedure', note: 'Starting powder ICB-4 (Table 1); product-glass Table 2 rows are not this starting map'}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 50.68
+          TiO2: 1.02
+          Al2O3: 14.06
+          FeO: 9.75
+          MgO: 9.36
+          CaO: 12.87
+          Na2O: 2.17
+          K2O: 0.08
+      locator:
+        published_page: 210
+        pdf_page_index: 3
+        table: '1'
+        note: 'ICB-4 starting material on anhydrous basis as printed; label ICB-4 hydrous Icelandic Reykjanes Ridge basalt; analytical +/- uncertainties not folded into the oxide map; H2O 4.38+/-0.41 retained only in this note (anhydrous-basis oxide map); Table 2 product glasses and Table 3 calculation mixes not used as the charge'
+    form:
+      state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
+      locator: *rusiecka_experiment_locator
+    pretreatment:
+      state: {tag: value, value: Ground under ethanol for 2 h, decarbonated overnight at 400-800 C at 2 C/min, then ground under ethanol at least 2 h}
+      locator: *rusiecka_experiment_locator
+- <<: *rusiecka_icb_common
+  experiment_id: icb-8-start
+  locator: {published_page: 210, section: '2. Experimental procedure', note: 'Starting powder ICB-8 (Table 1); product-glass Table 2 rows are not this starting map'}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 51.41
+          TiO2: 1.01
+          Al2O3: 13.20
+          FeO: 9.61
+          MgO: 9.46
+          CaO: 12.93
+          Na2O: 2.31
+          K2O: 0.06
+      locator:
+        published_page: 210
+        pdf_page_index: 3
+        table: '1'
+        note: 'ICB-8 starting material on anhydrous basis as printed; label ICB-8 hydrous Icelandic Reykjanes Ridge basalt; analytical +/- uncertainties not folded into the oxide map; H2O 6.29+/-0.33 retained only in this note (anhydrous-basis oxide map); Table 2 product glasses and Table 3 calculation mixes not used as the charge'
+    form:
+      state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
+      locator: *rusiecka_experiment_locator
+    pretreatment:
+      state: {tag: value, value: Ground under ethanol for 2 h, decarbonated overnight at 400-800 C at 2 C/min, then ground under ethanol at least 2 h}
+      locator: *rusiecka_experiment_locator
+- <<: *rusiecka_icb_common
+  experiment_id: icb-series
+  locator: *rusiecka_experiment_locator
+  sample:
+    printed_composition:
+      state: {tag: value, value: Hydrous Icelandic Reykjanes Ridge basalt with AgI-AgCl buffer}
+      locator: {published_page: 210, table: '1', note: 'Label retained on the mixed series; numeric anhydrous oxide maps live on icb-2-start, icb-4-start, and icb-8-start; Table 2 run-to-powder mapping is not explicit so product-glass bags stay on this series'}
+    form:
+      state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
+      locator: *rusiecka_experiment_locator
+    pretreatment:
+      state: {tag: value, value: Ground under ethanol for 2 h, decarbonated overnight at 400-800 C at 2 C/min, then ground under ethanol at least 2 h}
+      locator: *rusiecka_experiment_locator
 fidelity_samples:
 - observation_id: rusiecka_wood_2025_table2_experiments
   field: experiments
