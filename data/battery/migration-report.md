@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 46369
-records out (observations): 91588
+rows in: 46370
+records out (observations): 91807
 works: 238
-experiments: 6874
-queue size: 130257
+experiments: 6875
+queue size: 130479
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 168
@@ -19,16 +19,16 @@ hard issues: 1468
 | no_doi_works | 91 | 123 (mismatch) |
 | admission_statuses | 374 | 622 (mismatch) |
 | supersedes | 422 | 422 |
-| series | 60 | 75 (mismatch) |
+| series | 60 | 84 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1617 |
 | gibbs_reference_100000 | 1023 | 1023 |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 1625 |
 | equipment_payloads | 670 | 800 (mismatch) |
-| absent_admissions | 3511 | 4155 (mismatch) |
+| absent_admissions | 3511 | 4156 (mismatch) |
 | absent_classes | 2174 | 2194 (mismatch) |
 | range_only_T | 3125 | 2965 (mismatch) |
-| system_like_phases | 1065 | 2698 (mismatch) |
+| system_like_phases | 1065 | 2699 (mismatch) |
 | missing_phases | 237 | 309 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -17980,7 +17980,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 9 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 40 |
 | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` | 8 | 8 | 36 |
-| `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` | 9 | 9 | 46 |
+| `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` | 9 | 37 | 74 |
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 3 | 3 | 18 |
 | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 9 | 9 | 58 |
@@ -18060,7 +18060,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-137-bischof-2023.yaml` | 20 | 140 | 466 |
 | `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 34 | 169 |
 | `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 8 | 37 |
-| `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 53 | 316 |
+| `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 133 | 396 |
 | `data/literature/extracts/kems-169-nakazawa-1976.yaml` | 5 | 5 | 26 |
 | `data/literature/extracts/kems-184-behrens-1979.yaml` | 33 | 49 | 196 |
 | `data/literature/extracts/kems-188-nanjo-1976.yaml` | 6 | 6 | 31 |
@@ -18153,7 +18153,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 161 |
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 99 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 12 |
-| `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 7 | 11 | 41 |
+| `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 7 | 79 | 109 |
 | `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 5 | 5 | 35 |
@@ -18165,7 +18165,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ta-flemetakis-2024.yaml` | 8 | 8 | 47 |
 | `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` | 5 | 5 | 24 |
 | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 26 |
-| `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 3 | 3 | 15 |
+| `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 4 | 46 | 61 |
 | `data/literature/extracts/ts1985.yaml` | 16 | 16 | 59 |
 | `data/literature/extracts/usgs-lunar-sourcebook-tab8-1.yaml` | 23 | 23 | 115 |
 | `data/literature/extracts/usgs-lunar-sourcebook-tab8-2.yaml` | 25 | 25 | 100 |
@@ -18253,8 +18253,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 134518
+advisory issues: 134584
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 134518 |
+| `identity_incomplete` | 134584 |
