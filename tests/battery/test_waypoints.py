@@ -1170,3 +1170,123 @@ def test_multi_cited_source_counts_as_unattributable_not_pending(tmp_path, monke
         "unattributable_by_construction": {"source_count": 1, "experiment_count": 1},
         "reference_not_yet_resolved": {"source_count": 0, "experiment_count": 0},
     }
+
+
+def test_oxygen_condition_graphite_c_co_is_derived_never_printed() -> None:
+    """Graphite / C–CO buffer derives log fO2; authority stays DERIVED."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("C-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment(total_P=Decimal("101325")).pressure_environment,
+            sweep_gas=factories.located(
+                SweepGas(
+                    species="CO",
+                    flow_sccm=factories.State.unknown("not_published"),
+                    partial_pressure_Pa=factories.State.of(Decimal("101325")),
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "graphite_c_co_buffer"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    # Sanity vs published CCO at 1473.15 K, 1.01325 bar (Jakobsson & Oskarsson).
+    assert float(result.selected.value.point) == pytest.approx(-10.475256412619215, abs=1e-9)
+
+
+def test_oxygen_condition_c_co_prose_buffer_without_token_stays_refusal() -> None:
+    """Free-text CO/Ar prose is not a C–CO token and must not invent fO2."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.COMMANDED),
+            buffer=factories.located("CO partial pressure controlled by CO/Ar mixing"),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is None
+    assert not any(route.route == "graphite_c_co_buffer" for route in result.routes)
+
+
+def test_oxygen_condition_c_co_uses_total_p_when_co_is_the_stated_gas() -> None:
+    """When sweep CO PP is absent, printed total P is P_CO for a C–CO token."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1373.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("graphite-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment(total_P=Decimal("101325")).pressure_environment,
+            sweep_gas=factories.located(
+                SweepGas(
+                    species="CO",
+                    flow_sccm=factories.State.unknown("not_published"),
+                    partial_pressure_Pa=factories.State.unknown("not_published"),
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "graphite_c_co_buffer"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    assert float(result.selected.value.point) == pytest.approx(-11.553088871754722, abs=1e-9)
+
+
+def test_oxygen_condition_c_co_refuses_co_ar_alternatives_without_printed_p() -> None:
+    """CO-or-CO/Ar alternatives without a printed P_CO must not pick a pressure."""
+    unknown = factories.State.unknown("not_published")
+    alternatives = (
+        SweepGas(species="CO", flow_sccm=unknown, partial_pressure_Pa=unknown),
+        SweepGas(
+            species=None,
+            flow_sccm=unknown,
+            partial_pressure_Pa=unknown,
+            components=(
+                SweepGasComponent(
+                    species="CO",
+                    mole_fraction=unknown,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                ),
+                SweepGasComponent(
+                    species="Ar",
+                    mole_fraction=unknown,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                ),
+            ),
+        ),
+    )
+    experiment = replace(
+        factories.kems_experiment(),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("C-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment().pressure_environment,
+            total_pressure_Pa=factories.Located(factories.State.unknown("not_published")),
+            sweep_gas=factories.located(
+                SweepGas(
+                    species=None,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                    alternatives=alternatives,
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is None
+    assert not any(route.route == "graphite_c_co_buffer" for route in result.routes)
