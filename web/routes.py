@@ -49,6 +49,7 @@ from simulator.diagnostics import (
 )
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
+    UnknownFidelityVocabularyTokenError,
     canonicalize_fidelity_emission,
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
@@ -678,11 +679,32 @@ def _optimizer_tier_label(
     *,
     backend_payload: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    return optimizer_tier_label(
-        run_reference,
-        result_blob,
-        backend_payload=backend_payload,
-    )
+    try:
+        return optimizer_tier_label(
+            run_reference,
+            result_blob,
+            backend_payload=backend_payload,
+        )
+    except UnknownFidelityVocabularyTokenError as exc:
+        if exc.legacy_field != 'reduced_real_cache_state':
+            raise
+        token = str(exc.token)
+        evidence_class = run_reference.get('evidence_class')
+        if evidence_class is None:
+            evidence_class = result_blob.get('evidence_class')
+        return {
+            'tier': token,
+            'evidence_class': evidence_class,
+            'ux_label': 'UNVERIFIED',
+            'certification_allowed': False,
+            'title': (
+                f'Unknown cache tier: unrecognized {exc.legacy_field} token '
+                f'{token}; certification pending'
+            ),
+            'canonical': {'certification_allowed': False},
+            'unrecognized_field': exc.legacy_field,
+            'unrecognized_token': token,
+        }
 
 
 def _optimizer_backend_payload(
