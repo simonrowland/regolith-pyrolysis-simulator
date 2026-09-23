@@ -6328,13 +6328,41 @@ class Migrator:
             self._migrate_extract(path)
 
     @staticmethod
-    def _registry_id(work_id: str, kind: str, raw: object) -> str:
+    def _qualify_registry_id(work_id: str, kind: str, raw: object) -> str:
         token = str(raw or "").strip()
         if not token:
             raise ValueError(f"{kind} registry entry requires an id")
         if "::" in token:
             return token
         return f"{work_id}::{kind}::{token}"
+
+    def _registry_id(
+        self, work_id: str, kind: str, raw: object, *, path: str
+    ) -> str | None:
+        """Qualify a registry id, or refuse one outside this work.
+
+        A local id is minted as ``<work_id>::<kind>::<id>``. A token that
+        already contains ``::`` is accepted only when it carries that same
+        prefix. Any other qualified id names another work or kind: record
+        referential_integrity and return None so the caller writes no entry
+        and no link. Aliases of one work share ``work_id``, so a qualified
+        id minted for this work still resolves.
+        """
+        qualified = self._qualify_registry_id(work_id, kind, raw)
+        token = str(raw or "").strip()
+        if "::" in token and not qualified.startswith(f"{work_id}::{kind}::"):
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=path,
+                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                    detail=(
+                        f"qualified {kind} id {qualified!r} is outside work "
+                        f"{work_id!r}; no link written"
+                    ),
+                )
+            )
+            return None
+        return qualified
 
     def _lift_extract_registries(
         self,
@@ -6355,7 +6383,11 @@ class Migrator:
             if (raw.get("identity") or {}).get("basis") == BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE.value:
                 raise ValueError("extract cannot declare migration-only inferred_from_embedded_evidence")
             local_id = raw.get("id") or raw.get("bench_id")
-            bench_id = self._registry_id(work.work_id, "bench", local_id)
+            bench_id = self._registry_id(
+                work.work_id, "bench", local_id, path=f"bench[{local_id}]"
+            )
+            if bench_id is None:
+                continue
             payload = dict(raw)
             payload["id"] = bench_id
             payload["work_id"] = work.work_id
@@ -6391,15 +6423,26 @@ class Migrator:
                 raise TypeError("extract experiments entries must be mappings")
             local_id = raw.get("experiment_id") or raw.get("id")
             experiment_id = self._registry_id(
-                work.work_id, "experiment", local_id
+                work.work_id,
+                "experiment",
+                local_id,
+                path=f"experiment[{local_id}]",
             )
+            if experiment_id is None:
+                continue
             raw_bench_id = raw.get("bench_id") or raw.get("bench")
             bench_id = None
             if raw_bench_id is not None:
-                bench_id = bench_refs.get(
-                    str(raw_bench_id),
-                    self._registry_id(work.work_id, "bench", raw_bench_id),
-                )
+                key = str(raw_bench_id)
+                if key in bench_refs:
+                    bench_id = bench_refs[key]
+                else:
+                    bench_id = self._registry_id(
+                        work.work_id,
+                        "bench",
+                        raw_bench_id,
+                        path=f"experiment[{experiment_id}].bench_id",
+                    )
             locator = locator_from_mapping(
                 raw.get("locator"), fallback=f"{source_key}:experiments:{local_id}"
             )
@@ -6528,7 +6571,7 @@ class Migrator:
             return
         experiment_id = experiment_refs.get(
             str(raw_experiment),
-            self._registry_id(work.work_id, "experiment", raw_experiment),
+            self._qualify_registry_id(work.work_id, "experiment", raw_experiment),
         )
         experiment = self.result.experiments.get(experiment_id)
         if experiment is not None and experiment.work_id != work.work_id:
@@ -6620,12 +6663,19 @@ class Migrator:
             raw_experiment = obs.get("experiment")
             declared_experiment_id = None
             if raw_experiment is not None:
-                declared_experiment_id = experiment_refs.get(
-                    str(raw_experiment),
-                    self._registry_id(
-                        work.work_id, "experiment", raw_experiment
-                    ),
-                )
+                key = str(raw_experiment)
+                if key in experiment_refs:
+                    declared_experiment_id = experiment_refs[key]
+                else:
+                    raw_obs_id = str(
+                        obs.get("observation_id") or f"{source_id}:missing"
+                    )
+                    declared_experiment_id = self._registry_id(
+                        work.work_id,
+                        "experiment",
+                        raw_experiment,
+                        path=f"observation[{source_id}::{raw_obs_id}].experiment",
+                    )
             self._migrate_extract_observation(
                 formula=formula,
                 obs=obs,

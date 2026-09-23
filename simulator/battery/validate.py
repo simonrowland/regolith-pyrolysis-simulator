@@ -715,18 +715,27 @@ def validate_experiment(
                     f"simulated_experiment_id {experiment.simulated_experiment_id!r} does not resolve",
                 )
             )
-    if (
-        benches is not None
-        and experiment.bench_id is not None
-        and experiment.bench_id not in benches
-    ):
-        issues.append(
-            _issue(
-                f"{path}.bench_id",
-                RefusalReason.REFERENTIAL_INTEGRITY,
-                f"bench_id {experiment.bench_id!r} does not resolve",
+    if benches is not None and experiment.bench_id is not None:
+        bench = benches.get(experiment.bench_id)
+        if bench is None:
+            issues.append(
+                _issue(
+                    f"{path}.bench_id",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"bench_id {experiment.bench_id!r} does not resolve",
+                )
             )
-        )
+        elif experiment.work_id and bench.work_id != experiment.work_id:
+            issues.append(
+                _issue(
+                    f"{path}.bench_id",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    (
+                        f"bench_id {experiment.bench_id!r} belongs to work "
+                        f"{bench.work_id!r}, not {experiment.work_id!r}"
+                    ),
+                )
+            )
     if context_rows is not None and experiment.equipment_context_id is not None:
         row = context_rows.get(experiment.equipment_context_id)
         if row is None:
@@ -799,12 +808,31 @@ def _ancestry_cycles(observations: Mapping[str, Observation]) -> list[tuple[str,
     return cycles
 
 
+def _source_owners(works: Mapping[str, Work] | None) -> dict[str, str]:
+    """source_id → work_id. A source listed on two works is omitted."""
+    owners: dict[str, str] = {}
+    if not works:
+        return owners
+    ambiguous: set[str] = set()
+    for work in works.values():
+        for source_id in work.source_ids:
+            previous = owners.get(source_id)
+            if previous is not None and previous != work.work_id:
+                ambiguous.add(source_id)
+            else:
+                owners[source_id] = work.work_id
+    for source_id in ambiguous:
+        del owners[source_id]
+    return owners
+
+
 def validate_observation(
     observation: Observation,
     experiments: Mapping[str, Experiment],
     observations: Mapping[str, Observation],
     works: Mapping[str, Work] | None = None,
     path: str = "observation",
+    source_owners: Mapping[str, str] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     experiment = experiments.get(observation.experiment_id)
@@ -842,6 +870,23 @@ def validate_observation(
                         "literature observation requires read_from",
                     )
                 )
+    owners = _source_owners(works) if source_owners is None else source_owners
+    if (
+        experiment is not None
+        and experiment.work_id
+        and observation.source_id
+        and owners.get(observation.source_id) not in (None, experiment.work_id)
+    ):
+        issues.append(
+            _issue(
+                f"{path}.experiment_id",
+                RefusalReason.REFERENTIAL_INTEGRITY,
+                (
+                    f"experiment_id {observation.experiment_id!r} belongs to work "
+                    f"{experiment.work_id!r}, not {owners[observation.source_id]!r}"
+                ),
+            )
+        )
     work = None
     if experiment is not None and experiment.work_id and works:
         work = works.get(experiment.work_id)
@@ -1525,6 +1570,7 @@ def validate_corpus(
                 context_map,
             )
         )
+    source_owners = _source_owners(work_map)
     for observation in obs_map.values():
         issues.extend(
             validate_observation(
@@ -1533,6 +1579,7 @@ def validate_corpus(
                 obs_map,
                 work_map,
                 f"observation[{observation.observation_id}]",
+                source_owners,
             )
         )
     for cycle in _ancestry_cycles(obs_map):

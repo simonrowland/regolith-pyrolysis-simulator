@@ -17,6 +17,7 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    BenchIdentityBasis,
     EvidenceClass,
     IdentityEqualKind,
     MethodToken,
@@ -65,7 +66,7 @@ from simulator.battery.migrate import (
     work_id_for,
     write_outputs,
 )
-from simulator.battery.records import Species, State, as_decimal
+from simulator.battery.records import Bench, BenchIdentity, Species, State, as_decimal
 from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
 from tests.battery import factories as F
@@ -5215,3 +5216,198 @@ def test_duplicate_context_id_raises_typed(tmp_path: Path) -> None:
     root = _write_multi_extract_tree(tmp_path, [("dup-ctx", extract)])
     with pytest.raises(DuplicateContextIdError, match="dup-ctx::context::same_id"):
         migrate(root, write=False)
+
+
+def _bench_experiment_extract(source_id: str, doi: str, bench: str, experiment: str) -> dict:
+    doc = _named_extract(source_id, doi)
+    doc["benches"] = [
+        {"id": bench, "identity": {"basis": "described_in_this_work"}}
+    ]
+    doc["experiments"] = [
+        {
+            "experiment_id": experiment,
+            "method": "knudsen_effusion",
+            "bench_id": bench,
+            "locator": {"page": 2, "section": "experimental"},
+        }
+    ]
+    return doc
+
+
+def test_cross_work_bench_and_experiment_ids_are_refused(tmp_path: Path) -> None:
+    """A qualified bench or experiment id from another work is not a link.
+
+    The registry records referential_integrity and writes neither the bench
+    entry nor the foreign key. The victim records stay owned by the victim.
+    """
+    victim = _bench_experiment_extract(
+        "aaa-victim", "10.1234/VICTIM", "vic-bench", "vic-series"
+    )
+    root = _write_multi_extract_tree(tmp_path, [("aaa-victim", victim)])
+    lifted = migrate(root, write=False)
+    victim_bench_id = next(bid for bid in lifted.benches if bid.endswith("::bench::vic-bench"))
+    victim_experiment_id = next(
+        eid for eid in lifted.experiments if eid.endswith("::experiment::vic-series")
+    )
+    stolen = "10.1234/victim::bench::stolen"
+    attacker = _named_extract("zzz-attacker", "10.1234/ATTACK")
+    attacker["benches"] = [
+        {"id": stolen, "identity": {"basis": "described_in_this_work"}}
+    ]
+    attacker["experiments"] = [
+        {
+            "experiment_id": victim_experiment_id,
+            "method": "knudsen_effusion",
+            "locator": {"page": 1, "section": "experimental"},
+        },
+        {
+            "experiment_id": "atk",
+            "method": "knudsen_effusion",
+            "bench_id": victim_bench_id,
+            "locator": {"page": 2, "section": "experimental"},
+        },
+    ]
+    attacker["species"]["Na"]["observations"][0]["experiment"] = victim_experiment_id
+    root = _write_multi_extract_tree(
+        tmp_path / "run", [("aaa-victim", victim), ("zzz-attacker", attacker)]
+    )
+    result = migrate(root, write=False)
+    assert stolen not in result.benches
+    assert result.benches[victim_bench_id].work_id != next(
+        exp.work_id
+        for eid, exp in result.experiments.items()
+        if eid.endswith("::experiment::atk")
+    )
+    attacker_experiment = next(
+        exp for eid, exp in result.experiments.items() if eid.endswith("::experiment::atk")
+    )
+    assert attacker_experiment.bench_id is None
+    assert victim_experiment_id not in result.experiments_by_work[attacker_experiment.work_id]
+    attacker_obs = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "zzz-attacker"
+    ]
+    assert attacker_obs
+    assert all(obs.experiment_id != victim_experiment_id for obs in attacker_obs)
+    issues = [
+        issue
+        for issue in result.registry_issues
+        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and "outside work" in issue.detail
+    ]
+    paths = {issue.path for issue in issues}
+    assert f"bench[{stolen}]" in paths
+    assert any(path.endswith(".bench_id") and "atk" in path for path in paths)
+    assert any(path.startswith("observation[zzz-attacker::") and path.endswith(".experiment") for path in paths)
+    assert any(path == f"experiment[{victim_experiment_id}]" for path in paths)
+    assert all(victim_bench_id in issue.detail or stolen in issue.detail or victim_experiment_id in issue.detail for issue in issues)
+
+
+def test_same_work_qualified_bench_and_experiment_resolve(tmp_path: Path) -> None:
+    """Two extracts of one work may name that work's bench and experiment
+    by the qualified id. The cross-work refusal must not fire."""
+    first = _bench_experiment_extract(
+        "aaa-first", "10.1234/SHARED", "shared-bench", "shared-series"
+    )
+    root = _write_multi_extract_tree(tmp_path, [("aaa-first", first)])
+    lifted = migrate(root, write=False)
+    bench_id = next(bid for bid in lifted.benches if bid.endswith("::bench::shared-bench"))
+    experiment_id = next(
+        eid for eid in lifted.experiments if eid.endswith("::experiment::shared-series")
+    )
+    second = _named_extract("bbb-second", "10.1234/SHARED")
+    second["experiments"] = [
+        {
+            "experiment_id": "second-series",
+            "method": "knudsen_effusion",
+            "bench_id": bench_id,
+            "locator": {"page": 3, "section": "experimental"},
+        }
+    ]
+    second["species"]["Na"]["observations"][0]["experiment"] = experiment_id
+    root = _write_multi_extract_tree(
+        tmp_path / "run", [("aaa-first", first), ("bbb-second", second)]
+    )
+    result = migrate(root, write=False)
+    second_experiment = next(
+        exp for eid, exp in result.experiments.items() if eid.endswith("::experiment::second-series")
+    )
+    assert second_experiment.bench_id == bench_id
+    assert result.benches[bench_id].work_id == second_experiment.work_id
+    second_obs = [
+        obs for obs in result.observations.values() if obs.source_id == "bbb-second"
+    ]
+    assert second_obs
+    assert all(obs.experiment_id == experiment_id for obs in second_obs)
+    assert not any("outside work" in issue.detail for issue in result.registry_issues)
+
+
+def test_validate_flags_cross_work_bench_and_observation(tmp_path: Path) -> None:
+    """A hand-edited store whose bench or experiment belongs to another work
+    is the same referential_integrity failure the migrator refuses to write."""
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True)
+    works, experiments, observations = load_migrated_store(root)
+    experiment = next(iter(experiments.values()))
+    related = [
+        obs for obs in observations.values() if obs.experiment_id == experiment.experiment_id
+    ]
+    obs = related[0]
+    foreign_bench = Bench(
+        id="10.9999/OTHER::bench::foreign",
+        work_id="10.9999/OTHER",
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    mismatched = replace(experiment, bench_id=foreign_bench.id)
+    report = validate_corpus(
+        works,
+        [mismatched],
+        related,
+        benches={foreign_bench.id: foreign_bench},
+    )
+    bench_issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith(".bench_id") and "belongs to work" in issue.detail
+    ]
+    assert len(bench_issues) == 1
+    assert bench_issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert "10.9999/OTHER" in bench_issues[0].detail
+    assert experiment.work_id in bench_issues[0].detail
+    own_bench = replace(foreign_bench, id="own-bench", work_id=experiment.work_id)
+    report = validate_corpus(
+        works,
+        [replace(experiment, bench_id=own_bench.id)],
+        related,
+        benches={own_bench.id: own_bench},
+    )
+    assert not any(
+        issue.path.endswith(".bench_id") and "belongs to work" in issue.detail
+        for issue in report.issues
+    )
+
+    own = next(work for work in works.values() if obs.source_id in work.source_ids)
+    foreign_work = replace(
+        own, work_id="10.9999/OTHER", source_ids=("other-source",), doi="10.9999/OTHER"
+    )
+    foreign_exp = replace(
+        experiment,
+        experiment_id="10.9999/OTHER::experiment::foreign",
+        work_id=foreign_work.work_id,
+    )
+    ghost = replace(obs, experiment_id=foreign_exp.experiment_id)
+    report = validate_corpus(
+        [own, foreign_work], [experiment, foreign_exp], [ghost]
+    )
+    obs_issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith(".experiment_id") and "belongs to work" in issue.detail
+    ]
+    assert len(obs_issues) == 1
+    assert obs_issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert foreign_work.work_id in obs_issues[0].detail
+    assert own.work_id in obs_issues[0].detail
+    report = validate_corpus(works, experiments, observations)
+    assert not any("belongs to work" in issue.detail for issue in report.issues)
