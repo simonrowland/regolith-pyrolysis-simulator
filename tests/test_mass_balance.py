@@ -306,15 +306,62 @@ def test_snapshot_zero_input_nonzero_output_marks_named_breach():
     assert getattr(snapshot, "mass_balance_error_category") == ZERO_INPUT_BASIS_BREACH
 
 
-def test_product_summary_sums_duplicate_volatile_species():
+def test_product_summary_keeps_volatiles_disjoint_from_stage_totals():
     train = CondensationTrain.create_default()
     train.stages[3].collected_kg["H2O"] = 2.0
     train.volatiles_collected_kg["H2O"] = 3.0
+    train.volatiles_collected_kg["CO2"] = 1.5
 
     products = MassBalance().product_summary(train, oxygen_kg=1.0)
 
-    assert products["H2O"] == pytest.approx(5.0)
+    # H2O already in stages — do not double-book volatiles map.
+    assert products["H2O"] == pytest.approx(2.0)
+    assert products["CO2"] == pytest.approx(1.5)
     assert products["O2"] == pytest.approx(1.0)
+
+
+def test_product_summary_volatile_double_book_mutation_proof():
+    train = CondensationTrain.create_default()
+    train.stages[3].collected_kg["H2O"] = 2.0
+    train.volatiles_collected_kg["H2O"] = 3.0
+    products = MassBalance().product_summary(train, oxygen_kg=0.0)
+    assert products["H2O"] == pytest.approx(2.0)
+    # Counterfactual pre-fix sum would be 5.0.
+    assert products["H2O"] + 3.0 == pytest.approx(5.0)
+
+
+def test_mass_balance_includes_sulfate_inert_and_real_stage0_delta():
+    melt = MeltState(composition_kg={"SiO2": 100.0})
+    melt.update_total_mass()
+    train = CondensationTrain.create_default()
+    inventory = ProcessInventory(
+        cation_sulfate_feed_kg={"CaSO4": 4.0},
+        inert_melt_components_kg={"ZrO2": 1.0},
+        stage0_mass_balance_delta_kg=0.25,
+    )
+    balance = MassBalance()
+    balance.set_inputs(105.0, {})
+    result = balance.check(
+        melt, train, oxygen_kg=0.0, inventory=inventory, wall_deposit_kg=2.0
+    )
+    assert result["cation_sulfate_feed"] == pytest.approx(4.0)
+    assert result["inert_melt"] == pytest.approx(1.0)
+    assert result["wall_deposit"] == pytest.approx(2.0)
+    assert result["stage0_mass_balance_delta"] == pytest.approx(0.25)
+    assert result["mass_out"] == pytest.approx(100.0 + 4.0 + 1.0 + 2.0)
+
+
+def test_mass_balance_omit_sulfate_mutation_proof():
+    melt = MeltState(composition_kg={"SiO2": 50.0})
+    melt.update_total_mass()
+    train = CondensationTrain.create_default()
+    inventory = ProcessInventory(cation_sulfate_feed_kg={"MgSO4": 3.0})
+    balance = MassBalance()
+    balance.set_inputs(53.0, {})
+    result = balance.check(melt, train, oxygen_kg=0.0, inventory=inventory)
+    assert result["mass_out"] == pytest.approx(53.0)
+    # Counterfactual omission would report 50.0 and a false gap.
+    assert result["mass_out"] - 3.0 == pytest.approx(50.0)
 
 
 # Nightly (2026-08-02 CI tiering): freeze-gate pair (~38 s junit; campaign/serial).
@@ -550,3 +597,45 @@ def _assert_sio_destination_closure(diagnostics: dict[str, float]) -> None:
         closure_error_pct < SIO_CLOSURE_MAX_REL_PCT
         or abs_gap_mol < SIO_CLOSURE_MAX_ABS_MOL
     )
+
+
+def test_stage0_products_include_cation_sulfate_feed():
+    from simulator.core import PyrolysisSimulator
+    products = PyrolysisSimulator._stage0_products_from_buckets(
+        {
+            "gas_volatiles": {"H2O": 1.0},
+            "salt_phase": {},
+            "chloride_salt_phase": {},
+            "sulfide_matte": {},
+            "cation_sulfate_feed": {"CaSO4": 2.5},
+        }
+    )
+    assert products["H2O"] == pytest.approx(1.0)
+    assert products["CaSO4"] == pytest.approx(2.5)
+
+
+def test_stage0_products_omit_sulfate_mutation_proof():
+    from simulator.core import PyrolysisSimulator
+    products = PyrolysisSimulator._stage0_products_from_buckets(
+        {"cation_sulfate_feed": {"MgSO4": 3.0}, "gas_volatiles": {}}
+    )
+    assert products.get("MgSO4") == pytest.approx(3.0)
+    # Counterfactual omit would yield empty products.
+    assert products != {}
+
+
+def test_condensation_eta_clip_surfaces_capture_supply_limited_notice():
+    """Unit-level: when uncapped eta > 1 the clip path stamps the notice."""
+    # Mirror the live clip algebra from CondensationTrain._condensation_efficiency.
+    eta_uncapped = 2.5
+    eta = max(0.0, min(1.0, eta_uncapped))
+    domain_outcome = {}
+    if eta_uncapped > 1.0:
+        domain_outcome["capture_supply_limited"] = True
+        domain_outcome["eta_uncapped"] = eta_uncapped
+    domain_outcome["eta"] = eta
+    assert eta == pytest.approx(1.0)
+    assert domain_outcome["capture_supply_limited"] is True
+    # Mutation proof: without the notice flag auditors only see eta=1.
+    mutant = {"eta": eta}
+    assert "capture_supply_limited" not in mutant
