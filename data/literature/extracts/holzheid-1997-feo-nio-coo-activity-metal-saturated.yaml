@@ -75,17 +75,17 @@ fidelity_samples:
   observation_id: holzheid_1997_table3a_ad_co_variable_mgo
   field: fidelity_pin_CoO_wt_pct
   value: 2.03
-  locator: {page: 25, table: '3a', row: 'V 69'}
+  locator: {page: 26, table: '3a', row: 'V 69'}
 - species: NiO
   observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
   field: fidelity_pin_NiO_wt_pct
   value: 0.17
-  locator: {page: 25, table: '3a', row: 'V 69'}
+  locator: {page: 26, table: '3a', row: 'V 69'}
 - species: FeO
   observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
   field: fidelity_pin_FeO_wt_pct
   value: 26.0
-  locator: {page: 25, table: '3b', row: 'V 69'}
+  locator: {page: 26, table: '3b', row: 'V 69'}
 species:
   SiO2:
     observations:
@@ -123,7 +123,7 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo
       experiment: variable-mgo-equilibration-series
       type: activity_coefficient
-      locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      locator: {page: 26, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1670.0, 1677.0]
       phase: anorthite-diopside_silicate_melt
       standard_state: liquid CoO; pure-metal equilibrium as described in section 3
@@ -151,7 +151,7 @@ species:
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo
       experiment: variable-mgo-equilibration-series
       type: activity_coefficient
-      locator: {page: 26, table: '3c', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      locator: {page: 27, table: '3c', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
       phase: komatiitic_basalt_silicate_melt
       standard_state: liquid CoO; pure-metal equilibrium as described in section 3
@@ -176,8 +176,8 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
       experiment: variable-mgo-equilibration-series
       type: activity_coefficient
-      locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
-      T_range_K: [1667.0, 1673.0]
+      locator: {page: 26, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1670.0, 1677.0]
       phase: anorthite-diopside_silicate_melt
       standard_state: liquid NiO; pure-metal equilibrium as described in section 3
       regime: experimental_melt_equilibration
@@ -187,16 +187,16 @@ species:
         quantity: NiO_solubility_and_MgO_dependence
         fidelity_pin_NiO_wt_pct: 0.17
         rows:
-        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 7.22, MgO_sd_pct: 5, gamma_NiO: 3.06}
-        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.21, NiO_sd_pct: 5, MgO_wt_pct: 8.94, MgO_sd_pct: 5, gamma_NiO: 2.60}
-        - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, NiO_wt_pct: 0.26, NiO_sd_pct: 5, MgO_wt_pct: 10.4, MgO_sd_pct: 5, gamma_NiO: 2.61}
-        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 5, MgO_wt_pct: 11.1, MgO_sd_pct: 5, gamma_NiO: 3.07}
-        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.16, NiO_sd_pct: 6, MgO_wt_pct: 13.8, MgO_sd_pct: 5, gamma_NiO: 2.59}
-        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, NiO_wt_pct: 0.15, NiO_sd_pct: 5, MgO_wt_pct: 17.6, MgO_sd_pct: 5, gamma_NiO: 3.21}
-        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.20, NiO_sd_pct: 5, MgO_wt_pct: 18.2, MgO_sd_pct: 5, gamma_NiO: 2.84}
-        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 5, MgO_wt_pct: 18.2, MgO_sd_pct: 5, gamma_NiO: 3.30}
-        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.18, NiO_sd_pct: 5, MgO_wt_pct: 22.2, MgO_sd_pct: 5, gamma_NiO: 3.20}
-        - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 27.5, MgO_sd_pct: 5, gamma_NiO: 3.39}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.17, NiO_sd_pct: 6, MgO_wt_pct: 7.22, MgO_sd_pct: 1, gamma_NiO: 3.06}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.21, NiO_sd_pct: 5, MgO_wt_pct: 8.94, MgO_sd_pct: 1, gamma_NiO: 2.60}
+        - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, NiO_wt_pct: 0.26, NiO_sd_pct: 5, MgO_wt_pct: 10.4, MgO_sd_pct: 1, gamma_NiO: 2.61}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 5, MgO_wt_pct: 11.1, MgO_sd_pct: 1, gamma_NiO: 3.07}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.16, NiO_sd_pct: 6, MgO_wt_pct: 13.8, MgO_sd_pct: 1, gamma_NiO: 2.59}
+        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, NiO_wt_pct: 0.15, NiO_sd_pct: 5, MgO_wt_pct: 17.6, MgO_sd_pct: 1, gamma_NiO: 3.21}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.20, NiO_sd_pct: 10, MgO_wt_pct: 18.2, MgO_sd_pct: 1, gamma_NiO: 2.84}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 9, MgO_wt_pct: 18.2, MgO_sd_pct: 1, gamma_NiO: 3.30}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.18, NiO_sd_pct: 5, MgO_wt_pct: 22.2, MgO_sd_pct: 7, gamma_NiO: 3.20}
+        - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 27.5, MgO_sd_pct: 9, gamma_NiO: 3.39}
         analysis_method: instrumental neutron activation analysis for Ni; analytical standard deviations printed in Table 3
         derived_fields:
           gamma_NiO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
@@ -206,7 +206,7 @@ species:
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo
       experiment: variable-mgo-equilibration-series
       type: activity_coefficient
-      locator: {page: 26, table: '3d', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      locator: {page: 27, table: '3d', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
       phase: komatiitic_basalt_silicate_melt
       standard_state: liquid NiO; pure-metal equilibrium as described in section 3
@@ -231,7 +231,7 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
       experiment: variable-mgo-equilibration-series
       type: activity_coefficient
-      locator: {page: 25, table: '3b', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      locator: {page: 26, table: '3b', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1677.0]
       phase: anorthite-diopside_silicate_melt
       standard_state: wustite(liquid) standard state for FeO activity coefficient
@@ -242,11 +242,11 @@ species:
         quantity: FeO_solubility_and_MgO_dependence
         fidelity_pin_FeO_wt_pct: 26.0
         rows:
-        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.465, CoO_sd_pct: 5, NiO_wt_pct: 0.0518, NiO_sd_pct: 18, FeO_wt_pct: 26.0, FeO_sd_pct: 5, MgO_wt_pct: 4.87, MgO_sd_pct: 5, gamma_CoO: 1.65, gamma_NiO: 3.68, gamma_FeO: 1.72}
-        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.531, CoO_sd_pct: 5, NiO_wt_pct: 0.0502, NiO_sd_pct: 15, FeO_wt_pct: 20.8, FeO_sd_pct: 5, MgO_wt_pct: 6.83, MgO_sd_pct: 5, gamma_CoO: 1.75, gamma_NiO: 4.35, gamma_FeO: 1.83}
-        - {run: AD 10, T_K: 1677, duration_h: 50, log_fO2: -10.31, CoO_wt_pct: 0.334, CoO_sd_pct: 5, NiO_wt_pct: 0.0360, NiO_sd_pct: 7, FeO_wt_pct: 7.15, FeO_sd_pct: 5, MgO_wt_pct: 9.73, MgO_sd_pct: 5, gamma_CoO: 1.51, gamma_NiO: 3.82, gamma_FeO: 1.62}
-        - {run: V 64, T_K: 1677, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 0.280, CoO_sd_pct: 5, NiO_wt_pct: 0.0385, NiO_sd_pct: 19, FeO_wt_pct: 15.5, FeO_sd_pct: 5, MgO_wt_pct: 15.3, MgO_sd_pct: 5, gamma_CoO: 2.68, gamma_NiO: 4.87, gamma_FeO: 2.47}
-        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, CoO_wt_pct: 0.286, CoO_sd_pct: 5, NiO_wt_pct: 0.0457, NiO_sd_pct: 15, FeO_wt_pct: 15.8, FeO_sd_pct: 5, MgO_wt_pct: 15.8, MgO_sd_pct: 5, gamma_CoO: 2.89, gamma_NiO: 4.34, gamma_FeO: 3.44}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.465, CoO_sd_pct: 5, NiO_wt_pct: 0.0518, NiO_sd_pct: 18, FeO_wt_pct: 26.0, FeO_sd_pct: 5, MgO_wt_pct: 4.87, MgO_sd_pct: 1, gamma_CoO: 1.65, gamma_NiO: 3.68, gamma_FeO: 1.72}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.531, CoO_sd_pct: 5, NiO_wt_pct: 0.0502, NiO_sd_pct: 15, FeO_wt_pct: 20.8, FeO_sd_pct: 5, MgO_wt_pct: 6.83, MgO_sd_pct: 1, gamma_CoO: 1.75, gamma_NiO: 4.35, gamma_FeO: 1.83}
+        - {run: AD 10, T_K: 1677, duration_h: 50, log_fO2: -10.31, CoO_wt_pct: 0.334, CoO_sd_pct: 5, NiO_wt_pct: 0.0360, NiO_sd_pct: 7, FeO_wt_pct: 7.15, FeO_sd_pct: 5, MgO_wt_pct: 9.73, MgO_sd_pct: 1, gamma_CoO: 1.51, gamma_NiO: 3.82, gamma_FeO: 1.62}
+        - {run: V 64, T_K: 1677, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 0.280, CoO_sd_pct: 5, NiO_wt_pct: 0.0385, NiO_sd_pct: 19, FeO_wt_pct: 15.5, FeO_sd_pct: 5, MgO_wt_pct: 15.3, MgO_sd_pct: 1, gamma_CoO: 2.68, gamma_NiO: 4.87, gamma_FeO: 2.47}
+        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, CoO_wt_pct: 0.286, CoO_sd_pct: 5, NiO_wt_pct: 0.0457, NiO_sd_pct: 15, FeO_wt_pct: 15.8, FeO_sd_pct: 5, MgO_wt_pct: 15.8, MgO_sd_pct: 1, gamma_CoO: 2.89, gamma_NiO: 4.34, gamma_FeO: 3.44}
         - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.259, CoO_sd_pct: 5, NiO_wt_pct: 0.0367, NiO_sd_pct: 15, FeO_wt_pct: 10.6, FeO_sd_pct: 5, MgO_wt_pct: 20.0, MgO_sd_pct: 5, gamma_CoO: 3.53, gamma_NiO: 5.99, gamma_FeO: 4.41}
         - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.313, CoO_sd_pct: 5, NiO_wt_pct: 0.0689, NiO_sd_pct: 6, FeO_wt_pct: 9.56, FeO_sd_pct: 5, MgO_wt_pct: 25.0, MgO_sd_pct: 7, gamma_CoO: 3.06, gamma_NiO: 3.33, gamma_FeO: 5.22}
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
