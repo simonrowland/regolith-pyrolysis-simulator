@@ -37,3 +37,9 @@ def test_log10_fo2_matches_published_cco_at_1_atm() -> None:
     assert log10_fo2_c_co_bar(1473.15, 1.01325) == pytest.approx(
         -10.475256412619215, abs=1e-12
     )
+
+
+def test_log10_fo2_tracks_c_co_reaction_quotient() -> None:
+    assert log10_fo2_c_co_bar(1473.15, 0.101325) == pytest.approx(
+        -12.475256412619215, abs=1e-12
+    )

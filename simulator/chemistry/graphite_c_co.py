@@ -19,22 +19,32 @@ line by Stagno & Frost (2010, EPSL 300:72-84):
 
 Algebra
 -------
-    log10(fO2 / bar) = -21803 / T_K + 4.325 + 0.171 * (P_bar - 1) / T_K
+For C + 1/2 O2 = CO,
 
-where P_bar is the printed CO pressure (or total pressure when the paper
-states the gas is CO), converted Pa → bar by / 1e5.
+    K = (P_CO / bar) / (fO2 / bar) ** (1/2)
+    log10(fO2 / bar) = 2 * (log10(P_CO / bar) - log10(K))
+
+The published CCO expression supplies the 1-atm reference value. At fixed T,
+the reaction quotient therefore gives
+
+    log10(fO2) = log10(fO2_ref) + 2 * log10(P_CO / P_ref)
+
+where P_ref = 1 atm = 1.01325 bar.
 
 Units
 -----
-T_K / T_K and (K/bar) * bar / T_K are dimensionless; the constant terms are
+T_K / T_K and pressure ratios are dimensionless; the constant terms are
 already on a log10(fO2/bar) scale.
 
 Sanity
 ------
 At T = 1473.15 K and P_CO = 1.01325 bar (1 atm):
-    log10(fO2/bar) ≈ -10.475
-which matches the published CCO line and the numeric values previously
-computed for ts1985 via engines.builtin.cco_redox_buffer (same coefficients).
+    log10(fO2/bar) = -10.475256413
+This matches the published CCO line and the numeric values previously computed
+for ts1985 via engines.builtin.cco_redox_buffer (same coefficients).
+At the same T and P_CO = 0.101325 bar (0.1 atm):
+    log10(fO2/bar) = -12.475256413
+which is exactly two log units lower as required by the reaction quotient.
 """
 
 from __future__ import annotations
@@ -50,6 +60,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 _CCO_A = -21_803.0
 _CCO_B = 4.325
 _CCO_C = 0.171
+_REFERENCE_PRESSURE_BAR = 1.01325
 
 C_CO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
 C_CO_SOURCE = (
@@ -104,7 +115,14 @@ def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
         raise ValueError("temperature_K must be finite and positive")
     if not math.isfinite(pressure) or pressure <= 0.0:
         raise ValueError("p_co_bar must be finite and positive")
-    return _CCO_A / temperature + _CCO_B + _CCO_C * (pressure - 1.0) / temperature
+    reference_log10_fo2 = (
+        _CCO_A / temperature
+        + _CCO_B
+        + _CCO_C * (_REFERENCE_PRESSURE_BAR - 1.0) / temperature
+    )
+    return reference_log10_fo2 + 2.0 * math.log10(
+        pressure / _REFERENCE_PRESSURE_BAR
+    )
 
 
 __all__ = [
