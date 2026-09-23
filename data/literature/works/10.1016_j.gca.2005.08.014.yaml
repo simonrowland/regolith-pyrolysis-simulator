@@ -69,7 +69,72 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2005.08.014
 experiments:
-- experiment_id: 10.1016/j.gca.2005.08.014::3
+- experiment_id: 10.1016/j.gca.2005.08.014::REF-014
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_langmuir_flux_against_equilibrium_reference' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2005.08.014
+  locator:
+    note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011),
+      Meteorit. Planet. Sci. 46
+    record: potassium_silicate_vacuum
+- experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2005.08.014
+  locator:
+    note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table 3 pp. 212-213; primary
+      vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+- experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   kind: literature
   method:
     tag: value
@@ -128,41 +193,8 @@ experiments:
   work_id: 10.1016/j.gca.2005.08.014
   locator:
     table: '3'
-    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
-    record: fedkin_2006_table3_fe_hashimoto_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'langmuir_free_evaporation_inverse_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    page: 219
-    table: '4'
-    note: row=Mg; This work
-    source_path: tables/kems-005-fedkin-2006/t4.csv
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   apparatus:
     cell_material_and_liner:
       state:
@@ -172,194 +204,3 @@ experiments:
         paragraph: apparatus of primary experiment
         line_range: '171'
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-- experiment_id: 10.1016/j.gca.2005.08.014::fedkin_2006_table3_fe_hashimoto_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table 3 pp. 212-213; primary
-      vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
-    record: fedkin_2006_table3_fe_hashimoto_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::fedkin_2006_table3_mg_hashimoto_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983) Geochem. J. 17:111-145 vacuum free evaporation
-    record: fedkin_2006_table3_mg_hashimoto_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::fedkin_2006_table3_sio_hashimoto_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983)
-    record: fedkin_2006_table3_sio_hashimoto_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::fedkin_2006_yu_k_vacuum_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with uncertainty also by Richter
-      lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
-    record: fedkin_2006_yu_k_vacuum_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::fedkin_2006_yu_na_vacuum_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H., Alexander, C. M. O'D.
-      & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
-    record: fedkin_2006_yu_na_vacuum_langmuir
-- experiment_id: 10.1016/j.gca.2005.08.014::potassium_silicate_vacuum
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'vacuum_langmuir_flux_against_equilibrium_reference' is not a closed method token (kems_effusion alone
-      is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2005.08.014
-  locator:
-    note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011),
-      Meteorit. Planet. Sci. 46
-    record: potassium_silicate_vacuum

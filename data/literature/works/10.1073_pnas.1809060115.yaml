@@ -37,7 +37,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1073/pnas.1809060115
 experiments:
-- experiment_id: 10.1073/pnas.1809060115::1
+- experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   kind: literature
   method:
     tag: unknown
@@ -70,102 +70,3 @@ experiments:
     pdf_page_index: 2
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
-- experiment_id: 10.1073/pnas.1809060115::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'model_derived_evaporation_window' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1073/pnas.1809060115
-  locator:
-    published_page: 10923
-    pdf_page_index: 4
-    figure: '2'
-    note: fCr vs Delta53Cr Moon-Earth; model curves at 1500-1800 K and DeltaFMQ-1/0/+1
-- experiment_id: 10.1073/pnas.1809060115::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'model_derived_disk_cooling' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1073/pnas.1809060115
-  locator:
-    published_page: 10924
-    pdf_page_index: 5
-    figure: '3'
-    note: Fig. 3 schematic; printed numbers are from the caption, not axis digitisation
-- experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'mc_icp_ms_double_spike_not_kems' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1073/pnas.1809060115
-  locator:
-    published_page: 10921
-    pdf_page_index: 2
-    paragraph: Twenty terrestrial ultramafic samples have d53Cr between -0.17 +/- 0.06 permil (sample 422/95) and -0.07 +/-
-      0.04 permil (sample 49J), with an average of -0.11 +/- 0.05 permil (Table 1)

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1000:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=uranium-(reference-state):v=f779fafe22:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -108,113 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:row=10:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1048'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '30.66872'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='7.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=a12fe8ac9a:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -320,7 +214,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1100:row=12:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1048:col=H_minus_H298:name=uranium-(reference-state):v=bb587e26ac:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: U
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1048'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '30.66872'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 74
+    pdf_page_index: 80
+    table: b1259-ht-0049-uranium-reference-state
+    note: as_published='7.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
+    record: b1259-ht-0049-uranium-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=uranium-(reference-state):v=51f7a4863f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1200:row=13:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=uranium-(reference-state):v=887deb384b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -532,7 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1300:row=14:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=uranium-(reference-state):v=e5b2c8cef7:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -638,7 +638,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1400:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=uranium-(reference-state):v=73047da44d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -744,7 +744,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=061dc399b2:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -850,7 +850,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:row=17:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1405:col=H_minus_H298:name=uranium-(reference-state):v=93aaf547d1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -956,7 +956,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1500:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=uranium-(reference-state):v=748f14d3f0:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1062,7 +1062,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1600:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=uranium-(reference-state):v=762c07bf3c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1168,7 +1168,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1700:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=uranium-(reference-state):v=b8aa4692e7:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1274,7 +1274,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1800:row=21:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=uranium-(reference-state):v=ce69085669:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1380,7 +1380,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1900:row=22:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=uranium-(reference-state):v=4d930c62a9:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1486,7 +1486,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=2000:row=23:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=uranium-(reference-state):v=e03b2e31e3:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1592,7 +1592,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1698,7 +1698,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=400:row=1:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=uranium-(reference-state):v=a1b1ade56d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1804,7 +1804,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=500:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=uranium-(reference-state):v=bd9d0682fc:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -1910,7 +1910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=600:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=uranium-(reference-state):v=b7e558b0f4:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2016,7 +2016,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=700:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=uranium-(reference-state):v=24ddc30464:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2122,7 +2122,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=800:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=uranium-(reference-state):v=5cee184ce1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2228,7 +2228,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=900:row=6:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=uranium-(reference-state):v=12bf7dbc9b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2334,7 +2334,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:row=7:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=196f45e581:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2440,7 +2440,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:H_minus_H298:shared:T=941:col=H_minus_H298:name=uranium-(reference-state):v=8ad70ceaa1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2546,7 +2546,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1000:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1000:col=entropy:name=uranium-(reference-state):v=c93f267e5d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2652,7 +2652,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:row=10:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=19eba6b7d3:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2758,7 +2758,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1048:col=entropy:name=uranium-(reference-state):v=809cc4e978:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2864,7 +2864,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1100:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1100:col=entropy:name=uranium-(reference-state):v=a58108c5ac:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -2970,7 +2970,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1200:row=13:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1200:col=entropy:name=uranium-(reference-state):v=3dcc600cd0:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3076,7 +3076,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1300:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1300:col=entropy:name=uranium-(reference-state):v=3e2f14deb6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3182,7 +3182,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1400:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1400:col=entropy:name=uranium-(reference-state):v=158ac17493:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3288,113 +3288,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:row=16:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1405'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '113.05168'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='27.020'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:row=17:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=15a8a508d5:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3500,7 +3394,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1500:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1405:col=entropy:name=uranium-(reference-state):v=f7a60bf18c:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: U
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1405'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '113.05168'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 74
+    pdf_page_index: 80
+    table: b1259-ht-0049-uranium-reference-state
+    note: as_published='27.020'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
+    record: b1259-ht-0049-uranium-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1500:col=entropy:name=uranium-(reference-state):v=a48f7eccaa:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3606,7 +3606,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1600:row=19:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1600:col=entropy:name=uranium-(reference-state):v=10c05fb4ca:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3712,7 +3712,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1700:row=20:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1700:col=entropy:name=uranium-(reference-state):v=0532468938:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3818,7 +3818,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1800:row=21:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1800:col=entropy:name=uranium-(reference-state):v=85058e05db:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -3924,7 +3924,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1900:row=22:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=1900:col=entropy:name=uranium-(reference-state):v=dab353fa8d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4030,7 +4030,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=2000:row=23:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=2000:col=entropy:name=uranium-(reference-state):v=0aa25d7cda:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4136,7 +4136,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=400:row=1:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=400:col=entropy:name=uranium-(reference-state):v=fa8dab8694:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4242,7 +4242,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=500:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=500:col=entropy:name=uranium-(reference-state):v=17e3d1eec0:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4348,7 +4348,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=600:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=600:col=entropy:name=uranium-(reference-state):v=59c3bdfa0e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4454,7 +4454,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=700:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=700:col=entropy:name=uranium-(reference-state):v=ce69085669:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4560,7 +4560,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=800:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=800:col=entropy:name=uranium-(reference-state):v=773336b271:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4666,7 +4666,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=900:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=900:col=entropy:name=uranium-(reference-state):v=70a9e7e961:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4772,7 +4772,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:row=7:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=ad3f8ed97d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4878,7 +4878,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:S:shared:T=941:col=entropy:name=uranium-(reference-state):v=feb2180b7e:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -4984,7 +4984,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1000:row=9:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5128,7 +5128,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1048:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1048:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5272,7 +5272,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1100:row=12:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5416,7 +5416,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1200:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5560,7 +5560,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1300:row=14:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5704,7 +5704,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1400:row=15:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5848,7 +5848,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1405:row=16:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1405:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -5992,151 +5992,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1405:row=17:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1405'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1500:row=18:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6280,7 +6136,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1600:row=19:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6424,7 +6280,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1700:row=20:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6568,7 +6424,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1800:row=21:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6712,7 +6568,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1900:row=22:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -6856,7 +6712,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=2000:row=23:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7000,7 +6856,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7144,7 +7000,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=400:row=1:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7288,7 +7144,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=500:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7432,7 +7288,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=600:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7576,7 +7432,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=700:row=4:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7720,7 +7576,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=800:row=5:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -7864,7 +7720,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=900:row=6:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8008,7 +7864,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=941:row=7:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=941:col=delta_f_G:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8152,151 +8008,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fG:from_the_elements:T=941:row=8:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '941'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1000:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8440,7 +8152,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1048:row=10:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1048:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8584,151 +8296,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1048:row=11:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1048'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1100:row=12:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -8872,7 +8440,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1200:row=13:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9016,7 +8584,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1300:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9160,7 +8728,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1400:row=15:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9304,7 +8872,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1405:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1405:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9448,151 +9016,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1405:row=17:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1405'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1500:row=18:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9736,7 +9160,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1600:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -9880,7 +9304,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1700:row=20:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10024,7 +9448,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1800:row=21:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10168,7 +9592,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1900:row=22:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10312,7 +9736,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=2000:row=23:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10456,7 +9880,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10600,7 +10024,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=400:row=1:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10744,7 +10168,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=500:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -10888,7 +10312,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=600:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11032,7 +10456,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=700:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11176,7 +10600,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=800:row=5:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11320,7 +10744,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=900:row=6:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11464,7 +10888,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=941:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=941:col=delta_f_H:name=uranium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11608,151 +11032,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:delta_fH:from_the_elements:T=941:row=8:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '941'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1000:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -11887,7 +11167,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1048:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1048:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12022,142 +11302,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1048:row=11:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1048'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1100:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12292,7 +11437,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1200:row=13:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12427,7 +11572,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1300:row=14:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12562,7 +11707,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1400:row=15:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12697,7 +11842,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1405:row=16:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1405:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -12832,142 +11977,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1405:row=17:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1405'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1500:row=18:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13102,7 +12112,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1600:row=19:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13237,7 +12247,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1700:row=20:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13372,7 +12382,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1800:row=21:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13507,7 +12517,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1900:row=22:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13642,7 +12652,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=2000:row=23:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13777,7 +12787,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -13912,7 +12922,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=400:row=1:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14047,7 +13057,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=500:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14182,7 +13192,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=600:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14317,7 +13327,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=700:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14452,7 +13462,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=800:row=5:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14587,7 +13597,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=900:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:
@@ -14722,142 +13732,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=941:row=7:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: U
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '941'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 74
-    pdf_page_index: 80
-    table: b1259-ht-0049-uranium-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
-    record: b1259-ht-0049-uranium-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=941:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:log10_Kf:from_the_elements:T=941:col=log_Kf:name=uranium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0049-uranium-reference-state:tabulation
   identity:
     quantity:

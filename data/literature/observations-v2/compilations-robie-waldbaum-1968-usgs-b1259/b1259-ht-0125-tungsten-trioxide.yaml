@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1000:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1000:col=H_minus_H298:name=tungsten-trioxide:v=32fec3aa8f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -109,114 +109,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1050:row=10:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1050'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '71.3372'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='17.050'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1050:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1050:col=H_minus_H298:name=tungsten-trioxide:v=9ae9dfddc0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -323,7 +216,114 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1100:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1050:col=H_minus_H298:name=tungsten-trioxide:v=ebc17107d2
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: WO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
+          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1050'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '71.3372'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 150
+    pdf_page_index: 156
+    table: b1259-ht-0125-tungsten-trioxide
+    note: as_published='17.050'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
+    record: b1259-ht-0125-tungsten-trioxide
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1100:col=H_minus_H298:name=tungsten-trioxide:v=5a455f4220
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -430,7 +430,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1200:row=12:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1200:col=H_minus_H298:name=tungsten-trioxide:v=28df73ab63
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -537,7 +537,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1300:row=13:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1300:col=H_minus_H298:name=tungsten-trioxide:v=65e34cc0f1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -644,7 +644,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1400:row=14:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1400:col=H_minus_H298:name=tungsten-trioxide:v=d3940a76d4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -751,7 +751,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1500:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1500:col=H_minus_H298:name=tungsten-trioxide:v=5d15b6747a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -858,7 +858,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1600:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1600:col=H_minus_H298:name=tungsten-trioxide:v=98e840cdd8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -965,7 +965,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1700:row=17:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1700:col=H_minus_H298:name=tungsten-trioxide:v=274e7a87a3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1072,7 +1072,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1745:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1745:col=H_minus_H298:name=tungsten-trioxide:v=24057bd91a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1179,7 +1179,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1745:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1745:col=H_minus_H298:name=tungsten-trioxide:v=c7c55502a7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1286,7 +1286,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1800:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1800:col=H_minus_H298:name=tungsten-trioxide:v=87d56bc565
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1393,7 +1393,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1900:row=21:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=1900:col=H_minus_H298:name=tungsten-trioxide:v=3d906aa04b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1500,7 +1500,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=2000:row=22:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=2000:col=H_minus_H298:name=tungsten-trioxide:v=84ac85da50
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1607,7 +1607,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=400:col=H_minus_H298:name=tungsten-trioxide:v=49ef927e43
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1714,7 +1714,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=500:col=H_minus_H298:name=tungsten-trioxide:v=5eb383586e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1821,7 +1821,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=600:col=H_minus_H298:name=tungsten-trioxide:v=4e5508453d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -1928,7 +1928,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=700:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=700:col=H_minus_H298:name=tungsten-trioxide:v=2cf70f3ae9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2035,7 +2035,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=800:row=6:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=800:col=H_minus_H298:name=tungsten-trioxide:v=8509d5e36b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2142,7 +2142,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=900:row=7:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:H_minus_H298:shared:T=900:col=H_minus_H298:name=tungsten-trioxide:v=49950d7e2a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2249,7 +2249,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1000:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1000:col=entropy:name=tungsten-trioxide:v=dd6772e6b2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2356,114 +2356,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1050:row=10:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1050'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '190.53936'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='45.54'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1050:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1050:col=entropy:name=tungsten-trioxide:v=1361c5cdba
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2570,7 +2463,114 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1100:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1050:col=entropy:name=tungsten-trioxide:v=4161e89581
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: WO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
+          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1050'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '190.53936'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 150
+    pdf_page_index: 156
+    table: b1259-ht-0125-tungsten-trioxide
+    note: as_published='45.54'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
+    record: b1259-ht-0125-tungsten-trioxide
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1100:col=entropy:name=tungsten-trioxide:v=e6c3db7846
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2677,7 +2677,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1200:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1200:col=entropy:name=tungsten-trioxide:v=f5be16faec
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2784,7 +2784,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1300:row=13:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1300:col=entropy:name=tungsten-trioxide:v=dce7bf20fb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2891,7 +2891,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1400:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1400:col=entropy:name=tungsten-trioxide:v=0fb8a8c4e4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -2998,7 +2998,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1500:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1500:col=entropy:name=tungsten-trioxide:v=77f80b49df
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3105,7 +3105,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1600:row=16:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1600:col=entropy:name=tungsten-trioxide:v=34f537062d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3212,7 +3212,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1700:row=17:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1700:col=entropy:name=tungsten-trioxide:v=4e46fddc38
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3319,7 +3319,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1745:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1745:col=entropy:name=tungsten-trioxide:v=c5fd86f2aa
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3426,7 +3426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1800:row=20:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1800:col=entropy:name=tungsten-trioxide:v=3152b4ed39
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3533,7 +3533,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1900:row=21:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=1900:col=entropy:name=tungsten-trioxide:v=5f74efbe3c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3640,7 +3640,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=2000:row=22:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=2000:col=entropy:name=tungsten-trioxide:v=fd1005da97
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3747,7 +3747,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=400:col=entropy:name=tungsten-trioxide:v=7e97f06c1f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3854,7 +3854,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=500:col=entropy:name=tungsten-trioxide:v=43c43f4a9a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -3961,7 +3961,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=600:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=600:col=entropy:name=tungsten-trioxide:v=3ee79de9d7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4068,7 +4068,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=700:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=700:col=entropy:name=tungsten-trioxide:v=034cb3f0a4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4175,7 +4175,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=800:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=800:col=entropy:name=tungsten-trioxide:v=9488b3610e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4282,7 +4282,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=900:row=7:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:S:shared:T=900:col=entropy:name=tungsten-trioxide:v=d74489de28
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4389,7 +4389,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1050:row=10:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1050:col=delta_f_G:name=tungsten-trioxide:v=fbc5e5da2c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4558,7 +4558,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1100:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=tungsten-trioxide:v=70a0ba49d5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4727,7 +4727,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1200:row=12:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=tungsten-trioxide:v=82baabf78d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -4896,7 +4896,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1300:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=tungsten-trioxide:v=92e1d9b42f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -5065,7 +5065,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1400:row=14:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=tungsten-trioxide:v=1e69587e1e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -5234,7 +5234,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1500:row=15:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=tungsten-trioxide:v=bbc30503e4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -5403,7 +5403,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1600:row=16:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=tungsten-trioxide:v=5b327404a7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -5572,7 +5572,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1745:row=18:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1745:col=delta_f_G:name=tungsten-trioxide:v=0b7851a5cb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -5741,176 +5741,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1745:row=19:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1745'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: WO3
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
-                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -3/2
-        - species:
-            formula: W
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - W
-        - formula: W
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-408.69312'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='-97.680'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1800:row=20:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=tungsten-trioxide:v=92cdf6b662
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -6079,7 +5910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1900:row=21:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=tungsten-trioxide:v=3f427835ca
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -6248,7 +6079,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=2000:row=22:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=tungsten-trioxide:v=912a6275a4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -6417,7 +6248,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1000:row=8:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=tungsten-trioxide:v=1bc92cc30e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -6586,176 +6417,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1050:row=10:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1050'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: WO3
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
-                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -3/2
-        - species:
-            formula: W
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - W
-        - formula: W
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-827.879712'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='-197.868'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1050:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1050:col=delta_f_H:name=tungsten-trioxide:v=0af76f32ff
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -6924,7 +6586,176 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1100:row=11:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1050:col=delta_f_H:name=tungsten-trioxide:v=c5bd174eba
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: WO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
+          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1050'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: WO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
+                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+        - species:
+            formula: W
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - W
+        - formula: W
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-827.879712'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 150
+    pdf_page_index: 156
+    table: b1259-ht-0125-tungsten-trioxide
+    note: as_published='-197.868'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
+    record: b1259-ht-0125-tungsten-trioxide
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=tungsten-trioxide:v=2b898e96e2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7093,7 +6924,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1200:row=12:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=tungsten-trioxide:v=ffd752e741
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7262,7 +7093,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1300:row=13:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=tungsten-trioxide:v=c1581b4f68
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7431,7 +7262,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1400:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=tungsten-trioxide:v=b29f9971c7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7600,7 +7431,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1500:row=15:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=tungsten-trioxide:v=11b0c065a3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7769,7 +7600,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1600:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=tungsten-trioxide:v=16898401ef
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -7938,7 +7769,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1700:row=17:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=tungsten-trioxide:v=ca0c5d740f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -8107,176 +7938,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1745:row=18:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1745'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: WO3
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
-                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -3/2
-        - species:
-            formula: W
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - W
-        - formula: W
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-813.91352'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='-194.530'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1745:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1745:col=delta_f_H:name=tungsten-trioxide:v=6de4b2a798
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -8445,7 +8107,176 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1800:row=20:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1745:col=delta_f_H:name=tungsten-trioxide:v=ded997cefa
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: WO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
+          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1745'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: WO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
+                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+        - species:
+            formula: W
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - W
+        - formula: W
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-813.91352'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 150
+    pdf_page_index: 156
+    table: b1259-ht-0125-tungsten-trioxide
+    note: as_published='-194.530'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
+    record: b1259-ht-0125-tungsten-trioxide
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=tungsten-trioxide:v=4a8de0c816
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -8614,7 +8445,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1900:row=21:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=tungsten-trioxide:v=1d4aa67cb4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -8783,7 +8614,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=2000:row=22:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=tungsten-trioxide:v=359b795c59
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -8952,7 +8783,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=400:col=delta_f_H:name=tungsten-trioxide:v=bac2f7a459
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9121,7 +8952,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=500:col=delta_f_H:name=tungsten-trioxide:v=2edebc68a2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9290,7 +9121,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=600:col=delta_f_H:name=tungsten-trioxide:v=d0cb0d392c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9459,7 +9290,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=700:row=5:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=700:col=delta_f_H:name=tungsten-trioxide:v=96c788a68f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9628,7 +9459,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=800:row=6:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=800:col=delta_f_H:name=tungsten-trioxide:v=77f0522053
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9797,7 +9628,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=900:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:delta_fH:from_the_elements:T=900:col=delta_f_H:name=tungsten-trioxide:v=cd37bd79a4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -9966,7 +9797,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1050:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1050:col=log_Kf:name=tungsten-trioxide:v=3d61576191
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10126,7 +9957,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1100:row=11:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=tungsten-trioxide:v=5faa48df21
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10286,7 +10117,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1200:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=tungsten-trioxide:v=b09f160b20
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10446,7 +10277,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1300:row=13:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=tungsten-trioxide:v=d90cba88f8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10606,7 +10437,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1400:row=14:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=tungsten-trioxide:v=9b889ddbfd
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10766,7 +10597,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1500:row=15:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=tungsten-trioxide:v=233898db0d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -10926,7 +10757,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1600:row=16:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=tungsten-trioxide:v=a990eea125
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -11086,7 +10917,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1700:row=17:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=tungsten-trioxide:v=fbc64d4222
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -11246,7 +11077,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1745:row=18:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1745:col=log_Kf:name=tungsten-trioxide:v=0e0e2efc21
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -11406,167 +11237,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1745:row=19:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: WO3
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting point
-          1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1745'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: WO3
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals (monoclinic ?) 298.15° to 1050°K. Tetragonal crystals 1050° to melting
-                point 1745°K. Liquid 1745° to 2000°K. TUNGSTEN TRIOXIDE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -3/2
-        - species:
-            formula: W
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - W
-        - formula: W
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '12.234'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 150
-    pdf_page_index: 156
-    table: b1259-ht-0125-tungsten-trioxide
-    note: as_published='12.234'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0125-tungsten-trioxide.json
-    record: b1259-ht-0125-tungsten-trioxide
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1800:row=20:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=tungsten-trioxide:v=03f33156e1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -11726,7 +11397,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1900:row=21:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=tungsten-trioxide:v=23481a6e70
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:
@@ -11886,7 +11557,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=2000:row=22:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=tungsten-trioxide:v=d656745cf4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0125-tungsten-trioxide:tabulation
   identity:
     quantity:

@@ -60,6 +60,33 @@ observations:
         section: '2.4'
         equation: 2-5
         note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 489
+              pdf_page_index: 2
+              section: '2.4'
+              equation: 2-5
+              note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 489
+              pdf_page_index: 2
+              section: '2.4'
+              equation: 2-5
+              note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+        output_unit: K
 - observation_id: kems-067-yamada-1980::yamada_1980_fe_activity_fig8_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -653,6 +680,31 @@ observations:
         pdf_page_index: 3
         table: '1'
         note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 490
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 490
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+        output_unit: K
 - observation_id: kems-067-yamada-1980::yamada_1980_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -765,6 +817,33 @@ observations:
         table: '2'
         equation: '8'
         note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 492
+              pdf_page_index: 5
+              table: '2'
+              equation: '8'
+              note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 492
+              pdf_page_index: 5
+              table: '2'
+              equation: '8'
+              note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+        output_unit: K
 - observation_id: kems-067-yamada-1980::yamada_1980_p_Si_estimate_NSi_below_0p05
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -862,6 +941,31 @@ observations:
         pdf_page_index: 4
         section: '3.1'
         note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 491
+              pdf_page_index: 4
+              section: '3.1'
+              note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 491
+              pdf_page_index: 4
+              section: '3.1'
+              note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+        output_unit: K
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:

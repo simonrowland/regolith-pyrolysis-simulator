@@ -62,39 +62,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1051/0004-6361/201220803
 experiments:
-- experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'solid_SiO_growth_coefficient' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/201220803
-  locator:
-    equation: '8'
-    line_range: 317-329
-    note: particle-growth equation; authors call alpha(T) a growth coefficient
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
 - experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
   kind: literature
   method:
@@ -177,6 +144,29 @@ experiments:
           page: 2
           section: '2.1'
           note: UHV base pressure <10^-10 mbar; unit conversion only
+        inference:
+          relation: mbar_to_Pa
+          inputs:
+          - P_Pa = P_mbar × 100
+          - original_unit=mbar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000001'
+              locator:
+                page: 2
+                section: '2.1'
+                note: UHV base pressure <10^-10 mbar; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 2
+                section: '2.1'
+                note: UHV base pressure <10^-10 mbar; unit conversion only
+          output_unit: Pa
   work_id: 10.1051/0004-6361/201220803
   locator:
     page: 2
@@ -237,6 +227,29 @@ experiments:
           page: 4
           section: '2.4'
           note: Printed 100 min per anneal; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 4
+                section: '2.4'
+                note: Printed 100 min per anneal; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                section: '2.4'
+                note: Printed 100 min per anneal; unit conversion only
+          output_unit: s
     total_duration_s:
       state:
         tag: unknown
@@ -245,6 +258,39 @@ experiments:
         page: 4
         section: '2.4'
         note: Multiple gradually increased-temperature anneals; no total series duration printed
+- experiment_id: 10.1051/0004-6361/201220803::wetzel-gail-2013-sio-arrhenius
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_SiO_growth_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    equation: '8'
+    line_range: 317-329
+    note: particle-growth equation; authors call alpha(T) a growth coefficient
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
 benches:
 - id: 10.1051/0004-6361/201220803::bench::wetzel-uhv-film-apparatus
   work_id: 10.1051/0004-6361/201220803

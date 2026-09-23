@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=boehmite:v=900e6181ee:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=400:col=H_minus_H298:name=boehmite:v=f94ddca990:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=500:col=H_minus_H298:name=boehmite:v=e0c8dad3aa:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -320,7 +320,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=298.15:col=entropy:name=boehmite:v=cf46ad0802:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=500:col=entropy:name=boehmite:v=e7c87da0e1:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -532,7 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=boehmite:v=be29a39cb9:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -722,7 +722,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=boehmite:v=4ce1442571:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -912,7 +912,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=500:col=delta_f_G:name=boehmite:v=ce5947fe68:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -1102,7 +1102,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=boehmite:v=7c34cde9c0:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -1292,7 +1292,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=boehmite:v=d74600890a:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -1482,7 +1482,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=boehmite:v=2f25410cf1:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -1672,7 +1672,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=boehmite:v=ccf1d96dc2:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -1853,7 +1853,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=boehmite:v=9da8adc7ee:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:
@@ -2034,7 +2034,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=boehmite:v=9ebcaaf92f:poly=boehmite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
   identity:
     quantity:

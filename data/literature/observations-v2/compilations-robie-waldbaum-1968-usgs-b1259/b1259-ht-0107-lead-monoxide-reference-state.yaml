@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1000:row=10:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=lead-monoxide-(reference-state):v=78c895f176
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1100:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=lead-monoxide-(reference-state):v=63aa362f96
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -214,113 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1170:row=12:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1170'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '46.77712'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='11.180'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1170:row=13:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1170:col=H_minus_H298:name=lead-monoxide-(reference-state):v=75e74d4a64
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -426,7 +320,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1200:row=14:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1170:col=H_minus_H298:name=lead-monoxide-(reference-state):v=cca81f5f61
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1170'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '46.77712'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='11.180'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=lead-monoxide-(reference-state):v=66c3aaf8c1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -532,7 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1300:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=lead-monoxide-(reference-state):v=2ccd09e226
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -638,7 +638,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1400:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=lead-monoxide-(reference-state):v=26cc6df23a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -744,7 +744,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1500:row=17:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=lead-monoxide-(reference-state):v=062a813115
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -850,7 +850,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1600:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=lead-monoxide-(reference-state):v=c0bd83abfb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -956,7 +956,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1700:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=lead-monoxide-(reference-state):v=67f55037c1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1062,7 +1062,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1789:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1789:col=H_minus_H298:name=lead-monoxide-(reference-state):v=1573ab06d9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1168,7 +1168,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1789:row=21:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1789:col=H_minus_H298:name=lead-monoxide-(reference-state):v=d91bfd41e6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1274,7 +1274,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1800:row=22:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=lead-monoxide-(reference-state):v=0d3f5d052d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1380,7 +1380,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1900:row=23:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=lead-monoxide-(reference-state):v=d19d4f2a8f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1486,7 +1486,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=2000:row=24:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=lead-monoxide-(reference-state):v=ebf8eec4a4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1592,7 +1592,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=lead-monoxide-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1698,7 +1698,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=lead-monoxide-(reference-state):v=96bcf572e5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1804,7 +1804,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=lead-monoxide-(reference-state):v=583563bdd9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -1910,7 +1910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=lead-monoxide-(reference-state):v=72934e0895
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2016,7 +2016,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=700:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=lead-monoxide-(reference-state):v=cf4256152e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2122,113 +2122,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=762:row=6:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '762'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '24.677232'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='5.898'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=762:row=7:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=762:col=H_minus_H298:name=lead-monoxide-(reference-state):v=47a805744c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2334,7 +2228,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=800:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=762:col=H_minus_H298:name=lead-monoxide-(reference-state):v=bfbb2365d7
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '762'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '24.677232'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='5.898'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=lead-monoxide-(reference-state):v=9da9aa8197
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2440,7 +2440,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=900:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=lead-monoxide-(reference-state):v=aac67dc6b6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2546,7 +2546,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1000:row=10:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1000:col=entropy:name=lead-monoxide-(reference-state):v=e7b42f613b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2652,7 +2652,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1100:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1100:col=entropy:name=lead-monoxide-(reference-state):v=60f847f442
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2758,7 +2758,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1170:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1170:col=entropy:name=lead-monoxide-(reference-state):v=75d042d4cf
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2864,7 +2864,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1170:row=13:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1170:col=entropy:name=lead-monoxide-(reference-state):v=fc3d87cb60
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -2970,7 +2970,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1200:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1200:col=entropy:name=lead-monoxide-(reference-state):v=8335a0052c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3076,7 +3076,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1300:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1300:col=entropy:name=lead-monoxide-(reference-state):v=d694c486bd
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3182,7 +3182,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1400:row=16:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1400:col=entropy:name=lead-monoxide-(reference-state):v=19532ae2c2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3288,7 +3288,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1500:row=17:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1500:col=entropy:name=lead-monoxide-(reference-state):v=1642587340
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3394,7 +3394,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1600:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1600:col=entropy:name=lead-monoxide-(reference-state):v=4ec656c38f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3500,7 +3500,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1700:row=19:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1700:col=entropy:name=lead-monoxide-(reference-state):v=286911a3ed
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3606,113 +3606,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1789:row=20:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1789'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '188.40552'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='45.03'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1789:row=21:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1789:col=entropy:name=lead-monoxide-(reference-state):v=1e7268e0ab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3818,7 +3712,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1800:row=22:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1789:col=entropy:name=lead-monoxide-(reference-state):v=e52256534d
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1789'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '188.40552'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='45.03'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1800:col=entropy:name=lead-monoxide-(reference-state):v=c99909cd14
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -3924,7 +3924,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1900:row=23:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=1900:col=entropy:name=lead-monoxide-(reference-state):v=0f2ef6e897
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4030,7 +4030,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=2000:row=24:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=2000:col=entropy:name=lead-monoxide-(reference-state):v=68e718c8e8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4136,7 +4136,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=298.15:col=entropy:name=lead-monoxide-(reference-state):v=96d22fda68
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4242,7 +4242,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=400:col=entropy:name=lead-monoxide-(reference-state):v=4abbd60d41
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4348,7 +4348,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=500:col=entropy:name=lead-monoxide-(reference-state):v=73f3a1dfc6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4454,7 +4454,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=600:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=600:col=entropy:name=lead-monoxide-(reference-state):v=d3e6f46a87
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4560,7 +4560,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=700:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=700:col=entropy:name=lead-monoxide-(reference-state):v=e2bad2a706
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4666,7 +4666,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=762:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=762:col=entropy:name=lead-monoxide-(reference-state):v=a6010dd01c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4772,7 +4772,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=762:row=7:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=762:col=entropy:name=lead-monoxide-(reference-state):v=af31677345
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4878,7 +4878,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=800:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=800:col=entropy:name=lead-monoxide-(reference-state):v=14ec45e674
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -4984,7 +4984,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=900:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:S:shared:T=900:col=entropy:name=lead-monoxide-(reference-state):v=d0dc068166
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5090,7 +5090,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1000:row=10:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=lead-monoxide-(reference-state):v=b26a8389df
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5257,7 +5257,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1100:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=lead-monoxide-(reference-state):v=49b7a150da
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5424,7 +5424,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1170:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1170:col=delta_f_G:name=lead-monoxide-(reference-state):v=bf3a7c5f6a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5591,7 +5591,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1200:row=14:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=lead-monoxide-(reference-state):v=7336816e2a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5758,7 +5758,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1300:row=15:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=lead-monoxide-(reference-state):v=b4bc7ff154
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -5925,7 +5925,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1400:row=16:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=lead-monoxide-(reference-state):v=c60c3e958b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -6092,7 +6092,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1500:row=17:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=lead-monoxide-(reference-state):v=fdde10da57
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -6259,7 +6259,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1600:row=18:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=lead-monoxide-(reference-state):v=0e4da8503e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -6426,7 +6426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1700:row=19:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=lead-monoxide-(reference-state):v=6ece7e1d82
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -6593,7 +6593,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1789:row=20:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1789:col=delta_f_G:name=lead-monoxide-(reference-state):v=b54b3d1c6e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -6760,174 +6760,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1789:row=21:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1789'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-56.596968'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='-13.527'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1800:row=22:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=lead-monoxide-(reference-state):v=91d028b139
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7094,7 +6927,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1900:row=23:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=lead-monoxide-(reference-state):v=9df044dbaa
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7261,7 +7094,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=2000:row=24:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=lead-monoxide-(reference-state):v=4d6c92237f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7428,7 +7261,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=lead-monoxide-(reference-state):v=c4de536f63
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7595,7 +7428,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=lead-monoxide-(reference-state):v=c1f1212100
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7762,7 +7595,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=lead-monoxide-(reference-state):v=f334da4ce8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -7929,7 +7762,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=700:row=5:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=lead-monoxide-(reference-state):v=c69341e791
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -8096,7 +7929,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=762:row=6:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=762:col=delta_f_G:name=lead-monoxide-(reference-state):v=d245601f87
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -8263,174 +8096,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=762:row=7:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '762'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-141.862704'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='-33.906'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=800:row=8:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=lead-monoxide-(reference-state):v=112f18ea91
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -8597,7 +8263,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=900:row=9:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=lead-monoxide-(reference-state):v=5722190b8d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -8764,7 +8430,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1000:row=10:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=lead-monoxide-(reference-state):v=cf867b891a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -8931,7 +8597,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1100:row=11:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=lead-monoxide-(reference-state):v=1a3d59e30f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -9098,174 +8764,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1170:row=12:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1170'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-215.572232'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='-51.523'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1170:row=13:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1170:col=delta_f_H:name=lead-monoxide-(reference-state):v=908699a8b9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -9432,7 +8931,174 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1200:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1170:col=delta_f_H:name=lead-monoxide-(reference-state):v=b698110d94
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1170'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: PbO
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: Pb
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Pb
+        - formula: Pb
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-215.572232'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='-51.523'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=lead-monoxide-(reference-state):v=5224bebcb5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -9599,7 +9265,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1300:row=15:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=lead-monoxide-(reference-state):v=137fb304d8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -9766,7 +9432,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1400:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=lead-monoxide-(reference-state):v=31c2ff3bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -9933,7 +9599,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1500:row=17:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=lead-monoxide-(reference-state):v=6d73386ffc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -10100,7 +9766,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1600:row=18:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=lead-monoxide-(reference-state):v=324ea3da44
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -10267,7 +9933,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1700:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=lead-monoxide-(reference-state):v=fd634ad5e0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -10434,174 +10100,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1789:row=20:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1789'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-178.84508'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='-42.745'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1789:row=21:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1789:col=delta_f_H:name=lead-monoxide-(reference-state):v=91aa62946e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -10768,7 +10267,174 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1800:row=22:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1789:col=delta_f_H:name=lead-monoxide-(reference-state):v=fdedee9bfe
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1789'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: PbO
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: Pb
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Pb
+        - formula: Pb
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-178.84508'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='-42.745'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=lead-monoxide-(reference-state):v=bdced22d0e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -10935,7 +10601,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1900:row=23:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=lead-monoxide-(reference-state):v=a921704246
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11102,7 +10768,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=2000:row=24:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=lead-monoxide-(reference-state):v=7e0d18fd96
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11269,7 +10935,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=lead-monoxide-(reference-state):v=38c3c7e30f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11436,7 +11102,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=lead-monoxide-(reference-state):v=631e54ba40
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11603,7 +11269,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=lead-monoxide-(reference-state):v=ecdf9e7dd6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11770,7 +11436,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=lead-monoxide-(reference-state):v=af95436bdc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -11937,174 +11603,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=762:row=6:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '762'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-220.065848'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='-52.597'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=762:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=762:col=delta_f_H:name=lead-monoxide-(reference-state):v=1625914558
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -12271,7 +11770,174 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=800:row=8:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=762:col=delta_f_H:name=lead-monoxide-(reference-state):v=428549eff7
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: PbO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '762'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: PbO
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: Pb
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Pb
+        - formula: Pb
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-220.065848'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 132
+    pdf_page_index: 138
+    table: b1259-ht-0107-lead-monoxide-reference-state
+    note: as_published='-52.597'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
+    record: b1259-ht-0107-lead-monoxide-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=lead-monoxide-(reference-state):v=b3f84fb184
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -12438,7 +12104,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=900:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=lead-monoxide-(reference-state):v=9f8c650df2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -12605,7 +12271,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1000:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=lead-monoxide-(reference-state):v=b7614ac5e5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -12763,7 +12429,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1100:row=11:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=lead-monoxide-(reference-state):v=f8fe1185f7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -12921,7 +12587,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1170:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1170:col=log_Kf:name=lead-monoxide-(reference-state):v=34e174bbe1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -13079,165 +12745,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1170:row=13:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1170'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '4.51'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='4.510'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1200:row=14:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=lead-monoxide-(reference-state):v=1077d652fe
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -13395,7 +12903,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1300:row=15:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=lead-monoxide-(reference-state):v=d883d9e494
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -13553,7 +13061,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1400:row=16:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=lead-monoxide-(reference-state):v=a2dd0afbde
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -13711,7 +13219,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1500:row=17:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=lead-monoxide-(reference-state):v=cd73e6435d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -13869,7 +13377,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1600:row=18:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=lead-monoxide-(reference-state):v=95405574ca
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14027,7 +13535,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1700:row=19:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=lead-monoxide-(reference-state):v=1fd1366468
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14185,7 +13693,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1789:row=20:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1789:col=log_Kf:name=lead-monoxide-(reference-state):v=98c7bbb263
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14343,165 +13851,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1789:row=21:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1789'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '1.652'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='1.652'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1800:row=22:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=lead-monoxide-(reference-state):v=45622ab547
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14659,7 +14009,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1900:row=23:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=lead-monoxide-(reference-state):v=07249a9555
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14817,7 +14167,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=2000:row=24:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=lead-monoxide-(reference-state):v=cc36ffd9a2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -14975,7 +14325,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=lead-monoxide-(reference-state):v=0f64d916a5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -15133,7 +14483,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=lead-monoxide-(reference-state):v=b8d930c119
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -15291,7 +14641,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=lead-monoxide-(reference-state):v=b4c5f9ac2f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -15449,7 +14799,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=700:row=5:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=lead-monoxide-(reference-state):v=73093948e9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -15607,7 +14957,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=762:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=762:col=log_Kf:name=lead-monoxide-(reference-state):v=00b9b0e745
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -15765,165 +15115,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=762:row=7:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: PbO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '762'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: PbO
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-        - species:
-            formula: Pb
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Pb
-        - formula: Pb
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '9.724'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 132
-    pdf_page_index: 138
-    table: b1259-ht-0107-lead-monoxide-reference-state
-    note: as_published='9.724'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0107-lead-monoxide-reference-state.json
-    record: b1259-ht-0107-lead-monoxide-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=800:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=lead-monoxide-(reference-state):v=96a742a3ac
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:
@@ -16081,7 +15273,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=900:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=lead-monoxide-(reference-state):v=77de2ea547
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0107-lead-monoxide-reference-state:tabulation
   identity:
     quantity:

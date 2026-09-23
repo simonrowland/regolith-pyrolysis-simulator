@@ -55,6 +55,37 @@ experiments:
         page: 525
         section: 5.1 Starting Materials
         note: 5-70 mg; converted to kg
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -121,6 +152,37 @@ experiments:
         page: 525
         table: '1'
         note: 15-300 min per run; converted to s
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - original_high
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        output_unit: s
 benches:
 - id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e

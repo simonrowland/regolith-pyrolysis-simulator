@@ -19,37 +19,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1186/s40645-020-00354-0
 experiments:
-- experiment_id: 10.1186/s40645-020-00354-0::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'laser_boiling_with_inert_gas_cooling' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1186/s40645-020-00354-0
-  locator:
-    page: 2
-    table: '1'
 - experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   kind: literature
   method:
@@ -67,6 +36,29 @@ experiments:
         page: 3
         section: Experimental methods
         note: Printed approximately 15 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -105,6 +97,29 @@ experiments:
         page: 3
         section: Apparatus
         note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -128,6 +143,29 @@ experiments:
           page: 3
           section: Apparatus
           note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00001'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          output_unit: Pa
   work_id: 10.1186/s40645-020-00354-0
   locator:
     page: 3
@@ -157,6 +195,37 @@ experiments:
       locator:
         page: 4
         section: Experimental methods
+- experiment_id: 10.1186/s40645-020-00354-0::nakano-hashimoto-2020-bubbles-to-chondrites-i
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'laser_boiling_with_inert_gas_cooling' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1186/s40645-020-00354-0
+  locator:
+    page: 2
+    table: '1'
 benches:
 - id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
   work_id: 10.1186/s40645-020-00354-0
@@ -189,6 +258,29 @@ benches:
           page: 3
           section: Apparatus
           note: Printed 97 mm ID; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '97'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Printed 97 mm ID; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Printed 97 mm ID; unit conversion only
+          output_unit: m
       height_m:
         state:
           tag: value
@@ -200,6 +292,29 @@ benches:
           page: 3
           section: Apparatus
           note: Printed 310 mm H; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '310'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Printed 310 mm H; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Printed 310 mm H; unit conversion only
+          output_unit: m
   pumping_type:
     state:
       tag: value
@@ -218,6 +333,29 @@ benches:
       page: 3
       section: Apparatus
       note: Printed 50 Liter s-1; unit conversion only
+    inference:
+      relation: L_s_to_m3_s
+      inputs:
+      - Q_m3_s = Q_L_s / 1000
+      - original_unit=L/s
+      parameters:
+      - - original
+        - state:
+            tag: value
+            value: '50'
+          locator:
+            page: 3
+            section: Apparatus
+            note: Printed 50 Liter s-1; unit conversion only
+      - - factor
+        - state:
+            tag: value
+            value: '1000'
+          locator:
+            page: 3
+            section: Apparatus
+            note: Printed 50 Liter s-1; unit conversion only
+      output_unit: m3/s
   detector:
     state:
       tag: value

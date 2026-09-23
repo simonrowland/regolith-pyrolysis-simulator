@@ -137,6 +137,29 @@ benches:
           page: 5
           section: DSC
           note: 5 mm diameter crucibles; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 5
+                section: DSC
+                note: 5 mm diameter crucibles; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 5
+                section: DSC
+                note: 5 mm diameter crucibles; unit conversion only
+          output_unit: m
       height_m:
         state:
           tag: value
@@ -148,6 +171,29 @@ benches:
           page: 5
           section: DSC
           note: 5 mm high crucibles; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 5
+                section: DSC
+                note: 5 mm high crucibles; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 5
+                section: DSC
+                note: 5 mm high crucibles; unit conversion only
+          output_unit: m
   detector:
     state:
       tag: value

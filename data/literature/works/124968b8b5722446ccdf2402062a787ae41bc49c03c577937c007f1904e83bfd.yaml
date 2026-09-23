@@ -35,39 +35,7 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1335
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd
-  locator:
-    table: 1335
-    note: candidate_row=CoO(g); url=https://www.chem.msu.ru/rus/tsiv/Co/print-CoO.html; authors=E. A. Shenyavskaya; A. V.
-      Gusarov; page_date=2007-01-18
-- experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1436
+- experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::ivtan-mno-coo-thermo
   kind: literature
   method:
     tag: value

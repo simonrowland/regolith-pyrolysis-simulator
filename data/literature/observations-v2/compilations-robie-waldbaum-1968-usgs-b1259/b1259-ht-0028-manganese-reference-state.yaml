@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1000:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=manganese-(reference-state):v=34c59a8673:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1100:row=10:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=manganese-(reference-state):v=db9b287b96:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1200:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=manganese-(reference-state):v=db60e54433:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -320,7 +320,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1300:row=12:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=manganese-(reference-state):v=53d678d4d1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1400:row=13:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=manganese-(reference-state):v=b9779af835:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -532,113 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1410:row=14:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1410'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '43.22072'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='10.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1410:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1410:col=H_minus_H298:name=manganese-(reference-state):v=1969f9f1a1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -752,7 +646,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1500:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1410:col=H_minus_H298:name=manganese-(reference-state):v=8376125cc3:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1410'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '43.22072'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 53
+    pdf_page_index: 59
+    table: b1259-ht-0028-manganese-reference-state
+    note: as_published='10.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
+    record: b1259-ht-0028-manganese-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=manganese-(reference-state):v=a964b8616f:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -858,113 +858,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1517:row=17:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1517'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '50.08248'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='11.970'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1517:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1517:col=H_minus_H298:name=manganese-(reference-state):v=69ccd15777:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1070,7 +964,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1600:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1517:col=H_minus_H298:name=manganese-(reference-state):v=c6135d5932:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1517'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '50.08248'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 53
+    pdf_page_index: 59
+    table: b1259-ht-0028-manganese-reference-state
+    note: as_published='11.970'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
+    record: b1259-ht-0028-manganese-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=manganese-(reference-state):v=e3932753cc:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1176,7 +1176,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1700:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=manganese-(reference-state):v=631b40e789:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1282,7 +1282,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1900:row=22:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=manganese-(reference-state):v=b814b9dca9:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1388,7 +1388,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=2000:row=23:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=manganese-(reference-state):v=a1b1f39d5c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1494,7 +1494,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1600,7 +1600,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=400:row=1:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=manganese-(reference-state):v=6cba985804:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1706,7 +1706,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=500:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=manganese-(reference-state):v=047b8f80b8:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1812,7 +1812,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=600:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=manganese-(reference-state):v=173addf694:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -1918,7 +1918,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=700:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=manganese-(reference-state):v=68aa1967fd:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2024,7 +2024,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=800:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=manganese-(reference-state):v=684130554b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2130,7 +2130,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=900:row=6:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=manganese-(reference-state):v=68cea067ac:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2236,113 +2236,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=990:row=7:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '990'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '22.42624'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='5.360'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=990:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=990:col=H_minus_H298:name=manganese-(reference-state):v=0995ef72eb:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2448,7 +2342,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1000:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:H_minus_H298:shared:T=990:col=H_minus_H298:name=manganese-(reference-state):v=bda17baed4:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '990'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '22.42624'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 53
+    pdf_page_index: 59
+    table: b1259-ht-0028-manganese-reference-state
+    note: as_published='5.360'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
+    record: b1259-ht-0028-manganese-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1000:col=entropy:name=manganese-(reference-state):v=75e74d4a64:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2554,7 +2554,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1100:row=10:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1100:col=entropy:name=manganese-(reference-state):v=2b0b605a77:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2660,7 +2660,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1200:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1200:col=entropy:name=manganese-(reference-state):v=0ed0163a2b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2766,7 +2766,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1300:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1300:col=entropy:name=manganese-(reference-state):v=b827d45035:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2872,7 +2872,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1400:row=13:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1400:col=entropy:name=manganese-(reference-state):v=a1b1f39d5c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -2978,7 +2978,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1410:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1410:col=entropy:name=manganese-(reference-state):v=2bffecb0c6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3084,7 +3084,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1410:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1410:col=entropy:name=manganese-(reference-state):v=48697b3c76:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3198,7 +3198,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1500:row=16:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1500:col=entropy:name=manganese-(reference-state):v=d559b93d47:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3304,7 +3304,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1517:row=17:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1517:col=entropy:name=manganese-(reference-state):v=7cd1d46729:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3410,7 +3410,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1517:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1517:col=entropy:name=manganese-(reference-state):v=fd402c1cf5:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3516,7 +3516,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1600:row=19:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1600:col=entropy:name=manganese-(reference-state):v=8597712bf4:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3622,7 +3622,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1700:row=20:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1700:col=entropy:name=manganese-(reference-state):v=5e9211b3a6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3728,7 +3728,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1900:row=22:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=1900:col=entropy:name=manganese-(reference-state):v=7e57a2b5ce:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3834,7 +3834,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=2000:row=23:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=2000:col=entropy:name=manganese-(reference-state):v=d1086ff115:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -3940,7 +3940,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=298.15:col=entropy:name=manganese-(reference-state):v=da90fd7dfc:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4046,7 +4046,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=400:row=1:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=400:col=entropy:name=manganese-(reference-state):v=2135616ad5:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4152,7 +4152,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=500:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=500:col=entropy:name=manganese-(reference-state):v=5fe762ab09:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4258,7 +4258,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=600:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=600:col=entropy:name=manganese-(reference-state):v=3a8cea77fd:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4364,7 +4364,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=700:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=700:col=entropy:name=manganese-(reference-state):v=2a61a9aa21:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4470,7 +4470,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=800:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=800:col=entropy:name=manganese-(reference-state):v=85e20e40bd:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4576,7 +4576,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=900:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=900:col=entropy:name=manganese-(reference-state):v=425ac440f2:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4682,113 +4682,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=990:row=7:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '990'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '69.70544'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='16.660'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=990:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=990:col=entropy:name=manganese-(reference-state):v=0317311d85:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -4894,7 +4788,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1000:row=9:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:S:shared:T=990:col=entropy:name=manganese-(reference-state):v=13f0db8d2f:poly=reference
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '990'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '69.70544'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 53
+    pdf_page_index: 59
+    table: b1259-ht-0028-manganese-reference-state
+    note: as_published='16.660'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
+    record: b1259-ht-0028-manganese-reference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5038,7 +5038,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1100:row=10:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5182,7 +5182,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1200:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5326,7 +5326,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1300:row=12:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5470,7 +5470,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1400:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5614,7 +5614,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1410:row=14:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1410:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -5758,151 +5758,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1410:row=15:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1410'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1500:row=16:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6046,7 +5902,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1517:row=17:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1517:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6190,151 +6046,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1517:row=18:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1517'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1600:row=19:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6478,7 +6190,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1700:row=20:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6622,7 +6334,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1800:row=21:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6766,7 +6478,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1900:row=22:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -6910,7 +6622,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=2000:row=23:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7054,7 +6766,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7198,7 +6910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=400:row=1:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7342,7 +7054,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=500:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7486,7 +7198,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=600:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7630,7 +7342,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=700:row=4:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7774,7 +7486,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=800:row=5:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -7918,7 +7630,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=900:row=6:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8062,7 +7774,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=990:row=7:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=990:col=delta_f_G:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8206,151 +7918,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fG:from_the_elements:T=990:row=8:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '990'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1000:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8494,7 +8062,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1100:row=10:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8638,7 +8206,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1200:row=11:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8782,7 +8350,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1300:row=12:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -8926,7 +8494,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1400:row=13:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -9070,7 +8638,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1410:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1410:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -9214,151 +8782,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1410:row=15:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1410'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1500:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -9502,7 +8926,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1517:row=17:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1517:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -9646,151 +9070,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1517:row=18:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1517'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1600:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -9934,7 +9214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1700:row=20:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10078,7 +9358,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1800:row=21:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10222,7 +9502,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1900:row=22:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10366,7 +9646,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=2000:row=23:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10510,7 +9790,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10654,7 +9934,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=400:row=1:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10798,7 +10078,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=500:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -10942,7 +10222,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=600:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11086,7 +10366,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=700:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11230,7 +10510,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=800:row=5:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11374,7 +10654,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=900:row=6:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11518,7 +10798,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=990:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=990:col=delta_f_H:name=manganese-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11662,151 +10942,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:delta_fH:from_the_elements:T=990:row=8:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '990'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1000:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -11941,7 +11077,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1100:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12076,7 +11212,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1200:row=11:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12211,7 +11347,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1300:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12346,7 +11482,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1400:row=13:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12481,7 +11617,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1410:row=14:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1410:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12616,142 +11752,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1410:row=15:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1410'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1500:row=16:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -12886,7 +11887,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1517:row=17:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1517:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13021,142 +12022,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1517:row=18:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1517'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1600:row=19:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13291,7 +12157,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1700:row=20:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13426,7 +12292,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1800:row=21:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13561,7 +12427,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1900:row=22:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13696,7 +12562,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=2000:row=23:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13831,7 +12697,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -13966,7 +12832,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=400:row=1:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14101,7 +12967,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=500:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14236,7 +13102,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=600:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14371,7 +13237,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=700:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14506,7 +13372,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=800:row=5:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14641,7 +13507,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=900:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:
@@ -14776,142 +13642,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=990:row=7:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: Mn
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: reference
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '990'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Mn
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - Mn
-        - formula: Mn
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 53
-    pdf_page_index: 59
-    table: b1259-ht-0028-manganese-reference-state
-    note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json
-    record: b1259-ht-0028-manganese-reference-state
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=990:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:log10_Kf:from_the_elements:T=990:col=log_Kf:name=manganese-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0028-manganese-reference-state:tabulation
   identity:
     quantity:

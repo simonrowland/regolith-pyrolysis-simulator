@@ -74,6 +74,29 @@ experiments:
         published_page: 1338
         section: '2.1'
         note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:

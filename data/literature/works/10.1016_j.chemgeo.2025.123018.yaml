@@ -36,6 +36,29 @@ experiments:
         pdf_page_index: 8
         section: 2.1 Experiments
         note: Printed starting material about 100 mg; SI unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed starting material about 100 mg; SI unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed starting material about 100 mg; SI unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -109,6 +132,29 @@ experiments:
           pdf_page_index: 8
           section: 2.1 Experiments
           note: Ampoule inner pressure decreased to about 2.7 mbar before sealing; SI unit conversion only
+        inference:
+          relation: mbar_to_Pa
+          inputs:
+          - P_Pa = P_mbar × 100
+          - original_unit=mbar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.7'
+              locator:
+                pdf_page_index: 8
+                section: 2.1 Experiments
+                note: Ampoule inner pressure decreased to about 2.7 mbar before sealing; SI unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                pdf_page_index: 8
+                section: 2.1 Experiments
+                note: Ampoule inner pressure decreased to about 2.7 mbar before sealing; SI unit conversion only
+          output_unit: Pa
   work_id: 10.1016/j.chemgeo.2025.123018
   locator:
     pdf_page_index: 8
@@ -154,6 +200,47 @@ experiments:
         pdf_page_index: 8
         section: 2.1 Experiments
         note: Printed durations 5 min to 24 h; SI unit conversion only
+      inference:
+        relation: min_to_s+h_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit_low=min
+        - t_s = t_h × 3600
+        - original_unit_high=h
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed durations 5 min to 24 h; SI unit conversion only
+        - - factor_low
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed durations 5 min to 24 h; SI unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '24'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed durations 5 min to 24 h; SI unit conversion only
+        - - factor_high
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              pdf_page_index: 8
+              section: 2.1 Experiments
+              note: Printed durations 5 min to 24 h; SI unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value

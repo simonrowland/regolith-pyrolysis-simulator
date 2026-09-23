@@ -99,8 +99,33 @@ observations:
         pdf_page_index: 10
         paragraph: conclusions
         section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              paragraph: conclusions
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              paragraph: conclusions
+              section: '5'
+        output_unit: K
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
-  experiment_id: 10.3390/min13010079::3
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -187,7 +212,7 @@ observations:
     figure: '3'
   read_from: unknown:sublimation-kinetics-2023-minerals
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
-  experiment_id: 10.3390/min13010079::4
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -273,7 +298,7 @@ observations:
     figure: '4'
   read_from: unknown:sublimation-kinetics-2023-minerals
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig5_predicted_sublimation_rate_figure_only
-  experiment_id: 10.3390/min13010079::5
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -540,68 +565,30 @@ observations:
         published_page: 10
         pdf_page_index: 10
         section: '5'
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:0
-  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'bet_specific_surface_area_vs_sinter_temperature'
-    species:
-      formula: LMS-1
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298.15'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      plot_error_range_pct: '5'
-      quote: For the reporting of surface areas in the current work, an error range of 5% was added to plots; this error range
-        comes from the survey published by Hackley and Stefaniak [14] where a 5% error range was observed between multiple
-        laboratories. This error is predominantly attributed to the accuracy of the sample mass measurements.
-      locator:
-        published_page: 3
-        pdf_page_index: 3
-        section: '2.2'
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured
-    attribution: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples. Minimal further
-      surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: sublimation-kinetics-2023-minerals
-  locator:
-    published_page: 1
-    pdf_page_index: 1
-    paragraph: abstract
-  read_from: unknown:sublimation-kinetics-2023-minerals
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298.15'
-      locator:
-        published_page: 1
-        pdf_page_index: 1
-        paragraph: abstract
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              section: '5'
+        output_unit: K
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=1073.15:h=26640cfaec7e
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
@@ -662,7 +649,30 @@ observations:
         published_page: 5
         pdf_page_index: 5
         section: '3.1'
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              section: '3.1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              section: '3.1'
+        output_unit: K
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=1423.15:h=3dcafca0b145
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
     quantity:
@@ -723,6 +733,113 @@ observations:
         published_page: 5
         pdf_page_index: 5
         section: '3.1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              section: '3.1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              section: '3.1'
+        output_unit: K
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::T=298.15:row=abstract:h=efb3276e176c
+  experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bet_specific_surface_area_vs_sinter_temperature'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      plot_error_range_pct: '5'
+      quote: For the reporting of surface areas in the current work, an error range of 5% was added to plots; this error range
+        comes from the survey published by Hackley and Stefaniak [14] where a 5% error range was observed between multiple
+        laboratories. This error is predominantly attributed to the accuracy of the sample mass measurements.
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+        section: '2.2'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples. Minimal further
+      surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: abstract
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        paragraph: abstract
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 1
+              pdf_page_index: 1
+              paragraph: abstract
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1
+              pdf_page_index: 1
+              paragraph: abstract
+        output_unit: K
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig1_ssa_curve_figure_only
   experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   identity:
@@ -820,6 +937,31 @@ observations:
         pdf_page_index: 5
         figure: '2'
         section: '3.1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              figure: '2'
+              section: '3.1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5
+              pdf_page_index: 5
+              figure: '2'
+              section: '3.1'
+        output_unit: K
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
   experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
@@ -1048,8 +1190,31 @@ observations:
         published_page: 10
         pdf_page_index: 10
         section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 10
+              pdf_page_index: 10
+              section: '5'
+        output_unit: K
 - observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table1_apollo_12022_composition_snyder
-  experiment_id: 10.3390/min13010079::1
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: unknown
@@ -1115,8 +1280,8 @@ observations:
     pdf_page_index: 4
     table: '1'
   read_from: unknown:sublimation-kinetics-2023-minerals
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1073.15:h=6f172ee26c63
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1210,14 +1375,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1173.15:h=5aad9b4640e6
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1311,14 +1499,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1273.15:h=07bf09ab080a
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1412,14 +1623,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1323.15:h=a551374296db
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1513,14 +1747,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1373.15:h=4371c318198b
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1614,14 +1871,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1423.15:h=3eaca3124688
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1715,14 +1995,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::T=1473.15:h=ba0b4749d4e7
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1816,14 +2119,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1073.15:h=bd7ee815379f
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -1917,6 +2243,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1939,8 +2288,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1173.15:h=86946c1f77fa
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2034,6 +2383,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2056,8 +2428,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1273.15:h=e5650257708a
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2151,6 +2523,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2173,8 +2568,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1323.15:h=df0af1224da2
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2268,6 +2663,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2290,8 +2708,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1373.15:h=b418da2a399b
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2385,6 +2803,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2407,8 +2848,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1423.15:h=47f7ebd71855
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2502,6 +2943,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2524,8 +2988,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::T=1473.15:h=f967591dd634
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2619,6 +3083,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2641,8 +3128,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1073.15:h=d0ef1293e07a
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2734,14 +3221,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1173.15:h=2b8fb66a2723
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2833,14 +3343,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1273.15:h=4d0020499a44
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -2932,14 +3465,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1323.15:h=1c35e07225a9
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3031,14 +3587,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1373.15:h=ab74ae0675ac
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3130,14 +3709,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1423.15:h=827f924aea24
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3229,14 +3831,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::T=1473.15:h=8e857c4e90c2
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3328,14 +3953,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1073.15:h=dcf0d6307219
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3428,6 +4076,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3450,8 +4121,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1173.15:h=e3a5de31b946
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3544,6 +4215,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3566,8 +4260,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1273.15:h=2cc7eeb0dd70
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3660,6 +4354,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3682,8 +4399,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1323.15:h=ec4f25257dcd
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3776,6 +4493,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3798,8 +4538,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1373.15:h=b43c7535536f
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -3892,6 +4632,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3914,8 +4677,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1423.15:h=c54b254e601a
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4008,6 +4771,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4030,8 +4816,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::T=1473.15:h=d35a4c18a57d
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4124,6 +4910,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4146,8 +4955,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1073.15:h=ad79d074f703
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4239,14 +5048,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1173.15:h=96515ec44f47
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4338,14 +5170,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1273.15:h=7b08740af713
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4437,14 +5292,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1323.15:h=f5b37a001820
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4536,14 +5414,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1373.15:h=f3755c85a5e3
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4635,14 +5536,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1423.15:h=ca3ebbfcb62a
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4734,14 +5658,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::T=1473.15:h=8695e90ddac2
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4833,14 +5780,37 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: as_published
     inputs:
     - unknown:sublimation-kinetics-2023-minerals
     parameters: []
     output_unit: mol/s/m2 as printed
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:0
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1073.15:h=552956d8387d
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -4934,6 +5904,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4956,8 +5949,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:1
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1173.15:h=817d9aa54374
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5051,6 +6044,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5073,8 +6089,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:2
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1273.15:h=66e356075e73
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5168,6 +6184,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5190,8 +6229,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:3
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1323.15:h=51f35553922b
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5285,6 +6324,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5307,8 +6369,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:4
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1373.15:h=ca44ac1539f0
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5402,6 +6464,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5424,8 +6509,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:5
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1423.15:h=45b1734107ca
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5519,6 +6604,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5541,8 +6649,8 @@ observations:
           pdf_page_index: 7
           table: '2'
     output_unit: Pa
-- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:6
-  experiment_id: 10.3390/min13010079::2
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::T=1473.15:h=f59d54b81bd5
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   identity:
     quantity:
       tag: value
@@ -5636,6 +6744,29 @@ observations:
         published_page: 7
         pdf_page_index: 7
         table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 7
+              pdf_page_index: 7
+              table: '2'
+        output_unit: K
   derivation:
     relation: atm_to_Pa
     inputs:

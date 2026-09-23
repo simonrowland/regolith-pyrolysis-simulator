@@ -54,6 +54,29 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: About 10 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: About 10 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: About 10 g; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -90,6 +113,37 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '0.000004'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '0.000006'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -177,6 +231,29 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: About two hours; unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: About two hours; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              published_page: 116
+              pdf_page_index: 2
+              note: About two hours; unit conversion only
+        output_unit: s
 benches:
 - id: 10.2355/isijinternational1966.15.115::bench::ichise-rm6k
   work_id: 10.2355/isijinternational1966.15.115

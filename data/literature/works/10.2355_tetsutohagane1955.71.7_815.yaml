@@ -289,6 +289,40 @@ experiments:
         pdf_page_index: 5
         section: 4.1 Experimental method
         note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 819
+              pdf_page_index: 5
+              section: 4.1 Experimental method
+              note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 819
+              pdf_page_index: 5
+              section: 4.1 Experimental method
+              note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              published_page: 819
+              pdf_page_index: 5
+              section: 4.1 Experimental method
+              note: Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value

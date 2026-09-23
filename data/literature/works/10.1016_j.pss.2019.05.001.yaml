@@ -38,72 +38,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.pss.2019.05.001
 experiments:
-- experiment_id: 10.1016/j.pss.2019.05.001::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'quoted_composition' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.pss.2019.05.001
-  locator:
-    page: 18
-    pdf_page_index: 18
-    table: '2'
-    note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
-- experiment_id: 10.1016/j.pss.2019.05.001::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'glovebox_hydration' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.pss.2019.05.001
-  locator:
-    page: 10
-    pdf_page_index: 10
-    figure: '5'
-    note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
 - experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
   kind: literature
   method:
@@ -154,6 +88,29 @@ experiments:
         published_page: 2
         section: '2.2'
         note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000001'
+            locator:
+              published_page: 2
+              section: '2.2'
+              note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 2
+              section: '2.2'
+              note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -205,6 +162,39 @@ experiments:
           section: '2.2'
           note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
   bench_id: 10.1016/j.pss.2019.05.001::bench::prospa-like-volatiles-extraction
+- experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 18
+    pdf_page_index: 18
+    table: '2'
+    note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
 benches:
 - id: 10.1016/j.pss.2019.05.001::bench::prospa-like-volatiles-extraction
   work_id: 10.1016/j.pss.2019.05.001
@@ -238,6 +228,29 @@ benches:
           published_page: 2
           section: '2.2'
           note: Sample holder accommodates up to 2.8 mm diameter; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.8'
+              locator:
+                published_page: 2
+                section: '2.2'
+                note: Sample holder accommodates up to 2.8 mm diameter; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 2
+                section: '2.2'
+                note: Sample holder accommodates up to 2.8 mm diameter; unit conversion only
+          output_unit: m
       height_m:
         state:
           tag: value
@@ -250,6 +263,29 @@ benches:
           published_page: 2
           section: '2.2'
           note: Sample holder accommodates up to 4.5 mm height; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '4.5'
+              locator:
+                published_page: 2
+                section: '2.2'
+                note: Sample holder accommodates up to 4.5 mm height; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 2
+                section: '2.2'
+                note: Sample holder accommodates up to 4.5 mm height; unit conversion only
+          output_unit: m
   pumping_type:
     state:
       tag: value

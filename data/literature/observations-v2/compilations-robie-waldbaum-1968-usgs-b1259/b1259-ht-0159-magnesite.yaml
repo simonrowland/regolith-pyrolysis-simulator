@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0159-magnesite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=magnesite:v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:S:shared:T=298.15:col=entropy:name=magnesite:v=b64814c078
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=magnesite:v=fe3652cdc2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -404,7 +404,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=magnesite:v=8b6ccaa160
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -594,7 +594,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1000:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=magnesite:v=49345b11c9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -775,7 +775,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1100:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=magnesite:v=6a3cf6998e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -956,7 +956,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=magnesite:v=bda94ea52a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -1137,7 +1137,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=magnesite:v=c3afbfd8f2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -1318,7 +1318,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=magnesite:v=be5066f734
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -1499,7 +1499,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=600:col=log_Kf:name=magnesite:v=1dc0212dfa
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -1680,7 +1680,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=700:row=5:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=700:col=log_Kf:name=magnesite:v=59089121e0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -1861,7 +1861,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=800:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=magnesite:v=031408681f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:
@@ -2042,7 +2042,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=900:row=7:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:log10_Kf:from_the_elements:T=900:col=log_Kf:name=magnesite:v=67f38603e7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0159-magnesite:tabulation
   identity:
     quantity:

@@ -56,6 +56,31 @@ observations:
         pdf_page_index: 5
         figure: '9'
         note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 248
+              pdf_page_index: 5
+              figure: '9'
+              note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 248
+              pdf_page_index: 5
+              figure: '9'
+              note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
+        output_unit: K
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_epsilon_P_P_1600C
   experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
@@ -115,6 +140,31 @@ observations:
         pdf_page_index: 4
         equation: '7'
         note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 247
+              pdf_page_index: 4
+              equation: '7'
+              note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 247
+              pdf_page_index: 4
+              equation: '7'
+              note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
+        output_unit: K
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fe_activity_slight_negative_deviation
   experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
@@ -746,6 +796,29 @@ observations:
         published_page: 245
         pdf_page_index: 2
         note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
+        output_unit: K
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
   experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:

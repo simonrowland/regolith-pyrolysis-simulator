@@ -18,44 +18,11 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::1
+- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   kind: literature
   method:
     tag: value
     value: engine_evaluation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  locator:
-    published_page: 5
-    pdf_page_index: 5
-    table: '1'
-    section: '2.2'
-- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     initial_composition:
       state:
@@ -254,105 +221,6 @@ experiments:
         published_page: 14
         pdf_page_index: 14
         table: '2'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  locator:
-    published_page: 12
-    pdf_page_index: 12
-    figure: '2'
-    section: '3.3'
-- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::3
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  locator:
-    published_page: 17
-    pdf_page_index: 17
-    table: '3'
-    section: '3.4'
-- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::4
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  locator:
-    published_page: 22
-    pdf_page_index: 22
-    figure: '4'
-    section: '4.3'
-- experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample: {}
   conditions:
     temperature_K:
       state:

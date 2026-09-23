@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0063-millerite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=millerite:v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=400:col=H_minus_H298:name=millerite:v=dc0c798167
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=500:col=H_minus_H298:name=millerite:v=ac507e7385
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -320,7 +320,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:H_minus_H298:shared:T=600:col=H_minus_H298:name=millerite:v=06497fff4c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=298.15:col=entropy:name=millerite:v=61876a7f60
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -532,7 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=400:col=entropy:name=millerite:v=33598d8450
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -638,7 +638,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=500:col=entropy:name=millerite:v=dc0c756df3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -744,7 +744,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=600:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:S:shared:T=600:col=entropy:name=millerite:v=0f24dadb27
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -850,7 +850,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=millerite:v=d3e60b70fe
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1017,7 +1017,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=millerite:v=ca73fa06a8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1184,7 +1184,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=500:col=delta_f_G:name=millerite:v=fcd47ec36e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1351,7 +1351,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=600:row=4:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fG:from_the_elements:T=600:col=delta_f_G:name=millerite:v=788cf8effd
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1518,7 +1518,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=millerite:v=c0dde24a38
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1685,7 +1685,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=millerite:v=e884f98fa4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -1852,7 +1852,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=millerite:v=a136a2d2cc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -2019,7 +2019,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:delta_fH:from_the_elements:T=600:col=delta_f_H:name=millerite:v=4fef38dfa8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -2186,7 +2186,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=millerite:v=eca595967e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -2344,7 +2344,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=millerite:v=57c779fc7a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -2502,7 +2502,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=millerite:v=f801de2f89
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:
@@ -2660,7 +2660,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:log10_Kf:from_the_elements:T=600:col=log_Kf:name=millerite:v=6d53cd76c9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0063-millerite:tabulation
   identity:
     quantity:

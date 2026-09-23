@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0070-gibbsite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=gibbsite:v=900e6181ee:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:H_minus_H298:shared:T=400:col=H_minus_H298:name=gibbsite:v=ca78408497:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=298.15:col=entropy:name=gibbsite:v=857f1a9bd2:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -320,7 +320,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:S:shared:T=400:col=entropy:name=gibbsite:v=cf32893a6f:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=gibbsite:v=5ad672bc5c:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -616,7 +616,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=gibbsite:v=b4f63c1da1:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -806,7 +806,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=gibbsite:v=b440c13b94:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -996,7 +996,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=gibbsite:v=f45f7cbf00:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -1186,7 +1186,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=gibbsite:v=3f124d0382:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:
@@ -1367,7 +1367,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=gibbsite:v=dd098885dc:poly=gibbsite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0070-gibbsite:tabulation
   identity:
     quantity:

@@ -2,8 +2,8 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/refractory_vaporization_validation.yaml
 observations:
-- observation_id: cao_raw_pCa_0
-  experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[0]
+- observation_id: cao_raw_pCa:T=1812.0
+  experiment_id: 10.1007/978-3-031-80664-3_20::shornikov-2025-cao
   identity:
     quantity:
       tag: value
@@ -80,7 +80,7 @@ observations:
   notices: []
   source_id: shornikov-2025-cao
   locator:
-    record: raw_pCa[0]
+    record: raw_pCa:T=1812.0
   read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
@@ -88,7 +88,7 @@ observations:
         tag: value
         value: '1812'
       locator:
-        record: raw_pCa[0]
+        record: raw_pCa:T=1812.0
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -99,10 +99,10 @@ observations:
           tag: value
           value: '0.0000000659'
         locator:
-          record: raw_pCa[0]
+          record: raw_pCa:T=1812.0
     output_unit: Pa
-- observation_id: cao_raw_pCa_1
-  experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[1]
+- observation_id: cao_raw_pCa:T=1913.0
+  experiment_id: 10.1007/978-3-031-80664-3_20::shornikov-2025-cao
   identity:
     quantity:
       tag: value
@@ -179,7 +179,7 @@ observations:
   notices: []
   source_id: shornikov-2025-cao
   locator:
-    record: raw_pCa[1]
+    record: raw_pCa:T=1913.0
   read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
@@ -187,7 +187,7 @@ observations:
         tag: value
         value: '1913'
       locator:
-        record: raw_pCa[1]
+        record: raw_pCa:T=1913.0
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -198,10 +198,10 @@ observations:
           tag: value
           value: '0.000000409'
         locator:
-          record: raw_pCa[1]
+          record: raw_pCa:T=1913.0
     output_unit: Pa
-- observation_id: cao_raw_pCa_2
-  experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[2]
+- observation_id: cao_raw_pCa:T=2000.0
+  experiment_id: 10.1007/978-3-031-80664-3_20::shornikov-2025-cao
   identity:
     quantity:
       tag: value
@@ -278,7 +278,7 @@ observations:
   notices: []
   source_id: shornikov-2025-cao
   locator:
-    record: raw_pCa[2]
+    record: raw_pCa:T=2000.0
   read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
@@ -286,7 +286,7 @@ observations:
         tag: value
         value: '2000'
       locator:
-        record: raw_pCa[2]
+        record: raw_pCa:T=2000.0
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -297,10 +297,10 @@ observations:
           tag: value
           value: '0.00000176'
         locator:
-          record: raw_pCa[2]
+          record: raw_pCa:T=2000.0
     output_unit: Pa
-- observation_id: cao_raw_pCa_3
-  experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[3]
+- observation_id: cao_raw_pCa:T=2100.0
+  experiment_id: 10.1007/978-3-031-80664-3_20::shornikov-2025-cao
   identity:
     quantity:
       tag: value
@@ -377,7 +377,7 @@ observations:
   notices: []
   source_id: shornikov-2025-cao
   locator:
-    record: raw_pCa[3]
+    record: raw_pCa:T=2100.0
   read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
@@ -385,7 +385,7 @@ observations:
         tag: value
         value: '2100'
       locator:
-        record: raw_pCa[3]
+        record: raw_pCa:T=2100.0
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -396,10 +396,10 @@ observations:
           tag: value
           value: '0.00000785'
         locator:
-          record: raw_pCa[3]
+          record: raw_pCa:T=2100.0
     output_unit: Pa
 - observation_id: refractory:condensed_log10_kf:Al2O3
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-096
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -488,7 +488,7 @@ observations:
         table: Al-096
         record: Al-096
 - observation_id: refractory:log10_kf:Al
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-005
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -577,7 +577,7 @@ observations:
         table: Al-005
         record: Al-005
 - observation_id: refractory:log10_kf:Al2O
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-092
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -666,7 +666,7 @@ observations:
         table: Al-092
         record: Al-092
 - observation_id: refractory:log10_kf:AlO
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-074
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -755,7 +755,7 @@ observations:
         table: Al-074
         record: Al-074
 - observation_id: refractory:log10_kf:CaO
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Ca-030
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -844,7 +844,7 @@ observations:
         table: Ca-030
         record: Ca-030
 - observation_id: refractory:log10_kf:MgO
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Mg-011
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -933,7 +933,7 @@ observations:
         table: Mg-011
         record: Mg-011
 - observation_id: refractory:log10_kf:O
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-001
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -1022,7 +1022,7 @@ observations:
         table: O-001
         record: O-001
 - observation_id: refractory:log10_kf:SiO
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-012
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value
@@ -1111,7 +1111,7 @@ observations:
         table: O-012
         record: O-012
 - observation_id: refractory:log10_kf:TiO2
-  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-046
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
       tag: value

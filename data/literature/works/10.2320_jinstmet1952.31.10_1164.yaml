@@ -37,7 +37,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2320/jinstmet1952.31.10_1164
 experiments:
-- experiment_id: 10.2320/jinstmet1952.31.10_1164::1
+- experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   kind: literature
   method:
     tag: unknown
@@ -104,69 +104,3 @@ experiments:
         paragraph: るつぼ (CP-2) の寸法は内径 38 mm
         line_range: experimental method
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
-- experiment_id: 10.2320/jinstmet1952.31.10_1164::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2320/jinstmet1952.31.10_1164
-  locator:
-    table: '2'
-    equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
-- experiment_id: 10.2320/jinstmet1952.31.10_1164::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'olette_relative_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2320/jinstmet1952.31.10_1164
-  locator:
-    page: PDF p. 4 / printed p. 1167
-    table: '3'
-    paragraph: Evaporation coefficients of Mn, Cu, Sn, Cr and S in molten iron
-    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md

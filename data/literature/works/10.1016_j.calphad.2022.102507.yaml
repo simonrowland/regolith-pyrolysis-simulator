@@ -38,174 +38,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.calphad.2022.102507
 experiments:
-- experiment_id: 10.1016/j.calphad.2022.102507::10
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.calphad.2022.102507
-  locator:
-    published_page: 14
-    pdf_page_index: 14
-    table: '10'
-    note: Pets04, FACTSG column; GaO(g) = Ga(g) + O(g) row; quote=129404
-- experiment_id: 10.1016/j.calphad.2022.102507::12
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.calphad.2022.102507
-  locator:
-    published_page: 16
-    pdf_page_index: 17
-    table: '12'
-    note: quote=p(O2) [Pa] 0.006 0.147
-- experiment_id: 10.1016/j.calphad.2022.102507::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.calphad.2022.102507
-  locator:
-    published_page: 9
-    pdf_page_index: 9
-    figure: '5'
-    note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined within
-      a temperature range of 1510–1752 K.
-- experiment_id: 10.1016/j.calphad.2022.102507::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.calphad.2022.102507
-  locator:
-    published_page: 9
-    pdf_page_index: 9
-    figure: '6'
-    note: quote=Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified within
-      a temperature range of 1210–1611 K.
-- experiment_id: 10.1016/j.calphad.2022.102507::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.calphad.2022.102507
-  locator:
-    published_page: 10
-    pdf_page_index: 11
-    figure: '7'
-    note: also Figs 8-11 ln(K) and Delta_r H vs 1/T; quote=ln(K) for the reactions of Ga2O3 into a) Ga2O, b) Ga and c) GaO
-      plotted vs. reciprocal T for measured and literature data.
 - experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   kind: literature
   method:
@@ -429,6 +261,29 @@ experiments:
         page: 2
         published_page: 2
         note: KC chamber about 10^-6 mbar; unit conversion only
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              page: 2
+              published_page: 2
+              note: KC chamber about 10^-6 mbar; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 2
+              published_page: 2
+              note: KC chamber about 10^-6 mbar; unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -516,10 +371,11 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.calphad.2022.102507
   locator:
-    published_page: 4
-    pdf_page_index: 5
-    paragraph: ionisation_cross_section
-    note: quote=For molecular oxygen, not listed in Table 4 or 5, a cross section of sigma(O2) = 2.8 is used [32].
+    published_page: 9
+    pdf_page_index: 9
+    figure: '5'
+    note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined within
+      a temperature range of 1510–1752 K.
 benches:
 - id: 10.1016/j.calphad.2022.102507::bench::finnigan-mat-271-ir
   work_id: 10.1016/j.calphad.2022.102507

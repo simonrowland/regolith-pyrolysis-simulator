@@ -62,47 +62,140 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2007.09.005
 experiments:
-- experiment_id: 10.1016/j.gca.2007.09.005::1
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-vacuum-evaporation-series
   kind: literature
   method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Type B CAI-like SiO2-Al2O3-MgO-CaCO3 glass
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: not_published
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed 1600-1900 C and per-run Table 1 values; no single series setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.1016/j.gca.2007.09.005
   locator:
-    table: '1'
-    paragraph: Init/Final area mm2 columns
-    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    section: 3.1 Starting materials and experimental procedure
   apparatus:
     cell_material_and_liner:
       state:
         tag: value
-        value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+        value: iridium wire loops
       locator:
-        paragraph: iridium loops
-        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-- experiment_id: 10.1016/j.gca.2007.09.005::2
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated at 20.0 C/min; power cut for cooling
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        note: Per-run durations vary; no single series duration
+- experiment_id: 10.1016/j.gca.2007.09.005::kems-010-richter-2007
   kind: literature
   method:
     tag: value
@@ -253,159 +346,11 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
-    figure: '2'
-    line_range: 183-191
-    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-- experiment_id: 10.1016/j.gca.2007.09.005::3
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2007.09.005
-  locator:
     figure: '3'
     line_range: 447-448
     note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-- experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2007.09.005
-  locator:
-    published_page: 5551
-    section: 4.1. Evaporation kinetics
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-vacuum-evaporation-series
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
-          approximate: false
-      locator:
-        table: '1'
-        note: Printed 5-200 mg; unit conversion only
-    printed_composition:
-      state:
-        tag: value
-        value: Type B CAI-like SiO2-Al2O3-MgO-CaCO3 glass
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-    form:
-      state:
-        tag: value
-        value: partially molten glass on iridium wire loops
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-        note: Printed 1600-1900 C and per-run Table 1 values; no single series setpoint
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: bound
-          bound_operator: <
-          bound_value: '0.0001333223684210526315789473684'
-          approximate: false
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-        note: Printed <10^-6 Torr; unit conversion only
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.1016/j.gca.2007.09.005
-  locator:
-    section: 3.1 Starting materials and experimental procedure
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: iridium wire loops
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
-  thermal_schedule:
-    method:
-      state:
-        tag: value
-        value: heated at 20.0 C/min; power cut for cooling
-      locator:
-        section: 3.1 Starting materials and experimental procedure
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        table: '1'
-        note: Per-run durations vary; no single series duration
-- experiment_id: 10.1016/j.gca.2007.09.005::richter_2007_mg_cai_arrhenius_langmuir
+- experiment_id: 10.1016/j.gca.2007.09.005::richter-et-al-2007
   kind: literature
   method:
     tag: value
@@ -436,37 +381,6 @@ experiments:
   locator:
     note: Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005
     record: richter_2007_mg_cai_arrhenius_langmuir
-- experiment_id: 10.1016/j.gca.2007.09.005::richter_2007_si_cai_arrhenius_langmuir
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2007.09.005
-  locator:
-    note: Richter et al. (2007) GCA 71:5544-5564 abstract; cSi form
-    record: richter_2007_si_cai_arrhenius_langmuir
 benches:
 - id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   work_id: 10.1016/j.gca.2007.09.005

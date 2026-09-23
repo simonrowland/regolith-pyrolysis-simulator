@@ -88,6 +88,31 @@ experiments:
           pdf_page_index: 5
           section: Procedure
           note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          output_unit: Pa
   work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
   locator:
     published_page: 2
@@ -215,6 +240,31 @@ benches:
           pdf_page_index: 4
           section: Experiment - Apparatus
           note: 1.77 cm inside diameter; unit conversion only
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.77'
+              locator:
+                published_page: 2
+                pdf_page_index: 4
+                section: Experiment - Apparatus
+                note: 1.77 cm inside diameter; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 2
+                pdf_page_index: 4
+                section: Experiment - Apparatus
+                note: 1.77 cm inside diameter; unit conversion only
+          output_unit: m
   detector:
     state:
       tag: value

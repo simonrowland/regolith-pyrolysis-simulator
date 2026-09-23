@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1000:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=baddeleyite:v=061dc399b2:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -108,7 +108,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1100:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1100:col=H_minus_H298:name=baddeleyite:v=fa7686592b:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -214,7 +214,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1200:row=10:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1200:col=H_minus_H298:name=baddeleyite:v=32fec3aa8f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -320,7 +320,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1300:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1300:col=H_minus_H298:name=baddeleyite:v=75e74d4a64:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -426,7 +426,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1400:row=12:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1400:col=H_minus_H298:name=baddeleyite:v=6372b25e45:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -532,113 +532,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1478:row=13:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: ZrO2
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: monoclinic
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1478'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '86.27408'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 152
-    pdf_page_index: 158
-    table: b1259-ht-0127-baddeleyite
-    note: as_published='20.620'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
-    record: b1259-ht-0127-baddeleyite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1478:row=14:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1478:col=H_minus_H298:name=baddeleyite:v=04f19ff634:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -744,7 +638,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1500:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1478:col=H_minus_H298:name=baddeleyite:v=550555b0fc:poly=monoclinic
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: ZrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: monoclinic
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1478'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '86.27408'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 152
+    pdf_page_index: 158
+    table: b1259-ht-0127-baddeleyite
+    note: as_published='20.620'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
+    record: b1259-ht-0127-baddeleyite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1500:col=H_minus_H298:name=baddeleyite:v=3645401f07:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -850,7 +850,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1600:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1600:col=H_minus_H298:name=baddeleyite:v=173c9a7eac:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -956,7 +956,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1700:row=17:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1700:col=H_minus_H298:name=baddeleyite:v=7772954b5c:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1062,7 +1062,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1800:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1800:col=H_minus_H298:name=baddeleyite:v=beaef7eb6f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1168,7 +1168,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1900:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=1900:col=H_minus_H298:name=baddeleyite:v=0c420c5101:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1274,7 +1274,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=2000:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=2000:col=H_minus_H298:name=baddeleyite:v=62f6b3accb:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1380,7 +1380,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=baddeleyite:v=900e6181ee:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1486,7 +1486,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=400:col=H_minus_H298:name=baddeleyite:v=83e5239532:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1592,7 +1592,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=500:col=H_minus_H298:name=baddeleyite:v=9a4d703afa:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1698,7 +1698,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=600:col=H_minus_H298:name=baddeleyite:v=1daaaad0bd:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1804,7 +1804,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=700:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=700:col=H_minus_H298:name=baddeleyite:v=219a293d2e:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -1910,7 +1910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=800:row=6:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=800:col=H_minus_H298:name=baddeleyite:v=9179b8c258:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2016,7 +2016,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=900:row=7:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:H_minus_H298:shared:T=900:col=H_minus_H298:name=baddeleyite:v=776b42b8b8:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2122,7 +2122,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1000:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1000:col=entropy:name=baddeleyite:v=44a3221107:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2228,7 +2228,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1100:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1100:col=entropy:name=baddeleyite:v=819683f338:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2334,7 +2334,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1200:row=10:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1200:col=entropy:name=baddeleyite:v=be5d76837d:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2440,7 +2440,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1300:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1300:col=entropy:name=baddeleyite:v=71547fe4f1:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2546,7 +2546,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1400:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1400:col=entropy:name=baddeleyite:v=ff17941563:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2652,113 +2652,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1478:row=13:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: ZrO2
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: monoclinic
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1478'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '163.176'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 152
-    pdf_page_index: 158
-    table: b1259-ht-0127-baddeleyite
-    note: as_published='39.00'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
-    record: b1259-ht-0127-baddeleyite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1478:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1478:col=entropy:name=baddeleyite:v=a8e6717a18:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2864,7 +2758,113 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1500:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1478:col=entropy:name=baddeleyite:v=cad767c94e:poly=monoclinic
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: ZrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: monoclinic
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1478'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '163.176'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 152
+    pdf_page_index: 158
+    table: b1259-ht-0127-baddeleyite
+    note: as_published='39.00'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
+    record: b1259-ht-0127-baddeleyite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1500:col=entropy:name=baddeleyite:v=7bc3f12c7c:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -2970,7 +2970,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1600:row=16:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1600:col=entropy:name=baddeleyite:v=47f84e65b9:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3076,7 +3076,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1700:row=17:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1700:col=entropy:name=baddeleyite:v=be29894f0d:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3182,7 +3182,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1800:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1800:col=entropy:name=baddeleyite:v=1b2b73bbe8:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3288,7 +3288,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1900:row=19:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=1900:col=entropy:name=baddeleyite:v=0aaa100c75:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3394,7 +3394,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=2000:row=20:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=2000:col=entropy:name=baddeleyite:v=b3170f86d1:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3500,7 +3500,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=298.15:col=entropy:name=baddeleyite:v=530412bb7c:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3606,7 +3606,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=400:col=entropy:name=baddeleyite:v=260e03a975:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3712,7 +3712,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=500:col=entropy:name=baddeleyite:v=518aae0ea1:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3818,7 +3818,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=600:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=600:col=entropy:name=baddeleyite:v=1c615457f4:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -3924,7 +3924,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=700:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=700:col=entropy:name=baddeleyite:v=1c0f54f655:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4030,7 +4030,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=800:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=800:col=entropy:name=baddeleyite:v=b5a7a3f611:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4136,7 +4136,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=900:row=7:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:S:shared:T=900:col=entropy:name=baddeleyite:v=aca43e8b94:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4242,7 +4242,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1000:row=8:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=baddeleyite:v=291bfb478e:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4409,7 +4409,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1100:row=9:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=baddeleyite:v=2b8bc2d20d:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4576,7 +4576,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1200:row=10:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=baddeleyite:v=0de3052e59:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4743,7 +4743,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1300:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=baddeleyite:v=f6c0029436:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -4910,7 +4910,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1400:row=12:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=baddeleyite:v=d82c5cf4d6:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -5077,7 +5077,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1478:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1478:col=delta_f_G:name=baddeleyite:v=f8b3c4530c:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -5244,174 +5244,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1478:row=14:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: ZrO2
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: monoclinic
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1478'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: ZrO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: monoclinic
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: Zr
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Zr
-        - formula: Zr
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-818.549392'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 152
-    pdf_page_index: 158
-    table: b1259-ht-0127-baddeleyite
-    note: as_published='-195.638'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
-    record: b1259-ht-0127-baddeleyite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1500:row=15:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=baddeleyite:v=bd9ed6be5f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -5578,7 +5411,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=baddeleyite:v=b76ec8859f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -5745,7 +5578,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=baddeleyite:v=88c3ce06b2:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -5912,7 +5745,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=500:col=delta_f_G:name=baddeleyite:v=ca9d1d609e:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6079,7 +5912,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=600:row=4:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=600:col=delta_f_G:name=baddeleyite:v=f794f97def:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6246,7 +6079,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=700:row=5:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=700:col=delta_f_G:name=baddeleyite:v=4d4ff2b86d:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6413,7 +6246,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=800:row=6:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=800:col=delta_f_G:name=baddeleyite:v=f5ab935450:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6580,7 +6413,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=900:row=7:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fG:from_the_elements:T=900:col=delta_f_G:name=baddeleyite:v=62ff00b610:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6747,7 +6580,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1000:row=8:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=baddeleyite:v=2776d57461:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -6914,7 +6747,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1100:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=baddeleyite:v=6510241d4b:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -7081,7 +6914,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1200:row=10:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=baddeleyite:v=2d5acbc099:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -7248,7 +7081,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1300:row=11:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=baddeleyite:v=2a73d9a5b1:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -7415,7 +7248,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1400:row=12:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=baddeleyite:v=736a428768:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -7582,174 +7415,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1478:row=13:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: ZrO2
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: monoclinic
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1478'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: ZrO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: monoclinic
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: Zr
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Zr
-        - formula: Zr
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-1091.425688'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 152
-    pdf_page_index: 158
-    table: b1259-ht-0127-baddeleyite
-    note: as_published='-260.857'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
-    record: b1259-ht-0127-baddeleyite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1478:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1478:col=delta_f_H:name=baddeleyite:v=69f66fa89e:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -7916,7 +7582,174 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1500:row=15:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1478:col=delta_f_H:name=baddeleyite:v=de63a06c2a:poly=monoclinic
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: ZrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: monoclinic
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1478'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: ZrO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: monoclinic
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Zr
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Zr
+        - formula: Zr
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1091.425688'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 152
+    pdf_page_index: 158
+    table: b1259-ht-0127-baddeleyite
+    note: as_published='-260.857'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
+    record: b1259-ht-0127-baddeleyite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=baddeleyite:v=9e63229228:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8083,7 +7916,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1600:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=baddeleyite:v=d2e58f8be1:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8250,7 +8083,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1700:row=17:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=baddeleyite:v=ca858453ab:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8417,7 +8250,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1800:row=18:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=baddeleyite:v=b69cbd2def:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8584,7 +8417,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1900:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=baddeleyite:v=b9b45c0fc6:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8751,7 +8584,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=2000:row=20:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=baddeleyite:v=0b89571f4a:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -8918,7 +8751,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=baddeleyite:v=c66a5472b5:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9085,7 +8918,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=baddeleyite:v=69ac3761bb:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9252,7 +9085,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=baddeleyite:v=cb6da921ef:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9419,7 +9252,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=600:col=delta_f_H:name=baddeleyite:v=8cd9ec2a6d:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9586,7 +9419,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=700:row=5:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=700:col=delta_f_H:name=baddeleyite:v=2c4e787075:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9753,7 +9586,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=800:row=6:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=800:col=delta_f_H:name=baddeleyite:v=c943750945:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -9920,7 +9753,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=900:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:delta_fH:from_the_elements:T=900:col=delta_f_H:name=baddeleyite:v=b2fe80c5d8:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10087,7 +9920,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1000:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=baddeleyite:v=3ea1458b6c:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10245,7 +10078,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1100:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=baddeleyite:v=f949f6b83f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10403,7 +10236,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1200:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=baddeleyite:v=4443f2be47:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10561,7 +10394,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1300:row=11:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=baddeleyite:v=60c4397aaa:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10719,7 +10552,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1400:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=baddeleyite:v=357bf4c494:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -10877,7 +10710,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1478:row=13:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1478:col=log_Kf:name=baddeleyite:v=1eded14998:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11035,165 +10868,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1478:row=14:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: ZrO2
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: monoclinic
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1478'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: ZrO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: monoclinic
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: Zr
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-    formation_elements:
-      tag: value
-      value:
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-      - - Zr
-        - formula: Zr
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '28.928'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 152
-    pdf_page_index: 158
-    table: b1259-ht-0127-baddeleyite
-    note: as_published='28.928'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0127-baddeleyite.json
-    record: b1259-ht-0127-baddeleyite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1500:row=15:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=baddeleyite:v=2110ba4f62:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11351,7 +11026,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=baddeleyite:v=688e2bca02:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11509,7 +11184,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=baddeleyite:v=caca42d0e0:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11667,7 +11342,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=baddeleyite:v=61099a321f:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11825,7 +11500,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=600:col=log_Kf:name=baddeleyite:v=4c05437137:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -11983,7 +11658,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=700:row=5:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=700:col=log_Kf:name=baddeleyite:v=116212e443:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -12141,7 +11816,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=800:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=baddeleyite:v=28546d6108:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:
@@ -12299,7 +11974,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=900:row=7:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:log10_Kf:from_the_elements:T=900:col=log_Kf:name=baddeleyite:v=db02b0b31b:poly=monoclinic
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0127-baddeleyite:tabulation
   identity:
     quantity:

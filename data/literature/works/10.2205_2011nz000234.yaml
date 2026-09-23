@@ -54,6 +54,29 @@ experiments:
         published_page: 1
         section: opening methods paragraphs
         note: Printed 15 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1
+              section: opening methods paragraphs
+              note: Printed 15 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1
+              section: opening methods paragraphs
+              note: Printed 15 mg; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: unknown
@@ -133,6 +156,29 @@ experiments:
           published_page: 1
           section: opening methods paragraphs
           note: About 900 C starting temperature; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '900'
+              locator:
+                published_page: 1
+                section: opening methods paragraphs
+                note: About 900 C starting temperature; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1
+                section: opening methods paragraphs
+                note: About 900 C starting temperature; unit conversion only
+          output_unit: K
       hold_duration_s:
         state:
           tag: value
@@ -144,6 +190,29 @@ experiments:
           published_page: 1
           section: opening methods paragraphs
           note: About 15 min exposure per temperature step; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                published_page: 1
+                section: opening methods paragraphs
+                note: About 15 min exposure per temperature step; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 1
+                section: opening methods paragraphs
+                note: About 15 min exposure per temperature step; unit conversion only
+          output_unit: s
     total_duration_s:
       state:
         tag: value
@@ -155,6 +224,29 @@ experiments:
         published_page: 1
         section: opening methods paragraphs
         note: About 5 hr from about 900 C to complete evaporation; unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1
+              section: opening methods paragraphs
+              note: About 5 hr from about 900 C to complete evaporation; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              published_page: 1
+              section: opening methods paragraphs
+              note: About 5 hr from about 900 C to complete evaporation; unit conversion only
+        output_unit: s
 benches:
 - id: 10.2205/2011nz000234::bench::yakovlev-ms1301-kems
   work_id: 10.2205/2011nz000234

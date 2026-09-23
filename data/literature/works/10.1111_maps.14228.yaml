@@ -38,6 +38,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Printed three grams of milled material; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -75,6 +100,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Target temperature 950 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -155,6 +205,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Target temperature 950 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '950'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          output_unit: K
       hold_duration_s:
         state:
           tag: value
@@ -167,6 +242,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Reaction continued 15 min at target temperature; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          output_unit: s
     total_duration_s:
       state:
         tag: unknown
@@ -194,6 +294,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Printed three grams of milled material; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -231,6 +356,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Target temperature 950 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -302,6 +452,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Target temperature 950 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '950'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          output_unit: K
       hold_duration_s:
         state:
           tag: value
@@ -314,6 +489,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Reaction continued 15 min at target temperature; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          output_unit: s
     total_duration_s:
       state:
         tag: unknown
@@ -341,6 +541,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Printed three grams of milled material; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Printed three grams of milled material; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -378,6 +603,31 @@ experiments:
         pdf_page_index: 6
         section: Methods - Milling and Reduction of Lunar Simulants
         note: Target temperature 950 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2491
+              pdf_page_index: 6
+              section: Methods - Milling and Reduction of Lunar Simulants
+              note: Target temperature 950 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -449,6 +699,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Target temperature 950 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '950'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Target temperature 950 C; unit conversion only
+          output_unit: K
       hold_duration_s:
         state:
           tag: value
@@ -461,6 +736,31 @@ experiments:
           pdf_page_index: 6
           section: Methods - Milling and Reduction of Lunar Simulants
           note: Reaction continued 15 min at target temperature; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 2491
+                pdf_page_index: 6
+                section: Methods - Milling and Reduction of Lunar Simulants
+                note: Reaction continued 15 min at target temperature; unit conversion only
+          output_unit: s
     total_duration_s:
       state:
         tag: unknown

@@ -112,7 +112,39 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1063/1.555799
 experiments:
-- experiment_id: 10.1063/1.555799::LH87#Al_O_gas_species
+- experiment_id: 10.1063/1.555799::lamoreaux-hildenbrand-hildenbrand-1987
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1063/1.555799
+  locator:
+    table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
+    note: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
+    record: LH87_Ga2O_g_formation
+- experiment_id: 10.1063/1.555799::lh87-al-o-gas-species
   kind: literature
   method:
     tag: unknown
@@ -145,7 +177,7 @@ experiments:
       Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular identity before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g)
       Chase 1998.
     record: LH87#Al_O_gas_species
-- experiment_id: 10.1063/1.555799::LH87#CaO_g
+- experiment_id: 10.1063/1.555799::lh87-cao-g
   kind: literature
   method:
     tag: unknown
@@ -177,7 +209,7 @@ experiments:
     note: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799, Table 3 CaO(g);
       + JANAF CaO(g) Chase 1998 (REF-020).
     record: LH87#CaO_g
-- experiment_id: 10.1063/1.555799::LH87#MgO_g
+- experiment_id: 10.1063/1.555799::lh87-mgo-g
   kind: literature
   method:
     tag: unknown
@@ -210,191 +242,3 @@ experiments:
       of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg", J. Phys. Chem. Ref. Data 16:419–443, DOI
       10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry). Cross-ch
     record: LH87#MgO_g
-- experiment_id: 10.1063/1.555799::LH87_BaO_g_formation
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    note: ΔfH°298/R = −15.4 ± 1 kK; S°298/R = 28.306 ± 0.05; system §2.2.e p. 430; Figs. 17–20
-    record: LH87_BaO_g_formation
-- experiment_id: 10.1063/1.555799::LH87_BaO_s_formation
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    note: LH87_BaO_s_formation
-    record: LH87_BaO_s_formation
-- experiment_id: 10.1063/1.555799::LH87_Ga2O3_s_formation
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    note: ΔfH°298/R = −131.2 ± 0.5 kK
-    record: LH87_Ga2O3_s_formation
-- experiment_id: 10.1063/1.555799::LH87_SrO_g_formation
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    note: ΔfH°298/R = 0.2 ± 3 kK; S°298/R = 27.656 ± 0.002; system §2.2.d pp. 428–429; Figs. 13–16
-    record: LH87_SrO_g_formation
-- experiment_id: 10.1063/1.555799::LH87_SrO_s_formation
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    note: LH87_SrO_s_formation
-    record: LH87_SrO_s_formation
-- experiment_id: '10.1063/1.555799::Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
-    = 1.4712 kK'
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.555799
-  locator:
-    table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
-    note: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
-    record: LH87_Ga2O_g_formation

@@ -101,6 +101,31 @@ observations:
         pdf_page_index: 5
         equation: '3'
         note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1610'
+            locator:
+              published_page: 560
+              pdf_page_index: 5
+              equation: '3'
+              note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 560
+              pdf_page_index: 5
+              equation: '3'
+              note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
+        output_unit: K
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:
@@ -381,6 +406,29 @@ observations:
         published_page: 561
         pdf_page_index: 6
         paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1538'
+            locator:
+              published_page: 561
+              pdf_page_index: 6
+              paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 561
+              pdf_page_index: 6
+              paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
+        output_unit: K
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_activities
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
   identity:

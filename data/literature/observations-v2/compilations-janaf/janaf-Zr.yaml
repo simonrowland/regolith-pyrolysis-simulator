@@ -9,128 +9,7 @@ sources:
 - data/literature/compilations/janaf/tables/Zr-007.yaml
 - data/literature/compilations/janaf/tables/Zr-008.yaml
 observations:
-- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Zr-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Zr
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: alpha
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '-5.497'
-    - - '100'
-      - '-4.611'
-    - - '200'
-      - '-2.418'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.047'
-    - - '400'
-      - '2.606'
-    - - '500'
-      - '5.231'
-    - - '600'
-      - '7.922'
-    - - '700'
-      - '10.689'
-    - - '800'
-      - '13.538'
-    - - '900'
-      - '16.486'
-    - - '1000'
-      - '19.542'
-    - - '1100'
-      - '22.713'
-    - - '1135'
-      - '23.851'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-001.yaml
-    record: Zr-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
-      BETA"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:segment-1
+- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -247,7 +126,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -396,7 +276,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -507,12 +388,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:H_minus_H298:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Zr
       phase:
@@ -525,8 +407,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -538,68 +420,68 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '0'
-      - '0'
+      - '-5.497'
     - - '100'
-      - '14.055'
+      - '-4.611'
     - - '200'
-      - '29.05'
+      - '-2.418'
     - - '298.15'
-      - '38.869'
+      - '0'
     - - '300'
-      - '39.025'
+      - '0.047'
     - - '400'
-      - '46.384'
+      - '2.606'
     - - '500'
-      - '52.238'
+      - '5.231'
     - - '600'
-      - '57.143'
+      - '7.922'
     - - '700'
-      - '61.406'
+      - '10.689'
     - - '800'
-      - '65.21'
+      - '13.538'
     - - '900'
-      - '68.68'
+      - '16.486'
     - - '1000'
-      - '71.899'
+      - '19.542'
     - - '1100'
-      - '74.921'
+      - '22.713'
     - - '1135'
-      - '75.939'
+      - '23.851'
     approximate: false
   uncertainty:
     kind: none
@@ -627,8 +509,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:S:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -745,7 +628,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:S:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:S:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -894,7 +778,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:S:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:S:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1005,12 +890,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:S:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Zr
       phase:
@@ -1024,7 +910,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1036,68 +922,68 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '18.617'
+      - '14.055'
     - - '200'
-      - '23.873'
+      - '29.05'
     - - '298.15'
-      - '25.202'
+      - '38.869'
     - - '300'
-      - '25.218'
+      - '39.025'
     - - '400'
-      - '25.935'
+      - '46.384'
     - - '500'
-      - '26.564'
+      - '52.238'
     - - '600'
-      - '27.281'
+      - '57.143'
     - - '700'
-      - '28.053'
+      - '61.406'
     - - '800'
-      - '28.966'
+      - '65.21'
     - - '900'
-      - '30.003'
+      - '68.68'
     - - '1000'
-      - '31.128'
+      - '71.899'
     - - '1100'
-      - '32.306'
+      - '74.921'
     - - '1135'
-      - '32.724'
+      - '75.939'
     approximate: false
   uncertainty:
     kind: none
@@ -1126,7 +1012,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:cp:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1243,7 +1130,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:cp:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:cp:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1392,7 +1280,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:cp:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:cp:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1503,12 +1392,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-001:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:cp:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Zr
       phase:
@@ -1522,7 +1412,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1533,71 +1423,69 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '18.617'
     - - '200'
-      - '0'
+      - '23.873'
     - - '298.15'
-      - '0'
+      - '25.202'
     - - '300'
-      - '0'
+      - '25.218'
     - - '400'
-      - '0'
+      - '25.935'
     - - '500'
-      - '0'
+      - '26.564'
     - - '600'
-      - '0'
+      - '27.281'
     - - '700'
-      - '0'
+      - '28.053'
     - - '800'
-      - '0'
+      - '28.966'
     - - '900'
-      - '0'
+      - '30.003'
     - - '1000'
-      - '0'
+      - '31.128'
     - - '1100'
-      - '0'
+      - '32.306'
+    - - '1135'
+      - '32.724'
     approximate: false
   uncertainty:
     kind: none
@@ -1620,15 +1508,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='ALPHA' in "ALPHA <--> BETA"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
+      BETA"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fG:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1747,7 +1634,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fG:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fG:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -1898,7 +1786,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fG:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fG:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2013,12 +1902,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fG:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Zr
       phase:
@@ -2032,7 +1922,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -2054,31 +1944,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -2138,7 +2028,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fH:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2257,7 +2148,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fH:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fH:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2408,7 +2300,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:delta_fH:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fH:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2523,12 +2416,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-001:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:delta_fH:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Zr
       phase:
@@ -2542,7 +2436,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -2564,31 +2458,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -2647,8 +2541,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-001:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:log10_Kf:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2767,7 +2662,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-001:log10_Kf:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:log10_Kf:phase-window:T=2125.000..4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -2918,7 +2814,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-001:log10_Kf:segment-3
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:log10_Kf:phase-window:T=4702.633..open
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -3033,7 +2930,134 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-001:transition_temperature:alpha-beta
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:log10_Kf:phase-window:T=open..1135.000
+  experiment_id: nist-janaf-4th:Zr-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '400'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-001.yaml
+    record: Zr-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='ALPHA' in "ALPHA <--> BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:transition_temperature:T=1135.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -3126,7 +3150,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-001:transition_temperature:beta-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:transition_temperature:T=2125.000
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -3220,7 +3245,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-001:transition_temperature:liquid-ideal-gas
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-001:transition_temperature:T=4702.633
   experiment_id: nist-janaf-4th:Zr-001:tabulation
   identity:
     quantity:
@@ -3314,7 +3340,114 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-002:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:H_minus_H298:phase-window:T=1135.000..open
+  experiment_id: nist-janaf-4th:Zr-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: beta
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: H(T)-H(298.15 K)
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: series
+    series:
+    - - '1200'
+      - '26.004'
+    - - '1300'
+      - '29.413'
+    - - '1400'
+      - '32.938'
+    - - '1500'
+      - '36.572'
+    - - '1600'
+      - '40.304'
+    - - '1700'
+      - '44.119'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
+    record: Zr-002
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='BETA' in "ALPHA <-->
+      BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:H_minus_H298:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -3441,12 +3574,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:H_minus_H298:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:S:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
       tag: value
-      value: H_minus_H298
+      value: S
     species:
       formula: Zr
       phase:
@@ -3459,8 +3593,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
+      tag: not_applicable
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -3472,52 +3606,52 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '1200'
-      - '26.004'
+      - '77.783'
     - - '1300'
-      - '29.413'
+      - '80.511'
     - - '1400'
-      - '32.938'
+      - '83.123'
     - - '1500'
-      - '36.572'
+      - '85.63'
     - - '1600'
-      - '40.304'
+      - '88.038'
     - - '1700'
-      - '44.119'
+      - '90.351'
     approximate: false
   uncertainty:
     kind: none
@@ -3545,8 +3679,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:S:segment-0
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:S:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -3673,12 +3808,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-002:S:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:cp:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: cp
     species:
       formula: Zr
       phase:
@@ -3692,7 +3828,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile S does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -3704,52 +3840,52 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile cp does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '1200'
-      - '77.783'
+      - '33.502'
     - - '1300'
-      - '80.511'
+      - '34.681'
     - - '1400'
-      - '83.123'
+      - '35.807'
     - - '1500'
-      - '85.63'
+      - '36.846'
     - - '1600'
-      - '88.038'
+      - '37.762'
     - - '1700'
-      - '90.351'
+      - '38.52'
     approximate: false
   uncertainty:
     kind: none
@@ -3778,7 +3914,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-002:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:cp:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -3905,243 +4042,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-002:cp:segment-1
-  experiment_id: nist-janaf-4th:Zr-002:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: cp
-    species:
-      formula: Zr
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: beta
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile cp does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile cp does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile cp does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile cp does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile cp does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile cp does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile cp does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile cp does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile cp does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile cp does not use wall
-  value:
-    kind: series
-    series:
-    - - '1200'
-      - '33.502'
-    - - '1300'
-      - '34.681'
-    - - '1400'
-      - '35.807'
-    - - '1500'
-      - '36.846'
-    - - '1600'
-      - '37.762'
-    - - '1700'
-      - '38.52'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
-    record: Zr-002
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='BETA' in "ALPHA <-->
-      BETA"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-002:delta_fG:segment-0
-  experiment_id: nist-janaf-4th:Zr-002:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: Zr
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: alpha
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '0'
-    - - '100'
-      - '0'
-    - - '200'
-      - '0'
-    - - '250'
-      - '0'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0'
-    - - '350'
-      - '0'
-    - - '400'
-      - '0'
-    - - '450'
-      - '0'
-    - - '500'
-      - '0'
-    - - '600'
-      - '0'
-    - - '700'
-      - '0'
-    - - '800'
-      - '0'
-    - - '900'
-      - '0'
-    - - '1000'
-      - '0'
-    - - '1100'
-      - '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
-    record: Zr-002
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='ALPHA' in "ALPHA <--> BETA"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:delta_fG:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:delta_fG:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -4250,12 +4152,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:delta_fG:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Zr
       phase:
@@ -4269,7 +4172,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -4291,31 +4194,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -4381,7 +4284,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:delta_fH:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -4490,7 +4394,250 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-002:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:delta_fH:phase-window:T=open..1135.000
+  experiment_id: nist-janaf-4th:Zr-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
+    record: Zr-002
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='ALPHA' in "ALPHA <--> BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:log10_Kf:phase-window:T=1135.000..open
+  experiment_id: nist-janaf-4th:Zr-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: beta
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '1300'
+      - '-0.021'
+    - - '1400'
+      - '-0.029'
+    - - '1500'
+      - '-0.035'
+    - - '1600'
+      - '-0.038'
+    - - '1700'
+      - '-0.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
+    record: Zr-002
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='BETA' in "ALPHA <--> BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:log10_Kf:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -4621,116 +4768,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-002:log10_Kf:segment-1
-  experiment_id: nist-janaf-4th:Zr-002:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: Zr
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: beta
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: series
-    series:
-    - - '1300'
-      - '-0.021'
-    - - '1400'
-      - '-0.029'
-    - - '1500'
-      - '-0.035'
-    - - '1600'
-      - '-0.038'
-    - - '1700'
-      - '-0.04'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-002.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-002.yaml
-    record: Zr-002
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='BETA' in "ALPHA <--> BETA"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-002:transition_temperature:alpha-beta
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-002:transition_temperature:T=1135.000
   experiment_id: nist-janaf-4th:Zr-002:tabulation
   identity:
     quantity:
@@ -4823,126 +4862,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-003:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Zr-003:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Zr
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: value
-        value: alpha
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.047'
-    - - '350'
-      - '1.317'
-    - - '400'
-      - '2.605'
-    - - '450'
-      - '3.909'
-    - - '500'
-      - '5.229'
-    - - '600'
-      - '7.921'
-    - - '700'
-      - '10.687'
-    - - '800'
-      - '13.542'
-    - - '900'
-      - '16.412'
-    - - '1000'
-      - '19.245'
-    - - '1100'
-      - '22.068'
-    - - '1135'
-      - '23.058'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-003
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-003.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-003.yaml
-    record: Zr-003
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
-      BETA"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:H_minus_H298:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:H_minus_H298:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -5067,12 +4988,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:H_minus_H298:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Zr
       phase:
@@ -5085,8 +5007,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -5098,66 +5020,66 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '298.15'
-      - '43.192'
+      - '0'
     - - '300'
-      - '43.348'
+      - '0.047'
     - - '350'
-      - '47.264'
+      - '1.317'
     - - '400'
-      - '50.703'
+      - '2.605'
     - - '450'
-      - '53.775'
+      - '3.909'
     - - '500'
-      - '56.557'
+      - '5.229'
     - - '600'
-      - '61.462'
+      - '7.921'
     - - '700'
-      - '65.724'
+      - '10.687'
     - - '800'
-      - '69.535'
+      - '13.542'
     - - '900'
-      - '72.916'
+      - '16.412'
     - - '1000'
-      - '75.902'
+      - '19.245'
     - - '1100'
-      - '78.592'
+      - '22.068'
     - - '1135'
-      - '79.478'
+      - '23.058'
     approximate: false
   uncertainty:
     kind: none
@@ -5185,8 +5107,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-003:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:S:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -5311,12 +5234,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-003:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:S:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Zr
       phase:
@@ -5330,7 +5254,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5342,66 +5266,66 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '298.15'
-      - '25.202'
+      - '43.192'
     - - '300'
-      - '25.218'
+      - '43.348'
     - - '350'
-      - '25.587'
+      - '47.264'
     - - '400'
-      - '25.935'
+      - '50.703'
     - - '450'
-      - '26.238'
+      - '53.775'
     - - '500'
-      - '26.564'
+      - '56.557'
     - - '600'
-      - '27.281'
+      - '61.462'
     - - '700'
-      - '28.053'
+      - '65.724'
     - - '800'
-      - '28.966'
+      - '69.535'
     - - '900'
-      - '28.473'
+      - '72.916'
     - - '1000'
-      - '28.238'
+      - '75.902'
     - - '1100'
-      - '28.26'
+      - '78.592'
     - - '1135'
-      - '28.329'
+      - '79.478'
     approximate: false
   uncertainty:
     kind: none
@@ -5430,7 +5354,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-003:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:cp:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -5555,12 +5480,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-003:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:cp:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Zr
       phase:
@@ -5574,7 +5500,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5585,69 +5511,67 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '298.15'
-      - '3.521'
+      - '25.202'
     - - '300'
-      - '3.513'
+      - '25.218'
     - - '350'
-      - '3.297'
+      - '25.587'
     - - '400'
-      - '3.081'
+      - '25.935'
     - - '450'
-      - '2.865'
+      - '26.238'
     - - '500'
-      - '2.649'
+      - '26.564'
     - - '600'
-      - '2.217'
+      - '27.281'
     - - '700'
-      - '1.785'
+      - '28.053'
     - - '800'
-      - '1.353'
+      - '28.966'
     - - '900'
-      - '0.923'
+      - '28.473'
     - - '1000'
-      - '0.511'
+      - '28.238'
     - - '1100'
-      - '0.126'
+      - '28.26'
+    - - '1135'
+      - '28.329'
     approximate: false
   uncertainty:
     kind: none
@@ -5670,15 +5594,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='ALPHA' in "ALPHA <--> BETA"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
+      BETA"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:delta_fG:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -5805,12 +5728,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:delta_fG:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Zr
       phase:
@@ -5824,7 +5748,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5846,58 +5770,58 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
     - - '298.15'
-      - '4.81'
+      - '3.521'
     - - '300'
-      - '4.81'
+      - '3.513'
     - - '350'
-      - '4.809'
+      - '3.297'
     - - '400'
-      - '4.809'
+      - '3.081'
     - - '450'
-      - '4.808'
+      - '2.865'
     - - '500'
-      - '4.808'
+      - '2.649'
     - - '600'
-      - '4.809'
+      - '2.217'
     - - '700'
-      - '4.808'
+      - '1.785'
     - - '800'
-      - '4.813'
+      - '1.353'
     - - '900'
-      - '4.736'
+      - '0.923'
     - - '1000'
-      - '4.513'
+      - '0.511'
     - - '1100'
-      - '4.164'
+      - '0.126'
     approximate: false
   uncertainty:
     kind: none
@@ -5928,7 +5852,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:delta_fH:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -6055,12 +5980,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-003:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:delta_fH:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Zr
       phase:
@@ -6074,7 +6000,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -6096,58 +6022,58 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
     - - '298.15'
-      - '-0.617'
+      - '4.81'
     - - '300'
-      - '-0.612'
+      - '4.81'
     - - '350'
-      - '-0.492'
+      - '4.809'
     - - '400'
-      - '-0.402'
+      - '4.809'
     - - '450'
-      - '-0.333'
+      - '4.808'
     - - '500'
-      - '-0.277'
+      - '4.808'
     - - '600'
-      - '-0.193'
+      - '4.809'
     - - '700'
-      - '-0.133'
+      - '4.808'
     - - '800'
-      - '-0.088'
+      - '4.813'
     - - '900'
-      - '-0.054'
+      - '4.736'
     - - '1000'
-      - '-0.027'
+      - '4.513'
     - - '1100'
-      - '-0.006'
+      - '4.164'
     approximate: false
   uncertainty:
     kind: none
@@ -6177,8 +6103,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-003:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:log10_Kf:phase-window:T=1135.000..open
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -6305,7 +6232,132 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-003:transition_temperature:alpha-beta
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:log10_Kf:phase-window:T=open..1135.000
+  experiment_id: nist-janaf-4th:Zr-003:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '298.15'
+      - '-0.617'
+    - - '300'
+      - '-0.612'
+    - - '350'
+      - '-0.492'
+    - - '400'
+      - '-0.402'
+    - - '450'
+      - '-0.333'
+    - - '500'
+      - '-0.277'
+    - - '600'
+      - '-0.193'
+    - - '700'
+      - '-0.133'
+    - - '800'
+      - '-0.088'
+    - - '900'
+      - '-0.054'
+    - - '1000'
+      - '-0.027'
+    - - '1100'
+      - '-0.006'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-003
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-003.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-003.yaml
+    record: Zr-003
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='ALPHA' in "ALPHA <--> BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:transition_temperature:T=1135.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -6398,7 +6450,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-003:transition_temperature:beta-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-003:transition_temperature:T=2125.000
   experiment_id: nist-janaf-4th:Zr-003:tabulation
   identity:
     quantity:
@@ -6492,7 +6545,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-004:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -6708,7 +6762,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-004:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:S:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -6924,7 +6979,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-004:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -7140,7 +7196,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-004:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -7353,7 +7410,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-004:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -7566,7 +7624,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-004:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -7779,101 +7838,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-004:transition_temperature:beta-liquid
-  experiment_id: nist-janaf-4th:Zr-004:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: transition_temperature
-    species:
-      formula: Zr
-      phase:
-        tag: unknown
-        reason: transition spans phases named by "BETA <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and cannot
-          hold both
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: beta-liquid
-    per:
-      tag: not_applicable
-      reason: profile transition_temperature does not use per
-    temperature_K:
-      tag: not_applicable
-      reason: profile transition_temperature does not use temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile transition_temperature does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile transition_temperature does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use fO2_Pa
-    total_pressure_Pa:
-      tag: value
-      value: '100000'
-    sweep_gas:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile transition_temperature does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile transition_temperature does not use wall
-  value:
-    kind: point
-    point: '2125'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Zr-004
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-004.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-004.yaml
-    record: Zr-004
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF labelled row "BETA <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1 MPa
-      (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: K
-- observation_id: nist-janaf-4th:Zr-004:transition_temperature:glass-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:transition_temperature:T=1580.000
   experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
@@ -7967,105 +7933,73 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Zr-005:tabulation
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-004:transition_temperature:T=2125.000
+  experiment_id: nist-janaf-4th:Zr-004:tabulation
   identity:
     quantity:
       tag: value
-      value: H_minus_H298
+      value: transition_temperature
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: transition spans phases named by "BETA <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and cannot
+          hold both
       polymorph:
-        tag: value
-        value: alpha
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
       charge:
         tag: value
         value: 0
     subtype:
       tag: value
-      value: H(T)-H(298.15 K)
+      value: beta-liquid
     per:
-      tag: value
-      value: mol_species
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
     standard_pressure_Pa:
-      tag: value
-      value: '100000'
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
+      reason: profile transition_temperature does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
+      reason: profile transition_temperature does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
+      reason: profile transition_temperature does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
+      reason: profile transition_temperature does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
+      reason: profile transition_temperature does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
+      reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
+      reason: profile transition_temperature does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
+      reason: profile transition_temperature does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
+      reason: profile transition_temperature does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
+      reason: profile transition_temperature does not use wall
   value:
-    kind: series
-    series:
-    - - '0'
-      - '-5.497'
-    - - '100'
-      - '-4.611'
-    - - '200'
-      - '-2.418'
-    - - '250'
-      - '-1.202'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.047'
-    - - '350'
-      - '1.318'
-    - - '400'
-      - '2.606'
-    - - '450'
-      - '3.911'
-    - - '500'
-      - '5.231'
-    - - '600'
-      - '7.922'
-    - - '700'
-      - '10.689'
-    - - '800'
-      - '13.538'
-    - - '900'
-      - '16.486'
-    - - '1000'
-      - '19.542'
-    - - '1100'
-      - '22.713'
-    - - '1135'
-      - '23.851'
+    kind: point
+    point: '2125'
     approximate: false
   uncertainty:
     kind: none
@@ -8081,20 +8015,21 @@ observations:
   notices: []
   source_id: nist-janaf-4th
   locator:
-    table: Zr-005
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-005.txt'
-    source_path: data/literature/compilations/janaf/tables/Zr-005.yaml
-    record: Zr-005
+    table: Zr-004
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-004.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-004.yaml
+    record: Zr-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
-      BETA"
+    relation: Direct JANAF labelled row "BETA <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1 MPa
+      (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:segment-1
+    output_unit: K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -8211,7 +8146,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -8376,12 +8312,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:H_minus_H298:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Zr
       phase:
@@ -8394,8 +8331,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -8407,74 +8344,74 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '0'
-      - '0'
+      - '-5.497'
     - - '100'
-      - '14.055'
+      - '-4.611'
     - - '200'
-      - '29.05'
+      - '-2.418'
     - - '250'
-      - '34.474'
+      - '-1.202'
     - - '298.15'
-      - '38.869'
+      - '0'
     - - '300'
-      - '39.025'
+      - '0.047'
     - - '350'
-      - '42.943'
+      - '1.318'
     - - '400'
-      - '46.384'
+      - '2.606'
     - - '450'
-      - '49.457'
+      - '3.911'
     - - '500'
-      - '52.238'
+      - '5.231'
     - - '600'
-      - '57.143'
+      - '7.922'
     - - '700'
-      - '61.406'
+      - '10.689'
     - - '800'
-      - '65.21'
+      - '13.538'
     - - '900'
-      - '68.68'
+      - '16.486'
     - - '1000'
-      - '71.899'
+      - '19.542'
     - - '1100'
-      - '74.921'
+      - '22.713'
     - - '1135'
-      - '75.939'
+      - '23.851'
     approximate: false
   uncertainty:
     kind: none
@@ -8502,8 +8439,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:S:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -8620,7 +8558,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:S:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:S:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -8785,12 +8724,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:S:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Zr
       phase:
@@ -8804,7 +8744,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -8816,74 +8756,74 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '18.617'
+      - '14.055'
     - - '200'
-      - '23.873'
+      - '29.05'
     - - '250'
-      - '24.693'
+      - '34.474'
     - - '298.15'
-      - '25.202'
+      - '38.869'
     - - '300'
-      - '25.218'
+      - '39.025'
     - - '350'
-      - '25.606'
+      - '42.943'
     - - '400'
-      - '25.935'
+      - '46.384'
     - - '450'
-      - '26.246'
+      - '49.457'
     - - '500'
-      - '26.564'
+      - '52.238'
     - - '600'
-      - '27.281'
+      - '57.143'
     - - '700'
-      - '28.053'
+      - '61.406'
     - - '800'
-      - '28.966'
+      - '65.21'
     - - '900'
-      - '30.003'
+      - '68.68'
     - - '1000'
-      - '31.128'
+      - '71.899'
     - - '1100'
-      - '32.306'
+      - '74.921'
     - - '1135'
-      - '32.724'
+      - '75.939'
     approximate: false
   uncertainty:
     kind: none
@@ -8912,7 +8852,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:cp:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -9029,7 +8970,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:cp:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:cp:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -9194,12 +9136,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-005:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:cp:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Zr
       phase:
@@ -9213,7 +9156,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -9224,77 +9167,75 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '18.617'
     - - '200'
-      - '0'
+      - '23.873'
     - - '250'
-      - '0'
+      - '24.693'
     - - '298.15'
-      - '0'
+      - '25.202'
     - - '300'
-      - '0'
+      - '25.218'
     - - '350'
-      - '0'
+      - '25.606'
     - - '400'
-      - '0'
+      - '25.935'
     - - '450'
-      - '0'
+      - '26.246'
     - - '500'
-      - '0'
+      - '26.564'
     - - '600'
-      - '0'
+      - '27.281'
     - - '700'
-      - '0'
+      - '28.053'
     - - '800'
-      - '0'
+      - '28.966'
     - - '900'
-      - '0'
+      - '30.003'
     - - '1000'
-      - '0'
+      - '31.128'
     - - '1100'
-      - '0'
+      - '32.306'
+    - - '1135'
+      - '32.724'
     approximate: false
   uncertainty:
     kind: none
@@ -9317,15 +9258,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='ALPHA' in "ALPHA <--> BETA"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='ALPHA' in "ALPHA <-->
+      BETA"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fG:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -9444,7 +9384,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:delta_fG:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fG:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -9609,12 +9550,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fG:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Zr
       phase:
@@ -9628,7 +9570,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -9650,31 +9592,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -9740,7 +9682,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fH:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -9859,7 +9802,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:delta_fH:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fH:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -10024,12 +9968,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-005:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:delta_fH:phase-window:T=open..1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Zr
       phase:
@@ -10043,7 +9988,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -10065,31 +10010,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -10154,8 +10099,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-005:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:log10_Kf:phase-window:T=1135.000..2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -10274,7 +10220,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-005:log10_Kf:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:log10_Kf:phase-window:T=2125.000..open
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -10439,7 +10386,140 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-005:transition_temperature:alpha-beta
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:log10_Kf:phase-window:T=open..1135.000
+  experiment_id: nist-janaf-4th:Zr-005:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Zr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Zr-005
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Zr-005.txt'
+    source_path: data/literature/compilations/janaf/tables/Zr-005.yaml
+    record: Zr-005
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='ALPHA' in "ALPHA <--> BETA"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:transition_temperature:T=1135.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -10532,7 +10612,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-005:transition_temperature:beta-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-005:transition_temperature:T=2125.000
   experiment_id: nist-janaf-4th:Zr-005:tabulation
   identity:
     quantity:
@@ -10626,7 +10707,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Zr-006:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -10851,7 +10933,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-006:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:S:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -11076,7 +11159,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-006:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -11301,7 +11385,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-006:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -11530,7 +11615,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-006:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -11759,7 +11845,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-006:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-006:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-006:tabulation
   identity:
     quantity:
@@ -11986,7 +12073,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-007:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -12209,7 +12297,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-007:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:S:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -12432,7 +12521,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-007:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -12655,7 +12745,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-007:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -12876,7 +12967,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-007:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -13099,7 +13191,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-007:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-007:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-007:tabulation
   identity:
     quantity:
@@ -13320,7 +13413,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Zr-008:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -13543,7 +13637,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-008:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:S:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -13766,7 +13861,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-008:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -13989,7 +14085,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Zr-008:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -14210,7 +14307,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-008:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -14433,7 +14531,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Zr-008:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Zr-008:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Zr-008:tabulation
   identity:
     quantity:
@@ -14654,3 +14753,4 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
+    pure_substance_reference: true

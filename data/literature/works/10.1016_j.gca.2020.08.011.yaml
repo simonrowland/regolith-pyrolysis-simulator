@@ -38,6 +38,31 @@ experiments:
         pdf_page_index: 2
         section: 2.1 Experimental
         note: Printed sample mass about 25 mg; SI unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              section: 2.1 Experimental
+              note: Printed sample mass about 25 mg; SI unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              section: 2.1 Experimental
+              note: Printed sample mass about 25 mg; SI unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -86,6 +111,31 @@ experiments:
         pdf_page_index: 2
         section: 2.1 Experimental
         note: Printed total pressure 1 atm; SI unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              section: 2.1 Experimental
+              note: Printed total pressure 1 atm; SI unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              section: 2.1 Experimental
+              note: Printed total pressure 1 atm; SI unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -167,6 +217,40 @@ experiments:
         pdf_page_index: 2
         table: '1'
         note: Printed Table 1 run times 5-120 min; SI unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              table: '1'
+              note: Printed Table 1 run times 5-120 min; SI unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '120'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              table: '1'
+              note: Printed Table 1 run times 5-120 min; SI unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              published_page: 318
+              pdf_page_index: 2
+              table: '1'
+              note: Printed Table 1 run times 5-120 min; SI unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value

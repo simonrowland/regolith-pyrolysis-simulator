@@ -38,96 +38,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/isijinternational1966.23.56
 experiments:
-- experiment_id: 10.2355/isijinternational1966.23.56::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.23.56
-  locator:
-    published_page: 56
-    pdf_page_index: 1
-    table: '1'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
-          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
-          and Ni. Temperature fluctuation ±1 C.
-      locator:
-        published_page: 56
-        pdf_page_index: 1
-        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
-          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
-        section: II.1
-- experiment_id: 10.2355/isijinternational1966.23.56::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.23.56
-  locator:
-    published_page: 64
-    pdf_page_index: 9
-    table: '6'
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
-          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
-          and Ni. Temperature fluctuation ±1 C.
-      locator:
-        published_page: 56
-        pdf_page_index: 1
-        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
-          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
-        section: II.1
 - experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-cu-series
   kind: literature
   method:
@@ -394,6 +304,51 @@ experiments:
         page: 5
         published_page: 60
         note: 7200 s is the printed depletion-model time
+- experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 56
+    pdf_page_index: 1
+    table: '1'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
 benches:
 - id: 10.2355/isijinternational1966.23.56::bench::rm-6e
   work_id: 10.2355/isijinternational1966.23.56

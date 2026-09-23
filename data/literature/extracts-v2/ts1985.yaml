@@ -111,6 +111,35 @@ observations:
         paragraph: English Synopsis + Japanese 結言 (2)
         note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
           5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 1
+              published_page: 815
+              pdf_page_index: 1
+              paragraph: English Synopsis + Japanese 結言 (2)
+              note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
+                X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 815
+              pdf_page_index: 1
+              paragraph: English Synopsis + Japanese 結言 (2)
+              note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
+                X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -218,6 +247,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -325,6 +385,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -432,6 +523,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -539,6 +661,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -646,6 +799,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -753,6 +937,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -860,6 +1075,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -967,6 +1213,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -1074,6 +1351,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -1181,6 +1489,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -1288,6 +1627,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -1395,6 +1765,37 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
           A, B by reading Fig. 4/7 (p. 820).
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              table: '2'
+              equation: log a_Na2O = A/T + B
+              note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+                A, B by reading Fig. 4/7 (p. 820).
+        output_unit: K
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-equilibration-series
   identity:
@@ -1553,3 +1954,30 @@ observations:
         pdf_page_index: 7
         figure: '8'
         paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              figure: '8'
+              paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 821
+              pdf_page_index: 7
+              figure: '8'
+              paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
+        output_unit: K

@@ -46,7 +46,7 @@ observations:
     note: Figure 4 Residual gas analysis from test 12
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig5_ilmenite_EDS_ratios
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::5
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc
   identity:
     quantity:
       tag: unknown
@@ -90,7 +90,7 @@ observations:
     note: printed Fe/O and Ti/O ratios on Figure 5 (not axis readings)
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::6
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc
   identity:
     quantity:
       tag: unknown
@@ -134,7 +134,7 @@ observations:
     note: Figure 6 Equilibrium composition of MLS-1A at 10^{-1} Torr
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::7
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc
   identity:
     quantity:
       tag: unknown
@@ -178,7 +178,7 @@ observations:
     note: Figure 7 Equilibrium composition of MLS-1A at 10^{-7} Torr
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig9_PT_figure_only
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::9
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc
   identity:
     quantity:
       tag: unknown
@@ -272,881 +272,7 @@ observations:
         pdf_page_index: 7
         figure: '8'
         note: 'Figure 8 caption: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU; 10 g MLS-1A'
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:10
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: FeTiO3
-      phase:
-        tag: unknown
-        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '1709.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.0037'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
-        12) retained as printed and not interpolated.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: admitted
-    reason: printed numeric mass-loss cell with page locator
-    decided_by:
-      worker: extract-pyro-steurer
-      date: '2026-09-12'
-      evidence:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  notices: []
-  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  locator:
-    pdf_page_index: 3
-    table: '1'
-    note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1709.15'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1436'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: K
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '186.6513157894736842105263158'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=1.4 Torr
-        - printed=P_test_Torr
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1.4'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: Pa
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.37'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:11
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: unknown
-      phase:
-        tag: unknown
-        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '1747.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.101'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
-        12) retained as printed and not interpolated.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: admitted
-    reason: printed numeric mass-loss cell with page locator
-    decided_by:
-      worker: extract-pyro-steurer
-      date: '2026-09-12'
-      evidence:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  notices: []
-  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  locator:
-    pdf_page_index: 3
-    table: '1'
-    note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1747.15'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1474'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: K
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '18.66513157894736842105263158'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.14 Torr
-        - printed=P_test_Torr
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.14'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: Pa
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '10.1'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:2
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: FeTiO3
-      phase:
-        tag: unknown
-        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [821.15, 2140.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.16'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
-        12) retained as printed and not interpolated.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
-  notices:
-  - kind: source_disagreement
-    affected_quantities:
-    - mass_loss_fraction
-    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
-    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:2
-    source: cardiff-2007-vacuum-pyrolysis-gsfc
-    destination: kems-038-matchett-2006
-  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  locator:
-    pdf_page_index: 3
-    table: '1'
-    note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-  point_conditions:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '2.666447368421052631578947368'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.02 Torr
-        - printed=P_test_Torr
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.02'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: Pa
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '16'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:3
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: FeTiO3
-      phase:
-        tag: unknown
-        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '973.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.37'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
-        12) retained as printed and not interpolated.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
-  notices:
-  - kind: source_disagreement
-    affected_quantities:
-    - mass_loss_fraction
-    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
-    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:3
-    source: cardiff-2007-vacuum-pyrolysis-gsfc
-    destination: kems-038-matchett-2006
-  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  locator:
-    pdf_page_index: 3
-    table: '1'
-    note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '973.15'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '700'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: K
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '106.6578947368421052631578947'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.8 Torr
-        - printed=P_test_Torr
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.8'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: Pa
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '37'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:4
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: MgSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '821.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.0005'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
-        12) retained as printed and not interpolated.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: admitted
-    reason: printed numeric mass-loss cell with page locator
-    decided_by:
-      worker: extract-pyro-steurer
-      date: '2026-09-12'
-      evidence:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  notices: []
-  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  locator:
-    pdf_page_index: 3
-    table: '1'
-    note: TABLE 1. Results of 12 tests with the prototype system from 2005
-  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '821.15'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '548'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: K
-    total_pressure_Pa:
-      state:
-        tag: value
-        value: '5.86618421052631578947368421'
-      locator:
-        pdf_page_index: 3
-        table: '1'
-        note: TABLE 1. Results of 12 tests with the prototype system from 2005
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.044 Torr
-        - printed=P_test_Torr
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.044'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              pdf_page_index: 3
-              table: '1'
-              note: TABLE 1. Results of 12 tests with the prototype system from 2005
-        output_unit: Pa
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.05'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          pdf_page_index: 3
-          table: '1'
-          note: TABLE 1. Results of 12 tests with the prototype system from 2005
-    output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:5
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1345.15:row=mgsio3:h=3a6e3bff9a42
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
@@ -1327,7 +453,550 @@ observations:
           table: '1'
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:7
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1373.15:row=mgsio3:h=a654d3d43319
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MgSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.1066'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
+        12) retained as printed and not interpolated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-pyro-steurer
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  notices: []
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1333.223684210526315789473684'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=10.0 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '10.66'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    output_unit: dimensionless
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1709.15:row=fetio3:h=de182a02d33d
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: FeTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1709.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0037'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
+        12) retained as printed and not interpolated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-pyro-steurer
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  notices: []
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1709.15'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1436'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '186.6513157894736842105263158'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=1.4 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.4'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.37'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    output_unit: dimensionless
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=7bb710cb23de
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1747.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
+        12) retained as printed and not interpolated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-pyro-steurer
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  notices: []
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1747.15'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1474'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '18.66513157894736842105263158'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.14 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.14'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '10.1'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    output_unit: dimensionless
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=2140.15:row=fetio3:h=99230b3f99cf
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
@@ -1508,7 +1177,7 @@ observations:
           table: '1'
           note: TABLE 1. Results of 12 tests with the prototype system from 2005
     output_unit: dimensionless
-- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:8
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=821.15:row=mgsio3:h=f5cf08b26ea8
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:
     quantity:
@@ -1533,7 +1202,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: value
-      value: '1373.15'
+      value: '821.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use standard_pressure_Pa
@@ -1573,7 +1242,7 @@ observations:
       reason: profile mass_loss_fraction does not use wall
   value:
     kind: point
-    point: '0.1066'
+    point: '0.0005'
     approximate: false
   uncertainty:
     kind: printed
@@ -1606,7 +1275,7 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1373.15'
+        value: '821.15'
       locator:
         pdf_page_index: 3
         table: '1'
@@ -1620,7 +1289,7 @@ observations:
         - - original
           - state:
               tag: value
-              value: '1100'
+              value: '548'
             locator:
               pdf_page_index: 3
               table: '1'
@@ -1637,7 +1306,7 @@ observations:
     total_pressure_Pa:
       state:
         tag: value
-        value: '1333.223684210526315789473684'
+        value: '5.86618421052631578947368421'
       locator:
         pdf_page_index: 3
         table: '1'
@@ -1647,13 +1316,13 @@ observations:
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=10.0 Torr
+        - as_published=0.044 Torr
         - printed=P_test_Torr
         parameters:
         - - original
           - state:
               tag: value
-              value: '10'
+              value: '0.044'
             locator:
               pdf_page_index: 3
               table: '1'
@@ -1675,7 +1344,338 @@ observations:
     - - original
       - state:
           tag: value
-          value: '10.66'
+          value: '0.05'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    output_unit: dimensionless
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=973.15:row=fetio3:h=bd174775d8d7
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: FeTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '973.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
+        12) retained as printed and not interpolated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - mass_loss_fraction
+    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:3
+    source: cardiff-2007-vacuum-pyrolysis-gsfc
+    destination: kems-038-matchett-2006
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973.15'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '700'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '106.6578947368421052631578947'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.8 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '37'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 3
+          table: '1'
+          note: TABLE 1. Results of 12 tests with the prototype system from 2005
+    output_unit: dimensionless
+- observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:2
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: FeTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [821.15, 2140.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.16'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test 9) / blank mass loss (test
+        12) retained as printed and not interpolated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - mass_loss_fraction
+    reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::point:2
+    source: cardiff-2007-vacuum-pyrolysis-gsfc
+    destination: kems-038-matchett-2006
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: TABLE 1. Results of 12 tests with the prototype system from 2005
+  read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2.666447368421052631578947368'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.02 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '16'
         locator:
           pdf_page_index: 3
           table: '1'

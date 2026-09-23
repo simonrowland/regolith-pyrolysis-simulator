@@ -122,6 +122,27 @@ experiments:
       locator:
         section: 4.1 Experimental results
         note: About 13 mbar under argon; converted to Pa
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '13'
+            locator:
+              section: 4.1 Experimental results
+              note: About 13 mbar under argon; converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              section: 4.1 Experimental results
+              note: About 13 mbar under argon; converted to Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: value
@@ -151,6 +172,27 @@ experiments:
         locator:
           section: 3.2 Solar pyrolysis procedure
           note: Below 10^-3 mbar before heating; converted to Pa
+        inference:
+          relation: mbar_to_Pa
+          inputs:
+          - P_Pa = P_mbar × 100
+          - original_unit=mbar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.001'
+              locator:
+                section: 3.2 Solar pyrolysis procedure
+                note: Below 10^-3 mbar before heating; converted to Pa
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                section: 3.2 Solar pyrolysis procedure
+                note: Below 10^-3 mbar before heating; converted to Pa
+          output_unit: Pa
   work_id: 10.1016/j.asr.2026.02.003
   locator:
     section: 3.2 Solar pyrolysis procedure

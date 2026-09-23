@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1000:row=8:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=fluorite:v=fb1a2142b0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -109,7 +109,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1100:row=9:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1100:col=H_minus_H298:name=fluorite:v=a477105bee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -216,7 +216,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1200:row=10:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1200:col=H_minus_H298:name=fluorite:v=7f44ca6815
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -323,7 +323,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1300:row=11:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1300:col=H_minus_H298:name=fluorite:v=791f81d581
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -430,7 +430,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1400:row=12:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1400:col=H_minus_H298:name=fluorite:v=fbc324f163
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -537,114 +537,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1424:row=13:col=H_minus_H298
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: unknown
-      reason: no subtype mapped from source
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1424'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: point
-    point: '97.40352'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='23.280'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1424:row=14:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1424:col=H_minus_H298:name=fluorite:v=63e047722a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -751,7 +644,114 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1500:row=15:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1424:col=H_minus_H298:name=fluorite:v=93a436cc90
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaF
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
+          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1424'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '97.40352'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 174
+    pdf_page_index: 180
+    table: b1259-ht-0149-fluorite
+    note: as_published='23.280'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
+    record: b1259-ht-0149-fluorite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1500:col=H_minus_H298:name=fluorite:v=55eec5c74b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -858,7 +858,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1600:row=16:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1600:col=H_minus_H298:name=fluorite:v=66c03a40da
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -965,7 +965,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1691:row=17:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1691:col=H_minus_H298:name=fluorite:v=414d60f299
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1072,7 +1072,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1691:row=18:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1691:col=H_minus_H298:name=fluorite:v=44531ee4e6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1179,7 +1179,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1700:row=19:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1700:col=H_minus_H298:name=fluorite:v=653434b438
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1286,7 +1286,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1800:row=20:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1800:col=H_minus_H298:name=fluorite:v=929214db42
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1393,7 +1393,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1900:row=21:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=1900:col=H_minus_H298:name=fluorite:v=edb7f62b30
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1500,7 +1500,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=2000:row=22:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=2000:col=H_minus_H298:name=fluorite:v=084c32a137
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1607,7 +1607,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=fluorite:v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1714,7 +1714,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=400:col=H_minus_H298:name=fluorite:v=2745597c5a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1821,7 +1821,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=500:col=H_minus_H298:name=fluorite:v=5981a3440d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -1928,7 +1928,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=600:col=H_minus_H298:name=fluorite:v=2f480d1f3b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2035,7 +2035,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=700:row=5:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=700:col=H_minus_H298:name=fluorite:v=d3d285844b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2150,7 +2150,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=800:row=6:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=800:col=H_minus_H298:name=fluorite:v=5894bc66c9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2257,7 +2257,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=900:row=7:col=H_minus_H298
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:H_minus_H298:shared:T=900:col=H_minus_H298:name=fluorite:v=b2e77ef9c3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2364,7 +2364,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1000:row=8:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1000:col=entropy:name=fluorite:v=209164177d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2471,7 +2471,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1100:row=9:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1100:col=entropy:name=fluorite:v=3c6d74a6e4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2578,7 +2578,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1200:row=10:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1200:col=entropy:name=fluorite:v=1c8a4b1495
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2685,7 +2685,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1300:row=11:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1300:col=entropy:name=fluorite:v=cd3623403d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2792,7 +2792,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1400:row=12:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1400:col=entropy:name=fluorite:v=fd9f5e396b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -2899,7 +2899,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1424:row=13:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1424:col=entropy:name=fluorite:v=492b1d3c02
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3006,7 +3006,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1424:row=14:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1424:col=entropy:name=fluorite:v=e076a7cdc2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3113,7 +3113,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1500:row=15:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1500:col=entropy:name=fluorite:v=115182e472
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3220,7 +3220,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1600:row=16:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1600:col=entropy:name=fluorite:v=eca2d3d27c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3327,114 +3327,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1691:row=17:col=entropy
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1691'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: point
-    point: '222.3796'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='53.15'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - cal_th_to_J
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1691:row=18:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1691:col=entropy:name=fluorite:v=7528ff24eb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3541,7 +3434,114 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1700:row=19:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1691:col=entropy:name=fluorite:v=cace833106
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: CaF
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
+          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1691'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '222.3796'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 174
+    pdf_page_index: 180
+    table: b1259-ht-0149-fluorite
+    note: as_published='53.15'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
+    record: b1259-ht-0149-fluorite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1700:col=entropy:name=fluorite:v=2eefa1427b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3648,7 +3648,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1800:row=20:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1800:col=entropy:name=fluorite:v=fec85d1868
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3755,7 +3755,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1900:row=21:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=1900:col=entropy:name=fluorite:v=4dbbbdb465
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3862,7 +3862,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=2000:row=22:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=2000:col=entropy:name=fluorite:v=0567909fcb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -3969,7 +3969,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=298.15:col=entropy:name=fluorite:v=77cf2cad7a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4076,7 +4076,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=400:row=2:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=400:col=entropy:name=fluorite:v=eee643f703
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4183,7 +4183,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=500:row=3:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=500:col=entropy:name=fluorite:v=e03b75d871
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4290,7 +4290,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=600:row=4:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=600:col=entropy:name=fluorite:v=0ad0ccf92a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4397,7 +4397,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=700:row=5:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=700:col=entropy:name=fluorite:v=8a58af3314
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4512,7 +4512,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=800:row=6:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=800:col=entropy:name=fluorite:v=b9dd34f35e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4619,7 +4619,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=900:row=7:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:S:shared:T=900:col=entropy:name=fluorite:v=1226b3bf33
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4726,7 +4726,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1000:row=8:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=fluorite:v=3c6de84753
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -4895,7 +4895,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1100:row=9:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=fluorite:v=f4eb47f76b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -5064,7 +5064,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1300:row=11:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=fluorite:v=fe0f62ebde
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -5233,7 +5233,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1400:row=12:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=fluorite:v=4ce187adab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -5402,7 +5402,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1424:row=13:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1424:col=delta_f_G:name=fluorite:v=b93dcb14b2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -5571,176 +5571,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1424:row=14:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1424'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: CaF
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
-                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ca
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: F2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-    formation_elements:
-      tag: value
-      value:
-      - - Ca
-        - formula: Ca
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - F
-        - formula: F2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-977.139728'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='-233.542'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1500:row=15:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=fluorite:v=a151aee4ce
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -5909,7 +5740,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1600:row=16:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=fluorite:v=cecc173593
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -6078,7 +5909,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1691:row=17:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1691:col=delta_f_G:name=fluorite:v=28ca83507f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -6247,176 +6078,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1691:row=18:col=delta_f_G
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1691'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: CaF
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
-                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ca
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: F2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-    formation_elements:
-      tag: value
-      value:
-      - - Ca
-        - formula: Ca
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - F
-        - formula: F2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: point
-    point: '-937.17416'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='-223.990'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1700:row=19:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=fluorite:v=c11e577910
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -6585,7 +6247,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1800:row=20:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=fluorite:v=fa479df3b1
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -6754,7 +6416,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1900:row=21:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=fluorite:v=028cbea630
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -6923,7 +6585,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=fluorite:v=43322de5ff
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7092,7 +6754,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=400:col=delta_f_G:name=fluorite:v=565b62a954
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7261,7 +6923,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=500:col=delta_f_G:name=fluorite:v=d14f8eaf6e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7430,7 +7092,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=600:row=4:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=600:col=delta_f_G:name=fluorite:v=9cda67696d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7599,7 +7261,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=800:row=6:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=800:col=delta_f_G:name=fluorite:v=f0d380942b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7768,7 +7430,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=900:row=7:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fG:from_the_elements:T=900:col=delta_f_G:name=fluorite:v=94781d92be
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -7937,7 +7599,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1000:row=8:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=fluorite:v=4bc5516046
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8106,7 +7768,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1100:row=9:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=fluorite:v=25efa08c50
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8275,7 +7937,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1300:row=11:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=fluorite:v=2fc459d2ce
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8444,7 +8106,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1400:row=12:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=fluorite:v=e79a1ac570
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8613,7 +8275,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1424:row=13:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1424:col=delta_f_H:name=fluorite:v=0a798e90b6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8782,7 +8444,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1424:row=14:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1424:col=delta_f_H:name=fluorite:v=5ccfa3d758
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -8951,7 +8613,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1500:row=15:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=fluorite:v=27f3716c56
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -9120,7 +8782,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1600:row=16:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=fluorite:v=cf0378be95
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -9289,176 +8951,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1691:row=17:col=delta_f_H
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1691'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: CaF
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
-                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ca
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: F2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-    formation_elements:
-      tag: value
-      value:
-      - - Ca
-        - formula: Ca
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - F
-        - formula: F2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: point
-    point: '-1183.6536'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='-282.900'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters:
-    - - kcal_th_to_kJ
-      - state:
-          tag: value
-          value: '4.184'
-        locator:
-          published_page: 26
-          pdf_page_index: 32
-          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
-            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1691:row=18:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1691:col=delta_f_H:name=fluorite:v=65a099715a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -9627,7 +9120,176 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1700:row=19:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1691:col=delta_f_H:name=fluorite:v=a1d7f9b7d0
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CaF
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
+          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1691'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: CaF
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
+                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Ca
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: F2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Ca
+        - formula: Ca
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - F
+        - formula: F2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1183.6536'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 174
+    pdf_page_index: 180
+    table: b1259-ht-0149-fluorite
+    note: as_published='-282.900'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
+    record: b1259-ht-0149-fluorite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=fluorite:v=e346abc4d4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -9796,7 +9458,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1800:row=20:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=fluorite:v=61e25200bc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -9965,7 +9627,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1900:row=21:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=fluorite:v=7fe94135a4
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10134,7 +9796,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=2000:row=22:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=fluorite:v=57889d8a62
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10303,7 +9965,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=fluorite:v=4af1f1fcc9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10472,7 +10134,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=fluorite:v=fb48315aee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10641,7 +10303,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=fluorite:v=3593420452
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10810,7 +10472,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=600:col=delta_f_H:name=fluorite:v=11b6ece302
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -10979,7 +10641,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=700:row=5:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=700:col=delta_f_H:name=fluorite:v=ac23a69863
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11148,7 +10810,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=800:row=6:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=800:col=delta_f_H:name=fluorite:v=203ee8c33e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11317,7 +10979,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=900:row=7:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:delta_fH:from_the_elements:T=900:col=delta_f_H:name=fluorite:v=d4baeba7bc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11486,7 +11148,7 @@ observations:
           note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1000:row=8:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=fluorite:v=d32f158a70
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11646,7 +11308,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1100:row=9:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=fluorite:v=956781c166
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11806,7 +11468,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1200:row=10:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=fluorite:v=eccad421de
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -11966,7 +11628,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1300:row=11:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=fluorite:v=77c46dee83
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -12126,7 +11788,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1400:row=12:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=fluorite:v=34d1401001
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -12286,7 +11948,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1424:row=13:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1424:col=log_Kf:name=fluorite:v=3580654653
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -12446,167 +12108,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1424:row=14:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1424'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: CaF
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
-                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ca
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: F2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-    formation_elements:
-      tag: value
-      value:
-      - - Ca
-        - formula: Ca
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - F
-        - formula: F2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '35.843'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='35.843'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1500:row=15:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=fluorite:v=24b26c4378
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -12766,7 +12268,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1600:row=16:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=fluorite:v=7fbd3bd644
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -12926,7 +12428,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1691:row=17:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1691:col=log_Kf:name=fluorite:v=7b948ff1df
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -13086,167 +12588,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1691:row=18:col=log_Kf
-  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
-    species:
-      formula: CaF
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting point
-          1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: value
-      value: '1691'
-    standard_pressure_Pa:
-      tag: value
-      value: '101325'
-    reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: CaF
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Crystals I 298.15° to transition point 1424°K. Crystals II 1424° to melting
-                point 1691°K. Liquid 1691° to 2000°K. FLUORITE' is not a closed Polymorph token
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ca
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: F2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: -1/2
-    formation_elements:
-      tag: value
-      value:
-      - - Ca
-        - formula: Ca
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - F
-        - formula: F2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: point
-    point: '28.949'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: robie-waldbaum-1968-usgs-b1259
-  locator:
-    published_page: 174
-    pdf_page_index: 180
-    table: b1259-ht-0149-fluorite
-    note: as_published='28.949'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json
-    record: b1259-ht-0149-fluorite
-  read_from: unknown:robie-waldbaum-1968-usgs-b1259
-  derivation:
-    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
-      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
-      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
-      are this convention. Schema v2.1 has no closed token for it.
-    inputs:
-    - unknown:robie-waldbaum-1968-usgs-b1259
-    parameters: []
-    output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1700:row=19:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=fluorite:v=d5cda3b568
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -13406,7 +12748,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1800:row=20:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=fluorite:v=eec822b634
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -13566,7 +12908,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1900:row=21:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=fluorite:v=71d81acdaf
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -13726,7 +13068,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=2000:row=22:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=fluorite:v=7a91b43363
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -13886,7 +13228,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=fluorite:v=1c81f510b7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -14046,7 +13388,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=400:col=log_Kf:name=fluorite:v=7cfeb96a73
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -14206,7 +13548,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=500:col=log_Kf:name=fluorite:v=963bb17422
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -14366,7 +13708,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=600:col=log_Kf:name=fluorite:v=a7a150eec3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -14526,7 +13868,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=800:row=6:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=800:col=log_Kf:name=fluorite:v=d323a5b8d5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:
@@ -14686,7 +14028,7 @@ observations:
     - unknown:robie-waldbaum-1968-usgs-b1259
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=900:row=7:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:log10_Kf:from_the_elements:T=900:col=log_Kf:name=fluorite:v=5bad06c00a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0149-fluorite:tabulation
   identity:
     quantity:

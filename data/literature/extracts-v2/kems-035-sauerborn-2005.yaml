@@ -89,7 +89,7 @@ observations:
     paragraph: Inhaltsverzeichnis
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig22_jsc1_oxide_pie
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -138,7 +138,7 @@ observations:
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig22_jsc1_oxide_pie_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -769,7 +769,7 @@ observations:
     figure: '2.2'
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:0
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -848,7 +848,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -866,6 +866,25 @@ observations:
         value: '1673.15'
       locator:
         page: 76
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 76
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -911,7 +930,7 @@ observations:
         locator:
           page: 76
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:1
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1815.15:h=43dee28e38e2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -990,7 +1009,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1008,6 +1027,25 @@ observations:
         value: '1815.15'
       locator:
         page: 82
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1542'
+            locator:
+              page: 82
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 82
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1053,7 +1091,7 @@ observations:
         locator:
           page: 82
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:2
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1836.15:h=64d7233214d2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1132,7 +1170,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1150,6 +1188,25 @@ observations:
         value: '1836.15'
       locator:
         page: 88
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1563'
+            locator:
+              page: 88
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 88
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1195,7 +1252,7 @@ observations:
         locator:
           page: 88
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:3
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1853.15:h=ae6d81fdbe8c
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1274,7 +1331,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1292,6 +1349,25 @@ observations:
         value: '1853.15'
       locator:
         page: 98
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 98
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 98
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1337,7 +1413,7 @@ observations:
         locator:
           page: 98
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1433,6 +1509,25 @@ observations:
         value: '1673.15'
       locator:
         page: 76
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 76
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1478,7 +1573,7 @@ observations:
         locator:
           page: 76
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:1
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1815.15:h=43dee28e38e2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1574,6 +1669,25 @@ observations:
         value: '1815.15'
       locator:
         page: 82
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1542'
+            locator:
+              page: 82
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 82
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1619,7 +1733,7 @@ observations:
         locator:
           page: 82
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:2
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1836.15:h=64d7233214d2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1715,6 +1829,25 @@ observations:
         value: '1836.15'
       locator:
         page: 88
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1563'
+            locator:
+              page: 88
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 88
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -1760,7 +1893,7 @@ observations:
         locator:
           page: 88
     output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:3
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1853.15:h=ae6d81fdbe8c
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
@@ -1856,6 +1989,25 @@ observations:
         value: '1853.15'
       locator:
         page: 98
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 98
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 98
+        output_unit: K
     mass_kg:
       state:
         tag: value
@@ -2069,7 +2221,7 @@ observations:
     note: Abb. 5.1–5.3 and MS QMS/IR time series
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2117,7 +2269,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2156,7 +2308,7 @@ observations:
     table: '2.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2202,7 +2354,7 @@ observations:
     table: '2.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown

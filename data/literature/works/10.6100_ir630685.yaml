@@ -36,6 +36,29 @@ experiments:
         page: 127
         section: 3.2.1
         note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value

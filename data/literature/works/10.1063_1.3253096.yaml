@@ -94,7 +94,38 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1063/1.3253096
 experiments:
-- experiment_id: 10.1063/1.3253096::1
+- experiment_id: 10.1063/1.3253096::REF-040
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'direct_langmuir_to_knudsen_effusion_comparison' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1063/1.3253096
+  locator:
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
+    record: chromium_solid_langmuir_knudsen
+- experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   kind: literature
   method:
     tag: unknown
@@ -127,11 +158,11 @@ experiments:
     line_range: 279-281
     note: Table 1 selected α_v for solid Fe (OCR 'Ircn'); Wessel 1951
     source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
-- experiment_id: 10.1063/1.3253096::2
+- experiment_id: 10.1063/1.3253096::pound-1972-cr-langmuir-knudsen
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'langmuir_knudsen_comparison_review' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample: {}
   conditions:
     temperature_K:
@@ -156,46 +187,10 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1063/1.3253096
   locator:
-    page: 143
-    published_page: 143
-    pdf_page_index: 9
-    table: '2'
-    note: Table 2 Potassium, liquid; Neumann [1954]
-- experiment_id: 10.1063/1.3253096::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'condensation_high_supersaturation_review' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.3253096
-  locator:
-    page: 145
-    published_page: 145
-    pdf_page_index: 11
-    table: '3'
-    note: Table 3 Platinum condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
-- experiment_id: 10.1063/1.3253096::Pound-1972#McCabe_Cr
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson &
+      Paxton (1958), Trans. Met. Soc. AIME 212:102
+    record: pound_1972_cr_langmuir_knudsen
+- experiment_id: 10.1063/1.3253096::pound-1972-mccabe-cr
   kind: literature
   method:
     tag: unknown
@@ -228,132 +223,3 @@ experiments:
       J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already used for α_Cr in docs/lab-validation-whitepaper.md;
       Alcock et al. (1984) REF-032 Cr equations as second pure-Psat set.
     record: Pound-1972#McCabe_Cr
-- experiment_id: 10.1063/1.3253096::chromium_solid_langmuir_knudsen
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'direct_langmuir_to_knudsen_effusion_comparison' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.3253096
-  locator:
-    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
-    record: chromium_solid_langmuir_knudsen
-- experiment_id: 10.1063/1.3253096::docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'review_compilation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.3253096
-  locator:
-    section: Experimental Methods / Criteria
-    line_range: 23-91
-    source_path: docs-private/research/ocr-artifacts/kems-003-pound-1972/spool/out/kems-003-pound-1972/vlm/kems-003-pound-1972.md
-- experiment_id: 10.1063/1.3253096::kems-003-pound-1972
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'review_compilation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.3253096
-  locator:
-    page: 141
-    published_page: 141
-    pdf_page_index: 7
-    note: Tables 1-3 occupy printed pp. 141-146 (PDF pp. 7-12). No numbered figures in the 12-page article. No supplement
-      identified (Crossref/Unpaywall/HAL/NIST).
-- experiment_id: 10.1063/1.3253096::pound_1972_cr_langmuir_knudsen
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1063/1.3253096
-  locator:
-    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson &
-      Paxton (1958), Trans. Met. Soc. AIME 212:102
-    record: pound_1972_cr_langmuir_knudsen

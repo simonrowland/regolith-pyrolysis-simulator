@@ -19,7 +19,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2022.08.032
 experiments:
-- experiment_id: 10.1016/j.gca.2022.08.032::1
+- experiment_id: 10.1016/j.gca.2022.08.032::boulliung-wood-2022-so2-solubility-silicate-melts
   kind: literature
   method:
     tag: unknown
@@ -71,6 +71,37 @@ experiments:
         page: 152
         section: 2.2 Experimental conditions
         note: Printed 5-10 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 152
+              section: 2.2 Experimental conditions
+              note: Printed 5-10 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 152
+              section: 2.2 Experimental conditions
+              note: Printed 5-10 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 152
+              section: 2.2 Experimental conditions
+              note: Printed 5-10 mg; unit conversion only.
+        output_unit: kg
     printed_composition:
       state:
         tag: unknown

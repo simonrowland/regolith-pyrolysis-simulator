@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0223-halite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:S:shared:T=298.15:col=entropy:name=halite:v=77819ff451
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:tabulation
   identity:
     quantity:
@@ -106,7 +106,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=halite:v=1d13dcdaab
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:tabulation
   identity:
     quantity:
@@ -272,7 +272,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=halite:v=0ff2dd5246
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:tabulation
   identity:
     quantity:
@@ -438,7 +438,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=halite:v=3f14e87818
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0223-halite:tabulation
   identity:
     quantity:

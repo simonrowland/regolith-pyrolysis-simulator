@@ -44,272 +44,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1007/s11663-024-02995-6
 experiments:
-- experiment_id: 10.1007/s11663-024-02995-6::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    published_page: 826
-    pdf_page_index: 5
-    figure: 7
-    note: polythermal_figure=8; polythermal_published_page=827
-- experiment_id: 10.1007/s11663-024-02995-6::II
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'literature_compilation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 826
-    published_page: 826
-    pdf_page_index: 6
-    table: II
-    source_path: tables/kems-031-halwax-2024/t2.csv
-- experiment_id: 10.1007/s11663-024-02995-6::III
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_calibration' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 826
-    published_page: 826
-    pdf_page_index: 6
-    table: III
-    source_path: tables/kems-031-halwax-2024/t3.csv
-  apparatus:
-    ionization:
-      electron_energy_eV:
-        state:
-          tag: value
-          value: '70'
-        locator:
-          page: 826
-          published_page: 826
-          pdf_page_index: 6
-          table: III
-          source_path: tables/kems-031-halwax-2024/t3.csv
-        inference:
-          relation: identity:1
-          inputs:
-          - as_published=70 eV
-          - printed=electron_ionization_energy_eV
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '70'
-              locator:
-                page: 826
-                published_page: 826
-                pdf_page_index: 6
-                table: III
-                source_path: tables/kems-031-halwax-2024/t3.csv
-          output_unit: '1'
-- experiment_id: 10.1007/s11663-024-02995-6::IV
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'literature_compilation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 830
-    published_page: 830
-    pdf_page_index: 10
-    table: IV
-    source_path: tables/kems-031-halwax-2024/t4.csv
-- experiment_id: 10.1007/s11663-024-02995-6::V
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'literature_reprint' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 830
-    published_page: 830
-    pdf_page_index: 10
-    table: V
-    source_path: tables/kems-031-halwax-2024/t5.csv
-- experiment_id: 10.1007/s11663-024-02995-6::VI
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'literature_reprint' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 831
-    published_page: 831
-    pdf_page_index: 11
-    table: VI
-    source_path: tables/kems-031-halwax-2024/t6.csv
-- experiment_id: 10.1007/s11663-024-02995-6::VII
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'literature_reprint' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1007/s11663-024-02995-6
-  locator:
-    page: 833
-    published_page: 833
-    pdf_page_index: 13
-    table: VII
-    source_path: tables/kems-031-halwax-2024/t7.csv
 - experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   kind: literature
   method:
@@ -328,6 +62,37 @@ experiments:
         page: 825
         table: I
         note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '49.51'
+            locator:
+              page: 825
+              table: I
+              note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '53.93'
+            locator:
+              page: 825
+              table: I
+              note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              table: I
+              note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -385,6 +150,29 @@ experiments:
           page: 825
           section: III. Experimental
           note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.3'
+              locator:
+                page: 825
+                section: III. Experimental
+                note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 825
+                section: III. Experimental
+                note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+          output_unit: m
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -435,6 +223,37 @@ experiments:
         page: 825
         table: I
         note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '51.58'
+            locator:
+              page: 825
+              table: I
+              note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '53.67'
+            locator:
+              page: 825
+              table: I
+              note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              table: I
+              note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -492,6 +311,29 @@ experiments:
           page: 825
           section: III. Experimental
           note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.3'
+              locator:
+                page: 825
+                section: III. Experimental
+                note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 825
+                section: III. Experimental
+                note: Printed 0.3 mm lid-orifice diameter; unit conversion only
+          output_unit: m
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -580,11 +422,11 @@ experiments:
           page: 825
           section: III. Experimental
   bench_id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
-- experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
+- experiment_id: 10.1007/s11663-024-02995-6::halwax_sergeev_mueller_schenk_2024
   kind: literature
   method:
     tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -609,12 +451,73 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1007/s11663-024-02995-6
   locator:
-    page: 825
-    published_page: 825
+    published_page: 826
     pdf_page_index: 5
-    paragraph: experimental
-    note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the
-      lid of the cell had a diameter of 0.3 mm.
+    figure: 7
+    note: polythermal_figure=8; polythermal_published_page=827
+- experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'literature_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11663-024-02995-6
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  apparatus:
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '70'
+        locator:
+          page: 826
+          published_page: 826
+          pdf_page_index: 6
+          table: III
+          source_path: tables/kems-031-halwax-2024/t3.csv
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=70 eV
+          - printed=electron_ionization_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '70'
+              locator:
+                page: 826
+                published_page: 826
+                pdf_page_index: 6
+                table: III
+                source_path: tables/kems-031-halwax-2024/t3.csv
+          output_unit: '1'
 benches:
 - id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
   work_id: 10.1007/s11663-024-02995-6

@@ -37,7 +37,360 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000045'
+          interval_high: '0.00006'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+        note: 45 to 60 mg depending on density; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              published_page: 3
+              pdf_page_index: 7
+              section: Equipment
+              note: 45 to 60 mg depending on density; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              published_page: 3
+              pdf_page_index: 7
+              section: Equipment
+              note: 45 to 60 mg depending on density; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 3
+              pdf_page_index: 7
+              section: Equipment
+              note: 45 to 60 mg depending on density; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Simulant powder compacted by intermittent tapping
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: nitrogen
+          flow_sccm:
+            tag: value
+            value: '30'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    section: Equipment
+  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::dta-dt7
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: JSC-1AF run to 1050 C then cooled and rerun to 1250 C
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Sample Specific Procedures
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1666666666666666666666666667'
+            approximate: false
+        locator:
+          published_page: 3
+          pdf_page_index: 7
+          section: Equipment
+          note: 10 C/min; unit conversion only
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          output_unit: K/s
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-ftir-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermogravimetric_analysis_ftir' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: nitrogen
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+        note: 20 cm3/min sample flow and 40 cm3/min balance purge are distinct printed channels; no single flow is assigned
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    section: Equipment
+  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::tga-ftir-2950
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1666666666666666666666666667'
+            approximate: false
+        locator:
+          published_page: 3
+          pdf_page_index: 7
+          section: Equipment
+          note: 10 C/min; unit conversion only
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          output_unit: K/s
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermogravimetric_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+        note: Typical 100 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 3
+              pdf_page_index: 7
+              section: Equipment
+              note: Typical 100 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 3
+              pdf_page_index: 7
+              section: Equipment
+              note: Typical 100 mg; unit conversion only
+        output_unit: kg
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: nitrogen
+          flow_sccm:
+            tag: value
+            value: '30'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        section: Equipment
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    section: Equipment
+  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::tga-sta409
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1666666666666666666666666667'
+            approximate: false
+        locator:
+          published_page: 3
+          pdf_page_index: 7
+          section: Equipment
+          note: 10 C/min; unit conversion only
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                published_page: 3
+                pdf_page_index: 7
+                section: Equipment
+                note: 10 C/min; unit conversion only
+          output_unit: K/s
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
   kind: literature
   method:
     tag: unknown
@@ -128,257 +481,6 @@ experiments:
         pdf_page_index: 7
         table: '1'
         section: Equipment / Results
-- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'differential_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.000045'
-          interval_high: '0.00006'
-          approximate: false
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-        note: 45 to 60 mg depending on density; unit conversion only
-    form:
-      state:
-        tag: value
-        value: Simulant powder compacted by intermittent tapping
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-    sweep_gas:
-      state:
-        tag: value
-        value:
-          species: nitrogen
-          flow_sccm:
-            tag: value
-            value: '30'
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
-  locator:
-    published_page: 3
-    pdf_page_index: 7
-    section: Equipment
-  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::dta-dt7
-  thermal_schedule:
-    method:
-      state:
-        tag: value
-        value: JSC-1AF run to 1050 C then cooled and rerun to 1250 C
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Sample Specific Procedures
-    ramps:
-    - rate_K_s:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.1666666666666666666666666667'
-            approximate: false
-        locator:
-          published_page: 3
-          pdf_page_index: 7
-          section: Equipment
-          note: 10 C/min; unit conversion only
-- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-ftir-series
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermogravimetric_analysis_ftir' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-    sweep_gas:
-      state:
-        tag: value
-        value:
-          species: nitrogen
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-        note: 20 cm3/min sample flow and 40 cm3/min balance purge are distinct printed channels; no single flow is assigned
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
-  locator:
-    published_page: 3
-    pdf_page_index: 7
-    section: Equipment
-  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::tga-ftir-2950
-  thermal_schedule:
-    ramps:
-    - rate_K_s:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.1666666666666666666666666667'
-            approximate: false
-        locator:
-          published_page: 3
-          pdf_page_index: 7
-          section: Equipment
-          note: 10 C/min; unit conversion only
-- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-series
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermogravimetric_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: false
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-        note: Typical 100 mg; unit conversion only
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: experiment temperature not published
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-    sweep_gas:
-      state:
-        tag: value
-        value:
-          species: nitrogen
-          flow_sccm:
-            tag: value
-            value: '30'
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 3
-        pdf_page_index: 7
-        section: Equipment
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
-  locator:
-    published_page: 3
-    pdf_page_index: 7
-    section: Equipment
-  bench_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::tga-sta409
-  thermal_schedule:
-    ramps:
-    - rate_K_s:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.1666666666666666666666666667'
-            approximate: false
-        locator:
-          published_page: 3
-          pdf_page_index: 7
-          section: Equipment
-          note: 10 C/min; unit conversion only
-- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
-  locator:
-    published_page: 6
-    pdf_page_index: 10
-    section: Discussion JSC-1AF
 benches:
 - id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::bench::dta-dt7
   work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe

@@ -3,7 +3,7 @@ sources:
 - data/literature/compilations/janaf/tables/Ne-001.yaml
 - data/literature/compilations/janaf/tables/Ne-002.yaml
 observations:
-- observation_id: nist-janaf-4th:Ne-001:H_minus_H298:segment-0
+- observation_id: nist-janaf-4th:Ne-001:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -226,7 +226,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-001:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-001:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -449,7 +450,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ne-001:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-001:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -672,7 +674,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ne-001:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-001:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -902,7 +905,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-001:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-001:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -1132,7 +1136,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-001:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-001:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-001:tabulation
   identity:
     quantity:
@@ -1362,7 +1367,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ne-002:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -1585,7 +1591,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-002:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -1808,7 +1815,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ne-002:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -2031,7 +2039,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ne-002:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -2252,7 +2261,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-002:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -2475,7 +2485,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ne-002:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ne-002:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ne-002:tabulation
   identity:
     quantity:
@@ -2696,3 +2707,4 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
+    pure_substance_reference: true

@@ -62,700 +62,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2019.06.021
 experiments:
-- experiment_id: 10.1016/j.gca.2019.06.021::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.000025'
-          approximate: false
-      locator:
-        page: 5
-        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
-        note: quote=around 25 mg of powder
-        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        - as_published=25 mg
-        - printed=sample_mass
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '25'
-            locator:
-              page: 5
-              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
-              note: quote=around 25 mg of powder
-              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              page: 5
-              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
-              note: quote=around 25 mg of powder
-              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-        output_unit: kg
-    form:
-      state:
-        tag: value
-        value: Powder mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide; silicate melt during evaporation.
-      locator:
-        page: 5
-        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
-        note: quote=mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire
-          loop
-        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-    container:
-      state:
-        tag: value
-        value: Metal wire loop; Re where possible below FMQ, Pt (and one Ir loop) above FMQ. Per-run loop is recorded in Table
-          2.
-      locator:
-        page: 5
-        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
-        note: quote=mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire
-          loop
-        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        page: 2
-        section: Abstract
-        note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
-        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1 atm
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              page: 2
-              section: Abstract
-              note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
-              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              section: Abstract
-              note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
-              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    page: 53
-    table: '1'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
-      measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.; quote=Element
-      | Calculated | Measured | St. Dev.
-
-      Mn | 992.4 | 690.2 | 3.8'
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-      locator:
-        paragraph: loaded onto a metal wire loop; Re used where possible
-        line_range: '67'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00002'
-            approximate: false
-        locator:
-          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-          line_range: '71'
-          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        inference:
-          relation: identity:m2
-          inputs:
-          - as_published=2e-05 m2
-          - printed=sample_surface_area
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00002'
-              locator:
-                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-                line_range: '71'
-                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-          output_unit: m2
-      chamber_length_m:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.7'
-            approximate: false
-        locator:
-          page: 6
-          section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
-          note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
-          source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-        inference:
-          relation: cm_to_m
-          inputs:
-          - L_m = L_cm / 100
-          - original_unit=cm
-          - as_published=70 cm
-          - printed=chamber_length_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '70'
-              locator:
-                page: 6
-                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
-                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
-                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-          - - factor
-            - state:
-                tag: value
-                value: '100'
-              locator:
-                page: 6
-                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
-                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
-                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-          output_unit: m
-- experiment_id: 10.1016/j.gca.2019.06.021::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    form:
-      state:
-        tag: value
-        value: glass_bead_on_wire_loop
-      locator:
-        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-        line_range: '71'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '100000'
-          approximate: false
-      locator:
-        paragraph: 1-atm vertical tube gas-mixing furnaces
-        line_range: '408'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.0 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '2'
-    section: 4.0 Results / Table 2
-    line_range: 1104-1108
-    note: LA-ICP-MS Mn residue ppm in quenched glass vs T, t, fO2. Open 1-bar furnace; NOT a vacuum Langmuir alpha and NOT
-      a mol m^-2 s^-1 flux. Run 2M-15-07-16f omitted (empty OCR row).
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-      locator:
-        paragraph: loaded onto a metal wire loop; Re used where possible
-        line_range: '67'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00002'
-            approximate: false
-        locator:
-          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-          line_range: '71'
-          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        inference:
-          relation: identity:m2
-          inputs:
-          - as_published=2e-05 m2
-          - printed=sample_surface_area
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00002'
-              locator:
-                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-                line_range: '71'
-                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-          output_unit: m2
-- experiment_id: 10.1016/j.gca.2019.06.021::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    form:
-      state:
-        tag: value
-        value: glass_bead_on_wire_loop
-      locator:
-        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-        line_range: '71'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '100000'
-          approximate: false
-      locator:
-        paragraph: 1-atm vertical tube gas-mixing furnaces
-        line_range: '408'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.0 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '3'
-    paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
-    section: Results — Na / Table 3
-    line_range: '1108'
-    note: Table 3 fitted logK* at 1673.15 K; prose §4.2 also states -4.25±0.10
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-      locator:
-        paragraph: loaded onto a metal wire loop; Re used where possible
-        line_range: '67'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00002'
-            approximate: false
-        locator:
-          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-          line_range: '71'
-          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        inference:
-          relation: identity:m2
-          inputs:
-          - as_published=2e-05 m2
-          - printed=sample_surface_area
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00002'
-              locator:
-                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-                line_range: '71'
-                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-          output_unit: m2
-- experiment_id: 10.1016/j.gca.2019.06.021::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    form:
-      state:
-        tag: value
-        value: glass_bead_on_wire_loop
-      locator:
-        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-        line_range: '71'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '100000'
-          approximate: false
-      locator:
-        paragraph: 1-atm vertical tube gas-mixing furnaces
-        line_range: '408'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.0 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '4'
-    section: 4.6 Evaporation coefficients / Table 4
-    line_range: 1112-1118
-    note: Table 4 γ_i (this work) for NaO0.5; authors set α_e=1 and compute γ from K*/K
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
-      locator:
-        paragraph: loaded onto a metal wire loop; Re used where possible
-        line_range: '67'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00002'
-            approximate: false
-        locator:
-          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-          line_range: '71'
-          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        inference:
-          relation: identity:m2
-          inputs:
-          - as_published=2e-05 m2
-          - printed=sample_surface_area
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00002'
-              locator:
-                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
-                line_range: '71'
-                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-          output_unit: m2
-- experiment_id: 10.1016/j.gca.2019.06.021::5
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '5'
-    paragraph: Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand 1984
-    section: Table 5 pure-system thermodynamic data
-    line_range: '1121'
-    note: Table 5 pure-system columns for NaO0.5(l)=Na(g)+1/4 O2; Source column = 2 (L&H 1984)
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-- experiment_id: 10.1016/j.gca.2019.06.021::6
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '6'
-    section: 5.1 Equilibrium evaporation / Table 6
-    line_range: '1130'
-    note: 'Table 6 1% evaporation temperatures for Mn; caption/Fig.13: Mn taken from pure-system thermodynamic data, not the
-      experiments'
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-- experiment_id: 10.1016/j.gca.2019.06.021::docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '100000'
-          approximate: false
-      locator:
-        paragraph: 1-atm vertical tube gas-mixing furnaces
-        line_range: '408'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-      inference:
-        relation: bar_to_Pa
-        inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.0 bar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        - - factor
-          - state:
-              tag: value
-              value: '100000'
-            locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    section: 4.6 Evaporation coefficients
-    line_range: '306'
-    note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re/Pt wire loops
-      locator:
-        line_range: '67'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00002'
-            approximate: false
-        locator:
-          paragraph: surface areas ≈ 2e-5 m
-          line_range: '71'
-          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-        inference:
-          relation: identity:m2
-          inputs:
-          - as_published=2e-05 m2
-          - printed=sample_surface_area
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00002'
-              locator:
-                paragraph: surface areas ≈ 2e-5 m
-                line_range: '71'
-                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-          output_unit: m2
 - experiment_id: 10.1016/j.gca.2019.06.021::experiment::open-furnace-ferrobasalt-series
   kind: literature
   method:
@@ -773,6 +79,29 @@ experiments:
         page: 4
         section: 2.1 Experimental Methods
         note: Printed around 25 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 4
+              section: 2.1 Experimental Methods
+              note: Printed around 25 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 4
+              section: 2.1 Experimental Methods
+              note: Printed around 25 mg; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -860,6 +189,37 @@ experiments:
           page: 4
           section: 2.1 Experimental Methods
           note: Printed 1300 to 1550 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1300'
+              locator:
+                page: 4
+                section: 2.1 Experimental Methods
+                note: Printed 1300 to 1550 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1550'
+              locator:
+                page: 4
+                section: 2.1 Experimental Methods
+                note: Printed 1300 to 1550 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                section: 2.1 Experimental Methods
+                note: Printed 1300 to 1550 C; unit conversion only
+          output_unit: K
     total_duration_s:
       state:
         tag: value
@@ -872,6 +232,37 @@ experiments:
         page: 4
         section: 2.1 Experimental Methods
         note: Printed 15 to 930 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 4
+              section: 2.1 Experimental Methods
+              note: Printed 15 to 930 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '930'
+            locator:
+              page: 4
+              section: 2.1 Experimental Methods
+              note: Printed 15 to 930 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 4
+              section: 2.1 Experimental Methods
+              note: Printed 15 to 930 min; unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value
@@ -879,7 +270,202 @@ experiments:
       locator:
         page: 4
         section: 2.1 Experimental Methods
-- experiment_id: 10.1016/j.gca.2019.06.021::sossi_2019_na_open_furnace_apparent
+- experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000025'
+          approximate: false
+      locator:
+        page: 5
+        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+        note: quote=around 25 mg of powder
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25 mg
+        - printed=sample_mass
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 5
+              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+              note: quote=around 25 mg of powder
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 5
+              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+              note: quote=around 25 mg of powder
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: glass_bead_on_wire_loop
+      locator:
+        paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+        line_range: '71'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    container:
+      state:
+        tag: value
+        value: Metal wire loop; Re where possible below FMQ, Pt (and one Ir loop) above FMQ. Per-run loop is recorded in Table
+          2.
+      locator:
+        page: 5
+        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+        note: quote=mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire
+          loop
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        paragraph: 1-atm vertical tube gas-mixing furnaces
+        line_range: '408'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2019.06.021
+  locator:
+    section: 4.6 Evaporation coefficients
+    line_range: '306'
+    note: authors set α_e=1 after concluding coefficients close to unity within ×2–3
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+      locator:
+        paragraph: loaded onto a metal wire loop; Re used where possible
+        line_range: '67'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
+        locator:
+          paragraph: surface areas ≈ 2e-5 m
+          line_range: '71'
+          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: surface areas ≈ 2e-5 m
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
+      chamber_length_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.7'
+            approximate: false
+        locator:
+          page: 6
+          section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+          note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+          source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          - as_published=70 cm
+          - printed=chamber_length_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '70'
+              locator:
+                page: 6
+                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 6
+                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+          output_unit: m
+- experiment_id: 10.1016/j.gca.2019.06.021::sossi-et-al-2019
   kind: literature
   method:
     tag: unknown

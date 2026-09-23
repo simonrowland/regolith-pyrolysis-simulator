@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
 observations:
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=400:row=1:col=entropy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=400:col=entropy:name=diaspore:src=grid:v=7ff2543cbe:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -98,7 +98,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=600:row=3:col=entropy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=600:col=entropy:name=diaspore:src=grid:v=0e4ace826a:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -194,7 +194,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=700:row=4:col=entropy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=700:col=entropy:name=diaspore:src=grid:v=f38e2f0383:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -290,7 +290,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=400:row=1:col=heat_capacity:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=400:col=heat_capacity:name=diaspore:src=grid:v=14eb325010:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -386,7 +386,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=500:row=2:col=heat_capacity:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=500:col=heat_capacity:name=diaspore:src=grid:v=9d974b37a2:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -482,7 +482,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=600:row=3:col=heat_capacity:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=600:col=heat_capacity:name=diaspore:src=grid:v=80a19c51c3:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -578,7 +578,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=700:row=4:col=heat_capacity:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=700:col=heat_capacity:name=diaspore:src=grid:v=9230f64578:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -674,7 +674,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=400:row=1:col=formation_gibbs_energy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=400:col=formation_gibbs_energy:name=diaspore:src=grid:v=d1134db459:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -861,7 +861,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=500:row=2:col=formation_gibbs_energy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=500:col=formation_gibbs_energy:name=diaspore:src=grid:v=67f095b721:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1048,7 +1048,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=600:row=3:col=formation_gibbs_energy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=600:col=formation_gibbs_energy:name=diaspore:src=grid:v=a9310a94ec:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1235,7 +1235,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=700:row=4:col=formation_gibbs_energy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=700:col=formation_gibbs_energy:name=diaspore:src=grid:v=cd6368be76:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1422,7 +1422,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=400:row=1:col=formation_enthalpy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=400:col=formation_enthalpy:name=diaspore:src=grid:v=cc66abf5a1:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1609,7 +1609,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=500:row=2:col=formation_enthalpy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=500:col=formation_enthalpy:name=diaspore:src=grid:v=9646516edf:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1796,7 +1796,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=600:row=3:col=formation_enthalpy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=600:col=formation_enthalpy:name=diaspore:src=grid:v=3d3c219a1d:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -1983,7 +1983,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=700:row=4:col=formation_enthalpy:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=700:col=formation_enthalpy:name=diaspore:src=grid:v=82bc90a246:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -2170,7 +2170,7 @@ observations:
           pdf_page_index: 21
           note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=400:row=1:col=log_kf:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=400:col=log_kf:name=diaspore:src=grid:v=bef9b76da8:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -2349,7 +2349,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: dimensionless
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=500:row=2:col=log_kf:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=500:col=log_kf:name=diaspore:src=grid:v=8e7ba38391:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -2528,7 +2528,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: dimensionless
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=600:row=3:col=log_kf:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=600:col=log_kf:name=diaspore:src=grid:v=29c637829f:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:
@@ -2707,7 +2707,7 @@ observations:
     - unknown:hemingway-haas-robinson-1982-usgs-b1544
     parameters: []
     output_unit: dimensionless
-- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=700:row=4:col=log_kf:src=grid
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=700:col=log_kf:name=diaspore:src=grid:v=702316c496:poly=diaspore
   experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
   identity:
     quantity:

@@ -36,6 +36,29 @@ experiments:
         pdf_page_index: 11
         section: Methods
         note: Printed 3 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              pdf_page_index: 11
+              section: Methods
+              note: Printed 3 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 11
+              section: Methods
+              note: Printed 3 g; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -66,6 +89,29 @@ experiments:
         pdf_page_index: 11
         section: Methods
         note: Printed 1300 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 11
+              section: Methods
+              note: Printed 1300 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 11
+              section: Methods
+              note: Printed 1300 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -78,6 +124,29 @@ experiments:
         pdf_page_index: 3
         section: Experimental apparatus
         note: Printed one atmosphere; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              pdf_page_index: 3
+              section: Experimental apparatus
+              note: Printed one atmosphere; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              pdf_page_index: 3
+              section: Experimental apparatus
+              note: Printed one atmosphere; unit conversion only
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -132,6 +201,29 @@ experiments:
         pdf_page_index: 4
         section: Experimental vaporisation experiments
         note: Printed 60 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              pdf_page_index: 4
+              section: Experimental vaporisation experiments
+              note: Printed 60 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              pdf_page_index: 4
+              section: Experimental vaporisation experiments
+              note: Printed 60 min; unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value
@@ -171,6 +263,29 @@ benches:
           pdf_page_index: 11
           section: Methods
           note: Printed 4.5 cm3 crucible capacity; unit conversion only
+        inference:
+          relation: cm3_to_m3
+          inputs:
+          - V_m3 = V_cm3 / 1e6
+          - original_unit=cm3
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '4.5'
+              locator:
+                pdf_page_index: 11
+                section: Methods
+                note: Printed 4.5 cm3 crucible capacity; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000000'
+              locator:
+                pdf_page_index: 11
+                section: Methods
+                note: Printed 4.5 cm3 crucible capacity; unit conversion only
+          output_unit: m3
   detector:
     state:
       tag: value

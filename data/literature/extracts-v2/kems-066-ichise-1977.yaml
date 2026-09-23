@@ -66,6 +66,31 @@ observations:
         pdf_page_index: 6
         note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
           and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
+                and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
+                and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -125,6 +150,31 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_eq10_11_ion_ratio_integrand_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -181,6 +231,31 @@ observations:
         pdf_page_index: 4
         equation: 10-11
         note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 420
+              pdf_page_index: 4
+              equation: 10-11
+              note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 420
+              pdf_page_index: 4
+              equation: 10-11
+              note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -240,6 +315,31 @@ observations:
         pdf_page_index: 5
         table: '1'
         note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -730,7 +830,7 @@ observations:
     note: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
   read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
     quantity:
       tag: unknown
@@ -784,6 +884,31 @@ observations:
         pdf_page_index: 6
         table: '2'
         note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_this_study_1600C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -840,6 +965,31 @@ observations:
         pdf_page_index: 6
         table: '2'
         note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_from_Al2O_ratio_rejected
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -897,6 +1047,31 @@ observations:
         pdf_page_index: 7
         note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour of the ion-intensity-ratio
           (Belton-Fruehan) value
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 423
+              pdf_page_index: 7
+              note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour of the ion-intensity-ratio
+                (Belton-Fruehan) value
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 423
+              pdf_page_index: 7
+              note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour of the ion-intensity-ratio
+                (Belton-Fruehan) value
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_ion_ratio_NAl_0p5_1470C_30V
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -994,6 +1169,31 @@ observations:
         pdf_page_index: 2
         section: '2.5'
         note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1470'
+            locator:
+              published_page: 418
+              pdf_page_index: 2
+              section: '2.5'
+              note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 418
+              pdf_page_index: 2
+              section: '2.5'
+              note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+        output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:
@@ -1283,3 +1483,26 @@ observations:
         published_page: 423
         pdf_page_index: 7
         note: 'simple assumption: at 1500 C, N_Al=0.5, P_Al2O=0.8 Torr and P_Al=0.4 Torr; total 1.2 Torr'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 423
+              pdf_page_index: 7
+              note: 'simple assumption: at 1500 C, N_Al=0.5, P_Al2O=0.8 Torr and P_Al=0.4 Torr; total 1.2 Torr'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 423
+              pdf_page_index: 7
+              note: 'simple assumption: at 1500 C, N_Al=0.5, P_Al2O=0.8 Torr and P_Al=0.4 Torr; total 1.2 Torr'
+        output_unit: K

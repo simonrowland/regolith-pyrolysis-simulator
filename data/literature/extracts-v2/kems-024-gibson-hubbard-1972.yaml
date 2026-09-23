@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-024-gibson-hubbard-1972.yaml
 observations:
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -43,7 +43,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -95,8 +96,34 @@ observations:
         table: '2'
         paragraph: Ba row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -148,8 +175,34 @@ observations:
         table: '2'
         paragraph: Ba row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -201,8 +254,34 @@ observations:
         table: '2'
         paragraph: Ba row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -254,8 +333,33 @@ observations:
         table: '2'
         paragraph: Ba row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ba row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -295,7 +399,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -334,7 +438,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -374,7 +478,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -414,7 +518,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -454,7 +558,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -506,8 +611,33 @@ observations:
         table: '2'
         paragraph: Ce row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ce row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Ce row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -546,7 +676,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -586,7 +716,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -626,7 +756,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -666,7 +796,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -718,8 +849,33 @@ observations:
         table: '2'
         paragraph: Eu row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Eu row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Eu row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -758,7 +914,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -798,7 +954,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -838,7 +994,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -878,7 +1034,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -930,8 +1087,33 @@ observations:
         table: '2'
         paragraph: Gd row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Gd row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Gd row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -970,7 +1152,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -1010,7 +1192,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10017_1
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1062,8 +1245,33 @@ observations:
         table: '2'
         paragraph: K row; 10017 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -1103,7 +1311,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10073_3
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1155,8 +1364,33 @@ observations:
         table: '2'
         paragraph: K row; 10073 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -1196,7 +1430,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_5
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1248,8 +1483,34 @@ observations:
         table: '2'
         paragraph: K row; 12022 950°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1301,8 +1562,34 @@ observations:
         table: '2'
         paragraph: K row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1354,8 +1641,34 @@ observations:
         table: '2'
         paragraph: K row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1407,8 +1720,34 @@ observations:
         table: '2'
         paragraph: K row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    instantaneous
   identity:
     quantity:
       tag: unknown
@@ -1460,8 +1799,34 @@ observations:
         table: '2'
         paragraph: K row; 14163 1050°C instantaneous column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -1513,8 +1878,34 @@ observations:
         table: '2'
         paragraph: K row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -1566,8 +1957,34 @@ observations:
         table: '2'
         paragraph: K row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -1619,8 +2036,33 @@ observations:
         table: '2'
         paragraph: K row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -1660,7 +2102,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -1701,7 +2143,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_5
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1754,8 +2197,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 12022 950°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1808,8 +2277,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1862,8 +2357,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -1916,8 +2437,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    instantaneous
   identity:
     quantity:
       tag: unknown
@@ -1970,8 +2517,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 14163 1050°C instantaneous column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -2024,8 +2597,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -2078,8 +2677,34 @@ observations:
         table: '2'
         paragraph: K/Ba row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -2132,8 +2757,33 @@ observations:
         table: '2'
         paragraph: K/Ba row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Ba row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -2174,7 +2824,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -2215,7 +2865,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10017_1
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2268,8 +2919,33 @@ observations:
         table: '2'
         paragraph: K/Rb row; 10017 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -2310,7 +2986,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10073_3
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2363,8 +3040,33 @@ observations:
         table: '2'
         paragraph: K/Rb row; 10073 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -2405,7 +3107,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_5
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2458,8 +3161,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 12022 950°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2512,8 +3241,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2566,8 +3321,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -2620,8 +3401,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    instantaneous
   identity:
     quantity:
       tag: unknown
@@ -2674,8 +3481,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 14163 1050°C instantaneous column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -2728,8 +3561,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -2782,8 +3641,34 @@ observations:
         table: '2'
         paragraph: K/Rb row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -2836,8 +3721,33 @@ observations:
         table: '2'
         paragraph: K/Rb row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K/Rb row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -2878,7 +3788,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -2918,7 +3828,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -2958,7 +3868,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_10017_1
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3010,8 +3921,33 @@ observations:
         table: '2'
         paragraph: Li row; 10017 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -3051,7 +3987,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3103,8 +4040,34 @@ observations:
         table: '2'
         paragraph: Li row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3156,8 +4119,34 @@ observations:
         table: '2'
         paragraph: Li row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3209,8 +4198,33 @@ observations:
         table: '2'
         paragraph: Li row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Li row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -3249,7 +4263,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -3289,7 +4303,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10017_1
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3341,8 +4356,33 @@ observations:
         table: '2'
         paragraph: Na row; 10017 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -3382,7 +4422,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -3422,7 +4462,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_5
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3474,8 +4515,34 @@ observations:
         table: '2'
         paragraph: Na row; 12022 950°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3527,8 +4594,34 @@ observations:
         table: '2'
         paragraph: Na row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3580,8 +4673,34 @@ observations:
         table: '2'
         paragraph: Na row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -3633,8 +4752,34 @@ observations:
         table: '2'
         paragraph: Na row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    instantaneous
   identity:
     quantity:
       tag: unknown
@@ -3686,8 +4831,34 @@ observations:
         table: '2'
         paragraph: Na row; 14163 1050°C instantaneous column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -3739,8 +4910,34 @@ observations:
         table: '2'
         paragraph: Na row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -3792,8 +4989,34 @@ observations:
         table: '2'
         paragraph: Na row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -3845,8 +5068,33 @@ observations:
         table: '2'
         paragraph: Na row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -3886,7 +5134,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -3927,7 +5175,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -3967,7 +5215,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -4007,7 +5255,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -4047,7 +5295,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4099,8 +5348,33 @@ observations:
         table: '2'
         paragraph: Nd row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Nd row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Nd row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -4139,7 +5413,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -4179,7 +5453,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10017_1
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4231,8 +5506,33 @@ observations:
         table: '2'
         paragraph: Rb row; 10017 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 10017 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -4272,7 +5572,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10073_3
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4324,8 +5625,33 @@ observations:
         table: '2'
         paragraph: Rb row; 10073 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 10073 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -4365,7 +5691,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_5
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4417,8 +5744,34 @@ observations:
         table: '2'
         paragraph: Rb row; 12022 950°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 950°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_6
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4470,8 +5823,34 @@ observations:
         table: '2'
         paragraph: Rb row; 12022 1050°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1050°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_7
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4523,8 +5902,34 @@ observations:
         table: '2'
         paragraph: Rb row; 12022 1200°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1200°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -4576,8 +5981,34 @@ observations:
         table: '2'
         paragraph: Rb row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    instantaneous
   identity:
     quantity:
       tag: unknown
@@ -4629,8 +6060,34 @@ observations:
         table: '2'
         paragraph: Rb row; 14163 1050°C instantaneous column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C instantaneous column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    1 hr
   identity:
     quantity:
       tag: unknown
@@ -4682,8 +6139,34 @@ observations:
         table: '2'
         paragraph: Rb row; 14163 1050°C 1 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 1 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    6 hr
   identity:
     quantity:
       tag: unknown
@@ -4735,8 +6218,34 @@ observations:
         table: '2'
         paragraph: Rb row; 14163 1050°C 6 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 6 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
+    72 hr
   identity:
     quantity:
       tag: unknown
@@ -4788,8 +6297,33 @@ observations:
         table: '2'
         paragraph: Rb row; 14163 1050°C 72 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Rb row; 14163 1050°C 72 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_9
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
     quantity:
       tag: unknown
@@ -4829,7 +6363,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -4869,7 +6403,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_10017_0
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
     quantity:
       tag: unknown
@@ -4909,7 +6443,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_10073_2
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
     quantity:
       tag: unknown
@@ -4949,7 +6483,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_12022_4
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
     quantity:
       tag: unknown
@@ -4989,7 +6523,8 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_12022_8
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
+    2 hr
   identity:
     quantity:
       tag: unknown
@@ -5041,8 +6576,33 @@ observations:
         table: '2'
         paragraph: Sm row; 12022 1400°C 2 hr column
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Sm row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Sm row; 12022 1400°C 2 hr column
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown
@@ -5081,7 +6641,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sr_volatilization_statement
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
     quantity:
       tag: unknown

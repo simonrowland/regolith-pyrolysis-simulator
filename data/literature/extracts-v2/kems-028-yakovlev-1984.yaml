@@ -185,8 +185,31 @@ observations:
         published_page: 946
         pdf_page_index: 2
         paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1875'
+            locator:
+              published_page: 946
+              pdf_page_index: 2
+              paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 946
+              pdf_page_index: 2
+              paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated
-  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::Po2
+  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
       tag: value
@@ -299,7 +322,7 @@ observations:
       of Efremovka
   read_from: pdf:kems-028-yakovlev-1984
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_fig1_murchison_psat_figure_only
-  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::1
+  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
       tag: unknown
@@ -343,7 +366,7 @@ observations:
     note: Partial pressures of the components in the vapor phase released from the heated samples of Murchison (1)
   read_from: pdf:kems-028-yakovlev-1984
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_fig2_CAI_psat_figure_only
-  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::2
+  experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
       tag: unknown
@@ -526,6 +549,31 @@ observations:
         pdf_page_index: 1
         paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the maximum
           pressure P_Al=1.7×10^-3 tor
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2100'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the
+                maximum pressure P_Al=1.7×10^-3 tor
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the
+                maximum pressure P_Al=1.7×10^-3 tor
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -620,6 +668,29 @@ observations:
         published_page: 945
         pdf_page_index: 1
         paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1825'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_max_1950_2025C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -799,6 +870,29 @@ observations:
         published_page: 945
         pdf_page_index: 1
         paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1650'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_max_1450_1725C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -980,6 +1074,31 @@ observations:
         pdf_page_index: 1
         paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
           connected with the decay of troilite
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
+                connected with the decay of troilite
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
+                connected with the decay of troilite
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_K_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -1074,6 +1193,29 @@ observations:
         published_page: 945
         pdf_page_index: 1
         paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1225'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -1254,6 +1396,29 @@ observations:
         published_page: 945
         pdf_page_index: 1
         paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1225'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 945
+              pdf_page_index: 1
+              paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+        output_unit: K
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:

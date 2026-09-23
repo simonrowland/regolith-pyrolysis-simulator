@@ -149,6 +149,37 @@ experiments:
         page: 267
         section: 2. Description of Mass Spectrometric System
         note: 10^-8 to 10^-7 Torr; converted to Pa
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '0.00000001'
+            locator:
+              page: 267
+              section: 2. Description of Mass Spectrometric System
+              note: 10^-8 to 10^-7 Torr; converted to Pa
+        - - original_high
+          - state:
+              tag: value
+              value: '0.0000001'
+            locator:
+              page: 267
+              section: 2. Description of Mass Spectrometric System
+              note: 10^-8 to 10^-7 Torr; converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 267
+              section: 2. Description of Mass Spectrometric System
+              note: 10^-8 to 10^-7 Torr; converted to Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -224,6 +255,29 @@ benches:
           page: 268
           section: 2. Description of Mass Spectrometric System
           note: 0.80 cm outside diameter; converted to m
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.8'
+              locator:
+                page: 268
+                section: 2. Description of Mass Spectrometric System
+                note: 0.80 cm outside diameter; converted to m
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 268
+                section: 2. Description of Mass Spectrometric System
+                note: 0.80 cm outside diameter; converted to m
+          output_unit: m
       height_m:
         state:
           tag: value
@@ -235,6 +289,29 @@ benches:
           page: 268
           section: 2. Description of Mass Spectrometric System
           note: 1.90 cm height; converted to m
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.9'
+              locator:
+                page: 268
+                section: 2. Description of Mass Spectrometric System
+                note: 1.90 cm height; converted to m
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 268
+                section: 2. Description of Mass Spectrometric System
+                note: 1.90 cm height; converted to m
+          output_unit: m
   pumping_type:
     state:
       tag: value

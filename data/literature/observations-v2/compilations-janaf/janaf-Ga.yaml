@@ -8,252 +8,7 @@ sources:
 - data/literature/compilations/janaf/tables/Ga-006.yaml
 - data/literature/compilations/janaf/tables/Ga-007.yaml
 observations:
-- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '-5.561'
-    - - '100'
-      - '-4.618'
-    - - '200'
-      - '-2.448'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.048'
-    - - '302.92'
-      - '0.124'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '302.92'
-      - '5.714'
-    - - '400'
-      - '8.407'
-    - - '500'
-      - '11.104'
-    - - '600'
-      - '13.78'
-    - - '700'
-      - '16.442'
-    - - '800'
-      - '19.099'
-    - - '900'
-      - '21.756'
-    - - '1000'
-      - '24.413'
-    - - '1100'
-      - '27.069'
-    - - '1200'
-      - '29.726'
-    - - '1300'
-      - '32.383'
-    - - '1400'
-      - '35.04'
-    - - '1500'
-      - '37.697'
-    - - '1600'
-      - '40.354'
-    - - '1700'
-      - '43.01'
-    - - '1800'
-      - '45.667'
-    - - '1900'
-      - '48.324'
-    - - '2000'
-      - '50.981'
-    - - '2100'
-      - '53.638'
-    - - '2200'
-      - '56.295'
-    - - '2300'
-      - '58.951'
-    - - '2400'
-      - '61.608'
-    - - '2476.57'
-      - '63.643'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
-      LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:segment-2
+- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -420,118 +175,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: S
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '0'
-    - - '100'
-      - '16.085'
-    - - '200'
-      - '30.912'
-    - - '298.15'
-      - '40.838'
-    - - '300'
-      - '41'
-    - - '302.92'
-      - '41.253'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:S:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Ga
       phase:
@@ -544,8 +194,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -557,86 +207,86 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '302.92'
-      - '59.706'
+      - '5.714'
     - - '400'
-      - '67.426'
+      - '8.407'
     - - '500'
-      - '73.445'
+      - '11.104'
     - - '600'
-      - '78.324'
+      - '13.78'
     - - '700'
-      - '82.428'
+      - '16.442'
     - - '800'
-      - '85.976'
+      - '19.099'
     - - '900'
-      - '89.105'
+      - '21.756'
     - - '1000'
-      - '91.904'
+      - '24.413'
     - - '1100'
-      - '94.436'
+      - '27.069'
     - - '1200'
-      - '96.748'
+      - '29.726'
     - - '1300'
-      - '98.875'
+      - '32.383'
     - - '1400'
-      - '100.844'
+      - '35.04'
     - - '1500'
-      - '102.677'
+      - '37.697'
     - - '1600'
-      - '104.391'
+      - '40.354'
     - - '1700'
-      - '106.002'
+      - '43.01'
     - - '1800'
-      - '107.521'
+      - '45.667'
     - - '1900'
-      - '108.957'
+      - '48.324'
     - - '2000'
-      - '110.32'
+      - '50.981'
     - - '2100'
-      - '111.616'
+      - '53.638'
     - - '2200'
-      - '112.852'
+      - '56.295'
     - - '2300'
-      - '114.033'
+      - '58.951'
     - - '2400'
-      - '115.164'
+      - '61.608'
     - - '2476.57'
-      - '115.998'
+      - '63.643'
     approximate: false
   uncertainty:
     kind: none
@@ -664,8 +314,116 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:S:segment-2
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:H_minus_H298:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: H(T)-H(298.15 K)
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '-5.561'
+    - - '100'
+      - '-4.618'
+    - - '200'
+      - '-2.448'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0.048'
+    - - '302.92'
+      - '0.124'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:S:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -832,118 +590,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:S:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile cp does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile cp does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile cp does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile cp does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile cp does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile cp does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile cp does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile cp does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile cp does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile cp does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '0'
-    - - '100'
-      - '18.484'
-    - - '200'
-      - '23.815'
-    - - '298.15'
-      - '26.064'
-    - - '300'
-      - '26.091'
-    - - '302.92'
-      - '26.133'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:cp:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: cp
+      value: S
     species:
       formula: Ga
       phase:
@@ -957,7 +610,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -969,86 +622,86 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '302.92'
-      - '28.493'
+      - '59.706'
     - - '400'
-      - '27.154'
+      - '67.426'
     - - '500'
-      - '26.819'
+      - '73.445'
     - - '600'
-      - '26.694'
+      - '78.324'
     - - '700'
-      - '26.568'
+      - '82.428'
     - - '800'
-      - '26.568'
+      - '85.976'
     - - '900'
-      - '26.568'
+      - '89.105'
     - - '1000'
-      - '26.568'
+      - '91.904'
     - - '1100'
-      - '26.568'
+      - '94.436'
     - - '1200'
-      - '26.568'
+      - '96.748'
     - - '1300'
-      - '26.568'
+      - '98.875'
     - - '1400'
-      - '26.568'
+      - '100.844'
     - - '1500'
-      - '26.568'
+      - '102.677'
     - - '1600'
-      - '26.568'
+      - '104.391'
     - - '1700'
-      - '26.568'
+      - '106.002'
     - - '1800'
-      - '26.568'
+      - '107.521'
     - - '1900'
-      - '26.568'
+      - '108.957'
     - - '2000'
-      - '26.568'
+      - '110.32'
     - - '2100'
-      - '26.568'
+      - '111.616'
     - - '2200'
-      - '26.568'
+      - '112.852'
     - - '2300'
-      - '26.568'
+      - '114.033'
     - - '2400'
-      - '26.568'
+      - '115.164'
     - - '2476.57'
-      - '26.568'
+      - '115.998'
     approximate: false
   uncertainty:
     kind: none
@@ -1077,7 +730,115 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:cp:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:S:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '16.085'
+    - - '200'
+      - '30.912'
+    - - '298.15'
+      - '40.838'
+    - - '300'
+      - '41'
+    - - '302.92'
+      - '41.253'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:cp:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -1244,12 +1005,153 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-001:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:cp:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: series
+    series:
+    - - '302.92'
+      - '28.493'
+    - - '400'
+      - '27.154'
+    - - '500'
+      - '26.819'
+    - - '600'
+      - '26.694'
+    - - '700'
+      - '26.568'
+    - - '800'
+      - '26.568'
+    - - '900'
+      - '26.568'
+    - - '1000'
+      - '26.568'
+    - - '1100'
+      - '26.568'
+    - - '1200'
+      - '26.568'
+    - - '1300'
+      - '26.568'
+    - - '1400'
+      - '26.568'
+    - - '1500'
+      - '26.568'
+    - - '1600'
+      - '26.568'
+    - - '1700'
+      - '26.568'
+    - - '1800'
+      - '26.568'
+    - - '1900'
+      - '26.568'
+    - - '2000'
+      - '26.568'
+    - - '2100'
+      - '26.568'
+    - - '2200'
+      - '26.568'
+    - - '2300'
+      - '26.568'
+    - - '2400'
+      - '26.568'
+    - - '2476.57'
+      - '26.568'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
+      LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:cp:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
     species:
       formula: Ga
       phase:
@@ -1264,7 +1166,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1275,55 +1177,53 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '18.484'
     - - '200'
-      - '0'
+      - '23.815'
     - - '298.15'
-      - '0'
+      - '26.064'
     - - '300'
-      - '0'
+      - '26.091'
+    - - '302.92'
+      - '26.133'
     approximate: false
   uncertainty:
     kind: none
@@ -1346,156 +1246,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:delta_fG:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fG
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: l
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
-  value:
-    kind: series
-    series:
-    - - '400'
-      - '0'
-    - - '500'
-      - '0'
-    - - '600'
-      - '0'
-    - - '700'
-      - '0'
-    - - '800'
-      - '0'
-    - - '900'
-      - '0'
-    - - '1000'
-      - '0'
-    - - '1100'
-      - '0'
-    - - '1200'
-      - '0'
-    - - '1300'
-      - '0'
-    - - '1400'
-      - '0'
-    - - '1500'
-      - '0'
-    - - '1600'
-      - '0'
-    - - '1700'
-      - '0'
-    - - '1800'
-      - '0'
-    - - '1900'
-      - '0'
-    - - '2000'
-      - '0'
-    - - '2100'
-      - '0'
-    - - '2200'
-      - '0'
-    - - '2300'
-      - '0'
-    - - '2400'
-      - '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:delta_fG:segment-2
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fG:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -1666,122 +1424,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fG:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '0'
-    - - '100'
-      - '0'
-    - - '200'
-      - '0'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:delta_fH:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Ga
       phase:
@@ -1795,7 +1444,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1817,31 +1466,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -1917,7 +1566,119 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:delta_fH:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fG:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fH:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -2088,122 +1849,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-001:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fH:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile log10_Kf does not use subtype
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
-    reference_state:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile log10_Kf does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile log10_Kf does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile log10_Kf does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '0'
-    - - '100'
-      - '0'
-    - - '200'
-      - '0'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
-    record: Ga-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-001:log10_Kf:segment-1
-  experiment_id: nist-janaf-4th:Ga-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Ga
       phase:
@@ -2217,7 +1869,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -2239,31 +1891,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -2338,8 +1990,120 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-001:log10_Kf:segment-2
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:delta_fH:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:log10_Kf:phase-window:T=2476.570..open
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -2510,72 +2274,118 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-001:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:log10_Kf:phase-window:T=302.920..2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
       tag: value
-      value: transition_temperature
+      value: log10_Kf
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
-          cannot hold both
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
     subtype:
-      tag: value
-      value: crystal-liquid
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
     per:
-      tag: not_applicable
-      reason: profile transition_temperature does not use per
+      tag: value
+      value: mol_species
     temperature_K:
-      tag: not_applicable
-      reason: profile transition_temperature does not use temperature_K
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
     standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile transition_temperature does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile transition_temperature does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use fO2_Pa
-    total_pressure_Pa:
       tag: value
       value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile transition_temperature does not use sweep_gas
+      reason: profile log10_Kf does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile transition_temperature does not use exposure
+      reason: profile log10_Kf does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile transition_temperature does not use sample_mass_kg
+      reason: profile log10_Kf does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile transition_temperature does not use wall
+      reason: profile log10_Kf does not use wall
   value:
-    kind: point
-    point: '302.92'
+    kind: series
+    series:
+    - - '400'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    - - '1700'
+      - '0'
+    - - '1800'
+      - '0'
+    - - '1900'
+      - '0'
+    - - '2000'
+      - '0'
+    - - '2100'
+      - '0'
+    - - '2200'
+      - '0'
+    - - '2300'
+      - '0'
+    - - '2400'
+      - '0'
     approximate: false
   uncertainty:
     kind: none
@@ -2597,14 +2407,128 @@ observations:
     record: Ga-001
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
-      MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: K
-- observation_id: nist-janaf-4th:Ga-001:transition_temperature:liquid-ideal-gas
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:log10_Kf:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:transition_temperature:T=2476.570
   experiment_id: nist-janaf-4th:Ga-001:tabulation
   identity:
     quantity:
@@ -2698,7 +2622,103 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Ga-002:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-001:transition_temperature:T=302.920
+  experiment_id: nist-janaf-4th:Ga-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystal-liquid
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '302.92'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-001.yaml
+    record: Ga-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
+      MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -2813,7 +2833,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-002:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -2928,7 +2949,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-002:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -3043,7 +3065,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-002:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -3160,7 +3183,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-002:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -3277,7 +3301,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-002:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -3394,7 +3419,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-002:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-002:transition_temperature:T=302.920
   experiment_id: nist-janaf-4th:Ga-002:tabulation
   identity:
     quantity:
@@ -3488,7 +3514,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Ga-003:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -3647,7 +3674,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-003:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -3806,7 +3834,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-003:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -3965,7 +3994,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-003:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -4124,7 +4154,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-003:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -4283,7 +4314,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-003:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -4442,7 +4474,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-003:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-003:transition_temperature:T=302.920
   experiment_id: nist-janaf-4th:Ga-003:tabulation
   identity:
     quantity:
@@ -4536,115 +4569,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Ga-004:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Ga-004:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Ga
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
-          and title_as_published 'Gallium (Ga)  |  Ga1(cr,l)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '-5.561'
-    - - '100'
-      - '-4.618'
-    - - '200'
-      - '-2.448'
-    - - '250'
-      - '-1.231'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.048'
-    - - '302.92'
-      - '0.124'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Ga-004
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-004.txt'
-    source_path: data/literature/compilations/janaf/tables/Ga-004.yaml
-    record: Ga-004
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:H_minus_H298:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:H_minus_H298:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -4799,12 +4725,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:H_minus_H298:phase-window:T=open..302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Ga
       phase:
@@ -4818,8 +4745,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -4831,54 +4758,54 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '0'
-      - '0'
+      - '-5.561'
     - - '100'
-      - '16.085'
+      - '-4.618'
     - - '200'
-      - '30.912'
+      - '-2.448'
     - - '250'
-      - '36.338'
+      - '-1.231'
     - - '298.15'
-      - '40.838'
+      - '0'
     - - '300'
-      - '41'
+      - '0.048'
     - - '302.92'
-      - '41.253'
+      - '0.124'
     approximate: false
   uncertainty:
     kind: none
@@ -4906,8 +4833,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-004:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:S:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -5062,12 +4990,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-004:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:S:phase-window:T=open..302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Ga
       phase:
@@ -5082,7 +5011,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5094,54 +5023,54 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '18.484'
+      - '16.085'
     - - '200'
-      - '23.815'
+      - '30.912'
     - - '250'
-      - '24.907'
+      - '36.338'
     - - '298.15'
-      - '26.064'
+      - '40.838'
     - - '300'
-      - '26.091'
+      - '41'
     - - '302.92'
-      - '26.133'
+      - '41.253'
     approximate: false
   uncertainty:
     kind: none
@@ -5170,7 +5099,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-004:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:cp:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -5325,12 +5255,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-004:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:cp:phase-window:T=open..302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Ga
       phase:
@@ -5345,7 +5276,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5356,57 +5287,55 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '18.484'
     - - '200'
-      - '0'
+      - '23.815'
     - - '250'
-      - '0'
+      - '24.907'
     - - '298.15'
-      - '0'
+      - '26.064'
     - - '300'
-      - '0'
+      - '26.091'
+    - - '302.92'
+      - '26.133'
     approximate: false
   uncertainty:
     kind: none
@@ -5429,15 +5358,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:delta_fG:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -5592,12 +5520,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:delta_fG:phase-window:T=open..302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Ga
       phase:
@@ -5612,7 +5541,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5634,31 +5563,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -5704,7 +5633,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:delta_fH:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -5859,12 +5789,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-004:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:delta_fH:phase-window:T=open..302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Ga
       phase:
@@ -5879,7 +5810,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5901,31 +5832,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -5970,8 +5901,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-004:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:log10_Kf:phase-window:T=302.920..open
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -6126,7 +6058,121 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-004:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:log10_Kf:phase-window:T=open..302.920
+  experiment_id: nist-janaf-4th:Ga-004:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Gallium'
+          and title_as_published 'Gallium (Ga)  |  Ga1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ga-004
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ga-004.txt'
+    source_path: data/literature/compilations/janaf/tables/Ga-004.yaml
+    record: Ga-004
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-004:transition_temperature:T=302.920
   experiment_id: nist-janaf-4th:Ga-004:tabulation
   identity:
     quantity:
@@ -6220,7 +6266,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Ga-005:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -6445,7 +6492,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-005:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -6670,7 +6718,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-005:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -6895,7 +6944,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-005:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -7124,7 +7174,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-005:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -7353,7 +7404,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-005:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-005:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-005:tabulation
   identity:
     quantity:
@@ -7580,7 +7632,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-006:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -7803,7 +7856,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-006:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -8026,7 +8080,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-006:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -8249,7 +8304,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-006:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -8470,7 +8526,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-006:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -8693,7 +8750,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-006:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-006:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-006:tabulation
   identity:
     quantity:
@@ -8914,7 +8972,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Ga-007:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -9137,7 +9196,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-007:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:S:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -9360,7 +9420,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-007:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -9583,7 +9644,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Ga-007:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -9804,7 +9866,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-007:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -10027,7 +10090,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Ga-007:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Ga-007:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Ga-007:tabulation
   identity:
     quantity:
@@ -10248,3 +10312,4 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
+    pure_substance_reference: true

@@ -10,139 +10,7 @@ sources:
 - data/literature/compilations/janaf/tables/Si-008.yaml
 - data/literature/compilations/janaf/tables/Si-009.yaml
 observations:
-- observation_id: nist-janaf-4th:Si-001:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Si-001:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Si
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Silicon'
-          and title_as_published 'Silicon (Si)  |  Si1(ref)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '-3.218'
-    - - '100'
-      - '-2.952'
-    - - '200'
-      - '-1.773'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.037'
-    - - '400'
-      - '2.159'
-    - - '500'
-      - '4.436'
-    - - '600'
-      - '6.812'
-    - - '700'
-      - '9.26'
-    - - '800'
-      - '11.769'
-    - - '900'
-      - '14.331'
-    - - '1000'
-      - '16.942'
-    - - '1100'
-      - '19.598'
-    - - '1200'
-      - '22.297'
-    - - '1300'
-      - '25.037'
-    - - '1400'
-      - '27.82'
-    - - '1500'
-      - '30.644'
-    - - '1600'
-      - '33.51'
-    - - '1685'
-      - '35.979'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Si-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Si-001.txt'
-    source_path: data/literature/compilations/janaf/tables/Si-001.yaml
-    record: Si-001
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:H_minus_H298:segment-1
+- observation_id: nist-janaf-4th:Si-001:H_minus_H298:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -277,7 +145,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:H_minus_H298:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:H_minus_H298:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -422,12 +291,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:H_minus_H298:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Si
       phase:
@@ -441,8 +311,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -454,78 +324,78 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '0'
-      - '0'
+      - '-3.218'
     - - '100'
-      - '3.833'
+      - '-2.952'
     - - '200'
-      - '11.665'
+      - '-1.773'
     - - '298.15'
-      - '18.82'
+      - '0'
     - - '300'
-      - '18.943'
+      - '0.037'
     - - '400'
-      - '25.032'
+      - '2.159'
     - - '500'
-      - '30.11'
+      - '4.436'
     - - '600'
-      - '34.44'
+      - '6.812'
     - - '700'
-      - '38.212'
+      - '9.26'
     - - '800'
-      - '41.562'
+      - '11.769'
     - - '900'
-      - '44.579'
+      - '14.331'
     - - '1000'
-      - '47.329'
+      - '16.942'
     - - '1100'
-      - '49.86'
+      - '19.598'
     - - '1200'
-      - '52.208'
+      - '22.297'
     - - '1300'
-      - '54.401'
+      - '25.037'
     - - '1400'
-      - '56.463'
+      - '27.82'
     - - '1500'
-      - '58.411'
+      - '30.644'
     - - '1600'
-      - '60.261'
+      - '33.51'
     - - '1685'
-      - '61.765'
+      - '35.979'
     approximate: false
   uncertainty:
     kind: none
@@ -553,8 +423,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:S:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -689,7 +560,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:S:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:S:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -834,12 +706,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:S:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Si
       phase:
@@ -854,7 +727,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -866,78 +739,78 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '7.268'
+      - '3.833'
     - - '200'
-      - '15.636'
+      - '11.665'
     - - '298.15'
-      - '20'
+      - '18.82'
     - - '300'
-      - '20.05'
+      - '18.943'
     - - '400'
-      - '22.142'
+      - '25.032'
     - - '500'
-      - '23.33'
+      - '30.11'
     - - '600'
-      - '24.154'
+      - '34.44'
     - - '700'
-      - '24.803'
+      - '38.212'
     - - '800'
-      - '25.359'
+      - '41.562'
     - - '900'
-      - '25.874'
+      - '44.579'
     - - '1000'
-      - '26.338'
+      - '47.329'
     - - '1100'
-      - '26.778'
+      - '49.86'
     - - '1200'
-      - '27.196'
+      - '52.208'
     - - '1300'
-      - '27.614'
+      - '54.401'
     - - '1400'
-      - '28.033'
+      - '56.463'
     - - '1500'
-      - '28.451'
+      - '58.411'
     - - '1600'
-      - '28.87'
+      - '60.261'
     - - '1685'
-      - '29.225'
+      - '61.765'
     approximate: false
   uncertainty:
     kind: none
@@ -966,7 +839,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:cp:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -1101,7 +975,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:cp:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:cp:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -1246,12 +1121,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-001:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:cp:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Si
       phase:
@@ -1266,7 +1142,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1277,81 +1153,79 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '7.268'
     - - '200'
-      - '0'
+      - '15.636'
     - - '298.15'
-      - '0'
+      - '20'
     - - '300'
-      - '0'
+      - '20.05'
     - - '400'
-      - '0'
+      - '22.142'
     - - '500'
-      - '0'
+      - '23.33'
     - - '600'
-      - '0'
+      - '24.154'
     - - '700'
-      - '0'
+      - '24.803'
     - - '800'
-      - '0'
+      - '25.359'
     - - '900'
-      - '0'
+      - '25.874'
     - - '1000'
-      - '0'
+      - '26.338'
     - - '1100'
-      - '0'
+      - '26.778'
     - - '1200'
-      - '0'
+      - '27.196'
     - - '1300'
-      - '0'
+      - '27.614'
     - - '1400'
-      - '0'
+      - '28.033'
     - - '1500'
-      - '0'
+      - '28.451'
     - - '1600'
-      - '0'
+      - '28.87'
+    - - '1685'
+      - '29.225'
     approximate: false
   uncertainty:
     kind: none
@@ -1374,15 +1248,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fG:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -1519,7 +1392,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:delta_fG:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fG:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -1668,12 +1542,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fG:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Si
       phase:
@@ -1688,7 +1563,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -1710,31 +1585,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -1804,7 +1679,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fH:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -1941,7 +1817,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:delta_fH:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fH:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -2090,12 +1967,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-001:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:delta_fH:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Si
       phase:
@@ -2110,7 +1988,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -2132,31 +2010,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -2225,8 +2103,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-001:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:log10_Kf:phase-window:T=1685.000..3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -2363,7 +2242,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-001:log10_Kf:segment-2
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:log10_Kf:phase-window:T=3504.616..open
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -2512,7 +2392,145 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-001:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:log10_Kf:phase-window:T=open..1685.000
+  experiment_id: nist-janaf-4th:Si-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Silicon'
+          and title_as_published 'Silicon (Si)  |  Si1(ref)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '400'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Si-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Si-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Si-001.yaml
+    record: Si-001
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:transition_temperature:T=1685.000
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -2606,7 +2624,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Si-001:transition_temperature:liquid-ideal-gas
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-001:transition_temperature:T=3504.616
   experiment_id: nist-janaf-4th:Si-001:tabulation
   identity:
     quantity:
@@ -2700,7 +2719,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Si-002:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -2855,7 +2875,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-002:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3010,7 +3031,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-002:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3165,7 +3187,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-002:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3322,7 +3345,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-002:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3479,7 +3503,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-002:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3636,7 +3661,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-002:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-002:transition_temperature:T=1685.000
   experiment_id: nist-janaf-4th:Si-002:tabulation
   identity:
     quantity:
@@ -3730,7 +3756,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Si-003:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -3919,7 +3946,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-003:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4108,7 +4136,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-003:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4297,7 +4326,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-003:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4486,7 +4516,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-003:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4675,7 +4706,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-003:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4864,7 +4896,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-003:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-003:transition_temperature:T=1685.000
   experiment_id: nist-janaf-4th:Si-003:tabulation
   identity:
     quantity:
@@ -4958,145 +4991,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Si-004:H_minus_H298:segment-0
-  experiment_id: nist-janaf-4th:Si-004:tabulation
-  identity:
-    quantity:
-      tag: value
-      value: H_minus_H298
-    species:
-      formula: Si
-      phase:
-        tag: value
-        value: cr
-      polymorph:
-        tag: unknown
-        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Silicon'
-          and title_as_published 'Silicon (Si)  |  Si1(cr,l)' do not name a crystal polymorph
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: value
-      value: H(T)-H(298.15 K)
-    per:
-      tag: value
-      value: mol_species
-    temperature_K:
-      tag: unknown
-      reason: temperature varies along the series and is stored as the T_K coordinate
-    standard_pressure_Pa:
-      tag: value
-      value: '100000'
-    reaction:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile H_minus_H298 does not use wall
-  value:
-    kind: series
-    series:
-    - - '0'
-      - '-3.218'
-    - - '100'
-      - '-2.952'
-    - - '200'
-      - '-1.773'
-    - - '250'
-      - '-0.923'
-    - - '298.15'
-      - '0'
-    - - '300'
-      - '0.037'
-    - - '350'
-      - '1.072'
-    - - '400'
-      - '2.159'
-    - - '450'
-      - '3.283'
-    - - '500'
-      - '4.436'
-    - - '600'
-      - '6.812'
-    - - '700'
-      - '9.26'
-    - - '800'
-      - '11.769'
-    - - '900'
-      - '14.331'
-    - - '1000'
-      - '16.942'
-    - - '1100'
-      - '19.598'
-    - - '1200'
-      - '22.297'
-    - - '1300'
-      - '25.037'
-    - - '1400'
-      - '27.82'
-    - - '1500'
-      - '30.644'
-    - - '1600'
-      - '33.51'
-    - - '1685'
-      - '35.979'
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: compilation_assessed
-    original_method_class: assessed_thermodynamic_functions
-    model: assessed_thermodynamic_functions
-  admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
-  source_id: nist-janaf-4th
-  locator:
-    table: Si-004
-    note: 'NIST download_url: https://janaf.nist.gov/tables/Si-004.txt'
-    source_path: data/literature/compilations/janaf/tables/Si-004.yaml
-    record: Si-004
-  read_from: tables:nist-janaf-4th
-  derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
-      <--> LIQUID"
-    inputs:
-    - tables:nist-janaf-4th
-    parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:H_minus_H298:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:H_minus_H298:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -5251,12 +5147,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:H_minus_H298:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
       tag: value
-      value: S
+      value: H_minus_H298
     species:
       formula: Si
       phase:
@@ -5270,8 +5167,8 @@ observations:
         tag: value
         value: 0
     subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
+      tag: value
+      value: H(T)-H(298.15 K)
     per:
       tag: value
       value: mol_species
@@ -5283,84 +5180,84 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile S does not use reaction
+      reason: profile H_minus_H298 does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile S does not use formation_elements
+      reason: profile H_minus_H298 does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile S does not use reference_state
+      reason: profile H_minus_H298 does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile S does not use reservoir
+      reason: profile H_minus_H298 does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile S does not use composition
+      reason: profile H_minus_H298 does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile S does not use fO2_Pa
+      reason: profile H_minus_H298 does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
+      reason: profile H_minus_H298 does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile S does not use sweep_gas
+      reason: profile H_minus_H298 does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile S does not use exposure
+      reason: profile H_minus_H298 does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile S does not use sample_mass_kg
+      reason: profile H_minus_H298 does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile S does not use wall
+      reason: profile H_minus_H298 does not use wall
   value:
     kind: series
     series:
     - - '0'
-      - '0'
+      - '-3.218'
     - - '100'
-      - '3.833'
+      - '-2.952'
     - - '200'
-      - '11.665'
+      - '-1.773'
     - - '250'
-      - '15.446'
+      - '-0.923'
     - - '298.15'
-      - '18.82'
+      - '0'
     - - '300'
-      - '18.943'
+      - '0.037'
     - - '350'
-      - '22.132'
+      - '1.072'
     - - '400'
-      - '25.032'
+      - '2.159'
     - - '450'
-      - '27.68'
+      - '3.283'
     - - '500'
-      - '30.11'
+      - '4.436'
     - - '600'
-      - '34.44'
+      - '6.812'
     - - '700'
-      - '38.212'
+      - '9.26'
     - - '800'
-      - '41.562'
+      - '11.769'
     - - '900'
-      - '44.579'
+      - '14.331'
     - - '1000'
-      - '47.329'
+      - '16.942'
     - - '1100'
-      - '49.86'
+      - '19.598'
     - - '1200'
-      - '52.208'
+      - '22.297'
     - - '1300'
-      - '54.401'
+      - '25.037'
     - - '1400'
-      - '56.463'
+      - '27.82'
     - - '1500'
-      - '58.411'
+      - '30.644'
     - - '1600'
-      - '60.261'
+      - '33.51'
     - - '1685'
-      - '61.765'
+      - '35.979'
     approximate: false
   uncertainty:
     kind: none
@@ -5388,8 +5285,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-004:S:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:S:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -5544,12 +5442,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-004:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:S:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
       tag: value
-      value: cp
+      value: S
     species:
       formula: Si
       phase:
@@ -5564,7 +5463,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile cp does not use subtype
+      reason: profile S does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5576,84 +5475,84 @@ observations:
       value: '100000'
     reaction:
       tag: not_applicable
-      reason: profile cp does not use reaction
+      reason: profile S does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile cp does not use formation_elements
+      reason: profile S does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile cp does not use reference_state
+      reason: profile S does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile cp does not use reservoir
+      reason: profile S does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile cp does not use composition
+      reason: profile S does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile cp does not use fO2_Pa
+      reason: profile S does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile cp does not use total_pressure_Pa
+      reason: profile S does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile cp does not use sweep_gas
+      reason: profile S does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile cp does not use exposure
+      reason: profile S does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile cp does not use sample_mass_kg
+      reason: profile S does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile cp does not use wall
+      reason: profile S does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '7.268'
+      - '3.833'
     - - '200'
-      - '15.636'
+      - '11.665'
     - - '250'
-      - '18.221'
+      - '15.446'
     - - '298.15'
-      - '20'
+      - '18.82'
     - - '300'
-      - '20.05'
+      - '18.943'
     - - '350'
-      - '21.276'
+      - '22.132'
     - - '400'
-      - '22.142'
+      - '25.032'
     - - '450'
-      - '22.803'
+      - '27.68'
     - - '500'
-      - '23.33'
+      - '30.11'
     - - '600'
-      - '24.154'
+      - '34.44'
     - - '700'
-      - '24.803'
+      - '38.212'
     - - '800'
-      - '25.359'
+      - '41.562'
     - - '900'
-      - '25.874'
+      - '44.579'
     - - '1000'
-      - '26.338'
+      - '47.329'
     - - '1100'
-      - '26.778'
+      - '49.86'
     - - '1200'
-      - '27.196'
+      - '52.208'
     - - '1300'
-      - '27.614'
+      - '54.401'
     - - '1400'
-      - '28.033'
+      - '56.463'
     - - '1500'
-      - '28.451'
+      - '58.411'
     - - '1600'
-      - '28.87'
+      - '60.261'
     - - '1685'
-      - '29.225'
+      - '61.765'
     approximate: false
   uncertainty:
     kind: none
@@ -5682,7 +5581,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-004:cp:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:cp:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -5837,12 +5737,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-004:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:cp:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fG
+      value: cp
     species:
       formula: Si
       phase:
@@ -5857,7 +5758,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fG does not use subtype
+      reason: profile cp does not use subtype
     per:
       tag: value
       value: mol_species
@@ -5868,87 +5769,85 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use reaction
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile delta_fG does not use reference_state
+      reason: profile cp does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fG does not use reservoir
+      reason: profile cp does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fG does not use composition
+      reason: profile cp does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
+      reason: profile cp does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
+      reason: profile cp does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
+      reason: profile cp does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fG does not use exposure
+      reason: profile cp does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
+      reason: profile cp does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fG does not use wall
+      reason: profile cp does not use wall
   value:
     kind: series
     series:
     - - '0'
       - '0'
     - - '100'
-      - '0'
+      - '7.268'
     - - '200'
-      - '0'
+      - '15.636'
     - - '250'
-      - '0'
+      - '18.221'
     - - '298.15'
-      - '0'
+      - '20'
     - - '300'
-      - '0'
+      - '20.05'
     - - '350'
-      - '0'
+      - '21.276'
     - - '400'
-      - '0'
+      - '22.142'
     - - '450'
-      - '0'
+      - '22.803'
     - - '500'
-      - '0'
+      - '23.33'
     - - '600'
-      - '0'
+      - '24.154'
     - - '700'
-      - '0'
+      - '24.803'
     - - '800'
-      - '0'
+      - '25.359'
     - - '900'
-      - '0'
+      - '25.874'
     - - '1000'
-      - '0'
+      - '26.338'
     - - '1100'
-      - '0'
+      - '26.778'
     - - '1200'
-      - '0'
+      - '27.196'
     - - '1300'
-      - '0'
+      - '27.614'
     - - '1400'
-      - '0'
+      - '28.033'
     - - '1500'
-      - '0'
+      - '28.451'
     - - '1600'
-      - '0'
+      - '28.87'
+    - - '1685'
+      - '29.225'
     approximate: false
   uncertainty:
     kind: none
@@ -5971,15 +5870,14 @@ observations:
   read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
+      <--> LIQUID"
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:delta_fG:segment-1
+    output_unit: J_per_declared_mol_basis_per_K
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:delta_fG:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -6134,12 +6032,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:delta_fG:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
       tag: value
-      value: delta_fH
+      value: delta_fG
     species:
       formula: Si
       phase:
@@ -6154,7 +6053,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile delta_fH does not use subtype
+      reason: profile delta_fG does not use subtype
     per:
       tag: value
       value: mol_species
@@ -6176,31 +6075,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile delta_fH does not use reference_state
+      reason: profile delta_fG does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile delta_fH does not use reservoir
+      reason: profile delta_fG does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile delta_fH does not use composition
+      reason: profile delta_fG does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
+      reason: profile delta_fG does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
+      reason: profile delta_fG does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
+      reason: profile delta_fG does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile delta_fH does not use exposure
+      reason: profile delta_fG does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
+      reason: profile delta_fG does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile delta_fH does not use wall
+      reason: profile delta_fG does not use wall
   value:
     kind: series
     series:
@@ -6276,7 +6175,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:delta_fH:segment-1
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:delta_fH:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -6431,12 +6331,13 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-004:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:delta_fH:phase-window:T=open..1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
       tag: value
-      value: log10_Kf
+      value: delta_fH
     species:
       formula: Si
       phase:
@@ -6451,7 +6352,7 @@ observations:
         value: 0
     subtype:
       tag: not_applicable
-      reason: profile log10_Kf does not use subtype
+      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
@@ -6473,31 +6374,31 @@ observations:
         formation reaction
     reference_state:
       tag: not_applicable
-      reason: profile log10_Kf does not use reference_state
+      reason: profile delta_fH does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile log10_Kf does not use reservoir
+      reason: profile delta_fH does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile log10_Kf does not use composition
+      reason: profile delta_fH does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use fO2_Pa
+      reason: profile delta_fH does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile log10_Kf does not use total_pressure_Pa
+      reason: profile delta_fH does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile log10_Kf does not use sweep_gas
+      reason: profile delta_fH does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile log10_Kf does not use exposure
+      reason: profile delta_fH does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile log10_Kf does not use sample_mass_kg
+      reason: profile delta_fH does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile log10_Kf does not use wall
+      reason: profile delta_fH does not use wall
   value:
     kind: series
     series:
@@ -6572,8 +6473,9 @@ observations:
     inputs:
     - tables:nist-janaf-4th
     parameters: []
-    output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-004:log10_Kf:segment-1
+    output_unit: kJ_per_declared_mol_basis
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:log10_Kf:phase-window:T=1685.000..open
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -6728,7 +6630,151 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-004:transition_temperature:crystal-liquid
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:log10_Kf:phase-window:T=open..1685.000
+  experiment_id: nist-janaf-4th:Si-004:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Silicon'
+          and title_as_published 'Silicon (Si)  |  Si1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Si-004
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Si-004.txt'
+    source_path: data/literature/compilations/janaf/tables/Si-004.yaml
+    record: Si-004
+  read_from: tables:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
+    inputs:
+    - tables:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-004:transition_temperature:T=1685.000
   experiment_id: nist-janaf-4th:Si-004:tabulation
   identity:
     quantity:
@@ -6822,7 +6868,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: K
-- observation_id: nist-janaf-4th:Si-005:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -7047,7 +7094,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-005:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -7272,7 +7320,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-005:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -7497,7 +7546,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-005:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -7726,7 +7776,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-005:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -7955,7 +8006,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-005:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-005:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-005:tabulation
   identity:
     quantity:
@@ -8182,7 +8234,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-006:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -8405,7 +8458,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-006:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -8628,7 +8682,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-006:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -8851,7 +8906,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-006:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -9072,7 +9128,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-006:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -9295,7 +9352,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-006:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-006:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-006:tabulation
   identity:
     quantity:
@@ -9516,7 +9574,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-007:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -9739,7 +9798,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-007:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -9962,7 +10022,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-007:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -10185,7 +10246,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-007:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -10406,7 +10468,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-007:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -10629,7 +10692,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-007:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-007:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-007:tabulation
   identity:
     quantity:
@@ -10850,7 +10914,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-008:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -11073,7 +11138,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-008:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -11296,7 +11362,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-008:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -11519,7 +11586,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-008:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -11748,7 +11816,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-008:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -11977,7 +12046,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-008:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-008:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-008:tabulation
   identity:
     quantity:
@@ -12204,7 +12274,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
-- observation_id: nist-janaf-4th:Si-009:H_minus_H298:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:H_minus_H298:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -12427,7 +12498,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-009:S:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:S:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -12650,7 +12722,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-009:cp:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:cp:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -12873,7 +12946,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: nist-janaf-4th:Si-009:delta_fG:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:delta_fG:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -13102,7 +13176,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-009:delta_fH:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:delta_fH:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -13331,7 +13406,8 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
-- observation_id: nist-janaf-4th:Si-009:log10_Kf:segment-0
+    pure_substance_reference: true
+- observation_id: nist-janaf-4th:Si-009:log10_Kf:phase-window:whole
   experiment_id: nist-janaf-4th:Si-009:tabulation
   identity:
     quantity:
@@ -13558,3 +13634,4 @@ observations:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
+    pure_substance_reference: true

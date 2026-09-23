@@ -38,44 +38,11 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'tga_ms_heat_treatment_unspecified_on_table' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
-  locator:
-    pdf_page_index: 11
-    table: conclusions_total_gas_evolutions
-    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
-      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
 - experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   kind: literature
   method:
     tag: unknown
-    reason: regime 'tga_ms_he_and_stated_equivalent_in_vacuum' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'tga_ms_heat_treatment_unspecified_on_table' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -109,9 +76,10 @@ experiments:
           note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
   work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
   locator:
-    pdf_page_index: 4
-    section: Integrated Mass Spectroscopy
-    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
+      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
   apparatus:
     cell_material_and_liner:
       state:

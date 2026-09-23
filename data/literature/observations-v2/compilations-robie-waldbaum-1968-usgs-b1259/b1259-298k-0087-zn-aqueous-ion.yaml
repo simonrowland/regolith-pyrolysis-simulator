@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0087-zn-aqueous-ion.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=zn++-aqueous-ion:v=135291ad5f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:tabulation
   identity:
     quantity:
@@ -145,7 +145,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=zn++-aqueous-ion:v=e8cd26050e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0087-zn-aqueous-ion:tabulation
   identity:
     quantity:

@@ -37,72 +37,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/isijinternational1966.16.382
 experiments:
-- experiment_id: 10.2355/isijinternational1966.16.382::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 383
-    pdf_page_index: 2
-    table: '1'
-    note: Table 1. Chemical analysis of the pure materials (ppm)
-- experiment_id: 10.2355/isijinternational1966.16.382::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.2355/isijinternational1966.16.382
-  locator:
-    published_page: 385
-    pdf_page_index: 4
-    table: '3'
-    note: Table 3 comparison of gamma_Ti^o from previous works
 - experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   kind: literature
   method:
@@ -210,8 +144,8 @@ experiments:
   locator:
     published_page: 383
     pdf_page_index: 2
-    equation: 1-3
-    note: Wagner and St. Pierre 1545 C regular-solution G^E = H^M = -9700 N_Fe N_Ti cal/mol; gamma_Ti^o from eq (3) is 0.068
+    table: '1'
+    note: Table 1. Chemical analysis of the pure materials (ppm)
 benches:
 - id: 10.2355/isijinternational1966.16.382::bench::thoria-kems
   work_id: 10.2355/isijinternational1966.16.382

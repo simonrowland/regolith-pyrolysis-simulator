@@ -19,598 +19,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.3390/min13010079
 experiments:
-- experiment_id: 10.3390/min13010079::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
-  sample:
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.05490915921806480449788752468'
-          - - CaO
-            - '0.1055795091443572984791498063'
-          - - Cr2O3
-            - '0.001344645271037509295110597271'
-          - - FeO
-            - '0.1849027244706631278343171462'
-          - - K2O
-            - '0.0004602289578736738478695676032'
-          - - MgO
-            - '0.1604201309637965438587289399'
-          - - MnO
-            - '0.002182596425334022351282892583'
-          - - Na2O
-            - '0.004696377995353381025039314397'
-          - - SiO2
-            - '0.4454917556583907461809776934'
-          - - TiO2
-            - '0.04001287189512889262963651758'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 4
-        pdf_page_index: 4
-        table: '1'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.04'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '9.56'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_Cr2O3_wt_pct
-          - state:
-              tag: value
-              value: '0.33'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_Cr2O3_g_mol
-          - state:
-              tag: value
-              value: '151.98919999999998'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '21.45'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.44'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.25'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.47'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '43.22'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.16'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 4
-              pdf_page_index: 4
-              table: '1'
-        output_unit: mole_fraction
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '9.04'
-          CaO: '9.56'
-          Cr2O3: '0.33'
-          FeO: '21.45'
-          K2O: '0.07'
-          MgO: '10.44'
-          MnO: '0.25'
-          Na2O: '0.47'
-          SiO2: '43.22'
-          TiO2: '5.16'
-      locator:
-        published_page: 4
-        pdf_page_index: 4
-        table: '1'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3390/min13010079
-  locator:
-    published_page: 4
-    pdf_page_index: 4
-    table: '1'
-- experiment_id: 10.3390/min13010079::2
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3390/min13010079
-  locator:
-    published_page: 7
-    pdf_page_index: 7
-    table: '2'
-- experiment_id: 10.3390/min13010079::3
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample:
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.05490915921806480449788752468'
-          - - CaO
-            - '0.1055795091443572984791498063'
-          - - Cr2O3
-            - '0.001344645271037509295110597271'
-          - - FeO
-            - '0.1849027244706631278343171462'
-          - - K2O
-            - '0.0004602289578736738478695676032'
-          - - MgO
-            - '0.1604201309637965438587289399'
-          - - MnO
-            - '0.002182596425334022351282892583'
-          - - Na2O
-            - '0.004696377995353381025039314397'
-          - - SiO2
-            - '0.4454917556583907461809776934'
-          - - TiO2
-            - '0.04001287189512889262963651758'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 6
-        pdf_page_index: 6
-        figure: '3'
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.04'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '9.56'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_Cr2O3_wt_pct
-          - state:
-              tag: value
-              value: '0.33'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_Cr2O3_g_mol
-          - state:
-              tag: value
-              value: '151.98919999999998'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '21.45'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.44'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.25'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.47'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '43.22'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.16'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 6
-              pdf_page_index: 6
-              figure: '3'
-        output_unit: mole_fraction
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '9.04'
-          CaO: '9.56'
-          Cr2O3: '0.33'
-          FeO: '21.45'
-          K2O: '0.07'
-          MgO: '10.44'
-          MnO: '0.25'
-          Na2O: '0.47'
-          SiO2: '43.22'
-          TiO2: '5.16'
-      locator:
-        published_page: 6
-        pdf_page_index: 6
-        figure: '3'
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3390/min13010079
-  locator:
-    published_page: 6
-    pdf_page_index: 6
-    figure: '3'
-- experiment_id: 10.3390/min13010079::4
-  kind: literature
-  method:
-    tag: value
-    value: engine_evaluation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3390/min13010079
-  locator:
-    published_page: 7
-    pdf_page_index: 7
-    figure: '4'
-- experiment_id: 10.3390/min13010079::5
-  kind: literature
-  method:
-    tag: value
-    value: langmuir_free_evaporation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3390/min13010079
-  locator:
-    published_page: 8
-    pdf_page_index: 8
-    figure: '5'
 - experiment_id: 10.3390/min13010079::experiment::lms1-bet-analysis
   kind: literature
   method:
@@ -825,6 +233,31 @@ experiments:
         pdf_page_index: 2
         section: 2.1 Lunar Simulant Sintering
         note: Six hours; unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              section: 2.1 Lunar Simulant Sintering
+              note: Six hours; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              section: 2.1 Lunar Simulant Sintering
+              note: Six hours; unit conversion only
+        output_unit: s
     cooling_or_quench:
       state:
         tag: value
@@ -838,7 +271,223 @@ experiments:
   method:
     tag: unknown
     reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.05490915921806480449788752468'
+          - - CaO
+            - '0.1055795091443572984791498063'
+          - - Cr2O3
+            - '0.001344645271037509295110597271'
+          - - FeO
+            - '0.1849027244706631278343171462'
+          - - K2O
+            - '0.0004602289578736738478695676032'
+          - - MgO
+            - '0.1604201309637965438587289399'
+          - - MnO
+            - '0.002182596425334022351282892583'
+          - - Na2O
+            - '0.004696377995353381025039314397'
+          - - SiO2
+            - '0.4454917556583907461809776934'
+          - - TiO2
+            - '0.04001287189512889262963651758'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.04'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.56'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '21.45'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.44'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.22'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.16'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 4
+              pdf_page_index: 4
+              table: '1'
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '9.04'
+          CaO: '9.56'
+          Cr2O3: '0.33'
+          FeO: '21.45'
+          K2O: '0.07'
+          MgO: '10.44'
+          MnO: '0.25'
+          Na2O: '0.47'
+          SiO2: '43.22'
+          TiO2: '5.16'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
   conditions:
     temperature_K:
       state:

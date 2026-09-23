@@ -38,38 +38,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.icarus.2023.115577
 experiments:
-- experiment_id: 10.1016/j.icarus.2023.115577::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'post_heat_treatment_powder_characterization' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2023.115577
-  locator:
-    pdf_page_index: 20
-    table: '3'
-    note: Icarus journal pre-proof; no printed pagination.
 - experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
   kind: literature
   method:
@@ -87,6 +55,29 @@ experiments:
         pdf_page_index: 6
         section: 2.1 Thermal Analysis and Mass Spectroscopy
         note: Printed 1500 mg specimen; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        output_unit: kg
     form:
       state:
         tag: value
@@ -153,6 +144,29 @@ experiments:
           pdf_page_index: 6
           section: 2.1 Thermal Analysis and Mass Spectroscopy
           note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
     setpoints_and_holds:
     - temperature_K:
         state:
@@ -166,6 +180,37 @@ experiments:
           pdf_page_index: 6
           section: 2.1 Thermal Analysis and Mass Spectroscopy
           note: Printed 25-1200 C; unit conversion only.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '25'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - original_high
+            - state:
+                tag: value
+                value: '1200'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          output_unit: K
 - experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   kind: literature
   method:
@@ -228,6 +273,29 @@ experiments:
           pdf_page_index: 17
           section: 3.3 Heat Treatment Design
           note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
     setpoints_and_holds:
     - temperature_K:
         state:
@@ -240,6 +308,29 @@ experiments:
           pdf_page_index: 17
           section: 3.3 Heat Treatment Design
           note: Printed 750 C; unit conversion only.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '750'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 750 C; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 750 C; unit conversion only.
+          output_unit: K
       hold_duration_s:
         state:
           tag: value
@@ -251,6 +342,29 @@ experiments:
           pdf_page_index: 17
           section: 3.3 Heat Treatment Design
           note: Printed two-hour hold; unit conversion only.
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed two-hour hold; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed two-hour hold; unit conversion only.
+          output_unit: s
 - experiment_id: 10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series
   kind: literature
   method:
@@ -268,6 +382,29 @@ experiments:
         pdf_page_index: 7
         section: 2.1 Thermal Analysis and Mass Spectroscopy
         note: Printed approximately 23 g; unit conversion only.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23'
+            locator:
+              pdf_page_index: 7
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed approximately 23 g; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 7
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed approximately 23 g; unit conversion only.
+        output_unit: kg
     form:
       state:
         tag: value
@@ -335,6 +472,29 @@ experiments:
           pdf_page_index: 7
           section: 2.1 Thermal Analysis and Mass Spectroscopy
           note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+        inference:
+          relation: mbar_to_Pa
+          inputs:
+          - P_Pa = P_mbar × 100
+          - original_unit=mbar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000001'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+          output_unit: Pa
       pump:
         state:
           tag: value
@@ -371,6 +531,29 @@ experiments:
           pdf_page_index: 7
           section: 2.1 Thermal Analysis and Mass Spectroscopy
           note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
     setpoints_and_holds:
     - temperature_K:
         state:

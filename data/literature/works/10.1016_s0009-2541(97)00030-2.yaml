@@ -19,70 +19,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/s0009-2541(97)00030-2
 experiments:
-- experiment_id: 10.1016/s0009-2541(97)00030-2::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'experimental_melt_equilibration' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/s0009-2541(97)00030-2
-  locator:
-    page: 22
-    table: '1'
-    section: Silicate starting compositions (electron microprobe analysis)
-- experiment_id: 10.1016/s0009-2541(97)00030-2::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'summary_of_experimental_activity_coefficients' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/s0009-2541(97)00030-2
-  locator:
-    page: 29
-    table: '4'
-    section: Summary of activity coefficients gamma of metal oxides
 - experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   kind: literature
   method:
@@ -176,11 +112,42 @@ experiments:
         page: 25
         table: '3'
         note: Printed 48 to 75.3 h; unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '48'
+            locator:
+              page: 25
+              table: '3'
+              note: Printed 48 to 75.3 h; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 25
+              table: '3'
+              note: Printed 48 to 75.3 h; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              page: 25
+              table: '3'
+              note: Printed 48 to 75.3 h; unit conversion only
+        output_unit: s
 - experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   kind: literature
   method:
     tag: unknown
-    reason: regime 'thermodynamic_equilibrium_calculation' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'experimental_melt_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -205,9 +172,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/s0009-2541(97)00030-2
   locator:
-    page: 29
-    section: 3. Calculation of activity coefficients
-    note: equations=7-9
+    page: 22
+    table: '1'
+    section: Silicate starting compositions (electron microprobe analysis)
 benches:
 - id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
   work_id: 10.1016/s0009-2541(97)00030-2

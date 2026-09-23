@@ -55,6 +55,37 @@ experiments:
         published_page: 556
         pdf_page_index: 1
         note: About 1-2 g granular alloy; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 556
+              pdf_page_index: 1
+              note: About 1-2 g granular alloy; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 556
+              pdf_page_index: 1
+              note: About 1-2 g granular alloy; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 556
+              pdf_page_index: 1
+              note: About 1-2 g granular alloy; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value

@@ -87,7 +87,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.icarus.2003.08.023
 experiments:
-- experiment_id: 10.1016/j.icarus.2003.08.023::10
+- experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   kind: literature
   method:
     tag: unknown
@@ -119,172 +119,7 @@ experiments:
     table: '10'
     line_range: 649-661
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-- experiment_id: 10.1016/j.icarus.2003.08.023::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    page: 218
-    table: '2'
-    note: row=K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
-    source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-- experiment_id: 10.1016/j.icarus.2003.08.023::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    page: 221
-    table: '4'
-    note: row=SiO
-    source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-- experiment_id: 10.1016/j.icarus.2003.08.023::7
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    page: 226
-    table: '7'
-    note: row=Tholeiites
-    source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-- experiment_id: 10.1016/j.icarus.2003.08.023::8
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    page: 232
-    table: '8'
-    note: row=Na
-    source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-- experiment_id: 10.1016/j.icarus.2003.08.023::9
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    page: 234
-    table: '9'
-    note: row=SiO
-    source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-- experiment_id: 10.1016/j.icarus.2003.08.023::REF-016#SiO_KEMS_1700_2000K
+- experiment_id: 10.1016/j.icarus.2003.08.023::ref-016-sio-kems-1700-2000k
   kind: literature
   method:
     tag: unknown
@@ -317,7 +152,7 @@ experiments:
       \ cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016; docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n\
       (2) Schaefer, L. & Fegley, B. (2004) Icar"
     record: REF-016#SiO_KEMS_1700_2000K
-- experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+- experiment_id: 10.1016/j.icarus.2003.08.023::sf04-magma-companion-workbook
   kind: literature
   method:
     tag: unknown

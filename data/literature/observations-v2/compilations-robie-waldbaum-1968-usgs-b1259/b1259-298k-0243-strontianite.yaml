@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0243-strontianite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:S:shared:T=298.15:col=entropy:name=strontianite:v=e45c40134b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:tabulation
   identity:
     quantity:
@@ -106,7 +106,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=strontianite:v=2e3ec912e2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:tabulation
   identity:
     quantity:
@@ -272,7 +272,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=strontianite:v=7a3a2dd76f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:tabulation
   identity:
     quantity:
@@ -438,7 +438,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=strontianite:v=21fee5a6e0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0243-strontianite:tabulation
   identity:
     quantity:

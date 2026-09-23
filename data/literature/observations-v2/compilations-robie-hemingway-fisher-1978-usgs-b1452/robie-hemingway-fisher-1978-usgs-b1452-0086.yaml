@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0086.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:S:shared:T=298.15:row=0:col=entropy
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:S:shared:T=298.15:col=entropy:v=ad05150cc9:poly=reference
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:tabulation
   identity:
     quantity:
@@ -97,7 +97,7 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:delta_fH:from_the_elements:T=298.15:row=0:col=formation_enthalpy
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=725af3071b:poly=reference
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0086:tabulation
   identity:
     quantity:

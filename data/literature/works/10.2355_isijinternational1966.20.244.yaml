@@ -70,6 +70,29 @@ experiments:
         published_page: 245
         pdf_page_index: 2
         note: 1600 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: 1600 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: 1600 C; unit conversion only
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -207,6 +230,40 @@ benches:
         pdf_page_index: 1
         section: 1. Knudsen Cell Assembly
         note: 0.4-0.6 mm; unit conversion only. No effective area computed
+      inference:
+        relation: mm_to_m
+        inputs:
+        - L_m = L_mm / 1000
+        - original_unit=mm
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              section: 1. Knudsen Cell Assembly
+              note: 0.4-0.6 mm; unit conversion only. No effective area computed
+        - - original_high
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              section: 1. Knudsen Cell Assembly
+              note: 0.4-0.6 mm; unit conversion only. No effective area computed
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              section: 1. Knudsen Cell Assembly
+              note: 0.4-0.6 mm; unit conversion only. No effective area computed
+        output_unit: m
     orifice_channel_length_m:
       state:
         tag: unknown
