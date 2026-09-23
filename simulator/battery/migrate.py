@@ -5948,6 +5948,37 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
     )
 
 
+
+# b-555: absence of observations from an extract is fine; silence (no
+# extracts-v2 sibling and no migration-queue entry) is not. Typed refusal
+# reasons for the two known cohorts; catch-all keeps the class impossible.
+TABLE_SHAPED_EXTRACT_WHY = "table-shaped extract not consumed"
+MODEL_DERIVED_COHORT_WHY = "model-derived cohort excluded by ruling"
+ZERO_OBSERVATION_EXTRACT_WHY = "extract produced no observations"
+
+
+def silent_extract_refusal_why(doc: Mapping[str, Any]) -> str:
+    """Classify why a zero-observation extract is not ingested.
+
+    Table-shaped sidecars (``literature_extract_table.v1``) are not consumed
+    by the species/observations walk. Model-derived extracts (owner ruling)
+    stay out of the empirical observation store. Anything else that still
+    yields zero observations gets an explicit catch-all so silence cannot
+    recur.
+    """
+
+    schema = str(doc.get("schema_version") or "")
+    if schema == "literature_extract_table.v1":
+        return TABLE_SHAPED_EXTRACT_WHY
+    policy = doc.get("evidence_policy")
+    classification = ""
+    if isinstance(policy, Mapping):
+        classification = str(policy.get("classification") or "").lower()
+    if doc.get("model_tables") or "model" in classification:
+        return MODEL_DERIVED_COHORT_WHY
+    return ZERO_OBSERVATION_EXTRACT_WHY
+
+
 # ---------------------------------------------------------------------------
 # Migrator
 # ---------------------------------------------------------------------------
@@ -6596,6 +6627,46 @@ class Migrator:
                 local_ids=local_ids,
                 declared_experiment_id=declared_experiment_id,
             )
+        self._record_silent_extract_if_needed(
+            path=path, rel=rel, doc=doc, work=work
+        )
+
+    def _record_silent_extract_if_needed(
+        self,
+        *,
+        path: Path,
+        rel: str,
+        doc: Mapping[str, Any],
+        work: Work,
+    ) -> None:
+        """Emit a typed queue record when an extract leaves no store trace.
+
+        Zero observations is correct for table-shaped and model-derived
+        extracts (do not ingest). Zero typed records is not: freshness and
+        consumers must see why. Any extract with both counts at zero gets
+        one queue entry so silence cannot recur.
+        """
+
+        if self.result.observations_by_source.get(rel):
+            return
+        if any(entry.source == rel for entry in self.result.queue):
+            return
+        locator = doc.get("locator") if isinstance(doc.get("locator"), Mapping) else None
+        if locator is None:
+            extraction = doc.get("extraction")
+            if isinstance(extraction, Mapping) and isinstance(
+                extraction.get("source_pdf"), str
+            ):
+                locator = {"source_path": extraction["source_pdf"]}
+            else:
+                locator = {"source_path": rel}
+        self.result.add_queue(
+            work_id=work.work_id,
+            locator=locator,
+            axes=["document"],
+            why=silent_extract_refusal_why(doc),
+            source=rel,
+        )
 
     def _migrate_extract_observation(
         self,

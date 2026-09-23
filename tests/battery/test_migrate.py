@@ -31,7 +31,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
+    MODEL_DERIVED_COHORT_WHY,
     REPO_ROOT,
+    TABLE_SHAPED_EXTRACT_WHY,
+    ZERO_OBSERVATION_EXTRACT_WHY,
     DuplicateObservationIdError,
     Migrator,
     UnknownRailSpellingError,
@@ -55,6 +58,7 @@ from simulator.battery.migrate import (
     pressure_from_equipment,
     resolve_equipment_context,
     select_declared_source,
+    silent_extract_refusal_why,
     to_plain,
     work_id_for,
     write_outputs,
@@ -4791,3 +4795,204 @@ def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
     assert "janaf" not in aliases
     assert aliases["species-rail-differential"] == citation_hash("janaf")
     assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
+
+
+# ---------------------------------------------------------------------------
+# b-555 — silent extracts must emit a typed queue record (absence ≠ silence)
+# ---------------------------------------------------------------------------
+
+
+_TABLE_SHAPED_EXTRACT = {
+    "schema_version": "literature_extract_table.v1",
+    "source_id": "fixture-source",
+    "source_table": "S-I",
+    "species": "K",
+    "locator": {"table": "S-I", "page": 1},
+    "columns": "sample, A, B",
+    "rows": [{"sample": "S1", "A": 1.0, "B": 2.0}],
+}
+
+
+_MODEL_DERIVED_EXTRACT = {
+    "schema_version": "literature_extract.v1",
+    "source_id": "fixture-source",
+    "source": {
+        "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+        "doi": "10.1234/FIXTURE",
+    },
+    "extraction": {"method": "unit_test", "date": "2026-09-22", "worker": "pytest"},
+    "review_status": "draft",
+    "species": {},
+    "evidence_policy": {
+        "classification": "model",
+        "measurement_claim": "No laboratory measurements; modelling study.",
+    },
+    "model_tables": [
+        {
+            "table": "1",
+            "classification": "model_derived",
+            "values": {"method_class": "model_derived", "quantity": "inventory"},
+        }
+    ],
+}
+
+
+_EMPTY_SPECIES_EXTRACT = {
+    "schema_version": "literature_extract.v1",
+    "source_id": "fixture-source",
+    "source": {
+        "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+        "doi": "10.1234/FIXTURE",
+    },
+    "extraction": {"method": "unit_test", "date": "2026-09-22", "worker": "pytest"},
+    "review_status": "draft",
+    "species": {},
+}
+
+
+def test_b555_silent_extract_refusal_why_classifier() -> None:
+    assert silent_extract_refusal_why(_TABLE_SHAPED_EXTRACT) == TABLE_SHAPED_EXTRACT_WHY
+    assert silent_extract_refusal_why(_MODEL_DERIVED_EXTRACT) == MODEL_DERIVED_COHORT_WHY
+    assert silent_extract_refusal_why(_EMPTY_SPECIES_EXTRACT) == ZERO_OBSERVATION_EXTRACT_WHY
+    # Live motivating stems (schema / policy only; no ingest).
+    assert (
+        silent_extract_refusal_why(
+            {"schema_version": "literature_extract_table.v1", "rows": []}
+        )
+        == TABLE_SHAPED_EXTRACT_WHY
+    )
+    assert (
+        silent_extract_refusal_why(
+            {
+                "schema_version": "literature_extract.v1",
+                "species": {},
+                "evidence_policy": {
+                    "classification": "model_derived_and_compilation_assessed"
+                },
+                "model_tables": [{"table": "1"}],
+            }
+        )
+        == MODEL_DERIVED_COHORT_WHY
+    )
+
+
+def test_b555_table_shaped_extract_emits_typed_refusal_not_observations(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path, _TABLE_SHAPED_EXTRACT)
+    result = migrate(root, write=True)
+    src = "data/literature/extracts/fixture-source.yaml"
+    assert result.observations_by_source.get(src, []) == []
+    hits = [e for e in result.queue if e.source == src]
+    assert len(hits) == 1
+    assert hits[0].why == TABLE_SHAPED_EXTRACT_WHY
+    assert hits[0].axes == ["document"]
+    # Do not ingest: no extracts-v2 observations payload with rows.
+    sibling = root / "data" / "literature" / "extracts-v2" / "fixture-source.yaml"
+    # Absence of sibling is allowed; queue is the typed record. If a sibling
+    # exists (pre-existing empty rewrite path), it must stay observation-empty.
+    if sibling.is_file():
+        payload = yaml.safe_load(sibling.read_text(encoding="utf-8"))
+        assert payload.get("observations") == []
+
+
+def test_b555_model_derived_extract_emits_typed_refusal_not_observations(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path, _MODEL_DERIVED_EXTRACT)
+    result = migrate(root, write=True)
+    src = "data/literature/extracts/fixture-source.yaml"
+    assert result.observations_by_source.get(src, []) == []
+    hits = [e for e in result.queue if e.source == src]
+    assert len(hits) == 1
+    assert hits[0].why == MODEL_DERIVED_COHORT_WHY
+    assert not any(
+        oid.startswith("fixture-source::") for oid in result.observations
+    )
+
+
+def test_b555_zero_obs_zero_queue_is_impossible(tmp_path: Path) -> None:
+    """Class invariant: any extract with 0 observations and 0 typed records
+    must itself emit a typed record (catch-all for non-table/non-model)."""
+
+    root = _write_min_tree(tmp_path, _EMPTY_SPECIES_EXTRACT)
+    result = migrate(root, write=True)
+    src = "data/literature/extracts/fixture-source.yaml"
+    assert result.observations_by_source.get(src, []) == []
+    hits = [e for e in result.queue if e.source == src]
+    assert len(hits) == 1
+    assert hits[0].why == ZERO_OBSERVATION_EXTRACT_WHY
+
+
+def test_b555_silent_extract_mutation_proof(tmp_path: Path, monkeypatch) -> None:
+    """Mutating the recorder into a no-op restores silence; live path records."""
+
+    root = _write_min_tree(tmp_path, _TABLE_SHAPED_EXTRACT)
+    src = "data/literature/extracts/fixture-source.yaml"
+
+    live = migrate(root, write=False)
+    assert any(e.source == src and e.why == TABLE_SHAPED_EXTRACT_WHY for e in live.queue)
+
+    monkeypatch.setattr(
+        Migrator,
+        "_record_silent_extract_if_needed",
+        lambda self, **kwargs: None,
+    )
+    mutant = migrate(root, write=False)
+    assert not any(e.source == src for e in mutant.queue)
+    assert mutant.observations_by_source.get(src, []) == []
+
+    monkeypatch.undo()
+    restored = migrate(root, write=False)
+    assert any(
+        e.source == src and e.why == TABLE_SHAPED_EXTRACT_WHY for e in restored.queue
+    )
+
+
+def test_b555_live_extract_files_classify_to_named_reasons() -> None:
+    """Motivating extract files classify to the two named refusal reasons."""
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    expected = {
+        "bencze-yazhenskikh-2016-table-s1-k.yaml": TABLE_SHAPED_EXTRACT_WHY,
+        "charnoz-2023-hydrogen-magma-ocean.yaml": MODEL_DERIVED_COHORT_WHY,
+        "lebrun-2013-magma-ocean-atmosphere.yaml": MODEL_DERIVED_COHORT_WHY,
+        "vanbuchem-2023-lavatmos.yaml": MODEL_DERIVED_COHORT_WHY,
+    }
+    for name, why in expected.items():
+        doc = yaml.safe_load((extracts / name).read_text(encoding="utf-8"))
+        assert silent_extract_refusal_why(doc) == why, name
+
+
+def test_b555_committed_store_has_zero_silent_extracts() -> None:
+    """After regen: every extract has extracts-v2 sibling or a queue entry.
+
+    Pins the freshness tripwire contract (``scripts/check_store_freshness.py``
+    ``_untraced_extracts``) and the four motivating reasons on the queue.
+    """
+
+    from scripts.check_store_freshness import _untraced_extracts
+
+    untraced = _untraced_extracts("HEAD")
+    assert untraced == [], f"silent extracts remain: {untraced}"
+
+    queue = (REPO_ROOT / "data" / "battery" / "migration-queue.yaml").read_text(
+        encoding="utf-8"
+    )
+    expected = {
+        "data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml": (
+            TABLE_SHAPED_EXTRACT_WHY
+        ),
+        "data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml": (
+            MODEL_DERIVED_COHORT_WHY
+        ),
+        "data/literature/extracts/lebrun-2013-magma-ocean-atmosphere.yaml": (
+            MODEL_DERIVED_COHORT_WHY
+        ),
+        "data/literature/extracts/vanbuchem-2023-lavatmos.yaml": (
+            MODEL_DERIVED_COHORT_WHY
+        ),
+    }
+    for src, why in expected.items():
+        assert src in queue, src
+        assert why in queue, (src, why)

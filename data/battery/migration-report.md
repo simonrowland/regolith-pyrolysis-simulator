@@ -4,7 +4,7 @@ rows in: 46369
 records out (observations): 91588
 works: 238
 experiments: 6874
-queue size: 130257
+queue size: 130263
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 168
@@ -17950,7 +17950,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml` | 11 | 11 | 62 |
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 4 | 20 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 57 |
@@ -17959,7 +17959,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/burcat-third-millennium.yaml` | 37 | 37 | 148 |
 | `data/literature/extracts/busemann-2024-noble-gases-ryugu-bennu.yaml` | 2 | 2 | 11 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 34 |
-| `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml` | 8 | 8 | 37 |
 | `data/literature/extracts/costa-jacobson-2015.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
@@ -18072,7 +18072,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 100 | 389 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 93 |
 | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` | 6 | 6 | 27 |
-| `data/literature/extracts/lebrun-2013-magma-ocean-atmosphere.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/lebrun-2013-magma-ocean-atmosphere.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lh87-al-o-gas-species.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-beo-g.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-cao-g.yaml` | 1 | 1 | 5 |
@@ -18087,7 +18087,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lpi-compendium-62231.yaml` | 2 | 2 | 9 |
 | `data/literature/extracts/lpi-compendium-65701.yaml` | 4 | 4 | 23 |
 | `data/literature/extracts/lpi-lunar-soils.yaml` | 6 | 6 | 36 |
-| `data/literature/extracts/lpi-lunar-sourcebook-chapter08.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/lpi-lunar-sourcebook-chapter08.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lpsc-2014-2057.yaml` | 11 | 11 | 50 |
 | `data/literature/extracts/lpsc-2017-2171.yaml` | 3 | 3 | 15 |
 | `data/literature/extracts/lpsc-2019-2641.yaml` | 4 | 4 | 19 |
@@ -18171,8 +18171,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/usgs-lunar-sourcebook-tab8-2.yaml` | 25 | 25 | 100 |
 | `data/literature/extracts/usgs-lunar-sourcebook-tab8-4.yaml` | 18 | 18 | 90 |
 | `data/literature/extracts/van-kooten-2020-lunar-outgassing.yaml` | 3 | 3 | 13 |
-| `data/literature/extracts/vanbuchem-2023-lavatmos.yaml` | 0 | 0 | 0 |
-| `data/literature/extracts/vanbuchem-2025-lavatmos2.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/vanbuchem-2023-lavatmos.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/vanbuchem-2025-lavatmos2.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 13 | 13 | 66 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 74 |
