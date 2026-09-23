@@ -17,7 +17,7 @@ from simulator.battery.records import (
 )
 from simulator.battery.waypoints import (
     charge_moles_by_species, oxygen_condition, consumer_readiness,
-    WaypointAuthority, ReadinessStatus, GapReason,
+    WaypointAuthority, ReadinessStatus, GapReason, UnknownCompositionRelationError,
 )
 from tests.battery import factories as f
 
@@ -330,10 +330,20 @@ def test_engine_inputs_all_eight_and_provenance():
 
 
 def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice():
-    path = Path(__file__).parents[2] / "data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml"
+    root = Path(__file__).parents[2]
+    path = root / "data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml"
     extract = yaml.safe_load(path.read_text(encoding="utf-8"))
     experiments = {item["experiment_id"]: item for item in extract["experiments"]}
     mixes = {}
+    recipe_extract = yaml.safe_load(
+        (root / "data/literature/extracts/yam1983.yaml").read_text(encoding="utf-8")
+    )
+    recipe_relation = recipe_extract["experiments"][0]["sample"]["initial_composition"]["inference"]["relation"]
+    measured_relation = next(iter(experiments.values()))["sample"]["initial_composition"]["inference"]["relation"]
+    assert {recipe_relation, measured_relation} == {
+        "calculated_from_printed_recipe_or_aimed_target",
+        "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction",
+    }
 
     def collect_mix_values(value):
         if isinstance(value, dict):
@@ -379,15 +389,37 @@ def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice()
     composition = Composition("printed_recipe", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
     sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
         State.of(composition), locator=f.loc(),
-        inference=Derivation(relation="recipe_stoichiometry_to_oxide_mole_fraction", inputs=("recipe",), parameters=(), output_unit="mole_fraction"),
+        inference=Derivation(relation=recipe_relation, inputs=("recipe",), parameters=(), output_unit="mole_fraction"),
     ))
     result = engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))[0]
     assert result.payload["composition_method_class"] == "calculated"
     assert "calculated from printed recipe/aimed target" in result.payload["composition_notice"]
+    assert "calculated from measured composition" not in result.payload["composition_notice"]
     assert "recipe" in result.payload["composition_notice"]
     route = result.provenance["output_routes"]["composition_mol"]
     assert route["method_class"] == "calculated"
     assert route["notice"] == result.payload["composition_notice"]
+
+    measured_sample = replace(sample, initial_composition=replace(
+        sample.initial_composition,
+        inference=replace(sample.initial_composition.inference, relation=measured_relation),
+    ))
+    measured_result = engine_point_requests(
+        collect_consumer_inputs(replace(experiment, sample=measured_sample), bench, observation)
+    )[0]
+    assert "calculated from measured composition" in measured_result.payload["composition_notice"]
+    assert measured_result.provenance["output_routes"]["composition_mol"]["notice"] == measured_result.payload["composition_notice"]
+
+
+def test_unknown_composition_relation_refuses_loudly():
+    experiment, bench, observation = case()
+    composition = Composition("unknown_relation", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation="not_a_production_relation", inputs=("unknown",), parameters=(), output_unit="mole_fraction"),
+    ))
+    with pytest.raises(UnknownCompositionRelationError, match="unknown normalized composition relation"):
+        engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))
 
 
 @pytest.mark.parametrize("name", ["temperature_K", "total_pressure_Pa", "fO2_log"])

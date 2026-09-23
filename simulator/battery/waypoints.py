@@ -60,6 +60,10 @@ class GapReason(StrEnum):
     NO_SCOREABLE_OBSERVATIONS = "no_scoreable_observations"
 
 
+class UnknownCompositionRelationError(ValueError):
+    """A composition derivation relation lacks an explicit provenance mapping."""
+
+
 class ReadinessStatus(StrEnum):
     READY = "ready"
     PARTIAL = "partial"
@@ -510,11 +514,18 @@ def normalized_composition(
             if located.inference is not None:
                 locator = located.locator
                 locator_text = str(locator) if locator is not None else "source locator unavailable"
-                origin = (
-                    "printed recipe/aimed target"
-                    if located.inference.relation.startswith("recipe_")
-                    else "measured composition"
-                )
+                origins = {
+                    "calculated_from_printed_recipe_or_aimed_target":
+                        "printed recipe/aimed target",
+                    "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
+                        "measured composition",
+                }
+                try:
+                    origin = origins[located.inference.relation]
+                except KeyError as exc:
+                    raise UnknownCompositionRelationError(
+                        f"unknown normalized composition relation: {located.inference.relation!r}"
+                    ) from exc
                 notice = (
                     f"calculated from {origin}; "
                     f"relation={located.inference.relation}; "
@@ -531,6 +542,8 @@ def normalized_composition(
             if field == "initial_composition":
                 directness = 2 if raw.amount_basis is AmountBasis.MOLE_FRACTION else 1
             evidence_ranks.append((not bool(located.inference), directness))
+        except UnknownCompositionRelationError:
+            raise
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
             missing.append(path)
