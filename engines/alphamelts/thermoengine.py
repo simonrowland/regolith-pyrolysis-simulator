@@ -708,6 +708,14 @@ _TE_PURE_PHASE_POLYMORPH = {
     'En': 'orthoenstatite',
     'cEn': 'clinoenstatite',
     'pEn': 'protoenstatite',
+    # Berman symbols. Corundum is Crn, Mg-Al spinel is Spl, andalusite is
+    # And. Co / Sp / a are not phase symbols in this database.
+    'Lm': 'lime',
+    'Crn': 'corundum',
+    'Spl': 'spinel',
+    'And': 'andalusite',
+    'Ky': 'kyanite',
+    'Sil': 'sillimanite',
 }
 
 # BermanStoichiometricPhases.m `#define QUARTZ_ADJUSTMENT -1291.0`, added

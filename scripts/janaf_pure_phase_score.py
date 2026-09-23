@@ -34,10 +34,15 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from simulator.melt_backend.pure_phase import PurePhaseProperties  # noqa: E402
+from simulator.melt_backend.pure_phase import (  # noqa: E402
+    PurePhaseAccessError,
+    PurePhaseProperties,
+    PurePhaseUnknownSymbolError,
+)
 from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
     DEFAULT_PHASE_REQUESTS,
     DEFAULT_TEMPERATURES_K,
+    ENGINE_PHASE_ACCESS,
     ENGINES,
     NO_JANAF_TABLE_FOR_POLYMORPH,
     POLYMORPH_MISMATCH,
@@ -128,6 +133,25 @@ class JanafQuerier:
         return janaf_values_at(self._documents[table_id], temperature_K)
 
 
+def _consume_row(rows, refusals, build, **fields) -> None:
+    """Score one row. A bad row is a typed refusal; it does not abort the run."""
+
+    try:
+        rows.append(build())
+    except PolymorphMismatchError as exc:
+        refusals.append(
+            RefusalRow(reason=POLYMORPH_MISMATCH, detail=str(exc), **fields)
+        )
+    except (
+        PurePhaseUnknownSymbolError,
+        PurePhaseAccessError,
+        ValueError,
+    ) as exc:
+        refusals.append(
+            RefusalRow(reason=ENGINE_PHASE_ACCESS, detail=str(exc), **fields)
+        )
+
+
 def build_all_rows(
     querier: EngineQuerier, janaf: JanafQuerier, engines: Tuple[str, ...]
 ):
@@ -146,8 +170,10 @@ def build_all_rows(
                 if refusal is not None:
                     refusals.append(refusal)
                     continue
-                try:
-                    rows.append(
+                _consume_row(
+                    rows,
+                    refusals,
+                    lambda reaction=reaction, engine=engine, T=T: (
                         build_reaction_row(
                             reaction,
                             engine,
@@ -155,17 +181,11 @@ def build_all_rows(
                             engine_query=engine_query(engine),
                             janaf_query=janaf,
                         )
-                    )
-                except PolymorphMismatchError as exc:
-                    refusals.append(
-                        RefusalRow(
-                            reason=POLYMORPH_MISMATCH,
-                            detail=str(exc),
-                            engine=engine,
-                            reaction_id=reaction.reaction_id,
-                            temperature_K=T,
-                        )
-                    )
+                    ),
+                    engine=engine,
+                    reaction_id=reaction.reaction_id,
+                    temperature_K=T,
+                )
     for request in DEFAULT_PHASE_REQUESTS:
         if request.engine not in engines:
             continue
@@ -174,26 +194,20 @@ def build_all_rows(
             if refusal is not None:
                 refusals.append(refusal)
                 continue
-            try:
-                rows.append(
-                    build_phase_row(
-                        request,
-                        T,
-                        engine_query=engine_query(request.engine),
-                        janaf_query=janaf,
-                    )
-                )
-            except PolymorphMismatchError as exc:
-                refusals.append(
-                    RefusalRow(
-                        reason=POLYMORPH_MISMATCH,
-                        detail=str(exc),
-                        engine=request.engine,
-                        phase_id=request.phase_id,
-                        janaf_table_id=request.janaf_table_id,
-                        temperature_K=T,
-                    )
-                )
+            _consume_row(
+                rows,
+                refusals,
+                lambda request=request, T=T: build_phase_row(
+                    request,
+                    T,
+                    engine_query=engine_query(request.engine),
+                    janaf_query=janaf,
+                ),
+                engine=request.engine,
+                phase_id=request.phase_id,
+                janaf_table_id=request.janaf_table_id,
+                temperature_K=T,
+            )
     return rows, refusals
 
 
@@ -229,7 +243,7 @@ def render_markdown(rows, refusals) -> str:
     for row in reaction_rows:
         lines.append(
             f"| {row.engine} | {row.reaction_id} | {row.temperature_K:.2f} "
-            f"| {row.sio2_polymorph} | {_fmt(row.drG_engine_kJ_mol)} "
+            f"| {row.sio2_polymorph or '-'} | {_fmt(row.drG_engine_kJ_mol)} "
             f"| {_fmt(row.drG_janaf_kJ_mol)} | {_fmt(row.residual_kJ_mol)} "
             f"| {_fmt(row.drG_engine_no_quartz_adjustment_kJ_mol)} "
             f"| {_fmt(row.residual_no_quartz_adjustment_kJ_mol)} "
