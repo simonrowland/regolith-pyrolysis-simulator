@@ -181,7 +181,6 @@ def build_manifest(
     return {
         "schema_version": MANIFEST_SCHEMA,
         "source_id": SOURCE_ID,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
         "compilation_role": dict(COMPILATION_ROLE),
         "source": {
             **COMPILATION_SOURCE,

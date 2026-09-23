@@ -1311,7 +1311,7 @@ def build_manifest(
     database: ParsedDatabase,
     records: list[SpeciesRecord],
     *,
-    generated_at: str,
+    generated_at: str | None = None,
 ) -> dict[str, Any]:
     elements = feedstock_elements()
     coverage = coverage_table(records, elements)
@@ -1319,10 +1319,9 @@ def build_manifest(
     for record in records:
         rel = f"data/literature/compilations/sgte-unary/records/{record.record_id}.yaml"
         entries.append(manifest_entry(record, rel))
-    return {
+    payload: dict[str, Any] = {
         "schema_version": MANIFEST_SCHEMA,
         "source_id": SOURCE_ID,
-        "generated_at": generated_at,
         "corpus_status": {
             "scope": "complete unary50.tdb ingest; every ELEMENT, FUNCTION, PHASE, PARAMETER G/TC/BM/BMAGN, SPECIES",
             "source_file": database.source_path,
@@ -1353,6 +1352,9 @@ def build_manifest(
         "feedstock_coverage": coverage,
         "entries": entries,
     }
+    if generated_at is not None:
+        payload["generated_at"] = generated_at
+    return payload
 
 
 def load_record_yaml(path: Path) -> dict[str, Any]:

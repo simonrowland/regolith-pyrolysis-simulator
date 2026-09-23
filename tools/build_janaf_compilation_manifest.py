@@ -156,7 +156,6 @@ def main() -> int:
     manifest = {
         "schema_version": "literature_compilation_manifest.v1",
         "source_id": "nist-janaf-4th",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
         "source": dict(COMPILATION_SOURCE),
         "corpus_status": {
             "scope": "feedstock-element complete harvest",

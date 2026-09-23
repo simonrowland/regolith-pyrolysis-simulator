@@ -366,7 +366,6 @@ def parse_table(payload: bytes, entry: dict[str, Any], cache_path: Path) -> dict
         "compilation_role": dict(COMPILATION_ROLE),
         "extraction": {
             "method": "machine parse of NIST tab-delimited table download; source bytes cached unchanged",
-            "date": date.today().isoformat(),
             "user_agent": USER_AGENT,
             "source_cache_path": cache_path.as_posix(),
             "source_sha256": hashlib.sha256(payload).hexdigest(),
@@ -418,7 +417,6 @@ def main() -> int:
     run_ledger: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "source_id": "nist-janaf-4th",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
         "index_url": INDEX_URL,
         "index_cache_path": index_cache.as_posix(),
         "index_sha256": hashlib.sha256(index_payload).hexdigest(),
