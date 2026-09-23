@@ -8707,6 +8707,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             payload['calibration_status'] = next(iter(statuses))
         return payload
 
+    def rump_expectation_run_notice(self) -> Dict[str, Any] | None:
+        """Run-level rump-expectation warning notice, or None when none fired."""
+
+        warnings = [
+            str(item)
+            for item in list(getattr(self, '_rump_expectation_warnings', ()) or ())
+            if str(item).strip()
+        ]
+        if not warnings:
+            return None
+        # Preserve first-seen order while dropping exact duplicates.
+        unique: list[str] = []
+        seen: set[str] = set()
+        for warning in warnings:
+            if warning in seen:
+                continue
+            seen.add(warning)
+            unique.append(warning)
+        return {
+            'warnings': unique,
+            'count': len(warnings),
+        }
+
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
         spent_reductant_residue = self.atom_ledger.project_account_kg(

@@ -3608,6 +3608,9 @@ def product_summary(
     sulfsat = _sulfur_saturation_notice(sim)
     if sulfsat:
         summary["sulfur_saturation_notice"] = sulfsat
+    rump = _rump_expectation_notice(sim)
+    if rump:
+        summary["rump_expectation_notice"] = rump
     summary.update(_coating_product_summary(run_execution))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
@@ -3647,6 +3650,15 @@ def _sulfur_saturation_notice(sim: Any) -> Mapping[str, Any] | None:
         return None
     return dict(notice)
 
+
+def _rump_expectation_notice(sim: Any) -> Mapping[str, Any] | None:
+    reader = getattr(sim, "rump_expectation_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
 
 
 def _selection_coating_lifetime(
