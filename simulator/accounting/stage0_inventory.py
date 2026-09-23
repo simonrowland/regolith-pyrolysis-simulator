@@ -213,8 +213,13 @@ def depletion_record(
     fb33_absent = _fb33_absent_elements(feedstocks, feedstock_key)
 
     initial_buckets = _initial_species_kg(initial_inventory)
-    remaining_by_account = _remaining_species_kg_by_account(ledger)
-    released_by_account = _released_species_kg_by_account(ledger)
+    projection_failures: list[str] = []
+    remaining_by_account = _remaining_species_kg_by_account(
+        ledger, projection_failures=projection_failures,
+    )
+    released_by_account = _released_species_kg_by_account(
+        ledger, projection_failures=projection_failures,
+    )
 
     rows: list[dict[str, Any]] = []
     expansion_rows: dict[str, dict[str, Any]] = {}
@@ -282,6 +287,7 @@ def depletion_record(
         "depletion_hour": depletion_hour,
         "would_be_inventory_advance": bool(depleted and campaign_name == "C0"),
         "epsilon": float(epsilon),
+        "account_projection_failures": list(projection_failures),
         "exclude_elements": list(exclude),
         "stage0_release_kinetics": STAGE0_RELEASE_KINETICS,
     }
@@ -482,30 +488,74 @@ def _initial_species_kg(initial_inventory: Any) -> dict[str, float]:
     return dict(totals)
 
 
-def _remaining_species_kg_by_account(ledger: Any) -> dict[str, dict[str, float]]:
-    return _species_kg_by_accounts(ledger, REMAINING_ACCOUNTS)
+def _remaining_species_kg_by_account(
+    ledger: Any,
+    *,
+    projection_failures: list[str] | None = None,
+) -> dict[str, dict[str, float]]:
+    return _species_kg_by_accounts(
+        ledger,
+        REMAINING_ACCOUNTS,
+        projection_failures=projection_failures,
+    )
 
 
-def _released_species_kg_by_account(ledger: Any) -> dict[str, dict[str, float]]:
-    return _species_kg_by_accounts(ledger, _DESTINATION_ACCOUNTS)
+def _released_species_kg_by_account(
+    ledger: Any,
+    *,
+    projection_failures: list[str] | None = None,
+) -> dict[str, dict[str, float]]:
+    return _species_kg_by_accounts(
+        ledger,
+        _DESTINATION_ACCOUNTS,
+        projection_failures=projection_failures,
+    )
 
 
 def _species_kg_by_accounts(
     ledger: Any,
     accounts: tuple[str, ...],
+    *,
+    projection_failures: list[str] | None = None,
 ) -> dict[str, dict[str, float]]:
+    """Project species kg by account.
+
+    Projection failures are recorded on ``projection_failures`` when
+    provided; accounts are never silently omitted from a diagnostic that
+    claims to be complete.
+    """
+
     out: dict[str, dict[str, float]] = {}
     if ledger is None:
         return out
     for account in accounts:
         try:
             species_kg = ledger.project_account_kg(account)
-        except Exception:
+        except Exception as first_exc:
             try:
                 species_kg = ledger.kg_by_account(account)
-            except Exception:
+            except Exception as second_exc:
+                detail = (
+                    f'{account}: project_account_kg={type(first_exc).__name__}: {first_exc}; '
+                    f'kg_by_account={type(second_exc).__name__}: {second_exc}'
+                )
+                if projection_failures is not None:
+                    projection_failures.append(detail)
+                else:
+                    raise AccountingError(
+                        f'ledger account projection failed for {account}; '
+                        f'refusing silent omit on diagnostic inventory'
+                    ) from second_exc
                 continue
         if not isinstance(species_kg, Mapping):
+            detail = f'{account}: projected payload is not a mapping'
+            if projection_failures is not None:
+                projection_failures.append(detail)
+            else:
+                raise AccountingError(
+                    f'ledger account projection for {account} is not a mapping; '
+                    f'refusing silent omit on diagnostic inventory'
+                )
             continue
         cleaned: dict[str, float] = {}
         for species, kg in species_kg.items():
