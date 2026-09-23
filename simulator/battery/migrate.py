@@ -5732,6 +5732,31 @@ def _locator_layer(loc_path: str) -> str | None:
     return None
 
 
+def is_compilation_record_path(path: str) -> bool:
+    """True when *path* names a literature compilation record JSON file."""
+    lowered = path.replace("\\", "/").lower()
+    return (
+        "/compilations/" in lowered
+        and "/records/" in lowered
+        and lowered.endswith(".json")
+    )
+
+
+def compilation_record_asset_id(source_path: str) -> str:
+    rel = source_path.replace("\\", "/")
+    return f"compilation_record:{rel}"
+
+
+def compilation_record_source_file(source_path: str) -> SourceFile:
+    rel = source_path.replace("\\", "/")
+    return SourceFile(
+        asset_id=compilation_record_asset_id(rel),
+        role=AssetRole.COMPILATION_RECORD,
+        path=rel,
+        sha256=State.unknown("compilation record asset has no INDEX sha256"),
+    )
+
+
 def choose_read_from(work: Work, locator: Locator | None) -> str:
     files = work.source_files.files
     loc_path = locator.source_path if locator is not None else None
@@ -5741,6 +5766,24 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
                 asset.path in str(loc_path) or str(loc_path) in asset.path
             ):
                 return asset.asset_id
+        # Compilation record JSON locators resolve to a registered Work asset
+        # (exact record or compilation parent). Never fall through to PDF.
+        if is_compilation_record_path(str(loc_path)):
+            for asset in files:
+                if asset.role is not AssetRole.COMPILATION_RECORD:
+                    continue
+                if asset.path == "unknown":
+                    continue
+                asset_path = asset.path.replace("\\", "/")
+                needle = str(loc_path).replace("\\", "/")
+                if (
+                    asset_path == needle
+                    or needle.startswith(asset_path.rstrip("/") + "/")
+                    or asset_path in needle
+                    or needle in asset_path
+                ):
+                    return asset.asset_id
+            return _unknown_asset_id(files)
         layer = _locator_layer(str(loc_path))
         if layer == "table":
             for asset in files:
@@ -5982,6 +6025,8 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
+        # Compilation record JSON paths registered as Work assets (not INDEX).
+        self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -5989,6 +6034,33 @@ class Migrator:
             rec = SourceCount(path=path)
             self.result.source_counts[path] = rec
         return rec
+
+    def _merge_extra_assets(
+        self, work_id: str, files: list[SourceFile]
+    ) -> list[SourceFile]:
+        seen = {asset.asset_id for asset in files}
+        for asset in self._work_extra_assets.get(work_id, {}).values():
+            if asset.asset_id in seen:
+                continue
+            files.append(asset)
+            seen.add(asset.asset_id)
+        return files
+
+    def _register_compilation_record_asset(
+        self, work: Work, loc_path: str | None
+    ) -> Work:
+        """Attach a compilation record JSON path as a Work INDEX asset."""
+        if not loc_path or not is_compilation_record_path(str(loc_path)):
+            return work
+        asset = compilation_record_source_file(str(loc_path))
+        self._work_extra_assets[work.work_id][asset.asset_id] = asset
+        merged = self._merge_extra_assets(work.work_id, list(work.source_files.files))
+        new_work = replace(
+            work,
+            source_files=replace(work.source_files, files=tuple(merged)),
+        )
+        self.result.works[work.work_id] = new_work
+        return new_work
 
     def _ensure_work(
         self,
@@ -6016,12 +6088,13 @@ class Migrator:
             self._work_index_row[work_id] = index_row
         if source_id not in self._work_source_ids[work_id]:
             self._work_source_ids[work_id].append(source_id)
-        files = source_files_for(source_id, index_row)
+        pack = source_files_for(source_id, index_row)
+        merged = self._merge_extra_assets(work_id, list(pack.files))
         work = Work(
             work_id=work_id,
             citation=self._work_citations[work_id] or citation,
             source_ids=tuple(self._work_source_ids[work_id]),
-            source_files=files,
+            source_files=replace(pack, files=tuple(merged)),
             doi=self._work_dois[work_id],
         )
         self.result.works[work_id] = work
@@ -6047,6 +6120,7 @@ class Migrator:
                 files = list(
                     source_files_for(work_id, self._work_index_row.get(work_id)).files
                 )
+            files = self._merge_extra_assets(work_id, files)
             rebuilt[work_id] = Work(
                 work_id=work_id,
                 citation=work.citation,
@@ -6973,6 +7047,10 @@ class Migrator:
             locator,
             skip_tables=True,
         )
+        work = self._register_compilation_record_asset(
+            work,
+            locator.source_path if locator is not None else None,
+        )
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
@@ -7543,6 +7621,10 @@ class Migrator:
         point_conditions = None
         if temperature_K is not None and not isinstance(temperature_K, State):
             point_conditions = {"temperature_K": located_value(temperature_K, locator)}
+        work = self._register_compilation_record_asset(
+            work,
+            locator.source_path if locator is not None else None,
+        )
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
@@ -8249,6 +8331,7 @@ class Migrator:
         citation = str((src or {}).get("citation") or source_id)
         doi = extract_doi((src or {}).get("doi"), citation)
         work = self._work_from_citation(citation, doi, source_id)
+        work = self._register_compilation_record_asset(work, rel)
         role = doc.get("compilation_role") if isinstance(doc.get("compilation_role"), Mapping) else {}
         evidence = Evidence(
             class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
@@ -8365,6 +8448,12 @@ class Migrator:
         generated = generate_table(doc, source_path=rel)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -8443,6 +8532,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -8521,6 +8616,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -8599,6 +8700,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
