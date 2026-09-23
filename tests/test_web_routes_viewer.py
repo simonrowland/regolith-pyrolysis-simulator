@@ -167,6 +167,16 @@ def test_report_viewer_c3_dose_rejects_string_numeric_coercion() -> None:
     assert "Fe not emitted" in html
 
 
+def test_report_viewer_c3_dose_preserves_tiny_finite_value() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "makeHeader({header:{c3_dose:{Fe_kg:0.000128}}},[{}],{})",
+    )
+
+    assert "0.000128 kg" in html
+    assert 'title="0.000128 kg"' in html
+
+
 def test_report_viewer_scalar_labels_do_not_render_objects() -> None:
     html = _run_viewer_expression(
         "report-viewer.js",
