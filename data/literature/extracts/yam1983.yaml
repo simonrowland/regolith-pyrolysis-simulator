@@ -62,14 +62,28 @@ benches:
       state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
       locator: {page: 738, section: 'III. EMF measurement', note: Controlled within +/-1 K.}
 experiments:
-- experiment_id: na2o-sio2-emf-series
+- &yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p205
   bench_id: beta-alumina-emf-cell
   method: melt_equilibration_quench
-  locator: {page: 736, section: Abstract, note: Na2O activity measurements in Na2O-SiO2 melts using beta-alumina solid electrolyte.}
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.205'}
   sample:
     printed_composition:
-      state: {tag: value, value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions}
-      locator: {page: 736, section: Abstract}
+      state: {tag: value, value: 'X_Na2O 0.205 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.205']
+          - [SiO2, '0.795']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.205 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
     form:
       state: {tag: value, value: Pulverized vitrified sample}
       locator: {page: 737, section: 'II. Samples and electrolyte'}
@@ -110,6 +124,196 @@ experiments:
         locator: *yam_emf
     cooling_or_quench:
       state: {tag: value, value: Water-cooled copper plate used for sampling quench}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p298
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.298'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.298 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.298']
+          - [SiO2, '0.702']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.298 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p356
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.356'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.356 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.356']
+          - [SiO2, '0.644']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.356 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p400
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.400'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.400 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.400']
+          - [SiO2, '0.600']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.400 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p429
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.429'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.429 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.429']
+          - [SiO2, '0.571']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.429 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p500
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.500'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.500 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.500']
+          - [SiO2, '0.500']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.500 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-xna2o-0p601
+  locator: {page: 738, table: '1', note: 'Table 1 binary charge X_Na2O=0.601'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'X_Na2O 0.601 Na2O-SiO2 melt'}
+      locator: {page: 738, table: '1', note: 'Label retained; numeric mole fractions in initial_composition; batch composition as printed'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.601']
+          - [SiO2, '0.399']
+      locator:
+        page: 738
+        table: '1'
+        note: 'X_Na2O=0.601 as printed; SiO2=1-X_Na2O for the binary melt (complement); nominal batch composition; Ref. row and Fe2O3 reference melt not used as this charge'
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+- <<: *yam_emf_common
+  experiment_id: na2o-sio2-emf-series
+  locator: {page: 736, section: Abstract, note: 'Mixed X_Na2O observation bags; numeric maps live on na2o-sio2-xna2o-* experiments'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions}
+      locator: {page: 736, section: Abstract, note: 'Label retained on the mixed series; seven Table 1 X_Na2O charges live on na2o-sio2-xna2o-*'}
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
       locator: {page: 737, section: 'II. Samples and electrolyte'}
 species:
   Na2O:
