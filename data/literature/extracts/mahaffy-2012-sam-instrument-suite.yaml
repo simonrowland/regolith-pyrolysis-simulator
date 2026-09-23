@@ -15,7 +15,7 @@ extraction:
     data ONLY — oven geometry, QMS mass range, He carrier / ramp protocol, GC column inventory (Table
     9), TLS Herriott cell geometry, and calibration-gas cell fill (Table 11) landed; Mars science-motivation
     tables without laboratory numbers are typed absence. Kelvin companions carry DERIVED stamps (T_K =
-    T_C + 273.15). Modelled on tenkate-2010-vapor-instrument (instrument/breadboard pattern).'
+    T_C + 273.15). Modelled on tenkate-2010-vapor-instrument (instrument/breadboard pattern). Y12 P0 fix 2026-09-22: TLS Herriott passes/path split CH4 81/16.8 m vs CO2+H2O 43/8.93 m; oven Fig.8 1 cm is oven ID not cup height.'
   date: '2026-09-22'
   worker: n12-mars-sam
   provenance_path: data/literature/extracts/mahaffy-2012-sam-instrument-suite.yaml
@@ -258,8 +258,13 @@ species:
         heater_wire_diameter_mm_as_printed: 0.51
         heater_wire_alloy_as_printed: platinum-zirconium
         oven_tube_as_printed: Inconel 693
-        quartz_cup_height_cm_as_printed: 1
+        oven_ID_at_sample_location_cm_as_printed: 1
+        oven_ID_approximate_as_printed: true
         quartz_cup_ID_cm_as_printed: 0.7
+        geometry_note_as_printed: >-
+          Fig. 8 caption: inside diameter of the oven at the sample location is
+          approximately 1 cm and the inside diameter of the quartz cup 0.7 cm
+          (1 cm is oven ID, not cup height)
         manifold_bake_typical_C_as_printed: 135
         manifold_bake_typical_K_derived:
           value: 408.15
@@ -345,8 +350,10 @@ species:
         method_class: method_only
         mirror_separation_cm_as_printed: 20
         cell_volume_cm3_as_printed: 405
-        passes_for_CO2_H2O_as_printed: 81
-        path_length_m_as_printed: 8.93
+        passes_for_CH4_as_printed: 81
+        path_length_m_CH4_as_printed: 16.8
+        passes_for_CO2_H2O_as_printed: 43
+        path_length_m_CO2_H2O_as_printed: 8.93
         lasers_as_printed:
         - band: NIR
           wavelength_um_as_printed: 2.78
