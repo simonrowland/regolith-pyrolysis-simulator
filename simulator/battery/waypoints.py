@@ -1031,9 +1031,11 @@ def oxygen_condition(
                     # saturation the lab C–O fluid is the published CCO buffer
                     # (Jakobsson & Oskarsson 1994 via LEPR) — see
                     # simulator.chemistry.graphite_c_co.
-                    # Algebra: log10(fO2/bar)=-21803/T+4.325+0.171*(P_bar-1)/T.
-                    # Units: Pa/1e5 → bar; K/K and (K/bar)*bar/K dimensionless.
-                    # Sanity: 1473.15 K, 1.01325 bar → ≈ -10.475 (published CCO).
+                    # Algebra: log10(fO2)=log10(fO2_ref)
+                    # +2*log10(P_CO/P_ref) from K=P_CO/sqrt(fO2).
+                    # Units: Pa/1e5 → bar; pressure ratio is dimensionless.
+                    # Sanity: at 1473.15 K, 1 atm → -10.475 and
+                    # 0.1 atm → -12.475.
                     P_bar = pressure_value.point / Decimal(100000)
                     log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
                     routes.append(Waypoint(
