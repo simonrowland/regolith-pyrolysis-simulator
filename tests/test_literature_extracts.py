@@ -90,6 +90,26 @@ def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
         "7.8": {"page": 172, "section": "4.4.2", "figure": "4.15"},
     }
 
+
+def test_van_limpt_fig46_keeps_measured_markers_separate_from_model() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
+    observations = {
+        item["observation_id"]: item
+        for item in doc["species"]["Na"]["observations"]
+    }
+    measured = observations["van_limpt_2007_fig46_elemental_sodium_measured"]
+    model = observations["van_limpt_2007_fig46_elemental_sodium_model_output"]
+    assert [
+        row["p_Na_Pa_approx"]
+        for row in measured["values"]["rows"]
+        if row["temperature_C"] == 1462
+    ] == [2.2, 3.0, 3.5]
+    assert model["values"]["rows"] == [
+        {"temperature_C": 1462, "p_Na_Pa_approx": 2.6}
+    ]
+    assert model["values"]["measurement_status"] == "model_output_not_measurement"
+    assert model["admission_status"] == "rejected_model_output_not_measurement"
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.
