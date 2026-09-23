@@ -3602,6 +3602,9 @@ def product_summary(
         ),
         "target_species_yield_report": target_species_yield_report(sim),
     }
+    notice = _engine_commissioning_notice(sim)
+    if notice:
+        summary["engine_commissioning_notice"] = notice
     summary.update(_coating_product_summary(run_execution))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
@@ -3620,6 +3623,16 @@ def product_summary(
             )
         )
     return MappingProxyType(summary)
+
+
+def _engine_commissioning_notice(sim: Any) -> Mapping[str, Any] | None:
+    reader = getattr(sim, "engine_commissioning_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
 
 
 def _selection_coating_lifetime(

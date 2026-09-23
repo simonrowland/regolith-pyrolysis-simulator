@@ -71,8 +71,36 @@
       classificationPresent,
       classificationMalformed: classificationPresent && !isRecord(classificationValue),
       markdownPresent: own(block, "markdown"),
-      markdown: own(block, "markdown") ? block.markdown : undefined
+      markdown: own(block, "markdown") ? block.markdown : undefined,
+      commissioningNotice: own(block, "engine_commissioning_notice")
+        ? block.engine_commissioning_notice
+        : undefined
     };
+  }
+
+  function commissioningBanner(notice) {
+    if (!isRecord(notice)) return "";
+    const authority = typeof notice.authority === "string" && notice.authority
+      ? notice.authority
+      : "unspecified";
+    const items = Array.isArray(notice.notices) ? notice.notices : [];
+    const reasons = items.map((item) => {
+      if (!isRecord(item) || typeof item.reason !== "string" || !item.reason) return "";
+      const band = isRecord(item.certified_band) ? item.certified_band : null;
+      const parts = [];
+      if (band && Array.isArray(band.sio2_wt_pct) && band.sio2_wt_pct.length === 2) {
+        parts.push(`SiO2 [${band.sio2_wt_pct[0]}, ${band.sio2_wt_pct[1]}] wt%`);
+      }
+      if (band && Array.isArray(band.temperature_K) && band.temperature_K.length === 2) {
+        parts.push(`T [${band.temperature_K[0]}, ${band.temperature_K[1]}] K`);
+      }
+      return parts.length ? `${item.reason} (${parts.join(", ")})` : item.reason;
+    }).filter(Boolean);
+    const text = `Engine commissioning: authority ${authority}; ` +
+      `${reasons.join(", ") || "notice"}; ` +
+      `hours ${notice.first_hour}-${notice.last_hour}; ` +
+      `${notice.count} step(s). Reported numbers are unchanged.`;
+    return `<p class="sec-p11-flag" data-engine-commissioning-notice="true">${esc(text)}</p>`;
   }
 
   function quantityClaim(record, key) {
@@ -629,7 +657,8 @@
         "product_classification.classification is absent. No kg totals are invented."
       ) + renderMarkdown(envelope);
     }
-    return `<div class="sec-p11-grid">` +
+    return commissioningBanner(envelope.commissioningNotice) +
+      `<div class="sec-p11-grid">` +
       `${renderMetals(classification)}${renderSilica(classification, envelope.markdown)}` +
       `${renderMixedGlass(classification)}${renderRump(classification)}` +
       `</div>` +
