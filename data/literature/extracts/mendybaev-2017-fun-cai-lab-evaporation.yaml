@@ -52,8 +52,18 @@ experiments:
       state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000040'}}
       locator: {section: '3.1', pdf_page_index: 8, note: '25-40 mg; unit conversion only'}
     printed_composition:
-      state: {tag: value, value: '37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2, 7.6 wt% CaO'}
-      locator: {section: '3.1', pdf_page_index: 8}
+      state:
+        tag: value
+        value:
+          MgO: '37.9'
+          Al2O3: '11.6'
+          SiO2: '42.9'
+          CaO: '7.6'
+      locator:
+        section: '3.1'
+        pdf_page_index: 8
+        table: '1'
+        note: 'Starting FUNC row; oxide wt% as printed in §3.1 prose and Table 1 FUNC starting; label 37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2, 7.6 wt% CaO retained in note; residue rows not used as start'
     form:
       state: {tag: value, value: 'Mixture loaded onto 2.5 mm diameter iridium wire loops'}
       locator: {section: '3.1', pdf_page_index: 8}
