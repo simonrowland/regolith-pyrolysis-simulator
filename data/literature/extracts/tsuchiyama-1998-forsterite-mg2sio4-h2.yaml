@@ -1,0 +1,342 @@
+schema_version: literature_extract.v1
+source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+source:
+  citation: Tsuchiyama, A., Takahashi, T. and Tachibana, S. (1998), Evaporation rates of forsterite in
+    the system Mg2SiO4-H2, Mineralogical Journal 20, 113-126.
+  doi: 10.2465/minerj.20.113
+  year: 1998
+extraction:
+  method: Page-1 and Table 1 / apparatus pages rendered from encrypted publisher PDF (pdftoppm) and transcribed;
+    abstract Arrhenius and alpha range from page-1 text; Table 1 from published-page 116 render; no figure-axis
+    digitization of Figs. 2-3
+  date: '2026-09-22'
+  worker: n3-forsterite-evap-2026-09-22
+  provenance_path: ferry/pdfs-n/tsuchiyama-1998-forsterite-mg2sio4-h2.pdf
+review_status: draft
+fidelity_samples:
+- path: species.forsterite.observations[tsuchiyama_1998_table1_evaporation_runs].values.series[0].delta_M_over_S_g_cm2
+  value: 0.00174
+  locator:
+    table: '1'
+    published_page: 116
+    note: FoH-1 deltaM/S
+- path: species.forsterite.observations[tsuchiyama_1998_arrhenius_jFo_010].values.activation_energy_kJ_per_mol
+  value: 372
+  locator:
+    published_page: 113
+    section: Abstract
+- path: species.forsterite.observations[tsuchiyama_1998_evaporation_coefficient_range].values.alpha_recommended
+  value: 0.1
+  locator:
+    published_page: 113
+    section: Abstract
+species:
+  forsterite:
+    context:
+    - observation_id: tsuchiyama_1998_apparatus
+      type: apparatus
+      locator:
+        published_page: 115
+        pdf_page_index: 3
+        section: Experimental
+        figure: '1'
+      phase: forsterite_single_crystal
+      regime: H2_gas_evaporation_Mo_crucible
+      units: as published
+      values:
+        quantity: experimental_apparatus_and_conditions
+        method_class: method_only
+        crucible_material: Mo
+        crucible_inner_diameter_mm: 16
+        crucible_length_mm: 124
+        heater: Ta
+        thermal_shield: Ta
+        chamber_wall_near_heater: W
+        sample_mount: forsterite single crystal hung by Mo wire
+        thermocouple: W5Re-W26Re
+        thermocouple_calibration_metals_C:
+          Fe: 1535
+          Ni: 1453
+          Au: 1064
+        temperature_precision_C: better than ±10
+        preheat_chamber_pressure_bar_upper: 1.0e-08
+        pH2_bar: 1.4e-05
+        pH2_drift_bar: 6.0e-07
+        surface_studied: '{010}'
+        forsterite_density_g_cm3: 3.227
+        weighing_error_mg: 0.01
+        size_measurement_error_mm: 0.05
+      equipment:
+        cell_material:
+          value: Mo crucible; sample hung on Mo wire
+          locator:
+            published_page: 115
+            figure: '1'
+        chamber_pressure:
+          value: 1.4e-5 bar H2 during run; <1e-8 bar before H2 introduction
+          units: bar
+          locator:
+            published_page: 116
+            section: Experimental
+    observations:
+    - observation_id: tsuchiyama_1998_table1_evaporation_runs
+      type: mass_loss
+      locator:
+        table: '1'
+        published_page: 116
+        pdf_page_index: 4
+        note: Experimental conditions and results at 1.4e-5 bar p(H2)
+      phase: cr
+      regime: hydrogen_reaction_dominated_congruent_evaporation
+      T_range_K:
+      - 1473.15
+      - 1723.15
+      units: weights g; sizes cm; deltaM/S g cm^-2; time h
+      values:
+        quantity: mass_loss_and_deltaM_over_S
+        method_class: measured_direct
+        pH2_bar: 1.4e-05
+        density_used_g_cm3: 3.227
+        anisotropy_treatment: ignored; plates with b0 << a0 ~ c0; deltaX assumed equal on all faces
+        series:
+        - run: FoH-1
+          T_C: 1200
+          time_h: 24
+          initial_weight_g: 0.32694
+          final_weight_g: 0.32296
+          delta_M_g: 0.004
+          a0_cm: 1.013
+          b0_cm: 0.11
+          c0_cm: 0.92
+          delta_X_cm: 0.00054
+          delta_M_over_S_g_cm2: 0.00174
+        - run: FoH-14
+          T_C: 1200
+          time_h: 48
+          initial_weight_g: 0.2201
+          final_weight_g: 0.2132
+          delta_M_g: 0.0069
+          a0_cm: 0.68
+          b0_cm: 0.11
+          c0_cm: 0.98
+          delta_X_cm: 0.00127
+          delta_M_over_S_g_cm2: 0.00409
+        - run: FoH-18
+          T_C: 1200
+          time_h: 66
+          initial_weight_g: 0.32673
+          final_weight_g: 0.31568
+          delta_M_g: 0.0111
+          a0_cm: 0.985
+          b0_cm: 0.11
+          c0_cm: 1.005
+          delta_X_cm: 0.00142
+          delta_M_over_S_g_cm2: 0.00459
+        - run: FoH-11
+          T_C: 1250
+          time_h: 24
+          initial_weight_g: 0.28954
+          final_weight_g: 0.2796
+          delta_M_g: 0.0099
+          a0_cm: 0.9
+          b0_cm: 0.11
+          c0_cm: 0.91
+          delta_X_cm: 0.00152
+          delta_M_over_S_g_cm2: 0.00491
+        - run: A-10
+          T_C: 1250
+          time_h: 36
+          initial_weight_g: 0.2353
+          final_weight_g: 0.22106
+          delta_M_g: 0.0142
+          a0_cm: 0.88
+          b0_cm: 0.095
+          c0_cm: 0.955
+          delta_X_cm: 0.00219
+          delta_M_over_S_g_cm2: 0.00708
+        - run: FoH-12
+          T_C: 1250
+          time_h: 48
+          initial_weight_g: 0.3162
+          final_weight_g: 0.29103
+          delta_M_g: 0.0252
+          a0_cm: 0.895
+          b0_cm: 0.11
+          c0_cm: 0.99
+          delta_X_cm: 0.00361
+          delta_M_over_S_g_cm2: 0.01166
+        - run: A-7
+          T_C: 1300
+          time_h: 12
+          initial_weight_g: 0.24089
+          final_weight_g: 0.22554
+          delta_M_g: 0.0154
+          a0_cm: 0.89
+          b0_cm: 0.08
+          c0_cm: 1.11
+          delta_X_cm: 0.00209
+          delta_M_over_S_g_cm2: 0.00674
+        - run: A-6
+          T_C: 1300
+          time_h: 18
+          initial_weight_g: 0.253
+          final_weight_g: 0.23191
+          delta_M_g: 0.0211
+          a0_cm: 0.915
+          b0_cm: 0.1
+          c0_cm: 0.875
+          delta_X_cm: 0.00338
+          delta_M_over_S_g_cm2: 0.01091
+        - run: A-4
+          T_C: 1300
+          time_h: 24
+          initial_weight_g: 0.28208
+          final_weight_g: 0.25189
+          delta_M_g: 0.0302
+          a0_cm: 0.89
+          b0_cm: 0.09
+          c0_cm: 1.11
+          delta_X_cm: 0.00406
+          delta_M_over_S_g_cm2: 0.01311
+        - run: A-2
+          T_C: 1350
+          time_h: 4
+          initial_weight_g: 0.26392
+          final_weight_g: 0.25237
+          delta_M_g: 0.0116
+          a0_cm: 0.915
+          b0_cm: 0.1
+          c0_cm: 0.98
+          delta_X_cm: 0.00166
+          delta_M_over_S_g_cm2: 0.00535
+        - run: A-9
+          T_C: 1350
+          time_h: 8
+          initial_weight_g: 0.24339
+          final_weight_g: 0.21978
+          delta_M_g: 0.0236
+          a0_cm: 0.89
+          b0_cm: 0.08
+          c0_cm: 1.11
+          delta_X_cm: 0.00322
+          delta_M_over_S_g_cm2: 0.01041
+        - run: A-5
+          T_C: 1350
+          time_h: 12
+          initial_weight_g: 0.19937
+          final_weight_g: 0.16334
+          delta_M_g: 0.036
+          a0_cm: 0.89
+          b0_cm: 0.07
+          c0_cm: 1.105
+          delta_X_cm: 0.00506
+          delta_M_over_S_g_cm2: 0.01634
+        - run: FoH-19
+          T_C: 1400
+          time_h: 3
+          initial_weight_g: 0.31822
+          final_weight_g: 0.29818
+          delta_M_g: 0.02
+          a0_cm: 0.92
+          b0_cm: 0.11
+          c0_cm: 1.0
+          delta_X_cm: 0.00277
+          delta_M_over_S_g_cm2: 0.00895
+        - run: FoH-16
+          T_C: 1400
+          time_h: 6
+          initial_weight_g: 0.2153
+          final_weight_g: 0.18347
+          delta_M_g: 0.0318
+          a0_cm: 0.675
+          b0_cm: 0.1
+          c0_cm: 0.98
+          delta_X_cm: 0.00612
+          delta_M_over_S_g_cm2: 0.01975
+        - run: FoH-15
+          T_C: 1400
+          time_h: 24
+          initial_weight_g: 0.21697
+          final_weight_g: 0.07545
+          delta_M_g: 0.1415
+          a0_cm: 0.68
+          b0_cm: 0.1
+          c0_cm: 0.98
+          delta_X_cm: 0.03002
+          delta_M_over_S_g_cm2: 0.09689
+        - run: A-1
+          T_C: 1450
+          time_h: 2
+          initial_weight_g: 0.27608
+          final_weight_g: 0.25528
+          delta_M_g: 0.0208
+          a0_cm: 0.92
+          b0_cm: 0.1
+          c0_cm: 0.925
+          delta_X_cm: 0.00315
+          delta_M_over_S_g_cm2: 0.01016
+        - run: FoH-20
+          T_C: 1450
+          time_h: 3
+          initial_weight_g: 0.27443
+          final_weight_g: 0.24485
+          delta_M_g: 0.0296
+          a0_cm: 0.92
+          b0_cm: 0.1
+          c0_cm: 0.985
+          delta_X_cm: 0.00424
+          delta_M_over_S_g_cm2: 0.0137
+        - run: FoH-17
+          T_C: 1450
+          time_h: 6
+          initial_weight_g: 0.23935
+          final_weight_g: 0.18897
+          delta_M_g: 0.0504
+          a0_cm: 0.665
+          b0_cm: 0.13
+          c0_cm: 0.91
+          delta_X_cm: 0.01006
+          delta_M_over_S_g_cm2: 0.03246
+    - observation_id: tsuchiyama_1998_arrhenius_jFo_010
+      type: rate_series
+      locator:
+        published_page: 113
+        section: Abstract
+        note: also Fig. 3 Arrhenius; rates from slopes of Fig. 2 deltaM/S vs time
+      phase: cr
+      regime: hydrogen_reaction_dominated
+      T_range_K:
+      - 1473.15
+      - 1723.15
+      units: jFo in mole cm^-2 s^-1; Ea in kJ mol^-1
+      values:
+        quantity: evaporation_rate_jFo
+        method_class: author_derived_from_deltaM_S_vs_time_slopes
+        derived: true
+        surface: '{010}'
+        pH2_bar: 1.4e-05
+        arrhenius_as_printed: jFo = 2480 [mole cm^-2 s^-1] exp(-372 [kJ mol^-1]/RT)
+        prefactor_mole_cm2_s: 2480
+        activation_energy_kJ_per_mol: 372
+        activation_energy_kcal_per_mol_as_cited_by_kuroda: 88.9
+    - observation_id: tsuchiyama_1998_evaporation_coefficient_range
+      type: alpha
+      locator:
+        published_page: 113
+        section: Abstract
+      phase: cr
+      regime: FED_and_HRD
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_derived_measured_over_ideal_HK
+        derived: true
+        alpha_range_this_work:
+        - 0.04
+        - 0.12
+        alpha_range_with_prior_vacuum_and_H2:
+        - 0.03
+        - 0.2
+        alpha_recommended: 0.1
+        note: Ratios of measured to ideal Hertz-Knudsen rates; authors suggest ~0.1 for both FED and HRD
+          regimes.
