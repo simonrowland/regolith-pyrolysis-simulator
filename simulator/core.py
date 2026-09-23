@@ -11211,8 +11211,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buckets: Mapping[str, Mapping[str, float]]
     ) -> Dict[str, float]:
         products: Dict[str, float] = {}
+        # Ferry V / V1-S13: residual cation_sulfate_feed must appear in the
+        # stage-0 product rollup so non-ledger mass checks see leftovers
+        # instead of silently omitting sulfate inventory.
         for bucket_name in (
             'gas_volatiles', 'salt_phase', 'chloride_salt_phase', 'sulfide_matte',
+            'cation_sulfate_feed',
         ):
             bucket = buckets.get(bucket_name, {})
             for component, kg in bucket.items():
