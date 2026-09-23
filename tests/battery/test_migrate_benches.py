@@ -498,3 +498,65 @@ def test_aliased_work_counts_each_experiment_under_one_canonical_source(tmp_path
         assert sum(counts.values()) == 1
     for counts in readiness["summary"]["by_engine"].values():
         assert sum(counts.values()) == 1
+
+
+def test_work_with_no_experiments_is_listed_as_unscoreable_gap(tmp_path, monkeypatch) -> None:
+    """A work whose observations moved into context[] has no experiments.
+
+    It must stay in the report under its canonical source id, as a gap for
+    no scoreable observations, and must not change ready or partial counts.
+    """
+    import scripts.bench_readiness as module
+
+    monkeypatch.setattr(module, "consumer_readiness", _aggregation_readiness)
+    experiment, bench = _knudsen_case(Value.point_of("1"))
+    experiment = replace(experiment, bench_id=bench.id, work_id="scored-work")
+    scored = replace(factories.work("scored-work"), source_ids=("scored-source",))
+    context_only = replace(
+        factories.work("context-only"),
+        source_ids=("context-only-source", "context-only-alias"),
+    )
+
+    def install(works):
+        monkeypatch.setattr(
+            module,
+            "load_migrated_store",
+            lambda root: (works, {experiment.experiment_id: experiment}, {}),
+        )
+        monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+
+    install({scored.work_id: scored})
+    before = module.report(tmp_path)
+    install({scored.work_id: scored, context_only.work_id: context_only})
+    after = module.report(tmp_path)
+
+    assert before["source_count"] == 1
+    assert after["source_count"] == 2
+    by_id = {row["source_id"]: row for row in after["sources"]}
+    assert set(by_id) == {"scored-source", "context-only-source"}
+    missing = by_id["context-only-source"]
+    assert missing["experiments"] == []
+    expected_gap = {
+        "waypoint": "observations",
+        "reason": "no_scoreable_observations",
+        "missing": ["scoreable observations"],
+        "count": 0,
+        "experiment_ids": [],
+    }
+    assert expected_gap in missing["informational_gaps"]
+    for row in missing["consumers"] + missing["engines"]:
+        assert row["status"] == "gap"
+        assert expected_gap in row["gaps"]
+    for key in ("by_consumer", "by_engine"):
+        for name, counts in before["summary"][key].items():
+            after_counts = after["summary"][key][name]
+            assert after_counts["ready"] == counts["ready"]
+            assert after_counts["partial"] == counts["partial"]
+            assert after_counts["gap"] == counts["gap"] + 1
+    assert any(
+        item["waypoint"] == "observations"
+        and item["reason"] == "no_scoreable_observations"
+        and item["source_count"] == 1
+        and item["experiment_count"] == 0
+        for item in after["summary"]["top_blocking_waypoints"]
+    )
