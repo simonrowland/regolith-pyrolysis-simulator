@@ -8,7 +8,7 @@
 #   enginepatch.sh status  [engine]   # base SHA, drift, patch list
 #
 # Exit 0 = match, 1 = drift/failure. Safe to run in CI.
-set -uo pipefail
+set -euo pipefail
 
 # pwd -P is load-bearing. Reached through a symlink (e.g. ~/Repos/<repo> ->
 # a synced folder), bash's logical pwd makes "$PATCHES/../.." resolve to the
@@ -151,13 +151,32 @@ cmd_refresh() {
     echo "$e is report-only; no source checkout to refresh"
     return 1
   }
+  if [ ! -d "$d" ]; then
+    echo "$e: checkout missing at $d" >&2
+    return 1
+  fi
+  if ! git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "$e: $d is not a git work tree" >&2
+    return 1
+  fi
   n=$(ls "$PATCHES/$e"/*.patch 2>/dev/null | wc -l | tr -d ' ')
   if [ "$n" -gt 1 ]; then
     echo "$e has $n patches; refusing to collapse them into one."
     echo "Re-capture the changed patch by hand, then run: $0 verify $e"
     return 1
   fi
-  git -C "$d" diff > "$PATCHES/$e/0001-local.patch"
+  mkdir -p "$PATCHES/$e"
+  out="$PATCHES/$e/0001-local.patch"
+  if ! git -C "$d" diff > "$out"; then
+    echo "$e: git diff failed for $d" >&2
+    rm -f "$out"
+    return 1
+  fi
+  if [ ! -s "$out" ]; then
+    echo "$e: refusing empty patch capture (working tree clean or diff failed)" >&2
+    rm -f "$out"
+    return 1
+  fi
   echo "$e: recaptured to 0001-local.patch"
 }
 
