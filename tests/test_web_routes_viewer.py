@@ -791,7 +791,8 @@ def test_report_viewer_uses_legacy_source_side_o2_alias_with_metric_label() -> N
 
     assert state["html"].count("4.25 kg") >= 2
     assert "source-side O2 potential (emitted; not recovered)" in state["html"]
-    assert "O2_yield_kg_cumulative" in state["html"]
+    main_metric = re.search(r"Metric field</span><b>([^<]+)</b>", state["html"]).group(1)
+    assert main_metric == "O2_yield_kg_cumulative"
     assert fallback_cases == [1.5, 2.5, None]
 
 
