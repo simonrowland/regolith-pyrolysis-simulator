@@ -6152,6 +6152,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 context='oxygen_reservoir_exchange_delta',
                 melt_redox_capacity_mol_per_ln_fO2=C_m,
             )
+        # Two-reservoir oxygen exchange (Ferry V / V1-S13 R1).
+        #
+        # Premise: melt redox potential and headspace O₂ share one atom ledger.
+        # A CONTROLLED_O2 floor may enlarge *effective* headspace capacity C_h
+        # above the real overhead O₂ inventory so the RC network still has a
+        # finite target, but atoms cannot be invented.
+        #
+        # Algebra: dn_desired = α (x_m - x_h) / (1/C_m + 1/C_h) mol O₂ toward
+        # headspace. Absorbable claim is clamped to (C_h - n_floor); the ledger
+        # commit is further clamped to real (head_o2_mol - n_floor).
+        # Unit check: C_m has units mol / ln(fO₂), so Δln fO₂ = -dn_ledger / C_m
+        # is dimensionless in ln-space; log10(fO₂) = ln(fO₂)/ln(10).
+        # Sanity: advancing melt_intrinsic_fO2_log with dn_desired while the
+        # ledger only books dn_ledger would mint oxidizing potential without O
+        # atoms (managed_headspace_to_melt / exchange_clamped remainder). Drive
+        # fO₂ only with dn_ledger; surface the unbacked remainder explicitly.
         dn_ledger_to_headspace = dn_to_headspace
         exchange_clamped = False
         if dn_to_headspace < 0.0:
@@ -6193,13 +6209,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             )
 
-        x_m_after = x_m - dn_to_headspace / C_m
+        # fO₂ advances only with ledger-committed O₂ (dn_ledger), never with the
+        # managed-floor / clamp remainder that has no atom backing.
+        x_m_after = x_m - dn_ledger_to_headspace / C_m
         candidate_fO2_log = x_m_after / math.log(10.0)
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
             candidate_fO2_log,
             context='oxygen_reservoir_exchange',
             melt_redox_capacity_mol_per_ln_fO2=C_m,
-            delta_ln_fO2=(-dn_to_headspace / C_m),
+            delta_ln_fO2=(-dn_ledger_to_headspace / C_m),
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
@@ -6218,9 +6236,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 head_o2_mol=post_head_o2_mol,
             )
         )
-        reservoir.exchange_o2_mol = dn_to_headspace
+        reservoir.exchange_o2_mol = dn_ledger_to_headspace
         reservoir.exchange_o2_kg = (
-            dn_to_headspace * OXYGEN_MOLAR_MASS_KG_PER_MOL
+            dn_ledger_to_headspace * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        reservoir.exchange_unbacked_o2_mol = (
+            dn_to_headspace - dn_ledger_to_headspace
         )
         reservoir.exchange_clamped = exchange_clamped
         self.melt.oxygen_reservoir = reservoir
