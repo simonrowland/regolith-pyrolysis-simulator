@@ -133,6 +133,66 @@ benches:
       state: {tag: value, value: IR camera through special optics and vacuum window}
       locator: {page: 34, section: '3.1 Überblick und Layout'}
 experiments:
+- experiment_id: jsc1-ms1
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS1; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.000717'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.717 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1815.15'}, locator: {page: 105, table: '5.3', note: 'MS1 Tmax 1542 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '77'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms2
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS2; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.000991'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.991 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1836.15'}, locator: {page: 105, table: '5.3', note: 'MS2 Tmax 1563 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '55'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms4
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS4; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.001002'}}, locator: {page: 105, table: '5.3', note: 'Printed 1.002 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1698.15'}, locator: {page: 105, table: '5.3', note: 'MS4 Tmax 1425 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '38'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms5
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS5; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.007856'}}, locator: {page: 105, table: '5.3', note: 'Printed 7.856 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1853.15'}, locator: {page: 105, table: '5.3', note: 'MS5 Tmax 1580 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '174'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-solar-series
   bench_id: dlr-solar-vacuum-system
   method: solar_furnace_pyrolysis
@@ -551,7 +611,7 @@ species:
       uncertainty:
         note: IR-camera surface temperatures; no printed sigma on Tmax
     - observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms1
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -667,7 +727,7 @@ species:
       uncertainty:
         note: printed Standardabweichung on blank-foil means
     - observation_id: sauerborn_2005_table55_ms2_cold_trap_edx
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms2
       type: rate_series
       locator:
         table: '5.5'
@@ -786,7 +846,7 @@ species:
       uncertainty:
         note: none printed
     - observation_id: sauerborn_2005_fig523_ms1_epma_glass
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms1
       type: gibbs_table
       locator:
         figure: '5.23'
@@ -3584,7 +3644,7 @@ species:
   Fe:
     observations:
     - observation_id: sauerborn_2005_table56_ms5c_epma
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms5
       type: gibbs_table
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -3634,7 +3694,7 @@ species:
       uncertainty:
         note: none printed; mixed-analysis sums >100 are source format, not transcription error
     - observation_id: sauerborn_2005_table56_ms5c_epma_full_grid
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms5
       type: gibbs_table
       locator:
         table: '5.6'
