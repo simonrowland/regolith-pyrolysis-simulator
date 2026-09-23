@@ -25,7 +25,12 @@ extraction:
   worker: n1-vacuum-pyrolysis
   provenance_path: data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml
 review_status: draft
-corrections: []
+corrections:
+- date: '2026-09-23'
+  note: >-
+    NTRS AQ sibling check: accessions 19920035166 and 19920033574
+    remain METADATA_ONLY (no PDF). This Arizona-booklet abstract
+    extract is unchanged; no new observations invented.
 scope_assessment:
   document_type: one-page conference abstract inside a multi-paper abstract booklet
   measured_direct_observations: 0
@@ -98,6 +103,12 @@ species:
           oxygen in the gas phase
         nasa_stamp_as_printed: N91-26033
         booklet_handwritten_note: ABS. ONLY
+        related_full_papers_ntrs_aq_2026_09_23: >-
+          Princeton/AIAA/SSI accession 19920035166 and JBIS accession
+          19920033574 are both NTRS METADATA_ONLY (no downloads). See
+          senior-1992-vacuum-pyrolysis.yaml and
+          senior-1991-solar-heating-jbis.yaml; this abstract extract is
+          unchanged and remains the only held Senior full-text abstract.
       uncertainty:
         note: >-
           No numeric uncertainty printed. "circa 2000 K" is an approximate process
