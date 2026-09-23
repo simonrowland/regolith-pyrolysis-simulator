@@ -5513,6 +5513,18 @@ def _prefer_located(
         return new
     if old.state.is_unknown and new.state.is_value:
         return new
+    if old.state.is_value and new.state.is_value:
+        old_value = old.state.value
+        new_value = new.state.value
+        if (
+            isinstance(old_value, Value)
+            and isinstance(new_value, Value)
+            and old_value.kind is ValueKind.POINT
+            and new_value.kind is ValueKind.POINT
+            and old_value.point == new_value.point
+            and old_value.approximate != new_value.approximate
+        ):
+            return new if new_value.approximate else old
     if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
         return None
     if (

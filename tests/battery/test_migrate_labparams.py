@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _prefer_located,
     apparatus_from_equipment,
     experiment_from_plain,
     migrate,
@@ -18,8 +19,18 @@ from simulator.battery.migrate import (
     sample_from_equipment,
     to_plain,
 )
-from simulator.battery.records import as_decimal
+from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
+    exact = Located(State.of(Value.point_of("0.01333223684210526315789473684")))
+    approximate = Located(
+        State.of(Value(ValueKind.POINT, point=as_decimal("0.01333223684210526315789473684"), approximate=True))
+    )
+    merged = _prefer_located(exact, approximate)
+    assert merged is approximate
+    assert merged.state.value.approximate is True
 
 
 def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> None:
