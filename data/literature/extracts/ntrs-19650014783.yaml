@@ -1,82 +1,593 @@
 schema_version: literature_extract.v1
 source_id: ntrs-19650014783
 source:
-  citation: Bowles, K. J. & Rosenblum, L. (1965), "Vapor Pressure of Sodium from 0.5 to 120 Atmospheres", NASA Technical Note D-2849, Lewis Research Center.
+  citation: Bowles, K. J. & Rosenblum, L. (1965), "Vapor Pressure of Sodium from 0.5 to 120 Atmospheres", NASA Technical Note
+    D-2849, Lewis Research Center.
   url: https://ntrs.nasa.gov/citations/19650014783
   year: 1965
 extraction:
-  method: manual transcription from clean pdftotext -layout output, checked against rendered PDF Table I and experimental prose
+  method: manual transcription from clean pdftotext -layout output, checked against rendered PDF Table I and experimental
+    prose
   date: '2026-09-19'
   worker: w3-ntrs-19650014783
 review_status: draft
 benches:
 - id: static-sodium-capsule
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: Static capsule sodium vapor-pressure apparatus}
-    locator: &ntrs_apparatus_locator {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus'}
+    state:
+      tag: value
+      value: Static capsule sodium vapor-pressure apparatus
+    locator: &id001
+      published_page: 2
+      pdf_page_index: 4
+      section: Experiment - Apparatus
   cell_material_and_liner:
-    state: {tag: value, value: 90 percent tantalum and 10 percent tungsten alloy capsule}
-    locator: *ntrs_apparatus_locator
+    state:
+      tag: value
+      value: 90 percent tantalum and 10 percent tungsten alloy capsule
+    locator: *id001
   geometry:
     cell_internal_dimensions:
       diameter_m:
-        state: {tag: value, value: {kind: point, point: '0.0177'}}
-        locator: {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus', note: '1.77 cm inside diameter; unit conversion only'}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0177'
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+          note: 1.77 cm inside diameter; unit conversion only
   heating_method:
-    state: {tag: value, value: Tungsten resistance heater concentric around capsule}
-    locator: *ntrs_apparatus_locator
+    state:
+      tag: value
+      value: Tungsten resistance heater concentric around capsule
+    locator: *id001
   detector:
-    state: {tag: value, value: Pressure transducers}
-    locator: {published_page: 3, pdf_page_index: 5, section: 'Experiment - Apparatus'}
+    state:
+      tag: value
+      value: Pressure transducers
+    locator:
+      published_page: 3
+      pdf_page_index: 5
+      section: Experiment - Apparatus
   temperature_measurement:
     sensor:
-      state: {tag: value, value: Chromel-alumel for run 1; W-Re for runs 2-4; Pt-Pt-13Rh for run 5}
-      locator: {published_page: 4, pdf_page_index: 6, section: 'Temperature measurements'}
+      state:
+        tag: value
+        value: Chromel-alumel for run 1; W-Re for runs 2-4; Pt-Pt-13Rh for run 5
+      locator:
+        published_page: 4
+        pdf_page_index: 6
+        section: Temperature measurements
   temperature_calibration:
     method:
-      state: {tag: value, value: Pt-Pt-13Rh calibrated against NBS standard; W-Re calibrated against Pt-Pt-13Rh from 845 to 1820 K and extrapolated to 2200 K}
-      locator: {published_page: 4, pdf_page_index: 6, section: 'Temperature measurements'}
+      state:
+        tag: value
+        value: Pt-Pt-13Rh calibrated against NBS standard; W-Re calibrated against Pt-Pt-13Rh from 845 to 1820 K and extrapolated
+          to 2200 K
+      locator:
+        published_page: 4
+        pdf_page_index: 6
+        section: Temperature measurements
 experiments:
-- experiment_id: sodium-vapor-pressure-series
+- experiment_id: sodium-static-run-1
   bench_id: static-sodium-capsule
   method: static_capsule_vapor_pressure
-  locator: {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus and Procedure'}
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 1
   sample:
     printed_composition:
-      state: {tag: value, value: Sodium}
-      locator: {published_page: 2, pdf_page_index: 4, section: Experiment}
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
     form:
-      state: {tag: value, value: Liquid sodium}
-      locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
     pretreatment:
-      state: {tag: value, value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point}
-      locator: {published_page: 3, pdf_page_index: 5, section: 'Procedure; Sodium purification'}
+      state:
+        tag: value
+        value: Filtered
+        hot gettered with titanium: null
+        vacuum distilled: null
+        then heated above sodium melting point: null
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
   apparatus:
     geometry:
       orifice_diameter_m:
-        state: {tag: not_applicable, reason: not_applicable}
-        locator: *ntrs_apparatus_locator
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: &id002
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
       orifice_channel_length_m:
-        state: {tag: not_applicable, reason: not_applicable}
-        locator: *ntrs_apparatus_locator
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id002
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 6, pdf_page_index: 8, table: 'I', note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment}
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
     sweep_gas:
-      state: {tag: not_applicable, reason: not_applicable}
-      locator: {published_page: 3, pdf_page_index: 5, section: Procedure, note: Argon transfers sodium before measurement; it is not sweep gas}
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
     regime:
-      regime_class: {tag: unknown, reason: not_published}
+      regime_class:
+        tag: unknown
+        reason: not_published
     pumping:
       base_pressure_Pa:
-        state: {tag: value, value: {kind: point, point: '0.01333223684210526315789473684'}}
-        locator: {published_page: 3, pdf_page_index: 5, section: Procedure, note: 'Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only'}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
   thermal_schedule:
-    method:
-      state: {tag: value, value: Heated through series of test temperatures; sufficient time allowed between changes for equilibrium}
-      locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: &id003
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1290'
+          interval_high: '1472'
+      locator: *id003
+- experiment_id: sodium-static-run-2
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 2
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered
+        hot gettered with titanium: null
+        vacuum distilled: null
+        then heated above sodium melting point: null
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: &id004
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id004
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id003
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1320'
+          interval_high: '2076'
+      locator: *id003
+- experiment_id: sodium-static-run-3
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 3
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered
+        hot gettered with titanium: null
+        vacuum distilled: null
+        then heated above sodium melting point: null
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: &id005
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id005
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id003
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1436'
+          interval_high: '2154'
+      locator: *id003
+- experiment_id: sodium-static-run-4
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 4
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered
+        hot gettered with titanium: null
+        vacuum distilled: null
+        then heated above sodium melting point: null
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: &id006
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id006
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id003
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1414'
+          interval_high: '2146'
+      locator: *id003
+- experiment_id: sodium-static-run-5
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 5
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered
+        hot gettered with titanium: null
+        vacuum distilled: null
+        then heated above sodium melting point: null
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: &id007
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator: *id007
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id003
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1072'
+          interval_high: '1522'
+      locator: *id003
 species:
   Na:
     observations:
@@ -100,10 +611,14 @@ species:
         method_class: method_only
         evidence_class: measured_direct
         method: static capsule; heat a quantity of sodium in a closed capsule and measure pressure at test temperatures
-        equilibrium_statement: sufficient time was allotted between temperature changes for capsule and contents to reach equilibrium temperature
+        equilibrium_statement: sufficient time was allotted between temperature changes for capsule and contents to reach
+          equilibrium temperature
         sodium_purification:
-          feed_description: as-received chemically pure sodium filtered through a 20-micron stainless-steel filter, hot gettered with titanium, then vacuum distilled into stainless-steel storage containers
-          oxygen_content_ppm_range: [50, 100]
+          feed_description: as-received chemically pure sodium filtered through a 20-micron stainless-steel filter, hot gettered
+            with titanium, then vacuum distilled into stainless-steel storage containers
+          oxygen_content_ppm_range:
+          - 50
+          - 100
           oxygen_content_note: analysis of several storage containers 1 to 2 years after purification
         pressure_measurement:
           runs_1_to_4: four overlapping pressure-transducer ranges, 0-238, 0-340, 0-544, and 0-680 atm
@@ -112,34 +627,65 @@ species:
         apparatus_details:
           capsule_dimensions:
             value: 25.4 cm long; 2.54 cm outside diameter; 1.77 cm inside diameter
-            locator: {published_page: 2, pdf_page_index: 4, section: Experiment - Apparatus}
+            locator:
+              published_page: 2
+              pdf_page_index: 4
+              section: Experiment - Apparatus
           pressure_capillary_dimensions:
             value: 8.9 cm long; 0.32 cm outside diameter; 0.25 cm inside diameter
-            locator: {published_page: 2, pdf_page_index: 4, section: Experiment - Apparatus}
+            locator:
+              published_page: 2
+              pdf_page_index: 4
+              section: Experiment - Apparatus
           heater:
             value: tungsten resistance heater concentric around capsule, extending 3.8 cm beyond both ends
-            locator: {published_page: 2, pdf_page_index: 4, section: Experiment - Apparatus}
+            locator:
+              published_page: 2
+              pdf_page_index: 4
+              section: Experiment - Apparatus
           vacuum_chamber:
             value: steel vacuum bell jar with external cooling coils and optical sight port
-            locator: {published_page: 2, pdf_page_index: 4, section: Experiment - Apparatus}
+            locator:
+              published_page: 2
+              pdf_page_index: 4
+              section: Experiment - Apparatus
           injector_volume:
             value: 27 ml; piston displacement calibrated to 0.01 ml
-            locator: {published_page: 3, pdf_page_index: 5, section: Experiment - Apparatus}
+            locator:
+              published_page: 3
+              pdf_page_index: 5
+              section: Experiment - Apparatus
           storage_tank_inventory:
             value: about 1 pound of sodium
-            locator: {published_page: 3, pdf_page_index: 5, section: Experiment - Apparatus}
+            locator:
+              published_page: 3
+              pdf_page_index: 5
+              section: Experiment - Apparatus
           temperature_sensors:
             value: Chromel-alumel in run 1; tungsten-rhenium in runs 2 to 4; Pt-Pt-13 percent Rh in run 5
-            locator: {published_page: 4, pdf_page_index: 6, section: Temperature measurements}
+            locator:
+              published_page: 4
+              pdf_page_index: 6
+              section: Temperature measurements
           temperature_calibration:
-            value: Pt-Pt-13Rh against NBS standardized thermocouple; W-Re against Pt-Pt-13Rh from 845 to 1820 K, extrapolated to 2200 K with deviation no more than 6 K
-            locator: {published_page: 4, pdf_page_index: 6, section: Temperature measurements}
+            value: Pt-Pt-13Rh against NBS standardized thermocouple; W-Re against Pt-Pt-13Rh from 845 to 1820 K, extrapolated
+              to 2200 K with deviation no more than 6 K
+            locator:
+              published_page: 4
+              pdf_page_index: 6
+              section: Temperature measurements
           purge_gas:
             value: argon
-            locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
+            locator:
+              published_page: 3
+              pdf_page_index: 5
+              section: Procedure
           thermal_equilibration:
             value: capsule heated through a series of test temperatures; time allowed for equilibrium
-            locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
+            locator:
+              published_page: 3
+              pdf_page_index: 5
+              section: Procedure
       equipment:
         cell_material:
           value: 90 percent tantalum and 10 percent tungsten alloy capsule
@@ -155,15 +701,67 @@ species:
             published_page: 3
             pdf_page_index: 5
             section: Procedure
-    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule
+    - observation_id: bowles_rosenblum_1965_na_fit_this_work
       experiment: sodium-vapor-pressure-series
+      type: psat_series
+      locator:
+        published_page: 7
+        pdf_page_index: 9
+        equation: '1'
+      T_range_K:
+      - 1072
+      - 2154
+      phase: liquid_sodium
+      standard_state: sodium vapor pressure in atm; temperature in K
+      regime: author_least_squares_integrated_clausius_clapeyron_fit
+      units: atm as published
+      uncertainty:
+        standard_deviation: 3.2 percent in p
+      values:
+        quantity: pure_vapor_pressure_fit
+        gas_species: Na(g)
+        method_class: model_derived
+        model_generator: authors' least-squares fit of the 49 Table I static-capsule measurements using a two-constant integrated
+          Clausius-Clapeyron equation
+        log_p_equation: log10(p_atm) = 4.51961 - 5202.12/T_K
+    - observation_id: bowles_rosenblum_1965_na_fit_pooled_prior_studies
+      type: psat_series
+      locator:
+        published_page: 8
+        pdf_page_index: 10
+        equation: '2'
+      T_range_K:
+      - 1072
+      - 2154
+      phase: liquid_sodium
+      standard_state: pooled sodium vapor pressure in atm; temperature in K
+      regime: author_pooled_least_squares_fit
+      units: atm as published
+      uncertainty:
+        standard_deviation: 1.6 percent in p
+      values:
+        quantity: pure_vapor_pressure_fit
+        gas_species: Na(g)
+        method_class: model_derived
+        model_generator: authors' pooled regression over this study's equation and equations from references 2, 4, and 5;
+          not a direct measurement
+        log_p_equation: log10(p_p_atm) = 4.54025 - 5242.11/T_K
+        included_prior_studies:
+        - Makansi, Muendel, and Selke (reference 2)
+        - Ewing et al. (reference 4)
+        - Sowa (reference 5)
+    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule::run-1
+      experiment: sodium-static-run-1
       type: psat_series
       locator:
         published_page: 6
         pdf_page_index: 8
-        table: 'I'
+        table: I
         note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
-      T_range_K: [1072, 2154]
+        record: Run 1
+      T_range_K:
+      - 1072
+      - 2154
       phase: liquid_sodium
       standard_state: sodium vapor over liquid sodium in the closed capsule; pressure in atm as printed
       regime: static_capsule_equilibrium
@@ -177,118 +775,322 @@ species:
         gas_species: Na(g)
         method_class: measured_direct
         points:
-        - {run: 1, T_K: 1416, inv_T_1_per_K: 7.06e-4, p_atm: 7.28}
-        - {run: 1, T_K: 1441, inv_T_1_per_K: 6.94e-4, p_atm: 8.13}
-        - {run: 1, T_K: 1454, inv_T_1_per_K: 6.88e-4, p_atm: 8.76}
-        - {run: 1, T_K: 1472, inv_T_1_per_K: 6.80e-4, p_atm: 9.52}
-        - {run: 1, T_K: 1290, inv_T_1_per_K: 7.75e-4, p_atm: 2.96}
-        - {run: 2, T_K: 1320, inv_T_1_per_K: 7.58e-4, p_atm: 3.78}
-        - {run: 2, T_K: 1448, inv_T_1_per_K: 6.90e-4, p_atm: 8.34}
-        - {run: 2, T_K: 1505, inv_T_1_per_K: 6.64e-4, p_atm: 11.20}
-        - {run: 2, T_K: 1672, inv_T_1_per_K: 5.98e-4, p_atm: 25.50}
-        - {run: 2, T_K: 1741, inv_T_1_per_K: 5.74e-4, p_atm: 33.30}
-        - {run: 2, T_K: 1795, inv_T_1_per_K: 5.57e-4, p_atm: 41.27}
-        - {run: 2, T_K: 1852, inv_T_1_per_K: 5.40e-4, p_atm: 49.90}
-        - {run: 2, T_K: 1904, inv_T_1_per_K: 5.25e-4, p_atm: 58.90}
-        - {run: 2, T_K: 1954, inv_T_1_per_K: 5.12e-4, p_atm: 71.90}
-        - {run: 2, T_K: 1994, inv_T_1_per_K: 5.01e-4, p_atm: 79.70}
-        - {run: 2, T_K: 2048, inv_T_1_per_K: 4.88e-4, p_atm: 94.60}
-        - {run: 2, T_K: 2076, inv_T_1_per_K: 4.81e-4, p_atm: 106.00}
-        - {run: 3, T_K: 1436, inv_T_1_per_K: 6.96e-4, p_atm: 7.31}
-        - {run: 3, T_K: 1503, inv_T_1_per_K: 6.65e-4, p_atm: 10.88}
-        - {run: 3, T_K: 1585, inv_T_1_per_K: 6.31e-4, p_atm: 17.55}
-        - {run: 3, T_K: 1672, inv_T_1_per_K: 5.98e-4, p_atm: 26.39}
-        - {run: 3, T_K: 1734, inv_T_1_per_K: 5.77e-4, p_atm: 33.54}
-        - {run: 3, T_K: 1794, inv_T_1_per_K: 5.60e-4, p_atm: 43.88}
-        - {run: 3, T_K: 1870, inv_T_1_per_K: 5.35e-4, p_atm: 57.21}
-        - {run: 3, T_K: 1930, inv_T_1_per_K: 5.18e-4, p_atm: 71.97}
-        - {run: 3, T_K: 2004, inv_T_1_per_K: 4.99e-4, p_atm: 84.90}
-        - {run: 3, T_K: 2041, inv_T_1_per_K: 4.90e-4, p_atm: 94.83}
-        - {run: 3, T_K: 2071, inv_T_1_per_K: 4.83e-4, p_atm: 102.65}
-        - {run: 3, T_K: 2111, inv_T_1_per_K: 4.74e-4, p_atm: 110.75}
-        - {run: 3, T_K: 2154, inv_T_1_per_K: 4.64e-4, p_atm: 120.41}
-        - {run: 4, T_K: 1414, inv_T_1_per_K: 7.07e-4, p_atm: 7.15}
-        - {run: 4, T_K: 1543, inv_T_1_per_K: 6.48e-4, p_atm: 14.58}
-        - {run: 4, T_K: 1689, inv_T_1_per_K: 5.90e-4, p_atm: 27.93}
-        - {run: 4, T_K: 1839, inv_T_1_per_K: 5.44e-4, p_atm: 49.99}
-        - {run: 4, T_K: 1967, inv_T_1_per_K: 5.09e-4, p_atm: 73.46}
-        - {run: 4, T_K: 2043, inv_T_1_per_K: 4.89e-4, p_atm: 94.24}
-        - {run: 4, T_K: 2146, inv_T_1_per_K: 4.66e-4, p_atm: 121.05}
-        - {run: 5, T_K: 1072, inv_T_1_per_K: 9.33e-4, p_atm: 0.490}
-        - {run: 5, T_K: 1095, inv_T_1_per_K: 9.13e-4, p_atm: 0.559}
-        - {run: 5, T_K: 1127, inv_T_1_per_K: 8.87e-4, p_atm: 0.798}
-        - {run: 5, T_K: 1170, inv_T_1_per_K: 8.57e-4, p_atm: 1.134}
-        - {run: 5, T_K: 1232, inv_T_1_per_K: 8.12e-4, p_atm: 2.043}
-        - {run: 5, T_K: 1262, inv_T_1_per_K: 7.93e-4, p_atm: 2.559}
-        - {run: 5, T_K: 1329, inv_T_1_per_K: 7.53e-4, p_atm: 4.030}
-        - {run: 5, T_K: 1347, inv_T_1_per_K: 7.43e-4, p_atm: 4.622}
-        - {run: 5, T_K: 1404, inv_T_1_per_K: 7.12e-4, p_atm: 6.606}
-        - {run: 5, T_K: 1433, inv_T_1_per_K: 6.98e-4, p_atm: 7.939}
-        - {run: 5, T_K: 1455, inv_T_1_per_K: 6.87e-4, p_atm: 8.974}
-        - {run: 5, T_K: 1522, inv_T_1_per_K: 6.57e-4, p_atm: 12.920}
-    - observation_id: bowles_rosenblum_1965_na_fit_this_work
-      experiment: sodium-vapor-pressure-series
+        - run: 1
+          T_K: 1416
+          inv_T_1_per_K: 0.000706
+          p_atm: 7.28
+        - run: 1
+          T_K: 1441
+          inv_T_1_per_K: 0.000694
+          p_atm: 8.13
+        - run: 1
+          T_K: 1454
+          inv_T_1_per_K: 0.000688
+          p_atm: 8.76
+        - run: 1
+          T_K: 1472
+          inv_T_1_per_K: 0.00068
+          p_atm: 9.52
+        - run: 1
+          T_K: 1290
+          inv_T_1_per_K: 0.000775
+          p_atm: 2.96
+    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule::run-2
+      experiment: sodium-static-run-2
       type: psat_series
       locator:
-        published_page: 7
-        pdf_page_index: 9
-        equation: '1'
-      T_range_K: [1072, 2154]
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+        record: Run 2
+      T_range_K:
+      - 1072
+      - 2154
       phase: liquid_sodium
-      standard_state: sodium vapor pressure in atm; temperature in K
-      regime: author_least_squares_integrated_clausius_clapeyron_fit
+      standard_state: sodium vapor over liquid sodium in the closed capsule; pressure in atm as printed
+      regime: static_capsule_equilibrium
       units: atm as published
       uncertainty:
-        standard_deviation: 3.2 percent in p
+        runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+        run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+        temperature: ±0.25 percent on the Kelvin scale
       values:
-        quantity: pure_vapor_pressure_fit
+        quantity: pure_vapor_pressure
         gas_species: Na(g)
-        method_class: model_derived
-        model_generator: authors' least-squares fit of the 49 Table I static-capsule measurements using a two-constant integrated Clausius-Clapeyron equation
-        log_p_equation: log10(p_atm) = 4.51961 - 5202.12/T_K
-    - observation_id: bowles_rosenblum_1965_na_fit_pooled_prior_studies
+        method_class: measured_direct
+        points:
+        - run: 2
+          T_K: 1320
+          inv_T_1_per_K: 0.000758
+          p_atm: 3.78
+        - run: 2
+          T_K: 1448
+          inv_T_1_per_K: 0.00069
+          p_atm: 8.34
+        - run: 2
+          T_K: 1505
+          inv_T_1_per_K: 0.000664
+          p_atm: 11.2
+        - run: 2
+          T_K: 1672
+          inv_T_1_per_K: 0.000598
+          p_atm: 25.5
+        - run: 2
+          T_K: 1741
+          inv_T_1_per_K: 0.000574
+          p_atm: 33.3
+        - run: 2
+          T_K: 1795
+          inv_T_1_per_K: 0.000557
+          p_atm: 41.27
+        - run: 2
+          T_K: 1852
+          inv_T_1_per_K: 0.00054
+          p_atm: 49.9
+        - run: 2
+          T_K: 1904
+          inv_T_1_per_K: 0.000525
+          p_atm: 58.9
+        - run: 2
+          T_K: 1954
+          inv_T_1_per_K: 0.000512
+          p_atm: 71.9
+        - run: 2
+          T_K: 1994
+          inv_T_1_per_K: 0.000501
+          p_atm: 79.7
+        - run: 2
+          T_K: 2048
+          inv_T_1_per_K: 0.000488
+          p_atm: 94.6
+        - run: 2
+          T_K: 2076
+          inv_T_1_per_K: 0.000481
+          p_atm: 106.0
+    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule::run-3
+      experiment: sodium-static-run-3
       type: psat_series
       locator:
-        published_page: 8
-        pdf_page_index: 10
-        equation: '2'
-      T_range_K: [1072, 2154]
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+        record: Run 3
+      T_range_K:
+      - 1072
+      - 2154
       phase: liquid_sodium
-      standard_state: pooled sodium vapor pressure in atm; temperature in K
-      regime: author_pooled_least_squares_fit
+      standard_state: sodium vapor over liquid sodium in the closed capsule; pressure in atm as printed
+      regime: static_capsule_equilibrium
       units: atm as published
       uncertainty:
-        standard_deviation: 1.6 percent in p
+        runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+        run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+        temperature: ±0.25 percent on the Kelvin scale
       values:
-        quantity: pure_vapor_pressure_fit
+        quantity: pure_vapor_pressure
         gas_species: Na(g)
-        method_class: model_derived
-        model_generator: authors' pooled regression over this study's equation and equations from references 2, 4, and 5; not a direct measurement
-        log_p_equation: log10(p_p_atm) = 4.54025 - 5242.11/T_K
-        included_prior_studies:
-        - Makansi, Muendel, and Selke (reference 2)
-        - Ewing et al. (reference 4)
-        - Sowa (reference 5)
+        method_class: measured_direct
+        points:
+        - run: 3
+          T_K: 1436
+          inv_T_1_per_K: 0.000696
+          p_atm: 7.31
+        - run: 3
+          T_K: 1503
+          inv_T_1_per_K: 0.000665
+          p_atm: 10.88
+        - run: 3
+          T_K: 1585
+          inv_T_1_per_K: 0.000631
+          p_atm: 17.55
+        - run: 3
+          T_K: 1672
+          inv_T_1_per_K: 0.000598
+          p_atm: 26.39
+        - run: 3
+          T_K: 1734
+          inv_T_1_per_K: 0.000577
+          p_atm: 33.54
+        - run: 3
+          T_K: 1794
+          inv_T_1_per_K: 0.00056
+          p_atm: 43.88
+        - run: 3
+          T_K: 1870
+          inv_T_1_per_K: 0.000535
+          p_atm: 57.21
+        - run: 3
+          T_K: 1930
+          inv_T_1_per_K: 0.000518
+          p_atm: 71.97
+        - run: 3
+          T_K: 2004
+          inv_T_1_per_K: 0.000499
+          p_atm: 84.9
+        - run: 3
+          T_K: 2041
+          inv_T_1_per_K: 0.00049
+          p_atm: 94.83
+        - run: 3
+          T_K: 2071
+          inv_T_1_per_K: 0.000483
+          p_atm: 102.65
+        - run: 3
+          T_K: 2111
+          inv_T_1_per_K: 0.000474
+          p_atm: 110.75
+        - run: 3
+          T_K: 2154
+          inv_T_1_per_K: 0.000464
+          p_atm: 120.41
+    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule::run-4
+      experiment: sodium-static-run-4
+      type: psat_series
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+        record: Run 4
+      T_range_K:
+      - 1072
+      - 2154
+      phase: liquid_sodium
+      standard_state: sodium vapor over liquid sodium in the closed capsule; pressure in atm as printed
+      regime: static_capsule_equilibrium
+      units: atm as published
+      uncertainty:
+        runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+        run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+        temperature: ±0.25 percent on the Kelvin scale
+      values:
+        quantity: pure_vapor_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        points:
+        - run: 4
+          T_K: 1414
+          inv_T_1_per_K: 0.000707
+          p_atm: 7.15
+        - run: 4
+          T_K: 1543
+          inv_T_1_per_K: 0.000648
+          p_atm: 14.58
+        - run: 4
+          T_K: 1689
+          inv_T_1_per_K: 0.00059
+          p_atm: 27.93
+        - run: 4
+          T_K: 1839
+          inv_T_1_per_K: 0.000544
+          p_atm: 49.99
+        - run: 4
+          T_K: 1967
+          inv_T_1_per_K: 0.000509
+          p_atm: 73.46
+        - run: 4
+          T_K: 2043
+          inv_T_1_per_K: 0.000489
+          p_atm: 94.24
+        - run: 4
+          T_K: 2146
+          inv_T_1_per_K: 0.000466
+          p_atm: 121.05
+    - observation_id: bowles_rosenblum_1965_na_table1_static_capsule::run-5
+      experiment: sodium-static-run-5
+      type: psat_series
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+        record: Run 5
+      T_range_K:
+      - 1072
+      - 2154
+      phase: liquid_sodium
+      standard_state: sodium vapor over liquid sodium in the closed capsule; pressure in atm as printed
+      regime: static_capsule_equilibrium
+      units: atm as published
+      uncertainty:
+        runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+        run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+        temperature: ±0.25 percent on the Kelvin scale
+      values:
+        quantity: pure_vapor_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        points:
+        - run: 5
+          T_K: 1072
+          inv_T_1_per_K: 0.000933
+          p_atm: 0.49
+        - run: 5
+          T_K: 1095
+          inv_T_1_per_K: 0.000913
+          p_atm: 0.559
+        - run: 5
+          T_K: 1127
+          inv_T_1_per_K: 0.000887
+          p_atm: 0.798
+        - run: 5
+          T_K: 1170
+          inv_T_1_per_K: 0.000857
+          p_atm: 1.134
+        - run: 5
+          T_K: 1232
+          inv_T_1_per_K: 0.000812
+          p_atm: 2.043
+        - run: 5
+          T_K: 1262
+          inv_T_1_per_K: 0.000793
+          p_atm: 2.559
+        - run: 5
+          T_K: 1329
+          inv_T_1_per_K: 0.000753
+          p_atm: 4.03
+        - run: 5
+          T_K: 1347
+          inv_T_1_per_K: 0.000743
+          p_atm: 4.622
+        - run: 5
+          T_K: 1404
+          inv_T_1_per_K: 0.000712
+          p_atm: 6.606
+        - run: 5
+          T_K: 1433
+          inv_T_1_per_K: 0.000698
+          p_atm: 7.939
+        - run: 5
+          T_K: 1455
+          inv_T_1_per_K: 0.000687
+          p_atm: 8.974
+        - run: 5
+          T_K: 1522
+          inv_T_1_per_K: 0.000657
+          p_atm: 12.92
 fidelity_samples:
-- path: species.Na.observations[bowles_rosenblum_1965_na_table1_static_capsule].values.points[0]
+- path: species.Na.observations[bowles_rosenblum_1965_na_table1_static_capsule::run-1].values.points[0]
   value:
     run: 1
     T_K: 1416
-    inv_T_1_per_K: 7.06e-4
+    inv_T_1_per_K: 0.000706
     p_atm: 7.28
   locator:
     published_page: 6
     pdf_page_index: 8
-    table: 'I'
+    table: I
     note: Run 1 first row, temperature 1416 K and pressure 7.28 atm
-- path: species.Na.observations[bowles_rosenblum_1965_na_table1_static_capsule].values.points[48]
+- path: species.Na.observations[bowles_rosenblum_1965_na_table1_static_capsule::run-5].values.points[8]
   value:
     run: 5
     T_K: 1522
-    inv_T_1_per_K: 6.57e-4
-    p_atm: 12.920
+    inv_T_1_per_K: 0.000657
+    p_atm: 12.92
   locator:
     published_page: 6
     pdf_page_index: 8
-    table: 'I'
+    table: I
     note: Run 5 last row, temperature 1522 K and pressure 12.920 atm
