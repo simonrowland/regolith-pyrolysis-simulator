@@ -44,7 +44,7 @@ experiments:
   locator: *mendy_h2_apparatus
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    printed_composition: {state: {tag: value, value: '16 wt% MgO, 36% SiO2, 27% Al2O3, and 21% CaO'}, locator: {published_page: 5, section: '3.1', note: 'CAI4B2 starting melt; prose §3.1 as printed (not a numbered table); Table 1 has no oxide columns'}}
     form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
   conditions:
     temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 8, note: 1600 C; unit conversion only}}
@@ -64,7 +64,7 @@ experiments:
   locator: *mendy_vacuum_apparatus
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    printed_composition: {state: {tag: value, value: '16 wt% MgO, 36% SiO2, 27% Al2O3, and 21% CaO'}, locator: {published_page: 5, section: '3.1', note: 'CAI4B2 starting melt; prose §3.1 as printed (not a numbered table); Table 1 has no oxide columns'}}
     form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
   conditions:
     temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 7, note: 1600 C; unit conversion only}}
