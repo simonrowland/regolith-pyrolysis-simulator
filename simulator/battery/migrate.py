@@ -87,6 +87,7 @@ from simulator.battery.identity import (
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
     series_point_id,
+    series_row_extra,
     temperature_token,
 )
 from simulator.battery.records import (
@@ -7870,7 +7871,7 @@ class Migrator:
                     ["temperature_K"],
                     t_sel.reason or "series temperature_K is not numeric",
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
@@ -7886,7 +7887,7 @@ class Migrator:
                     value_sel.reason
                     or "series P is not grounded in a source pressure unit",
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -7898,11 +7899,12 @@ class Migrator:
                         "left out (own-quantity identity incomplete)"
                     ),
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
+        row_extra = series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None
         if coord is not None:
-            point_id = series_point_id(parent_id, temperature=coord)
+            point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
         else:
             point_id = _rekey_ordinal_point_observation_id(
                 f"{parent_id}::point:{index}",

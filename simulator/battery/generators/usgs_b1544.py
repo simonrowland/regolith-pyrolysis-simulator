@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+
 import argparse
 import json
 import re
@@ -1155,13 +1157,17 @@ def _observation(
     published_name = (
         str(record.get("name_as_published") or table1_phase or "") or None
     )
+    value_fp = hashlib.sha1(str(value).encode("utf-8")).hexdigest()[:10]
+    poly_extra = ""
+    if polymorph.is_value:
+        poly_extra = f":poly={str(polymorph.value).strip().lower()}"
     suffix = tabulated_cell_suffix(
         quantity.value,
         temperature=temperature,
         column=token.column,
         basis=basis or "shared",
         name=published_name,
-        extra=f"src={token.table1_source or 'grid'}",
+        extra=f"src={token.table1_source or 'grid'}:v={value_fp}{poly_extra}",
     )
     return Observation(
         observation_id=f"{SOURCE_ID}:{record_id}:{suffix}",

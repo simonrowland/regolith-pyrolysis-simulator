@@ -81,3 +81,47 @@ def test_migrate_oxygen_fanout_uses_field_not_index() -> None:
     ids_a = [series_point_id("yield", field=f) for f in fields]
     ids_b = [series_point_id("yield", field=f) for f in reversed(fields)]
     assert set(ids_a) == set(ids_b)
+
+
+def test_series_row_extra_distinguishes_same_T_rows() -> None:
+    from simulator.battery.stable_ids import series_point_id, series_row_extra
+
+    a = {"run": "V 66", "T_K": 1671, "MgO_wt_pct": 18.2, "log_fO2": -9.64}
+    b = {"run": "V 66", "T_K": 1671, "MgO_wt_pct": 22.0, "log_fO2": -9.64}
+    c = {"run": "V 65", "T_K": 1671, "MgO_wt_pct": 27.3, "log_fO2": -9.66}
+    ea, eb, ec = series_row_extra(a), series_row_extra(b), series_row_extra(c)
+    assert ea != eb != ec
+    assert "row=v-66" in ea and "h=" in ea
+    ids = {
+        series_point_id("parent", temperature=1671, extra=ea),
+        series_point_id("parent", temperature=1671, extra=eb),
+        series_point_id("parent", temperature=1671, extra=ec),
+    }
+    assert len(ids) == 3
+    assert all("T=1671" in i for i in ids)
+    assert all("::point:" not in i for i in ids)
+
+
+def test_series_row_extra_uses_sample_and_content_fingerprint() -> None:
+    from simulator.battery.stable_ids import series_point_id, series_row_extra
+
+    a = {
+        "sample": "R3-20",
+        "T_C": 1600.0,
+        "time_min": 2400.0,
+        "composition_wt_pct": {"MgO": 6.43},
+    }
+    b = {
+        "sample": "R3-21",
+        "T_C": 1600.0,
+        "time_min": 2400.0,
+        "composition_wt_pct": {"MgO": 9.44},
+    }
+    ea, eb = series_row_extra(a), series_row_extra(b)
+    assert ea != eb
+    assert "row=r3-20" in ea and "h=" in ea
+    ids = {
+        series_point_id("parent", temperature=2173.15, extra=ea),
+        series_point_id("parent", temperature=2173.15, extra=eb),
+    }
+    assert len(ids) == 2

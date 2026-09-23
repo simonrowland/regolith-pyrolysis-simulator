@@ -6,8 +6,11 @@ Key by published temperature, column/field name, or closed T-bounds instead.
 
 from __future__ import annotations
 
+import hashlib
+import json
+
 from decimal import Decimal
-from typing import Any
+from typing import Any, Mapping
 
 
 def temperature_token(value: Any) -> str:
@@ -64,13 +67,58 @@ def tabulated_cell_suffix(
     return suffix
 
 
-def series_point_id(parent_id: str, *, temperature: Any = None, field: str | None = None) -> str:
+def series_row_extra(raw_item: Any) -> str | None:
+    """Content suffix for a series row when T alone is not unique.
+
+    Prefer a printed row label (run / sample / locator.paragraph) plus a
+    short sha1 of the row payload with temperature fields removed. Distinct
+    printed rows rematerialize to distinct ids without encounter ordinals.
+    """
+
+    if not isinstance(raw_item, Mapping):
+        return None
+    parts: list[str] = []
+    label = raw_item.get("run")
+    if label is None:
+        label = raw_item.get("sample")
+    if label is None:
+        loc = raw_item.get("locator")
+        if isinstance(loc, Mapping):
+            label = loc.get("paragraph") or loc.get("row")
+    if label is not None and str(label).strip():
+        parts.append(f"row={_name_slug(str(label))}")
+    skip = {
+        "T_K",
+        "T_C",
+        "temperature_K",
+        "temperature_quote",
+        "quote",
+        "locator",
+    }
+    residual = {k: raw_item[k] for k in raw_item if k not in skip}
+    if residual:
+        blob = json.dumps(residual, sort_keys=True, default=str, separators=(",", ":"))
+        digest = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
+        parts.append(f"h={digest}")
+    return ":".join(parts) if parts else None
+
+
+
+def series_point_id(
+    parent_id: str,
+    *,
+    temperature: Any = None,
+    field: str | None = None,
+    extra: str | None = None,
+) -> str:
     """Exploded series / multi-field child id without an encounter-order index."""
 
     if field:
-        return f"{parent_id}::field:{field}"
+        base = f"{parent_id}::field:{field}"
+        return f"{base}:{extra}" if extra else base
     if temperature is not None:
-        return f"{parent_id}::T={temperature_token(temperature)}"
+        base = f"{parent_id}::T={temperature_token(temperature)}"
+        return f"{base}:{extra}" if extra else base
     raise ValueError(
         "series point id requires a temperature or field name (no ordinal index)"
     )
