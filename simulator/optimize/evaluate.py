@@ -5806,6 +5806,13 @@ def _cache_trace_payload(
             payload["engine_commissioning_notice"] = _compact_jsonable(
                 dict(commissioning_notice)
             )
+    sulfsat_reader = getattr(simulator, "sulfur_saturation_run_notice", None)
+    if callable(sulfsat_reader):
+        sulfsat_notice = sulfsat_reader()
+        if isinstance(sulfsat_notice, MappingABC) and sulfsat_notice:
+            payload["sulfur_saturation_notice"] = _compact_jsonable(
+                dict(sulfsat_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
