@@ -24,6 +24,17 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections:
+- observation_id: markova_1984_table1_initial_sample_compositions
+  field: samples[V].oxides_wt_pct.Al2O3
+  old: 19.29
+  new: 18.29
+  page: 510
+  table: '1'
+  quote: Table 1 sample V (alumina basalt) Al2O3 column. Stored 19.29 fails the printed
+    five-decimal sum 100.10 with the other nine oxides as stored (closes at 101.09). Al2O3=18.29
+    closes to 100.09. Independent check - five-oxide recast of sample V (all Fe as FeO) with
+    Al2O3=18.29 renormalizes to Table 2 right-panel T=0 (52.32 / 19.13 / 9.37 / 6.25 / 12.93);
+    Al2O3=19.29 does not. Damaged typewriter 8/9 glyph; sum + Table-2-recast select 18.29.
 - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
   field: points[T_C=0].FeO
   old: 4.04
@@ -238,7 +249,7 @@ species:
           oxides_wt_pct:
             SiO2: 50.01
             TiO2: 0.95
-            Al2O3: 19.29
+            Al2O3: 18.29
             FeO: 3.93
             Fe2O3: 5.59
             MnO: 0.2
