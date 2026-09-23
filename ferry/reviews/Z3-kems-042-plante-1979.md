@@ -3,17 +3,18 @@
 **Repo:** regolith-pyrolysis-simulator  
 **Branch:** `empirical/z3-kems-042-plante-1979-2026-09-22`  
 **Base:** `2e9e17c3d` (shared Z tip)  
-**Tip (post-fix):** `0e2b2dd6993de14a6848eef1d57f6a5913f0a58f`  
+**Tip (post-fix):** `0e2b2dd6993de14a6848eef1d57f6a5913f0a58f` (on `origin`)  
 **Worktree:** `/workspace/repos/wt/slot-z3`  
 **PDF:** `/workspace/ferry-inbox/from-main-B4-20260923T031628Z/audit-pdfs/kems-042-plante-1979.pdf` (NBS SP 561, 17 PDF pp = published 265–281). **Never committed.**  
 **Extract:** `data/literature/extracts/kems-042-plante-1979.yaml`  
-**Date:** 2026-09-22 ~23:35 EDT (America/Toronto)
+**Date:** 2026-09-22 ~23:45 EDT (America/Toronto) — **retry after prior `resource_exhausted`**
 
 ## Verdict
 
-**P0: 1** — sample-start composition trap (same class as E5/X5) — **fixed and pushed**.  
-**Numeric Table 2 fidelity: PASS** — sampled ≥108 cells (95 full p.276 GT + 13 later-page targets + 221 quote↔values self-checks); **0 wrong numbers**.  
+**P0: 1** — sample-start composition trap (same class as E5/X5) — **fixed and pushed** (`0e2b2dd69`).  
+**Numeric Table 2 fidelity: PASS** — independent re-verify: **95/95** p.276 cells + **17/17** later-page spots (after correcting auditor two-phase flag on 1738a) + **221/221** quote↔values + **162/162** eq.7 activities + Table 3 census **8/8**. **0 wrong numbers**.  
 **Coverage:** Table 2 complete (221/221 vs Table 3 No. Pts.); Table 1/3 intentionally not landed as measurements.  
+**Schema:** `validate_literature_extracts.py` → **FAIL: 324** `equipment.sample` missing top-level `value` (bags carry `printed_composition` + nested `form.value` + locator). Same tip as E5 (`906147d3e` extract byte-identical); **not numeric P0** — left (P0-only lane).  
 **READY for V-style verify** on tip `0e2b2dd69`.
 
 ## Inventory
@@ -29,16 +30,17 @@
 
 ## Method
 
-1. `pdftotext -layout/-raw` + `pdftoppm` 250–400 dpi of PDF pp. 12–14 (published Table 2 pp. 276–278) and Table 3 (p. 278).
-2. Census YAML: 383 observations; series counts; quantity/unit/locator maps.
-3. Build ground-truth for **all of p.276 readable rows** (1104×28 + 1110×38 + 1115×26 + 1122×3 = 95) from raw OCR left columns + visual right columns; cell-match vs YAML `T`, `Wt % K2O`, `P_K`.
-4. Spot-check ≥13 rows across pp. 277–278 (1123 / 1126 / 1129 / 1214 incl. two-phase `a` and series ends).
-5. Verify every K `quote` field ↔ `values` (221/221); Table 3 No. Pts. ↔ series lengths; activity `A = P_K²·(0.226·P_K)^{½}` for all 162 K2O rows.
-6. Check sample-start vs §3 Procedure / abstract / Table 2 running-oxide trap → P0 fix.
+1. `pdftotext -layout/-raw` + `pdftoppm` 200 dpi of PDF pp. 7, 12–14 (published §3 Procedure p. 271; Table 2 pp. 276–278; Table 3 p. 278).
+2. Census YAML: 383 observations; series counts; quantity/unit/locator maps; sample-start bags.
+3. Build ground-truth for **all of p.276 readable rows** (1104×28 + 1110×38 + 1115×26 + 1122×3 = 95) from visual + raw OCR; cell-match vs YAML `T`, `Wt % K2O`, `P_K`, two-phase marker.
+4. Spot-check ≥17 rows across pp. 277–278 (1122 / 1123 / 1126 / 1129 / 1214 incl. two-phase `a` and series ends).
+5. Verify every K `quote` field ↔ `values` (221/221); Table 3 No. Pts. ↔ series lengths; activity `A = P_K²·(0.226·P_K)^{½}` for all 162 K2O rows; `P_O2 = 0.226·P_K`.
+6. Check sample-start vs §3 Procedure / abstract / Table 2 running-oxide trap → P0 already fixed on tip.
+7. Re-run after `resource_exhausted` interruption; confirmed tip on origin; no further extract edit.
 
 ## P0 summary
 
-**P0 count: 1** — fixed on branch.
+**P0 count: 1** — fixed on branch (no new commit this retry).
 
 | # | Finding | Fix |
 | --- | --- | --- |
@@ -71,16 +73,20 @@ Master row 1104–1129 = 184 = 221 − 37 (1214) — consistent with author grou
 | 1115 | 26 | 1259 / 34.36 / 1.00E-7 | same | 1292 / 29.35 / 1.22E-7 | same |
 | 1122 | 3 (page start) | 1294 / 29.34 / 9.48E-8 | same | 1369 / 29.34 / 3.00E-7 | same |
 
-Mid samples also OK (e.g. 1115 @ 1404 / 34.34 / 1.53E-6 — matches deepening parent-discrepancy quote; 1110 @ 1720 / 36.00 / 1.77E-4).
+Mid samples also OK (e.g. 1115 @ 1404 / 34.34 / 1.53E-6; 1110 @ 1720 / 36.00 / 1.77E-4).
 
-### Table 2 pp.277–278 spot sample — **13/13 OK**
+### Table 2 pp.277–278 spot sample — **17/17 OK**
 
 | note | printed | YAML | two-phase |
 |---|---|---|---|
+| 1122 mid | 1403 / 29.34 / 6.31E-7 | same | — |
+| 1122 mid | 1760 / 27.74 / 1.26E-4 | same | — |
 | 1123 start | 1337 / 26.50 / 2.62E-7 | same | — |
+| 1123 mid | 1469 / 24.46 / 2.64E-6 | same | — (anomalous K2O print) |
 | 1123 mid | 1770 / 22.55 / 1.30E-4 | same | — |
 | 1123 end | 1298a / 21.14 / 1.04E-7 | same | `a` |
 | 1126 start | 1368a / 21.13 / 3.33E-7 | same | `a` |
+| 1126 mid | 1443 / 21.10 / 1.11E-6 | same | — |
 | 1126 mid | 1783 / 19.19 / 1.37E-4 | same | — |
 | 1126 end | 1310a / 16.62 / 9.59E-8 | same | `a` |
 | 1129 start | 1373a / 16.60 / 3.64E-7 | same | `a` |
@@ -88,7 +94,7 @@ Mid samples also OK (e.g. 1115 @ 1404 / 34.34 / 1.53E-6 — matches deepening pa
 | 1129 end | 1608a / 11.92 / 1.47E-5 | same | `a` |
 | 1214 start | 1315a / 11.86 / 1.29E-7 | same | `a` |
 | 1214 mid | 1672a / 10.16 / 2.11E-5 | same | `a` |
-| 1214 mid | 1738a / 7.88 / 4.00E-5 | same | `a` |
+| 1214 mid | 1738a / 7.88 / 4.00E-5 | same | `a` (visual; OCR missed superscript) |
 | 1214 last | 1335a / 6.76 / 1.01E-7 | same | `a` |
 
 ### Quote ↔ values integrity — **221/221 OK**
@@ -103,7 +109,7 @@ Every `species.K` `quote` (`T | K2O | P` / `Ta | …`) matches `T_K_as_published
 | Composition basis | wt% K2O as printed column — OK |
 | Sign | all P_K > 0; activities > 0 — OK |
 | T | Kelvin as printed — OK |
-| fO2 / P_O2 | not a printed Table 2 column; derived via stated `P_O2 = 0.226 P_K` (p. 279) on K2O rows — OK |
+| fO2 / P_O2 | not a printed Table 2 column; derived via stated `P_O2 = 0.226 P_K` (p. 279) on K2O rows — OK (162/162) |
 | Row→experiment | all 383 → `k2o-sio2-effusion-series` — OK (one charge; series = analysis groups per §3 / Table 3) |
 | Locator | `published_page` 276–278, `table: '2'` — OK |
 
@@ -117,8 +123,9 @@ Every `species.K` `quote` (`T | K2O | P` / `Ta | …`) matches `T_K_as_published
 |---|---|---|---|
 | experiment sample | label | `crystalline K2Si2O5` | §3 p. 271 crystalline K2Si2O5 |
 | 324× equipment.sample | label | `crystalline K2Si2O5` | same; Table 2 refused |
-| 324× form | form | `crystalline K2Si2O5` | same (pre-existing) |
+| 324× form | form | `crystalline K2Si2O5` | same |
 | per-row `values.composition_wt_pct` | running | Table 2 Wt % K2O (+ SiO2 complement on K2O parents) | running ion-current — **kept** |
+| 59 two-phase K rows | equipment.sample | absent | structural; pre-existing |
 
 ## Coverage
 
@@ -137,8 +144,9 @@ Every `species.K` `quote` (`T | K2O | P` / `Ta | …`) matches `T_K_as_published
 1. **SiO2 complement** on 162 K2O `values.composition_wt_pct` (and historically on the bad start maps) is **not a Table 2 column** — binary remainder. Documented; left intact per E5/X5 policy.
 2. **Anomalous printed row** Series 1123 `1469 | 24.46 | 2.64E-6` (breaks monotonic K2O trend between 26.48 and 26.40). pdftotext + visual agree on **24.46**; YAML matches print. Possible original typesetting typo — **not** an extract P0.
 3. **59 two-phase** observations still lack `equipment.sample` bags entirely (structural; pre-existing). Not numeric P0.
-4. **Experiment `form`** still “Dried K2O-SiO2 melt” (p. 269) while start label is crystalline K2Si2O5 — both appear in §3 (prepare crystal → dry/melt for run); left as-is.
-5. File still **byte-identical** to E5 tip extract after this fix; Z3 re-grounds the same landing on the shared Z base for I2.
+4. **324 schema** `equipment.sample` missing top-level `value` (validator wants value+locator; bags use bare `printed_composition` string + nested `form`). Same as E5 tip; not numeric P0.
+5. **Experiment `form`** still “Dried K2O-SiO2 melt” (p. 269) while start label is crystalline K2Si2O5 — both appear in §3 (prepare crystal → dry/melt for run); left as-is.
+6. File still **byte-identical** to E5 tip extract after this fix; Z3 re-grounds the same landing on the shared Z base for I2.
 
 ## Commits
 
@@ -146,4 +154,4 @@ Every `species.K` `quote` (`T | K2O | P` / `Ta | …`) matches `T_K_as_published
 |---|---|
 | `0e2b2dd69` | extracts: refuse Plante 1979 Table 2 running oxides as sample start |
 
-PDF path used for audit only — **not** in the commit.
+PDF path used for audit only — **not** in the commit. No force-push.
