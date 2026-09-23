@@ -165,6 +165,94 @@ def test_alphamelts_python_liquidus_finder_uses_findliq_gate():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+def test_alphamelts_python_liquidus_finder_requires_findliq_call():
+    """python_api must call findLiq. Skipping the call leaves this test red.
+
+    The reported liquidus is still the frac-M bisection. findLiq is the
+    cross-check: a result that disagrees with bisection has to warn.
+    """
+
+    class FakeFinderBackend(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = 'python_api'
+            self.findliq_calls = 0
+
+        def _find_petthermotools_liquidus_C(self, comp_wt, *, pressure_bar, seed_T_C):
+            self.findliq_calls += 1
+            return 1200.0, ()
+
+        def equilibrate(self, temperature_C, **kwargs):
+            frac = max(0.0, min(1.0, (float(temperature_C) - 1000.0) / 300.0))
+            return EquilibriumResult(
+                temperature_C=float(temperature_C),
+                pressure_bar=float(kwargs.get('pressure_bar', 1e-6)),
+                liquid_fraction=frac,
+                phases_present=['liq'] if frac > 0.0 else ['ol'],
+                phase_masses_kg={'liq': frac, 'ol': 1.0 - frac},
+                status='ok',
+            )
+
+    backend = FakeFinderBackend()
+    result = backend.find_liquidus_solidus(
+        composition_kg={
+            'SiO2': 49.0,
+            'TiO2': 1.5,
+            'Al2O3': 14.0,
+            'FeO': 10.0,
+            'Fe2O3': 1.0,
+            'MgO': 9.0,
+            'CaO': 11.0,
+            'Na2O': 2.5,
+            'K2O': 0.8,
+            'Cr2O3': 0.2,
+            'MnO': 0.2,
+            'P2O5': 0.3,
+        },
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert backend.findliq_calls == 1
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
+    assert any('findLiq differs' in warning for warning in result.warnings)
+
+
+def test_alphamelts_python_findliq_none_is_unavailable_without_bisection():
+    class FakeFinderBackend(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = 'python_api'
+            self.findliq_calls = 0
+
+        def _find_petthermotools_liquidus_C(self, comp_wt, *, pressure_bar, seed_T_C):
+            self.findliq_calls += 1
+            return None, ('PetThermoTools findLiq did not return a temperature',)
+
+        def equilibrate(self, temperature_C, **kwargs):
+            raise AssertionError('bisection must not run when findLiq returns None')
+
+    backend = FakeFinderBackend()
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 15.0, 'CaO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert backend.findliq_calls == 1
+    assert result.status == 'unavailable'
+    assert any('did not return a temperature' in warning for warning in result.warnings)
+
+
 def test_alphamelts_python_liquidus_timeout_marks_backend_unavailable():
     backend = AlphaMELTSBackend()
     backend._mode = 'python_api'

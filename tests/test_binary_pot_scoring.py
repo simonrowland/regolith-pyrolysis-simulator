@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 from dataclasses import replace
 from pathlib import Path
 
@@ -176,6 +177,22 @@ def test_pbo_composition_has_formula_molar_mass() -> None:
     assert mol["P2O5"] > 0.0
 
 
+def test_activity_comparator_celsius_offset_is_273_15() -> None:
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        _gamma_field_temperature_K,
+        _row_temperature_K,
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    assert _row_temperature_K({"T_C": 1370.0}, {}) == pytest.approx(
+        1370.0 + CELSIUS_TO_KELVIN_OFFSET
+    )
+    assert _gamma_field_temperature_K("gamma_1370C", {}) == pytest.approx(
+        1370.0 + CELSIUS_TO_KELVIN_OFFSET
+    )
+    assert _row_temperature_K({"T_K": 1643.0}, {}) == pytest.approx(1643.0)
+
+
 def test_model_derived_observation_is_not_scored() -> None:
     pots = build_scoring_pots_from_extracts()
     pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
@@ -323,7 +340,7 @@ def test_solid_standard_gamma_is_not_scored_against_liquid_activity() -> None:
         c
         for c in iter_activity_comparators()
         if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
-        and c.temperature_K == pot.temperatures_K[0]
+        and math.isclose(c.temperature_K, pot.temperatures_K[0], abs_tol=0.6)
     ]
     assert comparators
     assert "P2O5(s)" in (comparators[0].standard_state or "")
@@ -351,7 +368,7 @@ def test_compatible_liquid_reference_gamma_still_scores() -> None:
         c
         for c in iter_activity_comparators()
         if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
-        and c.temperature_K == pot.temperatures_K[0]
+        and math.isclose(c.temperature_K, pot.temperatures_K[0], abs_tol=0.6)
     ]
     assert comparators
     liquid = replace(

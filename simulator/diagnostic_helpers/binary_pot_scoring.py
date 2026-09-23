@@ -20,6 +20,7 @@ from typing import Any, Iterable, Mapping, Sequence
 import yaml
 
 from simulator.accounting.formulas import parse_formula
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     REFUSAL_COMPOSITION_PROJECTED,
@@ -312,7 +313,7 @@ def _row_temperature_K(
     for candidate in (
         row.get("T_K"),
         (obs.get("values") or {}).get("T_K"),
-        row.get("T_C") and (float(row["T_C"]) + 273.0),
+        row.get("T_C") and (float(row["T_C"]) + CELSIUS_TO_KELVIN_OFFSET),
     ):
         value = _finite_positive(candidate)
         if value is not None and value > 0.0:
@@ -632,7 +633,7 @@ def method_class_is_scored(method_class: str) -> bool:
 def _gamma_field_temperature_K(field: str, obs: Mapping[str, Any]) -> float | None:
     match = re.search(r"(\d{3,4})C$", field)
     if match:
-        return float(match.group(1)) + 273.0
+        return float(match.group(1)) + CELSIUS_TO_KELVIN_OFFSET
     return _row_temperature_K({}, obs)
 
 
