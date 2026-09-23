@@ -2,7 +2,8 @@
 
 **Repo:** regolith-pyrolysis-simulator  
 **Branch:** `empirical/z19-yamada-furukawa-yamada-kato-2026-09-23`  
-**Base / tip:** `origin/work-v064-green` @ `2e9e17c3d` (**no extract fix commit**)  
+**Base:** `origin/work-v064-green` = `2e9e17c3d138fdfba9269c493f82974a71153fa5`  
+**Tip:** review-only mailbox commit(s) on this branch atop green base (no extract/P0 fix); final SHA in STATUS  
 **Worktree:** `/workspace/repos/wt/slot-y12-n12`  
 **PDFs:** `/workspace/ferry-inbox/from-main-B5-20260923T041100Z/audit-pdfs/`  
 (`kems-067-yamada-1980.pdf`, `kems-069-furukawa-1976.pdf`, `kems-087-yamada-kato-1980.pdf`). **Never committed.**  
@@ -37,7 +38,7 @@ Assigned seat was Z18 Kato/Kambayashi/Ohara (`kems-049`, `kems-057`, `kems-058`)
 | kems-069-furukawa-1976 | 18 | **ALL 18** + **Table 1 ppm** + **full Table 2 (10×4)** + **full Table 4 Ti+Fe (11×4)** + Table 3 γ° lit | **0** | none |
 | kems-087-yamada-kato-1980 | 16 | **ALL 16** + ε_P^P / e_P^P / Fig.6 lit ε (4) + apparatus pins | **0** | none |
 
-**READY for V-style verify as “clean”** — tip unchanged at `2e9e17c3d`; branch pushed FF (review-only commit under `ferry/reviews/`).
+**READY for V-style verify as “clean”** — extract store tip = green base; branch carries review-only under ferry/reviews/.
 
 **Validator:** `tools/validate_literature_extracts.py` on all three → **OK: 3 extract file(s) valid**.
 
@@ -185,10 +186,16 @@ Iron ppm Al40/C50/S40/Si70/O26; Ti Fe100/Ag0.1/…/Sn50; γ° lit Chipman 0.011 
 
 ---
 
+## P1 (latent — not fixed)
+
+- **kems-069:** English synopsis Darken intercept +0.58 vs body eq.(6)/Fig.7 +0.53 — both recorded as printed (print_conflict); not a wrong stored number.
+- **kems-067:** Fig.4 English caption repeats Fig.3 I+_SiO/I+_Si wording while axis/Japanese body are I+_Si/I+_Fe — already flagged in extract.
+- Figure-only ion-ratio / activity curves (all three) remain admission_status figure_only — cannot feed numeric scores until digitised.
+
 ## Commits / push
 
 - **Extract patches:** none (P0=0)  
 - **Review commit:** `ferry/reviews/Z19-yamada-furukawa-yamada-kato.md` on this branch  
 - **No PDFs in git. No force-push.**
 
-**P0: 0 · sampled ALL obs on all three · tip: `2e9e17c3d` + review-only · READY**
+**P0: 0 · sampled ALL obs on all three · base tip `2e9e17c3d138fdfba9269c493f82974a71153fa5` + review mailbox · READY**
