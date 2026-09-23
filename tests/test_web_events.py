@@ -5642,6 +5642,34 @@ def test_control_event_refuses_without_active_run(event_name, payload):
         client.disconnect()
 
 
+@pytest.mark.parametrize(
+    ("event_name", "payload"),
+    [
+        ("make_decision", {"choice": "A"}),
+        ("adjust_parameter", {"param": "speed", "value": 1}),
+    ],
+)
+def test_control_event_refuses_retained_completed_run(event_name, payload):
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    sid = app_module.socketio.server.manager.sid_from_eio_sid(client.eio_sid, "/")
+    _simulations[sid] = {"run_id": "finished", "running": False}
+    _sim_locks[sid] = threading.RLock()
+    try:
+        client.get_received()
+        client.emit(event_name, payload)
+        statuses = [
+            (message.get("args") or [{}])[0]
+            for message in client.get_received()
+            if message.get("name") == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "no_active_run"
+        assert event_name in statuses[-1]["message"]
+    finally:
+        client.disconnect()
+        _clear_simulation_state(sid)
+
+
 def _socket_single_run_payload(target_or_recipe, **overrides):
     return {
         "single_run": {

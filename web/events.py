@@ -4197,7 +4197,10 @@ def register_events(socketio):
             resume_loop = False
             with lock:
                 current, _ = _current_simulation_state(sid, state['run_id'])
-                if current is not state or not state['running']:
+                if current is not state:
+                    return
+                if not state['running']:
+                    reject_control_without_active_run(sid, 'make_decision')
                     return
                 session = state['session']
                 decision = session.pending_decision()
@@ -4301,7 +4304,10 @@ def register_events(socketio):
         run_id = state['run_id']
         with lock:
             current, _ = _current_simulation_state(sid, run_id)
-            if current is not state or not state['running']:
+            if current is not state:
+                return
+            if not state['running']:
+                reject_control_without_active_run(sid, 'adjust_parameter')
                 return
             melt_snapshot = None
             campaign_overrides_snapshot = None
