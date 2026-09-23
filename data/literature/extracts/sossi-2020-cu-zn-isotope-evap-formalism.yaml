@@ -113,26 +113,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -264,26 +267,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -415,26 +421,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -566,26 +575,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -717,26 +729,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -868,26 +883,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1019,26 +1037,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1170,26 +1191,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1321,26 +1345,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1472,26 +1499,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1623,26 +1653,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1774,26 +1807,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -1925,26 +1961,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2076,26 +2115,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2227,26 +2269,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2378,26 +2423,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2529,26 +2577,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2680,26 +2731,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2831,26 +2885,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -2982,26 +3039,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3133,26 +3193,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3284,26 +3347,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3435,26 +3501,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3586,26 +3655,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3737,26 +3809,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -3888,26 +3963,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4039,26 +4117,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4190,26 +4271,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4341,26 +4425,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4492,26 +4579,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4643,26 +4733,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4794,26 +4887,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -4945,26 +5041,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -5096,26 +5195,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.178646943159']
+          - [Al2O3, '0.059209341645']
+          - [SiO2, '0.395271364779']
+          - [MgO, '0.219592440789']
+          - [FeO, '0.115579694296']
+          - [CuO0.5, '0.014498540589']
+          - [ZnO, '0.017201674743']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Cu-Zn Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Cu-Zn]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -5247,26 +5349,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:
@@ -5398,26 +5503,29 @@ experiments:
       state:
         tag: value
         value:
-          basis: sossi_2020_recipe_oxide_mole_fraction
+          basis: sossi_2020_measured_oxide_mole_fraction
           amount_basis: mole_fraction
           components:
-          - [CaO, '0.184056255580']
-          - [Al2O3, '0.077303627344']
-          - [SiO2, '0.436077372607']
-          - [MgO, '0.242682351130']
-          - [Fe2O3, '0.059880393339']
+          - [CaO, '0.184173189820']
+          - [Al2O3, '0.061040917494']
+          - [SiO2, '0.407498649620']
+          - [MgO, '0.226385291377']
+          - [FeO, '0.119155024992']
+          - [CuO0.5, '0.000872226180']
+          - [ZnO, '0.000874700516']
       locator:
-        published_page: 318
-        pdf_page_index: 2
-        section: '2.1 Experimental'
-        note: 'Calculated from the printed An42Di58 + approximately 15 wt.% forsterite + approximately 15 wt.% Fe2O3 recipe; not a measured composition.'
+        published_page: 320
+        pdf_page_index: 4
+        section: 3.1 Experimental Glasses / 3.2 Copper and Zinc concentrations
+        note: 'Converted from the paper''s measured major oxides and measured Metalloids Cu/Zn concentrations; FeOT retained as total-iron FeO equivalent, and Cu/Zn ppm converted to CuO0.5/ZnO oxide mole fractions.'
       method_class: calculated
       inference:
-        relation: recipe_stoichiometry_to_oxide_mole_fraction
+        relation: measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction
         inputs:
-        - 'An42Di58 = 42 mol% anorthite + 58 mol% diopside'
-        - '70 wt% An42Di58 base + 15 wt% forsterite + 15 wt% Fe2O3'
-        - 'oxide mass fractions: CaO 16.1908514%, Al2O3 12.3642646%, SiO2 41.1014102%, MgO 15.3433671%, Fe2O3 15.0000000%; sum 100.0000000% within rounding'
+        - 'measured_major_oxide_composition_wt_pct: SiO2 41.70, Al2O3 10.60, MgO 15.54, FeOT 14.58, CaO 17.59'
+        - 'starting_material_measured_concentrations[Metalloids]: Cu/Zn ppm as printed'
+        - 'FeOT retained as total iron on an FeO-equivalent basis; no Fe2O3 conversion'
+        - 'Cu/Zn ppm converted to CuO0.5/ZnO oxide masses using atomic and formula masses'
         output_unit: mole_fraction
     form:
       state:

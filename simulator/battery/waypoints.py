@@ -510,8 +510,13 @@ def normalized_composition(
             if located.inference is not None:
                 locator = located.locator
                 locator_text = str(locator) if locator is not None else "source locator unavailable"
+                origin = (
+                    "printed recipe/aimed target"
+                    if located.inference.relation.startswith("recipe_")
+                    else "measured composition"
+                )
                 notice = (
-                    "calculated from printed recipe/aimed target; "
+                    f"calculated from {origin}; "
                     f"relation={located.inference.relation}; "
                     f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
                 )

@@ -1,6 +1,9 @@
 from dataclasses import replace
 from decimal import Decimal
 import math
+from pathlib import Path
+
+import yaml
 
 import pytest
 
@@ -326,18 +329,62 @@ def test_engine_inputs_all_eight_and_provenance():
     assert result.provenance["bench_identity"]["basis"] == "inferred_from_embedded_evidence"
 
 
-def test_calculated_composition_notice_reaches_engine_payload_and_provenance():
+def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice():
+    path = Path(__file__).parents[2] / "data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml"
+    extract = yaml.safe_load(path.read_text(encoding="utf-8"))
+    experiments = {item["experiment_id"]: item for item in extract["experiments"]}
+    mixes = {}
+
+    def collect_mix_values(value):
+        if isinstance(value, dict):
+            if value.get("run") is not None and value.get("starting_mix") is not None:
+                mixes.setdefault(value["run"], set()).add(value["starting_mix"])
+            for child in value.values():
+                collect_mix_values(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_mix_values(child)
+
+    collect_mix_values(extract)
+    assert len(experiments) == 36
+    assert len(mixes) == 36
+    assert all(len(values) == 1 for values in mixes.values())
+    expected_components = {
+        "Metalloids": {
+            "CaO": "0.184173189820", "Al2O3": "0.061040917494", "SiO2": "0.407498649620",
+            "MgO": "0.226385291377", "FeO": "0.119155024992", "CuO0.5": "0.000872226180",
+            "ZnO": "0.000874700516",
+        },
+        "Cu-Zn": {
+            "CaO": "0.178646943159", "Al2O3": "0.059209341645", "SiO2": "0.395271364779",
+            "MgO": "0.219592440789", "FeO": "0.115579694296", "CuO0.5": "0.014498540589",
+            "ZnO": "0.017201674743",
+        },
+    }
+
+    for experiment in experiments.values():
+        mix = next(iter(mixes[experiment["locator"]["record"]]))
+        composition = experiment["sample"]["initial_composition"]
+        value = composition["state"]["value"]
+        species = dict(value["components"])
+        assert species == expected_components[mix]
+        assert value["basis"] == "sossi_2020_measured_oxide_mole_fraction"
+        assert composition["method_class"] == "calculated"
+        assert composition["inference"]["relation"] == "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction"
+        assert "FeO" in species and "Fe2O3" not in species
+        assert "CuO0.5" in species and "ZnO" in species
+        assert f"starting_material_measured_concentrations[{mix}]" in " ".join(composition["inference"]["inputs"])
+
     experiment, bench, observation = case()
     composition = Composition("printed_recipe", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
     sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
         State.of(composition), locator=f.loc(),
-        inference=Derivation(relation="calculated_from_printed_recipe", inputs=("An42Di58 recipe",), parameters=(), output_unit="mole_fraction"),
+        inference=Derivation(relation="recipe_stoichiometry_to_oxide_mole_fraction", inputs=("recipe",), parameters=(), output_unit="mole_fraction"),
     ))
-    inputs = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
-    result = engine_point_requests(inputs)[0]
+    result = engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))[0]
     assert result.payload["composition_method_class"] == "calculated"
-    assert "calculated from printed recipe" in result.payload["composition_notice"]
-    assert "An42Di58 recipe" in result.payload["composition_notice"]
+    assert "calculated from printed recipe/aimed target" in result.payload["composition_notice"]
+    assert "recipe" in result.payload["composition_notice"]
     route = result.provenance["output_routes"]["composition_mol"]
     assert route["method_class"] == "calculated"
     assert route["notice"] == result.payload["composition_notice"]
