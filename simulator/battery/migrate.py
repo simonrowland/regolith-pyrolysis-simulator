@@ -3250,6 +3250,54 @@ def uncertainty_for(raw: object) -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
 
 
+
+_VAPORIZATION_DFG_RE = re.compile(
+    r"dfG\(g\)-dfG\((cr|l)\)"
+)
+_VAPORIZATION_P0_RE = re.compile(
+    r"P0=([0-9.+(?:eE][0-9.+-]*)\s*Pa"
+)
+_VAPORIZATION_CONDENSED_PHASE = {
+    "cr": Phase.CR,
+    "l": Phase.L,
+}
+
+
+def lift_vaporization_reaction_from_ledger_note(
+    formula: str, note: object
+) -> tuple[Reaction, Decimal | None] | None:
+    """Lift condensed→gas vaporization reaction identity from a ledger note.
+
+    Ledger vapour-rail points print
+    ``ln(P_sat/P0)=-[dfG(g)-dfG(cr|l)]/(R T)`` with ``P0=... Pa``. The table
+    cell is ΔvapG, not log10(Psat/P0). Returns None when that reaction
+    identity is not printed.
+    """
+
+    if note is None:
+        return None
+    flat = " ".join(str(note).split())
+    if not flat:
+        return None
+    match = _VAPORIZATION_DFG_RE.search(flat)
+    if match is None:
+        return None
+    condensed_phase = _VAPORIZATION_CONDENSED_PHASE[match.group(1)]
+    gas = make_species(formula, Phase.G)
+    condensed = make_species(formula, condensed_phase)
+    reaction = Reaction(
+        terms=(
+            ReactionTerm(species=gas, coefficient=Fraction(1)),
+            ReactionTerm(species=condensed, coefficient=Fraction(-1)),
+        )
+    )
+    p0: Decimal | None = None
+    p0_match = _VAPORIZATION_P0_RE.search(flat)
+    if p0_match is not None:
+        p0 = as_decimal(p0_match.group(1))
+    return reaction, p0
+
+
 def make_species(
     formula: str,
     phase: Phase | State[Phase],
@@ -7482,6 +7530,7 @@ class Migrator:
         source_row_index: int | None = None,
         derivation: Derivation | None = None,
         per: PerBasis | State[PerBasis] | None = None,
+        reaction: Reaction | State[Reaction] | None = None,
         notices: tuple[Notice, ...] = (),
         value_reason: str | None = None,
     ) -> Observation:
@@ -7494,6 +7543,10 @@ class Migrator:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
+        if reaction is not None:
+            ident_kwargs["reaction"] = (
+                reaction if isinstance(reaction, State) else State.of(reaction)
+            )
         q_for_comp = (
             quantity
             if isinstance(quantity, Quantity)
@@ -8072,18 +8125,48 @@ class Migrator:
             derivation = None
             notices: tuple[Notice, ...] = ()
             value_reason = None
+            reaction: Reaction | None = None
+            standard_pressure_Pa: Decimal | None = None
+            obs_species = make_species(formula, map_phase(point.get("phase"))[0])
             if stated_q == "log10_Psat_over_P0":
-                ledger_quantity = State.unknown(log10_psat_reason)
-                self.result.add_queue(
-                    work.work_id,
-                    loc,
-                    ["quantity", "value"],
-                    log10_psat_reason,
-                    source=rel,
-                    observation_id=obs_id,
-                )
-                table_sel = _unavailable_selection(log10_psat_reason)
-                value_reason = log10_psat_reason
+                note = str(point.get("note") or "")
+                lifted = lift_vaporization_reaction_from_ledger_note(formula, note)
+                if lifted is None:
+                    ledger_quantity = State.unknown(log10_psat_reason)
+                    self.result.add_queue(
+                        work.work_id,
+                        loc,
+                        ["quantity", "value"],
+                        log10_psat_reason,
+                        source=rel,
+                        observation_id=obs_id,
+                    )
+                    table_sel = _unavailable_selection(log10_psat_reason)
+                    value_reason = log10_psat_reason
+                else:
+                    reaction, p0 = lifted
+                    ledger_quantity = State.of(Quantity.DELTA_FG)
+                    per = PerBasis.MOL_SPECIES
+                    obs_species = make_species(formula, Phase.G)
+                    if p0 is not None:
+                        standard_pressure_Pa = p0
+                    units = "kJ_per_mol" if energy_unit_ok else None
+                    if not energy_unit_ok:
+                        table_sel = _unavailable_selection(
+                            f"ledger header metric_units {metric_units!r} is not kJ/mol"
+                        )
+                        value_reason = table_sel.reason
+                    else:
+                        table_sel = select_declared_source(
+                            Quantity.DELTA_FG, units, point
+                        )
+                    if note:
+                        derivation = Derivation(
+                            relation=note,
+                            inputs=(choose_read_from(work, loc),),
+                            parameters=(),
+                            output_unit="kJ/mol",
+                        )
             else:
                 quantity_payload = dict(point)
                 if stated_q and not quantity_payload.get("quantity"):
@@ -8185,14 +8268,16 @@ class Migrator:
                 observation_id=obs_id,
                 locator=loc,
                 quantity=ledger_quantity,
-                species=make_species(formula, map_phase(point.get("phase"))[0]),
+                species=obs_species,
                 value=value,
                 evidence=evidence,
                 temperature_K=t if t is not None and t > 0 else None,
+                standard_pressure_Pa=standard_pressure_Pa,
                 method=map_method(point.get("method") or point.get("regime")),
                 source_row_index=row_index,
                 derivation=derivation,
                 per=per,
+                reaction=reaction,
                 notices=notices,
                 value_reason=value_reason,
             )
