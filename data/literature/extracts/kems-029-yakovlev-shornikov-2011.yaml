@@ -23,7 +23,7 @@ review_status: draft
 corrections: []
 fidelity_samples:
 - species: Na
-  observable: rate_series
+  observable: apparatus
   observation_id: yakovlev_shornikov_2011_kems_method_geometry
   field: sample_mass_mg
   value: 15.0
@@ -58,153 +58,170 @@ fidelity_samples:
     paragraph: the Na2O contents up to ~70 wt. %
 benches:
 - id: yakovlev-ms1301-kems
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: MS-1301 mass spectrometer with Knudsen effusion cell}
-    locator: {published_page: 1, section: 'opening methods paragraphs'}
+    state:
+      tag: value
+      value: MS-1301 mass spectrometer with Knudsen effusion cell
+    locator:
+      published_page: 1
+      section: opening methods paragraphs
   cell_material_and_liner:
-    state: {tag: value, value: Tungsten effusion cell with rhenium boat}
-    locator: {published_page: 1, section: 'opening methods paragraphs'}
+    state:
+      tag: value
+      value: Tungsten effusion cell with rhenium boat
+    locator:
+      published_page: 1
+      section: opening methods paragraphs
   heating_method:
-    state: {tag: value, value: Electron beam}
-    locator: {published_page: 1, section: 'opening methods paragraphs'}
+    state:
+      tag: value
+      value: Electron beam
+    locator:
+      published_page: 1
+      section: opening methods paragraphs
   temperature_measurement:
     sensor:
-      state: {tag: value, value: Optical pyrometer through the pyrometric hole of the cell}
-      locator: {published_page: 1, section: 'opening methods paragraphs'}
+      state:
+        tag: value
+        value: Optical pyrometer through the pyrometric hole of the cell
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
   temperature_calibration:
     uncertainty:
-      state: {tag: value, value: {kind: point, point: '1'}}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Printed accuracy +/-1 C'}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: Printed accuracy +/-1 C
 experiments:
 - experiment_id: meteorite-and-cai-series
   bench_id: yakovlev-ms1301-kems
   method: knudsen_effusion
-  locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Murchison, Krymka, Saratov chondrules, and CAI types A/B are distinct samples; no single composition is assigned'}
+  locator:
+    published_page: 1
+    section: opening methods paragraphs
+    note: Murchison, Krymka, Saratov chondrules, and CAI types A/B are distinct samples; no single composition
+      is assigned
   sample:
     mass_kg:
-      state: {tag: value, value: {kind: point, point: '0.000015'}}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Printed 15 mg; unit conversion only'}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000015'
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: Printed 15 mg; unit conversion only
     printed_composition:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Several meteorite and CAI materials; no single series composition'}
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: 'Several meteorite and CAI materials; no single series composition; L3 refuse composition:
+          multiple meteorite/CAI materials without a single printed composition map; L3 refuse oxygen_condition:
+          O2 table is model_derived (admission model_output_not_measurement), not a printed fO2_control/buffer/pO2
+          point; L3 refuse pressure_boundary: chamber/run pressure not printed as a point'
   apparatus:
     geometry:
       orifice_diameter_m:
-        state: {tag: unknown, reason: not_published}
-        locator: {published_page: 1, section: 'opening methods paragraphs'}
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1
+          section: opening methods paragraphs
       orifice_channel_length_m:
-        state: {tag: unknown, reason: not_published}
-        locator: {published_page: 1, section: 'opening methods paragraphs'}
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1
+          section: opening methods paragraphs
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'No single run setpoint; source prints a series start and upper extent'}
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: No single run setpoint; source prints a series start and upper extent
   thermal_schedule:
     method:
-      state: {tag: value, value: Stepwise heating, about 50 C steps}
-      locator: {published_page: 1, section: 'opening methods paragraphs'}
+      state:
+        tag: value
+        value: Stepwise heating
+        about 50 C steps: null
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
     total_duration_s:
-      state: {tag: value, value: {kind: point, point: '18000', approximate: true}}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 5 hr from about 900 C to complete evaporation; unit conversion only'}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18000'
+          approximate: true
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: About 5 hr from about 900 C to complete evaporation; unit conversion only
     setpoints_and_holds:
     - temperature_K:
-        state: {tag: value, value: {kind: point, point: '1173.15', approximate: true}}
-        locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 900 C starting temperature; unit conversion only'}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          published_page: 1
+          section: opening methods paragraphs
+          note: About 900 C starting temperature; unit conversion only
       hold_duration_s:
-        state: {tag: value, value: {kind: point, point: '900', approximate: true}}
-        locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 15 min exposure per temperature step; unit conversion only'}
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '900'
+            approximate: true
+        locator:
+          published_page: 1
+          section: opening methods paragraphs
+          note: About 15 min exposure per temperature step; unit conversion only
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Instrument detection and upper limits are not a single run pressure'}
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
+        note: Instrument detection and upper limits are not a single run pressure
     sweep_gas:
-      state: {tag: not_applicable, reason: not_applicable}
-      locator: {published_page: 1, section: 'opening methods paragraphs'}
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 1
+        section: opening methods paragraphs
     regime:
-      regime_class: {tag: value, value: molecular}
+      regime_class:
+        tag: value
+        value: molecular
 species:
   Na:
     observations:
-    - observation_id: yakovlev_shornikov_2011_kems_method_geometry
-      experiment: meteorite-and-cai-series
-      type: rate_series
-      locator:
-        published_page: 1
-        pdf_page_index: 1
-        note: Vestnik NZ6104 3-page PDF, page 1
-        paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis
-          of the vapor phase (MS-1301 mass spectrometer)
-      T_range_K:
-      - 1173.15
-      - 2873.15
-      phase: chondrite_and_CAI_knudsen
-      condensed_form:
-        state: liquid
-        metastable: false
-        basis: explicit_author
-        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
-      standard_state: gold-calibrated KEMS absolute partial pressures (mm Hg as printed for the instrument
-        range)
-      regime: kems_effusion
-      units: as published
-      values:
-        quantity: kems_method_geometry_reference
-        method_class: method_only
-        semantics: method_geometry_reference_not_measured_species_observation
-        instrument: MS-1301 mass spectrometer
-        instrument_reference: Semenov, Nikolaev & Franceva 1976
-        T_C_up_to_about: 2600.0
-        measurable_p_mmHg_lower: 1.0e-07
-        measurable_p_mmHg_upper_range:
-        - 0.01
-        - 0.1
-        heating_regime: stepwise
-        temperature_step_C_about: 50.0
-        step_duration_min_about: 15.0
-        total_duration_hr_about: 5.0
-        T_start_C_about: 900.0
-        heating: electron beam
-        temperature_method: optical pyrometer in the pyrometric hole of the cell (black-body)
-        temperature_accuracy_C: 1.0
-        absolute_pressure_method: gold calibration (sequential ionic currents of standard and sample in
-          the same cell)
-        sample_mass_mg: 15.0
-        sample_container: rhenium boat on the bottom of a tungsten effusion cell
-        W_reduction_note: Evaporation in the rhenium container strongly depressed the reducing activity
-          of tungsten, although did not eliminate it completely. This is suggested by the presence of
-          WO2 and WO3, as well as Ca and Mg tungstates in the vapor.
-        observed_vapor_species:
-        - K
-        - Na
-        - Fe
-        - Mg
-        - Ca
-        - Al
-        - SiO
-        - TiO
-        - TiO2
-        - AlO
-        - Al2O
-        - Al2O2
-        - O
-        - O2
-        samples:
-        - Murchison chondrite (CM)
-        - Krymka chondrite (LL3)
-        - chondrules of Saratov chondrites (L4)
-        - CAI types A and B from Efremovka (CV)
-        missing_for_motzfeldt:
-        - orifice_area
-        - orifice_diameter
-        - clausing_factor
-        - sample_surface_area
-        missing_note: 15 mg in a rhenium boat is printed; orifice diameter/Clausing and melt free surface
-          area are not printed.
-      uncertainty:
-        temperature_accuracy_C: 1.0
-        as_printed: The accuracy of temperature measurement was ±1 C
-        note: No numeric uncertainty printed for gold calibration or ion currents.
     - observation_id: yakovlev_shornikov_2011_complementary_vapor_wt_pct
       experiment: meteorite-and-cai-series
       type: rate_series
@@ -312,6 +329,86 @@ species:
         - -10
       uncertainty:
         note: Figure-only; curve not digitised.
+    context:
+    - observation_id: yakovlev_shornikov_2011_kems_method_geometry
+      experiment: meteorite-and-cai-series
+      type: apparatus
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        note: Vestnik NZ6104 3-page PDF, page 1
+        paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis
+          of the vapor phase (MS-1301 mass spectrometer)
+      T_range_K:
+      - 1173.15
+      - 2873.15
+      phase: chondrite_and_CAI_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: gold-calibrated KEMS absolute partial pressures (mm Hg as printed for the instrument
+        range)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: MS-1301 mass spectrometer
+        instrument_reference: Semenov, Nikolaev & Franceva 1976
+        T_C_up_to_about: 2600.0
+        measurable_p_mmHg_lower: 1.0e-07
+        measurable_p_mmHg_upper_range:
+        - 0.01
+        - 0.1
+        heating_regime: stepwise
+        temperature_step_C_about: 50.0
+        step_duration_min_about: 15.0
+        total_duration_hr_about: 5.0
+        T_start_C_about: 900.0
+        heating: electron beam
+        temperature_method: optical pyrometer in the pyrometric hole of the cell (black-body)
+        temperature_accuracy_C: 1.0
+        absolute_pressure_method: gold calibration (sequential ionic currents of standard and sample in
+          the same cell)
+        sample_mass_mg: 15.0
+        sample_container: rhenium boat on the bottom of a tungsten effusion cell
+        W_reduction_note: Evaporation in the rhenium container strongly depressed the reducing activity
+          of tungsten, although did not eliminate it completely. This is suggested by the presence of
+          WO2 and WO3, as well as Ca and Mg tungstates in the vapor.
+        observed_vapor_species:
+        - K
+        - Na
+        - Fe
+        - Mg
+        - Ca
+        - Al
+        - SiO
+        - TiO
+        - TiO2
+        - AlO
+        - Al2O
+        - Al2O2
+        - O
+        - O2
+        samples:
+        - Murchison chondrite (CM)
+        - Krymka chondrite (LL3)
+        - chondrules of Saratov chondrites (L4)
+        - CAI types A and B from Efremovka (CV)
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        missing_note: 15 mg in a rhenium boat is printed; orifice diameter/Clausing and melt free surface
+          area are not printed.
+      uncertainty:
+        temperature_accuracy_C: 1.0
+        as_printed: The accuracy of temperature measurement was ±1 C
+        note: No numeric uncertainty printed for gold calibration or ion currents.
   SiO:
     observations:
     - observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
