@@ -264,6 +264,28 @@ def _aggregate(
     }
 
 
+def _run_counts(
+    items: list[tuple[str, tuple[ConsumerReadiness, ...]]],
+    *,
+    consumer: str,
+    engine: str | None = None,
+) -> dict[str, int]:
+    counts = {status.value: 0 for status in ReadinessStatus}
+    for _, group in items:
+        selected = [
+            item for item in group
+            if item.consumer == consumer and item.engine == engine
+        ]
+        if consumer == "engine_point" and engine is None:
+            status = _collapse_engines(group).status
+        elif len(selected) == 1:
+            status = selected[0].status
+        else:
+            continue
+        counts[status.value] += 1
+    return counts
+
+
 def _sources_without_scoreable_observations(works, listed: set[str]) -> tuple[str, ...]:
     """Canonical source ids that the experiment walk never reaches.
 
@@ -308,6 +330,16 @@ def _no_scoreable_observations_row(source_id: str) -> dict[str, object]:
         "source_id": source_id,
         "consumers": consumers,
         "engines": engines,
+        "run_counts": {
+            "by_consumer": {
+                consumer: {status.value: 0 for status in ReadinessStatus}
+                for consumer in ("kems", "rps", "engine_point")
+            },
+            "by_engine": {
+                engine: {status.value: 0 for status in ReadinessStatus}
+                for engine in ENGINE_POINT_CONSUMERS
+            },
+        },
         "informational_gaps": [dict(gap)],
         "experiments": [],
     }
@@ -475,6 +507,12 @@ def report(root: Path) -> dict[str, object]:
     by_engine: dict[str, dict[str, int]] = {
         engine: dict(empty_counts) for engine in ENGINE_POINT_CONSUMERS
     }
+    by_consumer_runs: dict[str, dict[str, int]] = {
+        consumer: dict(empty_counts) for consumer in ("kems", "rps", "engine_point")
+    }
+    by_engine_runs: dict[str, dict[str, int]] = {
+        engine: dict(empty_counts) for engine in ENGINE_POINT_CONSUMERS
+    }
     blockers: dict[tuple[str, str], dict[str, set[str]]] = {}
     for source_id in sorted(by_source):
         source_items = source_readiness[source_id]
@@ -510,6 +548,16 @@ def report(root: Path) -> dict[str, object]:
             _aggregate(source_items, engine=engine)
             for engine in ENGINE_POINT_CONSUMERS
         ]
+        run_counts = {
+            "by_consumer": {
+                consumer: _run_counts(source_items, consumer=consumer)
+                for consumer in ("kems", "rps", "engine_point")
+            },
+            "by_engine": {
+                engine: _run_counts(source_items, consumer="engine_point", engine=engine)
+                for engine in ENGINE_POINT_CONSUMERS
+            },
+        }
         info_ids = sorted(source_information.get(source_id, set()))
         informational_gaps: list[dict[str, object]] = []
         if info_ids:
@@ -538,6 +586,7 @@ def report(root: Path) -> dict[str, object]:
                 "source_id": source_id,
                 "consumers": consumer_rows,
                 "engines": engine_rows,
+                "run_counts": run_counts,
                 "informational_gaps": informational_gaps,
                 "experiments": by_source[source_id],
             }
@@ -550,6 +599,12 @@ def report(root: Path) -> dict[str, object]:
             counts = by_engine[str(item["engine"])]
             status = str(item["status"])
             counts[status] = counts.get(status, 0) + 1
+        for consumer, counts in run_counts["by_consumer"].items():
+            for status, count in counts.items():
+                by_consumer_runs[consumer][status] += count
+        for engine, counts in run_counts["by_engine"].items():
+            for status, count in counts.items():
+                by_engine_runs[engine][status] += count
         for experiment_id, group in source_items:
             seen = set()
             for item in group:
@@ -596,6 +651,8 @@ def report(root: Path) -> dict[str, object]:
         "summary": {
             "by_consumer": by_consumer,
             "by_engine": by_engine,
+            "by_consumer_runs": by_consumer_runs,
+            "by_engine_runs": by_engine_runs,
             "top_blocking_waypoints": top_blockers,
             # The two bench_identity verdicts, counted separately so a caller can
             # tell how much of the gap acquisition could ever close: permanent
