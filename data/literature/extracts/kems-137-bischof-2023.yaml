@@ -223,17 +223,197 @@ benches:
       state: {tag: value, value: W97Re3/W75Re25 thermocouple and IGA-12 single-wavelength pyrometer}
       locator: *b137_apparatus
 experiments:
+- experiment_id: an-di-1-low
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Run 1_low; initially 1000 ppm Ga, In, Tl'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.0000791'}}
+      locator: {page: 5, table: '2', note: 'Table 2 1_low initial weight 79.1 mg; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.47'
+          Al2O3: '15.38'
+          MgO: '10.42'
+          CaO: '23.63'
+      locator:
+        page: 15
+        table: '6'
+        note: 'Table 6 1_low Start EPMA wt%; SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16; End column not landed as start; label Anorthite-diopside eutectic'
+    form:
+      state: {tag: value, value: Powdered glass}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+    characterization:
+      state: {tag: value, value: EPMA of pre-KEMS and post-KEMS glasses}
+      locator: {page: 6, section: '2.2.2 Electron probe micro-analyser'}
+    pretreatment:
+      state: {tag: value, value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004'}}
+        locator: *b137_apparatus
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: No channel length printed}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *b137_apparatus
+    regime:
+      regime_class: {tag: value, value: molecular}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step}
+      locator: {page: 5, table: '2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Per-run durations in Table 2; not collapsed here'}
+- experiment_id: an-di-2-low
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Run 2_low; initially 1000 ppm Ga, In, Tl'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.00007292'}}
+      locator: {page: 5, table: '2', note: 'Table 2 2_low initial weight 72.92 mg; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.47'
+          Al2O3: '15.38'
+          MgO: '10.42'
+          CaO: '23.63'
+      locator:
+        page: 15
+        table: '6'
+        note: 'Table 6 2_low Start EPMA wt%; SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16 (identical to 1_low Start; same starting glass); End column not landed as start; label Anorthite-diopside eutectic'
+    form:
+      state: {tag: value, value: Powdered glass}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+    characterization:
+      state: {tag: value, value: EPMA of pre-KEMS and post-KEMS glasses}
+      locator: {page: 6, section: '2.2.2 Electron probe micro-analyser'}
+    pretreatment:
+      state: {tag: value, value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004'}}
+        locator: *b137_apparatus
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: No channel length printed}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *b137_apparatus
+    regime:
+      regime_class: {tag: value, value: molecular}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step}
+      locator: {page: 5, table: '2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Per-run durations in Table 2; not collapsed here'}
+- experiment_id: an-di-3-high
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: 'Run 3_high; initially 10000 ppm Ga, In, Tl'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.00003869'}}
+      locator: {page: 5, table: '2', note: 'Table 2 3_high initial weight 38.69 mg; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.72'
+          Al2O3: '15.15'
+          MgO: '10.27'
+          CaO: '23.28'
+      locator:
+        page: 15
+        table: '6'
+        note: 'Table 6 3_high Start EPMA wt%; SiO2 49.72 ± 0.09, Al2O3 15.15 ± 0.08, MgO 10.27 ± 0.04, CaO 23.28 ± 0.09, Total 98.42 ± 0.16; Total <100 because ~1.1 wt% Ga2O3 and ~0.2 wt% In2O3 not in Table 6 oxide columns; End column not landed as start; label Anorthite-diopside eutectic'
+    form:
+      state: {tag: value, value: Powdered glass}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+    characterization:
+      state: {tag: value, value: EPMA of pre-KEMS and post-KEMS glasses}
+      locator: {page: 6, section: '2.2.2 Electron probe micro-analyser'}
+    pretreatment:
+      state: {tag: value, value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004'}}
+        locator: *b137_apparatus
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: No channel length printed}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *b137_apparatus
+    regime:
+      regime_class: {tag: value, value: molecular}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step}
+      locator: {page: 5, table: '2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 'Per-run durations in Table 2; not collapsed here'}
 - experiment_id: an-di-series
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge}
+  locator: {page: 5, table: '2', note: 'Multi-run series (1_low, 2_low, 3_high); per-run Table 6 Start oxides are on an-di-1-low / an-di-2-low / an-di-3-high'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003869', interval_high: '0.0000791'}}
       locator: {page: 5, table: '2', note: Printed initial weights across runs}
     printed_composition:
-      state: {tag: value, value: Anorthite-diopside eutectic, 42 wt% anorthite and 58 wt% diopside; Ga, In, and Tl trace-element additions vary by run}
-      locator: {page: 4, section: '2.1 Sample preparation'}
+      state:
+        tag: value
+        value:
+          SiO2: '50.34'
+          Al2O3: '15.40'
+          MgO: '10.80'
+          CaO: '23.46'
+      locator:
+        page: 4
+        section: '2.1 Sample preparation'
+        note: 'Nominal An-Di eutectic wt% as printed (42 wt% anorthite + 58 wt% diopside); per-run EPMA Start is on an-di-*-low/high experiments'
     form:
       state: {tag: value, value: Powdered glass}
       locator: {page: 4, section: '2.1 Sample preparation'}
@@ -271,6 +451,7 @@ experiments:
     total_duration_s:
       state: {tag: unknown, reason: not_published}
       locator: {page: 5, table: '2', note: 15 h at 1742 K applies to 1_low only, not every series run}
+
 species:
   Ga:
     observations:
@@ -585,7 +766,7 @@ species:
         x_GaO1.5_3_high_polytherm: 0.0589
         note: 1_low polytherm uses x from 2_low (same starting glass). Gamma itself is not this row.
     - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S1
@@ -705,7 +886,7 @@ species:
           p_O2_calc_Pa: 0.00106
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s2_1low_isotherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S2
@@ -865,7 +1046,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s3_2low_polytherm
-      experiment: an-di-series
+      experiment: an-di-2-low
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -1054,7 +1235,7 @@ species:
           K_Ga_SD: 5.0e-13
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s4_3high_polytherm
-      experiment: an-di-series
+      experiment: an-di-3-high
       type: activity_coefficient
       locator:
         table: S4-gamma
@@ -1935,7 +2116,7 @@ species:
           surface In was measured.'
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s1_1low_polytherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S1
@@ -2054,7 +2235,7 @@ species:
           p_O2_calc_Pa: 0.00106
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s2_1low_isotherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: activity_coefficient
       locator:
         table: S2
@@ -2213,7 +2394,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s3_2low_polytherm
-      experiment: an-di-series
+      experiment: an-di-2-low
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -2412,7 +2593,7 @@ species:
           K_In_SD: 6.19e-12
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s4_3high_polytherm
-      experiment: an-di-series
+      experiment: an-di-3-high
       type: activity_coefficient
       locator:
         table: S4-gamma
