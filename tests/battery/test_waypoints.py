@@ -552,7 +552,26 @@ def test_raw_printed_area_cannot_satisfy_effective_requirement() -> None:
     assert WaypointFlag.GEOMETRIC_ONLY in area.selected.flags
     kems = consumer_readiness(experiment, bench)[0]
     assert kems.status is ReadinessStatus.GAP
-    assert any(gap.waypoint == "effective_escape_area" for gap in kems.gaps)
+    escape = [gap for gap in kems.gaps if gap.waypoint == "effective_escape_area"]
+    assert len(escape) == 1
+    assert escape[0].reason is GapReason.MISSING_EVIDENCE
+    assert escape[0].missing == ("bench.geometry.clausing_factor",)
+
+
+def test_diameter_only_escape_gap_names_clausing_not_area() -> None:
+    experiment = replace(factories.kems_experiment(), sample=_charge(single=False), thermal_schedule=_schedule())
+    bench = _bench(
+        geometry=ApparatusGeometry(
+            orifice_diameter_m=factories.located(Value.point_of("0.001"))
+        )
+    )
+    area = effective_escape_area(experiment, bench)
+    assert WaypointFlag.GEOMETRIC_ONLY in area.selected.flags
+    assert "bench.geometry.orifice_area_m2" not in area.selected.inputs
+    kems = consumer_readiness(experiment, bench)[0]
+    assert kems.status is ReadinessStatus.GAP
+    escape = next(gap for gap in kems.gaps if gap.waypoint == "effective_escape_area")
+    assert escape.missing == ("bench.geometry.clausing_factor",)
 
 
 def test_readiness_pressure_floor_and_single_species_routing() -> None:

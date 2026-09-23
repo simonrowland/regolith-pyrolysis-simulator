@@ -1190,10 +1190,14 @@ def _effective_escape_gap(result: WaypointResult) -> ReadinessGap | None:
         return missing
     assert result.selected is not None
     if WaypointFlag.GEOMETRIC_ONLY in result.selected.flags:
+        # A geometric route is selected only when a printed area or a diameter
+        # is already present. The missing input is the Clausing factor: that
+        # is what turns the geometric area into an effective one. Naming
+        # orifice_area_m2 here reports a field the selected route already used.
         return ReadinessGap(
             "effective_escape_area",
             GapReason.MISSING_EVIDENCE,
-            ("bench.geometry.clausing_factor", "bench.geometry.orifice_area_m2"),
+            ("bench.geometry.clausing_factor",),
         )
     return None
 
