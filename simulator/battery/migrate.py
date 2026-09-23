@@ -40,7 +40,7 @@ import re
 import unicodedata
 from collections import defaultdict
 from dataclasses import dataclass, field, fields, is_dataclass, replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
 from pathlib import Path
@@ -690,6 +690,8 @@ def _located_from_plain(payload: object, cast) -> Located:
     inference = None
     if payload.get("inference"):
         inference = _derivation_from_plain(payload.get("inference"))
+    else:
+        inference = _inference_for_printed_conversion(payload)
     return Located(
         _state_from_plain(payload.get("state"), cast),
         locator=_locator_from_plain(payload.get("locator")),
@@ -1905,6 +1907,27 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "m3/s",
         "L/s",
     ),
+    "min_to_s": (Decimal("60"), "t_s = t_min × 60", "s", "min"),
+    "h_to_s": (Decimal("3600"), "t_s = t_h × 3600", "s", "h"),
+    "ks_to_s": (Decimal("1000"), "t_s = t_ks × 1000", "s", "ks"),
+    "C_per_min_to_K_per_s": (
+        Decimal("60"),
+        "rate_K_s = rate_C_per_min / 60",
+        "K/s",
+        "C/min",
+    ),
+    "cm3_to_m3": (
+        Decimal("1000000"),
+        "V_m3 = V_cm3 / 1e6",
+        "m3",
+        "cm3",
+    ),
+    "MPa_to_Pa": (
+        Decimal("1000000"),
+        "P_Pa = P_MPa × 1e6",
+        "Pa",
+        "MPa",
+    ),
     "percent_to_fraction": (
         Decimal("100"),
         "x = pct / 100",
@@ -2166,6 +2189,477 @@ def conversion_derivation(
         parameters=tuple(params),
         output_unit=output_unit,
     )
+
+
+def _converted_temperature(
+    amount: Decimal,
+    trail: str | None,
+    original: object,
+    locator: Locator | None,
+) -> Located[Decimal]:
+    """Kelvin point condition. A unit conversion keeps its printed original."""
+
+    return Located(
+        State.of(amount),
+        locator=locator,
+        inference=conversion_derivation(trail, original, locator),
+    )
+
+
+def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -> object:
+    if not field_name:
+        return None
+    raw = payload.get(field_name)
+    if isinstance(raw, Mapping):
+        return raw.get("value")
+    return raw
+
+
+# Extractor-written Kelvin sitting next to the printed Celsius. A field named
+# as published is the printed Kelvin and is not a twin.
+_TWIN_KELVIN_KEYS = frozenset({"T_K", "temperature_K", "Tmax_K"})
+
+
+def _prefer_printed_temperature(
+    found: list[tuple[str, object, Decimal, str]],
+) -> tuple[str, object, Decimal, str]:
+    """Prefer printed Celsius when its conversion equals the Kelvin twin.
+
+    The landed number is identical either way. A twin that does not match
+    keeps the historical first-key choice, so a +273 convention is not
+    rewritten as +273.15.
+    """
+
+    celsius = [item for item in found if item[3] == "celsius_to_kelvin"]
+    for c_item in celsius:
+        for k_item in found:
+            if k_item[0] in _TWIN_KELVIN_KEYS and k_item[2] == c_item[2]:
+                return c_item
+    return found[0]
+
+
+# Printed-unit recovery for a Located whose note (or as_published block)
+# records a conversion. The stored magnitude is never replaced.
+_PRINTED_WORD_NUMBERS = {"one": "1", "two": "2", "three": "3", "six": "6"}
+_PRINTED_SCI = (
+    r"(?:~?\s*\d+(?:\.\d+)?\s*[x×]\s*10\s*\^\s*\{?\s*[+-]?\d+\s*\}?"
+    r"|~?\s*\d+(?:\.\d+)?[eE][+-]?\d+"
+    r"|~?\s*10\s*\^\s*\{?\s*[+-]?\d+\s*\}?)"
+)
+_PRINTED_NUM = rf"(?:{_PRINTED_SCI}|~?\s*\d+(?:\.\d+)?)"
+_PRINTED_UNIT = (
+    r"C/min|°C|degC|(?<![A-Za-z])C(?![A-Za-z])|Torr|torr|mmHg|"
+    r"atmospheres|atmosphere|atm|mbar|millibar|MPa|bars|bar|mm|cm3|cm³|cm|"
+    r"mg|kg|grams|gram|g|ks|minutes|minute|min|hours|hour|hr|h|"
+    r"seconds|second|sec|s|L/s|Liter\s+s-1"
+)
+_CONVERSION_NOTE_RE = re.compile(r"unit conversion|\bconverted\b", re.IGNORECASE)
+_NOT_A_CONVERSION_RE = re.compile(r"no unit conversion", re.IGNORECASE)
+
+
+def _agrees_stored(converted: Decimal, stored: Decimal) -> bool:
+    """True when converted is the stored number, or its rounding."""
+
+    if converted == stored:
+        return True
+    exponent = stored.as_tuple().exponent
+    if not isinstance(exponent, int):
+        return False
+    quantum = Decimal(1).scaleb(exponent)
+    with localcontext() as ctx:
+        ctx.prec = 80
+        ctx.traps[InvalidOperation] = False
+        rounded = converted.quantize(quantum)
+    return bool(rounded.is_finite() and rounded == stored)
+
+
+def _normalize_printed_unit(unit: str) -> str:
+    token = unit.strip().lower().replace("³", "3")
+    token = re.sub(r"\s+", "", token)
+    return {
+        "c": "C",
+        "°c": "C",
+        "degc": "C",
+        "c/min": "C/min",
+        "torr": "Torr",
+        "mmhg": "Torr",
+        "atm": "atm",
+        "atmosphere": "atm",
+        "atmospheres": "atm",
+        "bar": "bar",
+        "bars": "bar",
+        "mbar": "mbar",
+        "millibar": "mbar",
+        "mpa": "MPa",
+        "mm": "mm",
+        "cm": "cm",
+        "cm3": "cm3",
+        "mg": "mg",
+        "g": "g",
+        "gram": "g",
+        "grams": "g",
+        "kg": "kg",
+        "s": "s",
+        "sec": "s",
+        "second": "s",
+        "seconds": "s",
+        "min": "min",
+        "minute": "min",
+        "minutes": "min",
+        "h": "h",
+        "hr": "h",
+        "hour": "h",
+        "hours": "h",
+        "ks": "ks",
+        "l/s": "L/s",
+        "liters-1": "L/s",
+    }.get(token, unit)
+
+
+def _convert_printed_amount(amount: Decimal, unit: str) -> tuple[Decimal, str] | None:
+    """Return (stored-unit amount, trail) at high precision, or None."""
+
+    normalized = _normalize_printed_unit(unit)
+    with localcontext() as ctx:
+        ctx.prec = 80
+        if normalized == "C":
+            return amount + Decimal("273.15"), "celsius_to_kelvin"
+        if normalized == "C/min":
+            return amount / Decimal(60), "C_per_min_to_K_per_s"
+        if normalized == "Torr":
+            return amount * Decimal(101325) / Decimal(760), "Torr_to_Pa"
+        if normalized == "atm":
+            return amount * Decimal(101325), "atm_to_Pa"
+        if normalized == "bar":
+            return amount * Decimal(100000), "bar_to_Pa"
+        if normalized == "mbar":
+            return amount * Decimal(100), "mbar_to_Pa"
+        if normalized == "MPa":
+            return amount * Decimal(1000000), "MPa_to_Pa"
+        if normalized == "mm":
+            return amount / Decimal(1000), "mm_to_m"
+        if normalized == "cm":
+            return amount / Decimal(100), "cm_to_m"
+        if normalized == "cm3":
+            return amount / Decimal(1000000), "cm3_to_m3"
+        if normalized == "mg":
+            return amount / Decimal(1000000), "mg_to_kg"
+        if normalized == "g":
+            return amount / Decimal(1000), "g_to_kg"
+        if normalized == "kg":
+            return amount, "identity:kg"
+        if normalized == "s":
+            return amount, "identity:s"
+        if normalized == "min":
+            return amount * Decimal(60), "min_to_s"
+        if normalized == "h":
+            return amount * Decimal(3600), "h_to_s"
+        if normalized == "ks":
+            return amount * Decimal(1000), "ks_to_s"
+        if normalized == "L/s":
+            return amount / Decimal(1000), "L_s_to_m3_s"
+    return None
+
+
+def _sci_to_decimal(text: str) -> Decimal:
+    token = (
+        text.strip()
+        .lstrip("~")
+        .replace(" ", "")
+        .replace("×", "x")
+        .replace("{", "")
+        .replace("}", "")
+    )
+    powered = re.fullmatch(r"(\d+(?:\.\d+)?)x10\^([+-]?\d+)", token, re.IGNORECASE)
+    if powered:
+        return Decimal(powered.group(1)) * (Decimal(10) ** int(powered.group(2)))
+    bare = re.fullmatch(r"10\^([+-]?\d+)", token, re.IGNORECASE)
+    if bare:
+        return Decimal(10) ** int(bare.group(1))
+    return Decimal(token)
+
+
+def _prepare_conversion_note(note: str) -> str:
+    text = re.sub(
+        r"\b(one|two|three|six)\b",
+        lambda match: _PRINTED_WORD_NUMBERS[match.group(1).lower()],
+        note,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(r"(\d)\s*-\s*(hour|hours)\b", r"\1 \2", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"\d+(?:\.\d+)?\s*\+/-\s*\d+(?:\.\d+)?",
+        lambda match: match.group(0).split("+/-")[0],
+        text,
+    )
+    # A stated factor ("1 Torr = 101325/760 Pa") is not an operand.
+    return re.sub(r",?\s*\d+(?:\.\d+)?\s*[A-Za-z°/]+\s*=\s*[^.;]+", " ", text)
+
+
+def _parse_printed_operands(note: str) -> list[tuple[Decimal, str]] | None:
+    """Printed (amount, unit) operands, or a clock as h/min/s. None if unread."""
+
+    if _NOT_A_CONVERSION_RE.search(note):
+        return None
+    text = _prepare_conversion_note(note)
+    clock = re.search(r"\b(\d{1,2}):(\d{2}):(\d{2})\b", text)
+    if clock:
+        hours, minutes, seconds = (Decimal(clock.group(i)) for i in (1, 2, 3))
+        return [(hours, "h"), (minutes, "min"), (seconds, "s")]
+    shared = re.search(
+        rf"({_PRINTED_NUM})\s*(?:-|to|and)\s*({_PRINTED_NUM})\s*[x×]\s*10\s*\^\s*"
+        rf"{{?\s*([+-]?\d+)\s*}}?\s*({_PRINTED_UNIT})\b",
+        text,
+        re.IGNORECASE,
+    )
+    if shared:
+        exponent = int(shared.group(3))
+        unit = shared.group(4)
+        scale = Decimal(10) ** exponent
+        return [
+            (_sci_to_decimal(shared.group(1)) * scale, unit),
+            (_sci_to_decimal(shared.group(2)) * scale, unit),
+        ]
+    ranged = re.search(
+        rf"({_PRINTED_NUM})\s*(?:-|to|and)\s*({_PRINTED_NUM})\s*-?\s*({_PRINTED_UNIT})\b",
+        text,
+        re.IGNORECASE,
+    )
+    if ranged:
+        unit = ranged.group(3)
+        return [
+            (_sci_to_decimal(ranged.group(1)), unit),
+            (_sci_to_decimal(ranged.group(2)), unit),
+        ]
+    spans = [
+        (_sci_to_decimal(match.group(1)), match.group(2))
+        for match in re.finditer(
+            rf"({_PRINTED_NUM})\s*-?\s*({_PRINTED_UNIT})\b", text, re.IGNORECASE
+        )
+    ]
+    if not spans:
+        return None
+    return spans[:2]
+
+
+def _stored_magnitudes(raw: object) -> tuple[str, list[Decimal], str | None] | None:
+    """(kind, magnitudes, bound operator) from a Located state value."""
+
+    if isinstance(raw, bool) or raw is None:
+        return None
+    if isinstance(raw, (str, int, float, Decimal)):
+        try:
+            return "point", [Decimal(str(raw))], None
+        except (ArithmeticError, ValueError):
+            return None
+    if not isinstance(raw, Mapping):
+        return None
+    kind = raw.get("kind")
+    try:
+        if kind == "point":
+            return "point", [Decimal(str(raw["point"]))], None
+        if kind == "interval":
+            return "interval", [
+                Decimal(str(raw["interval_low"])),
+                Decimal(str(raw["interval_high"])),
+            ], None
+        if kind == "bound":
+            return "bound", [Decimal(str(raw["bound_value"]))], (
+                str(raw.get("bound_operator")) if raw.get("bound_operator") else None
+            )
+    except (KeyError, ArithmeticError, ValueError):
+        return None
+    return None
+
+
+def _note_bound_operator(note: str) -> str | None:
+    if re.search(r"up to|<=|≤", note, re.IGNORECASE):
+        return "<="
+    if re.search(r"<|>|below|less than", note, re.IGNORECASE):
+        return "<"
+    return None
+
+
+def _clock_derivation(
+    operands: list[tuple[Decimal, str]], locator: Locator | None
+) -> Derivation:
+    hours, minutes, seconds = (item[0] for item in operands)
+    return Derivation(
+        relation="hms_to_s",
+        inputs=("t_s = 3600*h + 60*m + s", "original_unit=h:m:s"),
+        parameters=(
+            ("hours", Located(State.of(hours), locator=locator)),
+            ("minutes", Located(State.of(minutes), locator=locator)),
+            ("seconds", Located(State.of(seconds), locator=locator)),
+        ),
+        output_unit="s",
+    )
+
+
+def _interval_derivation(
+    operands: list[tuple[Decimal, str]],
+    trails: list[str],
+    locator: Locator | None,
+) -> Derivation | None:
+    if any(trail.startswith("identity") for trail in trails):
+        return None
+    metas = [_CONVERSION_META.get(trail) for trail in trails]
+    if any(meta is None for meta in metas):
+        return None
+    if trails[0] == trails[1]:
+        factor, arithmetic, output_unit, original_unit = metas[0]
+        return Derivation(
+            relation=trails[0],
+            inputs=(arithmetic, f"original_unit={original_unit}"),
+            parameters=(
+                ("original_low", Located(State.of(operands[0][0]), locator=locator)),
+                ("original_high", Located(State.of(operands[1][0]), locator=locator)),
+                ("factor", Located(State.of(factor), locator=locator)),
+            ),
+            output_unit=output_unit,
+        )
+    inputs: list[str] = []
+    parameters: list[tuple[str, Located[Decimal]]] = []
+    output_unit = None
+    for label, operand, meta in zip(("low", "high"), operands, metas):
+        factor, arithmetic, output_unit, original_unit = meta
+        inputs.append(arithmetic)
+        inputs.append(f"original_unit_{label}={original_unit}")
+        parameters.append((f"original_{label}", Located(State.of(operand[0]), locator=locator)))
+        parameters.append((f"factor_{label}", Located(State.of(factor), locator=locator)))
+    return Derivation(
+        relation=f"{trails[0]}+{trails[1]}",
+        inputs=tuple(inputs),
+        parameters=tuple(parameters),
+        output_unit=output_unit or "s",
+    )
+
+
+def _derivation_for_operands(
+    operands: list[tuple[Decimal, str]],
+    kind: str,
+    locator: Locator | None,
+) -> Derivation | None:
+    if len(operands) == 3 and [unit for _, unit in operands] == ["h", "min", "s"]:
+        return _clock_derivation(operands, locator)
+    converted: list[tuple[Decimal, str]] = []
+    for amount, unit in operands:
+        got = _convert_printed_amount(amount, unit)
+        if got is None:
+            return None
+        converted.append(got)
+    trails = [trail for _, trail in converted]
+    if kind == "interval":
+        if len(operands) != 2:
+            return None
+        return _interval_derivation(operands, trails, locator)
+    if len(operands) != 1:
+        return None
+    if trails[0].startswith("identity"):
+        return None
+    return conversion_derivation(trails[0], operands[0][0], locator)
+
+
+def _operands_match_stored(
+    operands: list[tuple[Decimal, str]],
+    kind: str,
+    stored: list[Decimal],
+) -> list[tuple[Decimal, str]] | None:
+    """Operands whose conversion reproduces the stored magnitudes, in order."""
+
+    if kind == "interval":
+        if len(operands) != 2 or len(stored) != 2:
+            return None
+        converted = []
+        for amount, unit in operands:
+            got = _convert_printed_amount(amount, unit)
+            if got is None or not _agrees_stored(got[0], stored[len(converted)]):
+                return None
+            converted.append(got[0])
+        return operands
+    if len(stored) != 1:
+        return None
+    matching = []
+    for amount, unit in operands:
+        got = _convert_printed_amount(amount, unit)
+        if got is not None and _agrees_stored(got[0], stored[0]):
+            matching.append((amount, unit))
+    if len(matching) != 1:
+        return None
+    return matching
+
+
+def _published_operands(published: Mapping[str, Any]) -> list[tuple[Decimal, str]] | None:
+    units = published.get("units")
+    if published.get("low") is not None and published.get("high") is not None:
+        low_unit = published.get("low_units") or units
+        high_unit = published.get("high_units") or units
+        if not low_unit or not high_unit:
+            return None
+        return [
+            (Decimal(str(published["low"])), str(low_unit)),
+            (Decimal(str(published["high"])), str(high_unit)),
+        ]
+    if published.get("value") is not None and units:
+        return [(Decimal(str(published["value"])), str(units))]
+    return None
+
+
+def _inference_for_printed_conversion(payload: Mapping[str, Any]) -> Derivation | None:
+    """Derivation for a converted Located. None when the printed original is not verified.
+
+    A structured ``as_published`` block that does not reproduce the stored
+    number is refused. A prose note that does not reproduce it is left
+    printed: the note is not a machine claim we can safely complete.
+    """
+
+    state = payload.get("state")
+    raw_value = state.get("value") if isinstance(state, Mapping) else None
+    parsed = _stored_magnitudes(raw_value)
+    if parsed is None:
+        if isinstance(payload.get("as_published"), Mapping):
+            raise ValueError(
+                "as_published conversion does not apply to a non-numeric located value"
+            )
+        return None
+    kind, stored, operator = parsed
+    locator = _locator_from_plain(payload.get("locator"))
+    published = payload.get("as_published")
+    if isinstance(published, Mapping) and (
+        published.get("units") or published.get("low_units") or published.get("value")
+        or published.get("low")
+    ):
+        operands = _published_operands(published)
+        if operands is None or _operands_match_stored(operands, kind, stored) is None:
+            raise ValueError(
+                "as_published conversion does not reproduce the stored value"
+            )
+        return _derivation_for_operands(operands, kind, locator)
+    locator_raw = payload.get("locator")
+    note = ""
+    if isinstance(locator_raw, Mapping):
+        note = str(locator_raw.get("note") or "")
+    if not note or not _CONVERSION_NOTE_RE.search(note) or _NOT_A_CONVERSION_RE.search(note):
+        return None
+    if kind == "bound":
+        claimed = _note_bound_operator(note)
+        if claimed is None or claimed != operator:
+            return None
+    operands = _parse_printed_operands(note)
+    if not operands:
+        return None
+    # A clock is three fields, not one magnitude. Check the sum.
+    if len(operands) == 3 and [unit for _, unit in operands] == ["h", "min", "s"]:
+        if kind != "point":
+            return None
+        total = operands[0][0] * 3600 + operands[1][0] * 60 + operands[2][0]
+        if not _agrees_stored(total, stored[0]):
+            return None
+        return _clock_derivation(operands, locator)
+    matched = _operands_match_stored(operands, kind, stored)
+    if matched is None:
+        return None
+    return _derivation_for_operands(matched, kind, locator)
 
 
 # ---------------------------------------------------------------------------
@@ -3993,6 +4487,7 @@ def select_declared_source(
     unused = _unused_ancillary(payload, None)
 
     if declared == AXIS_TEMPERATURE_K:
+        found_temperatures: list[tuple[str, object, Decimal, str]] = []
         for key, unit in (
             ("T_K", "K"),
             ("T_K_as_published", "K"),
@@ -4004,20 +4499,22 @@ def select_declared_source(
             if key not in payload:
                 continue
             raw = payload.get(key)
+            use_unit = unit
             if isinstance(raw, Mapping):
+                use_unit = str(raw.get("units") or unit)
                 raw = raw.get("value")
-                unit = str(payload.get(key).get("units") or unit) if isinstance(
-                    payload.get(key), Mapping
-                ) else unit
-            amount, trail = convert_temperature_to_k(raw, unit)
-            if amount is not None:
-                return _point_selection(amount, key, trail or "identity:K", payload, condition_ranges)
-            return _unavailable_selection(
-                trail or f"{key} is not numeric",
-                condition_ranges=condition_ranges,
-                field_name=key,
-                unit_trail=trail or "identity",
-            )
+            amount, trail = convert_temperature_to_k(raw, use_unit)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not numeric",
+                    condition_ranges=condition_ranges,
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            found_temperatures.append((key, raw, amount, trail or "identity:K"))
+        if found_temperatures:
+            key, _raw, amount, trail = _prefer_printed_temperature(found_temperatures)
+            return _point_selection(amount, key, trail, payload, condition_ranges)
         if "temperature" in payload:
             raw = payload.get("temperature")
             unit = "K"
@@ -6982,7 +7479,14 @@ class Migrator:
             )
         point_conditions = None
         if t_known is not None:
-            point_conditions = {"temperature_K": located_value(t_known, locator)}
+            point_conditions = {
+                "temperature_K": _converted_temperature(
+                    t_known,
+                    t_sel.unit_trail,
+                    _temperature_field_raw(t_payload, t_sel.field_name),
+                    locator,
+                )
+            }
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and bool(obs.get("equipment"))
@@ -7261,7 +7765,7 @@ class Migrator:
                 )
             t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, raw_item)
             t_trail = t_sel.unit_trail
-            t_original = raw_item.get(t_sel.field_name) if t_sel.field_name else None
+            t_original = _temperature_field_raw(raw_item, t_sel.field_name)
             coord = t_sel.amount
             if t_sel.field_name and not t_sel.available:
                 self.result.add_queue(
@@ -7364,10 +7868,8 @@ class Migrator:
         point_conditions = None
         if coord is not None:
             point_conditions = {
-                "temperature_K": Located(
-                    State.of(coord),
-                    locator=point_locator,
-                    inference=conversion_derivation(t_trail, t_original, point_locator),
+                "temperature_K": _converted_temperature(
+                    coord, t_trail, t_original, point_locator
                 )
             }
         lab_pc = point_lab_conditions(
