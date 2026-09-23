@@ -235,7 +235,12 @@ experiments:
       state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In/Tl addition 1000 ppm'}
       locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_07-11-19_Ga-In-Tl_1000'}
     initial_composition:
-      state: {tag: value, value: {basis: oxide_wt_pct, SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: wt_percent
+          components: [[SiO2, '50.47'], [Al2O3, '15.38'], [MgO, '10.42'], [CaO, '23.63']]
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 1_low; total 99.90; trace additions excluded from oxide columns'}
   pressure_environment:
     total_pressure_Pa:
@@ -260,7 +265,12 @@ experiments:
       state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In addition 1000 ppm'}
       locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_06_03_20_Ga_In_1000'}
     initial_composition:
-      state: {tag: value, value: {basis: oxide_wt_pct, SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: wt_percent
+          components: [[SiO2, '50.47'], [Al2O3, '15.38'], [MgO, '10.42'], [CaO, '23.63']]
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low'}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
@@ -283,7 +293,12 @@ experiments:
       state: {tag: value, value: 'Anorthite-diopside eutectic, trace Ga/In addition 10000 ppm'}
       locator: {page: 4, section: '2.1 Sample preparation', note: 'Run label KN_28_02_20_Ga_In_10000'}
     initial_composition:
-      state: {tag: value, value: {basis: oxide_wt_pct, SiO2: '49.72', Al2O3: '15.15', MgO: '10.27', CaO: '23.28'}}
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: wt_percent
+          components: [[SiO2, '49.72'], [Al2O3, '15.15'], [MgO, '10.27'], [CaO, '23.28']]
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 3_high; total oxide columns 98.42; trace Ga/In oxides excluded'}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
