@@ -1,0 +1,201 @@
+schema_version: literature_extract.v1
+source_id: schaefer-fegley-2011-vaporization-earth
+source:
+  citation: >-
+    Schaefer, Laura; Lodders, Katharina; Fegley, Bruce, Jr. (2012), "Vaporization
+    of the Earth: Application to Exoplanet Atmospheres", The Astrophysical Journal
+    755:41, DOI 10.1088/0004-637X/755/1/41. Corpus id retains 2011 (manuscript
+    submitted 2011-08-22; revised 2012-03-27).
+  doi: 10.1088/0004-637x/755/1/41
+  url: http://dx.doi.org/10.1088/0004-637X/755/1/41
+  year: 2012
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B3 schaefer-fegley-2011-vaporization-earth.pdf
+    (sha256 9b1e48b4275d28af171e82fa3f7a55c5dd17fadefc484831a5c80074026d3d2d;
+    50-page born-digital manuscript PDF). Tables 1–2 transcribed from pdftotext
+    -layout of PDF pages 31–32. N7 ruling: only printed MEASURED/TABULATED
+    non-model rows land as observations. Table 1 (compiled measured exoplanet
+    properties) kept in context. Table 2 (Wedepohl 1995 continental crust;
+    Kargel & Lewis 1993 BSE) landed as composition_series secondary_compilation.
+    Tables 3–4 and Figures 1–11 are Gibbs-minimization / photochemical MODEL
+    outputs — recorded as typed_absences; numeric model cells are NOT ingested.
+  date: '2026-09-22'
+  worker: n7-schaefer-spaargaren-pahlevan
+  provenance_path: data/literature/extracts/schaefer-fegley-2011-vaporization-earth.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Table 3 major atmospheric compositions at extreme T/P (continental crust vs BSE)
+  locator: {pdf_page_index: 33, table: '3'}
+  note: >-
+    Author Gibbs-energy minimization gas speciation; not a laboratory measurement.
+    Numbers deliberately not transcribed under N7 measured/tabulated-only rule.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Table 4 photochemical lifetimes of important gases at orbital distances
+  locator: {pdf_page_index: 34, table: '4'}
+  note: >-
+    Calculated tchem from printed J values / orbital scaling; model/derived cohort.
+    Numbers deliberately not transcribed.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figures 1–11 gas speciation, H/C/O abundance sweeps, gas/solid ratio, T–P profiles, example atmospheres
+  locator: {pdf_page_index: 35, note: figure captions begin after Table 4}
+  note: Figure-only model curves; no axis digitisation; not ingested.
+fidelity_samples:
+- species: continental_crust
+  observable: composition_series
+  observation_id: schaefer_2012_table2_continental_crust_wt_pct
+  field: O_wt_pct
+  value: 47.20
+  locator:
+    table: '2'
+    pdf_page_index: 32
+    note: Table 2 Continental Crust O 47.20 wt% as printed
+- species: bulk_silicate_earth
+  observable: composition_series
+  observation_id: schaefer_2012_table2_bse_wt_pct
+  field: Mg_wt_pct
+  value: 22.01
+  locator:
+    table: '2'
+    pdf_page_index: 32
+    note: Table 2 Bulk Silicate Earth Mg 22.01 wt% as printed
+species:
+  continental_crust:
+    observations:
+    - observation_id: schaefer_2012_table2_continental_crust_wt_pct
+      type: composition_series
+      locator:
+        table: '2'
+        pdf_page_index: 32
+        note: Table 2 Bulk compositions of vaporizing planets; Continental Crust column
+      phase: bulk_continental_crust_composition_input
+      condensed_form:
+        state: bulk_undifferentiated_crust
+        metastable: false
+        basis: explicit_author
+        note: Wedepohl (1995) average continental crust used as MAGMA/Gibbs input; not measured in this work
+      standard_state: elemental mass percent of bulk crust as printed
+      regime: compiled_composition
+      units: wt%
+      values:
+        quantity: bulk_elemental_composition_continental_crust
+        method_class: secondary_compilation
+        admission_status: authors_compilation_from_Wedepohl_1995_not_this_work_instrument
+        semantics: compiled_composition_input_not_model_output
+        caption_as_published: Table 2 Bulk compositions of vaporizing planets
+        headers_as_published: Element | Continental Crust (wt%) | Bulk Silicate Earth (wt%)
+        source_reference_as_printed: Wedepohl (1995)
+        total_wt_pct: 99.822
+        total_footnote_as_printed: Totals are less than 100% because Ni is not considered.
+        O_wt_pct: 47.20
+        elements:
+        - {element: O, wt_pct_as_printed: '47.20'}
+        - {element: Si, wt_pct_as_printed: '28.80'}
+        - {element: Al, wt_pct_as_printed: '7.96'}
+        - {element: Fe, wt_pct_as_printed: '4.32'}
+        - {element: Ca, wt_pct_as_printed: '3.85'}
+        - {element: Na, wt_pct_as_printed: '2.36'}
+        - {element: Mg, wt_pct_as_printed: '2.20'}
+        - {element: K, wt_pct_as_printed: '2.14'}
+        - {element: Ti, wt_pct_as_printed: '0.401'}
+        - {element: P, wt_pct_as_printed: '0.076'}
+        - {element: Cr, wt_pct_as_printed: '0.013'}
+        - {element: Mn, wt_pct_as_printed: '0.072'}
+        - {element: H, wt_pct_as_printed: '0.045'}
+        - {element: C, wt_pct_as_printed: '0.199'}
+        - {element: N, wt_pct_as_printed: '0.006'}
+        - {element: S, wt_pct_as_printed: '0.070'}
+        - {element: F, wt_pct_as_printed: '0.053'}
+        - {element: Cl, wt_pct_as_printed: '0.047'}
+      uncertainty:
+        note: No uncertainty printed on Table 2 crust column.
+    context:
+    - observation_id: schaefer_2012_table1_transiting_low_mass_planets
+      type: compiled_exoplanet_properties
+      locator:
+        table: '1'
+        pdf_page_index: 31
+        note: Table 1 Orbital and physical properties of known transiting low-mass planets
+      phase: exoplanet_catalogue_context
+      regime: literature_compilation_of_measured_planet_properties
+      units: as printed (M⊕, R⊕, g cm-3, AU, K)
+      values:
+        quantity: compiled_measured_transiting_planet_properties
+        method_class: secondary_compilation
+        admission_status: compiled_astronomy_measurements_not_this_work_instrument
+        caption_as_published: Table 1 Orbital and physical properties of known transiting low-mass planets
+        headers_as_published: Planet | Mass (×M⊕) | Radius (×R⊕) | Density (g cm-3) | Orbital Radius (AU) | Teq (K)
+        planets_as_printed:
+        - {planet: Kepler-11 f, mass_Mearth: '2.30', radius_Rearth: '2.61', density_g_cm3: '0.71', orbital_radius_AU: '0.25', Teq_K: '544'}
+        - {planet: GJ 1214 b, mass_Mearth: '6.55', radius_Rearth: '2.68', density_g_cm3: '1.88', orbital_radius_AU: '0.014', Teq_K: '555'}
+        - {planet: HD 97658 b, mass_Mearth: '6.40', radius_Rearth: '2.93', density_g_cm3: '1.40', orbital_radius_AU: '0.0797', Teq_K: '510-720'}
+        - {planet: Kepler-11 e, mass_Mearth: '8.40', radius_Rearth: '4.52', density_g_cm3: '0.5', orbital_radius_AU: '0.194', Teq_K: '617'}
+        - {planet: Kepler-11 d, mass_Mearth: '6.10', radius_Rearth: '3.43', density_g_cm3: '0.83', orbital_radius_AU: '0.159', Teq_K: '692'}
+        - {planet: Kepler-11 b, mass_Mearth: '4.30', radius_Rearth: '1.97', density_g_cm3: '3.10', orbital_radius_AU: '0.091', Teq_K: '900'}
+        - {planet: Kepler-20 b, mass_Mearth: '8.70', radius_Rearth: '1.91', density_g_cm3: '6.5', orbital_radius_AU: '0.04537', Teq_K: '1014'}
+        - {planet: Kepler-18 b, mass_Mearth: '6.90', radius_Rearth: '2.00', density_g_cm3: '4.9', orbital_radius_AU: '0.0447', Teq_K: '1179'}
+        - {planet: CoRoT-7 b, mass_Mearth: '7.42', radius_Rearth: '1.58', density_g_cm3: '10.4', orbital_radius_AU: '0.0172', Teq_K: '1810'}
+        - {planet: Kepler-10 b, mass_Mearth: '4.54', radius_Rearth: '1.42', density_g_cm3: '8.74', orbital_radius_AU: '0.01684', Teq_K: '1833'}
+        - {planet: 55 Cnc e, mass_Mearth: '7.985/8.636', radius_Rearth: '2.135/2.006', density_g_cm3: '4.975/5.96', orbital_radius_AU: '0.01564', Teq_K: '1967'}
+        footnotes_as_printed:
+        - Lissauer et al. 2011
+        - Charbonneau et al. 2009
+        - Léger et al. 2009; Hatzes et al. 2011
+        - Batalha et al. 2011
+        - Demory et al 2011
+        - Winn et al. 2011
+      uncertainty:
+        note: Uncertainties as in cited exoplanet papers; not reprinted as ± on Table 1 body.
+  bulk_silicate_earth:
+    observations:
+    - observation_id: schaefer_2012_table2_bse_wt_pct
+      type: composition_series
+      locator:
+        table: '2'
+        pdf_page_index: 32
+        note: Table 2 Bulk compositions of vaporizing planets; Bulk Silicate Earth column
+      phase: bulk_silicate_earth_composition_input
+      condensed_form:
+        state: bulk_silicate_earth
+        metastable: false
+        basis: explicit_author
+        note: Kargel & Lewis (1993) BSE used as MAGMA/Gibbs input; not measured in this work
+      standard_state: elemental mass percent of BSE as printed
+      regime: compiled_composition
+      units: wt%
+      values:
+        quantity: bulk_elemental_composition_bulk_silicate_earth
+        method_class: secondary_compilation
+        admission_status: authors_compilation_from_Kargel_and_Lewis_1993_not_this_work_instrument
+        semantics: compiled_composition_input_not_model_output
+        caption_as_published: Table 2 Bulk compositions of vaporizing planets
+        source_reference_as_printed: Kargel & Lewis (1993)
+        total_wt_pct: 99.776
+        total_footnote_as_printed: Totals are less than 100% because Ni is not considered.
+        Mg_wt_pct: 22.01
+        elements:
+        - {element: O, wt_pct_as_printed: '44.42'}
+        - {element: Si, wt_pct_as_printed: '21.61'}
+        - {element: Al, wt_pct_as_printed: '2.12'}
+        - {element: Fe, wt_pct_as_printed: '6.27'}
+        - {element: Ca, wt_pct_as_printed: '2.46'}
+        - {element: Na, wt_pct_as_printed: '0.29'}
+        - {element: Mg, wt_pct_as_printed: '22.01'}
+        - {element: K, wt_pct_as_printed: '0.02'}
+        - {element: Ti, wt_pct_as_printed: '0.12'}
+        - {element: P, wt_pct_as_printed: '0.008'}
+        - {element: Cr, wt_pct_as_printed: '0.29'}
+        - {element: Mn, wt_pct_as_printed: '0.11'}
+        - {element: H, wt_pct_as_printed: '0.006'}
+        - {element: C, wt_pct_as_printed: '0.006'}
+        - {element: N, wt_pct_as_printed: '0.88×10-4'}
+        - {element: S, wt_pct_as_printed: '0.027'}
+        - {element: F, wt_pct_as_printed: '0.002'}
+        - {element: Cl, wt_pct_as_printed: '0.004'}
+      uncertainty:
+        note: No uncertainty printed on Table 2 BSE column.

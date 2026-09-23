@@ -1,0 +1,134 @@
+schema_version: literature_extract.v1
+source_id: spaargaren-2025-disk-element-volatility
+source:
+  citation: >-
+    Spaargaren, Rob J.; Herbort, Oliver; Wang, Haiyang S.; Mojzsis, Stephen J.;
+    Sossi, Paolo (2025), "Proto-planetary disk composition-dependent element
+    volatility in the context of rocky planet formation", Astronomy & Astrophysics,
+    DOI 10.1051/0004-6361/202556011. arXiv:2509.03724v2.
+  doi: 10.1051/0004-6361/202556011
+  url: http://dx.doi.org/10.1051/0004-6361/202556011
+  year: 2025
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B3 spaargaren-2025-disk-element-volatility.pdf
+    (sha256 5a3317c5c7b0c1448672ee7bb9309384062d34646a6b25e36eb4bc4f1d393568;
+    31-page A&A proofs PDF). Table 1 transcribed from pdftotext -layout of PDF
+    page 3. N7 ruling: only printed MEASURED/TABULATED non-model cells land as
+    observations. Lodders (2003) L03 and Wood et al. (2019) W19 condensation-
+    temperature columns are secondary literature tabulations printed here and are
+    landed. The GGchem column is this paper's equilibrium MODEL output and is
+    recorded as a typed_absence (numbers not ingested). Figures 1–16 and
+    Appendices A–D parametrisations / simulation products are typed_absences.
+  date: '2026-09-22'
+  worker: n7-schaefer-spaargaren-pahlevan
+  provenance_path: data/literature/extracts/spaargaren-2025-disk-element-volatility.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Table 1 column GGchem (solar-disk TC simulated with GGchem, ±5 K)
+  locator: {pdf_page_index: 3, table: '1', column: GGchem}
+  note: >-
+    Author thermochemical-equilibrium condensation temperatures. Not a laboratory
+    measurement. Numeric GGchem cells deliberately not transcribed under N7.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figures 1–16 disk-composition-dependent TC / planet-composition simulations
+  locator: {note: figure captions throughout proofs PDF}
+  note: Model/simulation figures; no axis digitisation; not ingested.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Appendices A–D TC parametrisations, high-C/O condensate stability, effective TC, devolatilisation controls
+  locator: {note: appendices in proofs PDF}
+  note: Model-derived appendix products; not ingested as observations.
+fidelity_samples:
+- species: solar_disk_condensation_temperatures
+  observable: volatility_series
+  observation_id: spaargaren_2025_table1_lodders_2003_TC_K
+  field: Mg_TC_K
+  value: 1336
+  locator:
+    table: '1'
+    pdf_page_index: 3
+    note: Table 1 L03 Mg TC 1336 K as printed
+- species: solar_disk_condensation_temperatures
+  observable: volatility_series
+  observation_id: spaargaren_2025_table1_wood_2019_TC_K
+  field: Fe_TC_K
+  value: 1338
+  locator:
+    table: '1'
+    pdf_page_index: 3
+    note: Table 1 W19 Fe TC 1338 K as printed
+species:
+  solar_disk_condensation_temperatures:
+    observations:
+    - observation_id: spaargaren_2025_table1_lodders_2003_TC_K
+      type: volatility_series
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: Table 1 Solar disk condensation temperatures based on GGchem; L03 column only
+      phase: solar_composition_disk_literature_TC
+      regime: literature_tabulation
+      units: K
+      values:
+        quantity: fifty_percent_condensation_temperature_literature_Lodders_2003
+        method_class: secondary_compilation
+        admission_status: tabulated_from_Lodders_2003_not_this_work_instrument
+        semantics: literature_TC_column_not_GGchem_model
+        caption_as_published: Table 1 Solar disk condensation temperatures based on GGchem.
+        headers_as_published: Element | GGchem | L03 | W19
+        column_landed: L03
+        column_refused_as_model: GGchem
+        Mg_TC_K: 1336
+        notes_as_printed: >-
+          Condensation temperatures TC (K) of elements in the solar disk simulated
+          with GGchem (± 5 K) using solar abundances from Lodders (2003), TC values
+          from Lodders (2003) (L03), and TC values from Wood et al. (2019) (W19).
+        elements:
+          O: {TC_K: 180, TC_as_printed: '180'}
+          Na: {TC_K: 958, TC_as_printed: '958'}
+          Mg: {TC_K: 1336, TC_as_printed: '1336'}
+          Al: {TC_K: 1653, TC_as_printed: '1653'}
+          Si: {TC_K: 1310, TC_as_printed: '1310'}
+          S: {TC_K: 664, TC_as_printed: '664'}
+          Ca: {TC_K: 1517, TC_as_printed: '1517'}
+          Ti: {TC_K: 1582, TC_as_printed: '1582'}
+          Fe: {TC_K: 1334, TC_as_printed: '1334'}
+          Ni: {TC_K: 1353, TC_as_printed: '1353'}
+      uncertainty:
+        note: No ± printed on L03 column in Table 1; Lodders (2003) primary paper carries its own uncertainties.
+    - observation_id: spaargaren_2025_table1_wood_2019_TC_K
+      type: volatility_series
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: Table 1 Solar disk condensation temperatures based on GGchem; W19 column only
+      phase: solar_composition_disk_literature_TC
+      regime: literature_tabulation
+      units: K
+      values:
+        quantity: fifty_percent_condensation_temperature_literature_Wood_2019
+        method_class: secondary_compilation
+        admission_status: tabulated_from_Wood_et_al_2019_not_this_work_instrument
+        semantics: literature_TC_column_not_GGchem_model
+        caption_as_published: Table 1 Solar disk condensation temperatures based on GGchem.
+        column_landed: W19
+        column_refused_as_model: GGchem
+        Fe_TC_K: 1338
+        elements:
+          O: {TC_K: 183, TC_as_printed: '183'}
+          Na: {TC_K: 1035, TC_as_printed: '1035'}
+          Mg: {TC_K: 1343, TC_as_printed: '1343'}
+          Al: {TC_K: 1652, TC_as_printed: '1652'}
+          Si: {TC_K: 1314, TC_as_printed: '1314'}
+          S: {TC_K: 672, TC_as_printed: '672'}
+          Ca: {TC_K: 1535, TC_as_printed: '1535'}
+          Ti: {TC_K: 1565, TC_as_printed: '1565'}
+          Fe: {TC_K: 1338, TC_as_printed: '1338'}
+          Ni: {TC_K: 1363, TC_as_printed: '1363'}
+      uncertainty:
+        note: No ± printed on W19 column in Table 1; Wood et al. (2019) primary paper carries its own uncertainties.

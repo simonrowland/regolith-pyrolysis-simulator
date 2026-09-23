@@ -1,0 +1,104 @@
+schema_version: literature_extract.v1
+source_id: pahlevan-2026-protolunar-volatile-outflows
+source:
+  citation: >-
+    Pahlevan, Kaveh; Youdin, Andrew N.; Sossi, Paolo A. (2026), "Hydrodynamic
+    outflows of proto-lunar disk volatiles", manuscript submitted to Earth and
+    Planetary Science Letters. arXiv:2603.05322.
+  url: https://arxiv.org/abs/2603.05322
+  year: 2026
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B3 pahlevan-2026-protolunar-volatile-outflows.pdf
+    (sha256 6ef790619b731fb1b983657309dbb584263e0f43be779132ed9c37f1139385ca;
+    31-page EPSL-submission manuscript). pdftotext -layout inventory: header
+    states Figures: 4 and no numbered data tables. N7 ruling: this is a
+    hydrodynamic / chemical-equilibrium MODEL paper. No printed MEASURED or
+    author-lab TABULATED series are present to land as observations. All four
+    figures and all author model results are typed_absences (numeric model
+    outputs not ingested). Cited Apollo / literature ppm values appear only as
+    attributed prose assumptions and are not re-homed as this paper's measurements.
+  date: '2026-09-22'
+  worker: n7-schaefer-spaargaren-pahlevan
+  provenance_path: data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figure 1 Exsolution and vapor speciation of C-O-H atmosphere on post-giant impact Earth
+  locator: {note: Figure 1 caption near end of manuscript}
+  note: Model atmosphere speciation; not ingested.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figure 2 Structure of C-O-H atmosphere enveloping the proto-lunar magma disk
+  locator: {note: Figure 2 caption}
+  note: Model disk-atmosphere structure; not ingested.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figure 3 Hydrodynamic stability of adiabatic post-giant impact C-O-H atmospheres
+  locator: {note: Figure 3 caption}
+  note: Model hydrodynamic-stability analysis; not ingested.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figure 4 Dependence of entrained Na abundance on radial distance of the wind base
+  locator: {note: Figure 4 caption}
+  note: Model entrainment calculation; not ingested.
+- kind: no_printed_measurement_tables
+  reason: not_published
+  item: numbered laboratory or tabulated measurement tables
+  locator: {note: 'manuscript header Figures: 4; no Table N captions found'}
+  note: >-
+    STEP 0 / inventory found no author measurement tables. Quoted literature
+    abundances (Apollo-era volatile depletions; ~700–3000 ppm / 900 ppm H2O /
+    100 ppm H assumptions citing Hirschmann 2018, Marty 2012, McDonough & Sun
+    1995, McCubbin et al. 2023) remain attributed to prior works and are not
+    extracted as observations of this source.
+fidelity_samples:
+- species: proto_lunar_disk_volatiles
+  observable: laboratory_conditions
+  observation_id: pahlevan_2026_model_paper_scope
+  field: document_type
+  value: hydrodynamic_model_manuscript_no_measurement_tables
+  locator:
+    pdf_page_index: 1
+    note: 'Title page + abstract; Figures: 4; submitted for publication in EPSL'
+species:
+  proto_lunar_disk_volatiles:
+    observations: []
+    context:
+    - observation_id: pahlevan_2026_model_paper_scope
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: title_and_abstract
+        note: Manuscript title page; abstract; header metadata
+      phase: proto_lunar_disk_volatile_hydrodynamic_model
+      regime: theoretical_model_paper
+      units: as published
+      values:
+        quantity: model_paper_scope_and_typed_absence_summary
+        method_class: method_only
+        evidence_class: authors_model_manuscript_not_a_measurement_table
+        document_type: hydrodynamic_model_manuscript_no_measurement_tables
+        title_as_printed: Hydrodynamic outflows of proto-lunar disk volatiles
+        authors_as_printed:
+        - Kaveh Pahlevan
+        - Andrew N. Youdin
+        - Paolo A. Sossi
+        venue_as_printed: Submitted for publication in EPSL
+        arxiv_as_sidecar: '2603.05322'
+        figures_count_as_printed: 4
+        tables_count_as_printed: 0
+        n7_policy: >-
+          Model outputs = typed absence; do not ingest as observations. No
+          measured/tabulated author data to land.
+        keywords_as_printed:
+        - giant impact
+        - magma ocean
+        - proto-lunar disk
+        - hydrodynamic escape
+        - volatile depletion
+        - isotopic fractionation
+      uncertainty:
+        note: No measurement uncertainty applicable; no scored observations in this extract.
