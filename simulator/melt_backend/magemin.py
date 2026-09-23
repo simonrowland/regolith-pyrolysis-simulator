@@ -135,10 +135,6 @@ from simulator.melt_backend.liquidus import (
 )
 from simulator.melt_backend.pure_phase import (
     GIBBS_CONVENTION_APPARENT_298,
-    PHASE_FACTOR_UNAVAILABLE,
-    PHASE_NOT_PURE_AT_EQUILIBRIUM,
-    PHASE_NOT_STABLE_AT_TP,
-    PropertyAbsence,
     PurePhaseAccessError,
     PurePhaseBulkMismatchError,
     PurePhaseProperties,
@@ -365,14 +361,35 @@ def _magemin_bulk_projection_details(
 # Pure-phase registry and stdout/matlab parsers (diagnostic accessor)
 # ----------------------------------------------------------------------
 
-# Minimum endmember wt-fraction for a stable solution phase's S/Cp/H to be
-# reported as the pure endmember's properties (else typed absence).
-_MAGEMIN_PURITY_MIN = 0.999
-
 # Absolute wt-fraction tolerance for the SYS-row bulk-echo guard.  The KLB1
-# fallback moves SiO2 by ~0.38 wt-fraction; the token SiO2=1e-6 used to clear
-# the upstream arg_bulk[0]>0 gate moves it 1e-8.  3e-3 sits between.
+# fallback moves SiO2 by ~0.38 wt-fraction.  Measured against live output
+# (2026-09 review): MAGEMin's 1e-4 mol floor substitution moves every absent
+# oxide by 1-2.5e-4 wt-fraction, worst case MgO = 8.7e-4 in the periclase
+# run — so 3e-3 holds ~3.4x headroom over the substitution noise while the
+# KLB1 trap misses by two orders of magnitude.  The substitution constant is
+# upstream-version-dependent; if a future MAGEMin raises it past ~1e-3 this
+# guard false-refuses and the tolerance must be re-measured, not loosened
+# blindly.
 _MAGEMIN_BULK_ECHO_TOL = 3.0e-3
+
+# Central-difference half-width for S/Cp/H from the pure-endmember gbase:
+# S = -dG/dT, Cp = -T d²G/dT², H = G + T*S.  Chosen because the printed G
+# is coarse (pure phases %+10f kJ = 1e-3 J; solution endmembers %+12.5f kJ
+# = 0.01 J) but a 10 K stencil still resolves Cp.  Measured on this binary
+# at 298.15 K and 1000 K for q/fo/per/en/crst, comparing δ = 5, 10, 20 K:
+# |S(5)−S(10)| ≤ 0.01 J/K and |S(10)−S(20)| ≤ 0.04 J/K; the worst Cp
+# spread is fo at 1000 K, 175.60 (δ=5) vs 175.20 (δ=10) vs 175.10 (δ=20),
+# i.e. 0.4 J/K.  Print-quantization bound on that second difference is
+# ~T*√6*0.01/δ² ≈ 0.25 J/K at 1000 K.  Both sit under the 1–2 % JANAF
+# bands (~1 J/K on S, ~1–2 J/K on Cp), so the derivative is the pure
+# endmember's property, not a noisy proxy.
+_MAGEMIN_FD_DELTA_K = 10.0
+
+# ds62 Landau temperature of ig quartz (TC_endmembers.c "q", 847.0 K).
+# The experimental α–β point is 573 °C = 846.15 K, inside the same ±δ
+# window.  A stencil that contains it mixes the two branches and
+# misattributes the lambda Cp spike; the result is still returned, flagged.
+_MAGEMIN_QUARTZ_LAMBDA_K = 847.0
 
 
 @dataclass(frozen=True)
@@ -381,7 +398,6 @@ class _MAGEMinPurePhaseSpec:
 
     host_phase: Optional[str]  # solution host ('ol','fper','opx'); None = PP
     endmember: str             # symbol in the Verb=1 endmember table
-    assemblage_phase: str      # name in the matlab stable-assemblage table
     formula: str               # formula unit of the returned mol basis
     formula_basis: str         # basis note incl. divisor derivation
     formula_divisor: float     # engine formula units per `formula` unit
@@ -402,7 +418,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'fo': _MAGEMinPurePhaseSpec(
         host_phase='ol',
         endmember='fo',
-        assemblage_phase='ol',
         formula='Mg2SiO4',
         formula_basis='per 1 mol Mg2SiO4',
         formula_divisor=1.0,
@@ -412,7 +427,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'per': _MAGEMinPurePhaseSpec(
         host_phase='fper',
         endmember='per',
-        assemblage_phase='fper',
         formula='MgO',
         formula_basis='per 1 mol MgO',
         formula_divisor=1.0,
@@ -424,7 +438,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'en': _MAGEMinPurePhaseSpec(
         host_phase='opx',
         endmember='en',
-        assemblage_phase='opx',
         formula='MgSiO3',
         formula_basis='per 1 mol MgSiO3 (engine endmember Mg2Si2O6 / 2)',
         formula_divisor=2.0,
@@ -434,7 +447,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'q': _MAGEMinPurePhaseSpec(
         host_phase=None,
         endmember='q',
-        assemblage_phase='q',
         formula='SiO2',
         formula_basis='per 1 mol SiO2',
         formula_divisor=1.0,
@@ -444,7 +456,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'crst': _MAGEMinPurePhaseSpec(
         host_phase=None,
         endmember='crst',
-        assemblage_phase='crst',
         formula='SiO2',
         formula_basis='per 1 mol SiO2',
         formula_divisor=1.0,
@@ -454,7 +465,6 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     'trd': _MAGEMinPurePhaseSpec(
         host_phase=None,
         endmember='trd',
-        assemblage_phase='trd',
         formula='SiO2',
         formula_basis='per 1 mol SiO2',
         formula_divisor=1.0,
@@ -467,9 +477,21 @@ _MAGEMIN_PP_GBASE_RE = re.compile(
     r'^\s*([A-Za-z0-9_]+):\s+(-?\d+\.\d+)\s+\+?(-?\d+\.\d+)\s*$'
 )
 _MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
-_MAGEMIN_ASSEMBLAGE_ROW_RE = re.compile(
-    r'^\s*\d+\s*\|\s*([A-Za-z0-9_]+)\s*\|([^|]+)\|([^|]+)\|([^|]+)\|'
+_MAGEMIN_STATUS_RE = re.compile(
+    r'^\s*Status\s+:\s+(-?\d+)(?:\s+\[([^\]]+)\])?\s*$',
+    re.MULTILINE,
 )
+
+
+def _finite_gbase_token(token: str, *, context: str) -> float:
+    """float() plus a finiteness gate: engine output never carries NaN/inf."""
+    value = float(token)
+    if not math.isfinite(value):
+        raise PurePhaseAccessError(
+            f'MAGEMin gbase table value for {context} is not finite: '
+            f'{token!r}; refusing engine output'
+        )
+    return value
 
 
 def _parse_magemin_gbase_tables(
@@ -487,7 +509,12 @@ def _parse_magemin_gbase_tables(
     for i, line in enumerate(lines):
         m = _MAGEMIN_PP_GBASE_RE.match(line)
         if m:
-            pp.setdefault(m.group(1), (float(m.group(2)), float(m.group(3))))
+            pp.setdefault(m.group(1), (
+                _finite_gbase_token(m.group(2), context=m.group(1)),
+                _finite_gbase_token(
+                    m.group(3), context=f'{m.group(1)} factor'
+                ),
+            ))
             continue
         m = _MAGEMIN_SS_BLOCK_RE.match(line)
         if (
@@ -498,7 +525,12 @@ def _parse_magemin_gbase_tables(
         ):
             names = lines[i + 2].split()
             try:
-                values = [float(v) for v in lines[i + 3].split()]
+                values = [
+                    _finite_gbase_token(
+                        v, context=f'{m.group(1)}:{name}'
+                    )
+                    for name, v in zip(names, lines[i + 3].split())
+                ]
             except ValueError:
                 continue
             if len(names) == len(values):
@@ -506,116 +538,107 @@ def _parse_magemin_gbase_tables(
     return pp, ss
 
 
-def _parse_magemin_assemblage_factors(stdout: str) -> Dict[str, float]:
-    """Per-phase ``factor`` from the Verb=1 PHASE ASSEMBLAGE table.
+# Verb=1 'Status : N [label]' (upstream src/MAGEMin.c PrintStatus):
+# 0 success; 1/2 success under-relaxed; 3/4 failure.  -1 has no label: the
+# PGE guard sets it when the mass residual stays > 1e-3 or a saturated
+# component's chemical potential is non-negative (src/PGE_function.c).
+# Measured at true 1 bar on this binary: fo returns 0; q, per, en, crst
+# and trd return -1.  Refusing -1 would drop every phase but forsterite.
+# G/S/Cp/H come from the pre-minimisation gbase, which is printed before
+# that guard, so -1 is warned and the numbers are kept.  3/4, a missing
+# line, and any unrecognized code still refuse: a failed or unverifiable
+# run does not get to supply G.
+_MAGEMIN_STATUS_FAILURE_LABELS = {
+    3: 'failure, reached maximum iterations',
+    4: 'failure, terminated due to slow convergence or divergence',
+}
 
-    Rows look like::
-        1 | fper |  +0.041778 |  +0.000001 |  +1.168795 |  +1.000000 | ...
-    i.e. ON | phase | fraction | delta_G | factor | sum_xi | ...
-    The table repeats per global iteration; the last occurrence wins.
+
+def _parse_magemin_solver_status(stdout: str) -> Optional[int]:
+    """Last 'Status : N' of the Verb=1 computation summary; None if absent."""
+    matches = _MAGEMIN_STATUS_RE.findall(stdout)
+    if not matches:
+        return None
+    return int(matches[-1][0])
+
+
+def _check_magemin_solver_status(stdout: str, warnings: List[str]) -> None:
+    """Typed refusal on a failed/unverifiable solve; warning on guard trips."""
+    status = _parse_magemin_solver_status(stdout)
+    if status is None:
+        raise PurePhaseAccessError(
+            'MAGEMin Verb=1 output carries no Status line; the run cannot '
+            'be verified as a completed minimisation'
+        )
+    if status == 0:
+        return
+    if status == 1 or status == 2:
+        message = f'MAGEMin solver status {status} (success, under-relaxed)'
+    elif status == -1:
+        message = (
+            'MAGEMin solver status -1 (PGE mass-residual/chemical-potential '
+            'guard; the common outcome for near-pure bulks). Returned '
+            'G/S/Cp/H derive from the pre-minimisation endmember table and '
+            'do not depend on the minimisation.'
+        )
+    else:
+        label = _MAGEMIN_STATUS_FAILURE_LABELS.get(status)
+        raise PurePhaseAccessError(
+            f'MAGEMin solver status {status}'
+            + (f' [{label}]' if label else ' [unrecognized]')
+            + '; refusing output from a failed minimisation'
+        )
+    if message not in warnings:
+        warnings.append(message)
+
+
+def _magemin_endmember_gbase_kJ(
+    spec: _MAGEMinPurePhaseSpec, stdout: str
+) -> float:
+    """Endmember gbase in kJ per engine formula unit at the probe's (T, P)."""
+    pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(stdout)
+    if spec.host_phase is None:
+        entry = pp_gbase.get(spec.endmember)
+        g_kJ = entry[0] if entry is not None else None
+    else:
+        g_kJ = ss_endmember_gbase.get(spec.host_phase, {}).get(spec.endmember)
+    if g_kJ is None:
+        raise PurePhaseAccessError(
+            f'MAGEMin ig endmember table lacks {spec.endmember!r} '
+            f'(host {spec.host_phase!r}); cannot certify phase identity'
+        )
+    return g_kJ
+
+
+def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[str]:
+    """Flag a finite-difference stencil straddling a known lambda point.
+
+    Only quartz carries a lambda term in the ig (ds62) phase map over this
+    accessor's domain; the centred stencil across 846.15 K mixes the alpha
+    and beta branches' G(T) and misattributes the lambda Cp spike.
     """
-    factors: Dict[str, float] = {}
-    for line in stdout.splitlines():
-        m = _MAGEMIN_ASSEMBLAGE_ROW_RE.match(line)
-        if not m:
-            continue
-        try:
-            factor = float(m.group(4))
-        except ValueError:
-            continue
-        factors[m.group(1)] = factor
-    return factors
-
-
-def _parse_magemin_matlab_assemblage(
-    matlab_text: str,
-) -> Dict[str, List[Dict[str, float]]]:
-    """Rows of the out_matlab 'Stable mineral assemblage:' table.
-
-    Column bases (upstream headers partly mislabelled; see class notes):
-    G and H in kJ per mol formula, Cp in kJ/K per mol formula, Entropy in
-    kJ/K scaled by the phase factor.  Returns ordered row lists per phase
-    name: compositionally split SS instances print one row per instance, and
-    the instance order matches the 'End-members fractions' block.
-    """
-    rows: Dict[str, List[Dict[str, float]]] = {}
-    in_table = False
-    for line in matlab_text.splitlines():
-        if line.startswith('Stable mineral assemblage:'):
-            in_table = True
-            continue
-        if not in_table:
-            continue
-        if line.strip().startswith('phase') or not line.strip():
-            continue
-        tokens = line.split()
-        if tokens[0] == 'SYS':
-            break
-        if len(tokens) < 10:
-            continue
-        try:
-            row = {
-                'frac_wt': float(tokens[1]),
-                'G_kJ': float(tokens[2]),
-                'Cp_kJ_K': float(tokens[5]),
-                'S_kJ_K': float(tokens[8]),
-                'H_kJ': float(tokens[9]),
-            }
-        except ValueError:
-            continue
-        rows.setdefault(tokens[0], []).append(row)
-    return rows
-
-
-def _parse_magemin_endmember_fractions(
-    matlab_text: str,
-) -> Dict[str, List[Dict[str, float]]]:
-    """The matlab 'End-members fractions[wt fr]' block: {phase: [{em: fr}]}.
-
-    One entry per phase INSTANCE, in table order (matching the stable
-    assemblage row order).  Header rows carry '-' placeholders over padding
-    columns while value rows carry numbers there, so the zip is positional
-    and only name != '-' pairs survive.
-    """
-    fractions: Dict[str, List[Dict[str, float]]] = {}
-    in_block = False
-    header: List[str] = []
-    for line in matlab_text.splitlines():
-        if line.startswith('End-members fractions'):
-            in_block = True
-            continue
-        if not in_block:
-            continue
-        if line.startswith('Site fractions'):
-            break
-        tokens = line.split()
-        if not tokens:
-            continue
-        is_value_row = any(_is_float_token(t) for t in tokens[1:])
-        if is_value_row:
-            row = {
-                name: float(value)
-                for name, value in zip(header, tokens[1:])
-                if name != '-' and _is_float_token(value)
-            }
-            fractions.setdefault(tokens[0], []).append(row)
-        else:
-            header = tokens
-    return fractions
-
-
-def _is_float_token(token: str) -> bool:
-    try:
-        float(token)
-        return True
-    except ValueError:
-        return False
+    if (
+        endmember == 'q'
+        and abs(temperature_K - _MAGEMIN_QUARTZ_LAMBDA_K)
+        <= _MAGEMIN_FD_DELTA_K
+    ):
+        return (
+            'finite-difference stencil straddles the alpha-beta quartz '
+            f'lambda transition ({_MAGEMIN_QUARTZ_LAMBDA_K:g} K); S/Cp/H '
+            'mix the two branches and Cp is misattributed across the spike'
+        )
+    return None
 
 
 def _parse_magemin_sys_oxide_row(
     matlab_text: str,
 ) -> Optional[Dict[str, float]]:
-    """The SYS row of the matlab 'Oxide compositions [wt fr]' block."""
+    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+
+    Unparsable or non-finite values make the row unparseable (None) so the
+    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
+    comparison is False and would pass the guard silently).
+    """
     in_block = False
     header: List[str] = []
     for line in matlab_text.splitlines():
@@ -633,8 +656,13 @@ def _parse_magemin_sys_oxide_row(
             header = tokens
             continue
         if tokens[0] == 'SYS':
-            values = [float(t) for t in tokens[1:]]
+            try:
+                values = [float(t) for t in tokens[1:]]
+            except ValueError:
+                return None
             if len(values) != len(header):
+                return None
+            if not all(math.isfinite(v) for v in values):
                 return None
             return dict(zip(header, values))
     return None
@@ -2164,37 +2192,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # ------------------------------------------------------------------
     #
     # This path never touches equilibrate(): it runs the binary with
-    # --Verb=1 --out_matlab=1 and parses two additional stdout/file blocks.
+    # --Verb=1 --out_matlab=1.  The matlab dump is the bulk-echo guard only.
     #
-    # Units and bases (derivations verified against upstream source and
-    # NIST-JANAF, see docs-private/research/2026-09-22-janaf-p4a-scout/):
-    #
-    #   * The Verb=1 pre-minimisation table prints, per pure phase and per
-    #     solution endmember, ``gbase`` in kJ per mol of the printed formula
-    #     (Holland-Powell apparent Gibbs energy of formation: elements
-    #     referenced at 298.15 K only).  ``G_J = gbase_kJ * 1000 / divisor``.
-    #     The opx ``en`` endmember formula is Mg2Si2O6 (HP ds6), so
-    #     divisor=2 puts it on the JANAF MgSiO3 basis.
-    #   * The out_matlab "Stable mineral assemblage" table prints, per STABLE
-    #     phase: G [kJ/mol formula] (the "G[J]" header is mislabelled upstream;
-    #     verified: quartz at 298.15 K prints -923.048, matching apparent G in
-    #     kJ), Cp [kJ/K per mol formula, unscaled], and Entropy/Enthalpy
-    #     [kJ/K resp. kJ] scaled by the phase's ``factor``
-    #     (src/toolkit.c:1525,1555,1648,1651: phase_entropy =
-    #     -dGdT*factor; phase_enthalpy = phase_entropy*T + G*factor).
-    #     factor = fbc/ape (system bulk atoms-per-oxide over phase
-    #     atoms-per-formula, src/pp_min_function.c:117) is printed per phase:
-    #     for pure phases as the second column of the Verb=1 pure-phase table
-    #     line, for solution phases in the final "PHASE ASSEMBLAGE" table.
-    #     Molar S = printed/factor; sanity anchor: forsterite-bulk ol at
-    #     298.15 K prints S=31.708 J/K with factor 1/3 -> 95.13 J/K vs JANAF
-    #     Mg2SiO4 S(298.15) = 95.14 J/K/mol.
-    #   * S/Cp/H exist ONLY when the phase is stable for the stoichiometric
-    #     bulk at the requested T,P (the table lists stable phases only).
-    #     A solution phase must additionally sit at its endmember (purity
-    #     gate), else its S/Cp/H describe a mixture, not the pure phase.
-    #     Enstatite is never stable for an MgSiO3 bulk in ig at 298-1500 K
-    #     (ol + silica instead) -> typed absence, not a number.
+    # G, S, Cp and H are one object: the pure endmember.  G is the Verb=1
+    # pre-minimisation gbase (kJ per mol of the printed formula; Holland-
+    # Powell apparent Gibbs energy, elements referenced at 298.15 K only),
+    # ``G_J = gbase_kJ * 1000 / divisor``.  The opx ``en`` endmember is
+    # Mg2Si2O6, so divisor=2 puts every property on the MgSiO3 basis.
+    # S = -dG/dT, Cp = -T d²G/dT² and H = G + T*S are central differences
+    # of that same G at T±δ.  They are derived, not the equilibrium-
+    # assemblage row (that row is a slightly impure solution: MAGEMin
+    # substitutes trace oxides, and its S/H do not match this G).  Because
+    # the derivative does not need the phase to be stable, en/crst/trd and
+    # metastable quartz return S/Cp/H too.  A stencil across the quartz
+    # lambda is flagged, not dropped.
 
     def pure_phase_properties(
         self,
@@ -2242,102 +2253,59 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'only equilibrate payloads'
             )
 
-        temperature_C = temperature_K - 273.15
-        # bar -> kbar: 1 kbar = 1000 bar (CLI --Pres takes kbar).
-        pressure_kbar = float(pressure_bar) * 1.0e-4
-        stdout, matlab_text, warnings = self._run_pure_phase_probe(
-            bulk_wt_ig=dict(spec.bulk_wt_pct),
-            temperature_C=temperature_C,
-            pressure_kbar=pressure_kbar,
+        if temperature_K <= _MAGEMIN_FD_DELTA_K:
+            raise ValueError(
+                'pure_phase temperature_K must exceed the '
+                f'{_MAGEMIN_FD_DELTA_K:g} K finite-difference half-width; '
+                f'got {temperature_K!r}'
+            )
+        # Production conversion: bar -> GPa -> kbar.  1 bar = 1e-3 kbar.
+        # (bar * 1e-4 is 10x low; --Pres takes kbar.)
+        pressure_kbar = self._GPa_to_kbar(self._pressure_bar_to_GPa(pressure_bar))
+
+        def endmember_g_j(temperature_K_query: float) -> Tuple[float, List[str]]:
+            stdout, matlab_text, notes = self._run_pure_phase_probe(
+                bulk_wt_ig=dict(spec.bulk_wt_pct),
+                temperature_C=temperature_K_query - 273.15,
+                pressure_kbar=pressure_kbar,
+            )
+            _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
+            _check_magemin_solver_status(stdout, notes)
+            g_kJ = _magemin_endmember_gbase_kJ(spec, stdout)
+            return g_kJ * 1000.0 / spec.formula_divisor, notes
+
+        delta = _MAGEMIN_FD_DELTA_K
+        g_low, notes_low = endmember_g_j(temperature_K - delta)
+        g_mid, notes = endmember_g_j(temperature_K)
+        g_high, notes_high = endmember_g_j(temperature_K + delta)
+        for note in (*notes_low, *notes_high):
+            if note not in notes:
+                notes.append(note)
+
+        # Central differences of the pure-endmember G.  Derived, never
+        # stamped as a printed assemblage column.
+        s_j = -(g_high - g_low) / (2.0 * delta)
+        cp_j = -float(temperature_K) * (g_high - 2.0 * g_mid + g_low) / (
+            delta * delta
         )
-        _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
-
-        pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(stdout)
-        pp_factor: Optional[float] = None
-        if spec.host_phase is None:
-            g_entry = pp_gbase.get(spec.endmember)
-            if g_entry is not None:
-                g_kJ, pp_factor = g_entry
-        else:
-            g_kJ = ss_endmember_gbase.get(spec.host_phase, {}).get(
-                spec.endmember
-            )
-            g_entry = g_kJ
-        if g_entry is None:
-            raise PurePhaseAccessError(
-                f'MAGEMin ig endmember table lacks {spec.endmember!r} '
-                f'(host {spec.host_phase!r}); cannot certify phase identity'
-            )
-        G_J_mol = g_kJ * 1000.0 / spec.formula_divisor
-
-        absences: List[PropertyAbsence] = []
-        S_J_K_mol: Optional[float] = None
-        Cp_J_K_mol: Optional[float] = None
-        H_J_mol: Optional[float] = None
-
-        assemblage = _parse_magemin_matlab_assemblage(matlab_text)
-        phase_rows = assemblage.get(spec.assemblage_phase) or []
-        # A compositionally split SS prints one row per instance; the
-        # dominant instance (max wt fraction) is the candidate pure phase.
-        phase_index: Optional[int] = None
-        if phase_rows:
-            phase_index = max(
-                range(len(phase_rows)),
-                key=lambda i: phase_rows[i]['frac_wt'],
-            )
-        phase_row = phase_rows[phase_index] if phase_index is not None else None
-        if phase_row is None or phase_row['frac_wt'] <= 0.0:
-            absences.extend(
-                PropertyAbsence(prop, PHASE_NOT_STABLE_AT_TP)
-                for prop in ('S', 'Cp', 'H')
-            )
-        else:
-            if spec.host_phase is not None:
-                # Instance order matches between the two matlab blocks; the
-                # endmember fractions of the dominant instance decide purity.
-                em_rows = _parse_magemin_endmember_fractions(
-                    matlab_text
-                ).get(spec.host_phase) or []
-                em_row = (
-                    em_rows[phase_index]
-                    if phase_index is not None and phase_index < len(em_rows)
-                    else None
+        h_j = g_mid + float(temperature_K) * s_j
+        for name, value in (('S', s_j), ('Cp', cp_j), ('H', h_j)):
+            if not math.isfinite(value):
+                raise PurePhaseAccessError(
+                    f'MAGEMin endmember finite difference for {name} of '
+                    f'{spec.endmember!r} is not finite ({value!r}); '
+                    'refusing derived properties'
                 )
-                endmember_fraction = (em_row or {}).get(spec.endmember)
-                if (
-                    endmember_fraction is None
-                    or endmember_fraction < _MAGEMIN_PURITY_MIN
-                ):
-                    absences.extend(
-                        PropertyAbsence(prop, PHASE_NOT_PURE_AT_EQUILIBRIUM)
-                        for prop in ('S', 'Cp', 'H')
-                    )
-                    phase_row = None
-            if phase_row is not None:
-                factor = (
-                    pp_factor
-                    if spec.host_phase is None
-                    else _parse_magemin_assemblage_factors(stdout).get(
-                        spec.host_phase
-                    )
-                )
-                if factor is None or factor <= 0.0:
-                    absences.extend(
-                        PropertyAbsence(prop, PHASE_FACTOR_UNAVAILABLE)
-                        for prop in ('S', 'Cp', 'H')
-                    )
-                else:
-                    Cp_J_K_mol = (
-                        phase_row['Cp_kJ_K'] * 1000.0 / spec.formula_divisor
-                    )
-                    S_J_K_mol = (
-                        phase_row['S_kJ_K'] / factor * 1000.0
-                        / spec.formula_divisor
-                    )
-                    H_J_mol = (
-                        phase_row['H_kJ'] / factor * 1000.0
-                        / spec.formula_divisor
-                    )
+        derived = (
+            'S/Cp/H are central differences of the pure-endmember gbase '
+            f'(delta={delta:g} K): S=-dG/dT, Cp=-T d2G/dT2, H=G+T*S; '
+            'not the equilibrium-assemblage row'
+        )
+        if derived not in notes:
+            notes.append(derived)
+        lambda_note = _lambda_stencil_warning(spec.endmember, temperature_K)
+        if lambda_note is not None and lambda_note not in notes:
+            notes.append(lambda_note)
 
         return PurePhaseProperties(
             engine='magemin',
@@ -2350,12 +2318,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             gibbs_convention=GIBBS_CONVENTION_APPARENT_298,
             temperature_K=float(temperature_K),
             pressure_bar=float(pressure_bar),
-            G_J_mol=G_J_mol,
-            S_J_K_mol=S_J_K_mol,
-            Cp_J_K_mol=Cp_J_K_mol,
-            H_J_mol=H_J_mol,
-            absences=tuple(absences),
-            warnings=tuple(warnings),
+            G_J_mol=g_mid,
+            S_J_K_mol=s_j,
+            Cp_J_K_mol=cp_j,
+            H_J_mol=h_j,
+            absences=(),
+            warnings=tuple(notes),
         )
 
     def _run_pure_phase_probe(
