@@ -191,6 +191,7 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '101325'}}
+      inferred: true
       locator:
         table: '1'
         note: Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not printed.

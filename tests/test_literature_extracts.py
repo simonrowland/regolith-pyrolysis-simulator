@@ -252,6 +252,14 @@ def test_accepts_equipment_with_per_field_locator():
     assert errs == []
 
 
+def test_heck_atmospheric_pressure_remains_inferred():
+    """Atmospheric air supports inference, not a printed 101325 Pa point."""
+    doc = yaml.safe_load((EXTRACTS / "kems-140-heck-2025.yaml").read_text())
+    pressure = doc["experiments"][0]["pressure_environment"]["total_pressure_Pa"]
+    assert pressure["state"]["value"]["point"] == "101325"
+    assert pressure["inferred"] is True
+
+
 def test_r16_extract_ids_resolve_and_preserve_unavailable_queue_links():
     """Rewritten observation IDs must retain experiment and queue ownership."""
     root = REPO_ROOT / "data" / "literature"
