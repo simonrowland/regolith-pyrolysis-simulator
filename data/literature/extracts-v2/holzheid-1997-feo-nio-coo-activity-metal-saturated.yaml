@@ -125,7 +125,7 @@ observations:
     table: '1'
     section: Silicate starting compositions (electron microprobe analysis)
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   identity:
     quantity:
@@ -143,12 +143,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1670.0, 1677.0]; no midpoint invented
+      tag: value
+      value: '1673'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'CoO_solubility_and_MgO_dependence'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -170,7 +169,451 @@ observations:
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.63'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:1
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1677'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:2
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1670'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.93'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:3
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1675'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:4
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:5
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1670'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.93'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:6
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo::point:7
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      analytical_errors_Ni_and_Co_below_10_pct: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.66'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   identity:
     quantity:
@@ -188,12 +631,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1667.0, 1673.0]; no midpoint invented
+      tag: value
+      value: '1673'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'NiO_solubility_and_MgO_dependence'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -215,7 +657,573 @@ observations:
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:1
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:2
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1677'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:3
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1670'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.93'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:4
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1670'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.93'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:5
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1675'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:6
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:7
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1670'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.93'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:8
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo::point:9
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      analytical_errors_Ni_below_10_pct: true
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3a
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.66'
+      locator:
+        page: 25
+        table: 3a
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   identity:
     quantity:
@@ -233,12 +1241,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1667.0, 1677.0]; no midpoint invented
+      tag: value
+      value: '1673'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_solubility_and_MgO_dependence'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -260,7 +1267,390 @@ observations:
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.63'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:1
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.63'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:2
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1677'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.31'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:3
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1677'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:4
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1667'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.7'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:5
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo::point:6
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite-diopside_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1671'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 25
+    table: 3b
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.64'
+      locator:
+        page: 25
+        table: 3b
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo::point:0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   identity:
     quantity:
@@ -278,12 +1668,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1667.0, 1675.0]; no midpoint invented
+      tag: value
+      value: '1673'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'CoO_solubility_and_MgO_dependence'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -305,7 +1694,207 @@ observations:
     table: 3c
     section: Equilibration of metal and silicate melts with variable MgO-content
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.58'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo::point:1
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1667'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3c
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.7'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo::point:2
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1675'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3c
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo::point:3
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+    species:
+      formula: CoO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1667'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3c
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 26
+        table: 3c
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo::point:0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
   identity:
     quantity:
@@ -323,12 +1912,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1667.0, 1675.0]; no midpoint invented
+      tag: value
+      value: '1673'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'NiO_solubility_and_MgO_dependence'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -350,6 +1938,206 @@ observations:
     table: 3d
     section: Equilibration of metal and silicate melts with variable MgO-content
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.58'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo::point:1
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1667'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3d
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.7'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo::point:2
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1675'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3d
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo::point:3
+  experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+    species:
+      formula: NiO
+      phase:
+        tag: unknown
+        reason: phase string 'komatiitic_basalt_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1667'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      concentration_uncertainty: Table 3 s.d. columns retained per row
+      alloy_recalculation_uncertainty: true
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+  locator:
+    page: 26
+    table: 3d
+    section: Equilibration of metal and silicate melts with variable MgO-content
+  read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.79'
+      locator:
+        page: 26
+        table: 3d
+        section: Equilibration of metal and silicate melts with variable MgO-content
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table4_activity_coefficient_summary
   experiment_id: 10.1016/s0009-2541(97)00030-2::4
   identity:
