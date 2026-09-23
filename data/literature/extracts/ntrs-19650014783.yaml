@@ -174,11 +174,8 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1290'
-          interval_high: '1472'
+        tag: unknown
+        reason: multiple_table_points_per_static_run
       locator: *id003
 - experiment_id: sodium-static-run-2
   bench_id: static-sodium-capsule
@@ -276,11 +273,8 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1320'
-          interval_high: '2076'
+        tag: unknown
+        reason: multiple_table_points_per_static_run
       locator: *id003
 - experiment_id: sodium-static-run-3
   bench_id: static-sodium-capsule
@@ -378,11 +372,8 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1436'
-          interval_high: '2154'
+        tag: unknown
+        reason: multiple_table_points_per_static_run
       locator: *id003
 - experiment_id: sodium-static-run-4
   bench_id: static-sodium-capsule
@@ -480,11 +471,8 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1414'
-          interval_high: '2146'
+        tag: unknown
+        reason: multiple_table_points_per_static_run
       locator: *id003
 - experiment_id: sodium-static-run-5
   bench_id: static-sodium-capsule
@@ -582,11 +570,8 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1072'
-          interval_high: '1522'
+        tag: unknown
+        reason: multiple_table_points_per_static_run
       locator: *id003
 species:
   Na:
