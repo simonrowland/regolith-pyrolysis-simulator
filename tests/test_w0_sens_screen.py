@@ -84,6 +84,17 @@ SOURCE_A = "synthlab-a_kems_na2o_sio2"
 SOURCE_B = "synthlab-b_emf_na2o_sio2"
 
 
+@pytest.fixture(autouse=True)
+def _synthetic_preregistration_pin(monkeypatch) -> None:
+    """Keep synthetic screens independent of the private preregistration file."""
+
+    monkeypatch.setattr(
+        screen,
+        "PREREGISTRATION_REL",
+        Path("benchmarks/w0_sens/__init__.py"),
+    )
+
+
 # -- synthetic bench set -------------------------------------------------
 
 
