@@ -16,8 +16,12 @@ extraction:
     model paper).
   date: '2026-09-22'
   worker: n6-thomas-ueshima-jaggi
+  audited_by: y6-audit-n6-2026-09-22
 review_status: draft
-corrections: []
+corrections:
+- note: 'Y6 cross-audit 2026-09-22: Table 2 magma-ocean input compositions and Table 1 case parameters spot-checked PASS vs B3 PDF. Model outputs remain typed_absence (not observations).'
+  locators:
+  - pdf_page_index 5 Table 2
 benches:
 - id: spider-vaporock-vulcan-model-stack
   identity:

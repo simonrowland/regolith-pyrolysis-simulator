@@ -14,8 +14,12 @@ extraction:
     are the scored transition_point payload. T_K companions are T_C + 273.15 with derived stamp.
   date: '2026-09-22'
   worker: n6-thomas-ueshima-jaggi
+  audited_by: y6-audit-n6-2026-09-22
 review_status: draft
-corrections: []
+corrections:
+- note: 'Y6 cross-audit 2026-09-22: fixed base_pressure_Pa SI conversion of printed 10^-6〜10^-7 Torr degas vacuum (was 0.000133–0.00133 Pa; correct 1e-7..1e-6 Torr → ≈0.0000133–0.000133 Pa). Synopsis invariants 1454±2 / 1503–1521 / 1610±1 C and cell geometry spot-checks PASS.'
+  locators:
+  - published_page 2570 section 2.3
 benches:
 - id: hitachi-rm6k-knudsen
   identity:
@@ -232,13 +236,13 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '0.000133'
-            interval_high: '0.00133'
+            interval_low: '0.0000133'
+            interval_high: '0.000133'
             approximate: true
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Printed 10^-6 to 10^-7 Torr degas vacuum; Pa conversion 1 Torr = 133.322 Pa
+          note: Printed 10^-6 to 10^-7 Torr degas vacuum; Pa = Torr * 133.322 so 1e-7 Torr ≈ 1.33e-5 Pa (low) and 1e-6 Torr ≈ 1.33e-4 Pa (high)
   fO2_control:
     channel:
       tag: unknown
