@@ -4560,14 +4560,17 @@ def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
 
 
 def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
-    units = payload.get("units_as_published")
-    if isinstance(units, Mapping):
-        unit = units.get(key)
-        return str(unit) if unit not in (None, "") else None
     raw = payload.get(key)
     if isinstance(raw, Mapping):
         unit = raw.get("units") or raw.get("unit") or raw.get("units_as_published")
-        return str(unit) if unit not in (None, "") else None
+        if unit not in (None, ""):
+            return str(unit)
+    for units_key in ("units_as_published", "units"):
+        units = payload.get(units_key)
+        if isinstance(units, Mapping):
+            unit = units.get(key)
+            if unit not in (None, ""):
+                return str(unit)
     return None
 
 
@@ -4581,6 +4584,16 @@ def _convert_compilation_amount(
     conversion is derived from the printed unit and is never printed evidence.
     """
     if unit is None:
+        if quantity in {
+            Quantity.CP,
+            Quantity.S,
+            Quantity.H_MINUS_H298,
+            Quantity.DELTA_FH,
+            Quantity.DELTA_FG,
+        }:
+            # A printed thermodynamic number without its source unit cannot be
+            # grounded as SI or safely converted; refuse instead of assuming.
+            return None
         return amount, "as_published"
     token = re.sub(r"\s+", "", str(unit).lower()).replace("·", "")
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
@@ -4954,8 +4967,13 @@ def _selection_from_named_field(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
         if converted is None:
+            reason = (
+                f"missing printed unit for {key}; refusing ungrounded numeric value"
+                if _printed_unit_for_field(payload, key) is None and units is None
+                else f"unsupported printed unit for {key}"
+            )
             return _unavailable_selection(
-                f"unsupported printed unit for {key}",
+                reason,
                 condition_ranges=condition_ranges,
                 unused_ancillary=_unused_ancillary(payload, key),
                 field_name=key,
@@ -4987,8 +5005,13 @@ def _selection_from_named_field(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
         if converted is None:
+            reason = (
+                f"missing printed unit for {key}; refusing ungrounded numeric value"
+                if _printed_unit_for_field(payload, key) is None and units is None
+                else f"unsupported printed unit for {key}"
+            )
             return _unavailable_selection(
-                f"unsupported printed unit for {key}",
+                reason,
                 condition_ranges=condition_ranges,
                 unused_ancillary=_unused_ancillary(payload, key),
                 field_name=key,

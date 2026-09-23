@@ -3359,6 +3359,39 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     assert k_by_key["entropy_recommended"].value.point == as_decimal("111.21072")
 
 
+def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
+    page = json.loads(
+        (
+            REPO_ROOT
+            / "data/literature/compilations/pankratz-1987-usbm-b689/records/page-0003.json"
+        ).read_text(encoding="utf-8")
+    )
+    by_quantity = {
+        item.quantity: item.value.series[0][1]
+        for item in compilation_column_series_from_record(page)
+    }
+    assert by_quantity[Quantity.CP] == as_decimal("35.9824")
+    assert by_quantity[Quantity.DELTA_FH] == as_decimal("393.296")
+
+    for record in ("table-0001.json", "table-0002.json"):
+        doc = json.loads(
+            (
+                REPO_ROOT
+                / "data/literature/compilations/pankratz-1984-usbm-b677/records"
+                / record
+            ).read_text(encoding="utf-8")
+        )
+        assert compilation_column_series_from_record(doc) == ()
+
+    selection = select_declared_source(
+        Quantity.CP, None, {"cp": 25}
+    )
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.value.unavailable_reason == (
+        "missing printed unit for cp; refusing ungrounded numeric value"
+    )
+
+
 def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-1447.json")
