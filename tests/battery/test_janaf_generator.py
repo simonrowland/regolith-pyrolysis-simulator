@@ -474,7 +474,7 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     sodium = _generation("Na-020")
     cp = _quantity_observations(sodium, Quantity.CP)
     assert [obs.observation_id for obs in cp] == [
-        "nist-janaf-4th:Na-020:cp:segment-0"
+        "nist-janaf-4th:Na-020:cp:phase-window:whole"
     ]
     temperatures = [point[0] for point in cp[0].value.series or ()]
     assert Decimal("514.000") in temperatures
@@ -501,8 +501,12 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
     assert segments[1]["phase"]["value"] == "cr"
     assert segments[1]["polymorph"]["value"] == "iv"
     sulfate_cp = _quantity_observations(sulfate, Quantity.CP)
-    assert sulfate_cp[0].observation_id == "nist-janaf-4th:Na-025:cp:segment-0"
-    assert sulfate_cp[1].observation_id == "nist-janaf-4th:Na-025:cp:segment-1"
+    assert sulfate_cp[0].observation_id == (
+        "nist-janaf-4th:Na-025:cp:phase-window:T=open..458.000"
+    )
+    assert sulfate_cp[1].observation_id == (
+        "nist-janaf-4th:Na-025:cp:phase-window:T=458.000..514.000"
+    )
     assert (Decimal("458.000"), Decimal("153.331")) in (sulfate_cp[0].value.series or ())
     assert (Decimal("514.000"), Decimal("160.712")) in (sulfate_cp[1].value.series or ())
 

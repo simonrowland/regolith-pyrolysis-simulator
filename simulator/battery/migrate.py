@@ -84,6 +84,11 @@ from simulator.battery.identity import (
     celsius_to_kelvin,
     profile_for,
 )
+from simulator.battery.stable_ids import (
+    cao_raw_pca_id,
+    series_point_id,
+    temperature_token,
+)
 from simulator.battery.records import (
     Admission,
     AdmissionDecision,
@@ -3165,6 +3170,28 @@ _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("fraction_of_feedstock_oxygen_percent", Quantity.O2_YIELD),
 )
 
+
+
+_ORDINAL_POINT_SUFFIX_RE = re.compile(r"^(?P<stem>.*)::point:(?P<index>\d+)$")
+
+
+def _rekey_ordinal_point_observation_id(
+    raw_obs_id: str,
+    *,
+    temperature: object | None = None,
+    field: str | None = None,
+) -> str:
+    """Replace author ``::point:N`` with a content-stable suffix when possible."""
+
+    match = _ORDINAL_POINT_SUFFIX_RE.fullmatch(str(raw_obs_id))
+    if match is None:
+        return str(raw_obs_id)
+    stem = match.group("stem")
+    if field:
+        return series_point_id(stem, field=field)
+    if temperature is not None:
+        return series_point_id(stem, temperature=temperature)
+    return str(raw_obs_id)
 
 def _percent_named_fraction_field(key: str, units: str | None) -> bool:
     lowered = str(key or "").strip().lower()
@@ -7210,6 +7237,21 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        t_for_rekey = None
+        if isinstance(values, Mapping):
+            t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
+            if t_sel_rekey.available:
+                t_for_rekey = t_sel_rekey.amount
+        if t_for_rekey is None and isinstance(obs.get("identity"), Mapping):
+            ident_t = obs["identity"].get("temperature_K")
+            if isinstance(ident_t, Mapping) and ident_t.get("tag") == "value":
+                t_for_rekey = ident_t.get("value")
+            elif ident_t is not None and not isinstance(ident_t, Mapping):
+                t_for_rekey = ident_t
+        raw_obs_id = _rekey_ordinal_point_observation_id(
+            raw_obs_id, temperature=t_for_rekey
+        )
+        obs_id = f"{source_id}::{raw_obs_id}"
         oxygen_fields = _measured_oxygen_yield_fields(values)
         if oxygen_fields:
             for index, (child_quantity, field) in enumerate(oxygen_fields):
@@ -7225,7 +7267,9 @@ class Migrator:
                 if len(oxygen_fields) == 1:
                     child_obs["observation_id"] = raw_obs_id
                 else:
-                    child_obs["observation_id"] = f"{raw_obs_id}::point:{index}"
+                    child_obs["observation_id"] = series_point_id(
+                        raw_obs_id, field=field
+                    )
                 child_obs["values"] = child_values
                 self._migrate_extract_observation(
                     formula=formula,
@@ -7828,7 +7872,7 @@ class Migrator:
                     ["temperature_K"],
                     t_sel.reason or "series temperature_K is not numeric",
                     source=source_key,
-                    observation_id=f"{parent_id}::point:{index}",
+                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
@@ -7844,7 +7888,7 @@ class Migrator:
                     value_sel.reason
                     or "series P is not grounded in a source pressure unit",
                     source=source_key,
-                    observation_id=f"{parent_id}::point:{index}",
+                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -7856,10 +7900,25 @@ class Migrator:
                         "left out (own-quantity identity incomplete)"
                     ),
                     source=source_key,
-                    observation_id=f"{parent_id}::point:{index}",
+                    observation_id=(series_point_id(parent_id, temperature=coord) if coord is not None else f"{parent_id}::point:{index}"),
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
-        point_id = f"{parent_id}::point:{index}"
+        if coord is not None:
+            point_id = series_point_id(parent_id, temperature=coord)
+        else:
+            point_id = _rekey_ordinal_point_observation_id(
+                f"{parent_id}::point:{index}",
+                temperature=None,
+            )
+            # No T on the point: keep a deterministic content key from printed
+            # payload fields rather than the encounter index alone.
+            if point_id.endswith(f"::point:{index}") and isinstance(raw_item, Mapping):
+                printed = raw_item.get("as_published") or raw_item.get("value")
+                if printed is not None:
+                    point_id = f"{parent_id}::printed:{printed}"
+                else:
+                    point_id = f"{parent_id}::point:{index}"
+
         ident_kwargs = dict(ident_kwargs)
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
@@ -8579,9 +8638,15 @@ class Migrator:
                     continue
                 require_rail_if_stated(row)
                 count.rows_in += 1
-                loc = Locator(record=f"raw_pCa[{i}]")
                 t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, row)
                 t = t_sel.amount if t_sel.available else None
+                loc = Locator(
+                    record=(
+                        f"raw_pCa:T={t}"
+                        if t is not None
+                        else f"raw_pCa[{i}]"
+                    )
+                )
                 p_sel = select_declared_source(Quantity.P_PARTIAL, None, row)
                 from simulator.battery.records import Derivation
 
@@ -8602,7 +8667,12 @@ class Migrator:
                     work=work,
                     source_id="shornikov-2025-cao",
                     source_key=rel,
-                    observation_id=f"cao_raw_pCa_{i}",
+                    observation_id=(
+                        cao_raw_pca_id(temperature=t)
+                        if t is not None
+                        else f"cao_raw_pCa_row:{row.get('as_published') or row.get('pressure_atm') or i}"
+                    ),
+
                     locator=loc,
                     quantity=Quantity.P_PARTIAL,
                     species=make_species("Ca", map_phase(row.get("phase"))[0]),

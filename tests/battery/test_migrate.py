@@ -1743,7 +1743,7 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     alpha_points = [
         o
         for o in result.observations.values()
-        if "per_T_alpha_series::point:" in o.observation_id
+        if "per_T_alpha_series::T=" in o.observation_id
     ]
     assert len(alpha_points) == 12
     for obs in alpha_points:
@@ -1753,7 +1753,7 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     fe0 = next(
         o
         for o in alpha_points
-        if "fe_hashimoto_langmuir_per_T_alpha_series::point:0" in o.observation_id
+        if "fe_hashimoto_langmuir_per_T_alpha_series::T=1973" in o.observation_id
     )
     assert fe0.value.point == as_decimal("0.23")
     assert float(fe0.identity.temperature_K.value) == 1973.0
@@ -4284,7 +4284,7 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     points = [
         o
         for o in result.observations.values()
-        if "::point:" in o.observation_id
+        if "::T=" in o.observation_id
     ]
     assert len(points) == 2
     by_value = {o.value.point: o for o in points}
@@ -4336,7 +4336,11 @@ def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
         assert "no midpoint invented" in (obs.identity.temperature_K.reason or "")
         assert "1473.15" in (obs.identity.temperature_K.reason or "")
         assert obs.admission.status is AdmissionStatus.ADMITTED
-        local = obs.observation_id.split("::", 1)[1].split("::point:")[0]
+        local = obs.observation_id.split("::", 1)[1]
+        if "::field:" in local:
+            local = local.split("::field:")[0]
+        elif "::point:" in local:
+            local = local.split("::point:")[0]
         assert local == "na_psat"
 
 

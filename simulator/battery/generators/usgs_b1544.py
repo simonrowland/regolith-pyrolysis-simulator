@@ -27,6 +27,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
+from simulator.battery.stable_ids import tabulated_cell_suffix
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -1151,10 +1152,16 @@ def _observation(
                 Located(State.of(Decimal("1000")), locator=_unit_row_locator()),
             )
         )
-    suffix = (
-        f"{quantity.value}:{basis or 'shared'}:"
-        f"T={temperature}:row={token.row_index}:col={token.column}"
-        f":src={token.table1_source or 'grid'}"
+    published_name = (
+        str(record.get("name_as_published") or table1_phase or "") or None
+    )
+    suffix = tabulated_cell_suffix(
+        quantity.value,
+        temperature=temperature,
+        column=token.column,
+        basis=basis or "shared",
+        name=published_name,
+        extra=f"src={token.table1_source or 'grid'}",
     )
     return Observation(
         observation_id=f"{SOURCE_ID}:{record_id}:{suffix}",
