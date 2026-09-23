@@ -76,8 +76,26 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: {page: 27, table: '3.3', note: The printed 2.32 g is mass of the melted regolith sample, not the initial charge mass}
     printed_composition:
-      state: {tag: value, value: EAC-1A lunar regolith simulant}
-      locator: {page: 18, section: '3.1 Solar-pyrolysis experimental setup', note: The experimental demonstration uses EAC-1A; Table 1 separately prints its cited bulk composition}
+      state:
+        tag: value
+        value:
+          SiO2: 44.41
+          FeO: 0.00
+          MgO: 12.09
+          CaO: 10.98
+          Al2O3: 12.80
+          TiO2: 2.44
+          Cr2O3: 0.00
+          MnO: 0.20
+          Na2O: 2.95
+          K2O: 1.32
+          Fe2O3: 12.20
+          P2O5: 0.61
+      locator:
+        page: 39
+        pdf_page_index: 54
+        table: '4.1'
+        note: 'EAC-1 column; oxide wt% as printed; label EAC-1 (caption: EAC-1A numbers from [25]; column header EAC-1); experimental charge is EAC-1A; Total row 100.00 omitted; 0.00 cells retained as printed'
     form:
       state: {tag: value, value: Bulk regolith simulant in a crucible}
       locator: {page: 25, section: '3.2 Experiment procedure', note: Multiple solar exposures could use fresh regions of one bulk regolith sample under vacuum}
