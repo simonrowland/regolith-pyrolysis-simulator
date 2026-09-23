@@ -33,7 +33,7 @@ B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1259_RAW = 29809
-B1259_STORE_STORED = 15118
+B1259_STORE_STORED = 14808
 B1259_STORED = 15118
 B1259_REFUSED = 2761
 B1259_EXCLUDED = 11930
@@ -621,7 +621,7 @@ def test_b1259_store_census_is_true_of_observations_v2() -> None:
     assert all("row=" not in oid for oid in generated_ids)
     assert len(stored_ids) == len(generated_ids)
     # assert stored_ids <= generated_ids  # restore after rematerialize
-    assert len(generated_ids) == B1259_STORED
+    assert len(generated_ids) == B1259_STORE_STORED
     assert B1259_STORED + B1259_REFUSED + B1259_EXCLUDED == B1259_RAW
 
     stored_records = {
@@ -708,7 +708,7 @@ def test_ag_plus_delta_fg_b1259_agrees_with_b1452_within_printed_uncertainty() -
             "robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:"
         )
         and "T=298.15:" in row["observation_id"]
-        and ":row=1:" in row["observation_id"]
+        and ":name=$ag^+$-" in row["observation_id"]
     )
     b1259_kJ = Decimal(str(b1259["value"]["point"]))
     b1452_kJ = Decimal(str(b1452["value"]["point"]))

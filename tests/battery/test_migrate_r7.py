@@ -357,7 +357,16 @@ def absence_audit(paths=STORE_PATHS):
                     raw = (REPO_ROOT / source).read_text()
                     record = json.loads(raw) if source.endswith(".json") else yaml.load(raw, Loader=yaml.CSafeLoader)
                 else:
-                    local = oid.split("::", 1)[1].split("::point:")[0]
+                    local_id = oid.split("::", 1)[1]
+                    local = next(
+                        (
+                            candidate
+                            for candidate in legacy
+                            if local_id == candidate
+                            or local_id.startswith(f"{candidate}::")
+                        ),
+                        local_id,
+                    )
                     assert local in legacy, oid
                     record = legacy[local]
                 family = obs["source_id"]

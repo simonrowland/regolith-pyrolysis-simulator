@@ -605,7 +605,7 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
     tungstate = _generation("W-003")
     tungstate_cp = _quantity_observations(tungstate, Quantity.CP)
     assert [observation.observation_id for observation in tungstate_cp] == [
-        "nist-janaf-4th:W-003:cp:segment-0"
+        "nist-janaf-4th:W-003:cp:phase-window:whole"
     ]
     tungstate_reason = tungstate_cp[0].identity.species.phase.reason or ""
     assert tungstate_cp[0].identity.species.phase.is_unknown

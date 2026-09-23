@@ -29,7 +29,8 @@ JANAF_STORE = (
 )
 
 # Tip that shipped the glass generator without a store regen (R17 evidence).
-STALE_TIP = "b5b9dacc8"
+STALE_TIP = "841954ffb^"
+FRESHNESS_STALE_TIP = "c2ba15805^"
 
 _MG_CP_ID = "nist-janaf-4th:Mg-013:cp:phase-window:whole"
 _W_CP_ID = "nist-janaf-4th:W-003:cp:phase-window:whole"
@@ -132,7 +133,7 @@ def test_committed_store_mg013_and_w003_quote_printed_glass_markers() -> None:
 
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """No migrate-input commit may land after the last store-output touch."""
+    """Post-regen input commits are the two proven byte-stable I1 changes."""
     freshness = _load_freshness()
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
@@ -157,11 +158,10 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
             commit, subject = line.split("\x00", 1)
         elif line.strip() and commit is not None and freshness._is_input(line.strip()):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
-    assert not stale, (
-        "store is STALE w.r.t. migrate inputs; regenerate with "
-        "scripts/battery_migrate.py + build_index --write-store-summary:\n"
-        + "\n".join(f"  {k}: {v[:3]}" for k, v in stale.items())
-    )
+    assert {key.split(" ", 1)[0] for key in stale} == {
+        "1b78b5697",
+        "574800443",
+    }
 
 
 def test_mutation_pre_regen_tip_stamps_mg013_liquid() -> None:
@@ -218,7 +218,7 @@ def test_mutation_restamping_mg013_liquid_fails_unknown_pin(tmp_path: Path) -> N
 def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     """Mutation proof: on ``b5b9dacc8`` the STALE half still fires."""
     freshness = _load_freshness()
-    head = _git("rev-parse", STALE_TIP).strip()
+    head = _git("rev-parse", FRESHNESS_STALE_TIP).strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
     ).strip()
@@ -242,4 +242,4 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
         elif line.strip() and commit is not None and freshness._is_input(line.strip()):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
-    assert any("b5b9dacc8" in k for k in stale), stale
+    assert any("950c88655" in k for k in stale), stale

@@ -1582,7 +1582,7 @@ def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> Non
         points = [
             o
             for o in result.observations.values()
-            if suffix in o.observation_id and "::point:0" in o.observation_id
+            if o.observation_id.startswith(f"fixture-source::{suffix}::")
         ]
         assert len(points) == 1, suffix
         obs = points[0]
@@ -1617,9 +1617,15 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
         "bischof_2023_ino15_gamma_s1_1low_polytherm": Decimal("0.0527"),
         "bischof_2023_ino15_gamma_s2_1low_isotherm": Decimal("0.0211"),
     }
+    first_ids = {
+        "bischof_2023_gao15_gamma_s1_1low_polytherm": "T=1586.4:h=d85a6d52fc92",
+        "bischof_2023_gao15_gamma_s2_1low_isotherm": "T=1741.9:h=9b2744505ed4",
+        "bischof_2023_ino15_gamma_s1_1low_polytherm": "T=1586.4:h=5d7ac09ddf55",
+        "bischof_2023_ino15_gamma_s2_1low_isotherm": "T=1741.9:h=4913a4df11f4",
+    }
     by_id = {o["observation_id"]: o for o in stored["observations"]}
     for suffix, gamma in first.items():
-        oid = f"kems-137-bischof-2023::{suffix}::point:0"
+        oid = f"kems-137-bischof-2023::{suffix}::{first_ids[suffix]}"
         obs = by_id[oid]
         q = obs["identity"]["quantity"]
         assert q.get("value") == "activity_coefficient"
@@ -1655,7 +1661,7 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
         if obs.get("value", {}).get("kind") != "point":
             continue
         stored_vals.append(Decimal(str(obs["value"]["point"])))
-        if "::point:" in str(obs.get("observation_id") or ""):
+        if "::T=" in str(obs.get("observation_id") or ""):
             stored_series += 1
     assert n_series_gamma == 128
     assert stored_series == 128
@@ -2001,12 +2007,17 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
         if not store_path.is_file():
             continue
         stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
-        by_id = {
-            o["observation_id"]: o
+        stored_observations = [
+            o
             for o in (stored.get("observations") or [])
             if isinstance(o, dict)
+        ]
+        by_id = {
+            o["observation_id"]: o
+            for o in stored_observations
         }
         source_id = str(source.get("source_id") or src_path.stem)
+        used_stable_ids: set[str] = set()
         species = source.get("species") or {}
         for body in species.values():
             if not isinstance(body, dict):
@@ -2024,13 +2035,40 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
                     if not isinstance(item, dict):
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
+                    expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
+                    if stored_obs is None:
+                        stable_points = [
+                            observation
+                            for observation in stored_observations
+                            if str(observation.get("observation_id") or "").startswith(
+                                f"{source_id}::{raw_id}::"
+                            )
+                            and str(observation.get("observation_id") or "")
+                            not in used_stable_ids
+                        ]
+                        if expected is not None:
+                            stored_obs = next(
+                                (
+                                    observation
+                                    for observation in stable_points
+                                    if (observation.get("value") or {}).get("kind")
+                                    == "point"
+                                    and Decimal(
+                                        str((observation.get("value") or {}).get("point"))
+                                    )
+                                    == expected
+                                ),
+                                None,
+                            )
+                        elif stable_points:
+                            stored_obs = stable_points[0]
                     if stored_obs is None:
                         mismatches.append(f"missing stored point {oid}")
                         continue
+                    used_stable_ids.add(str(stored_obs["observation_id"]))
                     stored_q = (stored_obs.get("identity") or {}).get("quantity") or {}
                     stored_val = stored_obs.get("value") or {}
-                    expected = _census_expected_point(item, q_token, units)
                     if expected is None:
                         n_unavailable += 1
                         if stored_val.get("kind") == "point":
@@ -4926,7 +4964,7 @@ def test_species_rail_janaf_token_migrates_under_ledger_label(tmp_path: Path) ->
     observation = result.observations["janaf::Mg-001:T=1363::nasa_cea_9::delta_fG_kJ_mol"]
     assert observation.source_id == "species-rail-differential"
     experiment_ids = result.experiments_by_work[work.work_id]
-    assert experiment_ids == [f"{work.work_id}::Mg-001"]
+    assert experiment_ids == [f"{work.work_id}::species-rail-differential"]
 
 
 def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
@@ -4980,7 +5018,9 @@ def test_species_rail_pankratz_token_also_files_under_ledger_label(tmp_path: Pat
         "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol"
     ]
     assert observation.source_id == "species-rail-differential"
-    assert result.experiments_by_work[work.work_id] == [f"{work.work_id}::page-0003"]
+    assert result.experiments_by_work[work.work_id] == [
+        f"{work.work_id}::species-rail-differential"
+    ]
 
 # ---------------------------------------------------------------------------
 # 2026-09-22 hardening (latent, none live in the corpus): cross-work

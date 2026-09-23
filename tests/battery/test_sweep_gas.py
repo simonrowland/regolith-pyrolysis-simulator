@@ -54,9 +54,13 @@ def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
     experiment = next(e for e in result.experiments.values()
                       if e.experiment_id.endswith("::tms-n2-glass-series"))
     payload = json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
-    # Captured using the pre-d033 parser at 68460d5a8d428d918fa4aaa26ede256fe18c3957.
-    assert len(payload) == 2189
-    assert hashlib.sha256(payload).hexdigest() == "f73be35a1fc61f44ac45aae63e485d988f5211aacd194d2e9e8070df37805796"
+    # 4702a4d92 preserves each printed original beside a converted scalar.
+    # The sweep-gas value is unchanged; the larger payload and new digest are
+    # the explicit conversion-provenance fields added to its experiment.
+    assert len(payload) == 2637
+    assert hashlib.sha256(payload).hexdigest() == (
+        "bee143595612dfc9be00d3e1b40724a5678bb04ba38d3616735c18570fda0ac7"
+    )
     assert experiment_from_plain(to_plain(experiment)) == experiment
 
 

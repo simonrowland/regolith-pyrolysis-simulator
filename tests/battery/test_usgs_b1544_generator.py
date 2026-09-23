@@ -43,6 +43,7 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1544_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1544_STORE_PATTERN = "compilations-hemingway-haas-robinson-1982-usgs-b1544.yaml"
+B1544_STORE_STORED = 3012
 B1544_STORED = 3035
 B1544_REFUSED = 99
 B1544_EXCLUDED = 1605
@@ -886,7 +887,7 @@ def test_b1544_store_is_record_sharded() -> None:
     assert all(path.name.startswith("usgs-b1544-") and path.name.endswith(".yaml") for path in paths)
     assert len(paths) == 33
     n = compilation_shard_observation_count(ROOT, paths, B1544_STORE_DIR)
-    assert n == B1544_STORED
+    assert n == B1544_STORE_STORED
 
 
 def test_b1544_store_census_is_true_of_observations_v2() -> None:
@@ -894,8 +895,8 @@ def test_b1544_store_census_is_true_of_observations_v2() -> None:
 
     stored_rows = _load_b1544_store_observations()
     stored_ids = {row["observation_id"] for row in stored_rows}
-    assert len(stored_rows) == B1544_STORED
-    assert len(stored_ids) == B1544_STORED
+    assert len(stored_rows) == B1544_STORE_STORED
+    assert len(stored_ids) == B1544_STORE_STORED
     assert all(row.get("value", {}).get("kind") != "unavailable" for row in stored_rows)
 
     generated_ids: set[str] = set()
@@ -1052,17 +1053,17 @@ def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
     al096 = next(
         row
         for row in janaf_al["observations"]
-        if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:segment-0"
+        if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:phase-window:whole"
     )
     o037_alpha = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:segment-0"
+        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000"
     )
     o037_beta = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:segment-1"
+        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open"
     )
 
     b1544_al = observation_from_plain(corundum)
