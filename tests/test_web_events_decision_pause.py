@@ -58,6 +58,7 @@ from web.events import (
     _current_simulation_state,
     _simulations,
 )
+from web.run_store import RunArtifactStore
 
 
 # SocketIO pause/resume loop has timing flakes under xdist coscheduling.
@@ -65,8 +66,10 @@ pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 
 
 @pytest.fixture(autouse=True)
-def _deterministic_liquidus_gate(monkeypatch):
+def _deterministic_liquidus_gate(monkeypatch, tmp_path):
     """Keep web state-machine tests independent of external liquidus latency."""
+    run_store = RunArtifactStore(tmp_path / 'runs')
+    monkeypatch.setattr(events_module, 'get_run_store', lambda: run_store)
     curve = {
         'source': 'test_decision_pause_liquidus',
         'solidus_T_C': 1000.0,
@@ -300,8 +303,9 @@ def test_resume_while_parked_at_decision_does_not_re_emit(client):
         m['args'][0].get('status') for m in during
         if m['name'] == 'simulation_status'
     ]
-    assert 'paused' in statuses and 'resumed' in statuses, (
+    assert 'paused' in statuses and 'awaiting_decision' in statuses, (
         f'pause/resume churn never reached a live run: {statuses}')
+    assert 'resumed' not in statuses
     re_emits = [m for m in during if m['name'] == 'decision_required']
     assert re_emits == [], f'gate was re-emitted after resume: {re_emits}'
     # An unanswered gate must not advance: the loop owes the operator a decision,
@@ -403,7 +407,8 @@ def test_pause_resume_around_every_gate_is_ledger_identical(client):
     # (exactly one of each per gate), so the no-duplicate / identical-ledger
     # checks below are not vacuously satisfied by churn that silently no-op'd.
     assert pert_status_counts['paused'] == len(EXPECTED_DECISIONS)
-    assert pert_status_counts['resumed'] == len(EXPECTED_DECISIONS)
+    assert pert_status_counts['awaiting_decision'] == len(EXPECTED_DECISIONS)
+    assert pert_status_counts['resumed'] == 0
     # No mis-route, no duplicate: each recommendation routed to its own gate.
     assert routed == EXPECTED_ROUTING
     # Bit-identical final ledger -- the strongest "no perturbation" guarantee.

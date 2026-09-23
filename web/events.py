@@ -3619,7 +3619,9 @@ def register_events(socketio):
             mass_kg = _coerce_bounded_float(
                 data.get('mass_kg'),
                 field='mass_kg',
-                default=1000.0,
+                # Preserve the legacy optional-field default only for omission.
+                # An explicit null/blank means the operator cleared the field.
+                default=1000.0 if 'mass_kg' not in data else None,
                 minimum=0.0,
                 maximum=_MAX_WEB_MASS_KG,
                 exclusive_minimum=True,
@@ -3806,14 +3808,14 @@ def register_events(socketio):
         else:
             backend_message = f'Using {backend_type}'
 
-        # User-configurable parameters
-        c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
-            c5_enabled,
-            mre_target_species,
-            mre_max_voltage_V,
-        )
         session = SimSession()
         try:
+            # User-configurable parameters
+            c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
+                c5_enabled,
+                mre_target_species,
+                mre_max_voltage_V,
+            )
             session.start(
                 SimSessionConfig(
                     feedstock_id=feedstock_key,
@@ -4090,45 +4092,74 @@ def register_events(socketio):
 
     _registered_start_handler = handle_start
 
+    def reject_control_without_active_run(sid: str, event_name: str) -> None:
+        socketio.emit('simulation_status', {
+            'status': 'error',
+            'message': f'{event_name} requires an active run',
+            'error_type': 'no_active_run',
+        }, room=sid)
+
     @socketio.on('pause_simulation')
     def handle_pause():
         sid = request.sid
         state, lock = _current_simulation_state(sid)
-        if state and lock:
-            run_id = state['run_id']
-            with lock:
-                current, _ = _current_simulation_state(sid, run_id)
-                if current is not state or not state['running']:
-                    return
-                state['session'].pause()
-                state['paused'] = True
-                _emit_if_current(
-                    socketio,
-                    sid,
-                    run_id,
-                    'simulation_status',
-                    {'status': 'paused'},
-                )
+        if not state or not lock:
+            reject_control_without_active_run(sid, 'pause_simulation')
+            return
+        run_id = state['run_id']
+        with lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if current is not state:
+                return
+            if not state['running']:
+                reject_control_without_active_run(sid, 'pause_simulation')
+                return
+            state['session'].pause()
+            state['paused'] = True
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                {'status': 'paused'},
+            )
 
     @socketio.on('resume_simulation')
     def handle_resume():
         sid = request.sid
         state, lock = _current_simulation_state(sid)
-        if state and lock:
-            run_id = state['run_id']
-            with lock:
-                current, _ = _current_simulation_state(sid, run_id)
-                if current is not state or not state['running']:
-                    return
-                state['session'].resume()
-                state['paused'] = False
+        if not state or not lock:
+            reject_control_without_active_run(sid, 'resume_simulation')
+            return
+        run_id = state['run_id']
+        with lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if current is not state:
+                return
+            if not state['running']:
+                reject_control_without_active_run(sid, 'resume_simulation')
+                return
+            if state['session'].pending_decision() is not None:
                 _emit_if_current(
                     socketio,
                     sid,
                     run_id,
                     'simulation_status',
-                    {'status': 'resumed'},
+                    {
+                        'status': 'awaiting_decision',
+                        'message': 'resume_simulation is waiting for an operator decision',
+                    },
                 )
+                return
+            state['session'].resume()
+            state['paused'] = False
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                {'status': 'resumed'},
+            )
 
     @socketio.on('make_decision')
     def handle_decision(data):
@@ -4159,6 +4190,9 @@ def register_events(socketio):
             }, room=sid)
             return
         state, lock = _current_simulation_state(sid)
+        if not state or not lock:
+            reject_control_without_active_run(sid, 'make_decision')
+            return
         if state and lock:
             resume_loop = False
             with lock:
@@ -4227,6 +4261,7 @@ def register_events(socketio):
             return
         state, lock = _current_simulation_state(sid)
         if not state or not lock:
+            reject_control_without_active_run(sid, 'adjust_parameter')
             return
 
         param = str(data.get('param', '') or '').strip()

@@ -5555,6 +5555,93 @@ def test_start_with_valid_feedstock_still_starts(monkeypatch):
     assert "started" in statuses, f"valid feedstock should start; got {statuses!r}"
 
 
+@pytest.mark.parametrize("mass_kg", [None, ""])
+def test_start_with_cleared_mass_refuses_instead_of_defaulting(
+    monkeypatch, mass_kg
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": mass_kg,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        statuses = [
+            (message.get("args") or [{}])[0]
+            for message in client.get_received()
+            if message.get("name") == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "invalid_run_input"
+        assert "mass_kg" in statuses[-1]["message"]
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+def test_start_with_invalid_mre_policy_is_typed_refusal(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 10,
+                "speed": 0,
+                "track": "pyrolysis",
+                "c5_enabled": True,
+            },
+        )
+        statuses = [
+            (message.get("args") or [{}])[0]
+            for message in client.get_received()
+            if message.get("name") == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "invalid_run_input"
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("event_name", "payload"),
+    [
+        ("pause_simulation", None),
+        ("resume_simulation", None),
+        ("make_decision", {"choice": "A"}),
+        ("adjust_parameter", {"param": "speed", "value": 1}),
+    ],
+)
+def test_control_event_refuses_without_active_run(event_name, payload):
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    try:
+        if payload is None:
+            client.emit(event_name)
+        else:
+            client.emit(event_name, payload)
+        statuses = [
+            (message.get("args") or [{}])[0]
+            for message in client.get_received()
+            if message.get("name") == "simulation_status"
+        ]
+        assert statuses[-1]["error_type"] == "no_active_run"
+        assert event_name in statuses[-1]["message"]
+    finally:
+        client.disconnect()
+
+
 def _socket_single_run_payload(target_or_recipe, **overrides):
     return {
         "single_run": {
