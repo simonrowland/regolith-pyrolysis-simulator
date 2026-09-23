@@ -136,8 +136,11 @@ experiments:
   locator: {page: 270, section: '3. Procedure', note: K2O-SiO2 solution measurements; per-row compositions and temperatures remain in observations}
   sample:
     printed_composition:
-      state: {tag: value, value: K2O-SiO2 liquid solutions spanning 43.9 to 11.9 wt percent K2O}
-      locator: {section: Abstract}
+      state: {tag: value, value: crystalline K2Si2O5}
+      locator:
+        published_page: 271
+        section: '3. Procedure'
+        note: 'Solid-state product XRD-identified as K2Si2O5; no separate starting oxide assay is printed. Table 2 Wt % K2O is the running composition from the integrated 39K ion current and is not landed as start. Abstract 43.9-11.9 wt% K2O is the measured range, not a starting assay.'
     form:
       state: {tag: value, value: Dried K2O-SiO2 melt}
       locator: {page: 269, section: '3. Procedure'}
