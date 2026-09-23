@@ -67,8 +67,9 @@ def main() -> int:
         path = records_dir / f"{record.record_id}.yaml"
         path.write_text(record_to_yaml(record), encoding="utf-8")
 
-    generated_at = datetime.now(timezone.utc).isoformat()
-    manifest = build_manifest(database, records, generated_at=generated_at)
+    # Wall-clock stamps are omitted from committed compilation sidecars so
+    # regenerate is byte-stable; pass generated_at only from an explicit caller.
+    manifest = build_manifest(database, records, generated_at=None)
     (output_root / "manifest.yaml").write_text(
         yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True, width=120),
         encoding="utf-8",
