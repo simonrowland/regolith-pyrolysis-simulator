@@ -14,18 +14,18 @@ corrections:
 - The paper states a 4.5 cm3 crucible in the apparatus description and Methods, but says 4.5 mm2 in the later sample-description paragraph; both are retained below.
 fidelity_samples:
 - species: basaltic_silicate_melt
-  observable: apparatus
-  observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
-  field: sample_mass_g_as_printed
-  value: 3
+  observable: rate_series
+  observation_id: norris_2017_volatile_loss_conditions
+  field: T_C
+  value: 1300
   locator:
     pdf_page_index: 11
     section: Methods
     note: Each experiment used 3 g of material.
 - species: trace_elements
-  observable: volatility_factor
+  observable: volatility_series
   observation_id: norris_2017_figure3_volatility_factors
-  field: log_fO2_range_as_printed
+  field: log_fO2_range
   value: -7 to -13
   locator:
     pdf_page_index: 14
@@ -61,8 +61,22 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.003'}}
       locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
     printed_composition:
-      state: {tag: value, value: Natural Reykjanes Ridge basalt plus trace-element oxide mixture}
-      locator: {pdf_page_index: 11, section: Methods}
+      state:
+        tag: value
+        value:
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
+      locator:
+        pdf_page_index: 11
+        table: Extended Data Table 1
+        note: Starting material EBT1 major-element wt% (N=5); NiO printed 0 and Total 99.8 omitted.
     form:
       state: {tag: value, value: 12 mm diameter pressed pellet}
       locator: {pdf_page_index: 11, section: Methods}
@@ -324,6 +338,16 @@ species:
         T_C: 1300
         temperature_C: 1300
         log_fO2: -7
+        composition_wt_pct:
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
         plotted_elements:
         - Ag
         - Cd
@@ -336,7 +360,7 @@ species:
         digitised: false
     - observation_id: norris_2017_figure3_volatility_factors
       experiment: volatile-loss-series
-      type: rate_series
+      type: volatility_series
       locator:
         pdf_page_index: 16
         figure: '3'
@@ -392,7 +416,7 @@ species:
         digitised: false
     - observation_id: norris_2017_author_volatility_factor_definition
       experiment: volatile-loss-series
-      type: model_derived
+      type: volatility_series
       locator:
         pdf_page_index: 5
         section: Results
