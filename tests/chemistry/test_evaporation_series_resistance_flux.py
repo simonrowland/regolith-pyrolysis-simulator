@@ -271,9 +271,30 @@ def test_cro2_evaporation_proxy_absolute_diffusivity_pin():
     )
 
     # sigma_AB=(3.374+3.798)/2=3.586 A; M_AB=42.0150 g/mol;
-    # T*=1973/71.4=27.6331; Omega_D=0.631606; the CE expression gives
-    # 448.662 cm2/s = 0.0448662 m2/s at 1973 K and 1000 Pa.
-    assert result.d_ab_m2_s == pytest.approx(0.044866224694514775, rel=1e-12)
+    # T*=1973/71.4=27.6331; Omega_D=0.631606. The BSL atmosphere
+    # prefactor (0.0018583*sqrt(2)) gives 443.270 cm2/s = 0.0443270 m2/s
+    # at 1973 K and 1000 Pa. The previous 0.0448662 m2/s pin used the
+    # bar-form 0.00266 constant with P in atm (1.216% high).
+    assert result.d_ab_m2_s == pytest.approx(0.044327038311009044, rel=1e-12)
+
+
+def test_chapman_enskog_prefactor_matches_bsl_atmosphere_form():
+    """Default condensation D_AB uses the BSL atm prefactor, not 0.00266.
+
+    SiO/N2 at the documented 10 mbar, 1700 C anchor. Reverting the
+    prefactor to 0.00266 restores 0.04969275549781849 m2/s.
+    """
+    sio_n2 = _chapman_enskog_d_ab_m2_s("SiO", 1973.15, 1000.0, carrier="N2")
+    assert sio_n2 == pytest.approx(0.049095565578101914, rel=1e-12)
+
+    # O2 self-diffusion at 1 atm, 1000 K against NIST TN 2279
+    # (Hellmann O2-O2 fit, valid 55-2000 K). Chapman-Enskog with the
+    # BSL Table E.1 Lennard-Jones row is several percent low; 10% is
+    # the method band, not a coefficient to retune.
+    o2 = _chapman_enskog_d_ab_m2_s("O2", 1000.0, 101325.0, carrier="O2")
+    nist_m2_s = math.exp(-10.787 - 44.220 / 1000.0 + 1.649 * math.log(1000.0)) * 1.0e-4
+    assert o2 == pytest.approx(nist_m2_s, rel=0.10)
+    assert o2 < nist_m2_s
 
 
 @pytest.mark.xfail(

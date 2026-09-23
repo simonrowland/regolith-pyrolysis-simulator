@@ -108,7 +108,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # tree (1.03186545664e-05). docs-private/research/2026-08-02-train13-adjudication.md
 # Rebaselined 2026-08-28 after 090d0481/a34318c made the live SiO2(g)
 # draw debit the same SiO2 pool used by the SiO-yield chain.
-PHASE3BIS_SIO_EVOLVED_KG = 1.05260475258e-05
+# Moved with the 2026-09-22 Chapman-Enskog prefactor correction
+# (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
+PHASE3BIS_SIO_EVOLVED_KG = 1.04099243606e-05
 
 
 @lru_cache(maxsize=None)
@@ -160,7 +162,7 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
     # CLAIM 1, the property this test exists for: SiO evolution is independent
     # of wall temperature at fixed pO2 mode. Measured on the current tree it is
     # not merely close, it is BIT-IDENTICAL across all four liner setpoints:
-    #     1050 C / 1300 C / 1400 C / 1500 C -> 1.05260475258e-05 each,
+    #     1050 C / 1300 C / 1400 C / 1500 C -> 1.04099243606e-05 each,
     #     spread exactly 0.0, mass-balance error 1.14e-14 %.
     # This is the cheap, durable claim. It must never be relaxed to buy a green.
     spread = max(evolved) - min(evolved)
