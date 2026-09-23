@@ -125,6 +125,44 @@ def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
         assert "table" not in locator
         assert locator["note"].startswith("Figure 7 isotherm at ")
 
+
+def test_run_split_observations_keep_source_species_bucket() -> None:
+    split_extracts = (
+        "kems-200-ueshima-1983.yaml",
+        "wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml",
+        "sossi-2020-cu-zn-isotope-evap-formalism.yaml",
+        "mendybaev-2017-fun-cai-lab-evaporation.yaml",
+        "ntrs-19650014783.yaml",
+        "kems-015-hashimoto-1983.yaml",
+        "kems-012-sossi-2019.yaml",
+    )
+    removed_sources = {
+        "wimpenny_2019_table1_experimental_zn_rows": "Zn",
+        "sossi_2020_cu_table1_measured_runs": "Cu",
+        "sossi_2020_zn_table1_measured_runs": "Zn",
+        "mendybaev_2017_func_table1_mass_loss": "FUNC",
+        "bowles_rosenblum_1965_na_table1_static_capsule": "Na",
+    }
+    checked = 0
+    for filename in split_extracts:
+        doc = yaml.safe_load((EXTRACTS / filename).read_text())
+        species_by_id = {
+            observation["observation_id"]: species
+            for species, block in doc["species"].items()
+            for observation in block.get("observations", [])
+            if observation.get("observation_id")
+        }
+        for observation_id, species in species_by_id.items():
+            delimiter = "__run_" if "__run_" in observation_id else "::"
+            if delimiter not in observation_id:
+                continue
+            source_id = observation_id.split(delimiter, 1)[0]
+            expected = species_by_id.get(source_id, removed_sources.get(source_id))
+            assert expected is not None, (filename, observation_id, source_id)
+            assert species == expected, (filename, observation_id, species, expected)
+            checked += 1
+    assert checked == 389
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.
