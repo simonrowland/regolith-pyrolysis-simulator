@@ -24,17 +24,27 @@ benches:
     state: {tag: value, value: JEOL JSM-5800LV SEM with Oxford Link ISIS-300 EDS}
     locator: {page: 526, section: '5.3 Analytical Procedures'}
 experiments:
-- experiment_id: cai-evaporation-series
+- &cai_common
+  experiment_id: b-133-evaporation
   bench_id: evaporation-furnaces
   method: langmuir_free_evaporation
-  locator: {page: 525, section: '5.1 Starting Materials', note: Type B CAI-like evaporation series; Table 1 retains per-run temperature, pressure, area and duration}
+  locator: {page: 525, section: '5.1 Starting Materials', note: B-133 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
       locator: {page: 525, section: '5.1 Starting Materials', note: 5-70 mg; converted to kg}
     printed_composition:
-      state: {tag: value, value: Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2 composition}
-      locator: {page: 525, section: '5.1 Starting Materials'}
+      state:
+        tag: value
+        value:
+          MgO: '11.94'
+          SiO2: '46.04'
+          CaO: '22.64'
+          Al2O3: '19.30'
+      locator:
+        page: 525
+        table: '1'
+        note: 'B-133-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
     form:
       state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
       locator: {page: 525, section: '5.1 Starting Materials'}
@@ -57,11 +67,61 @@ experiments:
     total_duration_s:
       state: {tag: value, value: {kind: interval, interval_low: '900', interval_high: '18000'}}
       locator: {page: 525, table: '1', note: 15-300 min per run; converted to s}
+- <<: *cai_common
+  experiment_id: b-113-evaporation
+  locator: {page: 525, section: '5.1 Starting Materials', note: B-113 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
+      locator: {page: 525, section: '5.1 Starting Materials', note: 5-70 mg; converted to kg}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '12.67'
+          SiO2: '47.89'
+          CaO: '19.66'
+          Al2O3: '19.78'
+      locator:
+        page: 525
+        table: '1'
+        note: 'B-113-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
+    form:
+      state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+    pretreatment:
+      state: {tag: value, value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+- <<: *cai_common
+  experiment_id: bcai-evaporation
+  locator: {page: 525, section: '5.1 Starting Materials', note: BCAI starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
+      locator: {page: 525, section: '5.1 Starting Materials', note: 5-70 mg; converted to kg}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '17.84'
+          SiO2: '37.04'
+          CaO: '24.61'
+          Al2O3: '20.51'
+      locator:
+        page: 525
+        table: '1'
+        note: 'BCAI-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
+    form:
+      state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+    pretreatment:
+      state: {tag: value, value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity}
+      locator: {page: 525, section: '5.1 Starting Materials'}
 species:
   Mg:
     observations:
     - observation_id: richter_2002_mg_cai_langmuir_gamma
-      experiment: cai-evaporation-series
+      experiment: bcai-evaporation
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -126,7 +186,6 @@ species:
             pressure field.
           scope: vacuum_runs_only
     - observation_id: richter_2002_mg_table1_per_run_areas_b1
-      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -311,7 +370,7 @@ species:
   SiO:
     observations:
     - observation_id: richter_2002_sio_cai_langmuir_gamma
-      experiment: cai-evaporation-series
+      experiment: bcai-evaporation
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -353,7 +412,6 @@ species:
             line_range: '450'
             note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
     - observation_id: richter_2002_sio_table1_per_run_areas_b1
-      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
