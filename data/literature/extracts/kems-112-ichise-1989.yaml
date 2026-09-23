@@ -61,14 +61,21 @@ benches:
       state: {tag: value, value: separately pumped oil diffusion pumps}
       locator: *apparatus_locator
 experiments:
-  - experiment_id: fe-ta-nb-kems-series
+  - experiment_id: fe-ta-heat-9
     bench_id: ichise-kems
     method: knudsen_effusion
-    locator: {published_page: 844, section: '2.1 Apparatus; 2.2 Sample Preparation', note: 'Own Fe-Ta and Fe-Nb alloy measurements.'}
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 9; Table 1 X_Ta'}
     sample:
       printed_composition:
-        state: {tag: value, value: Fe-Ta or Fe-Nb alloy with pure iron foil on sample surface}
-        locator: {published_page: 844, section: '2.1 Apparatus'}
+        state:
+          tag: value
+          value:
+            Ta: '0.048'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 9; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
       form:
         state: {tag: value, value: iron foil covering the alloy sample surface}
         locator: {published_page: 844, section: '2.1 Apparatus'}
@@ -88,6 +95,1740 @@ experiments:
       total_duration_s:
         state: {tag: unknown, reason: not_published}
         locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-34
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 34; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.054'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 34; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-12
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 12; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.094'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 12; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-32
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 32; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.152'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 32; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-21
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 21; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.153'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 21; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-31
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 31; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.156'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 31; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-25
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 25; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.239'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 25; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-22
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 22; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.244'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 22; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-27
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 27; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.255'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 27; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-33
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 33; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.297'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 33; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-17
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 17; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.319'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 17; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-50
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 50; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.404'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 50; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-49
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 49; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.406'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 49; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-47
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 47; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.436'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 47; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-51
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 51; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.444'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 51; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-48
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 48; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.606'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 48; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-53
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 53; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.727'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 53; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-55
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 55; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.775'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 55; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-54
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 54; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.81'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 54; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-heat-56
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 846, table: '1', note: 'Fe-Ta KEMS heat 56; Table 1 X_Ta'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '0.828'
+        locator:
+          published_page: 846
+          pdf_page_index: 4
+          table: '1'
+          note: 'Table 1 heat 56; molar fraction X_Ta as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Ta alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-8
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 8; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.048'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 8; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-4
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 4; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.091'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 4; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-31
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 31; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.094'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 31; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-59
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 59; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.139'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 59; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-58
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 58; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.144'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 58; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-11
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 11; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.192'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 11; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-14
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 14; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.234'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 14; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-12
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 12; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.242'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 12; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-32
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 32; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.298'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 32; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-15
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 15; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.32'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 15; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-30
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 30; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.37'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 30; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-29
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 29; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.384'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 29; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-20
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 20; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.388'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 20; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-19
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 19; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.394'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 19; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-16
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 16; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.502'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 16; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-26
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 26; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.548'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 26; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-23
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 23; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.596'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 23; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-24
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 24; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.671'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 24; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-25
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 25; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.76'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 25; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-nb-heat-27
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 848, table: '5', note: 'Fe-Nb KEMS heat 27; Table 5 X_Nb'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Nb: '0.856'
+        locator:
+          published_page: 848
+          pdf_page_index: 6
+          table: '5'
+          note: 'Table 5 heat 27; molar fraction X_Nb as printed; Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge; label retained: Fe-Nb alloy with pure iron foil on sample surface'
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
+  - experiment_id: fe-ta-metallography-1
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 1; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '11.1'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 1; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-2
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 2; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '17.5'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 2; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-3
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 3; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '25.2'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 3; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-4
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 4; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '29.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 4; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-5
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 5; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '34.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 5; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-6
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 6; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '37.5'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 6; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-7
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 7; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '40.4'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 7; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-8
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 8; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '41.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 8; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-9
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 9; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '43.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 9; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-10
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 10; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '46.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 10; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-11
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 11; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '51.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 11; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
+  - experiment_id: fe-ta-metallography-12
+    bench_id: ichise-kems
+    method: metallography
+    locator: {published_page: 847, table: '2', note: 'Fe-Ta metallographic set row 12; Table 2 at% Ta (not EPMA phase boundary)'}
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value:
+            Ta: '64.0'
+        locator:
+          published_page: 847
+          pdf_page_index: 5
+          table: '2'
+          note: 'Table 2 metallographic set row 12; alloy at% Ta as printed (not mole fraction); Fe balance not printed; TRAP: Table 3 is EPMA phase-boundary at% Ta, not the bulk charge'
+      form:
+        state: {tag: value, value: metallographic specimen}
+        locator: {published_page: 847, table: '2'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2', note: 'Metallographic set; not a KEMS run'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 847, table: '2'}
+      regime:
+        regime_class: {tag: not_applicable, reason: not_applicable}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: heat treatment and metallography at 1873 K}
+        locator: {published_page: 847, table: '2'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 847, table: '2'}
 fidelity_samples:
 - path: species.Fe.observations[ichise_1989_table4_FeTa_1873K].values.rows[2].a_Fe
   value: 0.832
@@ -197,7 +1938,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table1_FeTa_a_Fe
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '1'
@@ -386,7 +2126,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table4_FeTa_1873K
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '4'
@@ -497,7 +2236,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table5_FeNb_a_Fe
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '5'
@@ -603,7 +2341,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table6_FeNb_1873K
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '6'
@@ -743,7 +2480,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_figs_ion_intensity_figure_only
-      experiment: fe-ta-nb-kems-series
       type: rate_series
       locator:
         figure: '1'
@@ -771,7 +2507,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_figs_activities_figure_only
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -801,7 +2536,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table2_metallography
-      experiment: fe-ta-nb-kems-series
       type: transition_point
       locator:
         table: '2'
@@ -873,7 +2607,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table3_phase_boundaries
-      experiment: fe-ta-nb-kems-series
       type: transition_point
       locator:
         table: '3'
@@ -930,7 +2663,6 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_infinite_dilution_gamma
-      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         published_page: 851

@@ -1,17 +1,18 @@
 schema_version: literature_extract.v1
 source_id: kems-200-ueshima-1983
 source:
-  citation: Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature Range of 1360 to
-    1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature
+    Range of 1360 to 1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556
   doi: 10.2355/tetsutohagane1955.69.6_556
   url: https://doi.org/10.2355/tetsutohagane1955.69.6_556
   year: 1983
 extraction:
-  method: Official J-STAGE OA PDF (https://www.jstage.jst.go.jp/article/tetsutohagane1955/69/6/69_6_556/_pdf). Japanese body
-    with English synopsis and English table/figure captions. pdftotext -layout used only as a page map. Tables 1-2 and printed
-    invariant/quoted KEMS temperatures transcribed from 400 dpi pdftoppm PNG renders of PDF pages 1-8 (published pp. 556-563).
-    Where decode and render disagree, the render wins. THIS PAPER'S OWN MEASUREMENTS ARE ANNEALING + OPTICAL/X-RAY/EPMA, NOT
-    KEMS. KEMS activity and KEMS thermal-analysis temperatures printed here are quoted from the authors' previous papers (refs
+  method: Official J-STAGE OA PDF (https://www.jstage.jst.go.jp/article/tetsutohagane1955/69/6/69_6_556/_pdf).
+    Japanese body with English synopsis and English table/figure captions. pdftotext -layout used only
+    as a page map. Tables 1-2 and printed invariant/quoted KEMS temperatures transcribed from 400 dpi
+    pdftoppm PNG renders of PDF pages 1-8 (published pp. 556-563). Where decode and render disagree, the
+    render wins. THIS PAPER'S OWN MEASUREMENTS ARE ANNEALING + OPTICAL/X-RAY/EPMA, NOT KEMS. KEMS activity
+    and KEMS thermal-analysis temperatures printed here are quoted from the authors' previous papers (refs
     1 and 2) and are labelled quoted_measurement. Figs 1-3 and Photos 1-3 are figure-only.
   date: '2026-09-13'
   worker: extract-alloys-b4
@@ -20,3301 +21,2513 @@ review_status: draft
 corrections: []
 benches:
 - id: ueshima-sic-annealing-furnace
-  identity:
-    basis: described_in_this_work
+  identity: {basis: described_in_this_work}
   apparatus_family:
-    state:
-      tag: value
-      value: Vertical SiC electric furnace with gas-tight high-purity alumina tube
-    locator: &id001
-      published_page: 556
-      pdf_page_index: 1
-      section: 2. Experimental Method
+    state: {tag: value, value: Vertical SiC electric furnace with gas-tight high-purity alumina tube}
+    locator: &ueshima_apparatus {published_page: 556, pdf_page_index: 1, section: '2. Experimental Method'}
   method:
-    state:
-      tag: value
-      value: Melt equilibration
-      annealing and water quench: null
-    locator: *id001
+    state: {tag: value, value: Melt equilibration, annealing and water quench}
+    locator: *ueshima_apparatus
   cell_material_and_liner:
-    state:
-      tag: value
-      value: Alumina SSA-S crucible in tantalum container
-    locator: *id001
+    state: {tag: value, value: Alumina SSA-S crucible in tantalum container}
+    locator: *ueshima_apparatus
   geometry:
     cell_internal_dimensions:
       diameter_m:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.009'
-        locator: *id001
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *ueshima_apparatus
       height_m:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.012'
-        locator: *id001
+        state: {tag: value, value: {kind: point, point: '0.012'}}
+        locator: *ueshima_apparatus
   temperature_measurement:
     sensor:
-      state:
-        tag: value
-        value: Pt-Rh (6/30) thermocouple
-      locator:
-        published_page: 557
-        pdf_page_index: 2
-        section: 2. Experimental Method
+      state: {tag: value, value: Pt-Rh (6/30) thermocouple}
+      locator: {published_page: 557, pdf_page_index: 2, section: '2. Experimental Method'}
   temperature_calibration:
     method:
-      state:
-        tag: value
-        value: Calibrated at Au 1064 C and Pd 1554 C points
-      locator:
-        published_page: 557
-        pdf_page_index: 2
-        section: 2. Experimental Method
+      state: {tag: value, value: Calibrated at Au 1064 C and Pd 1554 C points}
+      locator: {published_page: 557, pdf_page_index: 2, section: '2. Experimental Method'}
 experiments:
 - experiment_id: ueshima-1983-sh-1
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id002
-    published_page: 558
-    table: '1'
-    record: SH 1
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 1'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 1 38.2 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.2
-      locator: *id002
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.382']
+          - [Fe, '0.618']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.2 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1802.15'
-      locator: *id002
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '36000.0'
-      locator: *id002
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-3
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id003
-    published_page: 558
-    table: '1'
-    record: SH 3
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 3'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 3 39.2 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 39.2
-      locator: *id003
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.392']
+          - [Fe, '0.608']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=39.2 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1802.15'
-      locator: *id003
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '1800.0'
-      locator: *id003
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-2
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id004
-    published_page: 558
-    table: '1'
-    record: SH 2
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 2'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 2 47.5 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 47.5
-      locator: *id004
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.475']
+          - [Fe, '0.525']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=47.5 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1802.15'
-      locator: *id004
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '36000.0'
-      locator: *id004
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-27
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id005
-    published_page: 558
-    table: '1'
-    record: SH 27
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 27'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 27 45.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 45.0
-      locator: *id005
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.450']
+          - [Fe, '0.550']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=45.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1805.15'
-      locator: *id005
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id005
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-28
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id006
-    published_page: 558
-    table: '1'
-    record: SH 28
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 28'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 28 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id006
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1805.15'
-      locator: *id006
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id006
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-29
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id007
-    published_page: 558
-    table: '1'
-    record: SH 29
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 29'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 29 30.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 30.1
-      locator: *id007
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.301']
+          - [Fe, '0.699']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=30.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id007
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id007
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-30
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id008
-    published_page: 558
-    table: '1'
-    record: SH 30
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 30'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 30 34.0 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 34.0
-      locator: *id008
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.340']
+          - [Fe, '0.660']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=34.0 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id008
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id008
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-31
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id009
-    published_page: 558
-    table: '1'
-    record: SH 31
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 31'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 31 36.4 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 36.4
-      locator: *id009
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.364']
+          - [Fe, '0.636']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=36.4 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id009
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id009
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-8
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id010
-    published_page: 558
-    table: '1'
-    record: SH 8
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 8'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 8 38.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.8
-      locator: *id010
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.388']
+          - [Fe, '0.612']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id010
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id010
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-10
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id011
-    published_page: 558
-    table: '1'
-    record: SH 10
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 10'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 10 59.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.1
-      locator: *id011
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.591']
+          - [Fe, '0.409']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id011
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id011
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-11
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id012
-    published_page: 558
-    table: '1'
-    record: SH 11
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 11'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 11 76.5 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 76.5
-      locator: *id012
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.765']
+          - [Fe, '0.235']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=76.5 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1825.15'
-      locator: *id012
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id012
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-5
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id013
-    published_page: 558
-    table: '1'
-    record: SH 5
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 5'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 5 39.2 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 39.2
-      locator: *id013
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.392']
+          - [Fe, '0.608']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=39.2 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1834.15'
-      locator: *id013
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '1800.0'
-      locator: *id013
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-6
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id014
-    published_page: 558
-    table: '1'
-    record: SH 6
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 6'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 6 43.4 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 43.4
-      locator: *id014
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.434']
+          - [Fe, '0.566']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=43.4 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1834.15'
-      locator: *id014
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '1800.0'
-      locator: *id014
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-7
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id015
-    published_page: 558
-    table: '1'
-    record: SH 7
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 7'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 7 50.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 50.8
-      locator: *id015
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.508']
+          - [Fe, '0.492']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=50.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1834.15'
-      locator: *id015
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '1800.0'
-      locator: *id015
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-12
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id016
-    published_page: 558
-    table: '1'
-    record: SH 12
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 12'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 12 38.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.8
-      locator: *id016
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.388']
+          - [Fe, '0.612']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1858.15'
-      locator: *id016
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id016
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-13
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id017
-    published_page: 558
-    table: '1'
-    record: SH 13
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 13'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 13 44.3 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 44.3
-      locator: *id017
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.443']
+          - [Fe, '0.557']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=44.3 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1858.15'
-      locator: *id017
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id017
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-14
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id018
-    published_page: 558
-    table: '1'
-    record: SH 14
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 14'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 14 59.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.1
-      locator: *id018
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.591']
+          - [Fe, '0.409']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1858.15'
-      locator: *id018
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id018
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-15
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id019
-    published_page: 558
-    table: '1'
-    record: SH 15
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 15'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 15 76.5 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 76.5
-      locator: *id019
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.765']
+          - [Fe, '0.235']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=76.5 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1858.15'
-      locator: *id019
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id019
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-16
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id020
-    published_page: 558
-    table: '1'
-    record: SH 16
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 16'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 16 38.6 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.6
-      locator: *id020
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.386']
+          - [Fe, '0.614']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.6 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1860.15'
-      locator: *id020
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id020
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-17
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id021
-    published_page: 558
-    table: '1'
-    record: SH 17
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 17'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 17 44.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 44.1
-      locator: *id021
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.441']
+          - [Fe, '0.559']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=44.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1860.15'
-      locator: *id021
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id021
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-18
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id022
-    published_page: 558
-    table: '1'
-    record: SH 18
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 18'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 18 87.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 87.8
-      locator: *id022
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.878']
+          - [Fe, '0.122']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=87.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1860.15'
-      locator: *id022
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id022
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-19
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id023
-    published_page: 558
-    table: '1'
-    record: SH 19
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 19'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 19 38.6 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.6
-      locator: *id023
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.386']
+          - [Fe, '0.614']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.6 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1870.15'
-      locator: *id023
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id023
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-20
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id024
-    published_page: 558
-    table: '1'
-    record: SH 20
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 20'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 20 44.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 44.1
-      locator: *id024
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.441']
+          - [Fe, '0.559']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=44.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1870.15'
-      locator: *id024
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id024
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-21
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id025
-    published_page: 558
-    table: '1'
-    record: SH 21
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 21'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 21 87.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 87.8
-      locator: *id025
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.878']
+          - [Fe, '0.122']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=87.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1870.15'
-      locator: *id025
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id025
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-48
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id026
-    published_page: 558
-    table: '1'
-    record: SH 48
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 48'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 48 55.4 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 55.4
-      locator: *id026
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.554']
+          - [Fe, '0.446']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=55.4 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1870.15'
-      locator: *id026
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id026
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-49
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id027
-    published_page: 558
-    table: '1'
-    record: SH 49
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 49'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 49 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id027
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1870.15'
-      locator: *id027
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id027
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-59
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id028
-    published_page: 558
-    table: '1'
-    record: SH 59
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 59'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 59 45.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 45.0
-      locator: *id028
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.450']
+          - [Fe, '0.550']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=45.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1874.15'
-      locator: *id028
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '3600.0'
-      locator: *id028
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-57
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id029
-    published_page: 558
-    table: '1'
-    record: SH 57
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 57'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 57 49.2 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 49.2
-      locator: *id029
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.492']
+          - [Fe, '0.508']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=49.2 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1875.15'
-      locator: *id029
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id029
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-56
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id030
-    published_page: 558
-    table: '1'
-    record: SH 56
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 56'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 56 45.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 45.0
-      locator: *id030
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.450']
+          - [Fe, '0.550']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=45.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1877.15'
-      locator: *id030
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id030
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-51
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id031
-    published_page: 558
-    table: '1'
-    record: SH 51
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 51'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 51 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id031
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1877.15'
-      locator: *id031
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '10800.0'
-      locator: *id031
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-55
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id032
-    published_page: 558
-    table: '1'
-    record: SH 55
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 55'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 55 45.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 45.0
-      locator: *id032
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.450']
+          - [Fe, '0.550']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=45.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1881.15'
-      locator: *id032
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id032
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-54
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id033
-    published_page: 558
-    table: '1'
-    record: SH 54
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 54'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 54 50.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 50.0
-      locator: *id033
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.500']
+          - [Fe, '0.500']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=50.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1882.15'
-      locator: *id033
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '9000.0'
-      locator: *id033
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-53
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id034
-    published_page: 558
-    table: '1'
-    record: SH 53
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 53'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 53 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id034
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1883.15'
-      locator: *id034
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id034
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-23
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id035
-    published_page: 558
-    table: '1'
-    record: SH 23
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 23'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 23 76.5 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 76.5
-      locator: *id035
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.765']
+          - [Fe, '0.235']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=76.5 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1883.15'
-      locator: *id035
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id035
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-60
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id036
-    published_page: 558
-    table: '1'
-    record: SH 60
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 60'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 60 49.2 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 49.2
-      locator: *id036
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.492']
+          - [Fe, '0.508']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=49.2 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1884.15'
-      locator: *id036
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id036
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-52
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id037
-    published_page: 558
-    table: '1'
-    record: SH 52
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 52'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 52 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id037
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1887.15'
-      locator: *id037
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id037
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-37
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id038
-    published_page: 558
-    table: '1'
-    record: SH 37
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 37'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 37 45.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 45.0
-      locator: *id038
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.450']
+          - [Fe, '0.550']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=45.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1891.15'
-      locator: *id038
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id038
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-38
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id039
-    published_page: 558
-    table: '1'
-    record: SH 38
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 38'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 38 59.0 at% Mo (aimed)'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.0
-      locator: *id039
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.590']
+          - [Fe, '0.410']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.0 as printed (aimed composition (parentheses in Table 1)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1891.15'
-      locator: *id039
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '7200.0'
-      locator: *id039
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-24
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id040
-    published_page: 558
-    table: '1'
-    record: SH 24
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 24'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 24 38.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 38.8
-      locator: *id040
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.388']
+          - [Fe, '0.612']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1895.15'
-      locator: *id040
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id040
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-25
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id041
-    published_page: 558
-    table: '1'
-    record: SH 25
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 25'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 25 59.1 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 59.1
-      locator: *id041
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.591']
+          - [Fe, '0.409']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=59.1 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1895.15'
-      locator: *id041
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '14400.0'
-      locator: *id041
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 - experiment_id: ueshima-1983-sh-26
   bench_id: ueshima-sic-annealing-furnace
   method: melt_equilibration_quench
-  locator: &id042
-    published_page: 558
-    table: '1'
-    record: SH 26
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample SH 26'}
   sample:
     mass_kg:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.001'
-          interval_high: '0.002'
-          approximate: true
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: About 1-2 g granular alloy; unit conversion only
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
     printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 SH 26 76.5 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          at_pct_Mo: 76.5
-      locator: *id042
-    form:
-      state:
-        tag: value
-        value: Granular alloy from arc-melted sample
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.765']
+          - [Fe, '0.235']
       locator:
-        published_page: 556
-        pdf_page_index: 1
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=76.5 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
   pressure_environment:
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm:
-            tag: unknown
-            reason: not_published
-          partial_pressure_Pa:
-            tag: unknown
-            reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 556
-        pdf_page_index: 1
-        note: Flowing Ar; total pressure not printed
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: unknown
-      reason: not_published
+    channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state:
-        tag: value
-        value: '1895.15'
-      locator: *id042
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
   thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
     total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
+- experiment_id: ueshima-1983-as-melt
+  bench_id: ueshima-sic-annealing-furnace
+  method: melt_equilibration_quench
+  locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Table 1 sample As melt'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloy; Table 1 As melt 38.8 at% Mo'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+    initial_composition:
       state:
         tag: value
         value:
-          kind: point
-          point: '1800.0'
-      locator: *id042
+          basis: Fe-Mo_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Mo, '0.388']
+          - [Fe, '0.612']
+      locator:
+        published_page: 558
+        pdf_page_index: 3
+        table: '1'
+        note: 'Table 1 composition of sample (at% Mo)=38.8 as printed (analysed composition of sample (at% Mo)); mole fraction Mo = at%/100; Fe = 1 - Mo from binary Fe-Mo; not renormalised'
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
+  pressure_environment:
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 558, table: '1', note: 'Per-sample annealing time in Table 1; not collapsed here'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
+- experiment_id: ueshima-1983-annealing-series
+  bench_id: ueshima-sic-annealing-furnace
+  method: melt_equilibration_quench
+  locator: {published_page: '556-557', section: '2. Experimental Method', note: 'Multi-sample anneal series; per-sample Table 1 at% Mo is on ueshima-1983-sh-* / ueshima-1983-as-melt experiments'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloys, 30-88 at% Mo'}
+      locator: {published_page: 557, pdf_page_index: 2, note: 'Series range label; per-sample Table 1 compositions are on ueshima-1983-sh-* experiments'}
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
+  pressure_environment:
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 557, pdf_page_index: 2, note: '1529-1622 C is a series range, not one experiment setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 557, pdf_page_index: 2, note: '0.5-10 h is a series range, not one experiment duration'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 fidelity_samples:
 - path: species.Mo.observations[ueshima_1983_femo_invariant_this_work].values.T_C
   value: 1610.0
