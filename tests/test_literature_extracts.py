@@ -172,6 +172,31 @@ def test_sossi_split_compositions_point_to_table1_page() -> None:
         assert locator["table"] == "1"
         assert locator["pdf_page_index"] == 52
 
+
+def test_split_aggregate_locator_notes_preserve_commas() -> None:
+    cases = {
+        "kems-035-sauerborn-2005.yaml": (
+            "jsc1-solar-series",
+            "JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, "
+            "peak temperature, and high-temperature duration",
+        ),
+        "kems-137-bischof-2023.yaml": (
+            "an-di-series",
+            "Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge",
+        ),
+    }
+    for filename, (experiment_id, expected_note) in cases.items():
+        doc = yaml.safe_load((EXTRACTS / filename).read_text())
+        experiment = next(
+            item for item in doc["experiments"]
+            if item["experiment_id"] == experiment_id
+        )
+        assert experiment["locator"] == {
+            "page": experiment["locator"]["page"],
+            "table": experiment["locator"]["table"],
+            "note": expected_note,
+        }
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.

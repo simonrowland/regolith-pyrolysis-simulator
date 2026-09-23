@@ -288,7 +288,7 @@ experiments:
 - experiment_id: an-di-series
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion
-  locator: {page: 5, table: '2', note: Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge}
+  locator: {page: 5, table: '2', note: 'Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003869', interval_high: '0.0000791'}}
