@@ -23,7 +23,10 @@ extraction:
     in Supporting Information Tables S2–S9 are NOT in this PDF and are typed absence;
     Figures 5–10 EGA traces are figure-only and were NOT digitised. Kelvin companions
     carry DERIVED stamps (T_K = T_C + 273.15). Modelled on tenkate-2010-vapor-instrument
-    / N1 pyrolysis-EGA pattern.
+    / N1 pyrolysis-EGA pattern. N12 retry 2026-09-22: verified main-text
+    abundance ranges and peak temperatures against PDF; corrected
+    pdf_page_index/published_page_of off-by-one locators and sample
+    inventory figure (Fig.4 sols, not Fig.2). Numbers unchanged.
   date: '2026-09-22'
   worker: n12-mars-sam
   provenance_path: data/literature/extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml
@@ -54,8 +57,8 @@ benches:
         quadrupole mass spectrometer (QMS); evolved-gas analysis with He carrier
         (suite also includes GC columns and TLS; this paper reports QMS-EGA)
     locator: &sam_loc
-      pdf_page_index: 6
-      published_page_of: '6 of 24'
+      pdf_page_index: 7
+      published_page_of: '7 of 24'
       section: '2. Materials and Methods'
   heating_method:
     state:
@@ -90,17 +93,18 @@ experiments:
           Zechstein (ZE), Avanavero (AV), Canaima (CA); Carolyn Shoemaker
           formation (CSf) to Mirador formation (MIf); FED/FEST delivery after Sol 1536
       locator:
-        pdf_page_index: 5
-        published_page_of: '5 of 24'
-        figure: '2'
+        pdf_page_index: 8
+        published_page_of: '8 of 24'
+        figure: '4'
+        note: Target names and image sols from Fig.4 caption; CSf/MIf framing also in §1
   conditions:
     temperature_K:
       state:
         tag: value
         value: {kind: range, low: '373.15', high: '1173.15'}
       locator:
-        pdf_page_index: 6
-        published_page_of: '6 of 24'
+        pdf_page_index: 7
+        published_page_of: '7 of 24'
         note: 'DERIVED span covering printed ~100 °C to ~900 °C EGA window / oven max; ramp ~35 °C/min'
 - experiment_id: post-zechstein-windjana-blank
   bench_id: msl-curiosity-sam-ega-flight
@@ -134,8 +138,8 @@ fidelity_samples:
   field: H2O_wt_pct_range_as_printed
   value: {low: 0.87, high: 7.74}
   locator:
-    pdf_page_index: 9
-    published_page_of: '9 of 24'
+    pdf_page_index: 10
+    published_page_of: '10 of 24'
     section: '3.1. H2O'
     note: Main-text range; per-sample Table S2 not in this PDF
 - species: Gale_clay_sulfate_transition_fines
@@ -144,8 +148,8 @@ fidelity_samples:
   field: SO3_wt_pct_range_as_printed
   value: {low: '0.22 ± 0.13', high: '2.19 ± 1.39'}
   locator:
-    pdf_page_index: 12
-    published_page_of: '12 of 24'
+    pdf_page_index: 13
+    published_page_of: '13 of 24'
     section: '3.2. SO2'
 - species: Gale_clay_sulfate_transition_fines
   observable: gas_speciation
@@ -153,8 +157,8 @@ fidelity_samples:
   field: Cl_wt_pct_range_as_printed
   value: {low: 0.11, high: 0.65}
   locator:
-    pdf_page_index: 13
-    published_page_of: '13 of 24'
+    pdf_page_index: 14
+    published_page_of: '14 of 24'
     section: '3.4. HCl'
 - species: Gale_clay_sulfate_transition_fines
   observable: gas_speciation
@@ -171,8 +175,8 @@ fidelity_samples:
   field: ramp_rate_C_per_min_as_printed
   value: 35
   locator:
-    pdf_page_index: 6
-    published_page_of: '6 of 24'
+    pdf_page_index: 7
+    published_page_of: '7 of 24'
     section: '2. Materials and Methods'
     note: Printed approximate ~35 °C/min
 species:
@@ -182,8 +186,8 @@ species:
       experiment: clay-sulfate-transition-sam-ega-campaign
       type: gas_speciation
       locator:
-        pdf_page_index: 9
-        published_page_of: '9 of 24'
+        pdf_page_index: 10
+        published_page_of: '10 of 24'
         section: '3.1. H2O'
         note: Campaign-wide printed range; Table S2 per-sample cells absent from this PDF
       T_range_K: [373.15, 1023.15]
@@ -214,8 +218,8 @@ species:
       experiment: clay-sulfate-transition-sam-ega-campaign
       type: gas_speciation
       locator:
-        pdf_page_index: 12
-        published_page_of: '12 of 24'
+        pdf_page_index: 13
+        published_page_of: '13 of 24'
         section: '3.2. SO2'
       T_range_K: [593.15, 1023.15]
       phase: Gale_crater_clay_sulfate_transition_drill_fines
@@ -255,8 +259,8 @@ species:
       experiment: clay-sulfate-transition-sam-ega-campaign
       type: gas_speciation
       locator:
-        pdf_page_index: 13
-        published_page_of: '13 of 24'
+        pdf_page_index: 14
+        published_page_of: '14 of 24'
         section: '3.4. HCl'
       T_range_K: [823.15, 873.15]
       phase: Gale_crater_clay_sulfate_transition_drill_fines
@@ -306,8 +310,8 @@ species:
       experiment: clay-sulfate-transition-sam-ega-campaign
       type: gas_speciation
       locator:
-        pdf_page_index: 9
-        published_page_of: '9 of 24'
+        pdf_page_index: 10
+        published_page_of: '10 of 24'
         section: '3.1. H2O'
       T_range_K: [373.15, 973.15]
       phase: Gale_crater_clay_sulfate_transition_drill_fines
@@ -358,9 +362,9 @@ species:
       experiment: clay-sulfate-transition-sam-ega-campaign
       type: gas_speciation
       locator:
-        pdf_page_index: 16
-        published_page_of: '16 of 24'
-        section: CO
+        pdf_page_index: 17
+        published_page_of: '17 of 24'
+        section: '3.6. CO'
         note: CO subsection following CO2; figure 10
       T_range_K: [503.15, 798.15]
       phase: Gale_crater_clay_sulfate_transition_drill_fines
@@ -384,8 +388,8 @@ species:
       type: laboratory_conditions
       experiment: clay-sulfate-transition-sam-ega-campaign
       locator:
-        pdf_page_index: 6
-        published_page_of: '6 of 24'
+        pdf_page_index: 7
+        published_page_of: '7 of 24'
         section: '2. Materials and Methods'
       phase: SAM_EGA_flight_protocol
       regime: flight_sam_ega
@@ -414,9 +418,9 @@ species:
       type: characterization
       experiment: clay-sulfate-transition-sam-ega-campaign
       locator:
-        pdf_page_index: 5
-        published_page_of: '5 of 24'
-        figure: '2'
+        pdf_page_index: 8
+        published_page_of: '8 of 24'
+        figure: '4'
       phase: Gale_drill_targets
       regime: sample_description
       units: as published
@@ -443,8 +447,8 @@ species:
       type: characterization
       experiment: clay-sulfate-transition-sam-ega-campaign
       locator:
-        pdf_page_index: 9
-        published_page_of: '9 of 24'
+        pdf_page_index: 10
+        published_page_of: '10 of 24'
         section: '3. Results'
       phase: supporting_information_not_in_this_pdf
       regime: typed_absence
