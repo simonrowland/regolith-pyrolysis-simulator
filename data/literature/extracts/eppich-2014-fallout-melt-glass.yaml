@@ -1,0 +1,697 @@
+schema_version: literature_extract.v1
+source_id: eppich-2014-fallout-melt-glass
+source:
+  citation: Eppich, G. R.; Knight, K. B.; Jacomb-Hood, T. W.; Spriggs, G. D.; Hutcheon, I. D. (2014).
+    Constraints on fallout melt glass formation from a near-surface nuclear test. Journal of Radioanalytical
+    and Nuclear Chemistry 302, 593-609. LLNL-JRNL-650394 / OSTI author manuscript.
+  doi: 10.1007/s10967-014-3293-9
+  year: 2014
+  url: https://www.osti.gov/servlets/purl/1177252
+extraction:
+  method: 'Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/eppich-2014-fallout-melt-glass.pdf
+    (private; not committed). OSTI author manuscript (LLNL-JRNL-650394), 39 PDF pages. pdftotext -layout
+    cross-checked against pdftoppm PNG of Table 1 (PDF page 35 / stamp 33). SHA-256 matches sidecar ba4b22efdf476b09342076f55a2ed89eee77357103eeff34ce5740473246490f.
+    Printed-only: Table 1 major-oxide ICP-MS rows (F-7–F-28), Table 2 glass/sediment ratios as printed,
+    and sediment-average oxide prose. SiO2 not measured by ICP-MS (author difference estimate retained
+    as context only). Actinide Tables 3–5 and figure-only values not ingested for vapour-rail scope. No
+    digitisation.'
+  date: '2026-09-22'
+  worker: n13-fallout-glass
+  provenance_path: data/literature/extracts/eppich-2014-fallout-melt-glass.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: OSTI author manuscript of peer-reviewed JRNC paper on aerodynamic fallout melt glass
+  measured_direct_observations: 2
+  method_observations: 2
+  figure_only_observations: 0
+  absent_from_source:
+  - direct SiO2 ICP-MS analyses (SiO2 reported only by difference / SEM-EDS confirmation)
+  - digitised figure curves
+  - vapour partial-pressure or Langmuir-Knudsen flux measurements
+  - Tables 3–5 actinide concentrations and model ages (printed but out of vapour-rail extract scope this
+    lane)
+  note: 'High-T evidence is compositional: melt glasses vs local sediment, with author discussion of Na2O
+    volatilisation above the boiling point of Na2O (1950 C) under stated assumptions. That temperature
+    claim is author interpretation, retained as context, not as a measured run temperature.'
+fidelity_samples:
+- path: species.fallout_melt_glass.observations[eppich_2014_table1_fallout_glass_major_oxides_icpms].values.rows[0].Na2O_wt_pct
+  value: '3.52'
+  locator:
+    pdf_page_index: 35
+    published_page_stamp: 33
+    table: '1'
+    note: F-7 Na2O
+- path: species.fallout_melt_glass.observations[eppich_2014_table1_fallout_glass_major_oxides_icpms].values.rows[0].sample_id
+  value: F-7
+  locator:
+    pdf_page_index: 35
+    published_page_stamp: 33
+    table: '1'
+- path: species.fallout_melt_glass.observations[eppich_2014_table1_fallout_glass_major_oxides_icpms].values.rows[21].FeO_wt_pct
+  value: '3.00'
+  locator:
+    pdf_page_index: 35
+    published_page_stamp: 33
+    table: '1'
+    note: F-28 FeO
+- path: species.fallout_melt_glass.observations[eppich_2014_table2_glass_over_sediment_major_oxide_ratios].values.rows[0].Na2O_glass_over_sediment
+  value: '0.98'
+  locator:
+    pdf_page_index: 36
+    published_page_stamp: 34
+    table: '2'
+    note: F-7 Na2O ratio
+- species: local_sediment
+  observable: characterization
+  observation_id: eppich_2014_sediment_major_oxide_averages_prose
+  field: Na2O_wt_pct_as_printed
+  value: ~3.6
+  locator:
+    pdf_page_index: 12
+    section: Results / Chemical composition results
+    note: Prose average for six nominally uncontaminated sediments
+- species: fallout_melt_glass
+  observable: composition_series
+  observation_id: eppich_2014_table1_fallout_glass_major_oxides_icpms
+  field: n_samples_with_major_oxides
+  value: 22
+  locator:
+    pdf_page_index: 35
+    published_page_stamp: 33
+    table: '1'
+species:
+  fallout_melt_glass:
+    observations:
+    - observation_id: eppich_2014_table1_fallout_glass_major_oxides_icpms
+      type: composition_series
+      locator:
+        pdf_page_index: 35
+        published_page_stamp: 33
+        table: '1'
+        note: Table 1. Fallout glass major element composition, determined by quadrupole ICP-MS. NM, not
+          measured; uncert., expanded uncertainty (coverage factor k = 2).
+      phase: aerodynamic_fallout_melt_glass
+      regime: near_surface_nuclear_test_fallout
+      units: wt. % oxides as printed; expanded uncertainty k = 2
+      values:
+        quantity: major_oxide_composition_quadrupole_ICP_MS
+        method_class: measured
+        evidence_class: authors_own_measurement
+        instrument_as_printed: quadrupole ICP-MS
+        oxides_reported:
+        - Na2O
+        - MgO
+        - Al2O3
+        - K2O
+        - CaO
+        - FeO
+        SiO2_note_as_printed: SiO2 not measured directly by ICP-MS; author difference estimate ~72 to
+          75 wt. % retained only in context
+        n_samples_with_mass_and_shape: 28
+        n_samples_with_major_oxides: 22
+        samples_NM_oxides_as_printed:
+        - F-1
+        - F-2
+        - F-3
+        - F-4
+        - F-5
+        - F-6
+        rows:
+        - sample_id: F-7
+          mass_g_as_printed: '0.021116'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.52'
+          Na2O_uncert_wt_pct: '0.11'
+          MgO_wt_pct: '0.61'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '4.35'
+          K2O_uncert_wt_pct: '0.13'
+          CaO_wt_pct: '1.72'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '3.05'
+          FeO_uncert_wt_pct: '0.15'
+        - sample_id: F-8
+          mass_g_as_printed: '0.017437'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '2.97'
+          Na2O_uncert_wt_pct: '0.08'
+          MgO_wt_pct: '0.62'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '12.2'
+          Al2O3_uncert_wt_pct: '0.5'
+          K2O_wt_pct: '3.91'
+          K2O_uncert_wt_pct: '0.12'
+          CaO_wt_pct: '1.65'
+          CaO_uncert_wt_pct: '0.06'
+          FeO_wt_pct: '3.11'
+          FeO_uncert_wt_pct: '0.06'
+        - sample_id: F-9
+          mass_g_as_printed: '0.020327'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.32'
+          Na2O_uncert_wt_pct: '0.05'
+          MgO_wt_pct: '0.624'
+          MgO_uncert_wt_pct: '0.012'
+          Al2O3_wt_pct: '11.34'
+          Al2O3_uncert_wt_pct: '0.15'
+          K2O_wt_pct: '4.18'
+          K2O_uncert_wt_pct: '0.12'
+          CaO_wt_pct: '1.93'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '3.11'
+          FeO_uncert_wt_pct: '0.09'
+        - sample_id: F-10
+          mass_g_as_printed: '0.017022'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.49'
+          Na2O_uncert_wt_pct: '0.08'
+          MgO_wt_pct: '0.544'
+          MgO_uncert_wt_pct: '0.010'
+          Al2O3_wt_pct: '11.4'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.3'
+          K2O_uncert_wt_pct: '0.2'
+          CaO_wt_pct: '1.36'
+          CaO_uncert_wt_pct: '0.08'
+          FeO_wt_pct: '3.10'
+          FeO_uncert_wt_pct: '0.10'
+        - sample_id: F-11
+          mass_g_as_printed: '0.015143'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.25'
+          Na2O_uncert_wt_pct: '0.09'
+          MgO_wt_pct: '0.614'
+          MgO_uncert_wt_pct: '0.005'
+          Al2O3_wt_pct: '11.34'
+          Al2O3_uncert_wt_pct: '0.15'
+          K2O_wt_pct: '4.20'
+          K2O_uncert_wt_pct: '0.11'
+          CaO_wt_pct: '1.75'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '3.04'
+          FeO_uncert_wt_pct: '0.14'
+        - sample_id: F-12
+          mass_g_as_printed: '0.018902'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.46'
+          Na2O_uncert_wt_pct: '0.07'
+          MgO_wt_pct: '0.56'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '10.6'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.23'
+          K2O_uncert_wt_pct: '0.12'
+          CaO_wt_pct: '2.90'
+          CaO_uncert_wt_pct: '0.08'
+          FeO_wt_pct: '2.83'
+          FeO_uncert_wt_pct: '0.09'
+        - sample_id: F-13
+          mass_g_as_printed: '0.023776'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.32'
+          Na2O_uncert_wt_pct: '0.11'
+          MgO_wt_pct: '0.536'
+          MgO_uncert_wt_pct: '0.010'
+          Al2O3_wt_pct: '10.6'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.05'
+          K2O_uncert_wt_pct: '0.12'
+          CaO_wt_pct: '2.27'
+          CaO_uncert_wt_pct: '0.08'
+          FeO_wt_pct: '2.89'
+          FeO_uncert_wt_pct: '0.10'
+        - sample_id: F-14
+          mass_g_as_printed: '0.019379'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.17'
+          Na2O_uncert_wt_pct: '0.09'
+          MgO_wt_pct: '0.509'
+          MgO_uncert_wt_pct: '0.013'
+          Al2O3_wt_pct: '10.78'
+          Al2O3_uncert_wt_pct: '0.12'
+          K2O_wt_pct: '4.02'
+          K2O_uncert_wt_pct: '0.07'
+          CaO_wt_pct: '1.90'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '2.88'
+          FeO_uncert_wt_pct: '0.05'
+        - sample_id: F-15
+          mass_g_as_printed: '0.009058'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.07'
+          Na2O_uncert_wt_pct: '0.09'
+          MgO_wt_pct: '0.642'
+          MgO_uncert_wt_pct: '0.013'
+          Al2O3_wt_pct: '11.38'
+          Al2O3_uncert_wt_pct: '0.15'
+          K2O_wt_pct: '4.36'
+          K2O_uncert_wt_pct: '0.08'
+          CaO_wt_pct: '1.54'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '3.07'
+          FeO_uncert_wt_pct: '0.10'
+        - sample_id: F-16
+          mass_g_as_printed: '0.008650'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.41'
+          Na2O_uncert_wt_pct: '0.07'
+          MgO_wt_pct: '0.504'
+          MgO_uncert_wt_pct: '0.005'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.53'
+          K2O_uncert_wt_pct: '0.10'
+          CaO_wt_pct: '0.99'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '3.23'
+          FeO_uncert_wt_pct: '0.08'
+        - sample_id: F-17
+          mass_g_as_printed: '0.017236'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.13'
+          Na2O_uncert_wt_pct: '0.15'
+          MgO_wt_pct: '0.594'
+          MgO_uncert_wt_pct: '0.012'
+          Al2O3_wt_pct: '11.6'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.05'
+          K2O_uncert_wt_pct: '0.08'
+          CaO_wt_pct: '1.90'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '3.01'
+          FeO_uncert_wt_pct: '0.03'
+        - sample_id: F-18
+          mass_g_as_printed: '0.018805'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.55'
+          Na2O_uncert_wt_pct: '0.03'
+          MgO_wt_pct: '0.645'
+          MgO_uncert_wt_pct: '0.013'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.36'
+          K2O_uncert_wt_pct: '0.06'
+          CaO_wt_pct: '1.71'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '3.14'
+          FeO_uncert_wt_pct: '0.05'
+        - sample_id: F-19
+          mass_g_as_printed: '0.007086'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.40'
+          Na2O_uncert_wt_pct: '0.13'
+          MgO_wt_pct: '0.605'
+          MgO_uncert_wt_pct: '0.012'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.99'
+          K2O_uncert_wt_pct: '0.18'
+          CaO_wt_pct: '1.78'
+          CaO_uncert_wt_pct: '0.06'
+          FeO_wt_pct: '3.06'
+          FeO_uncert_wt_pct: '0.09'
+        - sample_id: F-20
+          mass_g_as_printed: '0.010145'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.50'
+          Na2O_uncert_wt_pct: '0.07'
+          MgO_wt_pct: '0.506'
+          MgO_uncert_wt_pct: '0.012'
+          Al2O3_wt_pct: '11.0'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '4.59'
+          K2O_uncert_wt_pct: '0.14'
+          CaO_wt_pct: '1.23'
+          CaO_uncert_wt_pct: '0.06'
+          FeO_wt_pct: '3.07'
+          FeO_uncert_wt_pct: '0.04'
+        - sample_id: F-21
+          mass_g_as_printed: '0.009069'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.09'
+          Na2O_uncert_wt_pct: '0.07'
+          MgO_wt_pct: '0.489'
+          MgO_uncert_wt_pct: '0.015'
+          Al2O3_wt_pct: '11.1'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.96'
+          K2O_uncert_wt_pct: '0.17'
+          CaO_wt_pct: '1.15'
+          CaO_uncert_wt_pct: '0.03'
+          FeO_wt_pct: '2.95'
+          FeO_uncert_wt_pct: '0.06'
+        - sample_id: F-22
+          mass_g_as_printed: '0.011855'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.38'
+          Na2O_uncert_wt_pct: '0.08'
+          MgO_wt_pct: '0.562'
+          MgO_uncert_wt_pct: '0.013'
+          Al2O3_wt_pct: '11.0'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '5.24'
+          K2O_uncert_wt_pct: '0.17'
+          CaO_wt_pct: '1.54'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '2.78'
+          FeO_uncert_wt_pct: '0.12'
+        - sample_id: F-23
+          mass_g_as_printed: '0.007955'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.15'
+          Na2O_uncert_wt_pct: '0.13'
+          MgO_wt_pct: '0.60'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '12.1'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '5.25'
+          K2O_uncert_wt_pct: '0.11'
+          CaO_wt_pct: '1.68'
+          CaO_uncert_wt_pct: '0.06'
+          FeO_wt_pct: '2.96'
+          FeO_uncert_wt_pct: '0.10'
+        - sample_id: F-24
+          mass_g_as_printed: '0.007408'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.17'
+          Na2O_uncert_wt_pct: '0.12'
+          MgO_wt_pct: '0.650'
+          MgO_uncert_wt_pct: '0.008'
+          Al2O3_wt_pct: '11.7'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '5.48'
+          K2O_uncert_wt_pct: '0.17'
+          CaO_wt_pct: '1.44'
+          CaO_uncert_wt_pct: '0.11'
+          FeO_wt_pct: '2.97'
+          FeO_uncert_wt_pct: '0.08'
+        - sample_id: F-25
+          mass_g_as_printed: '0.012177'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.33'
+          Na2O_uncert_wt_pct: '0.08'
+          MgO_wt_pct: '0.531'
+          MgO_uncert_wt_pct: '0.010'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '4.78'
+          K2O_uncert_wt_pct: '0.11'
+          CaO_wt_pct: '1.41'
+          CaO_uncert_wt_pct: '0.07'
+          FeO_wt_pct: '2.91'
+          FeO_uncert_wt_pct: '0.04'
+        - sample_id: F-26
+          mass_g_as_printed: '0.007856'
+          shape_as_printed: quasi-spherical
+          Na2O_wt_pct: '3.44'
+          Na2O_uncert_wt_pct: '0.12'
+          MgO_wt_pct: '0.420'
+          MgO_uncert_wt_pct: '0.013'
+          Al2O3_wt_pct: '10.6'
+          Al2O3_uncert_wt_pct: '0.2'
+          K2O_wt_pct: '5.37'
+          K2O_uncert_wt_pct: '0.07'
+          CaO_wt_pct: '1.74'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '2.64'
+          FeO_uncert_wt_pct: '0.06'
+        - sample_id: F-27
+          mass_g_as_printed: '0.010257'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.07'
+          Na2O_uncert_wt_pct: '0.12'
+          MgO_wt_pct: '0.66'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '11.5'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '4.87'
+          K2O_uncert_wt_pct: '0.13'
+          CaO_wt_pct: '1.65'
+          CaO_uncert_wt_pct: '0.04'
+          FeO_wt_pct: '3.00'
+          FeO_uncert_wt_pct: '0.08'
+        - sample_id: F-28
+          mass_g_as_printed: '0.011988'
+          shape_as_printed: oblong
+          Na2O_wt_pct: '3.13'
+          Na2O_uncert_wt_pct: '0.07'
+          MgO_wt_pct: '0.51'
+          MgO_uncert_wt_pct: '0.02'
+          Al2O3_wt_pct: '11.2'
+          Al2O3_uncert_wt_pct: '0.3'
+          K2O_wt_pct: '4.64'
+          K2O_uncert_wt_pct: '0.11'
+          CaO_wt_pct: '1.08'
+          CaO_uncert_wt_pct: '0.03'
+          FeO_wt_pct: '3.00'
+          FeO_uncert_wt_pct: '0.10'
+      uncertainty:
+        note: Per-oxide expanded uncertainties (k = 2) retained on each measured row; F-1–F-6 printed
+          NM for all oxides.
+    - observation_id: eppich_2014_table2_glass_over_sediment_major_oxide_ratios
+      type: composition_series
+      locator:
+        pdf_page_index: 36
+        published_page_stamp: 34
+        table: '2'
+        note: Table 2. Ratios of major element compositions of fallout glass samples relative to the average
+          composition of six sediment samples collected near ground zero.
+      phase: aerodynamic_fallout_melt_glass_relative_to_sediment
+      regime: near_surface_nuclear_test_fallout
+      units: dimensionless glass/sediment oxide ratios as printed
+      values:
+        quantity: glass_to_average_sediment_major_oxide_ratios
+        method_class: derived
+        evidence_class: author_calculated_from_table1_and_sediment_averages
+        DERIVED: true
+        derivation_as_printed: individual glass sample compositions divided by the average of six sediment
+          compositions
+        rows:
+        - sample_id: F-7
+          Na2O_glass_over_sediment: '0.98'
+          MgO_glass_over_sediment: '1.87'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '0.96'
+          CaO_glass_over_sediment: '1.19'
+          FeO_glass_over_sediment: '1.39'
+        - sample_id: F-8
+          Na2O_glass_over_sediment: '0.83'
+          MgO_glass_over_sediment: '1.91'
+          Al2O3_glass_over_sediment: '1.17'
+          K2O_glass_over_sediment: '0.87'
+          CaO_glass_over_sediment: '1.14'
+          FeO_glass_over_sediment: '1.42'
+        - sample_id: F-9
+          Na2O_glass_over_sediment: '0.92'
+          MgO_glass_over_sediment: '1.93'
+          Al2O3_glass_over_sediment: '1.09'
+          K2O_glass_over_sediment: '0.93'
+          CaO_glass_over_sediment: '1.33'
+          FeO_glass_over_sediment: '1.42'
+        - sample_id: F-10
+          Na2O_glass_over_sediment: '0.97'
+          MgO_glass_over_sediment: '1.68'
+          Al2O3_glass_over_sediment: '1.10'
+          K2O_glass_over_sediment: '0.96'
+          CaO_glass_over_sediment: '0.94'
+          FeO_glass_over_sediment: '1.41'
+        - sample_id: F-11
+          Na2O_glass_over_sediment: '0.91'
+          MgO_glass_over_sediment: '1.90'
+          Al2O3_glass_over_sediment: '1.09'
+          K2O_glass_over_sediment: '0.93'
+          CaO_glass_over_sediment: '1.21'
+          FeO_glass_over_sediment: '1.38'
+        - sample_id: F-12
+          Na2O_glass_over_sediment: '0.97'
+          MgO_glass_over_sediment: '1.73'
+          Al2O3_glass_over_sediment: '1.02'
+          K2O_glass_over_sediment: '0.94'
+          CaO_glass_over_sediment: '2.00'
+          FeO_glass_over_sediment: '1.29'
+        - sample_id: F-13
+          Na2O_glass_over_sediment: '0.92'
+          MgO_glass_over_sediment: '1.66'
+          Al2O3_glass_over_sediment: '1.02'
+          K2O_glass_over_sediment: '0.90'
+          CaO_glass_over_sediment: '1.56'
+          FeO_glass_over_sediment: '1.32'
+        - sample_id: F-14
+          Na2O_glass_over_sediment: '0.88'
+          MgO_glass_over_sediment: '1.58'
+          Al2O3_glass_over_sediment: '1.04'
+          K2O_glass_over_sediment: '0.89'
+          CaO_glass_over_sediment: '1.31'
+          FeO_glass_over_sediment: '1.31'
+        - sample_id: F-15
+          Na2O_glass_over_sediment: '0.86'
+          MgO_glass_over_sediment: '1.99'
+          Al2O3_glass_over_sediment: '1.09'
+          K2O_glass_over_sediment: '0.97'
+          CaO_glass_over_sediment: '1.06'
+          FeO_glass_over_sediment: '1.40'
+        - sample_id: F-16
+          Na2O_glass_over_sediment: '0.95'
+          MgO_glass_over_sediment: '1.56'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '1.00'
+          CaO_glass_over_sediment: '0.68'
+          FeO_glass_over_sediment: '1.47'
+        - sample_id: F-17
+          Na2O_glass_over_sediment: '0.87'
+          MgO_glass_over_sediment: '1.84'
+          Al2O3_glass_over_sediment: '1.12'
+          K2O_glass_over_sediment: '0.90'
+          CaO_glass_over_sediment: '1.31'
+          FeO_glass_over_sediment: '1.37'
+        - sample_id: F-18
+          Na2O_glass_over_sediment: '0.99'
+          MgO_glass_over_sediment: '2.00'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '0.97'
+          CaO_glass_over_sediment: '1.18'
+          FeO_glass_over_sediment: '1.43'
+        - sample_id: F-19
+          Na2O_glass_over_sediment: '0.95'
+          MgO_glass_over_sediment: '1.87'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '1.10'
+          CaO_glass_over_sediment: '1.22'
+          FeO_glass_over_sediment: '1.39'
+        - sample_id: F-20
+          Na2O_glass_over_sediment: '0.98'
+          MgO_glass_over_sediment: '1.57'
+          Al2O3_glass_over_sediment: '1.06'
+          K2O_glass_over_sediment: '1.02'
+          CaO_glass_over_sediment: '0.85'
+          FeO_glass_over_sediment: '1.40'
+        - sample_id: F-21
+          Na2O_glass_over_sediment: '0.86'
+          MgO_glass_over_sediment: '1.52'
+          Al2O3_glass_over_sediment: '1.07'
+          K2O_glass_over_sediment: '1.10'
+          CaO_glass_over_sediment: '0.79'
+          FeO_glass_over_sediment: '1.34'
+        - sample_id: F-22
+          Na2O_glass_over_sediment: '0.94'
+          MgO_glass_over_sediment: '1.74'
+          Al2O3_glass_over_sediment: '1.06'
+          K2O_glass_over_sediment: '1.16'
+          CaO_glass_over_sediment: '1.06'
+          FeO_glass_over_sediment: '1.27'
+        - sample_id: F-23
+          Na2O_glass_over_sediment: '0.88'
+          MgO_glass_over_sediment: '1.87'
+          Al2O3_glass_over_sediment: '1.16'
+          K2O_glass_over_sediment: '1.16'
+          CaO_glass_over_sediment: '1.16'
+          FeO_glass_over_sediment: '1.35'
+        - sample_id: F-24
+          Na2O_glass_over_sediment: '0.88'
+          MgO_glass_over_sediment: '2.01'
+          Al2O3_glass_over_sediment: '1.12'
+          K2O_glass_over_sediment: '1.21'
+          CaO_glass_over_sediment: '0.99'
+          FeO_glass_over_sediment: '1.35'
+        - sample_id: F-25
+          Na2O_glass_over_sediment: '0.93'
+          MgO_glass_over_sediment: '1.64'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '1.06'
+          CaO_glass_over_sediment: '0.97'
+          FeO_glass_over_sediment: '1.32'
+        - sample_id: F-26
+          Na2O_glass_over_sediment: '0.96'
+          MgO_glass_over_sediment: '1.30'
+          Al2O3_glass_over_sediment: '1.02'
+          K2O_glass_over_sediment: '1.19'
+          CaO_glass_over_sediment: '1.20'
+          FeO_glass_over_sediment: '1.20'
+        - sample_id: F-27
+          Na2O_glass_over_sediment: '0.86'
+          MgO_glass_over_sediment: '2.03'
+          Al2O3_glass_over_sediment: '1.11'
+          K2O_glass_over_sediment: '1.08'
+          CaO_glass_over_sediment: '1.14'
+          FeO_glass_over_sediment: '1.37'
+        - sample_id: F-28
+          Na2O_glass_over_sediment: '0.87'
+          MgO_glass_over_sediment: '1.59'
+          Al2O3_glass_over_sediment: '1.08'
+          K2O_glass_over_sediment: '1.03'
+          CaO_glass_over_sediment: '0.74'
+          FeO_glass_over_sediment: '1.37'
+      uncertainty:
+        note: No separate uncertainty column printed on Table 2 ratios.
+    context:
+    - observation_id: eppich_2014_icpms_sample_prep_and_mass_range
+      type: method
+      locator:
+        pdf_page_index: 7
+        section: Methods
+        note: Glass masses and digestion described before Table 1
+      phase: aerodynamic_fallout_melt_glass
+      regime: laboratory_dissolution_ICP_MS
+      units: as printed
+      values:
+        quantity: sample_mass_range_and_analytical_method
+        method_class: method_only
+        evidence_class: authors_methods_prose
+        glass_mass_range_g_as_printed: ~7 to 36 mg (Table 1)
+        morphologies_as_printed:
+        - oblong
+        - quasi-spherical
+        major_element_method_as_printed: quadrupole ICP-MS major oxides Na, Mg, Al, K, Ca, Fe
+  local_sediment:
+    observations: []
+    context:
+    - observation_id: eppich_2014_sediment_major_oxide_averages_prose
+      type: characterization
+      locator:
+        pdf_page_index: 12
+        section: Results / Chemical composition results
+      phase: nominally_uncontaminated_surface_sediment
+      regime: pre_detonation_local_geology
+      units: wt. % as printed (approximate)
+      values:
+        quantity: six_sediment_major_oxide_averages_prose
+        method_class: measured
+        evidence_class: authors_own_measurement_summarised_in_prose
+        n_sediments_as_printed: 6
+        Na2O_wt_pct_as_printed: ~3.6
+        MgO_wt_pct_as_printed: ~0.3
+        Al2O3_wt_pct_as_printed: ~10.4
+        K2O_wt_pct_as_printed: ~4.5
+        CaO_wt_pct_as_printed: ~1.5
+        FeO_wt_pct_as_printed: ~2.2
+        bulk_affinity_as_printed: rhyolitic bulk chemical composition
+        SiO2_wt_pct_by_difference_as_printed: ~72 to 75
+        SiO2_confirmation_as_printed: semi-quantitative X-ray fluorescence analysis
+        note: Tilde values retained as printed; not coerced to exact floats. Per-sediment table not printed.
+    - observation_id: eppich_2014_na_volatilisation_temperature_interpretation
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 15
+        section: Discussion
+        note: Author interpretation of Na depletion vs sediment
+      phase: fallout_melt
+      regime: author_volatilisation_interpretation
+      units: degrees Celsius as printed
+      values:
+        quantity: author_Na2O_volatilisation_temperature_claim
+        method_class: author_interpretation
+        evidence_class: discussion_prose_not_a_measurement
+        Na2O_glass_vs_sediment_as_printed: Na2O consistently depleted in glasses relative to sediments,
+          up to a factor of 0.86
+        boiling_point_Na2O_C_as_printed: 1950
+        claim_as_printed: If the depletion in Na is due to volatilization, fallout must have been held
+          at temperatures greater than the boiling point of Na2O (boiling point = 1950°C) for significant
+          duration.
+        stated_assumptions_as_printed:
+        - volatilization of SiO2 did not occur
+        - the six sediment samples are representative of the initial melt compositions
+        timescale_as_printed: formation time scales for glassy fallout debris are of order seconds
+        note: Not a measured furnace temperature; retained as printed interpretive bound only.

@@ -1,0 +1,261 @@
+schema_version: literature_extract.v1
+source_id: bonamici-2017-glassy-fallout-debris
+source:
+  citation: Bonamici, C. E.; Kinman, W. S.; Fournelle, J. H.; Zimmer, M.; Pollington, A. D.; Rector, K.
+    D. (2017). A geochemical approach to constraining the formation of glassy fallout debris from nuclear
+    tests. Contributions to Mineralogy and Petrology 172, 2. DOI 10.1007/s00410-016-1320-2. LANL author
+    manuscript LA-UR-15-24262 / OSTI.
+  doi: 10.1007/s00410-016-1320-2
+  year: 2017
+  url: https://www.osti.gov/servlets/purl/1340913
+extraction:
+  method: Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/bonamici-2017-glassy-fallout-debris.pdf
+    (private; not committed). LANL accepted manuscript (LA-UR-15-24262), 50 PDF pages. pdftotext -layout
+    cross-checked against pdftoppm PNG of Table 1 (PDF page 50). SHA-256 matches sidecar 477906e36aab1998b046007f91dc88c1e66c47b68cad70c20736b2fb7fd0a7f8.
+    Printed-only. Table 1 is author-estimated bulk sediment composition from mineral modes (not a direct
+    bulk chemical analysis) and is retained as context. EPMA glass major-element analyses are figure/supplement
+    only in this PDF and are recorded as typed absence, not digitised. Model Tg / viscosity / condensation
+    temperature bounds retained as author-interpretation context. No digitisation.
+  date: '2026-09-22'
+  worker: n13-fallout-glass
+  provenance_path: data/literature/extracts/bonamici-2017-glassy-fallout-debris.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: LANL accepted manuscript of CMP paper on Trinity aerodynamic glassy fallout (trinitite)
+  measured_direct_observations: 0
+  method_observations: 2
+  figure_only_observations: 1
+  absent_from_source:
+  - tabulated EPMA glass major-oxide analyses in the main PDF (figures / supplemental only)
+  - direct bulk sediment wet-chemistry or XRF assay table (Table 1 is mode-based estimate)
+  - measured furnace run temperatures or vapour pressures
+  - digitised figure composition clouds
+  note: 'High-T glass evidence is petrographic/geochemical: silica, alkali, and CaMgFe glass lineages
+    in aerodynamic beads; condensation / Tg bounds are model-derived and kept as context. No vapour-rail
+    scored observation is landed from this PDF alone.'
+fidelity_samples:
+- species: trinity_test_site_sediment
+  observable: characterization
+  observation_id: bonamici_2017_table1_estimated_bulk_sediment_compositions
+  field: high_quartz_Si_wt_pct_as_printed
+  value: '30.5'
+  locator:
+    pdf_page_index: 50
+    table: '1'
+    note: High Quartz Si
+- species: trinity_test_site_sediment
+  observable: characterization
+  observation_id: bonamici_2017_table1_estimated_bulk_sediment_compositions
+  field: average_Si_wt_pct_as_printed
+  value: '29.0'
+  locator:
+    pdf_page_index: 50
+    table: '1'
+    note: Average Si
+- species: trinitite_glass
+  observable: laboratory_conditions
+  observation_id: bonamici_2017_condensation_and_tg_temperature_bounds
+  field: condensation_upper_bound_K_as_printed
+  value: ~2200
+  locator:
+    pdf_page_index: 16
+    section: 5.2 Melt interactions
+species:
+  trinity_test_site_sediment:
+    observations: []
+    context:
+    - observation_id: bonamici_2017_table1_estimated_bulk_sediment_compositions
+      type: characterization
+      locator:
+        pdf_page_index: 50
+        table: '1'
+        note: Table 1. Estimated bulk compositions for the Trinity test site sediment.
+      phase: trinity_ground_zero_sediment_estimate
+      regime: mode_based_bulk_estimate
+      units: mineral modes dimensionless; element wt. % as printed
+      values:
+        quantity: estimated_bulk_sediment_composition_from_mineral_modes
+        method_class: author_estimate
+        evidence_class: mode_based_calculation_not_direct_bulk_assay
+        high_quartz_Si_wt_pct_as_printed: '30.5'
+        average_Si_wt_pct_as_printed: '29.0'
+        average_K_wt_pct_as_printed: '4.1'
+        average_Na_wt_pct_as_printed: '2.7'
+        average_Al_wt_pct_as_printed: '7.1'
+        average_Ca_wt_pct_as_printed: '5.9'
+        average_Mg_wt_pct_as_printed: '0.7'
+        average_Fe_wt_pct_as_printed: '1.6'
+        average_O_wt_pct_as_printed: '47.5'
+        average_C_wt_pct_as_printed: '1.3'
+        basis_as_printed: 'Estimated sediment compositions based on observations at the test site (Fig.
+          1) and descriptions of Jornada del Muerto sediments and Oscura Mountain lithologies. Last composition
+          is from the modal mineralogy measured in a mineral aggregate included within bead #7.'
+        rows:
+        - label_as_printed: High Quartz
+          quartz_mode: '0.50'
+          K_rich_alkali_fsp_mode: '0.15'
+          Na_rich_plag_fsp_mode: '0.15'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.15'
+          Si_wt_pct: '30.5'
+          K_wt_pct: '3.2'
+          Na_wt_pct: '2.3'
+          Al_wt_pct: '5.9'
+          Ca_wt_pct: '5.8'
+          Mg_wt_pct: '0.9'
+          Fe_wt_pct: '2.0'
+          O_wt_pct: '48.1'
+          C_wt_pct: '1.3'
+        - label_as_printed: Low Quartz
+          quartz_mode: '0.10'
+          K_rich_alkali_fsp_mode: '0.35'
+          Na_rich_plag_fsp_mode: '0.35'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.15'
+          Si_wt_pct: '29.0'
+          K_wt_pct: '4.6'
+          Na_wt_pct: '3.3'
+          Al_wt_pct: '8.5'
+          Ca_wt_pct: '4.8'
+          Mg_wt_pct: '0.5'
+          Fe_wt_pct: '1.3'
+          O_wt_pct: '47.1'
+          C_wt_pct: '0.8'
+        - label_as_printed: High K-feldspar
+          quartz_mode: '0.30'
+          K_rich_alkali_fsp_mode: '0.45'
+          Na_rich_plag_fsp_mode: '0.05'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.15'
+          Si_wt_pct: '29.4'
+          K_wt_pct: '7.3'
+          Na_wt_pct: '1.8'
+          Al_wt_pct: '7.4'
+          Ca_wt_pct: '3.7'
+          Mg_wt_pct: '0.7'
+          Fe_wt_pct: '1.5'
+          O_wt_pct: '47.2'
+          C_wt_pct: '1.0'
+        - label_as_printed: High Na-feldspar
+          quartz_mode: '0.30'
+          K_rich_alkali_fsp_mode: '0.05'
+          Na_rich_plag_fsp_mode: '0.45'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.15'
+          Si_wt_pct: '29.8'
+          K_wt_pct: '0.8'
+          Na_wt_pct: '4.0'
+          Al_wt_pct: '7.5'
+          Ca_wt_pct: '6.7'
+          Mg_wt_pct: '0.7'
+          Fe_wt_pct: '1.6'
+          O_wt_pct: '47.8'
+          C_wt_pct: '1.0'
+        - label_as_printed: High Calcite
+          quartz_mode: '0.35'
+          K_rich_alkali_fsp_mode: '0.20'
+          Na_rich_plag_fsp_mode: '0.10'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.30'
+          Si_wt_pct: '26.3'
+          K_wt_pct: '4.1'
+          Na_wt_pct: '1.9'
+          Al_wt_pct: '5.6'
+          Ca_wt_pct: '9.2'
+          Mg_wt_pct: '0.8'
+          Fe_wt_pct: '1.9'
+          O_wt_pct: '47.7'
+          C_wt_pct: '2.5'
+        - label_as_printed: '#7 mineral aggregate'
+          quartz_mode: '0.23'
+          K_rich_alkali_fsp_mode: '0.32'
+          Na_rich_plag_fsp_mode: '0.23'
+          pyroxene_mode: '0.05'
+          calcite_mode: '0.18'
+          Si_wt_pct: '28.8'
+          K_wt_pct: '4.9'
+          Na_wt_pct: '2.8'
+          Al_wt_pct: '7.7'
+          Ca_wt_pct: '5.4'
+          Mg_wt_pct: '0.6'
+          Fe_wt_pct: '1.3'
+          O_wt_pct: '47.3'
+          C_wt_pct: '1.1'
+        minimum_element_wt_pct_as_printed:
+          Si: '26.3'
+          K: '0.8'
+          Na: '1.8'
+          Al: '5.6'
+          Ca: '3.7'
+          Mg: '0.5'
+          Fe: '1.3'
+          O: '47.1'
+          C: '0.8'
+        maximum_element_wt_pct_as_printed:
+          Si: '30.5'
+          K: '7.3'
+          Na: '4.0'
+          Al: '8.5'
+          Ca: '9.2'
+          Mg: '0.9'
+          Fe: '2.0'
+          O: '48.1'
+          C: '2.5'
+        pyroxene_note_as_printed: Pyroxene used as representative mafic mineral, assumed equal parts Mg
+          and Fe; actual mafics may include hornblende, biotite, and/or chlorite.
+        note: Not a scored bulk assay; modes→element wt% are author estimates printed in Table 1.
+  trinitite_glass:
+    observations: []
+    context:
+    - observation_id: bonamici_2017_glass_lineages_and_textures
+      type: characterization
+      locator:
+        pdf_page_index: 9
+        section: Results
+        note: Three glass types in aerodynamic beads
+      phase: aerodynamic_trinitite_beads
+      regime: trinity_fallout_glass_petrography
+      units: as printed
+      values:
+        quantity: glass_lineages_in_aerodynamic_beads
+        method_class: method_only
+        evidence_class: authors_EPMA_petrography_prose
+        glass_types_as_printed:
+        - silica glass
+        - alkali glass
+        - CaMgFe glass
+        silica_glass_note_as_printed: essentially pure SiO2 glass (lechatelierite) from fused quartz
+        alkali_glass_note_as_printed: compositions equivalent to alkali feldspar mineral constituents
+          in site sediment
+        CaMgFe_glass_note_as_printed: wide compositional range spanning and exceeding SiO2 range of terrestrial
+          silicate magmatic rocks; interpreted as volatility-controlled condensate
+        EPMA_major_element_tables_in_main_PDF: absent
+        EPMA_data_location_as_printed: figures and Supplemental Materials Table 1
+        note: Typed absence for tabulated EPMA oxide rows in this main PDF; not digitised from figures.
+    - observation_id: bonamici_2017_condensation_and_tg_temperature_bounds
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 16
+        section: 5.2 Melt interactions
+      phase: trinitite_melt_interaction_window
+      regime: author_model_temperature_bounds
+      units: K as printed
+      values:
+        quantity: condensation_and_glass_transition_temperature_bounds
+        method_class: author_interpretation
+        evidence_class: model_and_literature_bound_not_a_furnace_measurement
+        condensation_upper_bound_K_as_printed: ~2200
+        condensation_range_K_as_printed: 1800-2200
+        condensation_basis_as_printed: condensation equilibria at high-temperature, circum-atmospheric
+          pressures
+        Tg_alkali_and_CaMgFe_lower_bound_K_as_printed: '>900'
+        model_ending_temperature_K_as_printed: 900
+        viscosity_model_as_printed: Giordano et al. (2008) anhydrous viscosities from EPMA-measured glass
+          compositions, 600-1800 K
+        viscosity_model_calibration_limit_K_as_printed: 1800
+        alkali_vs_CaMgFe_viscosity_contrast_as_printed: alkali melts 2-5 orders of magnitude more viscous
+          than CaMgFe melts between 800 and 1800 K
+        silica_vs_CaMgFe_viscosity_contrast_as_printed: trinitite silica glasses ~5-10 orders of magnitude
+          more viscous than most CaMgFe glasses (Ryan and Blevins 1987 molten quartz)
+        note: Not measured run temperatures; retained as printed interpretive / model bounds only.

@@ -1,0 +1,121 @@
+schema_version: literature_extract.v1
+source_id: ross-1948-optical-properties-alamogordo-glass
+source:
+  citation: Ross, Clarence S. (1948). Optical properties of glass from Alamogordo, New Mexico. American
+    Mineralogist 33(5-6), 360-362.
+  doi: null
+  year: 1948
+  url: http://www.minsocam.org/ammin/AM33/AM33_360.pdf
+extraction:
+  method: Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/ross-1948-optical-properties-alamogordo-glass.pdf
+    (private; not committed). Scanned 3-page American Mineralogist note. pdftotext -layout cross-checked
+    against pdftoppm PNG of pages 1-3 (published 360-362). SHA-256 matches sidecar 2a456984d319d4d5efed3c9715656a451daf74f732fea9c76bb24861cdedf739.
+    Printed-only refractive-index ranges, glass thickness, and fusion-temperature prose. No composition
+    table and no digitisation of photomicrographs.
+  date: '2026-09-22'
+  worker: n13-fallout-glass
+  provenance_path: data/literature/extracts/ross-1948-optical-properties-alamogordo-glass.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 3-page American Mineralogist note on Trinity (Alamogordo) glass optical properties
+  measured_direct_observations: 0
+  method_observations: 2
+  figure_only_observations: 1
+  absent_from_source:
+  - oxide wt% composition table
+  - measured furnace temperatures
+  - vapour-pressure or mass-loss data
+  - digitised photomicrograph grey levels
+  note: Optical refractive-index ranges are laboratory measurements but are not a vapour-rail scored observation
+    type; retained as characterization context. Fusion-temperature claims are interpretive.
+fidelity_samples:
+- species: alamogordo_glass
+  observable: characterization
+  observation_id: ross_1948_refractive_indices_two_glasses
+  field: feldspar_clay_glass_n_range_as_printed
+  value: 1.51 to 1.53
+  locator:
+    pdf_page_index: 2
+    published_page: 361
+- species: alamogordo_glass
+  observable: characterization
+  observation_id: ross_1948_refractive_indices_two_glasses
+  field: silica_glass_n_as_printed
+  value: close to 1.46
+  locator:
+    pdf_page_index: 3
+    published_page: 362
+- species: alamogordo_glass
+  observable: laboratory_conditions
+  observation_id: ross_1948_fusion_temperature_claims
+  field: cristobalite_fusion_C_as_printed
+  value: 1713
+  locator:
+    pdf_page_index: 3
+    published_page: 362
+species:
+  alamogordo_glass:
+    observations: []
+    context:
+    - observation_id: ross_1948_glass_layer_and_parent_sediment
+      type: characterization
+      locator:
+        pdf_page_index: 1
+        published_page: 360
+      phase: alamogordo_surface_melt_glass
+      regime: trinity_ground_glass_description
+      units: as printed
+      values:
+        quantity: glass_layer_morphology_and_parent_arkose
+        method_class: method_only
+        evidence_class: authors_petrographic_description
+        layer_thickness_cm_as_printed: 1 to 2
+        colour_as_printed: pale bottle green
+        texture_as_printed: extremely vesicular
+        parent_sediment_as_printed: 'arkosic sand: angular quartz, abundant microcline and lesser plagioclase,
+          minor calcite, hornblende, and augite in sandy clay matrix'
+        two_glass_types_as_printed:
+        - feldspar-clay-accessory glass (mobile, flow-lined)
+        - silica glass from direct fusion of quartz
+    - observation_id: ross_1948_refractive_indices_two_glasses
+      type: characterization
+      locator:
+        pdf_page_index: 2
+        published_page: 361
+        figure: '1'
+      phase: alamogordo_glass_thin_section
+      regime: optical_mineralogy
+      units: dimensionless refractive index n as printed
+      values:
+        quantity: measured_refractive_index_ranges
+        method_class: measured
+        evidence_class: authors_own_optical_measurement
+        feldspar_clay_glass_n_range_as_printed: 1.51 to 1.53
+        feldspar_clay_glass_n_high_as_printed: '1.54'
+        feldspar_clay_glass_n_ferromagnesian_as_printed: '1.55'
+        silica_glass_n_as_printed: close to 1.46
+        silica_glass_interpretation_as_printed: almost pure silica glass
+        boundary_as_printed: very sharp between feldspar-clay glass and silica glass; little diffusion
+        viscosity_contrast_as_printed: silica glass exceedingly viscous compared with the other glass;
+          little or no distortion of silica-glass areas
+        note: Optical n is not a vapour-rail scored type; retained as characterization context.
+    - observation_id: ross_1948_fusion_temperature_claims
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 3
+        published_page: 362
+      phase: quartz_to_silica_glass_fusion
+      regime: author_temperature_interpretation
+      units: degrees Celsius as printed
+      values:
+        quantity: quartz_and_cristobalite_fusion_temperature_claims
+        method_class: author_interpretation
+        evidence_class: discussion_prose_not_a_measurement
+        cristobalite_fusion_C_as_printed: 1713
+        quartz_direct_fusion_C_as_printed: slightly below 1470
+        explosion_temperature_claim_as_printed: much higher than 1470 C and reached so suddenly that quartz
+          fused directly to silica glass
+        copper_pigment_note_as_printed: oxblood-red glass areas contain essential copper by spectrographic
+          test; dispersed copper; likely from copper wire
+        note: Fusion temperatures are stated as known/thought values, not measured on these samples.
