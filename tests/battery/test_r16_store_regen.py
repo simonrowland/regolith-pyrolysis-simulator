@@ -47,6 +47,10 @@ MIN_FO2_LOG_HITS = {
 # Parent tip that shipped the stale store (R16 evidence SHA).
 STALE_TIP = "ce650a3d5^"
 
+# These post-c2ba15805 inputs are proven store-neutral: the bench payload and
+# ledger/sticking changes are not consumed by battery_migrate or build_index.
+STORE_NEUTRAL_INPUT_COMMITS = {"1b78b5697", "574800443", "149df2858"}
+
 
 def _git(*args: str) -> str:
     return subprocess.run(
@@ -56,6 +60,23 @@ def _git(*args: str) -> str:
         text=True,
         check=True,
     ).stdout
+
+
+def _require_git_history(*revisions: str) -> None:
+    """Skip history-only mutation proofs when CI copied a shallow worktree."""
+    for revision in revisions:
+        result = subprocess.run(
+            ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            pytest.skip(
+                "git_history_unavailable: required mutation revision "
+                f"{revision!r} is absent"
+            )
 
 
 def _load_freshness():
@@ -87,12 +108,28 @@ def test_committed_printed_fo2_stems_land_fO2_log_in_extracts_v2() -> None:
 
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """Post-regen input commits are the two proven byte-stable I1 changes.
+    """Reject unacknowledged post-regen migrate-input commits.
 
     Mirrors the STALE half of ``scripts/check_store_freshness.py`` so a
     mid-series regen followed by extract/migrate edits without a tip regen
-    fails in CI. Does not assert UNTRACED (pre-existing, out of R16 P1).
+    fails in CI. Three acknowledged I1 commits are store-neutral. Does not
+    assert UNTRACED (pre-existing, out of R16 P1).
     """
+    if _git("rev-parse", "--is-shallow-repository").strip() == "true":
+        pytest.skip("git_history_unavailable: freshness requires a full checkout")
+    _require_git_history(*sorted(STORE_NEUTRAL_INPUT_COMMITS))
+    for revision in STORE_NEUTRAL_INPUT_COMMITS:
+        if subprocess.run(
+            ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).returncode != 0:
+            pytest.skip(
+                "git_history_unavailable: acknowledged store-neutral input "
+                f"{revision} is not in HEAD history"
+            )
     freshness = _load_freshness()
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
@@ -117,10 +154,10 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
             commit, subject = line.split("\x00", 1)
         elif line.strip() and commit is not None and freshness._is_input(line.strip()):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
-    assert {key.split(" ", 1)[0] for key in stale} == {
-        "1b78b5697",
-        "574800443",
-    }
+    unexpected = {
+        key.split(" ", 1)[0] for key in stale
+    } - STORE_NEUTRAL_INPUT_COMMITS
+    assert not unexpected, f"unacknowledged post-regen migrate inputs: {unexpected}"
 
 
 def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:
@@ -130,6 +167,7 @@ def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:
     must show zero ``fO2_log`` keys — the defect R16 P1 named. If this
     ever goes green against that tip, the census no longer guards the hole.
     """
+    _require_git_history(STALE_TIP)
     for stem in PRINTED_FO2_STEMS:
         blob = _git(
             "show",
@@ -175,6 +213,7 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     migrate-input commits after ``2e9e17c3d`` would be reported. Guarding
     this keeps the freshness assertion from going vacuous.
     """
+    _require_git_history(STALE_TIP)
     freshness = _load_freshness()
     head = _git("rev-parse", STALE_TIP).strip()
     last_store = _git(
