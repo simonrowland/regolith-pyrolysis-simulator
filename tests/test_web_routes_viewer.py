@@ -797,6 +797,16 @@ def test_report_viewer_labels_viewer_derived_projections() -> None:
     assert "Fe evolved" not in html
 
 
+def test_report_viewer_accepted_species_scalar_text_is_escaped() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "tapsAndPuritySection({stage_purity:{stage1:{accepted_species:['<img src=x onerror=alert(1)>'],total_kg:1}}})",
+    )
+
+    assert "&lt;img" in html
+    assert "<img src=x" not in html
+
+
 def test_wall_deposit_empty_segment_stays_pending() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0", "wall_deposit_cumulative_kg": {"stage_0_to_1": {}}}, "ledger": {}}]
