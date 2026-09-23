@@ -9,7 +9,8 @@ from simulator.battery.generators import engine_point_requests, kems_case, vacuu
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
-    FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry, Located,
+    Derivation, FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry,
+    Located,
 )
 from simulator.battery.waypoints import (
     charge_moles_by_species, oxygen_condition, consumer_readiness,
@@ -153,6 +154,27 @@ def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
     result = oxygen_condition(experiment, bench, observation)
     assert result.selected is None
     assert not any(route.route == "vacuum_total_pressure_upper_bound" for route in result.routes)
+
+
+def test_inferred_run_pressure_refuses_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    inferred = Located(
+        State.of(Value.point_of("1e-4")),
+        locator=f.loc(note="vacuum inferred from gas load and pumping speed"),
+        inference=Derivation("Q_over_S", ("Q", "S"), (), "Pa"),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=inferred,
+        ),
+    )
+    result = oxygen_condition(experiment, bench, observation)
+    assert result.selected is None
+    assert not any(
+        route.route == "vacuum_total_pressure_upper_bound" for route in result.routes
+    )
 
 
 def test_buffer_derivation_and_domain():

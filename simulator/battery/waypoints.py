@@ -1078,8 +1078,17 @@ def oxygen_condition(
             located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
         locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
         vacuum_evidence = (
-            any(token in locator_note for token in ("vacuum", "residual", "chamber pressure", "during evaporation"))
-            or (located_pressure is not None and located_pressure.inference is not None)
+            located_pressure is not None
+            and located_pressure.inference is None
+            and any(
+                token in locator_note
+                for token in (
+                    "vacuum",
+                    "residual",
+                    "chamber pressure",
+                    "during evaporation",
+                )
+            )
         )
         upper_pa: Decimal | None = None
         if pressure.kind is ValueKind.POINT:
