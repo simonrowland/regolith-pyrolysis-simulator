@@ -177,6 +177,17 @@ def test_report_viewer_scalar_labels_do_not_render_objects() -> None:
     assert "malformed (object)" in html
 
 
+def test_report_viewer_does_not_derive_account_totals_or_mol_percentages() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "ledgerSection({feed:{Fe:2,O2:3},empty:{}}) + ceramicSection({final_state:{'process.cleaned_melt':{FeO:1,SiO2:3}}})",
+    )
+
+    assert ">5 mol<" not in html and ">0 mol<" not in html
+    assert "not emitted" in html
+    assert "75.0000%" not in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""

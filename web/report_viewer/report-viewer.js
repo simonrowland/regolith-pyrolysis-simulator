@@ -62,9 +62,6 @@ const exactMol = (value) => exactValue(value, "mol");
 const strictMol = (value) => typeof value === "number" && Number.isFinite(value)
   ? exactValue(value, "mol")
   : `<span class="trace">non-numeric (${esc(typeof value === "string" ? "string" : Array.isArray(value) ? "array" : typeof value)})</span>`;
-const strictMolSum = (values) => values.every((value) => typeof value === "number" && Number.isFinite(value))
-  ? exactValue(values.reduce((total, value) => total + value, 0), "mol")
-  : "not numeric";
 const money = (value) => hasNumber(value)
   ? Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 })
   : "not emitted";
@@ -293,7 +290,7 @@ function renderTimestepLedger(timestep) {
 function ledgerSection(finalState) {
   const rows = Object.entries(finalState || {}).map(([account, species]) => {
     const entries = Object.entries(species || {});
-    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
+    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">not emitted</td></tr>`;
   }).join("");
   return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step. Account totals were not emitted; none are summed in the viewer.</div>`);
 }
@@ -588,8 +585,7 @@ function taxonomyEntity(entity) {
 
 function ceramicSection(terminal) {
   const melt = terminal.final_state?.["process.cleaned_melt"] || {};
-  const total = sumObject(melt);
-  const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${hasNumber(value) && hasNumber(total) && total !== 0 ? `${(Number(value) / total * 100).toFixed(4)}%` : "not emitted"}</td></tr>`).join("");
+  const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">not emitted</td></tr>`).join("");
   const hasTaxonomy = Object.prototype.hasOwnProperty.call(
     terminal,
     "terminal_product_taxonomy",
@@ -604,7 +600,7 @@ function ceramicSection(terminal) {
   } else {
     taxonomy = taxonomyEntity(terminal.terminal_product_taxonomy);
   }
-  return section(7, "Terminal ceramic — cleaned melt", "Cleaned-melt ledger context plus the backend-owned terminal-product taxonomy entity.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${taxonomy}`);
+  return section(7, "Terminal ceramic — cleaned melt", "Cleaned-melt ledger context plus the backend-owned terminal-product taxonomy entity.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol% · emitted</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">No mol% denominator or projection was emitted; none is derived in the viewer. The mol-native ledger remains visible; kg conversion is a backend (W-A0) step.</div>${taxonomy}`);
 }
 
 function costSection(artifact, energy) {
