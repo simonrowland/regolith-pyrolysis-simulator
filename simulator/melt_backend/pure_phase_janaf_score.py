@@ -27,14 +27,24 @@ therefore the same physical quantity and may be differenced directly.  A
 SINGLE-phase apparent G must never be compared against JANAF Delta_fG(T):
 the element offsets do not cancel there.
 
-Polymorph contract: a residual is only meaningful when the engine phase
-and the JANAF table are the same polymorph.  JANAF MgSiO3(cr) (Mg-012) is
-the clinoenstatite assessment; the SiO2 tables are per-polymorph (O-037
-quartz, O-035/O-036 cristobalite high/low; this compilation has NO
-tridymite table).  A mismatched polymorph is a fake residual: the row is
-refused, typed, and never scored.  MAGEMin S/Cp/H exist only for phases
-stable at (T, P); an unreachable property stays a typed absence, never a
-zero.
+Polymorph contract: a residual is only meaningful inside the temperature
+band of one polymorph.  Each JANAF table's bands are read from its own
+printed solid-solid markers (``I <--> II`` and so on), not from a single
+label stamped on the whole table.  Mg-012 (MgSiO3) prints I->II at 903 K
+and II->III at 1258 K; those bands are the printed tokens i / ii / iii.
+The table title does not say clinoenstatite, so the whole table is not
+labelled clinoenstatite, and an engine clino/ortho/proto row is refused
+at every T.  Quartz (O-037) prints the same kind of marker (I->II at
+847 K, aliased to alpha/beta by the existing SiO2 transition table) but
+the title mineral is quartz and both engine quartz phases already contain
+that transition, so alpha and beta score as one mineral and the row names
+the printed sub-form.  Cristobalite high and low are two titled tables
+(O-035 / O-036) and stay two tokens; the engine's single ``cristobalite``
+label matches neither.  A row whose engine polymorph is not the band that
+contains T is refused with ``polymorph_mismatch`` and never scored.  This
+compilation has no tridymite table.  An unreachable property stays a typed
+absence, never a zero; a number returned together with an absence token
+is not scored.
 
 This module is the pure arithmetic/plan half.  The engine/JANAF IO and
 report rendering live in ``scripts/janaf_pure_phase_score.py``.
@@ -42,10 +52,18 @@ report rendering live in ``scripts/janaf_pure_phase_score.py``.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Optional, Tuple
 
+from simulator.battery.enums import StateTag
+from simulator.battery.polymorph_dictionary import (
+    JANAF_TRANSITION_POLYMORPHS,
+    canonicalize_janaf_transition,
+    resolve_janaf_polymorph,
+)
 from simulator.melt_backend.pure_phase import PurePhaseProperties
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 
@@ -94,26 +112,204 @@ class PolymorphMismatchError(ValueError):
 @dataclass(frozen=True)
 class JanafTableSpec:
     table_id: str
-    polymorph: str
     label: str
+    # Used only when the printed title names no polymorph AND the table
+    # has no solid-solid marker (MgO, Mg2SiO4).  Never a stand-in for a
+    # table the markers already split (Mg-012).
+    fallback_polymorph: Optional[str] = None
 
 
 JANAF_TABLES: Mapping[str, JanafTableSpec] = {
-    # Polymorph identities are from the printed table titles
-    # (index_entry.name / title_as_published in the compilation).
-    'Mg-008': JanafTableSpec('Mg-008', 'periclase', 'MgO(cr)'),
-    'O-037': JanafTableSpec('O-037', 'quartz', 'SiO2(cr, quartz)'),
-    'O-036': JanafTableSpec(
-        'O-036', 'cristobalite', 'SiO2(cr, cristobalite-low)'
-    ),
-    'O-035': JanafTableSpec(
-        'O-035', 'cristobalite', 'SiO2(cr, cristobalite-high)'
-    ),
-    # JANAF MgSiO3(cr) is the clinoenstatite assessment (scout P4a finding:
-    # TE cEn Cp matches Mg-012 at +0.03/+2.4 %, TE En is +5/+10 % off).
-    'Mg-012': JanafTableSpec('Mg-012', 'clinoenstatite', 'MgSiO3(cr, clinoenstatite)'),
-    'Mg-028': JanafTableSpec('Mg-028', 'forsterite', 'Mg2SiO4(cr, forsterite)'),
+    'Mg-008': JanafTableSpec('Mg-008', 'MgO(cr)', 'periclase'),
+    'O-037': JanafTableSpec('O-037', 'SiO2(cr, quartz)'),
+    'O-036': JanafTableSpec('O-036', 'SiO2(cr, cristobalite-low)'),
+    'O-035': JanafTableSpec('O-035', 'SiO2(cr, cristobalite-high)'),
+    # Title is "Magnesium Silicate"; polymorphs come from the printed
+    # I/II/III markers, not from a clinoenstatite label.
+    'Mg-012': JanafTableSpec('Mg-012', 'MgSiO3(cr)'),
+    'Mg-028': JanafTableSpec('Mg-028', 'Mg2SiO4(cr)', 'forsterite'),
 }
+
+
+# Engine ``quartz`` spans JANAF alpha and beta: O-037's title is quartz
+# and both engine quartz phases already carry the alpha-beta transition.
+# Cristobalite high/low are separate titled tables and are not listed.
+# MgSiO3 i/ii/iii are not listed: the printed table does not name them
+# clino, ortho, or proto.
+SAME_MINERAL_SUBFORMS: Mapping[str, frozenset] = {
+    'quartz': frozenset({'alpha', 'beta'}),
+}
+
+_PHASE_CHANGE_RE = re.compile(r'^\s*(.+?)\s*<-->\s*(.+?)\s*$')
+
+
+@dataclass(frozen=True)
+class PolymorphBand:
+    """One printed polymorph on a half-open temperature interval.
+
+    ``t_min_K`` is inclusive, ``t_max_K`` exclusive.  None is an open end.
+    The departing phase owns temperatures below the marker; the marker
+    temperature itself belongs to the arriving phase.  Scored value rows
+    do not sit on the marker (those lines are in ``parse_ambiguities``).
+    """
+
+    polymorph: str
+    t_min_K: Optional[float]
+    t_max_K: Optional[float]
+    source: str
+
+
+@dataclass(frozen=True)
+class TablePolymorphBands:
+    title_polymorph: Optional[str]
+    bands: Tuple[PolymorphBand, ...]
+
+
+def _canonical_transition_side(formula: str, side: str) -> Optional[str]:
+    token = JANAF_TRANSITION_POLYMORPHS.get(' '.join(side.upper().split()))
+    if token is None:
+        return None
+    return canonicalize_janaf_transition(formula, token).value
+
+
+def _title_polymorph(table: Mapping) -> Optional[str]:
+    entry = table.get('index_entry') or {}
+    tag, token, _reason = resolve_janaf_polymorph(
+        formula=str(entry.get('formula_normalised') or ''),
+        phase_is_crystal=str(entry.get('state') or '') == 'cr',
+        name=str(entry.get('name') or ''),
+        title=str(table.get('title_as_published') or ''),
+    )
+    if tag is StateTag.VALUE and token is not None:
+        return token.value
+    return None
+
+
+def printed_polymorph_bands(
+    document: Mapping, *, fallback_polymorph: Optional[str] = None
+) -> TablePolymorphBands:
+    """Bands from this table's printed ``LEFT <--> RIGHT`` markers.
+
+    Solid-solid sides become one band each (SiO2 I/II already alias to
+    alpha/beta).  A side that is not a crystal token and a LIQUID right
+    side closes the title/fallback mineral (``CRYSTAL <--> LIQUID``).
+    A table with no such marker is one band: the printed title polymorph,
+    or ``fallback_polymorph`` when the title names none.
+    """
+
+    table = document.get('table') or {}
+    formula = str((table.get('index_entry') or {}).get('formula_normalised') or '')
+    title_polymorph = _title_polymorph(table)
+    splits: list[tuple[float, Optional[str], Optional[str], str]] = []
+    melt_caps: list[float] = []
+    for item in table.get('parse_ambiguities') or ():
+        if not isinstance(item, Mapping):
+            continue
+        raw = str(item.get('raw_line') or '')
+        fields = raw.split('\t')
+        while fields and fields[-1] == '':
+            fields.pop()
+        if len(fields) < 2:
+            continue
+        label = fields[-1].strip()
+        match = _PHASE_CHANGE_RE.fullmatch(label)
+        if match is None:
+            continue
+        try:
+            temperature = float(fields[0].split()[0])
+        except ValueError:
+            continue
+        left = _canonical_transition_side(formula, match.group(1))
+        right_raw = match.group(2).strip()
+        right = _canonical_transition_side(formula, right_raw)
+        right_is_liquid = right_raw.upper() == 'LIQUID'
+        if left is not None and (right is not None or right_is_liquid):
+            splits.append((temperature, left, right, label))
+        elif left is None and right is None and right_is_liquid:
+            melt_caps.append(temperature)
+    splits.sort(key=lambda item: item[0])
+    if splits:
+        bands = []
+        first_T, first_left, _first_right, first_label = splits[0]
+        if first_left is not None:
+            bands.append(PolymorphBand(first_left, None, first_T, first_label))
+        for index, (temperature, _left, right, label) in enumerate(splits):
+            if right is None:
+                continue
+            next_T = splits[index + 1][0] if index + 1 < len(splits) else None
+            bands.append(PolymorphBand(right, temperature, next_T, label))
+        return TablePolymorphBands(title_polymorph, tuple(bands))
+    polymorph = title_polymorph or fallback_polymorph
+    if polymorph is None:
+        return TablePolymorphBands(title_polymorph, ())
+    t_max = min(melt_caps) if melt_caps else None
+    source = (
+        'printed title; crystal band closed by CRYSTAL <--> LIQUID'
+        if t_max is not None
+        else 'printed title; no solid-solid marker'
+    )
+    return TablePolymorphBands(
+        title_polymorph,
+        (PolymorphBand(polymorph, None, t_max, source),),
+    )
+
+
+@lru_cache(maxsize=None)
+def bands_for_table_id(table_id: str) -> TablePolymorphBands:
+    spec = JANAF_TABLES[table_id]
+    return printed_polymorph_bands(
+        load_janaf_table(table_id),
+        fallback_polymorph=spec.fallback_polymorph,
+    )
+
+
+def _band_contains(band: PolymorphBand, temperature_K: float) -> bool:
+    if band.t_min_K is not None and temperature_K < band.t_min_K:
+        return False
+    if band.t_max_K is not None and temperature_K >= band.t_max_K:
+        return False
+    return True
+
+
+def _band_polymorph_matches(
+    engine_polymorph: str,
+    band: PolymorphBand,
+    title_polymorph: Optional[str],
+) -> bool:
+    if engine_polymorph == band.polymorph:
+        return True
+    subforms = SAME_MINERAL_SUBFORMS.get(title_polymorph or '')
+    return bool(
+        title_polymorph
+        and engine_polymorph == title_polymorph
+        and subforms
+        and band.polymorph in subforms
+    )
+
+
+def matching_band(
+    engine_polymorph: Optional[str],
+    info: TablePolymorphBands,
+    temperature_K: float,
+) -> Optional[PolymorphBand]:
+    if engine_polymorph is None:
+        return None
+    for band in info.bands:
+        if not _band_contains(band, temperature_K):
+            continue
+        if _band_polymorph_matches(engine_polymorph, band, info.title_polymorph):
+            return band
+    return None
+
+
+def _band_edges(info: TablePolymorphBands) -> str:
+    def edge(value: Optional[float]) -> str:
+        return '-inf' if value is None else f'{value:g}'
+
+    return ', '.join(
+        f'{band.polymorph} [{edge(band.t_min_K)}, {edge(band.t_max_K)})'
+        for band in info.bands
+    ) or 'none'
 
 
 @dataclass(frozen=True)
@@ -286,16 +482,46 @@ def engine_phase_polymorph(engine: str, phase_id: str) -> Optional[str]:
 
 
 def require_polymorph_match(
-    engine_polymorph: Optional[str], janaf: JanafTableSpec, *, context: str
-) -> None:
-    """Refuse typed unless engine phase and JANAF table are one polymorph."""
+    engine_polymorph: Optional[str],
+    janaf: JanafTableSpec,
+    *,
+    temperature_K: float,
+    context: str,
+) -> PolymorphBand:
+    """The printed band at T, or a typed refusal when the engine is outside it."""
 
-    if engine_polymorph is None or engine_polymorph != janaf.polymorph:
-        raise PolymorphMismatchError(
-            f'{context}: engine polymorph {engine_polymorph!r} does not match '
-            f'JANAF table {janaf.table_id} polymorph {janaf.polymorph!r}; '
-            'a mismatched polymorph is a fake residual'
+    info = bands_for_table_id(janaf.table_id)
+    band = matching_band(engine_polymorph, info, temperature_K)
+    if band is None:
+        containing = next(
+            (
+                item.polymorph
+                for item in info.bands
+                if _band_contains(item, temperature_K)
+            ),
+            'none',
         )
+        raise PolymorphMismatchError(
+            f'{context}: engine polymorph {engine_polymorph!r} is not the '
+            f'printed JANAF band {containing!r} of table {janaf.table_id} at '
+            f'{temperature_K:g} K (bands: {_band_edges(info)}); a row outside '
+            f'the matching band is a fake residual'
+        )
+    return band
+
+
+def _subform_note(
+    engine_polymorph: Optional[str], band: PolymorphBand
+) -> Optional[str]:
+    """Note when a same-mineral exemption scored a printed sub-form."""
+
+    if engine_polymorph is None or engine_polymorph == band.polymorph:
+        return None
+    return (
+        f"JANAF printed sub-form {band.polymorph} ({band.source}); same "
+        f"mineral as engine {engine_polymorph}; the marker is read, and "
+        f"alpha/beta inside one quartz phase is not a mismatch"
+    )
 
 
 # ------------------------------------------------------------- the plan --
@@ -326,12 +552,12 @@ REACTION_FORSTERITE = ReactionSpec(
     },
 )
 
-# MgO(cr) + SiO2(cr) -> MgSiO3(cr).  JANAF MgSiO3(cr) = clinoenstatite, so
-# only TE cEn matches; MAGEMin's opx 'en' endmember is ORTHOenstatite ->
-# the MAGEMin rows of this reaction are refused typed (fake residual).
+# MgO(cr) + SiO2(cr) -> MgSiO3(cr).  Mg-012's printed bands are i/ii/iii,
+# not clinoenstatite.  Neither TE cEn nor MAGEMin en is one of those
+# tokens, so both engines' rows are refused typed.
 REACTION_ENSTATITE = ReactionSpec(
     reaction_id='MgO+SiO2->MgSiO3',
-    equation='MgO(cr) + SiO2(cr, quartz) -> MgSiO3(cr, clinoenstatite)',
+    equation='MgO(cr) + SiO2(cr, quartz) -> MgSiO3(cr)',
     terms=(('MgSiO3', 1.0), ('MgO', -1.0), ('SiO2', -1.0)),
     janaf_table_by_role={
         'MgO': 'Mg-008',
@@ -363,11 +589,10 @@ DEFAULT_PHASE_REQUESTS: Tuple[PhaseScoreRequest, ...] = (
     PhaseScoreRequest('thermoengine', 'Fo', 'Mg-028'),
     PhaseScoreRequest('magemin', 'q', 'O-037'),
     PhaseScoreRequest('thermoengine', 'Qz', 'O-037'),
+    # cEn / En / en are clino or ortho.  Mg-012's printed bands are
+    # i/ii/iii, so all three requests are refused at every default T.
     PhaseScoreRequest('thermoengine', 'cEn', 'Mg-012'),
-    # Planned refusal demonstrations (typed, never scored):
-    # TE 'En' is orthoenstatite -- mismatched against clinoenstatite Mg-012.
     PhaseScoreRequest('thermoengine', 'En', 'Mg-012'),
-    # MAGEMin opx 'en' is orthoenstatite -- same mismatch.
     PhaseScoreRequest('magemin', 'en', 'Mg-012'),
     # This JANAF compilation has no tridymite table; trd is the stable
     # MAGEMin silica polymorph at 1500 K, so the gap is real and typed.
@@ -375,8 +600,10 @@ DEFAULT_PHASE_REQUESTS: Tuple[PhaseScoreRequest, ...] = (
 )
 
 
-def preflight_phase_request(request: PhaseScoreRequest) -> Optional[RefusalRow]:
-    """Refuse a phase row typed when the polymorph contract cannot hold."""
+def preflight_phase_request(
+    request: PhaseScoreRequest, *, temperature_K: float
+) -> Optional[RefusalRow]:
+    """Refuse one phase row at one T when the polymorph band does not match."""
 
     engine_polymorph = engine_phase_polymorph(request.engine, request.phase_id)
     if request.janaf_table_id is None:
@@ -389,6 +616,7 @@ def preflight_phase_request(request: PhaseScoreRequest) -> Optional[RefusalRow]:
             ),
             engine=request.engine,
             phase_id=request.phase_id,
+            temperature_K=temperature_K,
             engine_polymorph=engine_polymorph,
         )
     janaf = JANAF_TABLES[request.janaf_table_id]
@@ -396,23 +624,36 @@ def preflight_phase_request(request: PhaseScoreRequest) -> Optional[RefusalRow]:
         require_polymorph_match(
             engine_polymorph,
             janaf,
+            temperature_K=temperature_K,
             context=f'{request.engine} {request.phase_id}',
         )
     except PolymorphMismatchError as exc:
+        info = bands_for_table_id(request.janaf_table_id)
+        containing = next(
+            (
+                item.polymorph
+                for item in info.bands
+                if _band_contains(item, temperature_K)
+            ),
+            None,
+        )
         return RefusalRow(
             reason=POLYMORPH_MISMATCH,
             detail=str(exc),
             engine=request.engine,
             phase_id=request.phase_id,
             janaf_table_id=request.janaf_table_id,
+            temperature_K=temperature_K,
             engine_polymorph=engine_polymorph,
-            janaf_polymorph=janaf.polymorph,
+            janaf_polymorph=containing,
         )
     return None
 
 
-def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalRow]:
-    """Refuse a reaction for one engine when any term's polymorph mismatches."""
+def preflight_reaction(
+    reaction: ReactionSpec, engine: str, *, temperature_K: float
+) -> Optional[RefusalRow]:
+    """Refuse one reaction row at one T when any term's band does not match."""
 
     phase_by_role = reaction.engine_phase_by_role.get(engine)
     if phase_by_role is None:
@@ -421,6 +662,7 @@ def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalR
             detail=f'no {engine} phase map for {reaction.reaction_id}',
             engine=engine,
             reaction_id=reaction.reaction_id,
+            temperature_K=temperature_K,
         )
     for role, _nu in reaction.terms:
         phase_id = phase_by_role[role]
@@ -430,9 +672,19 @@ def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalR
             require_polymorph_match(
                 engine_polymorph,
                 janaf,
+                temperature_K=temperature_K,
                 context=f'{engine} {phase_id} (role {role})',
             )
         except PolymorphMismatchError as exc:
+            info = bands_for_table_id(janaf.table_id)
+            containing = next(
+                (
+                    item.polymorph
+                    for item in info.bands
+                    if _band_contains(item, temperature_K)
+                ),
+                None,
+            )
             return RefusalRow(
                 reason=POLYMORPH_MISMATCH,
                 detail=str(exc),
@@ -440,8 +692,9 @@ def preflight_reaction(reaction: ReactionSpec, engine: str) -> Optional[RefusalR
                 reaction_id=reaction.reaction_id,
                 phase_id=phase_id,
                 janaf_table_id=janaf.table_id,
+                temperature_K=temperature_K,
                 engine_polymorph=engine_polymorph,
-                janaf_polymorph=janaf.polymorph,
+                janaf_polymorph=containing,
             )
     return None
 
@@ -485,12 +738,13 @@ def build_reaction_row(
         table_id = reaction.janaf_table_by_role[role]
         janaf_spec = JANAF_TABLES[table_id]
         props = engine_query(phase_id, temperature_K)
-        # Live re-check: the RETURNED polymorph must match the JANAF table,
-        # not just the static map (drift in an engine map is caught here).
-        require_polymorph_match(
+        # Live re-check: the RETURNED polymorph must sit in the printed
+        # band at this T, not just the static map.
+        band = require_polymorph_match(
             props.polymorph,
             janaf_spec,
-            context=f'{engine} {phase_id} live at {temperature_K} K',
+            temperature_K=temperature_K,
+            context=f'{engine} {phase_id} live at {temperature_K:g} K',
         )
         if props.G_J_mol is None:
             raise ValueError(
@@ -511,7 +765,7 @@ def build_reaction_row(
                 engine_phase_id=phase_id,
                 engine_polymorph=props.polymorph,
                 janaf_table_id=table_id,
-                janaf_polymorph=janaf_spec.polymorph,
+                janaf_polymorph=band.polymorph,
                 engine_G_kJ_mol=engine_g_kJ,
                 janaf_dfG_kJ_mol=janaf_values.formation_gibbs_kJ_mol,
             )
@@ -521,6 +775,13 @@ def build_reaction_row(
     drg_engine = reaction_sum(engine_terms)
     drg_janaf = reaction_sum(janaf_terms)
     notes = list(_quartz_notes(temperature_K))
+    for detail in details:
+        if detail.engine_polymorph != detail.janaf_polymorph:
+            notes.append(
+                f'{detail.role}: JANAF printed sub-form '
+                f'{detail.janaf_polymorph} at {temperature_K:g} K; same '
+                f'mineral as engine {detail.engine_polymorph}'
+            )
     drg_no_adj: Optional[float] = None
     residual_no_adj: Optional[float] = None
     if engine == 'thermoengine':
@@ -568,10 +829,13 @@ def build_phase_row(
 
     janaf_spec = JANAF_TABLES[request.janaf_table_id or '']
     props = engine_query(request.phase_id, temperature_K)
-    require_polymorph_match(
+    band = require_polymorph_match(
         props.polymorph,
         janaf_spec,
-        context=f'{request.engine} {request.phase_id} live at {temperature_K} K',
+        temperature_K=temperature_K,
+        context=(
+            f'{request.engine} {request.phase_id} live at {temperature_K:g} K'
+        ),
     )
     janaf_values = janaf_query(request.janaf_table_id or '', temperature_K)
     if janaf_values is None:
@@ -585,6 +849,15 @@ def build_phase_row(
         else engine_query(request.phase_id, 298.15)
     )
     absence_by_property = {a.property: a.reason for a in props.absences}
+    conflicted = [
+        name
+        for name, value in (
+            ('S', props.S_J_K_mol),
+            ('Cp', props.Cp_J_K_mol),
+            ('H', props.H_J_mol),
+        )
+        if value is not None and name in absence_by_property
+    ]
 
     def entry(
         prop: str,
@@ -594,8 +867,10 @@ def build_phase_row(
     ) -> PropertyResidual:
         # PropertyAbsence tokens use 'H'; the residual row names the derived
         # quantity 'H_increment' -- same absence, convention-free basis.
+        # A number alongside an absence token is not scored: the absence wins.
         absence_prop = 'H' if prop == 'H_increment' else prop
-        if engine_value is None:
+        absence_reason = absence_by_property.get(absence_prop)
+        if absence_reason is not None or engine_value is None:
             return PropertyResidual(
                 property=prop,
                 engine=None,
@@ -603,7 +878,7 @@ def build_phase_row(
                 residual=None,
                 residual_pct=None,
                 units=units,
-                absence_reason=absence_by_property.get(absence_prop, 'absent'),
+                absence_reason=absence_reason or 'absent',
             )
         if janaf_value is None:
             return PropertyResidual(
@@ -626,7 +901,11 @@ def build_phase_row(
         )
 
     h_increment_engine: Optional[float]
-    if props.H_J_mol is None or props_298.H_J_mol is None:
+    if (
+        'H' in absence_by_property
+        or props.H_J_mol is None
+        or props_298.H_J_mol is None
+    ):
         h_increment_engine = None
     else:
         h_increment_engine = enthalpy_increment_kJ_mol(
@@ -645,22 +924,24 @@ def build_phase_row(
     notes = list(
         _quartz_notes(temperature_K) if props.polymorph == 'quartz' else ()
     )
-    if props.engine == 'magemin' and props.host_phase is not None:
-        # Controller review of 037f84bce: MAGEMin S/Cp/H are read on the
-        # dominant equilibrium instance of the host solution (endmember
-        # fraction ~0.999, slightly impure), while G is the pure-endmember
-        # gbase.  The residual rows are labelled accordingly.
+    subform = _subform_note(props.polymorph, band)
+    if subform is not None:
+        notes.append(subform)
+    if conflicted:
         notes.append(
-            f"S/Cp/H read on the dominant '{props.host_phase}' equilibrium "
-            'instance (endmember ~0.999, slightly impure); G is the pure '
-            'endmember gbase'
+            'engine returned a number and a PropertyAbsence for '
+            + ', '.join(conflicted)
+            + '; the absence wins and the number is not scored'
         )
+    for warning in props.warnings:
+        if warning not in notes:
+            notes.append(warning)
     return PhaseRow(
         engine=request.engine,
         phase_id=request.phase_id,
         polymorph=props.polymorph,
         janaf_table_id=janaf_spec.table_id,
-        janaf_polymorph=janaf_spec.polymorph,
+        janaf_polymorph=band.polymorph,
         temperature_K=temperature_K,
         properties=properties,
         notes=tuple(notes),

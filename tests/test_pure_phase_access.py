@@ -301,7 +301,7 @@ def test_klb1_fallback_refused_live():
         _stdout, matlab_text, _w = backend._run_pure_phase_probe(
             bulk_wt_ig={"MgO": 100.0},
             temperature_C=25.0,
-            pressure_kbar=1.0e-4,
+            pressure_kbar=1.0e-3,  # 1 bar; --Pres is kbar
         )
     finally:
         backend.close()
