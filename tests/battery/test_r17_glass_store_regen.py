@@ -31,16 +31,17 @@ JANAF_STORE = (
 # Tip that shipped the glass generator without a store regen (R17 evidence).
 STALE_TIP = "b5b9dacc8"
 
-_MG_CP_ID = "nist-janaf-4th:Mg-013:cp:segment-0"
-_W_CP_ID = "nist-janaf-4th:W-003:cp:segment-0"
-_GLASS_LIQUID_ID_RE = re.compile(
-    r"observation_id:\s+(nist-janaf-4th:[^:]+:transition_temperature:glass-liquid)"
-)
-_CP_SEGMENT_RE = re.compile(
-    r"observation_id:\s+nist-janaf-4th:([^:]+):cp:segment-0\n"
-    r"(?:  .*\n)*?"
+_MG_CP_ID = "nist-janaf-4th:Mg-013:cp:phase-window:whole"
+_W_CP_ID = "nist-janaf-4th:W-003:cp:phase-window:whole"
+# F4 retargeted JANAF segment ids to phase-window T-bounds and keyed
+# transitions on temperature (not printed glass-liquid subtype). Detect
+# glass-region cp series by a printed GLASS marker in the phase reason.
+_CP_GLASS_RE = re.compile(
+    r"observation_id:\s+nist-janaf-4th:([^:]+):cp:phase-window:[^\n]+\n"
+    r"(?:.*\n){0,80}?"
     r"      phase:\n"
     r"        tag:\s+(\w+)(?:\n        value:\s+(\w+))?",
+    re.M,
 )
 
 
@@ -67,13 +68,15 @@ def _phase_token(tag: str, value: str | None) -> str:
     return value if tag == "value" else tag
 
 
-def _glass_liquid_tables_and_cp_phases(text: str) -> tuple[set[str], dict[str, str]]:
-    tables = {
-        match.group(1).split(":")[1] for match in _GLASS_LIQUID_ID_RE.finditer(text)
-    }
+def _glass_region_cp_tables_and_phases(text: str) -> tuple[set[str], dict[str, str]]:
+    tables: set[str] = set()
     phases: dict[str, str] = {}
-    for match in _CP_SEGMENT_RE.finditer(text):
+    for match in _CP_GLASS_RE.finditer(text):
         table, tag, value = match.group(1), match.group(2), match.group(3)
+        chunk = text[match.start() : match.start() + 2500]
+        if "GLASS" not in chunk.upper():
+            continue
+        tables.add(table)
         phases[table] = _phase_token(tag, value)
     return tables, phases
 
@@ -87,16 +90,16 @@ def _observation_phase(path: Path, observation_id: str) -> dict:
 
 
 def test_committed_store_glass_region_cp_series_are_unknown_not_liquid() -> None:
-    """All 128 glass-liquid tables must have cp:segment-0 phase unknown."""
+    """All 128 glass-region tables must have cp phase-window phase unknown."""
     glass_tables: set[str] = set()
     cp_phases: dict[str, str] = {}
     for path in sorted(JANAF_STORE.glob("janaf-*.yaml")):
-        tables, phases = _glass_liquid_tables_and_cp_phases(
+        tables, phases = _glass_region_cp_tables_and_phases(
             path.read_text(encoding="utf-8")
         )
         glass_tables |= tables
         for table in tables:
-            assert table in phases, f"{table}: missing cp:segment-0 in {path.name}"
+            assert table in phases, f"{table}: missing glass-region cp phase-window in {path.name}"
             cp_phases[table] = phases[table]
     assert len(glass_tables) == 128, (
         f"expected 128 glass-liquid tables, found {len(glass_tables)}"
