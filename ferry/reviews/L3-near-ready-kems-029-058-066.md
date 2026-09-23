@@ -130,9 +130,9 @@ Derived store not regenerated (extract-only lane).
 
 ## Commits / push
 
-Tip: `eeb82ca33e8ee9f9148fd39be0784c280474811a`
+Tip: `72f3b92da5ffdbd24f188ba65f807d91b5e520df`
 
 
 ## Push
 
-Branch pushed:  on .
+Branch pushed: `72f3b92da5ffdbd24f188ba65f807d91b5e520df` on `origin/empirical/l3-near-ready-kems-029-058-066-2026-09-22`.
