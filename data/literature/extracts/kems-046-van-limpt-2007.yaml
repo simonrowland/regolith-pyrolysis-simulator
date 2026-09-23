@@ -271,7 +271,10 @@ species:
       values:
         quantity: measured_K2O_activity_vs_temperature
         measurement_status: measured_figure_only
-        rows: [{temperature_C: 1400, a_K2O_approx: 0.5e-11}, {temperature_C: 1500, a_K2O_approx: 1.0e-11}, {temperature_C: 1520, a_K2O_approx: 1.5e-11}]
+        rows:
+        - {temperature_C: 1410, K2O_mass_pct: 4.8, a_K2O_approx: 0.5e-11}
+        - {temperature_C: 1410, K2O_mass_pct: 7.8, a_K2O_approx: 1.0e-11}
+        - {temperature_C: 1510, K2O_mass_pct: 4.8, a_K2O_approx: 1.5e-11}
         reported_relative_standard_deviation_pct: [24, 31]
   B:
     observations:
