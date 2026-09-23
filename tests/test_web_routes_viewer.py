@@ -737,6 +737,26 @@ def test_incomplete_cost_inputs_stay_pending_without_estimate_label() -> None:
     assert "Total not emitted" not in html
 
 
+def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = []
+    artifact["terminal"]["run_metadata"] = {
+        "cost_rollup_diagnostic": {
+            "pumping_diagnostic": {
+                "status": "no_rows",
+                "rows": [],
+                "pumping_electrical_kWh": 0.0,
+            }
+        }
+    }
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "Pumping energy</span><b>not computed — no rows" in html
+    assert "Pumping status</span><b>no_rows" in html
+    assert 'Pumping energy</span><b><span title="0 kWh">0 kWh' not in html
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 

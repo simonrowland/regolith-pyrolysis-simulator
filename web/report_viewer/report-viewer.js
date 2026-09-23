@@ -355,12 +355,14 @@ function wallAndOxygenSection(artifact, rows) {
   }
   const wallTotal = wallComplete && Object.keys(wallSpecies).length ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
+  const pumpingEnergy = pumping?.status === "no_rows"
+    ? "not computed — no rows"
+    : (pumping && hasNumber(pumping.pumping_electrical_kWh)
+      ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh`
+      : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted"));
   const o2 = sourceSideO2(last);
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
   const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
-  const pumpingEnergy = pumping && hasNumber(pumping.pumping_electrical_kWh)
-    ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh`
-    : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted");
   const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${esc(pumpingEnergy)}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
