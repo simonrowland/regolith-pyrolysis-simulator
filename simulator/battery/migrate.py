@@ -4605,6 +4605,8 @@ def _convert_compilation_amount(
         ctx.prec = 80
         if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
+        if heat and token in {"j/mol/k", "j/molk", "j/deg-mole", "j/degmole"}:
+            return amount, "identity:J_per_mol_K"
         if energy and token in {"kcal/mol", "kcal/mole"}:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:

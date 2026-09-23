@@ -3392,6 +3392,12 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     )
 
 
+def test_joule_heat_capacity_unit_is_identity() -> None:
+    selection = select_declared_source(Quantity.CP, "J/mol/K", {"cp": 25})
+    assert selection.value.kind is ValueKind.POINT
+    assert selection.value.point == as_decimal("25")
+
+
 def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-1447.json")
