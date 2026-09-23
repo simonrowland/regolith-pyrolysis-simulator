@@ -57,7 +57,7 @@ def _fe_series(**overrides):
 @pytest.mark.parametrize("bad_value", [math.nan, math.inf, -math.inf])
 def test_f5_nonfinite_regime_factor_refuses_by_name(bad_value):
     """NaN / +/-inf regime_factor must raise DepositionInputRefusal naming
-    regime_factor. Pre-fix, NaN produced the viscous flux (0.00589) instead
+    regime_factor. Pre-fix, NaN produced the viscous flux (0.005821) instead
     of refusing, 120x below free-molecular (0.710)."""
     with pytest.raises(
         DepositionInputRefusal,
@@ -74,7 +74,9 @@ def test_f5_nan_regime_factor_is_not_the_viscous_flux():
     flux_freemol = _fe_series(regime_factor=1.0)
     flux_viscous = _fe_series(regime_factor=0.0)
     assert flux_freemol == pytest.approx(0.710, rel=1e-2)
-    assert flux_viscous == pytest.approx(0.00589, rel=1e-2)
+    # 03616bb20 moved Chapman-Enskog D_AB by the atmosphere/bar prefactor
+    # ratio 0.9879823545; this viscous reference therefore moved with it.
+    assert flux_viscous == pytest.approx(0.005821160912253869, rel=1e-6)
     assert flux_freemol / flux_viscous > 100.0
     with pytest.raises(DepositionInputRefusal, match="parameter=regime_factor"):
         _fe_series(regime_factor=math.nan)

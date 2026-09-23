@@ -93,8 +93,13 @@ def test_e_down_from_s_zero_delta_still_refused():
 
 def test_interface_resistance_share_valid_pin_unchanged():
     series = interface_resistance_share(**_SHARE_KW)
-    assert series.flux_kg_s_m2 == pytest.approx(3.320903236135304e-06)
-    assert interface_share_s(series) == pytest.approx(0.0430930618815259)
+    # 03616bb20 corrected the Chapman-Enskog constant from the bar-form
+    # 0.00266 used with P[atm] to the BSL atmosphere form
+    # 0.0018583*sqrt(2)=0.002628033.  Thus D_AB moves by 0.9879823545;
+    # with finite interface resistance the series flux moves by
+    # (R_i + R_g,old)/(R_i + R_g,new)=0.9884942731, not linearly with D_AB.
+    assert series.flux_kg_s_m2 == pytest.approx(3.2826938303855116e-06)
+    assert interface_share_s(series) == pytest.approx(0.04259724487953812)
 
 
 def test_interface_resistance_share_zero_overhead_is_vacuum_hkl():
