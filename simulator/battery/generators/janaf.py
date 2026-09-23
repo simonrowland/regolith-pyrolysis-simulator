@@ -34,6 +34,7 @@ from simulator.battery.polymorph_dictionary import (
     canonicalize_janaf_transition,
     resolve_janaf_polymorph,
 )
+from simulator.battery.stable_ids import phase_window_suffix
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -1357,7 +1358,11 @@ def _observation(
         suffix = f"transition_temperature:{subtype}"
     else:
         assert segment is not None
-        suffix = f"{quantity.value}:segment-{segment.index}"
+        suffix = phase_window_suffix(
+            quantity.value,
+            lower_K=segment.lower_K,
+            upper_K=segment.upper_K,
+        )
     return Observation(
         observation_id=f"{SOURCE_ID}:{table_id}:{suffix}",
         experiment_id=f"{SOURCE_ID}:{table_id}:tabulation",

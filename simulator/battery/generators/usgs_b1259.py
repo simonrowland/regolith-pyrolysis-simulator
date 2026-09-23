@@ -41,6 +41,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
+from simulator.battery.stable_ids import tabulated_cell_suffix
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -1486,9 +1487,13 @@ def _observation(
         original_method_class=method_class,
         model="assessed_thermodynamic_functions",
     )
-    suffix = (
-        f"{quantity.value}:{basis or 'shared'}:"
-        f"T={temperature}:row={token.row_index}:col={token.column}"
+    published_name = str(record.get("name_as_published") or "") or None
+    suffix = tabulated_cell_suffix(
+        quantity.value,
+        temperature=temperature,
+        column=token.column,
+        basis=basis or "shared",
+        name=published_name,
     )
     return Observation(
         observation_id=f"{SOURCE_ID}:{record_id}:{suffix}",
@@ -1615,10 +1620,11 @@ def _identity_band_1x_10x(
         if not (tolerance > 0 and residual > tolerance and residual <= 10 * tolerance):
             continue
         row_index = result.get("row_index")
+        temperature = result.get("temperature_as_published")
         stored_with_notice = sorted(
             observation_id
             for observation_id in noticed_ids
-            if f":row={row_index}:" in observation_id
+            if temperature is not None and f":T={temperature}:" in observation_id
         )
         rows.append(
             {
