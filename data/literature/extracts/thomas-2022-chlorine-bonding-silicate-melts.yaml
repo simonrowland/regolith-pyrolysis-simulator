@@ -258,9 +258,8 @@ species:
         equation: logCCl = 1.601 + (4470 XCa - 3430 XSi + 2592 XFe - 4092 XK - 849 P) / T
         source_basis: 25 natural and synthetic silicate melt compositions from Thomas and Wood (2022); not a direct measurement in this paper
     - observation_id: thomas_2022_table2_experimental_conditions_and_xaf
+      experiment: quench-glass-series
       type: gibbs_table
-       experiment: quench-glass-series
-       type: experiment_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
         published_page: 121273
