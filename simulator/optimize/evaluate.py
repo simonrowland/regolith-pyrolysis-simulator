@@ -5246,6 +5246,13 @@ def _composition_wt_pct_to_mol(
     values: Mapping[Any, Any],
     run_execution: Any,
 ) -> dict[str, float]:
+    """Convert wt% to mol for rump-terminal proof inputs.
+
+    Any positive-mass species that cannot prove a formula refuses the
+    whole conversion (empty map). Omitting the species would drop mass
+    from the proof digest while looking like a successful leaner melt.
+    """
+
     sim = getattr(run_execution, "simulator", None)
     registry = dict(getattr(sim, "species_formula_registry", {}) or {})
     result: dict[str, float] = {}
@@ -5258,7 +5265,7 @@ def _composition_wt_pct_to_mol(
         try:
             formula = resolve_species_formula(str(species), registry)
         except Exception:  # noqa: BLE001 - unregistered species cannot prove
-            continue
+            return {}
         mol = mass_basis / formula.molar_mass_kg_per_mol()
         if math.isfinite(mol) and mol > 0.0:
             result[str(species)] = mol
