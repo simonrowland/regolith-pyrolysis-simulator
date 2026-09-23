@@ -351,9 +351,7 @@
       return `<div class="sec-p15-source-o2 sec-p15-inline-pending"><strong>${esc("Source-side O₂ readout pending")}</strong>` +
         `<span>${esc("Metric label and cumulative kg value not emitted")}</span></div>`;
     }
-    const renderedLabel = label !== null
-      ? label
-      : "Source-side O₂ metric label pending — not emitted";
+    const renderedLabel = label !== null ? label : "Source-side O₂ potential";
     const renderedAmount = amount !== null
       ? fmtNum(amount, "kg")
       : "Cumulative kg value pending — not emitted";
