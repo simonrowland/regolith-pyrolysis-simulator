@@ -3105,6 +3105,104 @@ def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
     assert state.is_value and state.value is Quantity.DELTA_FG
 
 
+def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
+    """Printed ATcT / NASA-Glenn formation enthalpy is Quantity.DELTA_FH."""
+    atct = {
+        "record_id": "atct-fixture",
+        "formula": "H2",
+        "phase": "g",
+        "formation_enthalpy_298_15_K_as_published": "0",
+        "units_as_published": "kJ/mol",
+    }
+    state, reason = compilation_quantity_from_record(atct)
+    assert state.is_value and state.value is Quantity.DELTA_FH and reason is None
+    sel = select_declared_source(state, None, atct)
+    assert sel.amount == as_decimal("0")
+    assert sel.value.kind is ValueKind.POINT
+    assert sel.field_name == "formation_enthalpy_298_15_K_as_published"
+
+    nasa = {
+        "record_id": "NG-fixture",
+        "formula": "CO2",
+        "phase": "gas",
+        "delta_f_H_298_15": {
+            "as_published": "-393510.000",
+            "value": -393510.0,
+            "units_as_published": "J/mol",
+        },
+        "intervals": [{"range_as_published": "200 1000"}],
+    }
+    state, reason = compilation_quantity_from_record(nasa)
+    assert state.is_value and state.value is Quantity.DELTA_FH and reason is None
+    sel = select_declared_source(state, None, nasa)
+    assert sel.amount == as_decimal("-393510.0")
+    assert sel.value.kind is ValueKind.POINT
+    assert sel.field_name == "delta_f_H_298_15"
+
+
+def test_g1_delta_fh_migrate_admits_point_without_token_queue(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "atct", "atct-1.222-0001.json")
+    _copy_compilation_record(root, "nasa-glenn", "NG-0467.json")
+    result = migrate(root, write=False)
+
+    atct_obs = [
+        obs
+        for oid, obs in result.observations.items()
+        if "atct-1.222-0001" in oid
+    ]
+    assert atct_obs
+    assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in atct_obs)
+    assert all(obs.value.kind is ValueKind.POINT for obs in atct_obs)
+    assert all(obs.value.point == as_decimal("0") for obs in atct_obs)
+
+    ng_obs = [
+        obs
+        for oid, obs in result.observations.items()
+        if "NG-0467" in oid
+    ]
+    assert ng_obs
+    assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in ng_obs)
+    assert all(obs.value.kind is ValueKind.POINT for obs in ng_obs)
+    assert all(obs.value.point == as_decimal("-103772.885") for obs in ng_obs)
+
+    for entry in result.queue:
+        assert "not a v2.1 Quantity token" not in (entry.why or "")
+
+
+def test_g1_delta_fh_mapping_mutation_proof() -> None:
+    """Removing formation-enthalpy cell maps restores the pre-fix unknown reason."""
+    from simulator.battery import migrate as migrate_mod
+
+    doc = {
+        "record_id": "atct-mut",
+        "formation_enthalpy_298_15_K_as_published": "12.5",
+    }
+    live, live_reason = compilation_quantity_from_record(doc)
+    assert live.is_value and live.value is Quantity.DELTA_FH and live_reason is None
+
+    saved = dict(migrate_mod._COMPILATION_CELL_QUANTITY)
+    try:
+        for key in (
+            "formation_enthalpy_298_15_K_as_published",
+            "delta_f_H_298_15",
+            "delta_f_H",
+            "delta_fH",
+            "deltafH",
+            "formation_enthalpy",
+        ):
+            migrate_mod._COMPILATION_CELL_QUANTITY.pop(key, None)
+        mutant, mutant_reason = compilation_quantity_from_record(doc)
+        assert not mutant.is_value
+        assert mutant_reason == "printed compilation columns are not mapped to a closed quantity"
+    finally:
+        migrate_mod._COMPILATION_CELL_QUANTITY.clear()
+        migrate_mod._COMPILATION_CELL_QUANTITY.update(saved)
+
+    restored, restored_reason = compilation_quantity_from_record(doc)
+    assert restored.is_value and restored.value is Quantity.DELTA_FH and restored_reason is None
+
+
 def test_l05c1_costa_control_is_not_condensation() -> None:
     row = _extract_observation(
         "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"

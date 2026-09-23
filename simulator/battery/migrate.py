@@ -349,6 +349,9 @@ QUANTITY_ALIASES = {
     "deltafG": Quantity.DELTA_FG,
     "delta_fG": Quantity.DELTA_FG,
     "delta_fG_kJ_mol": Quantity.DELTA_FG,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "delta_f_H": Quantity.DELTA_FH,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "activity": Quantity.ACTIVITY,
@@ -2307,6 +2310,12 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "table_kJ_mol": Quantity.DELTA_FG,
     "Gf": Quantity.DELTA_FG,
     "formation_gibbs_energy": Quantity.DELTA_FG,
+    "delta_f_H_298_15": Quantity.DELTA_FH,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "formation_enthalpy_298_15_K_as_published": Quantity.DELTA_FH,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
@@ -2893,6 +2902,12 @@ _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
     "Gf": Quantity.DELTA_FG,
     "formation_gibbs_energy": Quantity.DELTA_FG,
     "formation_gibbs": Quantity.DELTA_FG,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_f_H_298_15": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "formation_enthalpy_298_15_K_as_published": Quantity.DELTA_FH,
     "log_kf": Quantity.LOG10_KF,
     "log_Kf": Quantity.LOG10_KF,
     "log10_Kf": Quantity.LOG10_KF,
@@ -2941,12 +2956,16 @@ def compilation_quantity_from_record(
     if kind in _COMPILATION_KIND_NOT_QUANTITY or table_kind in _COMPILATION_KIND_NOT_QUANTITY:
         return State.unknown(_COMPILATION_UNKNOWN_REASON), _COMPILATION_UNKNOWN_REASON
     named: set[Quantity] = set()
+    named.update(_compilation_cell_quantities(doc))
     labels = doc.get("column_labels_as_published") or doc.get("column_labels") or ()
     if isinstance(labels, (list, tuple)):
         joined = " ".join(str(x) for x in labels).lower()
-        if "delta_fg" in joined.replace(" ", "") or "δfg" in joined or "dfg" in joined:
+        compact = joined.replace(" ", "")
+        if "delta_fg" in compact or "δfg" in joined or "dfg" in compact:
             named.add(Quantity.DELTA_FG)
-        if "log_kf" in joined.replace(" ", "") or "log10_kf" in joined.replace(" ", ""):
+        if "delta_fh" in compact or "δfh" in joined or "dfh" in compact:
+            named.add(Quantity.DELTA_FH)
+        if "log_kf" in compact or "log10_kf" in compact:
             named.add(Quantity.LOG10_KF)
     units = doc.get("units_as_published")
     if isinstance(units, Mapping):
@@ -2958,6 +2977,8 @@ def compilation_quantity_from_record(
         for row in rows:
             if isinstance(row, Mapping):
                 named.update(_compilation_cell_quantities(row))
+    # Preserve historical DELTA_FG preference when co-named; otherwise admit a
+    # single closed quantity (including DELTA_FH from printed formation enthalpy).
     if Quantity.DELTA_FG in named:
         return State.of(Quantity.DELTA_FG), None
     if len(named) == 1:
@@ -3379,6 +3400,15 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "table_kJ_mol",
         "Gf",
         "formation_gibbs_energy",
+        "value",
+    ),
+    Quantity.DELTA_FH: (
+        "delta_f_H_298_15",
+        "delta_f_H",
+        "delta_fH",
+        "deltafH",
+        "formation_enthalpy_298_15_K_as_published",
+        "formation_enthalpy",
         "value",
     ),
     Quantity.LOG10_KF: (
@@ -8326,17 +8356,9 @@ class Migrator:
         else:
             sel = select_declared_source(quantity, None, doc)
         value = sel.value
-        if sel.field_name in {"delta_f_H_298_15"} or "formation_enthalpy_298_15_K_as_published" in doc:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["quantity"],
-                "delta_fH is not a v2.1 Quantity token; stored as expression"
-                if "formation_enthalpy_298_15_K_as_published" not in doc
-                else "ATcT formation enthalpy is not a v2.1 Quantity token",
-                source=rel,
-                observation_id=f"{source_id}:{record_id}",
-            )
+        # Quantity.DELTA_FH is a closed v2.1 token; formation-enthalpy fields are
+        # projected above via compilation_quantity_from_record / QUANTITY_SOURCE_FIELDS.
+        # Do not re-queue a "not a v2.1 Quantity token" refusal here.
         self._generic_obs(
             work=work,
             source_id=source_id,
