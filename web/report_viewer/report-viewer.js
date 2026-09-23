@@ -341,9 +341,9 @@ function tapsAndPuritySection(terminal) {
     const acceptedSpecies = stage.accepted_species || [];
     const speciesList = activity
       ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${esc(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : esc(species)).join("<br>") || "none designated"
-      : acceptedSpecies.map((species) => scalarText(species)).join(" · ") || "none designated";
+      : acceptedSpecies.map((species) => esc(scalarText(species))).join(" · ") || "none designated";
     return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
-      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${stage.purity_fraction === null || verdict === "INDETERMINATE" || !hasMassSupport ? "not emitted" : hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span>${hasMassSupport ? "" : `<br><span class="trace">Verdict pending until stage masses are emitted.</span>`}</td></tr>`;
+      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${stage.purity_fraction === null || verdict === "INDETERMINATE" ? "no material" : !hasMassSupport ? "not emitted" : hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span>${hasMassSupport ? "" : `<br><span class="trace">Verdict pending until stage masses are emitted.</span>`}</td></tr>`;
   }).join("");
   return section(5, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
