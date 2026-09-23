@@ -341,7 +341,12 @@
     const label = typeof summary.O2_metric_label === "string" && summary.O2_metric_label.trim()
       ? summary.O2_metric_label.trim()
       : null;
-    const amount = hasNumber(summary.O2_yield_kg_cumulative) ? summary.O2_yield_kg_cumulative : null;
+    const canonical = summary.O2_source_side_potential_kg_cumulative;
+    const legacy = summary.O2_yield_kg_cumulative;
+    const amount = hasNumber(canonical) ? canonical : hasNumber(legacy) ? legacy : null;
+    const field = hasNumber(canonical)
+      ? "O2_source_side_potential_kg_cumulative"
+      : hasNumber(legacy) ? "O2_yield_kg_cumulative" : "O2_source_side_potential_kg_cumulative";
     if (label === null && amount === null) {
       return `<div class="sec-p15-source-o2 sec-p15-inline-pending"><strong>${esc("Source-side O₂ readout pending")}</strong>` +
         `<span>${esc("Metric label and cumulative kg value not emitted")}</span></div>`;
@@ -354,7 +359,7 @@
       : "Cumulative kg value pending — not emitted";
     const pendingClass = (label === null || amount === null) ? " sec-p15-inline-pending" : "";
     return `<div class="sec-p15-source-o2${pendingClass}"><strong>${esc(renderedLabel)}</strong>` +
-      `<span>${esc(renderedAmount)}</span></div>`;
+      `<span>${esc(renderedAmount)}</span><small>${esc(field)}</small></div>`;
   }
 
   function gasDome(summary) {

@@ -761,8 +761,18 @@ def test_report_viewer_uses_legacy_source_side_o2_alias_with_metric_label() -> N
 
     assert state["html"].count("4.25 kg") >= 2
     assert "source-side O2 potential (emitted; not recovered)" in state["html"]
-    assert "O2_yield_kg_cumulative" not in state["html"]
+    assert "O2_yield_kg_cumulative" in state["html"]
     assert fallback_cases == [1.5, 2.5, None]
+
+
+def test_report_viewer_equipment_diagram_uses_canonical_source_side_o2() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0", "O2_source_side_potential_kg_cumulative": 4.25}, "ledger": {}}]
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "4.25 kg" in html
+    assert "O2_source_side_potential_kg_cumulative" in html
 
 
 def test_report_viewer_labels_viewer_derived_projections() -> None:
