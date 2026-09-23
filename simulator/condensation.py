@@ -381,6 +381,7 @@ STICKING_UNKNOWN_REF = (
 )
 STICKING_STATUSES = {'CITED', 'UNCERTIFIED'}
 STICKING_REACTIVITY_CLASSES = {'reactive', 'physisorbing'}
+STICKING_WALL_PRODUCT_CLASSES = {'stable_condensation_product'}
 C4B_WALL_ROUTE_ORDER = ('SiO', 'Mg', 'Fe', 'Na', 'K')
 
 
@@ -404,6 +405,20 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
             f'reactivity_class_by_species.{species_name}',
             reactivity_class,
         )
+    wall_product_classes = raw.get('wall_product_class_by_species') or {}
+    if wall_product_classes and not isinstance(wall_product_classes, Mapping):
+        raise ValueError(f'{path}: wall_product_class_by_species must be a mapping')
+    if isinstance(wall_product_classes, Mapping):
+        for species_name, product_class in wall_product_classes.items():
+            if not isinstance(species_name, str) or not species_name:
+                raise ValueError(
+                    f'{path}: wall_product_class species names must be strings'
+                )
+            _validate_sticking_wall_product_class(
+                path,
+                f'wall_product_class_by_species.{species_name}',
+                product_class,
+            )
     _validate_sticking_entry(
         path,
         'unknown_species_default',
@@ -460,6 +475,12 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
 def _validate_sticking_reactivity_class(path: Path, name: str, value: Any) -> None:
     if value not in STICKING_REACTIVITY_CLASSES:
         allowed = ', '.join(sorted(STICKING_REACTIVITY_CLASSES))
+        raise ValueError(f'{path}: {name} must be one of {allowed}')
+
+
+def _validate_sticking_wall_product_class(path: Path, name: str, value: Any) -> None:
+    if value not in STICKING_WALL_PRODUCT_CLASSES:
+        allowed = ', '.join(sorted(STICKING_WALL_PRODUCT_CLASSES))
         raise ValueError(f'{path}: {name} must be one of {allowed}')
 
 
@@ -798,6 +819,34 @@ def _sticking_reactivity_class(species: str) -> str:
         reactivity_class,
     )
     return str(reactivity_class)
+
+
+def _sticking_wall_product_class(species: str) -> str | None:
+    """Declared wall condensation-product class, or None when reversible."""
+
+    classes = STICKING_DATA.get('wall_product_class_by_species') or {}
+    if not isinstance(classes, Mapping):
+        raise ValueError(
+            f'{STICKING_DATA_PATH}: wall_product_class_by_species must be a mapping'
+        )
+    species_name = str(species)
+    if species_name not in classes:
+        return None
+    product_class = classes.get(species_name)
+    _validate_sticking_wall_product_class(
+        STICKING_DATA_PATH,
+        f'wall_product_class_by_species.{species_name}',
+        product_class,
+    )
+    return str(product_class)
+
+
+def _reactive_product_backstop_authorized(species: str) -> bool:
+    return _sticking_reactivity_class(species) == 'reactive'
+
+
+def _stable_condensation_product_backstop_authorized(species: str) -> bool:
+    return _sticking_wall_product_class(species) == 'stable_condensation_product'
 
 
 def _sticking_ref_record(species: str, ref: Any) -> Mapping[str, Any] | None:
@@ -4518,12 +4567,14 @@ class CondensationModel:
                 # temperature gate preserves colder downstream carryover
                 # without admitting hotter upstream stages.
                 reactive_product_backstop=(
-                    species == 'SiO'
+                    _reactive_product_backstop_authorized(species)
                     and T_surface_C <= T_cond_C
                 ),
-                # Wall CrO2 remains reversible; designated Stage 2 instead
-                # materializes the declared stable Cr2O3 + O2 product route.
-                stable_condensation_product_backstop=(species == 'CrO2'),
+                # Stable product class (CrO2 today) materializes the declared
+                # irreversible oxide route instead of reversible pure-species Psat.
+                stable_condensation_product_backstop=(
+                    _stable_condensation_product_backstop_authorized(species)
+                ),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,
@@ -6431,10 +6482,10 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
     if stable_condensation_product_backstop:
-        if species != 'CrO2':
+        if not _stable_condensation_product_backstop_authorized(species):
             raise ValueError(
-                'stable condensation-product backstop is authorized only '
-                f'for CrO2, got {species!r}'
+                'stable condensation-product backstop requires declared '
+                f'wall_product_class stable_condensation_product, got {species!r}'
             )
         if diagnostic_out is not None:
             diagnostic_out["wall_saturation_pressure_pa"] = 0.0
@@ -6446,11 +6497,6 @@ def _wall_deposition_driving_pressure_pa(
     reactivity_class = None
     if reactive_product_backstop:
         reactivity_class = _sticking_reactivity_class(species)
-        if reactivity_class == 'reactive' and species != 'SiO':
-            raise ValueError(
-                'reactive wall-product backstop is C4b-authorized only '
-                f'for SiO, got {species!r}'
-            )
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
             # SiO has a melt standard-reaction pressure, not a stable pure-SiO

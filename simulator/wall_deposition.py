@@ -203,6 +203,7 @@ def wall_deposit_candidate_for_surface_kg(
         _flowing_species_partial_pressures_pa,
         _knudsen_number,
         _liner_material_config,
+        _reactive_product_backstop_authorized,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
         _species_vapor_data,
@@ -374,7 +375,7 @@ def wall_deposit_candidate_for_surface_kg(
             # wall (above T_cond) mass-deposit reactive products — the inverse
             # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
             reactive_product_backstop=(
-                species == 'SiO'
+                _reactive_product_backstop_authorized(species)
                 and float(wall_temperature_C) <= float(T_cond_C)
             ),
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
