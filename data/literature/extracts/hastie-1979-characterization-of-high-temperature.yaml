@@ -1,0 +1,282 @@
+schema_version: literature_extract.v1
+source_id: hastie-1979-characterization-of-high-temperature
+source:
+  citation: >-
+    Bonnell, D. W. and Hastie, J. W. (1979), "Transpiration Mass Spectrometry of
+    High Temperature Vapors", in Hastie, J. W. (ed.), Characterization of High
+    Temperature Vapors and Gases, NBS Special Publication 561, Vol. 1,
+    pp. 357–414, National Bureau of Standards, Washington, DC.
+  year: 1979
+  doi: 10.6028/NBS.SP.561v1
+  doi_scope: >-
+    Volume DOI shared with other NBS SP 561/1 chapters already extracted
+    (kems-042-plante-1979; kems-184-behrens-1979). This extract is the Bonnell &
+    Hastie TMS chapter only (printed pp. 357–414).
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf
+extraction:
+  method: >-
+    Manual visual transcription from 120–160 dpi pdftoppm renders of the 848-page
+    volume PDF. Scope: Bonnell & Hastie chapter printed tables only (Tables 1–4).
+    Modelled on kems-020-hastie-1981-nbsir / kems-042-plante-1979. Figures
+    (vapour-pressure plots etc.) not digitized — figure_only ledger. Derived
+    absolute pressures in Table 3 stamped derived. Detailed TMS numbers that
+    kems-020 cites as "Bonnell and Hastie 1979" live here.
+  date: '2026-09-22'
+  worker: n2-hastie-dacko
+  null_hypothesis_check: >-
+    No extract for Bonnell & Hastie 1979 TMS chapter. Volume DOI already used by
+    Plante (kems-042) and Behrens (kems-184) for different chapters; those are
+    not duplicates of this chapter. kems-020-hastie-1981-nbsir is a different
+    report (NBSIR 81-2279) that cites this chapter as original_source.
+review_status: draft
+fidelity_samples:
+  - species: N2
+    observable: concentration_series
+    observation_id: bonnell_hastie_1979_table1_calibration_gas
+    field: quantity
+    value: calibration_gas_mixture_characteristics
+    locator:
+      published_page: 376
+      pdf_page_index: 400
+      table: '1'
+  - species: N2
+    observable: concentration_series
+    observation_id: bonnell_hastie_1979_table1_calibration_gas
+    field: electron_energy_eV
+    value: 30
+    locator:
+      published_page: 376
+      pdf_page_index: 400
+      table: '1'
+      note: sigma at 30 eV (Kieffer and Dunn)
+  - species: NaCl
+    observable: partial_pressure
+    observation_id: bonnell_hastie_1979_table3_nacl_absolute_pressure_calibration
+    field: P_NaCl_total_atm
+    value: 2.96e-2
+    locator:
+      published_page: 385
+      pdf_page_index: 409
+      table: '3'
+      note: Derived P_NaCl total 2.96(+-0.6)e-2 atm
+  - species: NaCl
+    observable: partial_pressure
+    observation_id: bonnell_hastie_1979_table3_nacl_absolute_pressure_calibration
+    field: P_NaCl_monomer_atm
+    value: 2.28e-2
+    locator:
+      published_page: 385
+      pdf_page_index: 409
+      table: '3'
+      note: Derived monomer P_NaCl 2.28(+-0.4)e-2 atm
+  - species: Na2Cl2
+    observable: activity_coefficient
+    observation_id: bonnell_hastie_1979_table4_dimerization_comparison
+    field: quantity
+    value: dimerization_equilibrium_fit_parameters
+    locator:
+      published_page: 394
+      pdf_page_index: 418
+      table: '4'
+benches:
+- id: tms-reactor-ms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Transpiration mass spectrometer (TMS) — isothermal sonic-nozzle sampling into modulated-beam quadrupole MS}
+    locator: {published_page: 360, pdf_page_index: 384, section: '2. Apparatus', figure: '1'}
+  cell_material_and_liner:
+    state: {tag: value, value: Platinum sample boat / Pt reactor with radiation shields; interchangeable conical nozzle or capillary sampler}
+    locator: {published_page: 362, pdf_page_index: 386, section: '2. Apparatus', figure: '2'}
+  detector:
+    state: {tag: value, value: Quadrupole mass spectrometer with phase-sensitive detection; beam modulation chopper}
+    locator: {published_page: 361, pdf_page_index: 385, section: '2.1 The mass spectrometer system'}
+  other_facts:
+  - name: stage_I_diffusion_pump
+    unit: as_printed
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 'Varian/NRC VHS-6 6 in diffusion pump; net pumping ~800 L/s; Roots blower + rotary backing'}}
+      locator: {published_page: 360, pdf_page_index: 384, section: '2.1'}
+  - name: shutter_aperture_for_transpiration
+    unit: cm
+    value:
+      state: {tag: value, value: {kind: point, point: '0.05'}}
+      locator: {published_page: 361, pdf_page_index: 385, note: 0.05 cm diameter aperture, 4 cm from skimmer orifice}
+  - name: max_load_flow
+    unit: sccm
+    value:
+      state: {tag: value, value: {kind: point, point: '50'}}
+      locator: {published_page: 361, pdf_page_index: 385, note: '~50 sccm maximum load'}
+experiments:
+- experiment_id: nacl-tms-calibration-and-vaporization
+  bench_id: tms-reactor-ms
+  method: transpiration_mass_spectrometry
+  locator: {published_page: 381, pdf_page_index: 405, section: '4. Results for the NaCl system'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: {basis: pure_compound, components: {NaCl: 1.0}}}
+      locator: {published_page: 381, pdf_page_index: 405, note: NaCl system (solid and liquid)}
+    form:
+      state: {tag: value, value: NaCl charge in Pt boat under N2 or Ar carrier}
+      locator: {published_page: 381, pdf_page_index: 405}
+  pressure_environment:
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 381
+        pdf_page_index: 405
+        table: '2'
+        note: >-
+          N2 or Ar carrier is printed (Table 2 footnotes e/f give N2 pressures),
+          but total flow and partial pressure required by SweepGas are not a
+          single typed record for the whole series.
+    regime:
+      regime_class: {tag: value, value: transpiration_ms_and_knudsen_effusion_ms}
+observation_classifications:
+  bonnell_hastie_1979_table1_calibration_gas:
+    class_tag: measured
+  bonnell_hastie_1979_table2_nacl_ion_intensities:
+    class_tag: measured
+  bonnell_hastie_1979_table3_nacl_absolute_pressure_calibration:
+    class_tag: derived
+  bonnell_hastie_1979_table4_dimerization_comparison:
+    class_tag: derived
+  bonnell_hastie_1979_figures_vapor_pressure_ledger:
+    class_tag: figure_only
+species:
+  N2:
+    observations:
+    - observation_id: bonnell_hastie_1979_table1_calibration_gas
+      experiment: nacl-tms-calibration-and-vaporization
+      type: concentration_series
+      locator:
+        published_page: 376
+        pdf_page_index: 400
+        table: '1'
+        note: Matheson calibration gas mixture; GC-confirmed; sigma at 30 eV from Kieffer and Dunn [39]
+      phase: calibration_gas_mixture
+      regime: mass_discrimination_calibration
+      units: mole fraction; ionization cross section as printed (pia0^2 units implied by source); amu
+      values:
+        quantity: calibration_gas_mixture_characteristics
+        method_class: measured_direct
+        electron_energy_eV: 30
+        rows:
+        - {gas: N2, fraction_of_mix: 0.9489, ionization_cross_section: 1.18, ionization_cross_section_unc: 0.1, isotope_mass_amu: [28, 29], isotope_abundance: [0.9892, 0.0072]}
+        - {gas: He, fraction_of_mix: 0.0102, ionization_cross_section: 0.08, ionization_cross_section_unc: 0.03, isotope_mass_amu: [4], isotope_abundance: [1.00]}
+        - {gas: Ne, fraction_of_mix: 0.0100, ionization_cross_section: 0.11, ionization_cross_section_unc: 0.03, isotope_mass_amu: [20, 22], isotope_abundance: [0.905, 0.092]}
+        - {gas: Ar, fraction_of_mix: 0.0104, ionization_cross_section: 2.6, ionization_cross_section_unc: 0.3, isotope_mass_amu: [36, 40], isotope_abundance: [0.0034, 0.9959]}
+        - {gas: Kr, fraction_of_mix: 0.0104, ionization_cross_section: 3.8, ionization_cross_section_unc: 0.6, isotope_mass_amu: [84, 86], isotope_abundance: [0.570, 0.173]}
+        - {gas: Xe, fraction_of_mix: 0.0105, ionization_cross_section: 6.2, ionization_cross_section_unc: 2.0, isotope_mass_amu: [129, 132, 134], isotope_abundance: [0.264, 0.270, 0.105]}
+      uncertainty:
+        note: Cross-section uncertainties as printed (±); mixture fractions from GC vs gravimetric standards (footnote a).
+  NaCl:
+    observations:
+    - observation_id: bonnell_hastie_1979_table2_nacl_ion_intensities
+      experiment: nacl-tms-calibration-and-vaporization
+      type: rate_series
+      locator:
+        published_page: 381
+        pdf_page_index: 405
+        table: '2'
+      phase: NaCl_s_and_l
+      regime: knudsen_and_transpiration_ms
+      units: relative ion intensity normalized to I(Na+); T in K; eV
+      values:
+        quantity: typical_mass_spectral_ion_intensities
+        method_class: measured_direct
+        normalized_to: Na_plus
+        corrected_for_Cl_isotope_fractions: true
+        rows:
+        - {Na_plus: 1.00, NaCl_plus: 0.49, Na2Cl_plus: 0.88, R: 2.0, cell: Cu-Knudsen, T_K: 968, eV: 70, source: '[31]'}
+        - {Na_plus: 1.00, NaCl_plus: 0.73, Na2Cl_plus: 0.91, R: 1.4, cell: Cu-Knudsen, T_K: 960, T_K_qualifier: approximate, eV: 20, source: '[29]'}
+        - {Na_plus: 1.00, NaCl_plus: 0.66, Na2Cl_plus: 0.66, R: 1.5, cell: Pt-Knudsen, T_K: 957, eV: 30, source: Section 4.4, Na_plus_signal_uV: 920, electrometer_ohm: 1.0e7}
+        - {Na_plus: 1.00, NaCl_plus: 0.04, Na2Cl_plus: 0.08, R: 25.0, cell: Pt-transpiration, T_K: 1312, eV: 30, source: Section 4.3, carrier: N2, carrier_P_atm: 0.54, I_29_N2: 1.00, I_29_N2_uV: 1.8e4, k_N2_uV_per_atm_K: 1.66e-10}
+        - {Na_plus: 1.00, NaCl_plus: 0.03, Na2Cl_plus: 0.14, R: 33.3, cell: Pt-transpiration_weight_loss, T_K: 1360, eV: 30, source: this_work_weight_loss, carrier: N2, carrier_P_atm: 0.65, k_N2_uV_per_atm_K: 3.7e-11, Na_plus_signal_uV: 1.9e4}
+      uncertainty:
+        note: >-
+          R = I(Na+)/I(NaCl+). Footnote 8: R ~ 26 ± 4 stdev for data above
+          1170 K (prose). Per-row ion-intensity uncertainties not tabulated.
+    - observation_id: bonnell_hastie_1979_table3_nacl_absolute_pressure_calibration
+      experiment: nacl-tms-calibration-and-vaporization
+      type: partial_pressure
+      locator:
+        published_page: 385
+        pdf_page_index: 409
+        table: '3'
+        note: Section C pressures are derived from mass-loss + auxiliary inputs
+      phase: NaCl_liquid
+      regime: transpiration_mass_loss_calibration
+      units: atm as printed; mass loss in gm; flow in sccm; time in min; T in K
+      values:
+        quantity: NaCl_absolute_pressure_calibration
+        method_class: derived
+        derivation: >-
+          P_NaCl_total = [n_NaCl / (n_NaCl + n_N2)] * P_total from printed
+          transpiration mass-loss inputs; monomer P_NaCl after dimer fraction
+          correction. Stamp DERIVED.
+        inputs_measured:
+          time_min: 172
+          N2_flow_sccm: 7.9
+          T_K: 1360
+          N2_pressure_atm: 0.7
+          NaCl_mass_loss_g: 0.193
+        auxiliary_input:
+          average_mol_wt: 72
+          P_Na2Cl2_over_P_Na2Cl2_plus_P_NaCl: 0.23
+          auxiliary_note: >-
+            Footnote a — derived from JANAF [26] and stated self-consistent with
+            independent Knudsen and TMS data from this study (auxiliary DERIVED).
+        P_NaCl_total_atm: 2.96e-2
+        P_NaCl_total_unc_atm: 0.6e-2
+        P_NaCl_monomer_atm: 2.28e-2
+        P_NaCl_monomer_unc_atm: 0.4e-2
+      uncertainty:
+        note: Author-printed ±0.6e-2 and ±0.4e-2 atm on derived pressures.
+    context:
+    - observation_id: bonnell_hastie_1979_figures_vapor_pressure_ledger
+      type: method
+      locator:
+        published_page: 383
+        pdf_page_index: 407
+        figure: '8'
+        note: Ledger covers Figs 8–12 vapour-pressure / dimerization plots
+      units: as printed
+      values:
+        quantity: vapor_pressure_and_dimerization_figures
+        method_class: figure_only
+        digitized: false
+        figures:
+        - {figure: '8', topic: TMS vapor pressure curves for NaCl (s and l)}
+        - {figure: '9', topic: TMS NaCl monomer-dimer equilibrium}
+        - {figure: '10', topic: Knudsen effusion MS ion intensity vs T}
+        - {figure: '11', topic: Knudsen vapor pressure of NaCl monomer and dimer}
+        - {figure: '12', topic: Comparison of dimerization data sets (see Table 4)}
+        note: Numeric curve read-offs not taken; Table 3/4 hold printed calibration and fit coefficients.
+  Na2Cl2:
+    observations:
+    - observation_id: bonnell_hastie_1979_table4_dimerization_comparison
+      experiment: nacl-tms-calibration-and-vaporization
+      type: activity_coefficient
+      locator:
+        published_page: 394
+        pdf_page_index: 418
+        table: '4'
+        note: Reaction R7 — 2 NaCl(g) = Na2Cl2(g); thermodynamic fit parameters
+      phase: NaCl_vapor
+      regime: knudsen_and_tms_second_law
+      units: log Kd in atm^-1; -ΔHd kcal/mol; -ΔSd cal/deg mol; T in K
+      values:
+        quantity: dimerization_equilibrium_fit_parameters
+        method_class: derived
+        derivation: >-
+          Second-law / combined least-squares fits of Knudsen and TMS data
+          (and JANAF comparator row). Stamp DERIVED for experimental fit rows;
+          JANAF row is compilation comparator.
+        reaction: '2 NaCl(g) = Na2Cl2(g)'
+        rows:
+        - {log_Kd_expression: '9300(+-200)/T - 5.70(+-0.2)', minus_delta_Hd_kcal_per_mol: 42.5, minus_delta_Hd_unc: 0.8, minus_delta_Sd_cal_per_deg_mol: 26.1, minus_delta_Sd_unc: 0.9, T_range_K: [820, 980], data_source: Knudsen MS (fig. 11)}
+        - {log_Kd_expression: '10640(+-400)/T - 6.97(+-0.4)', minus_delta_Hd_kcal_per_mol: 48.7, minus_delta_Hd_unc: 1.8, minus_delta_Sd_cal_per_deg_mol: 31.9, minus_delta_Sd_unc: 1.8, T_range_K: [1100, 1480], data_source: TMS (fig. 9)}
+        - {log_Kd_expression: '10312(+-150)/T - 6.49(+-0.1)', minus_delta_Hd_kcal_per_mol: 47.1, minus_delta_Hd_unc: 3.5, minus_delta_Sd_cal_per_deg_mol: 29.7, minus_delta_Sd_unc: 1.0, T_range_K: [800, 1600], data_source: 'JANAF [26]', class_tag: compilation}
+        - {log_Kd_expression: '10140(+-150)/T - 6.60(+-0.13)', minus_delta_Hd_kcal_per_mol: 46.4, minus_delta_Hd_unc: 0.7, minus_delta_Sd_cal_per_deg_mol: 30.2, minus_delta_Sd_unc: 0.6, T_range_K: [820, 1480], data_source: Knudsen + TMS (fig. 12)}
+      uncertainty:
+        note: Parenthetical fit uncertainties and ± on ΔH/ΔS retained as printed.
