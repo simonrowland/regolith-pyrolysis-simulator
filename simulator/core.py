@@ -937,6 +937,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics: Dict[str, Any] = {}
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
+        self._sulfur_saturation_steps: list[dict[str, Any]] = []
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -1424,6 +1425,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics = {}
         self._last_out_of_domain_diagnostics = {}
         self._engine_commissioning_steps = []
+        self._sulfur_saturation_steps = []
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -8611,6 +8613,78 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         f'SulfSat gate ({sulfur_result.calibration_status}): '
                         f'{note}'
                     )
+            self._note_sulfur_saturation_step(sulfur_result)
+
+    def _note_sulfur_saturation_step(self, sulfur_result: 'Any') -> None:
+        """Keep out-of-range / unavailable SulfSat gate notices for the run rollup."""
+
+        status = str(getattr(sulfur_result, 'calibration_status', '') or '')
+        if status in ('', 'in_range'):
+            return
+        warnings = [
+            str(item)
+            for item in list(getattr(sulfur_result, 'warnings', ()) or ())
+            if str(item).strip()
+        ]
+        step = {
+            'hour': int(self.melt.hour) + 1,
+            'notice': {
+                'calibration_status': status,
+                'warnings': warnings,
+            },
+        }
+        steps = getattr(self, '_sulfur_saturation_steps', None)
+        if not isinstance(steps, list):
+            steps = []
+            self._sulfur_saturation_steps = steps
+        steps.append(step)
+
+    def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
+        """Run-level SulfSat notice, or None when every step was in range."""
+
+        steps = getattr(self, '_sulfur_saturation_steps', ())
+        if not isinstance(steps, (list, tuple)) or not steps:
+            return None
+        hours: list[int] = []
+        notices: list[dict[str, Any]] = []
+        seen: set[tuple[Any, ...]] = set()
+        for step in steps:
+            if not isinstance(step, dict):
+                continue
+            notice = step.get('notice')
+            if not isinstance(notice, dict):
+                continue
+            status = str(notice.get('calibration_status') or '').strip()
+            if not status or status == 'in_range':
+                continue
+            try:
+                hour = int(step['hour'])
+            except (KeyError, TypeError, ValueError):
+                continue
+            hours.append(hour)
+            warning_key = tuple(str(item) for item in list(notice.get('warnings') or ()))
+            identity = (status, warning_key)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            notices.append(
+                {
+                    'calibration_status': status,
+                    'warnings': list(warning_key),
+                }
+            )
+        if not hours or not notices:
+            return None
+        statuses = {item['calibration_status'] for item in notices}
+        payload: Dict[str, Any] = {
+            'notices': notices,
+            'first_hour': min(hours),
+            'last_hour': max(hours),
+            'count': len(hours),
+        }
+        if len(statuses) == 1:
+            payload['calibration_status'] = next(iter(statuses))
+        return payload
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
