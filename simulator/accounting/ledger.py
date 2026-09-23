@@ -949,11 +949,10 @@ class AtomLedger:
                                 f"{account}.{element} requires an explicitly "
                                 f"amalgamated pool"
                             )
-                        origin_unattributed_shortfall = (
-                            max(0.0, amount - available)
-                            if full_withdrawal
-                            else 0.0
-                        )
+                        # Ferry V / V1-S13 R2: never mint unresolved origin
+                        # atoms to close a full-withdrawal shortfall. Float dust
+                        # within withdrawal_tolerance is clipped by the pool
+                        # allocator; anything larger refuses.
                         try:
                             pool_withdrawal = allocate_pool_withdrawal(
                                 {
@@ -963,7 +962,7 @@ class AtomLedger:
                                     },
                                     "unresolved": account_unresolved,
                                 },
-                                amount - origin_unattributed_shortfall,
+                                amount,
                                 absolute_tolerance=withdrawal_tolerance,
                             )
                         except PoolWithdrawalError as exc:
@@ -976,19 +975,13 @@ class AtomLedger:
                             origin_amount = float(pool_withdrawal.get(origin, 0.0))
                             if origin_amount > 0.0:
                                 origin_allocation[origin][element] = origin_amount
-                        unresolved_allocation[element] = (
-                            float(pool_withdrawal.get("unresolved", 0.0))
-                            + origin_unattributed_shortfall
+                        unresolved_allocation[element] = float(
+                            pool_withdrawal.get("unresolved", 0.0)
                         )
-                        allocated = (
-                            math.fsum(
-                                origin_allocation[origin].get(element, 0.0)
-                                for origin in MATERIAL_ORIGINS
-                            )
-                            + unresolved_allocation[element]
-                        )
-                        if allocated < amount - tolerance:
-                            unresolved_allocation[element] += amount - allocated
+                        # allocate_pool_withdrawal already refused anything
+                        # beyond withdrawal_tolerance and clipped float dust
+                        # to available. Do not re-mint that dust as
+                        # unresolved origin inventory.
                     method = (
                         "pool_ratio"
                         if pool_ratio
@@ -2130,24 +2123,50 @@ def _reconcile_origin_projection(
             | set(unresolved.get(account, {}))
         )
         for element in elements:
-            physical = max(0.0, float(physical_atoms.get(element, 0.0)))
+            # Ferry V / V1-S13 R2: compare signed physical to tracked before
+            # flooring. Do not invent unresolved origin when tracked is empty,
+            # and do not silently floor large negative physical away.
+            physical_raw = float(physical_atoms.get(element, 0.0))
             origin_amounts = origins.get(account, {}).get(element, {})
             unknown = max(
                 0.0,
                 float(unresolved.get(account, {}).get(element, 0.0)),
             )
             tracked_total = math.fsum(origin_amounts.values()) + unknown
+            # Compare signed physical to tracked before any floor. Absolute
+            # dust band matches DEFAULT_ATOM_TOLERANCE_MOL so within-tolerance
+            # species overdraft residue does not look like a real negative
+            # inventory; larger negatives still refuse.
+            drift_tol = max(
+                _origin_atom_tolerance(max(abs(physical_raw), abs(tracked_total))),
+                DEFAULT_ATOM_TOLERANCE_MOL,
+            )
+            if physical_raw < -drift_tol:
+                raise OriginUnresolvedError(
+                    f"origin projection refuse negative physical for "
+                    f"{account}.{element}: physical={physical_raw:.12g} "
+                    f"tracked={tracked_total:.12g} mol-atoms"
+                )
+            physical = max(0.0, physical_raw)
             if tracked_total <= 0.0:
+                if physical > drift_tol:
+                    raise OriginUnresolvedError(
+                        f"origin projection invent refused for "
+                        f"{account}.{element}: physical={physical:.12g} "
+                        f"with no tracked origin (refuse minting unresolved)"
+                    )
                 _set_element_balance(
                     unresolved,
                     account,
                     element,
-                    physical,
+                    0.0,
                     0.0,
                 )
                 continue
             # Numerical reconciliation scales typed buckets together; it never
-            # invents one origin as the complement of another.
+            # invents one origin as the complement of another. Invent-from-
+            # empty is refused above; scale here only redistributes already
+            # tracked origin mass onto the physical species total.
             scale = physical / tracked_total
             for origin in tuple(origin_amounts):
                 _set_origin_balance(

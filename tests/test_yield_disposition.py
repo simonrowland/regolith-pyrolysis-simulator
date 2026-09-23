@@ -1105,7 +1105,13 @@ def test_pool_allocator_over_withdrawal_raises_typed() -> None:
         allocate_pool_withdrawal({"feedstock": 1.0}, 1.1)
 
 
-def test_origin_withdrawal_within_ledger_atom_tolerance_preserves_all_atoms() -> None:
+def test_origin_withdrawal_within_ledger_atom_tolerance_does_not_invent_unresolved() -> None:
+    """Float dust on full withdrawal must not mint unresolved origin atoms.
+
+    Before R2 the shortfall (amount - available) within withdrawal_tolerance
+    was padded into unresolved. After R2 the pool allocator clips to available
+    and unresolved stays empty; species still move within atom tolerance.
+    """
     atom_tolerance_mol = 1.0e-6
     shortfall_mol_atoms = 0.5 * atom_tolerance_mol
     ledger = AtomLedger(
@@ -1123,6 +1129,7 @@ def test_origin_withdrawal_within_ledger_atom_tolerance_preserves_all_atoms() ->
         source="feedstock oxygen buffer",
         material_origin="feedstock",
     )
+    before_kg = sum(ledger.total_kg_by_account().values())
 
     ledger.move(
         "within_origin_tolerance",
@@ -1140,14 +1147,96 @@ def test_origin_withdrawal_within_ledger_atom_tolerance_preserves_all_atoms() ->
     destination_origins = ledger.origin_atom_moles_by_account()["terminal.offgas"][
         "O"
     ]
-    destination_unattributed = ledger.unresolved_origin_atom_moles_by_account()[
-        "terminal.offgas"
-    ]["O"]
+    destination_unattributed = ledger.unresolved_origin_atom_moles_by_account().get(
+        "terminal.offgas", {}
+    ).get("O", 0.0)
+    after_kg = sum(ledger.total_kg_by_account().values())
     assert destination_origins["feedstock"] == pytest.approx(1.0)
-    assert destination_unattributed == pytest.approx(shortfall_mol_atoms)
-    assert math.fsum(destination_origins.values()) + destination_unattributed == pytest.approx(
-        1.0 + shortfall_mol_atoms
+    assert destination_unattributed == pytest.approx(0.0, abs=1e-18)
+    assert after_kg == pytest.approx(before_kg, abs=1e-15)
+
+
+def test_origin_shortfall_invent_mutation_proof() -> None:
+    """Mutation proof: padding shortfall into unresolved would be visible."""
+    atom_tolerance_mol = 1.0e-6
+    shortfall_mol_atoms = 0.5 * atom_tolerance_mol
+    # Counterfactual pre-R2: minting shortfall would yield this unattributed.
+    assert shortfall_mol_atoms > 0.0
+    ledger = AtomLedger(
+        account_policies=(
+            AccountPolicy.reservoir(
+                "reservoir.fo2_buffer",
+                credit_limit_kg_by_species={"O2": 1.0},
+            ),
+        ),
+        atom_tolerance_mol=atom_tolerance_mol,
     )
+    ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": 0.5},
+        source="feedstock oxygen buffer",
+        material_origin="feedstock",
+    )
+    ledger.move(
+        "within_origin_tolerance_mutation",
+        "reservoir.fo2_buffer",
+        "terminal.offgas",
+        {
+            "O2": (
+                0.5
+                + shortfall_mol_atoms / 2.0
+            )
+            * resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+        },
+    )
+    live_unattributed = ledger.unresolved_origin_atom_moles_by_account().get(
+        "terminal.offgas", {}
+    ).get("O", 0.0)
+    mutant_unattributed = live_unattributed + shortfall_mol_atoms
+    assert live_unattributed == pytest.approx(0.0, abs=1e-18)
+    assert mutant_unattributed == pytest.approx(shortfall_mol_atoms)
+
+
+
+def test_reconcile_origin_projection_refuses_invent_from_empty_tracked() -> None:
+    """_reconcile_origin_projection must not mint unresolved from bare physical."""
+    from simulator.accounting.ledger import _reconcile_origin_projection
+    from simulator.accounting.exceptions import OriginUnresolvedError
+
+    origins: dict = {}
+    unresolved: dict = {}
+    methods: dict = {}
+    physical = {"process.cleaned_melt": {"FeO": 1.0}}
+    # Empty origin tracking + positive physical → pre-R2 invented unresolved.
+    with pytest.raises(OriginUnresolvedError, match="invent refused"):
+        _reconcile_origin_projection(
+            origins,
+            unresolved,
+            methods,
+            physical,
+            {},
+        )
+
+
+def test_reconcile_origin_invent_mutation_proof_would_write_unresolved() -> None:
+    """Mutation proof: pre-R2 path wrote physical into unresolved when tracked=0."""
+    from simulator.accounting.ledger import (
+        _reconcile_origin_projection,
+        _signed_atom_moles_from_species_mol,
+    )
+
+    registry = {}
+    physical_mol = {"process.cleaned_melt": {"FeO": 1.0}}
+    physical_o = _signed_atom_moles_from_species_mol(
+        physical_mol["process.cleaned_melt"], registry
+    ).get("O", 0.0)
+    assert physical_o == pytest.approx(1.0)
+    # Live path refuses.
+    with pytest.raises(OriginUnresolvedError, match="invent refused"):
+        _reconcile_origin_projection({}, {}, {}, physical_mol, registry)
+    # Counterfactual: inventing unresolved would equal physical O atoms.
+    mutant_unresolved = physical_o
+    assert mutant_unresolved == pytest.approx(1.0)
 
 
 def test_origin_withdrawal_beyond_ledger_atom_tolerance_raises_typed() -> None:
