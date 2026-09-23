@@ -790,6 +790,38 @@ process.stdout.write(JSON.stringify(vm.runInContext("runMetaLine(testRun)", cont
     assert json.loads(completed.stdout) == ["Lunar Mare Low Ti"]
 
 
+def test_library_preserves_focus_across_rerenders() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const body = { dataset: {}, isConnected: true };
+const document = { activeElement: body };
+const controls = { folder: new Map(), star: new Map() };
+    function disconnect(map) { for (const control of map.values()) { control.isConnected = false; if (document.activeElement === control) document.activeElement = body; } map.clear(); }
+function control(kind, value) { return { dataset: { [kind]: value }, isConnected: true, focus() { if (this.isConnected) document.activeElement = this; }, closest(selector) { return selector === `[data-${kind}]` ? this : null; } }; }
+function element(id, kind) { return { id, value: "", listeners: {}, _html: "", addEventListener(type, fn) { this.listeners[type] = fn; }, focus() { document.activeElement = this; }, set innerHTML(value) { this._html = value; if (!kind) return; disconnect(controls[kind]); for (const match of value.matchAll(new RegExp(`data-${kind}=\"([^\"]+)\"`, "g"))) controls[kind].set(match[1], control(kind, match[1])); }, get innerHTML() { return this._html; } }; }
+const elements = { library: element("library") };
+Object.defineProperty(elements.library, "innerHTML", { get() { return this.libraryHTML || ""; }, set(value) { this.libraryHTML = value; elements["folder-list"] = element("folder-list", "folder"); elements["run-list"] = element("run-list", "star"); elements["run-filter"] = element("run-filter"); elements["run-sort"] = element("run-sort"); elements["run-sort"].value = "created"; } });
+document.querySelector = (selector) => elements[selector.slice(1)] || null;
+document.querySelectorAll = (selector) => selector === "[data-folder]" ? [...controls.folder.values()] : [...controls.star.values()];
+const context = { window: { location: { href: "" } }, document, encodeURIComponent, fetch: async () => ({ ok: true, json: async () => ({ starred: true }) }), console };
+context.globalThis = context; vm.createContext(context); vm.runInContext(labelsSource, context); vm.runInContext(librarySource, context);
+vm.runInContext("render([{run_id:'focus-run',name:'Focus',feedstock_id:'lunar_mare_low_ti',status:'ok',folder:'Favorites',live:true,starred:false}])", context);
+    (async () => { const click = elements.library.listeners.click; const star = controls.star.get("focus-run"); star.focus(); await click({ target: star }); const starFocus = document.activeElement.dataset.star; const folder = controls.folder.get("Favorites"); folder.focus(); await click({ target: folder }); const folderFocus = document.activeElement.dataset.folder; process.stdout.write(JSON.stringify({ folderFocus, starFocus })); })();
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / "library.js")],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert json.loads(completed.stdout) == {"folderFocus": "Favorites", "starFocus": "focus-run"}
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 

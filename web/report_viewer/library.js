@@ -90,7 +90,7 @@ function runCard(run) {
   return `<article class="card run-card">
     <div class="run-card-head">
       <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}${cancelledBadge}</div><h2>${esc(run.name)}</h2></div>
-      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
+      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " aria-disabled=\"true\" aria-busy=\"true\"" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
     ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
     <p class="run-summary">${runMetaLine(run).map((part) => esc(part)).join(" · ")}</p>
@@ -100,7 +100,29 @@ function runCard(run) {
   </article>`;
 }
 
-function renderList() {
+function focusedControlTarget() {
+  const active = document.activeElement;
+  if (active?.dataset?.star !== undefined) {
+    return { attribute: "star", value: active.dataset.star, fallback: { attribute: "folder", value: activeFolder } };
+  }
+  if (active?.dataset?.folder !== undefined) {
+    return { attribute: "folder", value: active.dataset.folder };
+  }
+  return null;
+}
+
+function matchingControl(target) {
+  return Array.from(document.querySelectorAll(`[data-${target.attribute}]`))
+    .find((candidate) => candidate.dataset[target.attribute] === target.value);
+}
+
+function restoreControlFocus(target) {
+  if (!target) return;
+  const control = matchingControl(target) || (target.fallback && matchingControl(target.fallback));
+  control?.focus({ preventScroll: true });
+}
+
+function renderList(focusTarget = focusedControlTarget()) {
   $("#folder-list").innerHTML = folderButtons();
   const visible = filteredRuns();
   const fallbackNotice = liveIndexError
@@ -113,6 +135,7 @@ function renderList() {
       : liveIndexError
         ? `<div class="pending"><strong>No static sample runs</strong><p>The live index could not be read, and the static sample index contains no entries.</p></div>`
         : `<div class="pending"><strong>No indexed runs</strong><p>The run index is valid but contains no entries.</p></div>`);
+  restoreControlFocus(focusTarget);
 }
 
 function bindControls() {
