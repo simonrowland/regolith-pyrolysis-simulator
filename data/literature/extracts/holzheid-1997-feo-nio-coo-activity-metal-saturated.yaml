@@ -21,17 +21,28 @@ benches:
       for_parameters: [apparatus_family, cell_material_and_liner, temperature_measurement, temperature_calibration, pumping_type]
       locator: {page: 25, section: '2.2 New experimental results', note: 'New experiments done in the same way as those described before; this paper does not print apparatus details'}
 experiments:
-- experiment_id: variable-mgo-equilibration-series
+- &variable_mgo_common
+  experiment_id: ad-variable-mgo-equilibration-series
   bench_id: cited-prior-equilibration-apparatus
   method: quench_equilibration
-  locator: {page: 25, section: '2.2 New experimental results'}
+  locator: {page: 25, section: '2.2 New experimental results', note: 'AD (anorthite-diopside) runs in Table 3; shared apparatus and schedule with BK series'}
   sample:
     mass_kg:
       state: {tag: unknown, reason: not_published}
       locator: {page: 25, section: '2.2 New experimental results'}
     printed_composition:
-      state: {tag: value, value: {kind: categorical, categorical: 'anorthite-diopside or komatiitic-basalt silicate with variable MgO'}}
-      locator: {page: 25, table: '3'}
+      state:
+        tag: value
+        value:
+          SiO2: 50.9
+          CaO: 24.9
+          MgO: 10.4
+          Al2O3: 13.8
+          FeO: 0.0
+      locator:
+        page: 22
+        table: '1'
+        note: 'AD (anorth.-diopside) column; electron-microprobe starting wt% as printed; label AD anorthite-diopside eutectic; FeO 0.0 retained as printed; Table 3 variable-MgO run rows are not a replacement for this starting vector'
     characterization:
       state: {tag: value, value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co}
       locator: {page: 25, section: '2.2 New experimental results'}
@@ -48,6 +59,29 @@ experiments:
     buffer:
       state: {tag: unknown, reason: not_published}
       locator: {page: 25, table: '3', note: 'Values listed per run; control apparatus deferred to cited papers'}
+- <<: *variable_mgo_common
+  experiment_id: bk-variable-mgo-equilibration-series
+  locator: {page: 25, section: '2.2 New experimental results', note: 'BK (komatiitic basalt) runs in Table 3; shared apparatus and schedule with AD series'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 25, section: '2.2 New experimental results'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 49.1
+          CaO: 19.2
+          MgO: 10.6
+          Al2O3: 14.1
+          FeO: 7.0
+      locator:
+        page: 22
+        table: '1'
+        note: 'BK (komatiiticbasalt) column; electron-microprobe starting wt% as printed; label BK komatiitic basalt; Table 3 variable-MgO run rows are not a replacement for this starting vector'
+    characterization:
+      state: {tag: value, value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co}
+      locator: {page: 25, section: '2.2 New experimental results'}
 scope_assessment:
   document_type: primary experimental silicate-melt solubility and activity-coefficient study
   measured_direct_observations: 6
@@ -121,7 +155,7 @@ species:
   CoO:
     observations:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo
-      experiment: variable-mgo-equilibration-series
+      experiment: ad-variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1670.0, 1677.0]
@@ -149,7 +183,7 @@ species:
       uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, analytical_errors_Ni_and_Co_below_10_pct: true}
       equipment: {}
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo
-      experiment: variable-mgo-equilibration-series
+      experiment: bk-variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 26, table: '3c', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
@@ -174,7 +208,7 @@ species:
   NiO:
     observations:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
-      experiment: variable-mgo-equilibration-series
+      experiment: ad-variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1673.0]
@@ -204,7 +238,7 @@ species:
       uncertainty: {analytical_errors_Ni_below_10_pct: true, concentration_uncertainty: Table 3 s.d. columns retained per row}
       equipment: {}
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo
-      experiment: variable-mgo-equilibration-series
+      experiment: bk-variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 26, table: '3d', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
@@ -229,7 +263,7 @@ species:
   FeO:
     observations:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
-      experiment: variable-mgo-equilibration-series
+      experiment: ad-variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3b', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1677.0]
