@@ -63,13 +63,13 @@ def main(argv=None):
                 record = {"experiment_id": inputs.experiment_id, "observation_id": inputs.observation_id,
                           "engine": result.readiness.engine, "status": status, "readiness": to_plain(result.readiness)}
                 if result.payload is not None:
-                    (args.output / (stem + ".json")).write_text(json.dumps(result.payload, default=str, indent=2) + "\n")
+                    (args.output / (stem + ".json")).write_text(json.dumps(result.payload, default=str, indent=2, sort_keys=True) + "\n")
                     record["file"] = stem + ".json"
-                (args.output / (stem + ".evidence.json")).write_text(json.dumps(to_plain(result.provenance), indent=2) + "\n")
+                (args.output / (stem + ".evidence.json")).write_text(json.dumps(to_plain(result.provenance), indent=2, sort_keys=True) + "\n")
                 record["evidence"] = stem + ".evidence.json"
                 manifest.append(record)
-    summary = {"consumer": args.consumer, "counts": dict(counts), "refusal_reasons": dict(reasons), "records": manifest}
-    (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    summary = {"consumer": args.consumer, "counts": dict(sorted(counts.items())), "refusal_reasons": dict(sorted(reasons.items())), "records": manifest}
+    (args.output / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"summary": str(args.output / "summary.json"), "counts": dict(counts)}))
     return 0
 
