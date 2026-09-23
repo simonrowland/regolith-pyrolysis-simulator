@@ -43,7 +43,23 @@ experiments:
   locator: {section: '2.2 Vacuum evaporation experiments'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.00007'}}, locator: {section: '2.1 Sample preparation', note: Printed 25-70 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: synthetic basaltic oxide and carbonate mixture}, locator: {section: '2.1 Sample preparation'}}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: 2.27
+          MgO: 7.09
+          CaO: 11.21
+          TiO2: 1.79
+          SiO2: 45.94
+          Al2O3: 16.00
+          FeO: 10.67
+          K2O: 2.49
+          Rb2O: 1.86
+      locator:
+        page: 71
+        table: '1'
+        note: 'Initial glass row; EPMA oxide wt% as printed; label synthetic basaltic oxide and carbonate mixture / Initial glass; Mixed powder row (Na/Al and Rb/Al only) and later residue rows not used; Rb2O retained as printed'
     form: {state: {tag: value, value: pre-molten glass on a 2.5 mm iridium wire loop}, locator: {section: '2.1 Sample preparation'}}
     pretreatment: {state: {tag: value, value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2}, locator: {section: '2.1 Sample preparation'}}
   apparatus:
