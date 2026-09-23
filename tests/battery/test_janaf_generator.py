@@ -920,6 +920,14 @@ def _raw_table_path(table_id: str) -> Path:
     return fixture if fixture.is_file() else _JANAF_SOURCE_DIR / f"{table_id}.txt"
 
 
+def _require_raw_table(table_id: str) -> Path:
+    """Return the raw table path, or skip when only a private corpus copy exists."""
+    path = _raw_table_path(table_id)
+    if not path.is_file():
+        pytest.skip(f"JANAF raw table {table_id!r} is absent ({path})")
+    return path
+
+
 def _parse_raw_document(table_id: str, payload: bytes):
     return generator.parse_table(
         payload,
@@ -1046,7 +1054,7 @@ def test_printed_temperature_set_is_per_table() -> None:
 
 def test_off_grid_temperature_with_intact_layout_is_refused() -> None:
     table_id = "B-133"
-    payload = _raw_table_path(table_id).read_bytes()
+    payload = _require_raw_table(table_id).read_bytes()
     control = generator.generate_table(_parse_raw_document(table_id, payload))
     assert control.report["refused_layout_rows"] == []
     assert "3000" in _cp_temperatures(control)
@@ -1093,7 +1101,7 @@ def test_grid_membership_is_distinct_from_field_count(
     )
     monkeypatch.setattr(generator, "table_printed_temperatures", _neuter_printed_set_to_all_grid_like)
     table_id = "B-133"
-    payload = _raw_table_path(table_id).read_bytes()
+    payload = _require_raw_table(table_id).read_bytes()
     text = payload.decode("utf-8")
     line_index, line = _row_for_temperature(text, "3000")
     rest = line.split("\t", 1)[1]
@@ -1104,7 +1112,7 @@ def test_grid_membership_is_distinct_from_field_count(
     assert generated.report["refused_layout_rows"] == []
     assert "4000" in _cp_temperatures(generated)
 
-    field_payload = _raw_table_path("Al-001").read_bytes()
+    field_payload = _require_raw_table("Al-001").read_bytes()
     field_text = field_payload.decode("utf-8")
     line_index, line = _row_for_temperature(field_text, "100")
     tab_positions = [match.start() for match in re.finditer("\t", line)]
@@ -1123,7 +1131,7 @@ def test_non_data_marker_lines_are_recorded() -> None:
     observed: list[tuple[str, int]] = []
     for table_id, line_numbers in _NON_DATA_MARKER_LINES:
         parsed = parse_janaf_txt(
-            _raw_table_path(table_id).read_bytes(),
+            _require_raw_table(table_id).read_bytes(),
             table_id=table_id,
             url=f"https://janaf.nist.gov/tables/{table_id}.html",
             download_url=f"https://janaf.nist.gov/tables/{table_id}.txt",
@@ -1135,7 +1143,7 @@ def test_non_data_marker_lines_are_recorded() -> None:
         ]
         assert [item["line_number"] for item in markers] == list(line_numbers)
         generated = generator.generate_table(
-            _parse_raw_document(table_id, _raw_table_path(table_id).read_bytes())
+            _parse_raw_document(table_id, _require_raw_table(table_id).read_bytes())
         )
         reported = generated.report["non_data_marker_lines"]
         assert [row["line_number"] for row in reported] == list(line_numbers)
@@ -1684,3 +1692,14 @@ def test_janaf_store_keeps_circularity_and_compilation_class() -> None:
         relation = (observation.get("derivation") or {}).get("relation") or ""
         assert "scoring_eligible=false" in relation
         assert warning in relation
+
+def test_janaf_raw_table_gate_skips_without_private_corpus(tmp_path, monkeypatch) -> None:
+    """Mutation proof: missing private fallthrough must skip, not FileNotFoundError."""
+    import tests.battery.test_janaf_generator as mod
+
+    monkeypatch.setattr(mod, "_JANAF_SOURCE_DIR", tmp_path / "janaf-nist-txt")
+    # Ensure no fixture shadows the missing private table.
+    assert not (mod.RAW_FIXTURES / "Ba-001.txt").is_file()
+    with pytest.raises(pytest.skip.Exception):
+        mod._require_raw_table("Ba-001")
+
