@@ -62,9 +62,14 @@ const exactMol = (value) => exactValue(value, "mol");
 const strictMol = (value) => typeof value === "number" && Number.isFinite(value)
   ? exactValue(value, "mol")
   : `<span class="trace">non-numeric (${esc(typeof value === "string" ? "string" : Array.isArray(value) ? "array" : typeof value)})</span>`;
-const money = (value) => hasNumber(value)
-  ? Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 })
-  : "not emitted";
+const money = (value) => {
+  if (!hasNumber(value)) return "not emitted";
+  const formatted = Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+  if (value !== 0 && Math.abs(value) < 0.005) {
+    return `<span title="${esc(`${String(value)} USD`)}">${value < 0 ? "&gt; -$0.01" : "&lt; $0.01"}</span>`;
+  }
+  return formatted;
+};
 const sci = (value) => hasNumber(value) ? (Number(value) === 0 ? "0" : Number(value).toExponential(3)) : "not emitted";
 
 function pending(task, message) {

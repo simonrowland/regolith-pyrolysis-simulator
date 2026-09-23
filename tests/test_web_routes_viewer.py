@@ -217,6 +217,13 @@ def test_report_viewer_zero_step_inventory_is_not_terminal_ceramic() -> None:
     assert "<h2><span class=\"sect\">07</span>Cleaned-melt inventory" in html
 
 
+def test_report_viewer_money_preserves_nonzero_subcent_cost() -> None:
+    rendered = _run_viewer_expression("report-viewer.js", "money(0.000128)")
+
+    assert "&lt; $0.01" in rendered
+    assert "0.000128 USD" in rendered
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
