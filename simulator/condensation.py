@@ -4585,9 +4585,27 @@ class CondensationModel:
                 f'condensation efficiency for {species} in stage '
                 f'{int(getattr(stage, "stage_number", -1))} is not finite'
             )
+        # Supply-limited capture: band flux * area * time can exceed available
+        # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
+        eta_uncapped = float(eta)
         eta = max(0.0, min(1.0, eta))
+        supply_limited = eta_uncapped > 1.0
         if domain_outcome is not None:
             domain_outcome['eta'] = eta
+            if supply_limited:
+                domain_outcome['capture_supply_limited'] = True
+                domain_outcome['eta_uncapped'] = eta_uncapped
+        if supply_limited and efficiency_outcomes is not None:
+            efficiency_outcomes.append(
+                {
+                    'status': 'capture_supply_limited',
+                    'reason': 'capture_supply_limited',
+                    'species': species,
+                    'stage_number': int(getattr(stage, 'stage_number', -1)),
+                    'eta': eta,
+                    'eta_uncapped': eta_uncapped,
+                }
+            )
         return eta
 
 
