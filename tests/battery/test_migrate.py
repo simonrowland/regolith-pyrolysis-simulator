@@ -2350,6 +2350,7 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
         "_point_selection",
         "_interval_selection",
         "_series_selection_from_items",
+        "_emit_series_or_point",
         "_value_from_plain",
     }
     func_stack: list[str] = []
