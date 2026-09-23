@@ -839,6 +839,16 @@ def test_wall_deposit_malformed_segment_stays_pending_but_keeps_valid_evidence()
     assert "3 kg" not in html
 
 
+def test_wall_deposit_empty_sibling_invalidates_total_but_keeps_valid_evidence() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0", "wall_deposit_cumulative_kg": {"good": {"Fe": 2.0}, "bad": {}}}, "ledger": {}}]
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "viewer-side sum (no emitted total)" not in html
+    assert "good" in html and "Fe" in html
+
+
 def test_incomplete_cost_inputs_stay_pending_without_estimate_label() -> None:
     artifact = _artifact(recipe_snapshot=None)
     artifact["header"]["cost_block"] = {"electrical_cost_per_kWh": 10.0}

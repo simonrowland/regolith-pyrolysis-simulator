@@ -372,6 +372,7 @@ function wallAndOxygenSection(artifact, rows) {
           wallComplete = false;
         }
       });
+      if (!Object.keys(species).length) wallComplete = false;
     });
   }
   const wallEvidence = wallSegments
