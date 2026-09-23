@@ -645,6 +645,25 @@ def _render_report_html_with_panels(artifact: dict, panels_js: str) -> str:
     return _render_report_state_with_panels(artifact, panels_js)["html"]
 
 
+def test_report_viewer_renders_malformed_timestep_scalars_honestly() -> None:
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "malformed-scalars", "name": "test", "feedstock_id": "test"},
+        "timesteps": [
+            {"hour": {"unexpected": 1}, "summary": {"campaign": {"unexpected": 2}}},
+        ],
+        "terminal": {},
+    }
+
+    state = _render_report_state_with_panels(artifact)
+
+    assert "[object Object]" not in state["html"]
+    assert "malformed (object)" in state["html"]
+    assert state["snapshots"][0]["step-output"] == "Hour malformed (object) · malformed (object)"
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 

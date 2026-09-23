@@ -1,6 +1,6 @@
 "use strict";
 
-const { esc } = globalThis.ReportLabels;
+const { scalarText, esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -687,8 +687,8 @@ function panelSectionsHtml(artifact, rows, spans, energy) {
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
-  const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : String(timestep.hour);
-  $("#step-output").textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
+  const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : scalarText(timestep.hour);
+  $("#step-output").textContent = `Hour ${hour} · ${scalarText(row.campaign ?? "campaign not emitted")}`;
   $(".status-pill").textContent = `${index + 1} / ${artifact.timesteps.length}`;
   $("#current-grid").innerHTML = [
     ["Temperature", hasNumber(row.T_C) ? `${Number(row.T_C).toLocaleString()} °C` : "not emitted"], ["Total pressure", hasNumber(row.P_total_bar) ? `${Number(row.P_total_bar).toExponential(3)} bar` : "not emitted"],
