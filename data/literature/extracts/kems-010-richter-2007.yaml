@@ -25,7 +25,19 @@ experiments:
   locator: {section: '3.1 Starting materials and experimental procedure'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.0002'}}, locator: {table: '1', note: Printed 5-200 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: Type B CAI-like SiO2-Al2O3-MgO-CaCO3 glass}, locator: {section: '3.1 Starting materials and experimental procedure'}}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: 11.48
+          SiO2: 46.00
+          Al2O3: 19.39
+          CaO: 23.12
+      locator:
+        published_page: 5549
+        pdf_page_index: 6
+        table: '1'
+        note: 'Starting material row; oxide wt% as printed; label Type B CAI-like starting glass; residue rows not used'
     form: {state: {tag: value, value: partially molten glass on iridium wire loops}, locator: {section: '3.1 Starting materials and experimental procedure'}}
   apparatus:
     cell_material_and_liner: {state: {tag: value, value: iridium wire loops}, locator: {section: '3.1 Starting materials and experimental procedure'}}
