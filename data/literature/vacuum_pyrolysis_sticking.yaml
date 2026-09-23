@@ -43,6 +43,16 @@ reactivity_class_by_species:
   Ti: physisorbing
   CrO2: physisorbing
 
+# Declared wall-product class authorizes condensation backstops (F4 / S10).
+# reactive_product uses reactivity_class == reactive (SiO today).
+# stable_condensation_product authorizes the irreversible oxide route (CrO2).
+# Species absent here keep reversible pure-species Psat driving pressure.
+wall_product_class_values:
+  - stable_condensation_product
+
+wall_product_class_by_species:
+  CrO2: stable_condensation_product
+
 species:
   Fe:
     value: 0.02
