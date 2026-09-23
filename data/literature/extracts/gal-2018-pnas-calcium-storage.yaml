@@ -1,0 +1,143 @@
+schema_version: literature_extract.v1
+source_id: gal-2018-pnas-calcium-storage
+source:
+  citation: >-
+    Gal, A., Sorrentino, A., Kahil, K., Pereiro, E., Faivre, D. & Scheffel, A.
+    (2018), "Native-state imaging of calcifying and noncalcifying microalgae
+    reveals similarities in their calcium storage organelles", Proc. Natl. Acad.
+    Sci. U.S.A. 115(43):11000–11005, doi:10.1073/pnas.1804139115.
+  doi: 10.1073/pnas.1804139115
+  url: https://doi.org/10.1073/pnas.1804139115
+  year: 2018
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B4 gal-2018-pnas-calcium-storage.pdf (sha256
+    47384f82da878b0590098d9eaf0d3e7b8f828f665ca62aeb4d6b0a8631a36514; 6-page
+    PNAS OA CC BY-NC-ND). pdftotext -layout. Sidecar identity_note:
+    unrelated-pnas-oa-misfile (bytes formerly parked under kems-045-sossi slot;
+    relocated 2026-09-13). Confirmed PDF p1 title/authors/DOI match sidecar —
+    biology / biomineralization cryoimaging paper, NOT Sossi 2018 Cr PNAS
+    (10.1073/pnas.1809060115) and NOT a KEMS/Langmuir/vapour-rail source.
+    Landed printed method/cultivation numbers as unscored d-032 context only;
+    0 scored observations.
+  date: '2026-09-22'
+  worker: n14-misc
+  provenance_path: data/literature/extracts/gal-2018-pnas-calcium-storage.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: out_of_scope_topic
+  reason: unrelated_to_vapour_rail
+  item: CryoSXT / cryoSEM / EDS calcium-storage organelle imaging in microalgae
+  locator: {pdf_page_index: 1, note: 'Title + Significance; PNAS Environmental Sciences'}
+  note: >-
+    No vaporization, evaporation, partial-pressure, melt-thermodynamic, KEMS,
+    or pyrolysis measurements. Figures 1–5 are biological imaging; not ingested
+    as vapour-rail observations.
+- kind: figure_only
+  reason: not_digitized
+  item: Figures 1–5 cryoSXT/cryoSEM/EDS image panels
+  locator: {note: 'Figs 1–5 throughout article'}
+  note: Image panels only; no numeric axis series printed for digitisation.
+fidelity_samples:
+- species: microalgae_calcium_storage
+  observable: laboratory_conditions
+  observation_id: gal_2018_document_identity
+  field: document_type
+  value: pnas_microalgae_cryoimaging_misfile_not_kems
+  locator:
+    pdf_page_index: 1
+    note: Title page DOI 10.1073/pnas.1804139115
+- species: microalgae_calcium_storage
+  observable: method
+  observation_id: gal_2018_cultivation_conditions
+  field: P_carterae_growth_T_C
+  value: 18
+  locator:
+    pdf_page_index: 6
+    section: Materials and Methods
+species:
+  microalgae_calcium_storage:
+    observations: []
+    context:
+    - observation_id: gal_2018_document_identity
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: title_and_abstract
+      phase: coccolithophore_and_green_alga_cells
+      regime: cryoimaging_biomineralization_paper
+      units: as published
+      values:
+        quantity: document_identity_and_scope
+        method_class: method_only
+        evidence_class: biology_cryoimaging_not_vapour_rail_measurement
+        document_type: pnas_microalgae_cryoimaging_misfile_not_kems
+        title_as_printed: >-
+          Native-state imaging of calcifying and noncalcifying microalgae reveals
+          similarities in their calcium storage organelles
+        authors_as_printed:
+        - Assaf Gal
+        - Andrea Sorrentino
+        - Keren Kahil
+        - Eva Pereiro
+        - Damien Faivre
+        - André Scheffel
+        doi_as_printed: 10.1073/pnas.1804139115
+        published_pages_as_printed: '11000–11005'
+        volume_issue_as_printed: '115(43)'
+        sidecar_topic_as_filed: unrelated-pnas-oa-misfile
+        not_the_sossi_cr_pnas_doi: 10.1073/pnas.1809060115
+        techniques_as_printed:
+        - cryo–soft-X-ray tomography (cryoSXT)
+        - cryoscanning electron microscopy (cryoSEM)
+        - energy dispersive spectroscopy (EDS)
+      uncertainty:
+        note: Identity/scope row; no vapour-rail measurement uncertainty.
+    - observation_id: gal_2018_cultivation_conditions
+      type: method
+      locator:
+        pdf_page_index: 6
+        section: Materials and Methods
+        note: Algae and Cultivation paragraph
+      phase: cultured_microalgae
+      regime: laboratory_culture
+      units: as printed
+      values:
+        quantity: cultivation_temperature_and_media
+        method_class: method_only
+        strains_as_printed:
+        - P. carterae CCMP645
+        - I. galbana RCC1353
+        - E. huxleyi CCMP2090
+        - C. reinhardtii (acetate-phosphate medium)
+        P_carterae_growth_T_C: 18
+        C_reinhardtii_growth_T_C: 22
+        P_carterae_media_as_printed: artificial seawater medium
+        C_reinhardtii_media_as_printed: acetate-phosphate medium
+        C_reinhardtii_illumination_as_printed: continuous illumination
+      uncertainty:
+        note: none printed beyond stated setpoints
+    - observation_id: gal_2018_cryo_imaging_energies
+      type: method
+      locator:
+        pdf_page_index: 6
+        section: Materials and Methods
+        note: CryoSXT / CryoSEM and EDS paragraphs
+      phase: vitrified_cells
+      regime: cryoSXT_cryoSEM_EDS
+      units: as printed
+      values:
+        quantity: cryoimaging_beam_and_stage_parameters
+        method_class: method_only
+        cryoSXT_tomography_energy_eV: 520
+        Ca_L_edge_pre_edge_eV: 342
+        Ca_L_edge_peak_eV: 353.2
+        Ca_L_edge_scan_start_eV: 344
+        Ca_L_edge_scan_end_eV: 360
+        Ca_L_edge_step_eV: 0.1
+        cryoSEM_stage_T_C: -120
+        cryoSEM_instrument_as_printed: Ultra 55 SEM (Zeiss)
+        EDS_carbon_coat_nm: 6
+      uncertainty:
+        note: Instrument setpoints as printed; no vapour-rail observables.

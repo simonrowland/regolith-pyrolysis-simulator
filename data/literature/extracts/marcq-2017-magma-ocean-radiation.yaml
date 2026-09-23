@@ -1,0 +1,100 @@
+schema_version: literature_extract.v1
+source_id: marcq-2017-magma-ocean-radiation
+source:
+  citation: >-
+    Marcq, E., Salvador, A., Massol, H. & Davaille, A. (2017), "Thermal radiation
+    of magma ocean planets using a 1-D radiative-convective model of H2O-CO2
+    atmospheres", Journal of Geophysical Research: Planets, 122, 1539–1553,
+    doi:10.1002/2016JE005224.
+  doi: 10.1002/2016JE005224
+  url: https://doi.org/10.1002/2016JE005224
+  year: 2017
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B4 marcq-2017-magma-ocean-radiation.pdf (sha256
+    035268efebf0a0560fa702556796ced68c04dcc95eea3733c724b703089296ff; HAL OA
+    copy insu-01564674, 16 pages including HAL cover). pdftotext -layout inventory.
+    N14 / BACKLOG 4 ruling: this is a 1-D radiative-convective MODEL paper
+    (updated Marcq 2012 / Lebrun et al. 2013 atmosphere module). Author model
+    outputs = typed_absences; do not ingest as observations. No laboratory
+    measurement tables are present. Table 1 is a literature comparison of model
+    NL values (also typed absence / not scored).
+  date: '2026-09-22'
+  worker: n14-misc
+  provenance_path: data/literature/extracts/marcq-2017-magma-ocean-radiation.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Figures 1–13 OLR vs Tsurf, ε(Tsurf), Tε contours, Nakajima-limit contours, T(z) profiles, emission spectra, spectral contrast, coupled-model comparison
+  locator: {note: 'Figure captions throughout Results/Discussion; Figs 1–13'}
+  note: Author radiative-convective model products; not ingested.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Table 1 Comparison Between Recent H2O-Rich Atmospheric Models (NL W/m2 column including This study 280)
+  locator: {pdf_page_index: 15, table: '1', published_page: 1552}
+  note: >-
+    Cross-model NL compilation / this-study model result. Not a laboratory
+    measurement; not ingested as scored observations under N14 model→typed-absence.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Abstract / Key Points Nakajima limit ~280 W/m2; cloud lowering up to 40%; Tε raise ~10%
+  locator: {pdf_page_index: 2, section: Abstract}
+  note: Model headline results restated in abstract; not ingested as observations.
+- kind: no_printed_measurement_tables
+  reason: not_published
+  item: laboratory or instrument measurement tables
+  locator: {note: 'Only Table 1 (model comparison); no lab apparatus tables'}
+  note: >-
+    STEP 0 / inventory found no author laboratory measurement tables. Cited
+    prior-work NL values (Goldblatt/Leconte 282; Kopparapu; Hamano; Marcq 2012
+    uncorrected 200/220) remain attributed to prior models and are not re-homed.
+fidelity_samples:
+- species: magma_ocean_H2O_CO2_atmosphere_model
+  observable: laboratory_conditions
+  observation_id: marcq_2017_model_paper_scope
+  field: document_type
+  value: radiative_convective_model_paper_no_lab_measurement_tables
+  locator:
+    pdf_page_index: 2
+    note: Journal first page / Abstract; DOI 10.1002/2016JE005224
+species:
+  magma_ocean_H2O_CO2_atmosphere_model:
+    observations: []
+    context:
+    - observation_id: marcq_2017_model_paper_scope
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 2
+        section: title_and_abstract
+        note: HAL cover is pdf p1; journal article begins pdf p2 = published p1539
+      phase: H2O_CO2_magma_ocean_atmosphere
+      regime: theoretical_model_paper
+      units: as published
+      values:
+        quantity: model_paper_scope_and_typed_absence_summary
+        method_class: method_only
+        evidence_class: authors_radiative_convective_model_not_a_measurement_table
+        document_type: radiative_convective_model_paper_no_lab_measurement_tables
+        title_as_printed: >-
+          Thermal radiation of magma ocean planets using a 1-D radiative-convective
+          model of H2O-CO2 atmospheres
+        authors_as_printed:
+        - E. Marcq
+        - A. Salvador
+        - H. Massol
+        - A. Davaille
+        venue_as_printed: "Journal of Geophysical Research: Planets, 122, 1539–1553"
+        doi_as_printed: 10.1002/2016JE005224
+        model_lineage_as_printed: >-
+          Updated version of Marcq (2012) 1-D radiative-convective H2O-CO2 model
+          used by Lebrun et al. (2013); OLR miscalculation corrected; optional N2;
+          adaptive P grid
+        tables_count_as_printed: 1
+        figures_count_as_printed: 13
+        n14_policy: >-
+          Model outputs = typed absence; do not ingest as observations. No
+          measured/tabulated author laboratory data to land.
+      uncertainty:
+        note: No measurement uncertainty applicable; no scored observations in this extract.

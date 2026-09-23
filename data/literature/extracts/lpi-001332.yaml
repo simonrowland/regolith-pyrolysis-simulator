@@ -1,0 +1,199 @@
+schema_version: literature_extract.v1
+source_id: lpi-001332
+source:
+  citation: >-
+    Duke, M. B. (compiler) (2006), Space Resources Roundtable VIII, Program and
+    Abstracts, LPI Contribution No. 1332, Lunar and Planetary Institute, Houston
+    (meeting October 31–November 2, 2006, Colorado School of Mines, Golden, CO).
+    ISSN 0161-5297.
+  doi: null
+  url: https://www.lpi.usra.edu/lpi/contribution_docs/LPI-001332.pdf
+  year: 2006
+  conference: Space Resources Roundtable VIII
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox B4 lpi-001332.pdf (sha256
+    21e5777c58d81ca36b6fc89a1de9bb8bbb2d785cbe5cdc2070b76a594c04ba95; 84-page
+    LPI abstracts volume). pdftotext -layout. STEP 0: PDF p1 "PROGRAM AND
+    ABSTRACTS / LPI Contribution No. 1332"; title page confirms Space Resources
+    Roundtable VIII 2006. No prior extract under this corpus id or Roundtable
+    VIII volume name. Extracted printed numbers from the two vacuum-pyrolysis
+    abstracts (Cardiff & Pomeroy p.14; Pomeroy & Cardiff p.47) as unscored
+    d-032 context. Figure curves (Cardiff Fig. 1 HSC model; Pomeroy Figs 1–2
+    RGA/dissociation plots) not digitized. Author numerical O2-yield model
+    range (10–15%) recorded as typed absence (model).
+  date: '2026-09-22'
+  worker: n14-misc
+  provenance_path: data/literature/extracts/lpi-001332.yaml
+review_status: draft
+corrections: []
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Cardiff Fig. 1 Conditions required to vaporize MLS-1A (HSC Gibbs minimization curve)
+  locator: {pdf_page_index: 26, figure: '1', published_page: 14}
+  note: Author model vaporization envelope; experimental points referenced but not printed as a numeric table; not digitized.
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: Pomeroy numerical analysis 10–15% oxygen yield by weight for average Apollo 15 sample
+  locator: {pdf_page_index: 59, published_page: 47, section: Experiment}
+  note: Cited as numerical analysis [2] (Matchett M.S. thesis); model/derived cohort; not ingested as observation.
+- kind: figure_only
+  reason: not_digitized
+  item: Pomeroy Fig. 1 Apollo 15 percent composition dissociation at 7.50e-7 Torr; Fig. 2 RGA MLS-1A run
+  locator: {pdf_page_index: 59, published_page: 47}
+  note: Figure curves/panels; only prose-printed values (1.17% mass loss; 1400 C) landed.
+- kind: volume_not_fully_extracted
+  reason: scope_limited_to_vacuum_pyrolysis_abstracts
+  item: Remaining Roundtable VIII abstracts (excavation, simulants, FFC-Cambridge, architectures, etc.)
+  locator: {note: '84-page abstracts volume; Contents pp.v–vii'}
+  note: >-
+    Volume contains many ISRU abstracts. This extract prioritizes the two
+    vacuum-pyrolysis abstracts that print laboratory pyrolysis conditions.
+    Other abstracts not transcribed here.
+fidelity_samples:
+- species: srr8_volume
+  observable: laboratory_conditions
+  observation_id: lpi_001332_volume_identity
+  field: lpi_contribution_number
+  value: 1332
+  locator:
+    pdf_page_index: 1
+    note: Cover PROGRAM AND ABSTRACTS / LPI Contribution No. 1332
+- species: MLS-1A_simulant
+  observable: method
+  observation_id: lpi_001332_pomeroy_vacuum_pyrolysis_run
+  field: hold_T_C
+  value: 1400
+  locator:
+    pdf_page_index: 59
+    published_page: 47
+    section: Experiment
+- species: MLS-1A_simulant
+  observable: characterization
+  observation_id: lpi_001332_pomeroy_mass_loss
+  field: non_condensed_mass_loss_pct
+  value: 1.17
+  locator:
+    pdf_page_index: 59
+    published_page: 47
+    section: Results
+species:
+  srr8_volume:
+    observations: []
+    context:
+    - observation_id: lpi_001332_volume_identity
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: cover
+      phase: conference_abstracts_volume
+      regime: LPI_contribution_abstracts
+      units: as published
+      values:
+        quantity: volume_identity
+        method_class: method_only
+        document_type: space_resources_roundtable_VIII_program_and_abstracts
+        title_as_printed: Space Resources Roundtable VIII
+        lpi_contribution_number: 1332
+        meeting_dates_as_printed: October 31–November 2, 2006
+        meeting_venue_as_printed: Colorado School of Mines, Golden, Colorado
+        compiler_chair_as_printed: Michael B. Duke, Colorado School of Mines
+        issn_as_printed: '0161-5297'
+        pages_as_sidecar: 84
+      uncertainty:
+        note: Bibliographic identity row.
+  MLS-1A_simulant:
+    observations: []
+    context:
+    - observation_id: lpi_001332_cardiff_vacuum_pyrolysis_method
+      type: method
+      locator:
+        pdf_page_index: 26
+        published_page: 14
+        section: Demonstrations
+        note: Cardiff E. H. & Pomeroy B. R., Development of Vacuum Pyrolysis Techniques
+      phase: lunar_regolith_simulant
+      regime: vacuum_pyrolysis_solar_and_resistive
+      units: as printed
+      values:
+        quantity: vacuum_pyrolysis_demonstration_and_bench_heritage
+        method_class: method_only
+        abstract_title_as_printed: Development of Vacuum Pyrolysis Techniques
+        authors_as_printed:
+        - E. H. Cardiff
+        - B. R. Pomeroy
+        affiliation_as_printed: NASA Goddard Space Flight Center / Pennsylvania State University
+        heating_modes_as_printed:
+        - concentrated solar flux
+        - resistive heating
+        simulants_and_minerals_tested_as_printed:
+        - MLS1A
+        - JSC1A
+        - ilmenite
+        oxygen_detection_as_printed: mass spectrometry detection of oxygen in evolved gases
+        sam_heritage_power_W_approx: 20
+        sam_heritage_note_as_printed: >-
+          Resistively-heated chamber derives much of its heritage from the Sample
+          Analysis Module (SAM) on the Mars Science Laboratory; SAM does not
+          operate in vacuum
+        scaleup_solar_reflector_kW: 9.6
+        analysis_package_as_printed: HSC (Gibbs free-energy minimization) for vaporization/dissociation chemistry
+      uncertainty:
+        note: Method/heritage numbers as printed in the one-page abstract; no tabulated run matrix.
+    - observation_id: lpi_001332_pomeroy_vacuum_pyrolysis_run
+      type: method
+      locator:
+        pdf_page_index: 59
+        published_page: 47
+        section: Experiment
+        note: Pomeroy B. R. & Cardiff E. H., A Proof of Concept of Vacuum Pyrolysis
+      phase: MLS-1A_and_mineral_charges
+      regime: vacuum_furnace_RGA
+      units: as printed
+      values:
+        quantity: vacuum_furnace_pyrolysis_run_conditions
+        method_class: method_only
+        abstract_title_as_printed: A Proof of Concept of Vacuum Pyrolysis
+        authors_as_printed:
+        - B. R. Pomeroy
+        - E. H. Cardiff
+        samples_tested_as_printed:
+        - ilmenite
+        - enstatite
+        - MLS-1A simulant
+        outgas_duration_hours: 2
+        outgas_T_C: 200
+        outgas_environment_as_printed: vacuum oven
+        heating_rate_C_per_min_max: 12
+        hold_T_C: 1400
+        hold_duration_minutes: 20
+        rga_instrument_as_printed: MKS PPT residual gas analyzer (RGA)
+        primary_mineral_MLS1A_as_printed: SiO2
+        dissociation_products_as_printed:
+        - SiO
+        - oxygen
+        - silicon
+      uncertainty:
+        note: Setpoints as printed; 'no more than 12 C per minute' bound retained.
+    - observation_id: lpi_001332_pomeroy_mass_loss
+      type: characterization
+      locator:
+        pdf_page_index: 59
+        published_page: 47
+        section: Results
+      phase: MLS-1A_simulant
+      regime: vacuum_furnace_RGA
+      units: percent as printed
+      values:
+        quantity: non_condensed_mass_loss_after_1400C_vacuum_pyrolysis
+        method_class: measured_direct
+        sample_as_printed: MLS-1A
+        hold_T_C: 1400
+        vaporized_completely_as_printed: true
+        non_condensed_mass_loss_pct: 1.17
+        note: >-
+          'The MLS-1A sample when heated to 1400 C vaporized completly. …
+          exhibited a non-condensed mass loss of 1.17%.'
+      uncertainty:
+        note: No uncertainty printed for the 1.17% mass-loss figure.
