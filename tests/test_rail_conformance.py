@@ -76,6 +76,12 @@ ENGINE_REPORT_PATH = (
     / "2026-08-03-vapour-rail-engine-crosscheck"
     / "engine_crosscheck_report.json"
 )
+
+
+def _engine_report_unavailable() -> bool:
+    return not ENGINE_REPORT_PATH.is_file()
+
+
 ORACLE_MESSAGE = (
     "investigate \N{EM DASH} do NOT tune the systematic path to match the incumbent."
 )
@@ -1227,6 +1233,10 @@ def test_c5_debit_route_alpha_and_source_metadata_are_executable(
         assert math.isfinite(alpha_value) and 0.0 < alpha_value <= 1.0
         assert alpha_diagnostic
         provider, _payload = load_rail_provider()
+        if _engine_report_unavailable():
+            pytest.skip(
+                f"machine-local engine crosscheck report absent: {ENGINE_REPORT_PATH}"
+            )
         report = json.loads(ENGINE_REPORT_PATH.read_text(encoding="utf-8"))
         composition_mol = deepcopy(report["composition"]["composition_mol"])
         if parent not in composition_mol:
@@ -1404,6 +1414,10 @@ def test_t3_mass_spec_residual_pins_are_two_way(
 
 @pytest.fixture(scope="module")
 def engine_residuals() -> dict[str, float]:
+    if _engine_report_unavailable():
+        pytest.skip(
+            f"machine-local engine crosscheck report absent: {ENGINE_REPORT_PATH}"
+        )
     report = json.loads(ENGINE_REPORT_PATH.read_text(encoding="utf-8"))
     rows = [
         row
@@ -1760,3 +1774,10 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
         transition_reasons
     )
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
+
+
+def test_engine_report_gate_skips_without_private_docs() -> None:
+    """Mutation proof: ungated ENGINE_REPORT_PATH.read_text ERROR'd on fresh CI."""
+    assert _engine_report_unavailable() is True
+    assert ENGINE_REPORT_PATH.is_file() is False
+
