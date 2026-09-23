@@ -16,6 +16,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    PerBasis,
     AdmissionStatus,
     BenchIdentityBasis,
     EvidenceClass,
@@ -59,6 +60,7 @@ from simulator.battery.migrate import (
     group_queue_entries,
     migrate,
     migration_queue_document,
+    lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
     select_declared_source,
@@ -66,7 +68,7 @@ from simulator.battery.migrate import (
     work_id_for,
     write_outputs,
 )
-from simulator.battery.records import Bench, BenchIdentity, Species, State, as_decimal
+from simulator.battery.records import Bench, BenchIdentity, Reaction, Species, State, as_decimal
 from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
 from tests.battery import factories as F
@@ -3394,6 +3396,171 @@ def test_l04_log10_psat_over_p0_is_not_a_pressure(tmp_path: Path) -> None:
     assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
     assert obs.value.kind is ValueKind.UNAVAILABLE
     assert any(reason == (e.why or "") for e in result.queue if e.observation_id == obs.observation_id)
+
+
+
+
+def test_g3_vaporization_note_lifts_reaction_and_delta_fg() -> None:
+    """Printed dfG(g)-dfG(cr|l) note lifts reaction identity onto delta_fG."""
+    note_cr = (
+        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(cr)]/(R T); "
+        "P0=100000 Pa; rail_id=Al; condensed_record=Al-002"
+    )
+    lifted = lift_vaporization_reaction_from_ledger_note("Al", note_cr)
+    assert lifted is not None
+    reaction, p0 = lifted
+    assert p0 == as_decimal("100000")
+    assert isinstance(reaction, Reaction)
+    phases = {term.species.phase.value for term in reaction.terms}
+    assert phases == {Phase.G, Phase.CR}
+    coeffs = {
+        term.species.phase.value: term.coefficient for term in reaction.terms
+    }
+    assert coeffs[Phase.G] == 1
+    assert coeffs[Phase.CR] == -1
+
+    note_l = (
+        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(l)]/(R T); P0=100000 Pa"
+    )
+    lifted_l = lift_vaporization_reaction_from_ledger_note("Al", note_l)
+    assert lifted_l is not None
+    phases_l = {term.species.phase.value for term in lifted_l[0].terms}
+    assert phases_l == {Phase.G, Phase.L}
+
+    assert lift_vaporization_reaction_from_ledger_note("Al", "janaf p°=0.1 MPa") is None
+    assert lift_vaporization_reaction_from_ledger_note("Al", "") is None
+
+
+def test_g3_vaporization_ledger_admits_delta_fg_with_reaction(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    note = (
+        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(cr)]/(R T); "
+        "P0=100000 Pa; rail_id=Al; condensed_record=Al-002; "
+        "a_melt=1; mechanism=compilation_disagreement"
+    )
+    oid = "janaf::Al-005:T=100::vapour_rail_psat::log10_Psat_over_P0"
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": oid,
+                        "source_id": "fixture-source",
+                        "species": "Al",
+                        "comparison_quantity": "log10_Psat_over_P0",
+                        "temperature_K": 100,
+                        "table_kJ_mol": 316.034,
+                        "note": note,
+                        "provenance_class": "independent_tabulation",
+                        "engine_channel": "vapour_rail_psat",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations[oid]
+    assert quantity_token(obs.identity) is Quantity.DELTA_FG
+    assert quantity_token(obs.identity) is not Quantity.P_SAT
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("316.034")
+    assert obs.identity.species.phase.is_value
+    assert obs.identity.species.phase.value is Phase.G
+    assert obs.identity.reaction is not None and obs.identity.reaction.is_value
+    reaction = obs.identity.reaction.value
+    assert reaction is not None
+    phases = {term.species.phase.value for term in reaction.terms}
+    assert phases == {Phase.G, Phase.CR}
+    assert obs.identity.per is not None and obs.identity.per.is_value
+    assert obs.identity.per.value is PerBasis.MOL_SPECIES
+    assert obs.identity.standard_pressure_Pa is not None
+    assert obs.identity.standard_pressure_Pa.is_value
+    assert obs.identity.standard_pressure_Pa.value == as_decimal("100000")
+    reason = (
+        "the table value is the Gibbs energy of the vaporization "
+        "reaction and the reaction identity is not lifted"
+    )
+    assert not any(
+        reason == (e.why or "")
+        for e in result.queue
+        if e.observation_id == obs.observation_id
+    )
+    assert not any(
+        set(e.axes or ()) >= {"quantity", "value"}
+        and reason in (e.why or "")
+        for e in result.queue
+        if e.observation_id == obs.observation_id
+    )
+
+
+def test_g3_vaporization_lift_mutation_proof(tmp_path: Path) -> None:
+    """Stripping the reaction lift restores the paired quantity/value refusal."""
+    import simulator.battery.migrate as migrate_mod
+
+    root = _write_min_tree(tmp_path)
+    note = (
+        "janaf p°=0.1 MPa; ln(P_sat/P0)=-[dfG(g)-dfG(l)]/(R T); "
+        "P0=100000 Pa; rail_id=Al; condensed_record=Al-003"
+    )
+    oid = "janaf::Al-005:T=1200::vapour_rail_psat::log10_Psat_over_P0"
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": oid,
+                        "source_id": "fixture-source",
+                        "species": "Al",
+                        "comparison_quantity": "log10_Psat_over_P0",
+                        "temperature_K": 1200,
+                        "table_kJ_mol": 250.0,
+                        "note": note,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    live = migrate(root, write=False)
+    live_obs = live.observations[oid]
+    assert quantity_token(live_obs.identity) is Quantity.DELTA_FG
+    assert live_obs.value.kind is ValueKind.POINT
+
+    reason = (
+        "the table value is the Gibbs energy of the vaporization "
+        "reaction and the reaction identity is not lifted"
+    )
+    saved = migrate_mod.lift_vaporization_reaction_from_ledger_note
+    try:
+        migrate_mod.lift_vaporization_reaction_from_ledger_note = (
+            lambda formula, note: None  # type: ignore[assignment]
+        )
+        mutant = migrate(root, write=False)
+    finally:
+        migrate_mod.lift_vaporization_reaction_from_ledger_note = saved
+
+    mutant_obs = mutant.observations[oid]
+    assert mutant_obs.identity.quantity.is_unknown
+    assert quantity_token(mutant_obs.identity) is not Quantity.DELTA_FG
+    assert mutant_obs.value.kind is ValueKind.UNAVAILABLE
+    assert any(
+        reason == (e.why or "")
+        for e in mutant.queue
+        if e.observation_id == mutant_obs.observation_id
+    )
+
+    restored = migrate(root, write=False)
+    restored_obs = restored.observations[oid]
+    assert quantity_token(restored_obs.identity) is Quantity.DELTA_FG
+    assert restored_obs.value.kind is ValueKind.POINT
+
 
 
 def test_l05c3_tm_k_and_delta_f_g_298_and_table_log10_kf(tmp_path: Path) -> None:
