@@ -181,14 +181,38 @@ class AlphaMELTSProvider(ChemistryProvider):
         # map to feed the adapter's ``composition_mol_by_account``
         # kwarg.
         composition_mol_by_account = self._composition_from_view(request)
-        composition_wt_pct = self._composition_wt_pct(
-            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
-            request.account_view.species_formula_registry,
-        )
         redox_diagnostic = self._redox_diagnostic(
             request,
             composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
         )
+        try:
+            composition_wt_pct = self._composition_wt_pct(
+                composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+                request.account_view.species_formula_registry,
+            )
+        except ValueError as exc:
+            warning = str(exc)
+            return IntentResult(
+                intent=request.intent,
+                status='out_of_domain',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=LiquidusDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='out_of_domain',
+                    backend_warnings=(warning,),
+                    backend_status_reason='unresolvable_species_composition',
+                    backend_diagnostics=_out_of_domain_diagnostics(
+                        request,
+                        composition_wt_pct={},
+                        composition_mol_by_account=composition_mol_by_account,
+                        reason='unresolvable_species_composition',
+                    ),
+                    **redox_diagnostic,
+                ).as_diagnostic(),
+                warnings=(warning,),
+            )
 
         # Run the domain gate even when the adapter is None so callers
         # see a meaningful rejection (rather than a silent
@@ -427,15 +451,15 @@ class AlphaMELTSProvider(ChemistryProvider):
                 continue
             try:
                 formula = resolve_species_formula(species, species_formula_registry)
-            except Exception:
-                # An unregistered species at this layer is the same
-                # condition the adapter would hit downstream; surface
-                # it through the domain gate by NOT including the
-                # species (the gate will then report a low major-oxide
-                # sum or missing-species warning). The kernel-level
-                # writer-purity invariants are unaffected because we
-                # never emit a transition.
-                continue
+            except Exception as exc:
+                # Positive-mol species that cannot resolve must refuse
+                # the composition projection. Dropping the species and
+                # renormalizing invents a leaner melt (e.g. SiO2+Bogus
+                # becomes SiO2=100 wt%).
+                raise ValueError(
+                    f'AlphaMELTS composition refuses unresolvable species '
+                    f'{species!r} with positive mol; not renormalizing around a hole'
+                ) from exc
             mass_kg = mol_val * formula.molar_mass_kg_per_mol()
             if mass_kg <= 0.0:
                 continue

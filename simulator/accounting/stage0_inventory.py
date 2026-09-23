@@ -15,7 +15,7 @@ from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_species_formula
 from simulator.accounting.yield_disposition import _ACCOUNT_TO_BIN
 
@@ -713,9 +713,19 @@ def _species_mol(
         return 0.0
     try:
         molar_mass_kg = float(formula.molar_mass_kg_per_mol())
-    except Exception:
+    except Exception as exc:
+        if float(kg) > 0.0:
+            raise AccountingError(
+                f'molar mass unavailable for species {species!r} with '
+                f'positive mass {kg}; refusing measured-looking 0.0 mol'
+            ) from exc
         return 0.0
     if not math.isfinite(molar_mass_kg) or molar_mass_kg <= 0.0:
+        if float(kg) > 0.0:
+            raise AccountingError(
+                f'non-positive molar mass for species {species!r} with '
+                f'positive mass {kg}; refusing measured-looking 0.0 mol'
+            )
         return 0.0
     return float(kg) / molar_mass_kg
 

@@ -1962,9 +1962,11 @@ print('ok')
                     ).molar_mass_kg_per_mol()
                     * 1000.0
                 )
-            except Exception:
-                mol.append(0.0)
-                continue
+            except Exception as exc:
+                raise ValueError(
+                    f'ThermoEngine cannot prove molar mass for endmember {name!r}; '
+                    f'refusing activity projection rather than inventing 0.0 mol'
+                ) from exc
             mol.append(wt / molar_mass_g_per_mol if molar_mass_g_per_mol > 0.0 else 0.0)
         return mol
 
@@ -1997,8 +1999,11 @@ print('ok')
                 resolve_species_formula(oxide, None).molar_mass_kg_per_mol()
                 * 1000.0
             )
-        except Exception:
-            return 0.0
+        except Exception as exc:
+            raise ValueError(
+                f'ThermoEngine cannot prove molar mass for oxide {oxide!r}; '
+                f'refusing measured-looking 0.0 mol for positive wt%'
+            ) from exc
         return wt / molar_mass_g_per_mol if molar_mass_g_per_mol > 0.0 else 0.0
 
     def _select_liquid_phase(self, phases: tuple[str, ...]) -> Optional[str]:
