@@ -392,11 +392,15 @@
       (Object.keys(rest).length ? renderTree(rest, path) : "");
   }
 
-  function renderPumping(value) {
+  // The producer (simulator/pumping_cost.py) builds one pumping row per simulated hour whose vented O2 needs
+  // sub-ambient pumping; an hour with missing inputs refuses instead of being skipped. So status "no_rows" with
+  // 0 kWh is a computed zero ("no hour needed pumping") whenever hours were simulated, and only absence when the
+  // run simulated no hours at all (an empty timesteps array). zeroSimulatedHours is true only in that case.
+  function renderPumping(value, zeroSimulatedHours) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic.pumping_diagnostic";
     if (!isRecord(value)) return structuredProblem(value, path, "an object");
     const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !["status", "pumping_electrical_kWh"].includes(key)));
-    const energy = value.status === "no_rows"
+    const energy = value.status === "no_rows" && zeroSimulatedHours
       ? `<div class="sec-p8-field"><span>Emitted pumping diagnostic energy</span><b>${pendingInline(`${path}.pumping_electrical_kWh`)}</b></div>`
       : expectedLeaf(value, "pumping_electrical_kWh", "Emitted pumping diagnostic energy", "kWh", path);
     return expectedScalar(value, "status", "Emitted pumping status", path) +
@@ -431,7 +435,7 @@
     return renderTree(diagnostic.warnings, path, "warning");
   }
 
-  function renderDiagnostic(diagnostic) {
+  function renderDiagnostic(diagnostic, zeroSimulatedHours) {
     const path = "terminal.run_metadata.cost_rollup_diagnostic";
     if (!isRecord(diagnostic)) return structuredProblem(diagnostic, path, "an object", `${path} is not emitted; no allocation depth is inferred.`);
     const priceBasis = expectedScalar(diagnostic, "price_basis", "Emitted diagnostic price basis", path);
@@ -464,7 +468,7 @@
       `<details class="sec-p8-details"><summary>Active inventory allocations</summary>${renderCostMap(diagnostic.active_inventory_costs, `${path}.active_inventory_costs`, false)}</details>` +
       `<details class="sec-p8-details"><summary>Run input cost</summary>${renderRunInput(diagnostic.run_input_cost)}</details>` +
       `<details class="sec-p8-details"><summary>Auxiliary electrical diagnostic</summary>${renderAuxiliary(diagnostic.auxiliary_electrical_diagnostic)}</details>` +
-      `<details class="sec-p8-details"><summary>Pumping diagnostic</summary>${renderPumping(diagnostic.pumping_diagnostic)}</details>` +
+      `<details class="sec-p8-details"><summary>Pumping diagnostic</summary>${renderPumping(diagnostic.pumping_diagnostic, zeroSimulatedHours)}</details>` +
       `<details class="sec-p8-details"><summary>Warnings</summary>${renderWarnings(diagnostic)}</details>` +
       `</details>`;
   }
@@ -477,7 +481,7 @@
       `<h2><span class="sect">P8</span>Cost rollup depth</h2>` +
       `<p class="sub">Canonical energy-cost totals and artifact price provenance, followed by diagnostic allocation depth with emitted basis disclosures intact.</p>` +
       `<div class="sec-p8-head"><div>${renderCostTotals(totals)}</div>${renderCostBlock(costBlock, totals)}</div>` +
-      renderDiagnostic(diagnostic) +
+      renderDiagnostic(diagnostic, Array.isArray(artifact?.timesteps) && artifact.timesteps.length === 0) +
       `</section>`;
   }
 

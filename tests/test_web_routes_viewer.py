@@ -930,6 +930,29 @@ def test_report_viewer_no_rows_pumping_is_pending_not_measured_zero() -> None:
     assert "pumping_diagnostic.pumping_electrical_kWh not emitted" in html
 
 
+def test_report_viewer_no_rows_pumping_with_simulated_hours_is_computed_zero() -> None:
+    # simulator/pumping_cost.py evaluates every simulated hour and emits a row only when that hour's vented O2
+    # needs sub-ambient pumping (missing inputs refuse instead). With hours simulated, "no_rows" + 0 kWh therefore
+    # means "no hour needed pumping" — a computed zero, not absence.
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0"}, "ledger": {}}]
+    artifact["terminal"]["run_metadata"] = {
+        "cost_rollup_diagnostic": {
+            "pumping_diagnostic": {
+                "status": "no_rows",
+                "rows": [],
+                "pumping_electrical_kWh": 0.0,
+            }
+        }
+    }
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "Pumping energy</span><b>0 kWh · no simulated hour needed sub-ambient pumping" in html
+    assert "Pumping status</span><b>no_rows" in html
+    assert "not computed — no rows" not in html
+
+
 def test_library_pretty_prints_feedstock_ids() -> None:
     root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
     harness = r"""

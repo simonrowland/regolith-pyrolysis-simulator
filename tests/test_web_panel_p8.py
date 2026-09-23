@@ -417,6 +417,25 @@ def test_no_rows_pumping_zero_is_preserved_without_viewer_inclusion_claim() -> N
     assert "pending · terminal.cost_totals.pumping_electrical_cost_usd not emitted" in totals_region
 
 
+def test_no_rows_pumping_zero_is_pending_when_the_run_simulated_no_hours() -> None:
+    # With zero simulated hours the producer still emits status "no_rows" and 0 kWh (its accumulator start),
+    # but nothing was evaluated, so the panel must not present that as a measured zero.
+    artifact = _full_artifact()
+    artifact["timesteps"] = []
+    pumping = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["pumping_diagnostic"]
+    pumping["status"] = "no_rows"
+    pumping["pumping_electrical_kWh"] = 0.0
+    pumping["rows"] = []
+
+    html = _render_panel(artifact)["html"]
+    pumping_region = _between(html, "<summary>Pumping diagnostic</summary>", "<summary>Warnings</summary>")
+
+    assert "no_rows" in _field_value(pumping_region, "Emitted pumping status")
+    energy = _field_value(pumping_region, "Emitted pumping diagnostic energy")
+    assert "pending" in energy
+    assert "0 kWh" not in energy
+
+
 def test_unavailable_pumping_energy_is_shown_with_reason_not_zero() -> None:
     artifact = _full_artifact()
     pumping = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]["pumping_diagnostic"]
