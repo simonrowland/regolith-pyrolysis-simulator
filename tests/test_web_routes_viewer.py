@@ -130,6 +130,48 @@ setImmediate(() => process.stdout.write(Object.values(els).map((e) => e._html).j
     assert "not emitted" in html
 
 
+def test_library_and_settings_reject_numeric_coercion() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+function run(sourcePath, expression) {
+  const context = {
+    window: { location: { search: "", href: "" } },
+    document: { querySelector() { return null; } },
+    URLSearchParams,
+    encodeURIComponent,
+    fetch: () => new Promise(() => {}),
+    console
+  };
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(labelsSource, context);
+  vm.runInContext(fs.readFileSync(sourcePath, "utf8"), context);
+  return vm.runInContext(expression, context);
+}
+process.stdout.write(JSON.stringify({
+  library: run(process.argv[3], '[exactNumber([], "kg"), exactNumber("  ", "kg"), exactNumber("12", "kg")]'),
+  settings: run(process.argv[4], '[displayNumber([], "kg"), displayNumber("  ", "kg"), displayNumber("12", "kg")]')
+}));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "library.js"), str(root / "settings.js"),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result["library"] == ["not emitted"] * 3
+    assert result["settings"] == ["not emitted"] * 3
+
+
 def _render_library_yield_chips(payload: dict) -> str:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/library.js"
     harness = r"""
