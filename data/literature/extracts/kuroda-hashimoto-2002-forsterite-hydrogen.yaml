@@ -1,0 +1,536 @@
+schema_version: literature_extract.v1
+source_id: kuroda-hashimoto-2002-forsterite-hydrogen
+source:
+  citation: Kuroda, D. and Hashimoto, A. (2002). The reaction of forsterite with hydrogen — its apparent
+    and real temperature dependences. Antarctic Meteorite Research 15, 152-164.
+  doi: 10.15094/00006017
+  year: 2002
+  url: https://nipr.repo.nii.ac.jp/record/6017/files/KJ00000041009.pdf
+extraction:
+  method: layout-preserving pdftotext of ClearScan PDF plus page-6 Table 1 render cross-check; printed
+    Table 1 numbers and abstract/eq. (3) activation parameters only; no figure-axis digitization
+  date: '2026-09-22'
+  worker: n3-forsterite-evap-2026-09-22
+  provenance_path: ferry/pdfs-n/kuroda-hashimoto-2002-forsterite-hydrogen.pdf
+review_status: draft
+fidelity_samples:
+- path: species.forsterite.observations[kuroda_2002_table1_net_reaction_rates].values.series[0].Jexp_g_cm2_s
+  value: 1.79e-06
+  locator:
+    table: '1'
+    published_page: 157
+    note: first Table 1 row Jexp at 1500 C
+- path: species.forsterite.observations[kuroda_2002_author_real_activation_and_rate_law].values.real_activation_energy_kcal_per_mol
+  value: 32.6
+  locator:
+    published_page: 152
+    section: Abstract
+    equation: '3'
+    note: real Ea at constant PH
+species:
+  forsterite:
+    context:
+    - observation_id: kuroda_2002_apparatus_and_sample
+      type: apparatus
+      locator:
+        published_page: 153
+        pdf_page_index: 2
+        section: 2. Experiments
+      phase: polycrystalline_forsterite
+      regime: H2_H_dissociation_catalyzed_Mo_cell
+      units: as published
+      values:
+        quantity: experimental_apparatus_and_sample
+        method_class: method_only
+        furnace: Deltech DT-31-VT-68-C
+        reaction_cell_material: Mo
+        dissociation_catalyst: fine-grained W granules (0.1-1.0 mm) and W foil strips; ~200 collisions
+          claimed before sample chamber
+        evacuation_tube_ID_cm: 0.8
+        evacuation_tube_length_cm: 5.4
+        downstream_alumina_tube_ID_mm: 55
+        downstream_alumina_tube_length_mm_approx: 300
+        diffusion_pump_capacity_L_per_s: 3000
+        sample: polished polycrystalline forsterite cylinders from 2:1 molar MgO+SiO2 (99.999%); sintered;
+          porosity 7.7±2.6%
+        porosity_pct_mean: 7.7
+        porosity_pct_uncertainty: 2.6
+        weight_loss_target_pct_of_initial: 2-5
+        ramp_up_C_per_min: 10
+        H2_flow_during_ramp_cc_per_min: 2
+        H2_flow_at_setpoint_cc_per_min_options:
+        - 6.7
+        - 20
+        - 60
+        temperatures_C:
+        - 1200
+        - 1300
+        - 1400
+        - 1500
+        note: Authors argue rate-controlling gas is atomic H (linear in PH), not H2; PH from H2 dissociation
+          equilibrium over W catalyst.
+      equipment:
+        cell_material:
+          value: Mo reaction cell with W catalyst bed
+          locator:
+            published_page: 153
+            section: '2.1'
+            figure: 1-2
+        chamber_pressure:
+          value: ~1e-4 bar total (H2+H)
+          units: bar
+          locator:
+            published_page: 157
+            section: '3.1'
+    observations:
+    - observation_id: kuroda_2002_table1_net_reaction_rates
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 157
+        pdf_page_index: 6
+        note: Table 1. Summary of experimental results.
+      phase: cr
+      regime: forsterite_hydrogen_reaction_net_rate
+      T_range_K:
+      - 1473.15
+      - 1773.15
+      units: Jexp in g cm^-2 s^-1; P in atm; A in cm^2; W in g; porosity in %; duration in min
+      values:
+        quantity: net_reaction_rate_Jexp
+        method_class: measured_direct
+        definition: Jexp from weight change, duration at max T, and average surface area before/after
+        series:
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 30
+          A1_cm2: 1.051
+          A2_cm2: 1.042
+          W1_g: 0.21428
+          W2_g: 0.21091
+          porosity1_pct: 7.3
+          porosity2_pct: 7.5
+          Jexp_g_cm2_s: 1.79e-06
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 30
+          A1_cm2: 0.729
+          A2_cm2: 0.724
+          W1_g: 0.09214
+          W2_g: 0.08959
+          porosity1_pct: 7.6
+          porosity2_pct: 8.9
+          Jexp_g_cm2_s: 1.95e-06
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 30
+          A1_cm2: 0.457
+          A2_cm2: 0.453
+          W1_g: 0.04563
+          W2_g: 0.04373
+          porosity1_pct: 6.8
+          porosity2_pct: 9.0
+          Jexp_g_cm2_s: 2.32e-06
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 15
+          A1_cm2: 0.244
+          A2_cm2: 0.24
+          W1_g: 0.01848
+          W2_g: 0.01788
+          porosity1_pct: 7.2
+          porosity2_pct: 7.8
+          Jexp_g_cm2_s: 2.75e-06
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 15
+          A1_cm2: 0.123
+          A2_cm2: 0.121
+          W1_g: 0.00593
+          W2_g: 0.0056
+          porosity1_pct: 9.6
+          porosity2_pct: 11.8
+          Jexp_g_cm2_s: 3.01e-06
+        - T_C: 1500
+          PH2_atm: 0.00019
+          PH_atm: 3.9e-06
+          duration_min: 15
+          A1_cm2: 0.065
+          A2_cm2: 0.063
+          W1_g: 0.00263
+          W2_g: 0.00245
+          porosity1_pct: 7.5
+          porosity2_pct: 9.1
+          Jexp_g_cm2_s: 3.21e-06
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 120
+          A1_cm2: 1.091
+          A2_cm2: 1.083
+          W1_g: 0.21552
+          W2_g: 0.21113
+          porosity1_pct: 5.4
+          porosity2_pct: 6.4
+          Jexp_g_cm2_s: 5.61e-07
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 120
+          A1_cm2: 0.729
+          A2_cm2: 0.719
+          W1_g: 0.09405
+          W2_g: 0.09074
+          porosity1_pct: 6.8
+          porosity2_pct: 7.6
+          Jexp_g_cm2_s: 6.35e-07
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 120
+          A1_cm2: 0.441
+          A2_cm2: 0.437
+          W1_g: 0.04424
+          W2_g: 0.04182
+          porosity1_pct: 6.1
+          porosity2_pct: 9.5
+          Jexp_g_cm2_s: 7.65e-07
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 60
+          A1_cm2: 0.254
+          A2_cm2: 0.252
+          W1_g: 0.01866
+          W2_g: 0.01797
+          porosity1_pct: 6.5
+          porosity2_pct: 8.3
+          Jexp_g_cm2_s: 7.58e-07
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 30
+          A1_cm2: 0.123
+          A2_cm2: 0.122
+          W1_g: 0.00614
+          W2_g: 0.00595
+          porosity1_pct: 6.0
+          porosity2_pct: 8.1
+          Jexp_g_cm2_s: 8.65e-07
+        - T_C: 1400
+          PH2_atm: 0.000182
+          PH_atm: 1.54e-06
+          duration_min: 45
+          A1_cm2: 0.07
+          A2_cm2: 0.07
+          W1_g: 0.00295
+          W2_g: 0.00278
+          porosity1_pct: 4.5
+          porosity2_pct: 8.7
+          Jexp_g_cm2_s: 9.01e-07
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 360
+          A1_cm2: 1.083
+          A2_cm2: 1.079
+          W1_g: 0.21233
+          W2_g: 0.21012
+          porosity1_pct: 5.8
+          porosity2_pct: 6.2
+          Jexp_g_cm2_s: 9.46e-08
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 360
+          A1_cm2: 0.724
+          A2_cm2: 0.723
+          W1_g: 0.09308
+          W2_g: 0.09136
+          porosity1_pct: 5.8
+          porosity2_pct: 6.8
+          Jexp_g_cm2_s: 1.1e-07
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 300
+          A1_cm2: 0.446
+          A2_cm2: 0.442
+          W1_g: 0.04521
+          W2_g: 0.04429
+          porosity1_pct: 4.8
+          porosity2_pct: 5.4
+          Jexp_g_cm2_s: 1.15e-07
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 210
+          A1_cm2: 0.254
+          A2_cm2: 0.252
+          W1_g: 0.01918
+          W2_g: 0.01879
+          porosity1_pct: 6.0
+          porosity2_pct: 7.3
+          Jexp_g_cm2_s: 1.22e-07
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 180
+          A1_cm2: 0.127
+          A2_cm2: 0.126
+          W1_g: 0.00637
+          W2_g: 0.00617
+          porosity1_pct: 6.3
+          porosity2_pct: 8.5
+          Jexp_g_cm2_s: 1.47e-07
+        - T_C: 1300
+          PH2_atm: 0.000177
+          PH_atm: 5.42e-07
+          duration_min: 180
+          A1_cm2: 0.063
+          A2_cm2: 0.062
+          W1_g: 0.00247
+          W2_g: 0.00237
+          porosity1_pct: 5.3
+          porosity2_pct: 8.5
+          Jexp_g_cm2_s: 1.48e-07
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 2400
+          A1_cm2: 1.03
+          A2_cm2: 1.024
+          W1_g: 0.20576
+          W2_g: 0.20277
+          porosity1_pct: 7.9
+          porosity2_pct: 8.3
+          Jexp_g_cm2_s: 2.02e-08
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 2400
+          A1_cm2: 0.716
+          A2_cm2: 0.712
+          W1_g: 0.08897
+          W2_g: 0.08713
+          porosity1_pct: 6.8
+          porosity2_pct: 7.6
+          Jexp_g_cm2_s: 1.79e-08
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 2160
+          A1_cm2: 0.448
+          A2_cm2: 0.443
+          W1_g: 0.04323
+          W2_g: 0.04207
+          porosity1_pct: 7.8
+          porosity2_pct: 8.5
+          Jexp_g_cm2_s: 2.01e-08
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 2100
+          A1_cm2: 0.238
+          A2_cm2: 0.234
+          W1_g: 0.01755
+          W2_g: 0.01681
+          porosity1_pct: 6.7
+          porosity2_pct: 8.3
+          Jexp_g_cm2_s: 2.49e-08
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 1200
+          A1_cm2: 0.131
+          A2_cm2: 0.13
+          W1_g: 0.00643
+          W2_g: 0.0063
+          porosity1_pct: 6.9
+          porosity2_pct: 7.5
+          Jexp_g_cm2_s: 1.38e-08
+        - T_C: 1200
+          PH2_atm: 0.000171
+          PH_atm: 1.66e-07
+          duration_min: 1620
+          A1_cm2: 0.055
+          A2_cm2: 0.054
+          W1_g: 0.00176
+          W2_g: 0.00168
+          porosity1_pct: 8.2
+          porosity2_pct: 10.1
+          Jexp_g_cm2_s: 1.6e-08
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 70
+          A1_cm2: 1.077
+          A2_cm2: 1.07
+          W1_g: 0.20759
+          W2_g: 0.20247
+          porosity1_pct: 6.6
+          porosity2_pct: 7.9
+          Jexp_g_cm2_s: 1.14e-06
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 70
+          A1_cm2: 0.711
+          A2_cm2: 0.702
+          W1_g: 0.08485
+          W2_g: 0.08122
+          porosity1_pct: 8.8
+          porosity2_pct: 11.0
+          Jexp_g_cm2_s: 1.22e-06
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 50
+          A1_cm2: 0.43
+          A2_cm2: 0.427
+          W1_g: 0.0402
+          W2_g: 0.03851
+          porosity1_pct: 6.0
+          porosity2_pct: 8.5
+          Jexp_g_cm2_s: 1.31e-06
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 30
+          A1_cm2: 0.24
+          A2_cm2: 0.238
+          W1_g: 0.01572
+          W2_g: 0.01509
+          porosity1_pct: 6.7
+          porosity2_pct: 8.4
+          Jexp_g_cm2_s: 1.47e-06
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 30
+          A1_cm2: 0.095
+          A2_cm2: 0.094
+          W1_g: 0.00248
+          W2_g: 0.00222
+          porosity1_pct: 8.3
+          porosity2_pct: 13.2
+          Jexp_g_cm2_s: 1.53e-06
+        - T_C: 1400
+          PH2_atm: 0.000547
+          PH_atm: 2.67e-06
+          duration_min: 30
+          A1_cm2: 0.066
+          A2_cm2: 0.065
+          W1_g: 0.00254
+          W2_g: 0.00236
+          porosity1_pct: 8.4
+          porosity2_pct: 12.0
+          Jexp_g_cm2_s: 1.53e-06
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 200
+          A1_cm2: 1.077
+          A2_cm2: 0.107
+          W1_g: 0.20834
+          W2_g: 0.20485
+          porosity1_pct: 6.5
+          porosity2_pct: 7.4
+          Jexp_g_cm2_s: 2.71e-07
+          note: A2 printed 0.107 in PDF text layer; likely typesetting error vs ~1.07 from neighboring
+            rows; retained as printed
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 200
+          A1_cm2: 0.703
+          A2_cm2: 0.699
+          W1_g: 0.08514
+          W2_g: 0.08266
+          porosity1_pct: 6.2
+          porosity2_pct: 7.8
+          Jexp_g_cm2_s: 2.95e-07
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 150
+          A1_cm2: 0.421
+          A2_cm2: 0.418
+          W1_g: 0.03771
+          W2_g: 0.03635
+          porosity1_pct: 8.2
+          porosity2_pct: 10.1
+          Jexp_g_cm2_s: 3.61e-07
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 100
+          A1_cm2: 0.239
+          A2_cm2: 0.236
+          W1_g: 0.01576
+          W2_g: 0.01519
+          porosity1_pct: 7.1
+          porosity2_pct: 8.5
+          Jexp_g_cm2_s: 4.0e-07
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 90
+          A1_cm2: 0.123
+          A2_cm2: 0.121
+          W1_g: 0.00648
+          W2_g: 0.00618
+          porosity1_pct: 7.4
+          porosity2_pct: 9.4
+          Jexp_g_cm2_s: 4.64e-07
+        - T_C: 1400
+          PH2_atm: 6.1e-05
+          PH_atm: 8.93e-07
+          duration_min: 70
+          A1_cm2: 0.054
+          A2_cm2: 0.053
+          W1_g: 0.00167
+          W2_g: 0.00156
+          porosity1_pct: 9.0
+          porosity2_pct: 11.1
+          Jexp_g_cm2_s: 4.88e-07
+      uncertainty:
+        note: Table 1 prints point values without per-row uncertainty; sample porosity stated 7.7±2.6%
+          elsewhere in §2.3
+    - observation_id: kuroda_2002_author_real_activation_and_rate_law
+      type: rate_series
+      locator:
+        published_page: 152
+        section: Abstract
+        equation: '3'
+        note: also §3.2 / Fig. 7 curve (c); real Ea at constant PH
+      phase: cr
+      regime: forsterite_atomic_hydrogen_reaction
+      units: kcal/mol for Ea; rate law as printed with JF in g cm^-2 s^-1 and PH in atm
+      values:
+        quantity: author_fitted_rate_law_and_activation_energies
+        method_class: author_derived_from_Jexp_vs_A_intercepts_and_Arrhenius
+        derived: true
+        apparent_activation_energy_kcal_per_mol: 86.5
+        apparent_activation_energy_uncertainty_kcal_per_mol_2sigma: 4.8
+        apparent_activation_basis: constant_PH2_reference_1.9e-4_atm
+        real_activation_energy_kcal_per_mol: 32.6
+        real_activation_energy_uncertainty_kcal_per_mol_2sigma: 4.8
+        real_activation_basis: constant_PH_reference_3.9e-6_atm
+        rate_law_as_printed: log10(JF / g cm^-2 s^-1) = -32.6(±4.8)*10^3/(2.303 RT) + log10(PH/atm) +
+          4.00(±0.07)
+        rate_law_prefactor_log10: 4.0
+        rate_law_prefactor_uncertainty_log10: 0.07
+        PH_dependence_slope_at_1400C: 1.05
+        PH_dependence_slope_uncertainty: 0.09
+        PH2_dependence_slope_at_1400C: 0.52
+        PH2_dependence_slope_uncertainty: 0.05
+        note: JF is the true forward rate from y-intercept of Jexp vs A·Jexp (eq. 2); not a raw Jexp table
+          value.
+      uncertainty:
+        note: Printed 2σ on Ea ±4.8 kcal/mol and on prefactor ±0.07 in log10 units
