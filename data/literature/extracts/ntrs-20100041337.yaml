@@ -1,0 +1,320 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20100041337
+source:
+  citation: >-
+    Forsyth, E.T.; Maes, M.; Stoltzfus, J.M.; Bachelier, F. (2003), "Promoted
+    Ignition and Burning Tests of Stainless Steel in Flowing and Nonflowing
+    Oxygen", Flammability and Sensitivity of Materials in Oxygen-Enriched
+    Atmospheres: Tenth Volume, ASTM STP 1454, T.A. Steinberg, H.D. Beeson, and
+    B.E. Newton, Eds., ASTM International, West Conshohocken, PA. NASA NTRS
+    20100041337 (WSTF / Industry-Sponsored Metals Combustion Test Program 96-1).
+  url: https://ntrs.nasa.gov/citations/20100041337
+  year: 2003
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/ntrs-20100041337.pdf
+    (private; not committed). Scanned 18-page ASTM STP reprint. pdftotext -layout
+    plus page-image cross-check of Tables 1, 2, and 5. SHA-256 matches sidecar
+    c84dad73bbe7eaffc8296ac4db772113b7aab599c26d899ff03e5137df227793.
+    Sidecar citation field is OCR garbage ("Source of Acqui siti on"); PDF p1
+    title/authors identify the Forsyth et al. 2003 STP 1454 paper. No closed
+    observation type fits metal promoted-ignition burn length / threshold
+    pressure (oxygen-compatibility engineering, not vapour-rail), so printed
+    Phase I/II/supplementary summaries and apparatus are landed in context
+    (d-032 Option A / N7 off-rail pattern). Figs 4–9 photographs/plots are
+    figure-only except where prose/table duplicates the numbers. Amendment
+    request noted for a future flammability_threshold observation type.
+  date: '2026-09-22'
+  worker: n11-nist-ntrs
+  provenance_path: data/literature/extracts/ntrs-20100041337.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: ASTM STP experimental paper — promoted ignition/burning of stainless steel in O2 (WSTF)
+  measured_direct_observations: 0
+  method_observations: 4
+  figure_only_observations: 6
+  absent_from_source:
+  - closed observation-type home for burn_length / threshold_pressure (amendment requested)
+  - digitised axis readings from Figs 5, 7, 9, 10 (figure-only; table summaries used)
+  - Sch. 80 / Sch. XXS pipe Tables 3–4 full cell dumps (minimal burn; XXS no sustained burn — summarised in context only)
+  note: >-
+    STEP 0: no prior Forsyth / Stoltzfus / Program 96-1 extract. Sidecar citation
+    is truncated OCR; identity taken from PDF p1. Primary measured burn-length
+    tables live in context because they are outside the vapour-rail closed set.
+fidelity_samples:
+- species: SS316L
+  observable: experiment_series
+  observation_id: forsyth_2003_phase1_nonflowing_table1_and_thresholds
+  field: threshold_pressure_psia_half_inch_316L_as_printed
+  value: 1200
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: 1/2 in. 316L threshold pressure 1200 psi (8.3 MPa) if 1.0 in min burn = self-sustained
+- species: SS316L
+  observable: experiment_series
+  observation_id: forsyth_2003_phase2_flowing_half_inch_rod_table2
+  field: max_burn_length_in_at_500_psia_50_fts_as_printed
+  value: 4.81
+  locator:
+    pdf_page_index: 8
+    table: '2'
+    note: complete sample burn 4.81 in (12.22 cm) at 500 psia / 50 ft/s
+- species: SS316L
+  observable: experiment_series
+  observation_id: forsyth_2003_supplementary_half_inch_rod_table5
+  field: flowing_threshold_reduction_percent_as_printed
+  value: 70
+  locator:
+    pdf_page_index: 14
+    table: '5'
+    note: flowing O2 can reduce threshold pressure by nearly 70% vs nonflowing
+species:
+  SS316L:
+    observations: []
+    context:
+    - observation_id: forsyth_2003_wstf_flowing_oxygen_apparatus
+      type: apparatus
+      locator:
+        pdf_page_index: 5
+        figure: '1'
+        section: Test System
+        note: Apparatus prose spans PDF pp. 4–6; Fig. 1 schematic
+      phase: WSTF_flowing_oxygen_promoted_ignition_chamber
+      regime: ASTM_G124_derived_counterflow_upward_propagation
+      units: as published
+      values:
+        quantity: flowing_oxygen_promoted_ignition_apparatus
+        method_class: method_only
+        evidence_class: authors_own_WSTF_Program_96-1
+        chamber_max_pressure_psia_as_printed: 4500
+        chamber_max_pressure_MPa_as_printed: 31
+        chamber_body_as_printed: 304 stainless steel lined with copper
+        flow_configuration_as_printed: counter-flowing oxygen with upward flame-front propagation
+        promoter_ignition_as_printed: Pyrofuze wire
+        oxygen_purity_min_percent_as_printed: 99.5
+        oxygen_purity_spec_as_printed: MIL-PRF-27210G Aviator's Breathing Oxygen
+        sample_geometries_as_printed:
+        - 1/2 in. (1.27 cm) dia 316L rods
+        - 1-1/4 in. Sch. 80 316L pipe
+        - 1-1/4 in. Sch. XXS 316L pipe
+        positive_ignition_rod_min_burn_past_promoter_in_as_printed: 0.5
+        positive_ignition_rod_min_burn_past_promoter_cm_as_printed: 1.3
+        self_sustained_burn_definition_min_length_in_as_printed: 1.0
+        self_sustained_burn_definition_min_length_cm_as_printed: 2.54
+        program_as_printed: Industry-Sponsored Metals Combustion Test Program 96-1 Phase II
+        facility_as_printed: NASA JSC White Sands Test Facility (WSTF)
+    - observation_id: forsyth_2003_phase1_nonflowing_table1_and_thresholds
+      type: experiment_series
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: Phase I nonflowing oxygen max burn lengths + prose thresholds
+      phase: SS316_family_nonflowing_oxygen_promoted_ignition
+      regime: ASTM_G124_nonflowing
+      units: psia, MPa, in, cm as printed
+      values:
+        quantity: phase1_max_burn_length_and_threshold_pressure_summary
+        method_class: measured_direct
+        evidence_class: authors_own_Program_96-1_Phase_I
+        self_sustained_definition_as_printed: 1.0 in (2.54 cm) minimum burn length
+        rows_as_printed:
+        - wstf: '97-31619'
+          description: 1/8 in. 316H
+          pressures_psia: [2000, 1000, 700]
+          pressures_MPa: [13.2, 6.9, 4.8]
+          max_burn_length_in: [6.2, 5.2, 1.7]
+          max_burn_length_cm: [15.75, 13.20, 4.32]
+        - wstf: '97-31575'
+          description: 1/8 in. 316L
+          pressures_psia: [500, 400, 300]
+          pressures_MPa: [3.5, 2.8, 2.1]
+          max_burn_length_in: [6.3, 1.3, 0.4]
+          max_burn_length_cm: [16.00, 3.30, 1.02]
+        - wstf: '97-31753'
+          description: 1/4 in. CF8M
+          pressures_psia: [1000, 800, 700]
+          pressures_MPa: [6.9, 5.5, 4.8]
+          max_burn_length_in: [4.9, 1.5, 0.8]
+          max_burn_length_cm: [12.45, 3.81, 2.03]
+        - wstf: '97-31574'
+          description: 1/2 in. 316L
+          pressures_psia: [1500, 1200, 1000]
+          pressures_MPa: [10.4, 8.3, 6.9]
+          max_burn_length_in: [4.5, 2.1, 0.2]
+          max_burn_length_cm: [11.43, 5.33, 0.51]
+        threshold_pressure_psia_eighth_inch_316H_as_printed: '<700'
+        threshold_pressure_MPa_eighth_inch_316H_as_printed: '<4.8'
+        threshold_pressure_psia_eighth_inch_316L_as_printed: 400
+        threshold_pressure_MPa_eighth_inch_316L_as_printed: 2.8
+        threshold_pressure_psia_quarter_inch_CF8M_as_printed: 800
+        threshold_pressure_MPa_quarter_inch_CF8M_as_printed: 5.5
+        threshold_pressure_psia_half_inch_316L_as_printed: 1200
+        threshold_pressure_MPa_half_inch_316L_as_printed: 8.3
+        amendment_request: >-
+          No closed observation type for metal flammability threshold_pressure /
+          burn_length; retained in context pending owner ruling.
+    - observation_id: forsyth_2003_phase2_flowing_half_inch_rod_table2
+      type: experiment_series
+      locator:
+        pdf_page_index: 8
+        table: '2'
+        note: Phase II flowing GOX 1/2-in. 316L rod summary
+      phase: SS316L_half_inch_rod_flowing_oxygen
+      regime: counterflow_promoted_ignition
+      units: psia, MPa, ft/s, m/s, in, cm as printed
+      values:
+        quantity: phase2_half_inch_rod_max_burn_length_vs_P_and_velocity
+        method_class: measured_direct
+        evidence_class: authors_own_Program_96-1_Phase_II
+        sample_as_printed: 1/2 in. (1.27 cm) dia 316L rods
+        max_burn_length_in_at_500_psia_50_fts_as_printed: 4.81
+        max_burn_length_cm_at_500_psia_50_fts_as_printed: 12.22
+        rows_as_printed:
+        - pressure_psia: 500
+          pressure_MPa: 3.4
+          velocity_fts: 50
+          velocity_ms: 15
+          n_tests: 11
+          n_positive_ignitions: 7
+          max_burn_length_in: 4.81
+          max_burn_length_cm: 12.22
+          note: complete burning of the test sample
+        - pressure_psia: 500
+          pressure_MPa: 3.4
+          velocity_fts: 100
+          velocity_ms: 30
+          n_tests: 9
+          n_positive_ignitions: 2
+          max_burn_length_in: 0.40
+          max_burn_length_cm: 1.02
+        - pressure_psia: 500
+          pressure_MPa: 3.4
+          velocity_fts: 200
+          velocity_ms: 60
+          n_tests: 5
+          n_positive_ignitions: 0
+          max_burn_length_as_printed: No burn
+        - pressure_psia: 1000
+          pressure_MPa: 6.9
+          velocity_fts: 50
+          velocity_ms: 15
+          n_tests: 9
+          n_positive_ignitions: 2
+          max_burn_length_in: 0.36
+          max_burn_length_cm: 0.91
+        - pressure_psia: 1000
+          pressure_MPa: 6.9
+          velocity_fts: 100
+          velocity_ms: 30
+          n_tests: 5
+          n_positive_ignitions: 0
+          max_burn_length_as_printed: No burn
+        - pressure_psia: 1500
+          pressure_MPa: 10.3
+          velocity_fts: 50
+          velocity_ms: 15
+          n_tests: 7
+          n_positive_ignitions: 0
+          max_burn_length_as_printed: No burn
+        contrast_to_phase1_as_printed: >-
+          Phase I nonflowing 1/2 in. 316L max burn only 0.2 in (0.51 cm) at
+          1000 psia (6.9 MPa); Phase II at 500 psia / 50 ft/s showed complete burning.
+    - observation_id: forsyth_2003_supplementary_half_inch_rod_table5
+      type: experiment_series
+      locator:
+        pdf_page_index: 14
+        table: '5'
+        note: Air Liquide supplementary flowing tests at lower P/velocity
+      phase: SS316L_half_inch_rod_flowing_oxygen_supplementary
+      regime: counterflow_promoted_ignition_lower_P_V
+      units: psia, MPa, ft/s, m/s, in, cm as printed
+      values:
+        quantity: supplementary_half_inch_rod_max_burn_length_and_threshold_reduction
+        method_class: measured_direct
+        evidence_class: authors_own_Air_Liquide_follow_up_at_WSTF
+        sponsor_as_printed: Air Liquide Corporation
+        rows_as_printed:
+        - pressure_psia: 500
+          pressure_MPa: 3.4
+          velocity_fts: 50
+          velocity_ms: 15
+          n_tests: 3
+          n_positive_ignitions: 3
+          max_burn_length_in: 2.50
+          max_burn_length_cm: 6.35
+        - pressure_psia: 450
+          pressure_MPa: 3.1
+          velocity_fts: 55
+          velocity_ms: 17
+          n_tests: 4
+          n_positive_ignitions: 2
+          max_burn_length_in: 1.20
+          max_burn_length_cm: 3.05
+        - pressure_psia: 450
+          pressure_MPa: 3.1
+          velocity_fts: 29
+          velocity_ms: 8.8
+          n_tests: 3
+          n_positive_ignitions: 2
+          max_burn_length_in: 3.13
+          max_burn_length_cm: 7.95
+        - pressure_psia: 400
+          pressure_MPa: 2.8
+          velocity_fts: 29
+          velocity_ms: 8.8
+          n_tests: 3
+          n_positive_ignitions: 3
+          max_burn_length_in: 1.34
+          max_burn_length_cm: 3.40
+        - pressure_psia: 350
+          pressure_MPa: 2.4
+          velocity_fts: 29
+          velocity_ms: 8.8
+          n_tests: 3
+          n_positive_ignitions: 1
+          max_burn_length_in: 1.27
+          max_burn_length_cm: 3.23
+        - pressure_psia: 300
+          pressure_MPa: 2.1
+          velocity_fts: 29
+          velocity_ms: 8.8
+          n_tests: 3
+          n_positive_ignitions: 1
+          max_burn_length_in: 0.57
+          max_burn_length_cm: 1.45
+        self_sustained_down_to_psia_at_29_fts_as_printed: 350
+        self_sustained_down_to_MPa_at_29_fts_as_printed: 2.4
+        nonflowing_comparator_threshold_psia_as_printed: 1200
+        nonflowing_comparator_threshold_MPa_as_printed: 8.27
+        flowing_threshold_reduction_percent_as_printed: 70
+        prose_as_printed: >-
+          flowing oxygen under these conditions can potentially reduce the
+          threshold pressure for burning by nearly 70 percent compared to the
+          threshold pressure in nonflowing oxygen
+  SS316_family_pipe:
+    observations: []
+    context:
+    - observation_id: forsyth_2003_phase2_pipe_sch80_schxxs_summary
+      type: experiment_series
+      locator:
+        pdf_page_index: 11
+        table: '3'
+        note: Table 3 Sch. 80; Table 4 Sch. XXS summarised (minimal / no sustained burn)
+      phase: SS316L_pipe_flowing_oxygen
+      regime: counterflow_promoted_ignition_pipe_ID_flow
+      units: as published
+      values:
+        quantity: phase2_pipe_burn_summary_sch80_and_schxxs
+        method_class: measured_direct
+        evidence_class: authors_own_Program_96-1_Phase_II
+        sch80_max_burn_length_in_range_as_printed: 0.04 to 0.40
+        sch80_note_as_printed: minimal burn lengths; promoter often failed to propagate past major wall thickness
+        sch80_example_500_psia_50_fts_max_burn_in_as_printed: 0.19
+        sch80_example_500_psia_50_fts_max_burn_cm_as_printed: 0.48
+        sch80_example_500_psia_100_fts_max_burn_in_as_printed: 0.40
+        sch80_example_500_psia_100_fts_max_burn_cm_as_printed: 1.02
+        schxxs_result_as_printed: all tests failed to show self-sustained burning past the promoter region
+        omitted:
+          full_table3_table4_every_cell: summarised_only_minimal_propagation

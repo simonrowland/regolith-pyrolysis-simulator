@@ -1,0 +1,236 @@
+schema_version: literature_extract.v1
+source_id: nist-nbsir-77-859
+source:
+  citation: >-
+    Roder, H.M. (1977), "The Thermodynamic Properties of Slush Hydrogen and
+    Oxygen", NBSIR 77-859, National Bureau of Standards Cryogenics Division,
+    Boulder, CO; Final Report prepared for NASA-Johnson Space Center,
+    November 1977.
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir77-859.pdf
+  year: 1977
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/nist-nbsir-77-859.pdf
+    (private; not committed). Digitized 45-page NBSIR. pdftotext -layout;
+    SHA-256 matches sidecar
+    e209245db0109d8a42327a58baa33007ff718da4a0e70f4b092d9c9389bdd065.
+    PDF p1/p3 title/author match sidecar citation. Landed only clearly printed
+    thermodynamic fixed points and heats of fusion at the triple point that the
+    author selects as reference values for the slush computer programs. Full
+    melting-line / solid-vapor pressure fit coefficients, solid-density
+    polynomials, and Appendix A/B FORTRAN listings are not re-homed (program
+    code / fit surfaces, not new lab measurements). Kelvin/atm values kept as
+    printed; Pa companions carry DERIVED stamps (1 atm = 101325 Pa).
+  date: '2026-09-22'
+  worker: n11-nist-ntrs
+  provenance_path: data/literature/extracts/nist-nbsir-77-859.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: NBSIR compilation + computer programs for slush H2/O2 thermodynamic properties
+  measured_direct_observations: 0
+  method_observations: 1
+  figure_only_observations: 0
+  absent_from_source:
+  - author-new calorimetric heat-of-fusion series (H2 ΔHfus from Dwyer et al. 1965b; O2 from Giauque & Johnston 1929)
+  - digitised Appendix A/B program listings as observations
+  - full solid-vapor / melting-line tabulated property grids (returned by the programs, not printed as measurement tables here)
+  note: >-
+    Author states properties are calculated from literature values or
+    extrapolations based on other simple fluids; programs extend prior EOS
+    (Roder & McCarty 1975 H2; Weber 1977 O2). Scored rows are the printed
+    reference fixed points / selected ΔHfus the author adopts — evidence_class
+    secondary_compilation / author_selected_literature, not this report's lab
+    campaign.
+fidelity_samples:
+- species: H2
+  observable: transition_point
+  observation_id: roder_1977_h2_triple_point
+  field: T_triple_K_as_printed
+  value: 13.8
+  locator:
+    pdf_page_index: 11
+    published_page: 5
+    section: '3.2 The Melting Pressure Equation'
+    note: triple point 13.800 K and 0.0695 atm chosen for the 32-term EOS
+- species: H2
+  observable: transition_point
+  observation_id: roder_1977_h2_heat_of_fusion_triple_point
+  field: delta_H_fusion_J_mol_as_printed
+  value: 117.277
+  locator:
+    pdf_page_index: 12
+    published_page: 6
+    section: '3.3 The Heats of Fusion at Elevated Pressures'
+    note: 117.277 J/mol (28.03 cal/mol, Woolley et al. 1948) selected at TP
+- species: O2
+  observable: transition_point
+  observation_id: roder_1977_o2_triple_point_and_heat_of_fusion
+  field: T_triple_K_as_printed
+  value: 54.359
+  locator:
+    pdf_page_index: 19
+    published_page: 13
+    section: '6.1 The Reference Point'
+    note: triple point temperature 54.359 K; ΔHfus 106.3 cal/mol (444.8 J/mol)
+species:
+  H2:
+    observations:
+    - observation_id: roder_1977_h2_triple_point
+      type: transition_point
+      locator:
+        pdf_page_index: 11
+        published_page: 5
+        section: '3.2 The Melting Pressure Equation'
+        note: >-
+          Melting-pressure equation shifted 0.003 K so it intersects the liquid
+          vapor-pressure curve at the triple point adopted for the 32-term MBWR.
+      T_range_K: [13.8, 13.8]
+      phase: solid_liquid_vapor_triple_point
+      standard_state: hydrogen triple point as adopted for the 32-term equation of state
+      regime: author_selected_reference_values_for_slush_programs
+      units: K and atm as printed
+      uncertainty:
+        note: No numeric uncertainty printed on the adopted 13.800 K / 0.0695 atm pair in this section.
+      values:
+        quantity: triple_point_temperature_and_pressure
+        method_class: secondary_compilation
+        evidence_class: author_selected_literature_reference_for_EOS_consistency
+        property_kind: triple_point
+        T_triple_K_as_printed: 13.8
+        T_triple_K_printed_full_precision: 13.800
+        P_triple_atm_as_printed: 0.0695
+        P_triple_Pa_derived:
+          value: 7042.08625
+          stamp: DERIVED
+          formula: P_Pa = P_atm * 101325
+          from_printed_atm: 0.0695
+        melting_line_source_as_printed: Goodwin (1962) with +0.003 K temperature shift
+        EOS_anchor_as_printed: 32-term MBWR of Roder and McCarty (1975)
+    - observation_id: roder_1977_h2_heat_of_fusion_triple_point
+      type: transition_point
+      locator:
+        pdf_page_index: 12
+        published_page: 6
+        section: '3.3 The Heats of Fusion at Elevated Pressures'
+        note: Selected heat of fusion at the triple point; elevated-P linear fit cited from Dwyer et al. 1965b
+      T_range_K: [13.8, 13.8]
+      phase: solid_liquid
+      standard_state: enthalpy of fusion of solid parahydrogen at the triple point
+      regime: author_selected_literature_value_shifted_Dwyer_fit
+      units: J/mol and cal/mol as printed
+      uncertainty:
+        as_printed: around 1%
+        note: >-
+          Uncertainty remains essentially as estimated by Dwyer et al. (1965b),
+          around 1%.
+      values:
+        quantity: enthalpy_of_fusion_at_triple_point
+        method_class: secondary_compilation
+        evidence_class: author_selected_literature_Woolley_1948_consistent_with_Dwyer_1965b
+        property_kind: melting_point_and_enthalpy_of_fusion
+        delta_H_fusion_J_mol_as_printed: 117.277
+        delta_H_fusion_cal_mol_as_printed: 28.03
+        cal_to_J_factor_as_printed: 4.184
+        citation_as_printed: Woolley, et al., 1948; also see table 9-3, Roder et al., 1973
+        elevated_P_experimental_source_as_printed: Dwyer, et al. (1965b)
+        omitted:
+          elevated_P_linear_fit_coefficients: program_input_equation_not_rehomed_as_measurement_series
+    context:
+    - observation_id: roder_1977_slush_h2_program_scope
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 27
+        published_page: 22
+        section: '9. SUMMARY'
+      phase: slush_hydrogen_solid_liquid_and_solid_vapor
+      regime: computer_program_property_evaluation_not_lab_measurement
+      units: as published
+      values:
+        quantity: slush_hydrogen_program_scope_and_limits
+        method_class: method_only
+        evidence_class: author_program_description
+        input_as_printed: temperature and quality
+        outputs_as_printed:
+        - pressure
+        - density
+        - enthalpy
+        - entropy
+        - internal energy
+        - quality
+        upper_pressure_limit_psia_as_printed: 5000
+        upper_pressure_limit_MN_m2_as_printed: 34
+        regions_as_printed:
+        - solid-vapor
+        - solid-liquid
+        prior_EOS_as_printed: Roder and McCarty (1975) 32-term equation of state for hydrogen
+  O2:
+    observations:
+    - observation_id: roder_1977_o2_triple_point_and_heat_of_fusion
+      type: transition_point
+      locator:
+        pdf_page_index: 19
+        published_page: 13
+        section: '6.1 The Reference Point'
+        note: >-
+          Triple-point T/P and Giauque & Johnston (1929) heat of fusion used as
+          the solid-vapor reference point; melting-pressure equation from Weber (1977b).
+      T_range_K: [54.359, 54.359]
+      phase: solid_liquid_vapor_triple_point
+      standard_state: oxygen triple point and enthalpy of fusion at the triple point
+      regime: author_selected_literature_reference_for_slush_oxygen_programs
+      units: K, atm, cal/mol, J/mol as printed
+      uncertainty:
+        note: >-
+          No numeric uncertainty printed on Giauque & Johnston 106.3 cal/mol here;
+          volume change on fusion at TP stated elsewhere as uncertain by about 0.6%.
+      values:
+        quantity: triple_point_and_enthalpy_of_fusion
+        method_class: secondary_compilation
+        evidence_class: author_selected_literature_Giauque_Johnston_1929_Weber_1977b
+        property_kind: triple_point_and_enthalpy_of_fusion
+        T_triple_K_as_printed: 54.359
+        P_triple_atm_as_printed: 0.0014451
+        P_triple_Pa_derived:
+          value: 146.4237615
+          stamp: DERIVED
+          formula: P_Pa = P_atm * 101325
+          from_printed_atm: 0.0014451
+        delta_H_fusion_cal_mol_as_printed: 106.3
+        delta_H_fusion_J_mol_as_printed: 444.8
+        delta_H_fusion_source_as_printed: Giauque and Johnston (1929)
+        melting_pressure_source_as_printed: Weber (1977b)
+        volume_change_on_fusion_cm3_mol_approx_as_printed: 0.94
+        gamma_solid_T_range_K_as_printed: 43.801 to 54.359
+        gamma_solid_low_T_source_as_printed: Kemp and Pickup (1972)
+    context:
+    - observation_id: roder_1977_slush_o2_program_scope_and_limits
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 27
+        published_page: 22
+        section: '9. SUMMARY'
+        note: Summary + §8 error estimates; O2 solid-liquid described as best estimate
+      phase: slush_oxygen_solid_liquid_and_solid_vapor
+      regime: computer_program_property_evaluation_limited_experimental_data
+      units: as published
+      values:
+        quantity: slush_oxygen_program_scope_limits_and_caveats
+        method_class: method_only
+        evidence_class: author_program_description
+        input_as_printed: temperature and quality
+        outputs_as_printed:
+        - pressure
+        - density
+        - enthalpy
+        - entropy
+        - internal energy
+        - quality
+        upper_pressure_limit_psia_as_printed: 5000
+        upper_pressure_limit_MN_m2_as_printed: 34
+        oxygen_data_caveat_as_printed: >-
+          experimental data are very limited and the properties calculated are
+          in the nature of a "best estimate"
+        solid_liquid_O2_status_as_printed: thermodynamic properties had to be estimated (see §5)
+        prior_EOS_as_printed: Weber (1977a, 1977b) equation of state for oxygen
+        T_range_example_solid_vapor_K_as_printed: 44 to 58.2

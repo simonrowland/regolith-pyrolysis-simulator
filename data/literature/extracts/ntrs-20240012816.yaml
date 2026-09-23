@@ -1,0 +1,204 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20240012816
+source:
+  citation: >-
+    Tylka, Jonathan (2024), "Promoted Combustion Behavior of 316 Stainless Steel
+    and 6061 Aluminum Alloys in Elevated Pressure Nitrox", presentation, ASTM
+    G04 Meetings and Symposium, Prague, 23 October 2024. NASA NTRS 20240012816
+    (Johnson Space Center / White Sands Test Facility).
+  url: https://ntrs.nasa.gov/citations/20240012816
+  year: 2024
+extraction:
+  method: >-
+    Corpus PDF ferry-inbox/from-main-B4-20260923T031628Z/new-pdfs/ntrs-20240012816.pdf
+    (private; not committed). Born-digital 15-page PowerPoint presentation.
+    pdftotext -layout on all pages; slides 4/5/8/10–13 cross-checked as page
+    images (4/5/8 are photo/title slides with no numeric tables; 10/12 are
+    figure-only 3POD scatter plots — only printed prose numbers used). SHA-256
+    matches sidecar
+    f6ac9c1e7b1159089323f413399d4d1373bd8736b891a61d431b9f8a163e2ecf.
+    PDF p1 title/presenter match sidecar. No closed observation type for metal
+    flammability threshold / non-flammable pressure in Nitrox, so printed
+    conclusions and method claims landed in context (d-032 / N7 off-rail
+    pattern). Figure-only 3POD run scatters not digitised.
+  date: '2026-09-22'
+  worker: n11-nist-ntrs
+  provenance_path: data/literature/extracts/ntrs-20240012816.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: ASTM G04 symposium presentation (promoted combustion in elevated-pressure Nitrox)
+  measured_direct_observations: 0
+  method_observations: 3
+  figure_only_observations: 2
+  absent_from_source:
+  - digitised 3POD scatter-plot run-by-run pressures from slides 10 and 12
+  - closed observation-type home for flammability_threshold / non_flammable_pressure
+  - absolute promoter energy / rod mass-loss beyond burn/no-burn classification
+  note: >-
+    STEP 0: no prior Tylka / Nitrox-promoted-combustion extract. Standard G124
+    ~3 mm OD rods; 25% and 50% O2 (bal. N2) test atmospheres. Primary printed
+    results are NASA non-flammable pressures and ~10% reaction-rate estimates.
+fidelity_samples:
+- species: Al6061
+  observable: experiment_series
+  observation_id: tylka_2024_al6061_nitrox_thresholds
+  field: non_flammable_pressure_MPa_at_50pct_O2_as_printed
+  value: 11
+  locator:
+    pdf_page_index: 11
+    note: 6061 Aluminum considered non-flammable by NASA at ~11 MPa at 50% oxygen
+- species: SS316
+  observable: experiment_series
+  observation_id: tylka_2024_ss316_nitrox_thresholds
+  field: non_flammable_pressure_MPa_at_50pct_O2_as_printed
+  value: 33
+  locator:
+    pdf_page_index: 13
+    note: 316 Stainless Steel considered non-flammable by NASA at ~33 MPa at 50% oxygen
+- species: SS316
+  observable: laboratory_conditions
+  observation_id: tylka_2024_conclusions_breathing_air_and_nitrox
+  field: both_alloys_not_flammable_at_69_MPa_25pct_O2_as_printed
+  value: true
+  locator:
+    pdf_page_index: 14
+    section: Conclusions
+    note: both alloys not flammable at 69 MPa 25% oxygen, bal. nitrogen
+species:
+  Al6061:
+    observations: []
+    context:
+    - observation_id: tylka_2024_al6061_breathing_air_25pct
+      type: experiment_series
+      locator:
+        pdf_page_index: 6
+        note: Promoted Combustion of 6061 Aluminum at 25% Oxygen
+      phase: Al6061_G124_rod_25pct_oxygen_bal_nitrogen
+      regime: ASTM_G124_promoted_combustion
+      units: MPa as printed
+      values:
+        quantity: promoted_combustion_25pct_O2_no_sustained_burn
+        method_class: measured_direct
+        evidence_class: authors_own_NASA_WSTF_campaign
+        test_pressure_MPa_as_printed: 69
+        n_tests_as_printed: 10
+        sustained_combustion_observed_as_printed: false
+        promoter_as_printed: primarily Pyrofuse/Titanium (to meet ASTM G124 melted rod tip requirement)
+        rod_OD_as_printed: ~3 mm standard G124
+    - observation_id: tylka_2024_al6061_nitrox_thresholds
+      type: experiment_series
+      locator:
+        pdf_page_index: 11
+        note: slides 10–11; Fig. on slide 10 figure-only
+      phase: Al6061_G124_rod_50pct_oxygen_bal_nitrogen
+      regime: ASTM_G124_promoted_combustion_3POD_then_10_replicate_validation
+      units: MPa as printed
+      values:
+        quantity: nitrox_50pct_O2_threshold_and_non_flammable_pressure
+        method_class: measured_direct
+        evidence_class: authors_own_NASA_WSTF_campaign
+        oxygen_mole_percent_as_printed: 50
+        balance_as_printed: nitrogen
+        reaction_rate_10pct_estimated_pressure_MPa_as_printed: 15
+        reaction_rate_10pct_estimate_tilde_as_printed: true
+        non_flammable_pressure_MPa_at_50pct_O2_as_printed: 11
+        non_flammable_pressure_tilde_as_printed: true
+        nasa_criterion_as_printed: >-
+          10 "no burn" replicates required for non-flammable; any burn → flammable
+          at that condition
+        omitted:
+          slide10_3POD_scatter_run_pressures: figure_only_not_digitised
+  SS316:
+    observations: []
+    context:
+    - observation_id: tylka_2024_ss316_breathing_air_25pct
+      type: experiment_series
+      locator:
+        pdf_page_index: 7
+        note: Promoted Combustion of 316 Stainless Steel at 25% Oxygen
+      phase: SS316_G124_rod_25pct_oxygen_bal_nitrogen
+      regime: ASTM_G124_promoted_combustion
+      units: MPa as printed
+      values:
+        quantity: promoted_combustion_25pct_O2_no_sustained_burn
+        method_class: measured_direct
+        evidence_class: authors_own_NASA_WSTF_campaign
+        test_pressure_MPa_as_printed: 69
+        n_tests_as_printed: 10
+        sustained_combustion_observed_as_printed: false
+        promoter_as_printed: primarily Pyrofuse/Titanium (to meet ASTM G124 melted rod tip requirement)
+        rod_OD_as_printed: ~3 mm standard G124
+    - observation_id: tylka_2024_ss316_nitrox_thresholds
+      type: experiment_series
+      locator:
+        pdf_page_index: 13
+        note: slides 12–13; Fig. on slide 12 figure-only
+      phase: SS316_G124_rod_50pct_oxygen_bal_nitrogen
+      regime: ASTM_G124_promoted_combustion_3POD_then_10_replicate_validation
+      units: MPa as printed
+      values:
+        quantity: nitrox_50pct_O2_threshold_and_non_flammable_pressure
+        method_class: measured_direct
+        evidence_class: authors_own_NASA_WSTF_campaign
+        oxygen_mole_percent_as_printed: 50
+        balance_as_printed: nitrogen
+        reaction_rate_10pct_estimated_pressure_MPa_as_printed: 43
+        reaction_rate_10pct_estimate_tilde_as_printed: true
+        non_flammable_pressure_MPa_at_50pct_O2_as_printed: 33
+        non_flammable_pressure_tilde_as_printed: true
+        nasa_criterion_as_printed: >-
+          10 "no burn" replicates required for non-flammable; any burn → flammable
+          at that condition
+        omitted:
+          slide12_3POD_scatter_run_pressures: figure_only_not_digitised
+    - observation_id: tylka_2024_conclusions_breathing_air_and_nitrox
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 14
+        section: Conclusions
+      phase: SS316_and_Al6061_elevated_pressure_nitrox
+      regime: presentation_conclusions
+      units: MPa and percent oxygen as printed
+      values:
+        quantity: conclusions_non_flammable_pressures
+        method_class: measured_direct
+        evidence_class: authors_own_NASA_WSTF_campaign_summary
+        both_alloys_not_flammable_at_69_MPa_25pct_O2_as_printed: true
+        al6061_not_flammable_at_11_MPa_50pct_O2_as_printed: true
+        ss316_not_flammable_at_33_MPa_50pct_O2_as_printed: true
+        balance_gas_as_printed: nitrogen
+        titanium_caution_as_printed: Caution should be used with titanium in high-pressure breathing air
+        application_as_printed: NASA applying data to GSE and spacecraft applications
+  nitrox_test_design:
+    observations: []
+    context:
+    - observation_id: tylka_2024_motivation_and_test_design
+      type: method
+      locator:
+        pdf_page_index: 2
+        note: Motivation slides 2–3 and Nitrox design slide 9
+      phase: NASA_breathing_air_and_nitrox_OCA
+      regime: ASTM_G124_promoted_combustion_test_design
+      units: as published
+      values:
+        quantity: test_atmosphere_margins_and_sequential_experiment_design
+        method_class: method_only
+        evidence_class: presentation_method_prose
+        breathing_air_spec_gt_oxygen_percent_as_printed: 23
+        flammability_test_oxygen_percent_breathing_air_margin_as_printed: 25
+        nbl_nitrox_typical_gt_oxygen_percent_as_printed: 46
+        flammability_test_oxygen_percent_nitrox_margin_as_printed: 50
+        limited_data_note_as_printed: limited data for metals flammability in <100% O2 above 35 MPa
+        breathing_air_storage_can_approach_MPa_as_printed: 69
+        materials_as_printed:
+        - 6061 Aluminum
+        - 316 Stainless Steel
+        rod_config_as_printed: Standard G124 ~3 mm OD rods
+        sequential_design_as_printed:
+        - 3-Phase Optimal Design (3POD) targeting 10% reaction rate
+        - validate highest no-burn pressure with 10 replicates
+        standards_as_printed:
+        - NASA-STD-6016 4.2.1.4
+        - NASA-STD-6001B
+        - ASTM G124
