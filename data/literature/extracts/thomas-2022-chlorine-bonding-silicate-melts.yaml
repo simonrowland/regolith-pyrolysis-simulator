@@ -12,6 +12,14 @@ extraction:
   provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/
 review_status: draft
 corrections:
+- note: >-
+    Z12 fidelity audit 2026-09-22 — Table 1 AgI/Cl-024 Cl was stored as 2.70 wt%
+    (AgI/Cl-025's value) instead of the printed 2.54(0.06). Corrected to 2.54.
+  locators: [published page 121271 Table 1, PDF page 3]
+- note: >-
+    Z12 fidelity audit 2026-09-22 — rows_as_printed Ab/Fo-3 K2O uncertainty was
+    0.32(0.05); PDF prints 0.32(0.02). Prose snapshot only; Cl series unc was already correct.
+  locators: [published page 121271 Table 1, PDF page 3]
 - note: The abstract and conclusion state 44 experimentally produced glasses, while Tables 1 and 2 enumerate 43 experiment IDs; both statements are retained without reconciliation.
   locators: [published page 121269 abstract, published pages 121271-121274 Tables 1-2]
 fidelity_samples:
@@ -42,7 +50,7 @@ species:
         rows_as_printed:
         - Ab/Fo-1 | 31 | 70.47(0.71), 0.02(0.02), 19.35(0.24), 0.13(0.02), 0.00(0.01), 2.93(0.08), 0.15(0.02), 5.77(0.23), 0.19(0.02), 0.56(0.02), 0.06(0.07), 0.45(0.48), P2O5/Cr2O3/NiO/H2O absent | Total 100.09
         - Ab/Fo-2 | 31 | 63.51(0.65), 0.03(0.02), 15.49(0.60), 0.10(0.02), 0.00(0.02), 2.43(0.29), 11.06(0.37), 4.70(0.21), 0.24(0.03), 1.41(0.06), 0.07(0.03), 0.35(0.34), other trace columns absent | Total 99.40
-        - Ab/Fo-3 | 33 | 55.97(0.51), 0.03(0.02), 12.44(0.16), 0.11(0.02), 0.00(0.01), 1.87(0.03), 19.69(0.02), 3.49(0.12), 0.32(0.05), 2.75(0.05), 0.14(0.03), 0.22(0.17), other trace columns absent | Total 97.02
+        - Ab/Fo-3 | 33 | 55.97(0.51), 0.03(0.02), 12.44(0.16), 0.11(0.02), 0.00(0.01), 1.87(0.03), 19.69(0.02), 3.49(0.12), 0.32(0.02), 2.75(0.05), 0.14(0.03), 0.22(0.17), other trace columns absent | Total 97.02
         - Ab/Fo-5 | 33 | 47.44(0.71), 0.05(0.04), 10.84(0.20), 0.06(0.02), MnO absent, 1.52(0.05), 28.64(0.42), 2.89(0.14), 0.09(0.02), 4.09(0.14), 0.21(0.05), 0.12(0.15), other trace columns absent | Total 96.03
         - AgI/Cl-27 | 20 | 54.30(0.82), TiO2 0.99(0.08), Al2O3 15.84(0.25), FeOT 0.50(0.13), MnO absent, MgO 9.28(0.12), CaO 13.19(0.19), Na2O 1.86(0.31), K2O absent, Cl 1.60(0.03), I2O 0.04(0.02), Ag2O 0.41(0.40), other trace columns absent | Total 98.05
         - Dacite-1 | 32 | 69.65(1.10), 0.97(0.08), 15.98(0.89), 0.69(0.12), 0.04(0.02), 1.50(0.13), 3.49(0.30), 0.62(0.13), 4.02(0.21), 0.46(0.06), 0.16(0.14), 1.00(0.86), other trace columns absent | Total 97.02
@@ -75,7 +83,7 @@ species:
         - {experiment: Ab/Fo-3, Cl_wt_pct: 2.75, uncertainty_wt_pct: 0.05}
         - {experiment: Ab/Fo-5, Cl_wt_pct: 4.09, uncertainty_wt_pct: 0.14}
         - {experiment: AgI/Cl-27, Cl_wt_pct: 1.60, uncertainty_wt_pct: 0.03}
-        - {experiment: AgI/Cl-024, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.06}
+        - {experiment: AgI/Cl-024, Cl_wt_pct: 2.54, uncertainty_wt_pct: 0.06}
         - {experiment: AgI/Cl-025, Cl_wt_pct: 2.70, uncertainty_wt_pct: 0.19}
         - {experiment: AgI/Cl-026, Cl_wt_pct: 3.49, uncertainty_wt_pct: 0.28}
         - {experiment: Dacite-1, Cl_wt_pct: 0.46, uncertainty_wt_pct: 0.06}
