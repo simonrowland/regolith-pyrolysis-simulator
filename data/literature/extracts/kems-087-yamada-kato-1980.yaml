@@ -14,7 +14,7 @@ extraction:
     epsilon_P^P = 7.3 +/- 0.1, e_P^P = 0.054, sample mass, orifice range, 22 eV, and the Fig. 9 average
     812.7 transcribed from 400 dpi pdftoppm renders of PDF pages 1-7 (published pp. 244-250). Figs 1-10
     listed figure-only; axes were not digitised. Quoted epsilon_P^P of Urbain, Frohberg, Ban-ya and Schenck
-    kept distinct from this-work 7.3. L4 2026-09-22: verified ferry PDF title/authors match; landed Fig. 9
+    kept distinct from this-work 7.3. L4b 2026-09-22: verified ferry PDF title/authors match; landed Fig. 9
     sample 1.52 wt% (2.71 at%) P as fep-1p52wt-fig9 with printed at% mole fractions and Fe complement;
     series retains the printed 0.7-3.2 wt% P range label only (no invented discrete charges from Fig. 4).
     Vacuum KEMS: no fO2 invented; chamber total pressure unstated.'
@@ -80,6 +80,15 @@ experiments:
     temperature_K:
       state: {tag: value, value: '1873.15'}
       locator: {published_page: 245, pdf_page_index: 2, note: '1600 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 245, pdf_page_index: 2, note: 'Chamber / ion-source pressure unstated. Body estimates P vapor pressure ~1e-9 atm at 1600 C when [wt% P]=1; that is sample vapor pressure, not chamber total pressure.'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 245, pdf_page_index: 2, note: 'Vacuum KEMS measurement.'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
   thermal_schedule:
     method:
       state: {tag: value, value: 'At 1600 C, ion-peak scanning repeated as many times as possible'}
