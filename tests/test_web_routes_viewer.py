@@ -45,6 +45,33 @@ def _artifact(*, recipe_snapshot: dict | None) -> dict:
     }
 
 
+def _run_viewer_expression(script_name: str, expression: str):
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const context = {
+  window: { location: { search: "", href: "" } },
+  document: { title: "", querySelector() { return null; }, querySelectorAll() { return []; } },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: () => new Promise(() => {}),
+  console,
+  setTimeout
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+process.stdout.write(JSON.stringify(vm.runInContext(process.argv[4], context)));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(root / "labels.js"), str(root / script_name), expression],
+        input=harness, text=True, capture_output=True, check=True,
+    )
+    return json.loads(completed.stdout)
+
+
 def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     client = _app(tmp_path).test_client()
 
@@ -172,22 +199,37 @@ process.stdout.write(JSON.stringify({
     assert result["settings"] == ["not emitted"] * 3
 
 
+def test_shared_escape_marks_non_scalars_across_viewer_modules() -> None:
+    values = {
+        script: _run_viewer_expression(
+            script,
+            '[ReportLabels.esc({bad: 1}), esc({bad: 1}), esc([1, 2])]',
+        )
+        for script in ("report-viewer.js", "library.js", "settings.js")
+    }
+
+    for escaped in values.values():
+        assert escaped == ["malformed (object)", "malformed (object)", "malformed (array)"]
+
+
 def _render_library_yield_chips(payload: dict) -> str:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/library.js"
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const context = {
   document: { querySelector() { return null; } },
   fetch() { return new Promise(() => {}); }
 };
 vm.createContext(context);
+vm.runInContext(labelsSource, context);
 vm.runInContext(source, context);
-process.stdout.write(context.yieldChips(JSON.parse(process.argv[3])));
+process.stdout.write(context.yieldChips(JSON.parse(process.argv[4])));
 """
     completed = subprocess.run(
-        ["node", "-", str(script_path), json.dumps(payload)],
+        ["node", "-", str(script_path.parent / "labels.js"), str(script_path), json.dumps(payload)],
         input=harness,
         text=True,
         capture_output=True,
@@ -245,21 +287,23 @@ def test_report_viewer_presence_gates_stage_purity_activity(
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labels = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const report = { innerHTML: "" };
 const context = {
   window: { location: { search: "" } },
   document: { querySelector: (selector) => selector === "#report" ? report : null },
   URLSearchParams,
   encodeURIComponent,
-  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[3]) })
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
 };
+vm.runInNewContext(labels, context);
 vm.runInNewContext(source, context);
 setImmediate(() => process.stdout.write(report.innerHTML));
 """
 
     completed = subprocess.run(
-        ["node", "-", str(script_path), json.dumps(artifact)],
+        ["node", "-", str(script_path.parent / "labels.js"), str(script_path), json.dumps(artifact)],
         input=harness,
         text=True,
         capture_output=True,
@@ -305,20 +349,22 @@ def test_report_viewer_empty_stage_carries_indeterminate_token() -> None:
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labels = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const report = { innerHTML: "" };
 const context = {
   window: { location: { search: "" } },
   document: { querySelector: (selector) => selector === "#report" ? report : null },
   URLSearchParams,
   encodeURIComponent,
-  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[3]) })
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
 };
+vm.runInNewContext(labels, context);
 vm.runInNewContext(source, context);
 setImmediate(() => process.stdout.write(report.innerHTML));
 """
     completed = subprocess.run(
-        ["node", "-", str(script_path), json.dumps(artifact)],
+        ["node", "-", str(script_path.parent / "labels.js"), str(script_path), json.dumps(artifact)],
         input=harness,
         text=True,
         capture_output=True,
@@ -351,12 +397,13 @@ def test_settings_script_executes_live_run_resolution_and_manifest_gate(
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labels = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const settings = { innerHTML: "" };
 const download = { addEventListener() {} };
 let fetched = null;
 const context = {
-  window: { location: { search: process.argv[3] } },
+  window: { location: { search: process.argv[4] } },
   document: {
     querySelector(selector) {
       if (selector === "#settings") return settings;
@@ -372,15 +419,16 @@ const context = {
   setTimeout,
   fetch: async (url) => {
     fetched = url;
-    return { ok: true, json: async () => JSON.parse(process.argv[4]) };
+    return { ok: true, json: async () => JSON.parse(process.argv[5]) };
   }
 };
+vm.runInNewContext(labels, context);
 vm.runInNewContext(source, context);
 setImmediate(() => process.stdout.write(JSON.stringify({ fetched, html: settings.innerHTML })));
 """
 
     completed = subprocess.run(
-        ["node", "-", str(script_path), "?run=run/live", json.dumps(artifact)],
+        ["node", "-", str(script_path.parent / "labels.js"), str(script_path), "?run=run/live", json.dumps(artifact)],
         input=harness,
         text=True,
         capture_output=True,

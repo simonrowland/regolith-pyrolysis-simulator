@@ -1,13 +1,11 @@
 "use strict";
 
+const { esc } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
 
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[character]));
 const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const exactNumber = (value, unit) => hasNumber(value)
   ? `<span title="${esc(`${String(value)} ${unit}`)}">${esc(Number(value).toLocaleString(undefined, { maximumSignificantDigits: 4 }))} ${esc(unit)}</span>`

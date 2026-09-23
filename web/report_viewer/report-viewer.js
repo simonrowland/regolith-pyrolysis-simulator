@@ -1,5 +1,6 @@
 "use strict";
 
+const { esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -10,9 +11,6 @@ const ELLINGHAM_ORDER = ["Na", "K", "Fe", "Cr", "Mn", "Mg", "Si", "Al", "Ti", "C
 const COLORS = ["#e8940f", "#1f7798", "#468466", "#8b63a6", "#a95c43", "#6f8c9e"];
 
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[c]));
 const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const isUnavailableQuantity = (value) => isRecord(value) && value.status === "unavailable";

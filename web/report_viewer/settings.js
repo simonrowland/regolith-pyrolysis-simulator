@@ -1,14 +1,12 @@
 "use strict";
 
+const { esc } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
   ? `/api/runs/${encodeURIComponent(RUN_ID)}`
   : "./sample-run-artifact.json";
 const $ = (selector, root = document) => root.querySelector(selector);
-const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-}[character]));
 const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const displayNumber = (value, unit = "") => hasNumber(value)
   ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(Number(value).toLocaleString(undefined, { maximumSignificantDigits: 4 }))}${unit ? ` ${esc(unit)}` : ""}</span>`
