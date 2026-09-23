@@ -33,6 +33,30 @@ import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
 
+
+def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
+    )
+    assert doc["source"]["url"] == "https://pmc.ncbi.nlm.nih.gov/articles/PMC6485635/"
+    expected = {
+        "SiO2": "50.66",
+        "TiO2": "0.96",
+        "Al2O3": "15.11",
+        "FeO": "9.69",
+        "MnO": "0.20",
+        "MgO": "8.90",
+        "CaO": "12.28",
+        "Na2O": "1.96",
+        "K2O": "0.07",
+    }
+    for experiment in doc["experiments"]:
+        composition = experiment["sample"]["printed_composition"]
+        assert composition["state"] == {"tag": "value", "value": expected}
+        assert composition["locator"]["table"] == "Extended Data Table 1"
+        assert composition["locator"].get("pdf_page_index") is None
+        assert "PMC6485635 online" in composition["locator"]["note"]
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.

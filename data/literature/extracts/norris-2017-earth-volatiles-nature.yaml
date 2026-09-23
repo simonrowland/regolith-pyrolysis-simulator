@@ -3,9 +3,10 @@ source_id: norris-2017-earth-volatiles-nature
 source:
   citation: Norris, C. Ashley & Wood, Bernard J. (2017), "Earth's volatile contents established by melting and vaporization", Nature, DOI 10.1038/nature23645
   doi: 10.1038/nature23645
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6485635/
   year: 2017
 extraction:
-  method: pdftotext -layout transcription of the 18-page publisher PDF; plotted results retained as figure-only because the PDF contains no readable extended-data table cells
+  method: pdftotext -layout transcription of the 18-page publisher PDF plus verification against the lawful PMC online author manuscript; plotted results retained as figure-only
   date: '2026-09-19'
   worker: w3-norris-2017-earth-volatiles-nature
   source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/norris-2017-earth-volatiles-nature/norris-2017-earth-volatiles-nature.pdf
@@ -74,9 +75,8 @@ experiments:
           Na2O: '1.96'
           K2O: '0.07'
       locator:
-        pdf_page_index: 11
         table: Extended Data Table 1
-        note: Starting material EBT1 major-element wt% (N=5); NiO printed 0 and Total 99.8 omitted.
+        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed 0 and Total 99.8 omitted.
     form:
       state: {tag: value, value: 12 mm diameter pressed pellet}
       locator: {pdf_page_index: 11, section: Methods}
@@ -118,7 +118,7 @@ experiments:
       locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
-      locator: {pdf_page_index: 11, table: Extended Data Table 1, note: Starting material EBT1 major-element wt%; unit values as printed}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
@@ -148,7 +148,7 @@ experiments:
   sample:
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
-      locator: {pdf_page_index: 11, table: Extended Data Table 1, note: Starting material EBT1 major-element wt%; unit values as printed}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
@@ -178,7 +178,7 @@ experiments:
   sample:
     printed_composition:
       state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
-      locator: {pdf_page_index: 11, table: Extended Data Table 1, note: Starting material EBT1 major-element wt%; unit values as printed}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
   conditions:
     temperature_K:
       state: {tag: value, value: '1573.15'}
