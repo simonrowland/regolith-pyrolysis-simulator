@@ -54,8 +54,24 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.003'}}
       locator: &reduction_mass_locator {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Printed three grams of milled material; unit conversion only}
     printed_composition:
-      state: {tag: value, value: JSC-1A lunar simulant}
-      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+      state:
+        tag: value
+        value:
+          SiO2: 46.2
+          TiO2: 1.85
+          Al2O3: 17.9
+          FeO: 11.2
+          MnO: 0.19
+          MgO: 6.87
+          CaO: 9.43
+          Na2O: 3.33
+          K2O: 0.85
+          P2O5: 0.62
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: 'JSC-1A bulk oxide wt% as printed; label JSC-1A lunar simulant; mineral-abundance rows not used; Cr2O3 and SO3 omitted (blank cells); footnote b attributes JSC-1A/MLS-1 to Hill et al. (2007)'
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
@@ -105,8 +121,26 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.003'}}
       locator: *reduction_mass_locator
     printed_composition:
-      state: {tag: value, value: LMS-1 lunar simulant}
-      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          TiO2: 4.62
+          Al2O3: 14.13
+          Cr2O3: 0.21
+          FeO: 7.87
+          MnO: 0.15
+          MgO: 18.89
+          CaO: 5.94
+          Na2O: 4.92
+          K2O: 0.57
+          P2O5: 0.44
+          SO3: 0.11
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: 'LMS-1 bulk oxide wt% as printed; label LMS-1 lunar simulant; mineral-abundance rows not used; footnote a attributes LMS-1 to CLASS Exolith Lab'
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
@@ -120,8 +154,25 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.003'}}
       locator: *reduction_mass_locator
     printed_composition:
-      state: {tag: value, value: LHS-1 lunar simulant}
-      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+      state:
+        tag: value
+        value:
+          SiO2: 44.18
+          TiO2: 0.79
+          Al2O3: 26.24
+          Cr2O3: 0.02
+          FeO: 3.04
+          MnO: 0.05
+          MgO: 11.22
+          CaO: 11.62
+          Na2O: 2.30
+          K2O: 0.46
+          SO3: 0.1
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: 'LHS-1 bulk oxide wt% as printed; label LHS-1 lunar simulant; mineral-abundance rows not used; P2O5 omitted (blank cell); footnote a attributes LHS-1 to CLASS Exolith Lab'
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
