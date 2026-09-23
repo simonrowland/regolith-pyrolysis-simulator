@@ -1414,6 +1414,7 @@ class PyrolysisRun:
                 "backend_authoritative": bool(execution.backend_authoritative),
             }
         )
+        _attach_engine_commissioning_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3290,6 +3291,73 @@ def _final_summary_report(
     }
 
 
+def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
+    reader = getattr(sim, "engine_commissioning_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_engine_commissioning_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    notice = _engine_commissioning_notice(sim)
+    if notice:
+        run_metadata["engine_commissioning_notice"] = _json_safe(notice)
+
+
+def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
+    authority = str(notice.get("authority") or "unspecified")
+    pieces: list[str] = []
+    for item in notice.get("notices") or ():
+        if not isinstance(item, Mapping) or not item.get("reason"):
+            continue
+        band = item.get("certified_band")
+        band_text = ""
+        if isinstance(band, Mapping):
+            parts: list[str] = []
+            sio2 = band.get("sio2_wt_pct")
+            temperature = band.get("temperature_K")
+            if isinstance(sio2, (list, tuple)) and len(sio2) == 2:
+                parts.append(f"SiO2 [{sio2[0]:g}, {sio2[1]:g}] wt%")
+            if isinstance(temperature, (list, tuple)) and len(temperature) == 2:
+                parts.append(f"T [{temperature[0]:g}, {temperature[1]:g}] K")
+            if parts:
+                band_text = " (" + ", ".join(parts) + ")"
+        pieces.append(f"{item['reason']}{band_text}")
+    reason_text = ", ".join(pieces) if pieces else "notice"
+    return (
+        f"**Engine commissioning**: authority `{authority}`; {reason_text}; "
+        f"hours {notice.get('first_hour')}-{notice.get('last_hour')}; "
+        f"{notice.get('count')} step(s). Reported numbers are unchanged."
+    )
+
+
+def _markdown_with_engine_commissioning(
+    markdown: str,
+    notice: Mapping[str, Any],
+) -> str:
+    sentence = _engine_commissioning_sentence(notice)
+    lines = markdown.split("\n")
+    out: list[str] = []
+    inserted = False
+    for line in lines:
+        out.append(line)
+        if not inserted and line.startswith("**Class totals**:"):
+            out.append("")
+            out.append(sentence)
+            inserted = True
+    if not inserted:
+        if out and out[-1] != "":
+            out.append("")
+        out.append(sentence)
+    return "\n".join(out)
+
+
 def _product_classification_report(
     sim: PyrolysisSimulator,
     *,
@@ -3298,14 +3366,23 @@ def _product_classification_report(
 ) -> dict[str, Any]:
     """Return the machine-readable classes and their operator markdown."""
     classification = classify_products(sim, early_tap_mode=False)
-    return {
+    markdown = format_three_product_markdown(
+        classification,
+        feedstock_id=feedstock_id,
+        campaign=campaign,
+    )
+    report: dict[str, Any] = {
         "classification": _json_safe(classification),
-        "markdown": format_three_product_markdown(
-            classification,
-            feedstock_id=feedstock_id,
-            campaign=campaign,
-        ),
+        "markdown": markdown,
     }
+    notice = _engine_commissioning_notice(sim)
+    if notice:
+        report["engine_commissioning_notice"] = _json_safe(notice)
+        report["markdown"] = _markdown_with_engine_commissioning(
+            markdown,
+            notice,
+        )
+    return report
 
 
 def _terminal_product_taxonomy_report(
@@ -4909,6 +4986,7 @@ def _runner_failure_result(
                 refusal_diagnostic
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
+    _attach_engine_commissioning_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
         if sim is not None

@@ -936,6 +936,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._backend_status_history: list[str] = []
         self._last_backend_diagnostics: Dict[str, Any] = {}
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
+        self._engine_commissioning_steps: list[dict[str, Any]] = []
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -1422,6 +1423,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._backend_status_history = []
         self._last_backend_diagnostics = {}
         self._last_out_of_domain_diagnostics = {}
+        self._engine_commissioning_steps = []
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -8965,7 +8967,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'last_cache_state',
                 None,
             )
+        self._note_engine_commissioning_from_last_diagnostics()
         return result
+
+    def _note_engine_commissioning_from_last_diagnostics(self) -> None:
+        """Keep this step's commissioning notice after diagnostics are overwritten."""
+
+        from engines.engine_commissioning import (
+            commissioning_step_from_diagnostics,
+        )
+
+        step = commissioning_step_from_diagnostics(
+            getattr(self, '_last_backend_diagnostics', None),
+            # The snapshot hour is assigned after this equilibrium, by
+            # incrementing the pre-step hour.
+            hour=int(self.melt.hour) + 1,
+        )
+        if step is None:
+            return
+        steps = getattr(self, '_engine_commissioning_steps', None)
+        if not isinstance(steps, list):
+            steps = []
+            self._engine_commissioning_steps = steps
+        steps.append(step)
+
+    def engine_commissioning_run_notice(self) -> Dict[str, Any] | None:
+        """Run-level commissioning notice, or None when every step was in band."""
+
+        from engines.engine_commissioning import (
+            aggregate_engine_commissioning_notice,
+        )
+
+        return aggregate_engine_commissioning_notice(
+            getattr(self, '_engine_commissioning_steps', ())
+        )
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.

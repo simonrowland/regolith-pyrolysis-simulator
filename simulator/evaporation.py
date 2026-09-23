@@ -2137,6 +2137,13 @@ class EvaporationMixin:
                 self._last_backend_diagnostics = dict(diagnostics)
                 if status == 'out_of_domain':
                     self._last_out_of_domain_diagnostics = dict(diagnostics)
+                note = getattr(
+                    self,
+                    '_note_engine_commissioning_from_last_diagnostics',
+                    None,
+                )
+                if callable(note):
+                    note()
             warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
             reasons.append(
                 f'{source} unavailable: status={status}'

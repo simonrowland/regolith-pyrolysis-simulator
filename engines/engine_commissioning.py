@@ -419,10 +419,134 @@ def assess_engine_commissioning(
 _RUNTIME_TABLE = parse_engine_commissioning_file(DEFAULT_COMMISSIONING_PATH)
 
 
+def commissioning_step_from_diagnostics(
+    diagnostics: Mapping[str, Any] | None,
+    *,
+    hour: int,
+) -> dict[str, Any] | None:
+    """One equilibrium's commissioning notice, or None when the step is in band.
+
+    In-band results omit ``commissioning_notice``. Absence is not a notice.
+    """
+
+    if not isinstance(diagnostics, Mapping):
+        return None
+    notice = diagnostics.get('commissioning_notice')
+    if not isinstance(notice, Mapping):
+        return None
+    plain = _plain_commissioning_notice(notice)
+    if plain is None:
+        return None
+    return {'hour': int(hour), 'notice': plain}
+
+
+def aggregate_engine_commissioning_notice(
+    steps: Any,
+) -> dict[str, Any] | None:
+    """Fold per-step notices into one run-level notice.
+
+    ``count`` is the number of steps that carried a notice. ``notices`` keeps
+    one entry per distinct reason, constraint list, band, and authority.
+    Returns None when no step was out of band, so an in-band run carries no key.
+    """
+
+    if not isinstance(steps, (list, tuple)) or not steps:
+        return None
+    hours: list[int] = []
+    distinct: list[dict[str, Any]] = []
+    seen: set[tuple[Any, ...]] = set()
+    for step in steps:
+        if not isinstance(step, Mapping):
+            continue
+        notice = step.get('notice')
+        if not isinstance(notice, Mapping):
+            continue
+        plain = _plain_commissioning_notice(notice)
+        if plain is None:
+            continue
+        try:
+            hour = int(step['hour'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        hours.append(hour)
+        identity = (
+            plain['reason'],
+            tuple(plain['failed_constraints']),
+            tuple(
+                (key, tuple(plain['certified_band'][key]))
+                for key in sorted(plain['certified_band'])
+            ),
+            plain.get('authority'),
+        )
+        if identity in seen:
+            continue
+        seen.add(identity)
+        distinct.append(plain)
+    if not hours or not distinct:
+        return None
+    distinct.sort(
+        key=lambda item: (
+            str(item['reason']),
+            tuple(item['failed_constraints']),
+            str(item.get('authority') or ''),
+        )
+    )
+    authorities = {
+        str(item['authority'])
+        for item in distinct
+        if item.get('authority')
+    }
+    payload: dict[str, Any] = {}
+    if len(authorities) == 1:
+        payload['authority'] = next(iter(authorities))
+    payload['notices'] = distinct
+    payload['first_hour'] = min(hours)
+    payload['last_hour'] = max(hours)
+    payload['count'] = len(hours)
+    return payload
+
+
+def _plain_commissioning_notice(notice: Mapping[str, Any]) -> dict[str, Any] | None:
+    reason = notice.get('reason')
+    if not isinstance(reason, str) or not reason.strip():
+        return None
+    band = notice.get('certified_band')
+    if not isinstance(band, Mapping):
+        return None
+    plain_band: dict[str, list[float]] = {}
+    for key in ('sio2_wt_pct', 'temperature_K'):
+        raw = band.get(key)
+        if not isinstance(raw, (list, tuple)) or len(raw) != 2:
+            continue
+        try:
+            plain_band[key] = [float(raw[0]), float(raw[1])]
+        except (TypeError, ValueError):
+            return None
+    if not plain_band:
+        return None
+    failed_raw = notice.get('failed_constraints')
+    failed = (
+        [str(item) for item in failed_raw]
+        if isinstance(failed_raw, (list, tuple))
+        else []
+    )
+    plain: dict[str, Any] = {
+        'reason': reason,
+        'certified_band': plain_band,
+        'failed_constraints': failed,
+    }
+    authority = notice.get('authority')
+    if isinstance(authority, str) and authority.strip():
+        plain['authority'] = authority
+    return plain
+
+
 __all__ = (
     'COMMISSIONING_NOTICE_KIND',
     'CONSTRAINT_SILICATE_NETWORK_BAND',
     'CONSTRAINT_TEMPERATURE_RANGE',
+    'aggregate_engine_commissioning_notice',
+    'commissioning_step_from_diagnostics',
     'CertifiedInterval',
     'CommissioningAssessment',
     'CommissioningSource',
