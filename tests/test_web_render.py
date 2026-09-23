@@ -423,6 +423,24 @@ def test_unavailable_product_story_never_renders_as_ok():
     assert empty_fallback["text"]["product-ledger-content"] == "n/a"
 
 
+@pytest.mark.parametrize("product_value", [True, "12", [], {}])
+def test_product_ledger_rejects_non_numeric_product_evidence(product_value):
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "product_story": None,
+            "product_story_status": "ok",
+            "products": {"Fe": product_value},
+        },
+    )
+    content = rendered["text"]["product-ledger-content"]
+    assert rendered["text"]["product-ledger-state"] == "no-products"
+    assert "Fe: unavailable" in content
+    assert "12 kg" not in content
+
+
 def test_started_status_clears_completion_bound_advisory_panels():
     html = app_module.create_app().test_client().get("/").get_data(as_text=True)
     rendered = _render_advisory_sequence(

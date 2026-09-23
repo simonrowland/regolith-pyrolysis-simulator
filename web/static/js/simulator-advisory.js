@@ -336,9 +336,10 @@ function advisoryPrettyKey(key) {
     return String(key).replace(/_/g, ' ');
 }
 
-function advisoryFormatValue(value, unit) {
-    if (typeof value === 'boolean') return String(value);
-    const number = Number(value);
+function advisoryFormatValue(value, unit, strictNumeric = false) {
+    if (value === null || value === undefined || value === '') return 'n/a';
+    if (!strictNumeric && typeof value === 'boolean') return String(value);
+    const number = strictNumeric ? value : Number(value);
     if (Number.isFinite(number)) {
         const abs = Math.abs(number);
         const formatted = abs > 0 && (abs < 0.001 || abs >= 10000)
@@ -346,30 +347,31 @@ function advisoryFormatValue(value, unit) {
             : number.toFixed(3).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
         return unit ? `${formatted} ${unit}` : formatted;
     }
-    if (value === null || value === undefined || value === '') return 'n/a';
+    if (strictNumeric && unit) return 'unavailable';
+    if (typeof value === 'boolean') return String(value);
     if (Array.isArray(value)) return value.length ? value.join(', ') : 'none';
     return String(value);
 }
 
-function advisoryNestedValue(value, unit) {
+function advisoryNestedValue(value, unit, strictNumeric = false) {
     const payload = advisoryObject(value);
-    if (!payload) return advisoryFormatValue(value, unit);
+    if (!payload) return advisoryFormatValue(value, unit, strictNumeric);
     const parts = advisoryEntries(payload).map(([key, nested]) => {
         const nestedPayload = advisoryObject(nested);
         if (nestedPayload) {
             const inner = advisoryEntries(nestedPayload)
-                .map(([innerKey, innerValue]) => (
-                    `${advisoryPrettyKey(innerKey)} ${advisoryFormatValue(innerValue, unit)}`
-                ))
+                .map(([innerKey, innerValue]) => {
+                    return `${advisoryPrettyKey(innerKey)} ${advisoryFormatValue(innerValue, unit, strictNumeric)}`;
+                })
                 .join(', ');
             return `${advisoryPrettyKey(key)} (${inner || 'n/a'})`;
         }
-        return `${advisoryPrettyKey(key)} ${advisoryFormatValue(nested, unit)}`;
+        return `${advisoryPrettyKey(key)} ${advisoryFormatValue(nested, unit, strictNumeric)}`;
     });
-    return parts.length ? parts.join('; ') : 'n/a';
+    return parts.length ? parts.join('; ') : unit ? 'unavailable' : 'n/a';
 }
 
-function appendAdvisorySection(parent, title, mapping, unit) {
+function appendAdvisorySection(parent, title, mapping, unit, strictNumeric = false) {
     const entries = advisoryEntries(mapping);
     if (!entries.length) return false;
     const heading = document.createElement('div');
@@ -377,7 +379,7 @@ function appendAdvisorySection(parent, title, mapping, unit) {
     heading.textContent = title;
     parent.appendChild(heading);
     for (const [key, value] of entries) {
-        appendCeramicLine(parent, advisoryPrettyKey(key), advisoryNestedValue(value, unit));
+        appendCeramicLine(parent, advisoryPrettyKey(key), advisoryNestedValue(value, unit, strictNumeric));
     }
     return true;
 }
@@ -390,9 +392,11 @@ function setAdvisoryEmpty(content, stateId) {
 }
 
 function didRunExtractAnything(data, story, extractedFlatProducts) {
+    const finiteNumber = (value) => (
+        typeof value === 'number' && Number.isFinite(value) ? value : null
+    );
     const numeric = (value) => {
-        const n = Number(value);
-        return Number.isFinite(n) ? n : 0;
+        return finiteNumber(value) ?? 0;
     };
     const sumClassTotals = (classes) => classes.reduce(
         (sum, cls) => sum + (cls ? numeric(cls.class_total_kg) : 0),
@@ -403,11 +407,10 @@ function didRunExtractAnything(data, story, extractedFlatProducts) {
             ? Object.values(mapping).reduce((sum, value) => sum + numeric(value), 0)
             : 0
     );
-    const hasCanonicalMass = data.extracted_product_kg !== undefined
-        && data.extracted_product_kg !== null
-        && Number.isFinite(Number(data.extracted_product_kg));
+    const canonicalMass = finiteNumber(data.extracted_product_kg);
+    const hasCanonicalMass = canonicalMass !== null;
     const extractedKg = hasCanonicalMass
-        ? Number(data.extracted_product_kg)
+        ? canonicalMass
         : story
             ? sumClassTotals([
                 story.metal_ingots,
@@ -418,10 +421,10 @@ function didRunExtractAnything(data, story, extractedFlatProducts) {
             : sumValues(extractedFlatProducts)
                 + numeric(data.oxygen_kg)
                 + numeric(data.oxygen_stored_kg);
-    const feedKg = Number(
-        (story && story.input && story.input.batch_mass_kg)
-        || data.mass_in_kg
-        || 0,
+    const feedKg = numeric(
+        story && story.input && story.input.batch_mass_kg !== undefined
+            ? story.input.batch_mass_kg
+            : data.mass_in_kg,
     );
     return feedKg > 0
         ? extractedKg > feedKg * 1e-6
@@ -452,18 +455,18 @@ function renderProductLedgerPanel(payload) {
     const story = advisoryObject(data.product_story);
     if (story) {
         if (appendAdvisorySection(content, 'Pot of regolith in', story.input)) sections += 1;
-        if (appendAdvisorySection(content, 'Metal ingots out', story.metal_ingots, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Glass out', story.glass, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Oxygen out', story.oxygen, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Captured volatiles out', story.captured_volatiles, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Refractory ceramic out', story.refractory_ceramic, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Terminal residue — incompletely extracted', story.terminal_residue, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Escaped to vacuum', story.escaped_to_vacuum, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Unrecovered process inventory', story.unrecovered_process_inventory, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Furnace wall deposits', story.wall_deposits, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Process residue', story.process_residue, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Off-spec condenser capture', story.off_spec_condensate, 'kg')) sections += 1;
-        if (appendAdvisorySection(content, 'Unclassified output', story.unclassified, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Metal ingots out', story.metal_ingots, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Glass out', story.glass, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Oxygen out', story.oxygen, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Captured volatiles out', story.captured_volatiles, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Refractory ceramic out', story.refractory_ceramic, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Terminal residue — incompletely extracted', story.terminal_residue, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Escaped to vacuum', story.escaped_to_vacuum, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Unrecovered process inventory', story.unrecovered_process_inventory, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Furnace wall deposits', story.wall_deposits, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Process residue', story.process_residue, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Off-spec condenser capture', story.off_spec_condensate, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Unclassified output', story.unclassified, 'kg', true)) sections += 1;
     }
     const extractedFlatProducts = {};
     const reagentBookkeepingResidue = {};
@@ -474,7 +477,7 @@ function renderProductLedgerPanel(payload) {
             : extractedFlatProducts;
         target[key] = value;
     }
-    if (appendAdvisorySection(content, 'Products', extractedFlatProducts, 'kg')) sections += 1;
+    if (appendAdvisorySection(content, 'Products', extractedFlatProducts, 'kg', true)) sections += 1;
     if (appendAdvisorySection(content, 'Reagent bookkeeping residue', reagentBookkeepingResidue, 'kg')) sections += 1;
 
     const oxygen = {};
