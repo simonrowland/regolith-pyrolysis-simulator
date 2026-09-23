@@ -54,6 +54,7 @@ from simulator.battery.identity import (
 from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
+    iter_observation_store_paths,
     load_migrated_store,
     load_yaml,
     to_plain,
@@ -513,14 +514,35 @@ def authority_allowed(quantity: Quantity | None, authority: Authority | None) ->
     return False
 
 
+def _origin_under_compilations(origin: str | None) -> bool:
+    """True when the store path (relative) lives under a compilations-* payload."""
+
+    if not origin:
+        return False
+    first = origin.replace("\\", "/").split("/", 1)[0]
+    return first.startswith("compilations-")
+
+
 def is_compilation_source(source_id: str | None, origin: str | None = None) -> bool:
-    if origin and origin.startswith("compilations-"):
+    """Classify compilation rows by store path (or role), not source_id prefixes.
+
+    Nested USGS shards live under ``compilations-<family>/<shard>.yaml``. Their
+    ``source_id`` values (``robie-…``, ``hemingway-…``) do not match
+    ``COMPILATION_SOURCE_MARKERS`` prefixes, so path membership is the gate.
+    ``COMPILATION_SOURCE_MARKERS`` remains only as a legacy fallback when origin
+    is unknown (synthetic / hand-built rows).
+    """
+
+    if _origin_under_compilations(origin):
         return True
     if not source_id:
         return False
     lowered = source_id.lower()
     if lowered.startswith("compilations-"):
         return True
+    if origin:
+        # Origin present but not under compilations-* → not a compilation by path.
+        return False
     return any(lowered.startswith(marker) for marker in COMPILATION_SOURCE_MARKERS)
 
 
@@ -1578,13 +1600,17 @@ def load_score_context(root: Path | None = None) -> ScoreContext:
     for directory in (literature / "extracts-v2", literature / "observations-v2"):
         if not directory.is_dir():
             continue
-        for path in sorted(directory.glob("*.yaml")):
+        for path in iter_observation_store_paths(directory):
             doc = load_yaml(path)
             if not isinstance(doc, Mapping):
                 continue
+            try:
+                origin_key = str(path.relative_to(directory))
+            except ValueError:
+                origin_key = path.name
             for raw in doc.get("observations") or []:
                 if isinstance(raw, Mapping) and raw.get("observation_id"):
-                    origins[str(raw["observation_id"])] = path.name
+                    origins[str(raw["observation_id"])] = origin_key
     extracts = literature / "extracts"
     if extracts.is_dir():
         for path in sorted(extracts.glob("*.yaml")):
