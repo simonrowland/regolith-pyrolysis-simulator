@@ -163,6 +163,15 @@ def test_run_split_observations_keep_source_species_bucket() -> None:
             checked += 1
     assert checked == 389
 
+
+def test_sossi_split_compositions_point_to_table1_page() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-012-sossi-2019.yaml").read_text())
+    assert len(doc["experiments"]) == 43
+    for experiment in doc["experiments"]:
+        locator = experiment["sample"]["printed_composition"]["locator"]
+        assert locator["table"] == "1"
+        assert locator["pdf_page_index"] == 52
+
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set
 # grows → this hash drifts and the shrink-only test goes RED.
