@@ -373,6 +373,7 @@ class AssetRole(StrEnum):
     MINERU_MD = "mineru_md"
     PDFTOTEXT = "pdftotext"
     TABLE_CSV = "table_csv"
+    COMPILATION_RECORD = "compilation_record"
 
 
 class IdentityEqualKind(StrEnum):

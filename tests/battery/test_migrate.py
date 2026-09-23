@@ -19,6 +19,7 @@ from simulator.battery.enums import (
     PerBasis,
     AdmissionStatus,
     BenchIdentityBasis,
+    AssetRole,
     EvidenceClass,
     IdentityEqualKind,
     MethodToken,
@@ -55,6 +56,9 @@ from simulator.battery.migrate import (
     map_phase,
     map_quantity,
     compilation_quantity_from_record,
+    choose_read_from,
+    is_compilation_record_path,
+    compilation_record_asset_id,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -67,6 +71,7 @@ from simulator.battery.migrate import (
     to_plain,
     work_id_for,
     write_outputs,
+
 )
 from simulator.battery.records import Bench, BenchIdentity, Reaction, Species, State, as_decimal
 from tests.battery import load_observation_store_summary
@@ -5300,7 +5305,6 @@ def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
     assert aliases["species-rail-differential"] == citation_hash("janaf")
     assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
 
-
 def test_species_rail_pankratz_token_also_files_under_ledger_label(tmp_path: Path) -> None:
     """Comparison-compilation tokens other than janaf must not land ledger
     residuals on the real compilation work (USBM B689)."""
@@ -5778,3 +5782,134 @@ def test_validate_flags_cross_work_bench_and_observation(tmp_path: Path) -> None
     assert own.work_id in obs_issues[0].detail
     report = validate_corpus(works, experiments, observations)
     assert not any("belongs to work" in issue.detail for issue in report.issues)
+def test_g4_compilation_record_path_predicate() -> None:
+    assert is_compilation_record_path(
+        "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/"
+        "records/robie-hemingway-fisher-1978-usgs-b1452-0003.json"
+    )
+    assert not is_compilation_record_path(
+        "data/literature/compilations/janaf/tables/Al-001.yaml"
+    )
+    assert not is_compilation_record_path("ocr/missing.md")
+    assert not is_compilation_record_path("raw/source/file.pdf")
+
+
+def test_g4_compilation_record_registers_index_asset(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    dest = _copy_compilation_record(
+        root,
+        "robie-hemingway-fisher-1978-usgs-b1452",
+        "robie-hemingway-fisher-1978-usgs-b1452-0003.json",
+    )
+    result = migrate(root, write=False)
+    rel = dest.relative_to(root).as_posix()
+    asset_id = compilation_record_asset_id(rel)
+    obs_list = [
+        obs
+        for oid, obs in result.observations.items()
+        if "robie-hemingway-fisher-1978-usgs-b1452-0003" in oid
+    ]
+    assert obs_list
+    assert all(obs.read_from == asset_id for obs in obs_list)
+    assert all(obs.locator.source_path == rel for obs in obs_list)
+    assert not any(
+        "has no matching INDEX asset" in (entry.why or "") for entry in result.queue
+    )
+    works = [
+        work
+        for work in result.works.values()
+        if "robie-hemingway-fisher-1978-usgs-b1452" in work.source_ids
+    ]
+    assert len(works) == 1
+    assets = {f.asset_id: f for f in works[0].source_files.files}
+    assert asset_id in assets
+    assert assets[asset_id].role is AssetRole.COMPILATION_RECORD
+    assert assets[asset_id].path == rel
+    assert all(obs.read_from in assets for obs in obs_list)
+
+
+def test_g4_compilation_record_asset_mutation_proof(tmp_path: Path) -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    root = _write_min_tree(tmp_path)
+    dest = _copy_compilation_record(
+        root,
+        "robie-hemingway-fisher-1978-usgs-b1452",
+        "robie-hemingway-fisher-1978-usgs-b1452-0003.json",
+    )
+    rel = dest.relative_to(root).as_posix()
+
+    live = migrate(root, write=False)
+    live_obs = next(
+        obs
+        for oid, obs in live.observations.items()
+        if "robie-hemingway-fisher-1978-usgs-b1452-0003" in oid
+    )
+    assert live_obs.read_from == compilation_record_asset_id(rel)
+    assert not any(
+        "has no matching INDEX asset" in (entry.why or "") for entry in live.queue
+    )
+
+    saved = migrate_mod.is_compilation_record_path
+    migrate_mod.is_compilation_record_path = lambda _path: False  # type: ignore[assignment]
+    try:
+        mutant = migrate(root, write=False)
+        assert any(
+            "has no matching INDEX asset" in (entry.why or "") for entry in mutant.queue
+        )
+        mutant_obs = next(
+            obs
+            for oid, obs in mutant.observations.items()
+            if "robie-hemingway-fisher-1978-usgs-b1452-0003" in oid
+        )
+        assert str(mutant_obs.read_from).startswith("unknown")
+    finally:
+        migrate_mod.is_compilation_record_path = saved
+
+    restored = migrate(root, write=False)
+    restored_obs = next(
+        obs
+        for oid, obs in restored.observations.items()
+        if "robie-hemingway-fisher-1978-usgs-b1452-0003" in oid
+    )
+    assert restored_obs.read_from == compilation_record_asset_id(rel)
+    assert not any(
+        "has no matching INDEX asset" in (entry.why or "") for entry in restored.queue
+    )
+
+
+def test_g4_choose_read_from_compilation_does_not_fall_through_to_pdf() -> None:
+    from simulator.battery.records import Locator, SourceFile, SourceFiles, Work, State
+
+    work = Work(
+        work_id="w",
+        citation="c",
+        source_ids=("robie-hemingway-fisher-1978-usgs-b1452",),
+        source_files=SourceFiles(
+            corpus_repo="regolith-corpus",
+            corpus_commit=State.unknown("test"),
+            files=(
+                SourceFile(
+                    asset_id="pdf:robie-hemingway-fisher-1978-usgs-b1452",
+                    role=AssetRole.PDF,
+                    path="raw/robie-hemingway-fisher-1978-usgs-b1452/file.pdf",
+                    sha256=State.unknown("test"),
+                ),
+                SourceFile(
+                    asset_id="unknown:robie-hemingway-fisher-1978-usgs-b1452",
+                    role=AssetRole.PDFTOTEXT,
+                    path="unknown",
+                    sha256=State.unknown("test"),
+                ),
+            ),
+        ),
+    )
+    locator = Locator(
+        source_path=(
+            "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/"
+            "records/robie-hemingway-fisher-1978-usgs-b1452-0003.json"
+        )
+    )
+    read_from = choose_read_from(work, locator)
+    assert str(read_from).startswith("unknown")
+    assert not str(read_from).startswith("pdf:")
