@@ -822,6 +822,23 @@ def _engine_species_candidates(obs: AdoptedObservation) -> list[str]:
     return out
 
 
+def _antoine_fallback_pressure_scale_pa(source_form: str) -> float | None:
+    """Pa per unit of an Antoine log10 pressure, matched on whole tokens.
+
+    ``"bar" in "mbar"`` is false here: millibar is its own token and scales
+    by 100 Pa, not by 1e5. Longer tokens are tested first.
+    """
+
+    tokens = set(re.findall(r"[a-z]+", source_form.lower()))
+    if "mbar" in tokens or "millibar" in tokens:
+        return 100.0
+    if "mmhg" in tokens or {"mm", "hg"} <= tokens or "mm" in tokens:
+        return 133.322368
+    if "bar" in tokens:
+        return 1.0e5
+    return None
+
+
 def _literature_pressure_points(
     obs: AdoptedObservation,
 ) -> tuple[list[dict[str, Any]] | None, str | None, list[dict[str, Any]]]:
@@ -1008,11 +1025,11 @@ def _literature_pressure_points(
             elif use_mmhg:
                 P = (10.0**log10_p) * 133.322368
             else:
-                # Behrens-style log10(P_bar) without explicit runtime conversion.
-                if "bar" in source_form.lower():
-                    P = (10.0**log10_p) * 1.0e5
-                elif "mm" in source_form.lower():
-                    P = (10.0**log10_p) * 133.322368
+                # Unit strings that missed the explicit P_bar / P_Pa / mmHg
+                # branches. Match the unit token exactly so "mbar" is not "bar".
+                scale_pa = _antoine_fallback_pressure_scale_pa(source_form)
+                if scale_pa is not None:
+                    P = (10.0**log10_p) * scale_pa
                 else:
                     # Prefer Pa-like A magnitude (A~10) vs bar (A~4-6) heuristic.
                     P = 10.0**log10_p if A >= 7.0 else (10.0**log10_p) * 1.0e5

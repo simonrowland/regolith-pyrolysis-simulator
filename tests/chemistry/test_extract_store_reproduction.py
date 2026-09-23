@@ -890,6 +890,50 @@ def test_A_Pa_runtime_coefficients_are_parsed_not_no_usable_payload() -> None:
     del drops
 
 
+def test_antoine_fallback_mbar_is_not_scaled_as_bar() -> None:
+    """Whole-token units: 'mbar' is 100 Pa, not the 'bar' substring at 1e5 Pa."""
+
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _literature_pressure_points,
+    )
+
+    def observation(source_form: str) -> AdoptedObservation:
+        return AdoptedObservation(
+            species_id="X",
+            source_id="fixture",
+            observation_id="antoine_unit",
+            obs_type="psat_series",
+            review_status=None,
+            phase=None,
+            regime=None,
+            standard_state=None,
+            T_range_K=(1000.0, 1000.0),
+            units=None,
+            uncertainty=None,
+            locator={},
+            values={
+                "source_form": source_form,
+                "coefficients": {"A": 5.0, "B": 0.0, "C": 0.0},
+            },
+            equipment={},
+            disagreement_dex=None,
+            is_priority_winner=True,
+            geometry_assumption=geometry_assumption_text(),
+        )
+
+    def pressure_pa(source_form: str) -> float:
+        points, skip, _drops = _literature_pressure_points(observation(source_form))
+        assert skip is None, skip
+        assert points is not None and len(points) == 1
+        return float(points[0]["P_Pa"])
+
+    # log10(P) = 5. Substring "bar" inside "mbar" used to multiply by 1e5.
+    assert pressure_pa("log10(P_mbar) = A - B/(T+C)") == pytest.approx(1.0e7)
+    assert pressure_pa("mbar") == pytest.approx(1.0e7)
+    assert pressure_pa("log10(P/bar) = A - B/(T+C)") == pytest.approx(1.0e10)
+    assert pressure_pa("log10(P_bar) = A - B/(T+C)") == pytest.approx(1.0e10)
+
+
 def test_point_level_drops_emit_gap_records_not_silent() -> None:
     """P3: mixed series with rate-only rows must not vanish without a record."""
 
