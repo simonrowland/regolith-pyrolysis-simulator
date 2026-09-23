@@ -331,7 +331,7 @@ function tapsAndPuritySection(terminal) {
   const hasActivity = stages.some(([, stage]) => stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
   const stageRows = stages.map(([key, stage]) => {
     const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
-    const hasMassSupport = [stage.total_kg, stage.designated_kg, stage.impurity_kg].some(hasNumber);
+    const hasMassSupport = [stage.total_kg, stage.designated_kg, stage.impurity_kg].every(hasNumber);
     const verdict = hasMassSupport ? backendVerdict ?? "UNAVAILABLE" : "PENDING";
     const verdictClass = ["pure", "mixed", "contaminated"].includes(verdict.toLowerCase())
       ? verdict.toLowerCase()

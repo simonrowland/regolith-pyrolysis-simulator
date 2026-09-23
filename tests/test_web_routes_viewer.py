@@ -217,6 +217,16 @@ def test_report_viewer_sparse_stage_purity_stays_pending() -> None:
     assert "100.0000%" not in html
 
 
+def test_report_viewer_partial_stage_masses_stay_pending() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "tapsAndPuritySection({stage_purity:{s:{verdict:'PURE',purity_fraction:1,total_kg:'bad',designated_kg:[2],impurity_kg:0}}})",
+    )
+
+    assert "PENDING" in html
+    assert "100.0000%" not in html
+
+
 def test_report_viewer_zero_step_inventory_is_not_terminal_ceramic() -> None:
     html = _run_viewer_expression(
         "report-viewer.js",
