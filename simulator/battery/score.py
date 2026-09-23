@@ -493,9 +493,9 @@ def compute_metric(
         if candidate <= 0 or reference <= 0:
             return None
         ratio = candidate / reference
-        # Decimal.ln / ln(10); math.log10 on float is the same operation
-        # for the reported grain. Keep Decimal via log10 of the ratio.
-        return Decimal(str(math.log10(float(ratio))))
+        # Keep Decimal end-to-end: ln(ratio)/ln(10). The float(math.log10)
+        # path truncates Decimal grain and can flip str(median) bytes.
+        return ratio.ln() / Decimal(10).ln()
     return None
 
 
