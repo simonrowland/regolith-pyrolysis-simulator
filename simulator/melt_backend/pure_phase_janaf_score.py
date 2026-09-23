@@ -46,6 +46,13 @@ compilation has no tridymite table.  An unreachable property stays a typed
 absence, never a zero; a number returned together with an absence token
 is not scored.
 
+``REACTION_CATALOGUE`` is declarative data: the two Mg-silicate reactions
+plus spinel and one row per Al2SiO5 polymorph.  CaSiO3, Ca2SiO4 and
+stoichiometric FeO are not in this harvest (Fe-001 is Fe0.947O), so those
+reactions are absent.  MAGEMin ig has no plain MgAl2O4 endmember (host
+``spl``; ``nsp`` is ordered normal spinel), so that engine's spinel row is
+a typed refusal rather than a score.
+
 This module is the pure arithmetic/plan half.  The engine/JANAF IO and
 report rendering live in ``scripts/janaf_pure_phase_score.py``.
 """
@@ -79,6 +86,12 @@ from simulator.melt_backend.magemin import _MAGEMIN_PURE_PHASES
 POLYMORPH_MISMATCH = 'polymorph_mismatch'
 NO_JANAF_TABLE_FOR_POLYMORPH = 'no_janaf_table_for_polymorph'
 NO_JANAF_ROW_AT_T = 'no_janaf_row_at_temperature'
+# ig host ``spl`` endmember ``nsp`` is ordered normal spinel. JANAF Al-089
+# is calorimetric spinel; scoring nsp would fold order-disorder into the
+# residual. The row is refused, not mapped.
+NO_JUSTIFIED_ENGINE_ENDMEMBER = 'no_justified_engine_endmember'
+# One bad engine row must not abort the run (scripts/janaf_pure_phase_score).
+ENGINE_PHASE_ACCESS = 'engine_phase_access'
 
 STATUS_SCORED = 'scored'
 STATUS_REFUSED = 'refused'
@@ -91,6 +104,16 @@ PRESSURE_BAR = 1.0
 # JANAF quartz table row are metastable extensions.  Matched polymorphs, but
 # the row is flagged.
 QUARTZ_METASTABLE_ABOVE_K = 1143.0
+
+# 1 bar, not JANAF markers. Holdaway 1971 invariant is 501 C / 3.76 kbar.
+# The 1-bar kyanite-andalusite intercept on that family is ~220 C
+# (Anderson, Newton & Kleppa 1977). Above it kyanite is metastable.
+KYANITE_METASTABLE_ABOVE_K = 493.0
+# Holdaway 1971 1-bar andalusite-sillimanite intercept, 770 C.
+ANDALUSITE_SILLIMANITE_1BAR_K = 1043.0
+# Mullite + silica replaces Al2SiO5 at 1 atm above ~1200 C
+# (Igami, Ohi & Miyake 2019).
+AL2SIO5_MULLITE_ABOVE_K = 1473.0
 
 # ThermoEngine quartz includes the upstream MELTS quartz correction:
 # QUARTZ_ADJUSTMENT = -1291.0 J/mol (ThermoEngine src/
@@ -128,6 +151,16 @@ JANAF_TABLES: Mapping[str, JanafTableSpec] = {
     # I/II/III markers, not from a clinoenstatite label.
     'Mg-012': JanafTableSpec('Mg-012', 'MgSiO3(cr)'),
     'Mg-028': JanafTableSpec('Mg-028', 'Mg2SiO4(cr)', 'forsterite'),
+    # Title names no polymorph. CRYSTAL <--> LIQUID closes the fallback.
+    'Al-089': JanafTableSpec('Al-089', 'MgAl2O4(cr)', 'spinel'),
+    # Title mineral is corundum; ALPHA <--> LIQUID is the alpha band.
+    'Al-096': JanafTableSpec('Al-096', 'Al2O3(cr, alpha)'),
+    'Al-102': JanafTableSpec('Al-102', 'Al2SiO5(cr, andalusite)'),
+    'Al-103': JanafTableSpec('Al-103', 'Al2SiO5(cr, kyanite)'),
+    'Al-104': JanafTableSpec('Al-104', 'Al2SiO5(cr, sillimanite)'),
+    # No Ca-silicate reaction: this harvest has no CaSiO3 or Ca2SiO4 table.
+    # Fallback names the crystal so a later unary score is not band-less.
+    'Ca-027': JanafTableSpec('Ca-027', 'CaO(cr)', 'lime'),
 }
 
 
@@ -138,6 +171,8 @@ JANAF_TABLES: Mapping[str, JanafTableSpec] = {
 # clino, ortho, or proto.
 SAME_MINERAL_SUBFORMS: Mapping[str, frozenset] = {
     'quartz': frozenset({'alpha', 'beta'}),
+    # Al-096 title resolves to corundum; the printed marker is ALPHA.
+    'corundum': frozenset({'alpha'}),
 }
 
 _PHASE_CHANGE_RE = re.compile(r'^\s*(.+?)\s*<-->\s*(.+?)\s*$')
@@ -423,7 +458,8 @@ class ReactionRow:
     temperature_K: float
     reaction_id: str
     equation: str
-    sio2_polymorph: str
+    # None when the reaction has no SiO2 term. Never an empty string.
+    sio2_polymorph: Optional[str]
     drG_engine_kJ_mol: float
     drG_janaf_kJ_mol: float
     residual_kJ_mol: float  # engine - JANAF
@@ -532,7 +568,10 @@ class ReactionSpec:
     equation: str
     terms: Tuple[Tuple[str, float], ...]  # (role, nu); products positive
     janaf_table_by_role: Mapping[str, str]
-    engine_phase_by_role: Mapping[str, Mapping[str, str]]
+    engine_phase_by_role: Mapping[str, Mapping[str, Optional[str]]]
+    # (engine, role, why that role has no phase id). A missing phase id
+    # without an entry here is a catalogue bug, not a physics refusal.
+    missing_endmember: Tuple[Tuple[str, str, str], ...] = ()
 
 
 # 2 MgO(cr) + SiO2(cr) -> Mg2SiO4(cr), SiO2 on the QUARTZ basis at all T
@@ -570,7 +609,90 @@ REACTION_ENSTATITE = ReactionSpec(
     },
 )
 
-REACTIONS = (REACTION_FORSTERITE, REACTION_ENSTATITE)
+# MgO + Al2O3 -> MgAl2O4. ThermoEngine Berman symbol is Spl (MgAl2O4).
+# MAGEMin ig host spl has no plain MgAl2O4 endmember. nsp is the ordered
+# normal spinel of Holland et al. 2018; JANAF Al-089 is calorimetric
+# spinel, so nsp is not scored.
+_MAGEMIN_SPINEL_REFUSAL = (
+    "MAGEMin ig host 'spl' has no plain MgAl2O4 endmember "
+    "(nsp, isp, nhc, ihc, nmt, imt, pcr, qndm). nsp is ordered normal "
+    "spinel (Holland et al. 2018); JANAF Al-089 is calorimetric spinel, "
+    "so nsp is not scored"
+)
+REACTION_SPINEL = ReactionSpec(
+    reaction_id='MgO+Al2O3->MgAl2O4',
+    equation='MgO(cr) + Al2O3(cr, alpha) -> MgAl2O4(cr, spinel)',
+    terms=(('MgAl2O4', 1.0), ('MgO', -1.0), ('Al2O3', -1.0)),
+    janaf_table_by_role={
+        'MgO': 'Mg-008',
+        'Al2O3': 'Al-096',
+        'MgAl2O4': 'Al-089',
+    },
+    engine_phase_by_role={
+        'magemin': {'MgO': 'per', 'Al2O3': 'cor', 'MgAl2O4': None},
+        'thermoengine': {'MgO': 'Per', 'Al2O3': 'Crn', 'MgAl2O4': 'Spl'},
+    },
+    missing_endmember=(
+        ('magemin', 'MgAl2O4', _MAGEMIN_SPINEL_REFUSAL),
+    ),
+)
+
+# Al2O3 + SiO2(quartz) -> Al2SiO5. One row per product polymorph so a
+# mismatched engine phase refuses. CaSiO3 / Ca2SiO4 / stoichiometric FeO
+# are omitted: this harvest has no CaSiO3 or Ca2SiO4 table, and Fe-001 is
+# Fe0.947O (Fe-030 hematite has no stoichiometric FeO partner).
+REACTION_ANDALUSITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(andalusite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, andalusite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-102',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'and'},
+        'thermoengine': {'Al2O3': 'Crn', 'SiO2': 'Qz', 'Al2SiO5': 'And'},
+    },
+)
+REACTION_KYANITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(kyanite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, kyanite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-103',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'ky'},
+        'thermoengine': {'Al2O3': 'Crn', 'SiO2': 'Qz', 'Al2SiO5': 'Ky'},
+    },
+)
+REACTION_SILLIMANITE = ReactionSpec(
+    reaction_id='Al2O3+SiO2->Al2SiO5(sillimanite)',
+    equation='Al2O3(cr, alpha) + SiO2(cr, quartz) -> Al2SiO5(cr, sillimanite)',
+    terms=(('Al2SiO5', 1.0), ('Al2O3', -1.0), ('SiO2', -1.0)),
+    janaf_table_by_role={
+        'Al2O3': 'Al-096',
+        'SiO2': 'O-037',
+        'Al2SiO5': 'Al-104',
+    },
+    engine_phase_by_role={
+        'magemin': {'Al2O3': 'cor', 'SiO2': 'q', 'Al2SiO5': 'sill'},
+        'thermoengine': {'Al2O3': 'Crn', 'SiO2': 'Qz', 'Al2SiO5': 'Sil'},
+    },
+)
+
+REACTION_CATALOGUE: Tuple[ReactionSpec, ...] = (
+    REACTION_FORSTERITE,
+    REACTION_ENSTATITE,
+    REACTION_SPINEL,
+    REACTION_ANDALUSITE,
+    REACTION_KYANITE,
+    REACTION_SILLIMANITE,
+)
+REACTIONS = REACTION_CATALOGUE
 ENGINES = ('magemin', 'thermoengine')
 
 
@@ -589,11 +711,25 @@ DEFAULT_PHASE_REQUESTS: Tuple[PhaseScoreRequest, ...] = (
     PhaseScoreRequest('thermoengine', 'Fo', 'Mg-028'),
     PhaseScoreRequest('magemin', 'q', 'O-037'),
     PhaseScoreRequest('thermoengine', 'Qz', 'O-037'),
+    PhaseScoreRequest('magemin', 'cor', 'Al-096'),
+    PhaseScoreRequest('thermoengine', 'Crn', 'Al-096'),
+    # No MAGEMin spinel request: host spl has no justified endmember
+    # (see REACTION_SPINEL.missing_endmember).
+    PhaseScoreRequest('thermoengine', 'Spl', 'Al-089'),
+    PhaseScoreRequest('magemin', 'and', 'Al-102'),
+    PhaseScoreRequest('thermoengine', 'And', 'Al-102'),
+    PhaseScoreRequest('magemin', 'ky', 'Al-103'),
+    PhaseScoreRequest('thermoengine', 'Ky', 'Al-103'),
+    PhaseScoreRequest('magemin', 'sill', 'Al-104'),
+    PhaseScoreRequest('thermoengine', 'Sil', 'Al-104'),
     # cEn / En / en are clino or ortho.  Mg-012's printed bands are
     # i/ii/iii, so all three requests are refused at every default T.
     PhaseScoreRequest('thermoengine', 'cEn', 'Mg-012'),
     PhaseScoreRequest('thermoengine', 'En', 'Mg-012'),
     PhaseScoreRequest('magemin', 'en', 'Mg-012'),
+    # Andalusite phase vs the sillimanite table: polymorph refuse.
+    PhaseScoreRequest('thermoengine', 'And', 'Al-104'),
+    PhaseScoreRequest('magemin', 'and', 'Al-104'),
     # This JANAF compilation has no tridymite table; trd is the stable
     # MAGEMin silica polymorph at 1500 K, so the gap is real and typed.
     PhaseScoreRequest('magemin', 'trd', None, (1500.0,)),
@@ -665,7 +801,29 @@ def preflight_reaction(
             temperature_K=temperature_K,
         )
     for role, _nu in reaction.terms:
-        phase_id = phase_by_role[role]
+        phase_id = phase_by_role.get(role)
+        if phase_id is None:
+            detail = next(
+                (
+                    text
+                    for eng, role_name, text in reaction.missing_endmember
+                    if eng == engine and role_name == role
+                ),
+                None,
+            )
+            if detail is None:
+                raise KeyError(
+                    f'{reaction.reaction_id} has no {engine} phase id for '
+                    f'{role} and no missing_endmember entry'
+                )
+            return RefusalRow(
+                reason=NO_JUSTIFIED_ENGINE_ENDMEMBER,
+                detail=detail,
+                engine=engine,
+                reaction_id=reaction.reaction_id,
+                janaf_table_id=reaction.janaf_table_by_role[role],
+                temperature_K=temperature_K,
+            )
         janaf = JANAF_TABLES[reaction.janaf_table_by_role[role]]
         engine_polymorph = engine_phase_polymorph(engine, phase_id)
         try:
@@ -713,6 +871,66 @@ def _quartz_notes(reaction_or_phase_T: float) -> Tuple[str, ...]:
             'polymorphs matched, stability flagged',
         )
     return ()
+
+
+def _al2sio5_product_polymorph(reaction: ReactionSpec) -> Optional[str]:
+    table_id = reaction.janaf_table_by_role.get('Al2SiO5')
+    if table_id is None:
+        return None
+    return bands_for_table_id(table_id).title_polymorph
+
+
+def _al2sio5_stability_notes(
+    polymorph: Optional[str], temperature_K: float
+) -> Tuple[str, ...]:
+    """1-bar metastability flags. Matched polymorphs still score."""
+
+    if polymorph is None:
+        return ()
+    notes = []
+    if polymorph == 'kyanite' and temperature_K > KYANITE_METASTABLE_ABOVE_K:
+        notes.append(
+            'kyanite is metastable at 1 bar above the andalusite-kyanite '
+            'intercept (~493 K / ~220 C; Holdaway 1971 family); polymorph '
+            'matched, stability flagged'
+        )
+    if (
+        polymorph == 'sillimanite'
+        and temperature_K < ANDALUSITE_SILLIMANITE_1BAR_K
+    ):
+        notes.append(
+            'sillimanite is metastable at 1 bar below the '
+            'andalusite-sillimanite transition (~1043 K / 770 C, Holdaway '
+            '1971); polymorph matched, stability flagged'
+        )
+    if (
+        polymorph == 'andalusite'
+        and temperature_K > ANDALUSITE_SILLIMANITE_1BAR_K
+    ):
+        notes.append(
+            'andalusite is metastable at 1 bar above the '
+            'andalusite-sillimanite transition (~1043 K / 770 C, Holdaway '
+            '1971); polymorph matched, stability flagged'
+        )
+    if (
+        polymorph in ('andalusite', 'kyanite', 'sillimanite')
+        and temperature_K > AL2SIO5_MULLITE_ABOVE_K
+    ):
+        notes.append(
+            'Al2SiO5 is metastable at 1 bar above the mullite + silica '
+            'boundary (~1473 K / 1200 C); polymorph matched, stability '
+            'flagged'
+        )
+    return tuple(notes)
+
+
+def sio2_polymorph_for_reaction(reaction: ReactionSpec) -> Optional[str]:
+    """Title mineral of the SiO2 term, or None when the reaction has none."""
+
+    table_id = reaction.janaf_table_by_role.get('SiO2')
+    if table_id is None:
+        return None
+    return bands_for_table_id(table_id).title_polymorph
 
 
 def build_reaction_row(
@@ -774,7 +992,14 @@ def build_reaction_row(
         janaf_terms.append((nu, janaf_values.formation_gibbs_kJ_mol))
     drg_engine = reaction_sum(engine_terms)
     drg_janaf = reaction_sum(janaf_terms)
-    notes = list(_quartz_notes(temperature_K))
+    notes: list[str] = []
+    if reaction.janaf_table_by_role.get('SiO2') == 'O-037':
+        notes.extend(_quartz_notes(temperature_K))
+    notes.extend(
+        _al2sio5_stability_notes(
+            _al2sio5_product_polymorph(reaction), temperature_K
+        )
+    )
     for detail in details:
         if detail.engine_polymorph != detail.janaf_polymorph:
             notes.append(
@@ -803,7 +1028,7 @@ def build_reaction_row(
         temperature_K=temperature_K,
         reaction_id=reaction.reaction_id,
         equation=reaction.equation,
-        sio2_polymorph='quartz',
+        sio2_polymorph=sio2_polymorph_for_reaction(reaction),
         drG_engine_kJ_mol=drg_engine,
         drG_janaf_kJ_mol=drg_janaf,
         residual_kJ_mol=drg_engine - drg_janaf,
@@ -924,6 +1149,7 @@ def build_phase_row(
     notes = list(
         _quartz_notes(temperature_K) if props.polymorph == 'quartz' else ()
     )
+    notes.extend(_al2sio5_stability_notes(props.polymorph, temperature_K))
     subform = _subform_note(props.polymorph, band)
     if subform is not None:
         notes.append(subform)

@@ -18,16 +18,25 @@ from simulator.melt_backend.pure_phase import (
     PHASE_NOT_STABLE_AT_TP,
     PropertyAbsence,
     PurePhaseProperties,
+    PurePhaseUnknownSymbolError,
 )
 from simulator.melt_backend.pure_phase_janaf_score import (
     DEFAULT_PHASE_REQUESTS,
     DEFAULT_TEMPERATURES_K,
+    ENGINE_PHASE_ACCESS,
     JANAF_TABLES,
     NO_JANAF_TABLE_FOR_POLYMORPH,
+    NO_JUSTIFIED_ENGINE_ENDMEMBER,
     POLYMORPH_MISMATCH,
     PolymorphMismatchError,
+    REACTION_ANDALUSITE,
+    REACTION_CATALOGUE,
     REACTION_ENSTATITE,
     REACTION_FORSTERITE,
+    REACTION_KYANITE,
+    REACTION_SILLIMANITE,
+    REACTION_SPINEL,
+    REACTIONS,
     JanafValues,
     PhaseScoreRequest,
     bands_for_table_id,
@@ -50,6 +59,11 @@ JANAF_DFG_1000 = {
     'O-037': -730.256,    # SiO2 quartz
     'Mg-012': -1257.958,  # MgSiO3(cr) printed form II, not a clino label
     'Mg-028': -1778.598,  # Mg2SiO4(cr) forsterite
+    'Al-096': -1361.437,  # Al2O3 alpha / corundum
+    'Al-089': -1886.914,  # MgAl2O4
+    'Al-102': -2097.155,  # andalusite
+    'Al-103': -2090.0,    # kyanite
+    'Al-104': -2096.351,  # sillimanite
 }
 # 298.15 K:
 JANAF_DFG_298 = {
@@ -57,6 +71,11 @@ JANAF_DFG_298 = {
     'O-037': -856.443,
     'Mg-012': -1462.023,
     'Mg-028': -2057.879,
+    'Al-096': -1582.275,
+    'Al-089': -2176.621,
+    'Al-102': -2444.482,
+    'Al-103': -2443.937,
+    'Al-104': -2442.394,
 }
 
 # Engine probe fixtures (P4a scout probe_thermoengine.py, verbatim; J/mol):
@@ -525,3 +544,387 @@ def test_absence_token_beats_a_numeric_engine_value():
         assert prop.residual is None
         assert prop.absence_reason == PHASE_NOT_STABLE_AT_TP
     assert any('absence wins' in note for note in row.notes)
+
+
+# --- W2 reaction catalogue (ported onto the printed-band rule) --------------
+
+
+def test_reaction_catalogue_is_declarative_and_covers_targets():
+    assert REACTIONS is REACTION_CATALOGUE
+    assert [r.reaction_id for r in REACTION_CATALOGUE] == [
+        '2MgO+SiO2->Mg2SiO4',
+        'MgO+SiO2->MgSiO3',
+        'MgO+Al2O3->MgAl2O4',
+        'Al2O3+SiO2->Al2SiO5(andalusite)',
+        'Al2O3+SiO2->Al2SiO5(kyanite)',
+        'Al2O3+SiO2->Al2SiO5(sillimanite)',
+    ]
+    for reaction in REACTION_CATALOGUE:
+        assert set(reaction.janaf_table_by_role) == {role for role, _ in reaction.terms}
+        assert set(reaction.engine_phase_by_role) == {'magemin', 'thermoengine'}
+        for table_id in reaction.janaf_table_by_role.values():
+            assert table_id in JANAF_TABLES
+
+
+def test_catalogue_omits_ca_silicates_and_stoichiometric_feo():
+    """No CaSiO3 / Ca2SiO4 table, and Fe-001 is Fe0.947O not FeO."""
+    blob = ' '.join(r.reaction_id for r in REACTION_CATALOGUE)
+    assert 'CaSiO3' not in blob and 'Ca2SiO4' not in blob and 'FeO' not in blob
+    assert JANAF_TABLES['Ca-027'].fallback_polymorph == 'lime'
+    assert 'Fe-030' not in JANAF_TABLES
+    assert all(
+        'Ca-027' not in r.janaf_table_by_role.values()
+        for r in REACTION_CATALOGUE
+    )
+
+
+def test_corundum_matches_printed_alpha_band_below_the_liquid():
+    """ALPHA <--> LIQUID is corundum's alpha band, not a refuse-at-all-T."""
+    info = bands_for_table_id('Al-096')
+    assert info.title_polymorph == 'corundum'
+    assert [band.polymorph for band in info.bands] == ['alpha']
+    assert info.bands[0].t_max_K == 2327.0
+    for temperature in DEFAULT_TEMPERATURES_K:
+        band = require_polymorph_match(
+            'corundum', JANAF_TABLES['Al-096'],
+            temperature_K=temperature, context='t',
+        )
+        assert band.polymorph == 'alpha'
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'corundum', JANAF_TABLES['Al-096'],
+            temperature_K=2327.0, context='t',
+        )
+
+
+def test_spinel_and_lime_fallbacks_close_at_the_printed_liquid():
+    spinel = bands_for_table_id('Al-089')
+    assert spinel.title_polymorph is None
+    assert spinel.bands[0].polymorph == 'spinel'
+    assert spinel.bands[0].t_max_K == 2408.0
+    lime = bands_for_table_id('Ca-027')
+    assert lime.bands[0].polymorph == 'lime'
+    assert lime.bands[0].t_max_K == 3200.0
+    matched = require_polymorph_match(
+        'spinel', JANAF_TABLES['Al-089'], temperature_K=1000.0, context='t'
+    )
+    assert matched.polymorph == 'spinel'
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'spinel', JANAF_TABLES['Al-089'], temperature_K=2408.0, context='t'
+        )
+
+
+def test_reaction_sum_janaf_spinel_1000K_hand_computed():
+    # -1886.914 - (-492.952) - (-1361.437) = -32.525
+    assert reaction_sum([
+        (1.0, JANAF_DFG_1000['Al-089']),
+        (-1.0, JANAF_DFG_1000['Mg-008']),
+        (-1.0, JANAF_DFG_1000['Al-096']),
+    ]) == pytest.approx(-32.525, abs=1e-9)
+
+
+def test_reaction_sum_janaf_andalusite_1000K_hand_computed():
+    # -2097.155 - (-1361.437) - (-730.256) = -5.462
+    assert reaction_sum([
+        (1.0, JANAF_DFG_1000['Al-102']),
+        (-1.0, JANAF_DFG_1000['Al-096']),
+        (-1.0, JANAF_DFG_1000['O-037']),
+    ]) == pytest.approx(-5.462, abs=1e-9)
+
+
+def test_build_reaction_row_spinel_janaf_side_1000K():
+    fixtures = {
+        'Per': _props('thermoengine', 'Per', 'periclase', -650763.6656),
+        'Crn': _props('thermoengine', 'Crn', 'corundum', -1670000.0),
+        'Spl': _props('thermoengine', 'Spl', 'spinel', -2350000.0),
+    }
+    row = build_reaction_row(
+        REACTION_SPINEL,
+        'thermoengine',
+        1000.0,
+        engine_query=lambda phase_id, T: fixtures[phase_id],
+        janaf_query=_janaf_stub,
+    )
+    assert row.drG_janaf_kJ_mol == pytest.approx(-32.525, abs=1e-9)
+    assert row.sio2_polymorph is None
+    assert row.drG_engine_no_quartz_adjustment_kJ_mol is None
+    assert not any('quartz is metastable' in note for note in row.notes)
+
+
+def test_preflight_magemin_spinel_refused_typed():
+    """nsp is ordered normal spinel; it is not scored as JANAF Al-089."""
+    for temperature in DEFAULT_TEMPERATURES_K:
+        refusal = preflight_reaction(
+            REACTION_SPINEL, 'magemin', temperature_K=temperature
+        )
+        assert refusal is not None
+        assert refusal.reason == NO_JUSTIFIED_ENGINE_ENDMEMBER
+        assert 'nsp' in refusal.detail
+        assert "host 'spl'" in refusal.detail
+    assert preflight_reaction(
+        REACTION_SPINEL, 'thermoengine', temperature_K=1000.0
+    ) is None
+    assert 'sp' not in REACTION_SPINEL.engine_phase_by_role['magemin'].values()
+    assert REACTION_SPINEL.engine_phase_by_role['thermoengine']['Al2O3'] == 'Crn'
+    assert REACTION_SPINEL.engine_phase_by_role['thermoengine']['MgAl2O4'] == 'Spl'
+
+
+def test_preflight_al2sio5_polymorph_mismatch_refused():
+    assert preflight_reaction(
+        REACTION_ANDALUSITE, 'thermoengine', temperature_K=1000.0
+    ) is None
+    assert preflight_reaction(
+        REACTION_KYANITE, 'magemin', temperature_K=1000.0
+    ) is None
+    assert preflight_reaction(
+        REACTION_SILLIMANITE, 'thermoengine', temperature_K=1500.0
+    ) is None
+    by_key = {
+        (r.engine, r.phase_id, r.janaf_table_id): r
+        for r in DEFAULT_PHASE_REQUESTS
+    }
+    refuse = preflight_phase_request(
+        by_key[('thermoengine', 'And', 'Al-104')], temperature_K=1000.0
+    )
+    assert refuse is not None and refuse.reason == POLYMORPH_MISMATCH
+    assert refuse.engine_polymorph == 'andalusite'
+    assert refuse.janaf_polymorph == 'sillimanite'
+    mm = preflight_phase_request(
+        by_key[('magemin', 'and', 'Al-104')], temperature_K=1000.0
+    )
+    assert mm is not None and mm.reason == POLYMORPH_MISMATCH
+
+
+def test_al2sio5_metastability_flagged_like_quartz():
+    """Kyanite above ~493 K, and every Al2SiO5 row above the mullite bound."""
+    kyanite_298 = build_reaction_row(
+        REACTION_KYANITE, 'thermoengine', 298.15,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Crn': 'corundum', 'Qz': 'quartz', 'Ky': 'kyanite'}[phase_id],
+            -1.0e6, temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert not any('metastable' in note for note in kyanite_298.notes)
+    kyanite_500 = build_reaction_row(
+        REACTION_KYANITE, 'thermoengine', 500.0,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Crn': 'corundum', 'Qz': 'quartz', 'Ky': 'kyanite'}[phase_id],
+            -1.0e6, temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert any('kyanite is metastable' in note for note in kyanite_500.notes)
+    andalusite_1000 = build_reaction_row(
+        REACTION_ANDALUSITE, 'thermoengine', 1000.0,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Crn': 'corundum', 'Qz': 'quartz', 'And': 'andalusite'}[phase_id],
+            -1.0e6, temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert not any('metastable' in note for note in andalusite_1000.notes)
+    andalusite_1500 = build_reaction_row(
+        REACTION_ANDALUSITE, 'thermoengine', 1500.0,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Crn': 'corundum', 'Qz': 'quartz', 'And': 'andalusite'}[phase_id],
+            -1.0e6, temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert any('andalusite is metastable' in note for note in andalusite_1500.notes)
+    assert any('mullite' in note for note in andalusite_1500.notes)
+    # Quartz flag on the forsterite row is unchanged in wording.
+    forsterite_1500 = build_reaction_row(
+        REACTION_FORSTERITE, 'thermoengine', 1500.0,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Per': 'periclase', 'Qz': 'quartz', 'Fo': 'forsterite'}[phase_id],
+            TE_G_1000_J.get(phase_id, -1.0e6), temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert any(
+        note.startswith('quartz is metastable above the q->trd transition')
+        for note in forsterite_1500.notes
+    )
+    assert not any('Al2SiO5' in note or 'kyanite' in note for note in forsterite_1500.notes)
+    sillimanite_1000 = build_reaction_row(
+        REACTION_SILLIMANITE, 'thermoengine', 1000.0,
+        engine_query=lambda phase_id, T: _props(
+            'thermoengine', phase_id,
+            {'Crn': 'corundum', 'Qz': 'quartz', 'Sil': 'sillimanite'}[phase_id],
+            -1.0e6, temperature_K=T,
+        ),
+        janaf_query=_janaf_stub,
+    )
+    assert any('sillimanite is metastable' in note for note in sillimanite_1000.notes)
+    assert not any('mullite' in note for note in sillimanite_1000.notes)
+
+
+def test_janaf_values_at_real_tables_spinel_corundum_andalusite_1000K():
+    spinel = janaf_values_at(load_janaf_table('Al-089'), 1000.0)
+    corundum = janaf_values_at(load_janaf_table('Al-096'), 1000.0)
+    andalusite = janaf_values_at(load_janaf_table('Al-102'), 1000.0)
+    assert spinel is not None and spinel.formation_gibbs_kJ_mol == pytest.approx(-1886.914)
+    assert corundum is not None and corundum.formation_gibbs_kJ_mol == pytest.approx(-1361.437)
+    assert andalusite is not None and andalusite.formation_gibbs_kJ_mol == pytest.approx(-2097.155)
+
+
+def test_build_all_rows_one_bad_phase_does_not_abort():
+    """An unknown symbol on one row is a typed refusal; later rows still score."""
+    import scripts.janaf_pure_phase_score as runner
+
+    class _Querier:
+        def __call__(self, engine, phase_id, temperature_K):
+            if phase_id in ('Crn', 'cor', 'Spl', 'And', 'Ky', 'Sil', 'and', 'ky', 'sill'):
+                raise PurePhaseUnknownSymbolError(f'no {phase_id}')
+            polymorph = {
+                'Per': 'periclase', 'Qz': 'quartz', 'Fo': 'forsterite',
+                'per': 'periclase', 'q': 'quartz', 'fo': 'forsterite',
+                'cEn': 'clinoenstatite', 'En': 'orthoenstatite',
+                'en': 'orthoenstatite',
+            }[phase_id]
+            return _props(engine, phase_id, polymorph, -1.0e6, temperature_K=temperature_K)
+
+    rows, refusals = runner.build_all_rows(
+        _Querier(), runner.JanafQuerier(), ('magemin', 'thermoengine')
+    )
+    assert any(
+        getattr(row, 'reaction_id', None) == '2MgO+SiO2->Mg2SiO4'
+        for row in rows
+    )
+    access = [
+        refusal for refusal in refusals
+        if refusal.reason == ENGINE_PHASE_ACCESS
+    ]
+    assert access
+    assert any(refusal.reaction_id == 'MgO+Al2O3->MgAl2O4' for refusal in access)
+    assert any(
+        refusal.reason == NO_JUSTIFIED_ENGINE_ENDMEMBER
+        for refusal in refusals
+    )
+
+
+def _thermoengine_available() -> bool:
+    try:
+        from simulator.engine_local_config import setup_thermoengine_dylib_path
+
+        setup_thermoengine_dylib_path()
+        import thermoengine  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+needs_thermoengine = pytest.mark.skipif(
+    not _thermoengine_available(),
+    reason='ThermoEngine dylibs/package unavailable on this machine',
+)
+
+
+def _magemin_binary_available() -> bool:
+    try:
+        from simulator.engine_local_config import configured_magemin_binary_path
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        if configured_magemin_binary_path() is not None:
+            return True
+        return MAGEMinBackend._locate_binary(None) is not None
+    except Exception:
+        return False
+
+
+needs_magemin = pytest.mark.skipif(
+    not _magemin_binary_available(),
+    reason='no MAGEMin binary',
+)
+
+
+@needs_thermoengine
+def test_catalogue_thermoengine_symbols_resolve_on_the_engine():
+    """Phase ids are checked with Database.get_phase, not against the map."""
+    from simulator.engine_local_config import setup_thermoengine_dylib_path
+
+    setup_thermoengine_dylib_path()
+    from thermoengine import model
+
+    from engines.alphamelts.thermoengine import (
+        _TE_PURE_PHASE_POLYMORPH,
+        _thermoengine_phase_formula,
+    )
+
+    database = model.Database(database='Berman')
+    catalogue_symbols = {
+        phase_id
+        for reaction in REACTION_CATALOGUE
+        for phase_id in reaction.engine_phase_by_role['thermoengine'].values()
+        if phase_id
+    }
+    # Lm is the lime fallback's Berman symbol; it is not a reaction term.
+    catalogue_symbols.add('Lm')
+    expected = {
+        'Crn': ('Al2O3', 'Corundum'),
+        'Spl': ('MgAl2O4', 'Spinel'),
+        'And': ('Al2SiO5', 'Andalusite'),
+        'Ky': ('Al2SiO5', 'Kyanite'),
+        'Sil': ('Al2SiO5', 'Sillimanite'),
+        'Lm': ('CaO', 'Lime'),
+    }
+    for symbol in sorted(catalogue_symbols):
+        phase = database.get_phase(symbol)
+        formula = _thermoengine_phase_formula(phase, symbol)
+        name = getattr(phase, 'phase_name', '')
+        if callable(name):
+            name = name()
+        if symbol in expected:
+            want_formula, want_name = expected[symbol]
+            assert formula == want_formula
+            assert want_name in str(name)
+        assert symbol in _TE_PURE_PHASE_POLYMORPH
+    for bad in ('Co', 'Sp', 'a'):
+        with pytest.raises(Exception):
+            database.get_phase(bad)
+
+
+@needs_magemin
+def test_catalogue_magemin_endmembers_resolve_in_the_verb1_table():
+    """Endmembers are read from a live Verb=1 table, not from the spec text."""
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _MAGEMIN_PURE_PHASES,
+        _parse_magemin_gbase_tables,
+    )
+
+    backend = MAGEMinBackend()
+    assert backend.initialize({'warm_worker': False})
+    spec = _MAGEMIN_PURE_PHASES['q']
+    stdout, _matlab, _notes = backend._run_pure_phase_probe(
+        bulk_wt_ig=dict(spec.bulk_wt_pct),
+        temperature_C=1000.0 - 273.15,
+        pressure_kbar=0.001,
+    )
+    pure_phases, solutions = _parse_magemin_gbase_tables(stdout)
+    assert 'spl' in solutions
+    assert 'nsp' in solutions['spl']
+    assert 'sp' not in solutions['spl']
+    assert 'spn' not in solutions
+    mapped_spinel = REACTION_SPINEL.engine_phase_by_role['magemin'].get('MgAl2O4')
+    assert mapped_spinel not in solutions['spl']
+    assert mapped_spinel not in pure_phases
+    for reaction in REACTION_CATALOGUE:
+        for phase_id in reaction.engine_phase_by_role['magemin'].values():
+            if not phase_id:
+                continue
+            phase = _MAGEMIN_PURE_PHASES[phase_id]
+            if phase.host_phase is None:
+                assert phase.endmember in pure_phases
+            else:
+                assert phase.endmember in solutions[phase.host_phase]
+    for endmember in ('cor', 'and', 'ky', 'sill'):
+        assert endmember in pure_phases

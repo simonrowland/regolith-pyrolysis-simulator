@@ -471,6 +471,49 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
         polymorph='tridymite',
         bulk_wt_pct={'SiO2': 100.0},
     ),
+    # ig pure phases cor/and/ky/sill. No spinel entry: host spl's endmembers
+    # are nsp, isp, nhc, ihc, nmt, imt, pcr, qndm. nsp is ordered normal
+    # spinel and is not JANAF Al-089. Corundum carries the same token SiO2
+    # as periclase so retrieve_bulk_PT honors --Bulk.
+    # Al2SiO5 bulk from ledger CIAAW weights (Al 26.9815385, Si 28.085,
+    # O 15.999): Al2O3 101.960077, SiO2 60.083, Al2SiO5 162.043077 g/mol;
+    # SiO2 37.0780 wt%, Al2O3 62.9220 wt%.
+    'cor': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='cor',
+        formula='Al2O3',
+        formula_basis='per 1 mol Al2O3',
+        formula_divisor=1.0,
+        polymorph='corundum',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'Al2O3': 100.0},
+    ),
+    'and': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='and',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='andalusite',
+        bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
+    ),
+    'ky': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='ky',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='kyanite',
+        bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
+    ),
+    'sill': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='sill',
+        formula='Al2SiO5',
+        formula_basis='per 1 mol Al2SiO5',
+        formula_divisor=1.0,
+        polymorph='sillimanite',
+        bulk_wt_pct={'SiO2': 37.0780, 'Al2O3': 62.9220},
+    ),
 }
 
 _MAGEMIN_PP_GBASE_RE = re.compile(
@@ -2218,7 +2261,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
         ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
-        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd``.
+        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd`` /
+        ``cor`` / ``and`` / ``ky`` / ``sill``. There is no plain spinel id.
         Cold subprocess: same binary and slot discipline as the production
         subprocess bridge; equilibrate() is untouched.
         """
