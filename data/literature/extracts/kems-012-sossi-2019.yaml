@@ -50,8 +50,18 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.000025', approximate: true}}
       locator: {page: 4, section: '2.1 Experimental Methods', note: 'Printed around 25 mg; unit conversion only'}
     printed_composition:
-      state: {tag: value, value: synthetic FCMAS ferrobasalt with 20 trace elements}
-      locator: {page: 1, section: Abstract}
+      state:
+        tag: value
+        value:
+          SiO2: 40.60
+          Al2O3: 10.67
+          MgO: 15.40
+          FeO: 16.26
+          CaO: 16.82
+      locator:
+        pdf_page_index: 53
+        table: '1'
+        note: 'Table 1 Measured major-element wt% (EPMA of glasses unaffected by Fe-loss or crystallisation; N=8); label synthetic FCMAS ferrobasalt with 20 trace elements; Calculated column and trace-element ppm rows not folded into the oxide map; no average of Calculated and Measured'
     form:
       state: {tag: value, value: powder slurry loaded onto a metal wire loop}
       locator: {page: 4, section: '2.1 Experimental Methods'}
