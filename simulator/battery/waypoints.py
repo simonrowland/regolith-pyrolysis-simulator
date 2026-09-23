@@ -506,10 +506,19 @@ def normalized_composition(
                 raise ValueError("empty charge")
             # n_i/sum(n_j) is dimensionless and invariant under n -> k*n, k>0.
             # A one-mole reference charge preserves ratios at specified T/P/fO2.
+            notice = None
+            if located.inference is not None:
+                locator = located.locator
+                locator_text = str(locator) if locator is not None else "source locator unavailable"
+                notice = (
+                    "calculated from printed recipe/aimed target; "
+                    f"relation={located.inference.relation}; "
+                    f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
+                )
             routes.append(Waypoint("normalized_composition",
                 {species: n / total for species, n in amounts.items()},
                 ("observation_" if key in point else "") + "normalized_" + field,
-                WaypointAuthority.DERIVED, (path,)))
+                WaypointAuthority.DERIVED, (path,), notice=notice))
             # Rank source evidence before normalization makes every output DERIVED.
             # Evidence directness: a printed x_i outranks a printed molar inventory,
             # which outranks a wt%-to-moles derivation (external molar-mass table).

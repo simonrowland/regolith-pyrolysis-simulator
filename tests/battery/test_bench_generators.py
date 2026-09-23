@@ -326,6 +326,23 @@ def test_engine_inputs_all_eight_and_provenance():
     assert result.provenance["bench_identity"]["basis"] == "inferred_from_embedded_evidence"
 
 
+def test_calculated_composition_notice_reaches_engine_payload_and_provenance():
+    experiment, bench, observation = case()
+    composition = Composition("printed_recipe", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation="calculated_from_printed_recipe", inputs=("An42Di58 recipe",), parameters=(), output_unit="mole_fraction"),
+    ))
+    inputs = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    result = engine_point_requests(inputs)[0]
+    assert result.payload["composition_method_class"] == "calculated"
+    assert "calculated from printed recipe" in result.payload["composition_notice"]
+    assert "An42Di58 recipe" in result.payload["composition_notice"]
+    route = result.provenance["output_routes"]["composition_mol"]
+    assert route["method_class"] == "calculated"
+    assert route["notice"] == result.payload["composition_notice"]
+
+
 @pytest.mark.parametrize("name", ["temperature_K", "total_pressure_Pa", "fO2_log"])
 def test_engine_bounds_are_preserved_and_refused_without_midpoint(name):
     experiment, bench, observation = case()

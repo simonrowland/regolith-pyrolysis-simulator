@@ -122,6 +122,13 @@ experiments:
         pdf_page_index: 5
         figure: '9'
         note: '2.71 at% P as printed for the Fig. 9 sample; Fe=1-0.0271 complement for the binary alloy; not renormalised. Accompanying 1.52 wt% P is retained on printed_composition only (not converted).'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Fe-P alloy, 1.52 wt% (2.71 at%) P"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
     pretreatment:
       state: {tag: value, value: 'Iron melted in high vacuum and deoxidized by Al; samples again deoxidized in the Knudsen cell'}
       locator: {published_page: 245, pdf_page_index: 2, section: '3. Samples'}

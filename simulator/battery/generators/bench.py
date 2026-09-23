@@ -128,9 +128,15 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             # Definitions: Celsius = kelvin - 273.15; 1 bar = 100000 Pa.
             # Units: K -> degC, Pa/(Pa/bar) -> bar. 1500 K -> 1226.85 C;
             # 1 Pa -> 1e-5 bar. These projections are DERIVED, never PRINTED.
+            composition_route = inputs.waypoints["normalized_composition"].selected
             payload = {"engine": engine, "temperature_C": _dec_payload(temperature - Decimal("273.15")),
                        "pressure_bar": _dec_payload(pressure / Decimal(100000)), "fO2_log": _dec_payload(oxygen),
                        "composition_mol": composition}
+            composition_output = {"waypoint": "normalized_composition", "authority": "derived"}
+            if composition_route is not None and composition_route.notice is not None:
+                payload["composition_method_class"] = "calculated"
+                payload["composition_notice"] = composition_route.notice
+                composition_output.update({"method_class": "calculated", "notice": composition_route.notice})
             oxygen_output = {
                 "waypoint": "oxygen_condition",
                 "authority": oxygen_route.authority.value,
@@ -141,8 +147,7 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
                 "pressure_bar": {"authority": "derived", "waypoint": "pressure_boundary", "formula": "Pa / 100000"},
                 "fO2_log": oxygen_output,
-                "composition_mol": {"waypoint": "normalized_composition", "authority": "derived",
-                                    "formula": "x_i * 1 mol reference charge"},
+                "composition_mol": {**composition_output, "formula": "x_i * 1 mol reference charge"},
             }}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
