@@ -57,22 +57,33 @@ benches:
       state: {tag: value, value: Thermocouples}
       locator: {page: 127, figure: '3.2'}
 experiments:
-- experiment_id: glass-transpiration-series
-  bench_id: glass-transpiration-rig
-  method: transpiration
-  locator: {page: 127, section: '3.2.1-3.2.2'}
+- &glass_common
+  experiment_id: float-glass-without-so3
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'float glass without so3 transpiration charge'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.025'}}
       locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
     printed_composition:
-      state: {tag: value, value: Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions}
-      locator: {page: 127, section: '3.2.1'}
+      state:
+        tag: value
+        value:
+          SiO2: '72.85'
+          Na2O: '13.98'
+          CaO: '7.46'
+          MgO: '4.52'
+          Al2O3: '0.86'
+          K2O: '0.22'
+          Fe2O3: '0.095'
+      locator:
+        page: 141
+        table: '4.2'
+        note: 'Float glass without SO3 column; XRF mass% as printed; label float glass without SO3; cells printed <0.01 omitted (SO3, Cl, Sb2O3, BaO)'
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
-      state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
       locator: {page: 127, section: '3.2.1'}
   conditions:
     temperature_K:
@@ -102,11 +113,227 @@ experiments:
     cooling_or_quench:
       state: {tag: value, value: Water dosing stopped and furnace cooled}
       locator: {page: 127, section: '3.2.2'}
+- <<: *glass_common
+  experiment_id: float-glass-with-so3
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'float glass with so3 transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '72.16'
+          Na2O: '14.18'
+          CaO: '7.88'
+          MgO: '4.32'
+          Al2O3: '0.85'
+          K2O: '0.20'
+          Fe2O3: '0.087'
+          SO3: '0.25'
+      locator:
+        page: 141
+        table: '4.2'
+        note: 'Float glass with SO3 column; XRF mass% as printed; label float glass with SO3; cells printed <0.01 omitted (Cl, Sb2O3, BaO)'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: tableware-glass-a
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'tableware glass a transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '70.1'
+          Na2O: '10.5'
+          CaO: '8.00'
+          Al2O3: '1.09'
+          K2O: '4.98'
+          SO3: '0.01'
+          Sb2O3: '0.22'
+          BaO: '5.07'
+      locator:
+        page: 141
+        table: '4.2'
+        note: 'Tableware glass A column; XRF mass% as printed; measured (not parenthetical) values; cells printed <0.01 omitted (MgO, Fe2O3, Cl); Sb2O3 uses measured 0.22 not batch (0.30)'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: tableware-glass-b
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'tableware glass b transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '67.2'
+          Na2O: '10.0'
+          CaO: '8.00'
+          MgO: '0'
+          Al2O3: '0.97'
+          K2O: '5.03'
+          Fe2O3: '0'
+          SO3: '0'
+          Cl: '0.42'
+          Sb2O3: '0'
+          BaO: '8.41'
+      locator:
+        page: 141
+        table: '4.2'
+        note: 'Tableware glass B column; ONLY parenthetical theoretical batch mass% are printed (footnote 1); no measured XRF column body; landed as printed theoretical values; zeros printed as 0 retained'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: tableware-glass-c
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'tableware glass c transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '70.4'
+          Na2O: '10.4'
+          CaO: '8.25'
+          Al2O3: '1.06'
+          K2O: '4.67'
+          SO3: '0.13'
+          Cl: '0.03'
+          Sb2O3: '0.06'
+          BaO: '4.98'
+      locator:
+        page: 141
+        table: '4.2'
+        note: 'Tableware glass C column; XRF mass% as printed; measured values (parenthetical batch ignored); cells printed <0.01 omitted (MgO, Fe2O3); SO3 uses measured 0.13 not (0.40); Cl uses 0.03 not (0.44); Sb2O3 uses 0.06 not (0.10)'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: borosilicate-glass-1
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'borosilicate glass 1 transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          B2O3: '2.6'
+          Na2O: '0.10'
+          Al2O3: '14.1'
+          SiO2: '59.7'
+          CaO: '23.5'
+      locator:
+        page: 142
+        table: '4.3'
+        note: 'Glass 1 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 1'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: borosilicate-glass-2
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'borosilicate glass 2 transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          B2O3: '5.0'
+          Na2O: '0.10'
+          Al2O3: '13.7'
+          SiO2: '58.8'
+          CaO: '22.4'
+      locator:
+        page: 142
+        table: '4.3'
+        note: 'Glass 2 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 2'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: borosilicate-glass-3
+  locator: {page: 127, section: '3.2.1-3.2.2', note: 'borosilicate glass 3 transpiration charge'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          B2O3: '7.6'
+          Na2O: '0.15'
+          Al2O3: '13.8'
+          SiO2: '54.1'
+          CaO: '24.3'
+      locator:
+        page: 142
+        table: '4.3'
+        note: 'Glass 3 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 3'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+- <<: *glass_common
+  experiment_id: sodium-disilicate-transpiration
+  locator: {page: 153, section: '4.3.1', note: Sodium-disilicate melt transpiration series; no separate binary wt% table printed}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: sodium-disilicate}
+      locator:
+        page: 153
+        section: '4.3.1'
+        note: 'Named sodium-disilicate melt; scout/Table search found no separate binary wt% starting assay; stoichiometric oxide wt% not invented'
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
 species:
   Na:
     observations:
     - observation_id: van_limpt_2007_setup_c_and_sodium_conditions
-      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -138,7 +365,6 @@ species:
         furnace_temperature_C: [1300, 1500]
         measurement_status_note: "All values above are apparatus or operating conditions stated in the experimental procedure, not model output."
     - observation_id: van_limpt_2007_table42_float_and_tableware_compositions
-      experiment: glass-transpiration-series
       type: gibbs_table
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -164,7 +390,6 @@ species:
         - glass_family: tableware_glass_C
           composition_wt_pct: {SiO2: 70.4, Na2O: 10.4, CaO: 8.25, MgO: '<0.01', Al2O3: 1.06, K2O: 4.67, Fe2O3: '<0.01', SO3: 0.13, Cl: 0.03, Sb2O3: 0.06, BaO: 4.98}
     - observation_id: van_limpt_2007_fig45_naoh_saturation_measured
-      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -182,7 +407,7 @@ species:
         soda_lime_silica_1463C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 0.0}, {p_H2O_sqrt_bar_sqrt: 0.43, p_NaOH_Pa_approx: 20.0}, {p_H2O_sqrt_bar_sqrt: 0.58, p_NaOH_Pa_approx: 24.0}, {p_H2O_sqrt_bar_sqrt: 0.68, p_NaOH_Pa_approx: 26.0}]
         glass_composition_mol_pct: {SiO2: 74, Na2O: 16, CaO: 10}
     - observation_id: van_limpt_2007_table44_sodium_mass_balance
-      experiment: glass-transpiration-series
+      experiment: sodium-disilicate-transpiration
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -203,7 +428,7 @@ species:
         - {temperature_C: 1356, extractive_weight_loss_mg: 85, gravimetric_weight_loss_mg: 71, ratio_extractive_to_gravimetric: 1.21}
         fitted_relation: 'm_gravimetric = (1.02 ± 0.04) × m_extractive'
     - observation_id: van_limpt_2007_sodium_transpiration_operating_window
-      experiment: glass-transpiration-series
+      experiment: sodium-disilicate-transpiration
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -226,7 +451,7 @@ species:
         total_Na_evaporation_rate_mol_m2_s: {at_1400C_approx: 7.0e-05, at_1450_1460C_approx: 1.2e-04}
         dominant_species_statement: NaOH_in_humid_atmosphere; Na_in_dry_oxygen_lean_atmosphere
     - observation_id: van_limpt_2007_fig46_elemental_sodium_measured
-      experiment: glass-transpiration-series
+      experiment: sodium-disilicate-transpiration
       type: psat_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -249,7 +474,6 @@ species:
   K:
     observations:
     - observation_id: van_limpt_2007_table42_potassium_bearing_glasses
-      experiment: glass-transpiration-series
       type: gibbs_table
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.2'}
       phase: alkali_lime_silicate_melt
@@ -262,7 +486,6 @@ species:
         source_rows: [tableware_glass_A, tableware_glass_C]
         main_measured_species_under_oxidized_humid_conditions: KOH
     - observation_id: van_limpt_2007_fig15_potassium_activity_measured
-      experiment: glass-transpiration-series
       type: activity_coefficient
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 172, figure: '4.15', note: 'figure reading; measured markers kept separate from ASM model'}
       phase: alkali_lime_silicate_melt
@@ -276,7 +499,6 @@ species:
   B:
     observations:
     - observation_id: van_limpt_2007_table43_borosilicate_compositions
-      experiment: glass-transpiration-series
       type: gibbs_table
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.3'}
       phase: alkali_lean_borosilicate_melt
@@ -291,7 +513,6 @@ species:
         - {glass: '2', composition_wt_pct: {B2O3: 5.0, Na2O: 0.10, Al2O3: 13.7, SiO2: 58.8, CaO: 22.4}}
         - {glass: '3', composition_wt_pct: {B2O3: 7.6, Na2O: 0.15, Al2O3: 13.8, SiO2: 54.1, CaO: 24.3}}
     - observation_id: van_limpt_2007_fig48_boron_evaporation_measured
-      experiment: glass-transpiration-series
       type: rate_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 161, figure: '4.8', note: 'page image checked; diamond markers measured, line excluded; approximate plot readings'}
       phase: alkali_free_borosilicate_melt
@@ -305,7 +526,6 @@ species:
         rows: [{p_H2O_bar: 0.0, boron_rate_mol_s: 3.7e-08}]
         refused_figure_points: "The remaining Fig. 4.8 points were not admitted: the OCR chart table does not preserve the plotted marker count/coordinates reliably, and the thesis prints no numeric point values."
     - observation_id: van_limpt_2007_boron_operating_conditions_and_uncertainties
-      experiment: glass-transpiration-series
       type: rate_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 183, section: '4.6', table: 'maximum errors table'}
       phase: silicate_melt
