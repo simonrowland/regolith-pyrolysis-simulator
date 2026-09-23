@@ -178,7 +178,7 @@ function makeHeader(artifact, rows, energy) {
       <div class="doc-label">Run report<br><span class="mono">${esc(header.run_id)}</span></div>
     </div>
     <h1>${esc(header.name)}</h1>
-    <p class="lede"><b>${hasNumber(peakTemperature) ? `${peakTemperature.toLocaleString()} °C` : "not emitted"} peak</b> · ${esc(header.feedstock_id)} · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
+    <p class="lede"><b>${hasNumber(peakTemperature) ? `${peakTemperature.toLocaleString()} °C viewer-derived peak` : "peak temperature not emitted"}</b> · ${esc(header.feedstock_id)} · <b>${rows.length} viewer-derived timestep rows</b> · ${esc(campaignChain)}</p>
     <div class="meta-chips">
       <span class="chip">charge ${kg(header.charge_mass_kg, 0)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
@@ -190,7 +190,7 @@ function makeHeader(artifact, rows, energy) {
       <p>Lifecycle: ${esc(artifact.lifecycle)}. ${esc(failureText)}</p></div>
     </div>
     <div class="glance">
-      <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe, 2)}</div></div>
+      <div class="metric"><div class="k">Fe product-ledger projection</div><div class="v">${kg(finalMetal.Fe, 2)}</div></div>
       <div class="metric"><div class="k">${esc(o2Label)}</div><div class="v">${exactKg(o2)}</div></div>
       <div class="metric"><div class="k">Reported energy</div><div class="v">${hasNumber(reportedEnergy) ? `${Number(reportedEnergy).toFixed(1)} <small>kWh electrical + evaporation thermal</small>` : "not emitted"}</div></div>
       <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}</div></div>
@@ -201,7 +201,7 @@ function makeHeader(artifact, rows, energy) {
 function yieldDispositionBanner(terminal) {
   const absent = pending(
     "W-A0 / W-A1",
-    "Atom-basis available mass, fraction, and denominator are not emitted. Exact evolved kg is shown; no yield percentage is invented."
+    "Atom-basis available mass, fraction, and denominator are not emitted. Exact product-ledger kg is shown; no yield percentage is invented."
   );
   if (!isRecord(terminal) || !Object.prototype.hasOwnProperty.call(terminal, "yield_disposition")) {
     return absent;
@@ -210,7 +210,7 @@ function yieldDispositionBanner(terminal) {
   if (payload === null) {
     return pending(
       "W-A0 / W-A1",
-      "yield_disposition is a typed producer refusal (OD-3 envelope-null). Feedstock-origin shares are unavailable; exact evolved kg is shown; no 0% shares are invented."
+      "yield_disposition is a typed producer refusal (OD-3 envelope-null). Feedstock-origin shares are unavailable; exact product-ledger kg is shown; no 0% shares are invented."
     );
   }
   const chartReady = isRecord(payload)
@@ -220,18 +220,18 @@ function yieldDispositionBanner(terminal) {
   if (!chartReady) {
     return pending(
       "W-A0 / W-A1",
-      "yield_disposition is present but is not a chart-ready origin-to-bin payload. Exact evolved kg is shown; no yield percentage is invented."
+      "yield_disposition is present but is not a chart-ready origin-to-bin payload. Exact product-ledger kg is shown; no yield percentage is invented."
     );
   }
-  return `<div class="note">Feedstock-origin atom fractions render in section 14 as origin-to-bin provenance. Exact evolved kg is shown here; no yield percentage is invented in this section.</div>`;
+  return `<div class="note">Feedstock-origin atom fractions render in section 14 as origin-to-bin provenance. Exact product-ledger kg is shown here; no yield percentage is invented in this section.</div>`;
 }
 
 function yieldsSection(rows, terminal) {
   const evolved = rows.at(-1).metal_yields_kg || {};
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
-  const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${element}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
+  const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${element}</div><div class="kg">${exactKg(evolved[element])} projected</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
   const gap = yieldDispositionBanner(terminal);
-  return section(1, "Extraction yields — Ellingham order", "Exact evolved mass from the final hourly metal_yields_kg row.", `<div class="yield-track">${chips}</div>${gap}`);
+  return section(1, "Product-ledger metal projection — Ellingham order", "Mixed-account product-ledger projection from the final hourly metal_yields_kg row; not recovery-only.", `<div class="yield-track">${chips}</div>${gap}`);
 }
 
 function processSection(artifact, rows, spans) {
@@ -295,7 +295,7 @@ function ledgerSection(finalState) {
     const entries = Object.entries(species || {});
     return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
   }).join("");
-  return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>`);
+  return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step. Account totals were not emitted; none are summed in the viewer.</div>`);
 }
 
 function campaignSection(artifact, spans) {
@@ -309,9 +309,9 @@ function campaignSection(artifact, spans) {
     const temperatures = summaries.map((row) => row.T_C);
     const lowTemperature = temperatures.every(hasNumber) ? minPresent(temperatures) : null;
     const highTemperature = temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
-    return `<div class="card"><div class="ct">${esc(span.name)} · h ${esc(steps[0].hour)}–${esc(steps.at(-1).hour)}</div><div class="cbig">${steps.length} <small>hours</small></div>` +
-      `<div class="kv"><span>Temperature range</span><b>${hasNumber(lowTemperature) && hasNumber(highTemperature) ? `${lowTemperature}–${highTemperature} °C` : "not emitted"}</b></div>` +
-      `<div class="kv"><span>Electrical + evaporation thermal</span><b>${hasNumber(energy) ? `${energy.toFixed(3)} kWh` : "not emitted"}</b></div>` +
+    return `<div class="card"><div class="ct">${esc(span.name)} · h ${esc(steps[0].hour)}–${esc(steps.at(-1).hour)}</div><div class="cbig">${steps.length} <small>viewer-derived timestep rows</small></div>` +
+      `<div class="kv"><span>Viewer-derived temperature range</span><b>${hasNumber(lowTemperature) && hasNumber(highTemperature) ? `${lowTemperature}–${highTemperature} °C` : "not emitted"}</b></div>` +
+      `<div class="kv"><span>Viewer-derived electrical + evaporation thermal</span><b>${hasNumber(energy) ? `${energy.toFixed(3)} kWh` : "not emitted"}</b></div>` +
       `<div class="kv"><span>End pO₂</span><b>${hasNumber(final.pO2_bar) ? `${Number(final.pO2_bar).toExponential(3)} bar` : "not emitted"}</b></div>` +
       `<div class="kv"><span>End regime</span><b>${esc(final.regime)}</b></div></div>`;
   }).join("");
@@ -353,11 +353,11 @@ function wallAndOxygenSection(artifact, rows) {
       else wallComplete = false;
     }));
   }
-  const wallTotal = wallComplete ? sumObject(wallSpecies) : null;
+  const wallTotal = wallComplete && Object.keys(wallSpecies).length ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const o2 = sourceSideO2(last);
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${hasNumber(wallTotal) ? `${exactKg(wallTotal)} <small>viewer-side sum (no emitted total)</small>` : "not emitted"}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
   const pumpingEnergy = pumping && hasNumber(pumping.pumping_electrical_kWh)
     ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh`
     : (unavailableText(pumping?.pumping_electrical_kWh) || "not emitted");
@@ -612,7 +612,9 @@ function costSection(artifact, energy) {
   const electricalTotalText = hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : (energy.electricalUnavailable || "not emitted");
   const totalFormula = energy.canonicalCostTotals
     ? `<div class="note"><b>Total ${totalLabel}</b> binds terminal.cost_totals: ${esc(electricalTotalText)} kWh total electrical plus ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
-    : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`;
+    : hasNumber(energy.totalCost)
+      ? `<div class="note"><b>Total ${money(energy.totalCost)} · viewer-computed estimate (no emitted cost total)</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
+      : pending("cost estimate", "One or more required energy or price values were not emitted, so the viewer did not compute a total.");
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
     provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${electricalHeadline}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${hasNumber(energy.electricalCost) ? money(energy.electricalCost) : esc(energy.electricalUnavailable || "not emitted")}</b></div></div>` +
     `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${hasNumber(energy.thermal) ? `${energy.thermal.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Latent breakdown</span><b>${hasNumber(energy.latent) ? `${energy.latent.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${hasNumber(energy.dissociation) ? `${energy.dissociation.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +

@@ -698,6 +698,45 @@ def test_report_viewer_uses_legacy_source_side_o2_alias_with_metric_label() -> N
     assert fallback_cases == [1.5, 2.5, None]
 
 
+def test_report_viewer_labels_viewer_derived_projections() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [
+        {"hour": 1, "summary": {"campaign": "C0", "T_C": 100.0, "energy_electrical_kWh": 1.0, "energy_evaporation_thermal_kWh": 2.0}, "ledger": {}},
+        {"hour": 2, "summary": {"campaign": "C0", "T_C": 200.0, "energy_electrical_kWh": 3.0, "energy_evaporation_thermal_kWh": 4.0}, "ledger": {}},
+    ]
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "viewer-derived peak" in html
+    assert "viewer-derived timestep rows" in html
+    assert "Viewer-derived temperature range" in html
+    assert "Viewer-derived electrical + evaporation thermal" in html
+    assert "Fe evolved" not in html
+
+
+def test_wall_deposit_empty_segment_stays_pending() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0", "wall_deposit_cumulative_kg": {"stage_0_to_1": {}}}, "ledger": {}}]
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "none emitted" in html
+    assert "viewer-side sum (no emitted total)" not in html
+    assert ">0 kg</span>" not in html
+
+
+def test_incomplete_cost_inputs_stay_pending_without_estimate_label() -> None:
+    artifact = _artifact(recipe_snapshot=None)
+    artifact["header"]["cost_block"] = {"electrical_cost_per_kWh": 10.0}
+    artifact["timesteps"] = [{"hour": 1, "summary": {"campaign": "C0", "energy_electrical_kWh": 1.0, "energy_evaporation_thermal_kWh": 2.0}, "ledger": {}}]
+
+    html = _render_report_state_with_panels(artifact)["html"]
+
+    assert "Pending cost estimate" in html
+    assert "viewer-computed estimate" not in html
+    assert "Total not emitted" not in html
+
+
 _PORTED_PANELS: list[str] = ["p1-fe-redox", "p2-taps", "p3-wall-coating", "p4-stage-purity", "p5-alkali-shuttle", "p6-mre", "p7-energy", "p8-cost-rollup", "p9-provenance", "p10-vapor-source", "p11-deliverables", "p12-carrier-pressure", "p13-status-strip", "p14-sankey", "p15-equipment-diagram"]
 
 
