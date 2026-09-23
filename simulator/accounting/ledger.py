@@ -1270,8 +1270,19 @@ class AtomLedger:
             for name, species in sorted(self._balances.items())
         }
 
-    def project_account_kg(self, account: str) -> dict[str, float]:
-        """Project one account for reports, products, and terminal summaries."""
+    def project_account_kg(
+        self,
+        account: str,
+        *,
+        dust_clamped_kg: dict[str, float] | None = None,
+    ) -> dict[str, float]:
+        """Project one account for reports, products, and terminal summaries.
+
+        Negative dust within projection tolerance is omitted from the outward
+        map (display clamp). When ``dust_clamped_kg`` is provided, forgiven
+        dust is recorded there so auditors can see it (Ferry V / V1-S13 P3).
+        Canonical signed mol/kg balances remain untouched.
+        """
         name = str(account)
         species_kg = self.kg_by_account(name)
         if self.account_policy(name).allow_negative:
@@ -1290,6 +1301,8 @@ class AtomLedger:
             if value < 0.0:
                 # Display-only clamp. Canonical signed mol/kg remains untouched,
                 # preserving exact ledger closure for audit and validation.
+                if dust_clamped_kg is not None:
+                    dust_clamped_kg[str(species)] = float(value)
                 continue
             if value != 0.0:
                 projected[species] = value
