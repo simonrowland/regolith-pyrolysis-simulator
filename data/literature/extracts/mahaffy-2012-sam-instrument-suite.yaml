@@ -1,0 +1,374 @@
+schema_version: literature_extract.v1
+source_id: mahaffy-2012-sam-instrument-suite
+source:
+  citation: Mahaffy, P. R., Webster, C. R., Cabane, M., Conrad, P. G., Coll, P., Atreya, S. K., et al.
+    (2012), "The Sample Analysis at Mars Investigation and Instrument Suite", Space Science Reviews, 170,
+    401–478, DOI 10.1007/s11214-012-9879-z
+  doi: 10.1007/s11214-012-9879-z
+  url: https://doi.org/10.1007/s11214-012-9879-z
+  year: 2012
+extraction:
+  method: 'Corpus PDF from ferry inbox from-main-B4-20260923T031628Z/new-pdfs/mahaffy-2012-sam-instrument-suite.pdf
+    (sha256 c96a13886d05a0f2028c4867a94d4e74b3c204a20a6365aeb77a54a3ff0ddc09 matches sidecar). Clean text
+    via pdftotext -layout. STEP 0: no prior extract for DOI 10.1007/s11214-012-9879-z or Mahaffy 2012
+    SAM suite under another stem; PDF p1 title/authors/DOI match sidecar. BACKLOG N12 rule: instrument/bench
+    data ONLY — oven geometry, QMS mass range, He carrier / ramp protocol, GC column inventory (Table
+    9), TLS Herriott cell geometry, and calibration-gas cell fill (Table 11) landed; Mars science-motivation
+    tables without laboratory numbers are typed absence. Kelvin companions carry DERIVED stamps (T_K =
+    T_C + 273.15). Modelled on tenkate-2010-vapor-instrument (instrument/breadboard pattern).'
+  date: '2026-09-22'
+  worker: n12-mars-sam
+  provenance_path: data/literature/extracts/mahaffy-2012-sam-instrument-suite.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: flight-instrument description / pre-flight calibration suite paper (SAM on MSL)
+  measured_direct_observations: 1
+  method_observations: 5
+  figure_only_observations: 0
+  absent_from_source:
+  - Mars surface science measurements (pre-landing instrument paper)
+  - digitised schematic dimensions beyond printed prose numbers
+  - per-column chromatographic retention tables (not printed as numeric grids here)
+  note: 'STEP 0 PASS. N12 instruction: instrument/bench data only. The single scored observation is Table
+    11 calibration-gas cell mole fractions; oven/QMS/GC/TLS and SS-EGA protocol are context (apparatus
+    / laboratory_conditions).'
+benches:
+- id: sam-fm-instrument-suite
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Sample Analysis at Mars (SAM) flight-model instrument suite — QMS + GC (six columns) + TLS,
+        with solid-sample pyrolysis ovens, gas processing system, and wide-range pumps (~40 kg suite)
+    locator:
+      pdf_page_index: 1
+      published_page: 401
+      section: Abstract / Introduction
+  heating_method:
+    state:
+      tag: value
+      value: Dual solid-sample pyrolysis ovens; quartz or metal cups; Pt–Zr 0.51 mm heater wire on Inconel
+        693 tube; one oven with auxiliary heater to 1100 °C
+    locator:
+      pdf_page_index: 31
+      published_page: 431
+      section: solid-sample ovens
+  detector:
+    state:
+      tag: value
+      value: Quadrupole mass spectrometer (unit mass resolution over printed 2–535 Da / 1.5–535.5 Da operating
+        window); six GC columns with TCD on five columns; tunable laser spectrometer (NIR + IC lasers)
+        with multipass Herriott cell
+    locator:
+      pdf_page_index: 1
+      published_page: 401
+      section: Abstract / Introduction
+  vacuum_system:
+    state:
+      tag: value
+      value: Two wide-range pumps (WRP1 to QMS; WRP2 to manifolds / TLS / scrubbers)
+    locator:
+      pdf_page_index: 21
+      published_page: 421
+      section: Table 5 / gas & solid processing
+experiments:
+- experiment_id: sam-ss-ega-nominal-protocol
+  bench_id: sam-fm-instrument-suite
+  method: solid_sample_evolved_gas_analysis_he_carrier
+  locator:
+    pdf_page_index: 23
+    published_page: 423
+    section: SS-EGA sequence description
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Nominal solid-sample EGA protocol (quartz cup; no specific Mars sample in this paper)
+      locator:
+        pdf_page_index: 23
+        published_page: 423
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: range
+          low: '298.15'
+          high: '1373.15'
+      locator:
+        pdf_page_index: 23
+        published_page: 423
+        note: DERIVED from printed ambient start to 950–1100 °C final; nominal ramp 35 °C/min
+- experiment_id: sam-calibration-gas-cell
+  bench_id: sam-fm-instrument-suite
+  method: onboard_calibration_gas_cell_mix
+  locator:
+    pdf_page_index: 52
+    published_page: 452
+    section: 6.13 Gas Calibration Cell
+    table: '11'
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: SAM calibration gas cell fill (4.76 ml cell; Table 11 mole fractions at 100 °C)
+      locator:
+        pdf_page_index: 52
+        published_page: 452
+        table: '11'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '373.15'
+      locator:
+        pdf_page_index: 52
+        published_page: 452
+        table: '11'
+        note: DERIVED from printed 100 °C MR column header
+fidelity_samples:
+- species: SAM_instrument_suite
+  observable: composition_series
+  observation_id: mahaffy_2012_cal_gas_table11
+  field: mole_fraction_pct_at_100C_as_printed
+  value:
+    CO2: 24.32
+    N2: 24.1
+    Ar: 24.04
+    XeT: 8.48
+    129Xe: 15.51
+    PFTBA: 3.0
+    1FN: 0.54
+    DFBP: 0.016
+    PFBP: 0.0078
+  locator:
+    pdf_page_index: 52
+    published_page: 452
+    table: '11'
+species:
+  SAM_instrument_suite:
+    observations:
+    - observation_id: mahaffy_2012_cal_gas_table11
+      experiment: sam-calibration-gas-cell
+      type: composition_series
+      locator:
+        pdf_page_index: 52
+        published_page: 452
+        table: '11'
+        note: Mole fractions at 100 °C as printed in Table 11
+      T_range_K:
+      - 373.15
+      - 373.15
+      phase: SAM_onboard_calibration_gas_mix
+      standard_state: calibration cell fill composition as published
+      regime: preflight_instrument_calibration_hardware
+      units: mole percent at 100 °C as published
+      values:
+        quantity: calibration_gas_cell_mole_fractions
+        method_class: measured_direct
+        evidence_class: authors_own_instrument_fill_specification
+        cell_volume_ml_as_printed: 4.76
+        installation_pressure_bar_as_printed: 1.3
+        installation_temperature_C_as_printed: 125
+        installation_temperature_K_derived:
+          value: 398.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 125
+        table_temperature_C_as_printed: 100
+        table_temperature_K_derived:
+          value: 373.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 100
+        mole_fraction_pct_at_100C_as_printed:
+          CO2: 24.32
+          N2: 24.1
+          Ar: 24.04
+          XeT: 8.48
+          129Xe: 15.51
+          PFTBA: 3.0
+          1FN: 0.54
+          DFBP: 0.016
+          PFBP: 0.0078
+        component_names_as_printed:
+          CO2: Carbon dioxide
+          N2: Nitrogen
+          Ar: Argon
+          XeT: Xenon (near terrestrial isotopic composition)
+          129Xe: 129-Xenon
+          PFTBA: Perfluorotributylamine
+          1FN: 1-Fluoronaphthalene
+          DFBP: 2,2'-Difluoro-1,1'-biphenyl
+          PFBP: Perfluorobiphenyl
+        enrichment_note_as_printed: Three-fold enrichment of 129Xe relative to terrestrial Xe so that
+          the cell Xe isotope mix differs strongly from the low 129Xe/132Xe Mars-atmosphere model
+    context:
+    - observation_id: mahaffy_2012_ss_ega_protocol
+      type: laboratory_conditions
+      experiment: sam-ss-ega-nominal-protocol
+      locator:
+        pdf_page_index: 23
+        published_page: 423
+        section: SS-EGA sequence
+      phase: SAM_solid_sample_EGA_nominal
+      regime: flight_sam_ega_design_protocol
+      units: as published
+      values:
+        quantity: solid_sample_EGA_thermal_and_carrier_protocol
+        method_class: method_only
+        helium_flow_atm_cc_per_sec_as_printed: 0.03
+        final_temperature_C_as_printed:
+          low: 950
+          high: 1100
+        final_temperature_K_derived:
+          low:
+            value: 1223.15
+            stamp: DERIVED
+            formula: T_K = T_C + 273.15
+            from_printed_C: 950
+          high:
+            value: 1373.15
+            stamp: DERIVED
+            formula: T_K = T_C + 273.15
+            from_printed_C: 1100
+        ramp_rate_C_per_min_as_printed: 35
+        ramp_rate_note_as_printed: Nearly linear over low and mid temperature range; above ~800 °C oven
+          power supply applies maximum power and T–t curve becomes non-linear
+        auxiliary_heater_oven_max_C_as_printed: 1100
+        other_oven_nominal_max_C_as_printed: 950
+        cup_precondition_C_as_printed: '>900'
+    - observation_id: mahaffy_2012_oven_geometry
+      type: apparatus
+      experiment: sam-ss-ega-nominal-protocol
+      locator:
+        pdf_page_index: 31
+        published_page: 431
+        section: solid-sample ovens
+      phase: SAM_pyrolysis_oven
+      regime: instrument_hardware
+      units: as published
+      values:
+        quantity: pyrolysis_oven_and_cup_geometry
+        method_class: method_only
+        heater_wire_diameter_mm_as_printed: 0.51
+        heater_wire_alloy_as_printed: platinum-zirconium
+        oven_tube_as_printed: Inconel 693
+        quartz_cup_height_cm_as_printed: 1
+        quartz_cup_ID_cm_as_printed: 0.7
+        manifold_bake_typical_C_as_printed: 135
+        manifold_bake_typical_K_derived:
+          value: 408.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 135
+        transfer_line_operating_C_as_printed:
+          low: 135
+          high: 200
+    - observation_id: mahaffy_2012_qms_mass_window
+      type: apparatus
+      experiment: sam-ss-ega-nominal-protocol
+      locator:
+        pdf_page_index: 35
+        published_page: 435
+        section: QMS
+      phase: SAM_QMS
+      regime: instrument_hardware
+      units: Da as published
+      values:
+        quantity: QMS_mass_range_and_resolution
+        method_class: method_only
+        mass_range_Da_as_printed:
+          low: 1.5
+          high: 535.5
+        mass_resolution_Da_as_printed: 0.1
+        unit_mass_resolution_window_Da_as_printed:
+          low: 2
+          high: 535
+        dynamic_range_as_printed: ~1e9
+        sensitivity_as_printed: '>1e-2 (cnts/sec)/(part/cc)'
+    - observation_id: mahaffy_2012_gc_columns_table9
+      type: apparatus
+      experiment: sam-ss-ega-nominal-protocol
+      locator:
+        pdf_page_index: 37
+        published_page: 437
+        table: '9'
+      phase: SAM_GC
+      regime: instrument_hardware
+      units: as published
+      values:
+        quantity: gas_chromatograph_column_inventory
+        method_class: method_only
+        column_length_m_as_printed: 30
+        column_ID_mm_as_printed: 0.25
+        columns_as_printed:
+        - id: GC1-MXT20_WCOT
+          stationary_phase: Polydimethylsiloxane with 20% phenyl
+          targets: Medium molecular weight organics (C5–C15)
+        - id: GC2-MTX5_WCOT
+          stationary_phase: Polydimethylsiloxane with 5% phenyl
+          targets: High molecular weight VOCs including >C15 chemical derivatives
+        - id: GC3-Carbobond_PLOT
+          stationary_phase: Carbon molecular sieve
+          targets: Permanent gases and C1–C2 HCs
+        - id: GC4-Chirasil-beta_Dex_CB
+          stationary_phase: beta cyclodextrin
+          targets: Enantiomers of VOCs
+        - id: GC5-MXT_CLP_WCOT
+          stationary_phase: Polydimethylsiloxane with phenyl and cyanopropyl
+          targets: Medium molecular weight organics (C5–C15)
+        - id: GC6-MXT_Q_PLOT
+          stationary_phase: Divinylbenzene or substituted divinylbenzene
+          targets: C1–C4 VOCs NH3 S-containing compounds
+        columns_with_adsorption_trap_as_printed:
+        - GC4
+        - GC5
+        - GC6
+        TCD_on_five_columns_as_printed: true
+    - observation_id: mahaffy_2012_tls_herriott_cell
+      type: apparatus
+      experiment: sam-ss-ega-nominal-protocol
+      locator:
+        pdf_page_index: 39
+        published_page: 439
+        section: TLS
+      phase: SAM_TLS
+      regime: instrument_hardware
+      units: as published
+      values:
+        quantity: TLS_Herriott_cell_geometry
+        method_class: method_only
+        mirror_separation_cm_as_printed: 20
+        cell_volume_cm3_as_printed: 405
+        passes_for_CO2_H2O_as_printed: 81
+        path_length_m_as_printed: 8.93
+        lasers_as_printed:
+        - band: NIR
+          wavelength_um_as_printed: 2.78
+          targets: CO2 and H2O isotopes
+        - band: IC
+          wavelength_um_as_printed: 3.27
+          targets: CH4
+    - observation_id: mahaffy_2012_cal_gas_cell_purpose
+      type: laboratory_conditions
+      experiment: sam-calibration-gas-cell
+      locator:
+        pdf_page_index: 52
+        published_page: 452
+        section: '6.13'
+      phase: SAM_calibration_hardware
+      regime: instrument_calibration
+      units: as published
+      values:
+        quantity: calibration_cell_intended_use
+        method_class: method_only
+        purpose_as_printed: Monitor performance shifts; tune QMS; provide characterized reference gas
+          for isotopic analyses by QMS and TLS
+        transfer_temperature_C_as_printed: 100 or higher
+        supported_calibrations_as_printed: at least 100 in situ calibration experiments
+        GCMS_LOD_confirmation_nmol_as_printed: well below 0.1
