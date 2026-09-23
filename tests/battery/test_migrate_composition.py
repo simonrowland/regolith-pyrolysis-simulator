@@ -293,11 +293,18 @@ def test_markova_vi_lherzolite_carries_printed_five_oxide_composition() -> None:
     expected_ratio = (printed["SiO2"] / m_sio2) / (printed["MgO"] / m_mgo)
     got_ratio = mole["SiO2"] / mole["MgO"]
     assert abs(got_ratio - expected_ratio) < as_decimal("1e-12")
-    later = next(
-        (obs for obs in rows if str(obs.get("observation_id") or "").endswith("::point:10")),
-        None,
+    later = max(
+        rows,
+        key=lambda obs: Decimal(
+            re.search(
+                r"::T=([0-9.]+):",
+                str(obs.get("observation_id") or ""),
+            ).group(1)
+        )
+        if re.search(r"::T=([0-9.]+):", str(obs.get("observation_id") or ""))
+        else Decimal("-1"),
     )
-    assert later is not None
+    assert later is not t0
     later_printed = _printed_wt_map(later)
     assert later_printed
     assert later_printed != printed, "ramp residual composition was collapsed into one map"
