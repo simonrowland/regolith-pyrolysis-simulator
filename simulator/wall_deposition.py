@@ -72,7 +72,9 @@ def wall_deposit_candidates_by_segment_kg(
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> dict[str, float]:
     from simulator.condensation import (
-        WallSaturationPressureRefusal, _deposition_finite_scalar,
+        KnudsenRegimeRefusal,
+        WallSaturationPressureRefusal,
+        _deposition_finite_scalar,
     )
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
@@ -106,6 +108,23 @@ def wall_deposit_candidates_by_segment_kg(
                 segment=segment,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
+        except KnudsenRegimeRefusal as exc:
+            record = {
+                "status": "refused",
+                "reason": str(exc),
+                "refusal_type": type(exc).__name__,
+                "output_status": "status_bearing",
+                "authority_level": "unavailable",
+                "diagnostic": getattr(exc, "diagnostic", None),
+            }
+            _record_wall_pressure_notice(
+                model,
+                "wall_knudsen_regime_refusals_by_species",
+                species,
+                segment.name,
+                record,
+            )
+            continue
         except WallSaturationPressureRefusal as exc:
             record = {
                 "status": "refused", "reason": str(exc), "refusal_type": type(exc).__name__,
@@ -555,7 +574,19 @@ def _wall_deposition_flux_budget_kg_hr(
 
 
 def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
-    from simulator.condensation import _knudsen_number, _knudsen_regime_factor
+    """Knudsen regime factor for one wall segment.
+
+    Fail closed: unusable Knudsen inputs refuse the segment candidate.
+    A default of 1.0 would invent continuum deposition under viscous
+    overhead and is not a measured regime factor.
+    """
+
+    from simulator.condensation import (
+        KnudsenRegimeRefusal,
+        _knudsen_input_refusal,
+        _knudsen_number,
+        _knudsen_regime_factor,
+    )
 
     try:
         pressure_pa = float(model.overhead_pressure_mbar) * 100.0
@@ -572,8 +603,15 @@ def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
             carrier_gas=carrier_gas,
         )
         return _knudsen_regime_factor(kn)
-    except Exception:
-        return float(getattr(model, "regime_factor", 1.0) or 1.0)
+    except KnudsenRegimeRefusal:
+        raise
+    except Exception as exc:
+        raise _knudsen_input_refusal(
+            reason="wall_segment_knudsen_inputs_unusable",
+            field="overhead_pressure_mbar",
+            value=getattr(model, "overhead_pressure_mbar", None),
+            detail=f"{type(exc).__name__}: {exc}",
+        ) from exc
 
 
 def _wall_geometry_conductance_weight(segment: Any) -> float:
