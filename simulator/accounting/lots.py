@@ -19,6 +19,9 @@ MATERIAL_ORIGINS = frozenset({"feedstock", "reagent"})
 ATTRIBUTION_METHODS = frozenset({"tracked", "pool_ratio"})
 POOL_WITHDRAWAL_ABSOLUTE_TOLERANCE = 1.0e-18
 POOL_WITHDRAWAL_RELATIVE_TOLERANCE = 5.0e-14
+# Documented float eps for silent clip-with-note. Dust above the effective
+# tolerance (max(absolute, available * relative)) still refuses.
+POOL_WITHDRAWAL_FLOAT_EPS = 1.0e-18
 
 
 def allocate_pool_withdrawal(
@@ -26,8 +29,15 @@ def allocate_pool_withdrawal(
     withdrawal: float,
     *,
     absolute_tolerance: float = POOL_WITHDRAWAL_ABSOLUTE_TOLERANCE,
+    dust_notes: list | None = None,
 ) -> dict[str, float]:
-    """Allocate one withdrawal over a declared well-mixed pool."""
+    """Allocate one withdrawal over a declared well-mixed pool.
+
+    Withdrawals above available by more than the effective tolerance refuse.
+    Within that band the request is clipped to available and, when
+    ``dust_notes`` is provided, a typed ``pool_withdrawal_clip`` note is
+    appended (Ferry V / V1-S13 — no silent clip without a dust note channel).
+    """
 
     available_by_origin: dict[str, float] = {}
     for origin, raw_amount in balances.items():
@@ -63,7 +73,17 @@ def allocate_pool_withdrawal(
             f"pool withdrawal exceeds available balance: "
             f"withdrawal={amount:.12g}, available={available:.12g}"
         )
+    clipped_dust = max(0.0, amount - available) if amount > available else 0.0
     amount = min(max(0.0, amount), available)
+    if clipped_dust > 0.0 and dust_notes is not None:
+        dust_notes.append(
+            {
+                "kind": "pool_withdrawal_clip",
+                "dust": clipped_dust,
+                "available": available,
+                "tolerance": tolerance,
+            }
+        )
     if amount <= 0.0 or available <= 0.0:
         return {}
     result: dict[str, float] = {}

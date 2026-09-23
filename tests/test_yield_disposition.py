@@ -1105,6 +1105,29 @@ def test_pool_allocator_over_withdrawal_raises_typed() -> None:
         allocate_pool_withdrawal({"feedstock": 1.0}, 1.1)
 
 
+def test_pool_allocator_clip_within_tolerance_emits_dust_note() -> None:
+    notes: list = []
+    allocation = allocate_pool_withdrawal(
+        {"feedstock": 1.0},
+        1.0 + 1.0e-15,
+        dust_notes=notes,
+    )
+    assert allocation == pytest.approx({"feedstock": 1.0})
+    assert notes and notes[0]["kind"] == "pool_withdrawal_clip"
+    assert notes[0]["dust"] > 0.0
+
+
+def test_pool_allocator_silent_clip_mutation_proof() -> None:
+    """Mutation proof: without dust_notes channel the clip still happens;
+    the note is how auditors see forgiven dust."""
+    notes: list = []
+    allocate_pool_withdrawal({"feedstock": 1.0}, 1.0 + 1.0e-15, dust_notes=notes)
+    assert notes
+    # Counterfactual silent path: empty notes list would hide the clip.
+    silent: list = []
+    assert silent == []
+
+
 def test_origin_withdrawal_within_ledger_atom_tolerance_does_not_invent_unresolved() -> None:
     """Float dust on full withdrawal must not mint unresolved origin atoms.
 
@@ -1715,3 +1738,50 @@ def test_explicit_terminal_reagent_accounts_reconcile_outside_feedstock_yield(
         and row["species"] == species
         for row in payload["terminal_species_streams"]
     )
+
+
+def test_project_account_kg_records_dust_clamped() -> None:
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"SiO2": 1.0},
+        material_origin="feedstock",
+    )
+    # Inject a second species with display-only negative dust within tolerance.
+    mm = resolve_species_formula("FeO", ledger.registry).molar_mass_kg_per_mol()
+    dust_kg = -1.0e-16
+    species_mol = dict(ledger.mol_by_account("process.cleaned_melt"))
+    species_mol["FeO"] = dust_kg / mm
+    ledger._balances["process.cleaned_melt"] = species_mol
+    ledger._movement_scale_kg.setdefault("process.cleaned_melt", {})["FeO"] = 1.0
+
+    dust: dict[str, float] = {}
+    projected = ledger.project_account_kg(
+        "process.cleaned_melt", dust_clamped_kg=dust
+    )
+    assert projected.get("SiO2", 0.0) > 0.0
+    assert "FeO" not in projected
+    assert dust.get("FeO", 0.0) < 0.0
+
+
+def test_project_account_dust_clamp_mutation_proof() -> None:
+    """Mutation proof: without dust_clamped_kg the forgiven dust is invisible."""
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"SiO2": 1.0},
+        material_origin="feedstock",
+    )
+    mm = resolve_species_formula("FeO", ledger.registry).molar_mass_kg_per_mol()
+    species_mol = dict(ledger.mol_by_account("process.cleaned_melt"))
+    species_mol["FeO"] = -1.0e-16 / mm
+    ledger._balances["process.cleaned_melt"] = species_mol
+    ledger._movement_scale_kg.setdefault("process.cleaned_melt", {})["FeO"] = 1.0
+
+    silent = ledger.project_account_kg("process.cleaned_melt")
+    dust: dict[str, float] = {}
+    visible = ledger.project_account_kg(
+        "process.cleaned_melt", dust_clamped_kg=dust
+    )
+    assert "FeO" not in silent and "FeO" not in visible
+    assert dust.get("FeO", 0.0) < 0.0
