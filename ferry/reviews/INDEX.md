@@ -28,15 +28,3 @@ Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `
 | S6 absence becomes number | sites=26 live=24 P0=9 P1=7 P2=8 P3=2 |
 
 Optional `R*-fix.patch` files sit beside write-ups (incl. R10). W1 / S5 / S7–S9 still in flight.
-
-## Evening sweeps (janaf-batch tip)
-
-| Sweep | Result |
-| --- | --- |
-| S5 unit/scale | sites=8 live=2 P0=0 P1=2 P2=3 P3=3 |
-| S5b engines-only | sites=0 live=0 (clean) |
-| S6 absence→number | sites=26 live=24 P0=9 P1=7 P2=8 P3=2 |
-| S7 notice dropped | sites=9 live=9 P0=5 P1=2 P2=0 P3=2 |
-| S7b vapour-bridge | sites=8 live=8 P0=3 P1=2 P2=2 P3=1 |
-| S8 tests cannot fail | sites=22 live=22 P0=0 P1=7 P2=13 P3=2 |
-| S9 polymorph mismatch | sites=5 live=2 P0=1 P1=3 P2=1 P3=0 |
