@@ -30,8 +30,10 @@ experiments:
   locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI, CM, and CR prototype simulants measured at NASA JSC ARES}
   sample:
     printed_composition:
-      state: {tag: value, value: CI asteroid-simulant prototype}
-      locator: {pdf_page_index: 9, table: '3', note: CI Simulant column is the printed composition of the charge used for the mapped TG/EGA result}
+      state:
+        tag: value
+        value: {SiO2: 25.0, TiO2: 0.5, Al2O3: 3.1, FeOT: 25.8, MnO: 0.3, MgO: 30.2, CaO: 3.0, Na2O: 6.4, K2O: 0.4, P2O5: 0.4, Cr2O3: 0.2, SO3: 4.9}
+      locator: {pdf_page_index: 9, table: '3', note: 'CI Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '3000'}}
@@ -63,8 +65,10 @@ experiments:
   locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CM prototype simulant measured at NASA JSC ARES}
   sample:
     printed_composition:
-      state: {tag: value, value: CM asteroid-simulant prototype}
-      locator: {pdf_page_index: 9, table: '3', note: CM Simulant column is the printed composition of the charge used for the mapped TG/EGA result}
+      state:
+        tag: value
+        value: {SiO2: 32.5, TiO2: 0.3, Al2O3: 3.1, FeOT: 20.2, MnO: 0.2, MgO: 32.1, CaO: 3.1, Na2O: 6.2, K2O: 0.2, P2O5: 0.4, Cr2O3: 0.2, SO3: 1.5}
+      locator: {pdf_page_index: 9, table: '3', note: 'CM Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '3000'}}
@@ -91,8 +95,10 @@ experiments:
   locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CR prototype simulant measured at NASA JSC ARES}
   sample:
     printed_composition:
-      state: {tag: value, value: CR asteroid-simulant prototype}
-      locator: {pdf_page_index: 9, table: '3', note: CR Simulant column is the printed composition of the charge used for the mapped TG/EGA result}
+      state:
+        tag: value
+        value: {SiO2: 19.3, TiO2: 0.4, Al2O3: 1.2, FeOT: 42.9, MnO: 0.3, MgO: 30.1, CaO: 0.8, Na2O: 3.3, K2O: 0.1, P2O5: 0.4, Cr2O3: 0.1, SO3: 0.9}
+      locator: {pdf_page_index: 9, table: '3', note: 'CR Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '3000'}}
