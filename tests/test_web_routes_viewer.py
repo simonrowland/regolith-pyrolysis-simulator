@@ -157,6 +157,16 @@ setImmediate(() => process.stdout.write(Object.values(els).map((e) => e._html).j
     assert "not emitted" in html
 
 
+def test_report_viewer_c3_dose_rejects_string_numeric_coercion() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "makeHeader({header:{c3_dose:{Fe_kg:'12'}}},[{}],{})",
+    )
+
+    assert "Fe 12 kg" not in html
+    assert "Fe not emitted" in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
