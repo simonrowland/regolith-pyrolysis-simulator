@@ -165,9 +165,9 @@ function makeHeader(artifact, rows, energy) {
   const temperatures = rows.map((row) => row.T_C);
   const peakTemperature = temperatures.length && temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
   const reportedEnergy = hasNumber(energy.electrical) && hasNumber(energy.evaporation) ? energy.electrical + energy.evaporation : null;
-  const campaignChain = Array.isArray(header.campaign_chain) ? header.campaign_chain.join("→") || "—" : "—";
+  const campaignChain = Array.isArray(header.campaign_chain) ? header.campaign_chain.map((value) => scalarText(value)).join("→") || "—" : "—";
   const status = artifact.execution_status;
-  const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).join(" · ") || "No failure reason or error message was emitted in this artifact.";
+  const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).map((value) => scalarText(value)).join(" · ") || "No failure reason or error message was emitted in this artifact.";
   const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
     ? header.cost_block.provenance.trim()
     : null;
@@ -332,7 +332,7 @@ function tapsAndPuritySection(terminal) {
     const acceptedSpecies = stage.accepted_species || [];
     const speciesList = activity
       ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${esc(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : esc(species)).join("<br>") || "none designated"
-      : esc(acceptedSpecies.join(" · ") || "none designated");
+      : acceptedSpecies.map((species) => scalarText(species)).join(" · ") || "none designated";
     return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
       `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${stage.purity_fraction === null || verdict === "INDETERMINATE" ? "no material" : hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
   }).join("");

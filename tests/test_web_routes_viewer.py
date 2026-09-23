@@ -167,6 +167,16 @@ def test_report_viewer_c3_dose_rejects_string_numeric_coercion() -> None:
     assert "Fe not emitted" in html
 
 
+def test_report_viewer_scalar_labels_do_not_render_objects() -> None:
+    html = _run_viewer_expression(
+        "report-viewer.js",
+        "makeHeader({header:{campaign_chain:[{}]},failure:{reason:{}},execution_status:'failed'},[{}],{}) + tapsAndPuritySection({stage_purity:{stage1:{accepted_species:[{}],total_kg:1}}})",
+    )
+
+    assert "[object Object]" not in html
+    assert "malformed (object)" in html
+
+
 def test_library_and_settings_reject_numeric_coercion() -> None:
     root = Path(__file__).resolve().parents[1] / "web/report_viewer"
     harness = r"""
