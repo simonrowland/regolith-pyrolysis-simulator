@@ -1,0 +1,411 @@
+schema_version: literature_extract.v1
+source_id: ta-mendybaev-2002-lpsc
+source:
+  citation: >-
+    Mendybaev, R. A., Davis, A. M. & Richter, F. M. (2002), "The Effect of
+    Sample Size on Experimental Evaporation of Type B CAIs", Lunar and Planetary
+    Science XXXIII, abstract 2040.
+  url: https://www.lpi.usra.edu/meetings/lpsc2002/pdf/2040.pdf
+  year: 2002
+  conference: Lunar and Planetary Science XXXIII
+extraction:
+  method: >-
+    Corpus PDF raw/ta-mendybaev-2002-lpsc/ta-mendybaev-2002-lpsc.pdf (2-page LPSC
+    abstract 2040). Clean text layer via pdftotext -layout; no OCR and no figure
+    digitisation. Printed starting oxides, vacuum furnace conditions, and prose
+    weight-loss rates / Mg kinetic fractionation factor retained verbatim.
+    N4b FILL (Y4 P1): page-2 printed multi-T 1.0 mm rates (~1.1x10^-5 / ~2x10^-6
+    / ~3x10^-7 g/mm^2/min at 1800/1700/1600 C) and Ea=580 kJ/mole landed with
+    locators; forsterite Ea comparators retained as quoted_attributed in the Ea
+    row. Figure 1–3 curves were not digitized. Kelvin companions for printed °C
+    carry DERIVED stamps (T_K = T_C + 273.15).
+  date: '2026-09-22'
+  worker: n4b-y4-omissions
+  provenance_path: data/literature/extracts/ta-mendybaev-2002-lpsc.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 2-page LPSC conference abstract (vacuum evaporation of Type B CAI-like liquids)
+  measured_direct_observations: 5
+  method_observations: 2
+  figure_only_observations: 0
+  model_derived_observations: 1
+  absent_from_source:
+  - tabulated per-run residue oxide compositions
+  - digitized weight-loss time series from Fig. 1
+  - digitized weight-loss rate vs surface area from Fig. 2
+  - digitized Mg isotope Rayleigh plot from Fig. 3
+  - absolute sample masses
+  - furnace conductance / orifice geometry
+  - oxygen fugacity buffer
+  note: >-
+    Abstract reports effect of Ir-loop sample size on vacuum evaporation rate and
+    Mg isotopic fractionation of B133-glass Type B CAI-like liquids. N4 scored
+    1800 C rate averages and Rayleigh alpha; N4b adds page-2 printed 1.0 mm
+    multi-T rates (1700/1600 C) and apparent Ea=580 kJ/mole. Related full papers
+    (Richter 2002/2007) already have separate extracts and are not re-ingested
+    here.
+benches:
+- id: chicago-high-vacuum-furnace-cai
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: High-vacuum evaporation furnace}
+    locator: &methods_loc {pdf_page_index: 1, section: Experimental methods}
+  heating_method:
+    state: {tag: value, value: "Not further specified in this abstract; furnace configuration deferred to Wang 1994 Ph.D. thesis [4]"}
+    locator: *methods_loc
+  temperature_measurement:
+    sensor: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+  pumping_type:
+    state: {tag: value, value: High vacuum; P less than or equal to 10^-6 torr as printed}
+    locator: *methods_loc
+  analytical_instruments:
+    state:
+      tag: value
+      value: >-
+        JEOL JSM-5800LV SEM with Oxford/Link ISIS-300 x-ray microanalysis;
+        modified AEI IM-20 ion microprobe for Mg isotopes
+    locator: *methods_loc
+experiments:
+- experiment_id: b133-vacuum-1800C-loop-series
+  bench_id: chicago-high-vacuum-furnace-cai
+  method: vacuum_free_evaporation_ir_wire_loop
+  locator: {pdf_page_index: 1, section: Experimental methods}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
+      locator: {pdf_page_index: 1, section: Experimental methods}
+    form:
+      state: {tag: value, value: Suspended on Ir-wire loops of 1.0, 2.5, 3.3 and 6.0 mm diameter}
+      locator: {pdf_page_index: 1, section: Experimental methods}
+    initial_surface_area_mm2:
+      state: {tag: value, value: {kind: interval, interval_low: '3.5', interval_high: '85', approximate: true}}
+      locator: {pdf_page_index: 1, section: Experimental methods, note: 'initial surface area varied from about 3.5 to 85 mm2'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '2073.15'}}
+      locator: {pdf_page_index: 1, section: Experimental methods, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; rate averages reported at 1800 C'}
+  pressure_environment:
+    total_pressure_as_printed:
+      state: {tag: value, value: 'P≤10^-6 torr'}
+      locator: {pdf_page_index: 1, section: Experimental methods}
+    sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *methods_loc}
+- experiment_id: b133-vacuum-multi-T-campaign
+  bench_id: chicago-high-vacuum-furnace-cai
+  method: vacuum_free_evaporation_ir_wire_loop
+  locator: {pdf_page_index: 1, section: Experimental methods, note: 'campaigns at 1800/1700/1600 C; page-2 Results prints 1.0 mm multi-T rates and Ea=580 kJ/mole'}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
+      locator: {pdf_page_index: 1, section: Experimental methods}
+    form:
+      state: {tag: value, value: Ir-wire loop suspended melt droplets}
+      locator: {pdf_page_index: 1, section: Experimental methods}
+  conditions:
+    temperature_C_setpoints_as_printed:
+      state: {tag: value, value: [1800, 1700, 1600]}
+      locator: {pdf_page_index: 1, section: Experimental methods}
+  pressure_environment:
+    total_pressure_as_printed:
+      state: {tag: value, value: 'P≤10^-6 torr'}
+      locator: {pdf_page_index: 1, section: Experimental methods}
+fidelity_samples:
+- species: B133_CAI_like_melt
+  observable: rate_series
+  observation_id: mendybaev_2002_weight_loss_rate_1800C_large_loops
+  field: rate_g_per_mm2_per_min_as_printed
+  value: '(6.8±0.8)x10^-6'
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C
+- species: B133_CAI_like_melt
+  observable: rate_series
+  observation_id: mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+  field: rate_g_per_mm2_per_min_as_printed
+  value: '(1.1±0.2)x10^-5'
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: 1.0 mm diameter samples at 1800 C; about 50% higher than larger loops
+- species: Mg
+  observable: alpha
+  observation_id: mendybaev_2002_mg_isotope_alpha_vacuum
+  field: alpha_as_printed
+  value: 0.987
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: residues fit by fractionation factor alpha=0.987 independent of sample size
+- species: B133_CAI_like_melt
+  observable: rate_series
+  observation_id: mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+  field: rate_g_per_mm2_per_min_as_printed
+  value: '~2x10^-6'
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: '1.0 mm samples at 1700 C; approximate as printed (~2x10^-6)'
+- species: B133_CAI_like_melt
+  observable: rate_series
+  observation_id: mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+  field: rate_g_per_mm2_per_min_as_printed
+  value: '~3x10^-7'
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: '1.0 mm samples at 1600 C; approximate as printed (~3x10^-7)'
+- species: B133_CAI_like_melt
+  observable: rate_series
+  observation_id: mendybaev_2002_apparent_Ea_1mm_multi_T
+  field: Ea_kJ_per_mole_as_printed
+  value: '580'
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: 'apparent activation energy from 1.0 mm multi-T rates; Ea=580 kJ/mole'
+- species: B133_CAI_like_melt
+  observable: laboratory_conditions
+  observation_id: mendybaev_2002_starting_composition_and_conditions
+  field: starting_MgO_wt_pct
+  value: 12.0
+  locator:
+    pdf_page_index: 1
+    section: Experimental methods
+species:
+  B133_CAI_like_melt:
+    observations:
+    - observation_id: mendybaev_2002_weight_loss_rate_1800C_large_loops
+      experiment: b133-vacuum-1800C-loop-series
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: prose average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C
+      T_range_K: [2073.15, 2073.15]
+      phase: Type_B_CAI_like_liquid_B133
+      regime: vacuum_free_evaporation
+      units: g/mm^2/min as printed
+      uncertainty:
+        note: 'Printed ±0.8 on (6.8±0.8)x10^-6; retained as stated.'
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_vacuum_furnace
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        loop_diameters_mm: [2.5, 3.3, 6.0]
+        rate_g_per_mm2_per_min_as_printed: '(6.8±0.8)x10^-6'
+        rate_g_per_mm2_per_min: 6.8e-6
+        rate_uncertainty_g_per_mm2_per_min: 0.8e-6
+        normalization: surface area (initial and final compared in Fig. 1; rate quoted in prose without specifying init vs final for this average)
+        lost_species_as_printed: Mg and Si (not Ca or Al)
+        note: >-
+          Average of the three larger loop sizes; authors state rates are not
+          resolvably different among 2.5–6.0 mm samples.
+    - observation_id: mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+      experiment: b133-vacuum-1800C-loop-series
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+      T_range_K: [2073.15, 2073.15]
+      phase: Type_B_CAI_like_liquid_B133
+      regime: vacuum_free_evaporation
+      units: g/mm^2/min as printed
+      uncertainty:
+        note: 'Printed ±0.2 on (1.1±0.2)x10^-5; authors also note possible systematic underestimation of 1.0 mm evaporating area if melt wets the Ir wire.'
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_vacuum_furnace
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        loop_diameters_mm: [1.0]
+        rate_g_per_mm2_per_min_as_printed: '(1.1±0.2)x10^-5'
+        rate_g_per_mm2_per_min: 1.1e-5
+        rate_uncertainty_g_per_mm2_per_min: 0.2e-5
+        relative_to_large_loops_as_printed: about 50% higher
+        lost_species_as_printed: Mg and Si (not Ca or Al)
+    - observation_id: mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+      experiment: b133-vacuum-multi-T-campaign
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: >-
+          Printed triad: weight loss rates of 1.0 mm samples evaporated at
+          1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6 and ~3x10^-7
+          g/mm^2/min, respectively.
+      T_range_K: [1973.15, 1973.15]
+      phase: Type_B_CAI_like_liquid_B133
+      regime: vacuum_free_evaporation
+      units: g/mm^2/min as printed
+      uncertainty:
+        note: >-
+          Approximate tilde (~2x10^-6) as printed; no numeric uncertainty band
+          printed for the 1700 C rate.
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_vacuum_furnace
+        temperature_C_as_printed: 1700
+        temperature_K_derived:
+          value: 1973.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1700
+        loop_diameters_mm: [1.0]
+        rate_g_per_mm2_per_min_as_printed: '~2x10^-6'
+        rate_g_per_mm2_per_min: 2.0e-6
+        approximate: true
+        lost_species_as_printed: Mg and Si (not Ca or Al)
+        note: >-
+          Page-2 multi-T prose for 1.0 mm loops. The companion 1800 C member of
+          the same triad (~1.1x10^-5) is the approximate form of the already-scored
+          (1.1±0.2)x10^-5 row; not re-scored here.
+    - observation_id: mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+      experiment: b133-vacuum-multi-T-campaign
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: >-
+          Printed triad: weight loss rates of 1.0 mm samples evaporated at
+          1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6 and ~3x10^-7
+          g/mm^2/min, respectively.
+      T_range_K: [1873.15, 1873.15]
+      phase: Type_B_CAI_like_liquid_B133
+      regime: vacuum_free_evaporation
+      units: g/mm^2/min as printed
+      uncertainty:
+        note: >-
+          Approximate tilde (~3x10^-7) as printed; no numeric uncertainty band
+          printed for the 1600 C rate.
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_vacuum_furnace
+        temperature_C_as_printed: 1600
+        temperature_K_derived:
+          value: 1873.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1600
+        loop_diameters_mm: [1.0]
+        rate_g_per_mm2_per_min_as_printed: '~3x10^-7'
+        rate_g_per_mm2_per_min: 3.0e-7
+        approximate: true
+        lost_species_as_printed: Mg and Si (not Ca or Al)
+    - observation_id: mendybaev_2002_apparent_Ea_1mm_multi_T
+      experiment: b133-vacuum-multi-T-campaign
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: >-
+          Printed: corresponds to an apparent activation energy of evaporation
+          Ea =580 kJ/mole
+      T_range_K: [1873.15, 2073.15]
+      phase: Type_B_CAI_like_liquid_B133
+      regime: vacuum_free_evaporation
+      units: kJ/mole as printed
+      uncertainty:
+        note: >-
+          No numeric uncertainty printed on Ea=580 kJ/mole. Authors compare to
+          forsterite literature values (quoted_attributed below).
+      values:
+        quantity: activation_energy_of_vaporization
+        method_class: model_derived
+        evidence_class: authors_arrhenius_from_printed_1mm_rates
+        semantics: apparent_activation_energy_from_multi_T_weight_loss_rates
+        Ea_kJ_per_mole_as_printed: '580'
+        Ea_kJ_per_mole: 580
+        loop_diameters_mm: [1.0]
+        rate_triad_g_per_mm2_per_min_as_printed:
+          '1800_C': '~1.1x10^-5'
+          '1700_C': '~2x10^-6'
+          '1600_C': '~3x10^-7'
+        forsterite_comparator_single_crystal_kJ_per_mole_as_printed: '628±16'
+        forsterite_comparator_single_crystal_citation: '[4] Wang J. (1994) Ph.D. thesis'
+        forsterite_comparator_polycrystalline_kJ_per_mole_as_printed: '584±28'
+        forsterite_comparator_polycrystalline_citation: '[3] Hashimoto A. (1990) Nature, 347, 53-55'
+        forsterite_comparators_status: quoted_attributed
+        note: >-
+          Apparent Ea from the printed 1.0 mm multi-T rates. Forsterite 628±16
+          and 584±28 are literature comparators in the same sentence, not this
+          campaign's measurement.
+    context:
+    - observation_id: mendybaev_2002_starting_composition_and_conditions
+      type: laboratory_conditions
+      experiment: b133-vacuum-multi-T-campaign
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+      phase: B133-glass_Type_B_CAI_like
+      regime: vacuum_free_evaporation
+      units: as published
+      values:
+        quantity: starting_material_and_run_conditions
+        method_class: method_only
+        starting_material_as_printed: B133-glass
+        starting_MgO_wt_pct: 12.0
+        starting_SiO2_wt_pct: 46.1
+        starting_Al2O3_wt_pct: 19.4
+        starting_CaO_wt_pct: 25.5
+        composition_basis: oxide wt% as printed (not renormalised)
+        loop_diameters_mm: [1.0, 2.5, 3.3, 6.0]
+        initial_surface_area_mm2_as_printed: about 3.5 to 85
+        temperature_C_setpoints_as_printed: [1800, 1700, 1600]
+        pressure_as_printed: 'P≤10^-6 torr'
+        support: Ir-wire loops
+        furnace_detail_deferred_to: Wang J. (1994) Ph.D. thesis, University of Chicago [4]
+        analytical_SEM_as_printed: JEOL JSM-5800LV with Oxford/Link ISIS-300
+        analytical_ion_probe_as_printed: modified AEI IM-20 ion microprobe (Mg isotopes)
+  Mg:
+    observations:
+    - observation_id: mendybaev_2002_mg_isotope_alpha_vacuum
+      experiment: b133-vacuum-1800C-loop-series
+      type: alpha
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: Rayleigh fit; no apparent distinction as to sample size
+      phase: Type_B_CAI_like_liquid_B133_residue
+      regime: Rayleigh_distillation_vacuum
+      units: dimensionless
+      uncertainty:
+        note: >-
+          No numeric uncertainty printed on alpha=0.987 in this abstract.
+          Introduction also quotes prior vacuum alpha=0.989 and H2 alpha=0.987
+          from related work; those are attributed citations, not this campaign's
+          new fit.
+      values:
+        quantity: kinetic_isotope_fractionation_factor_Mg
+        method_class: measured_direct_regression
+        evidence_class: authors_own_vacuum_furnace
+        alpha_as_printed: 0.987
+        alpha: 0.987
+        isotope_pair_as_printed: Mg (heavy-isotope enrichment of residues; Rayleigh R/Ro = f^(alpha-1))
+        sample_size_dependence_as_printed: no apparent distinction as to sample size
+        theoretical_comparator_as_printed: 'alpha = sqrt(24/25) = 0.980'
+        conclusion_as_printed: >-
+          No evidence that recondensation drives the departure from the
+          theoretical fractionation factor across the sampled size range.
+        note: >-
+          Introduction cites prior vacuum alpha=0.989 and PH2~2x10^-4 bar
+          alpha=0.987 from related experiments; those values are not re-scored
+          here (quoted_attributed). The 0.987 fit is the result stated for this
+          vacuum residue set.

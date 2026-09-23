@@ -1,0 +1,136 @@
+schema_version: literature_extract.v1
+source_id: ta-shirai-2000-lpsc
+source:
+  citation: Shirai, T., Tachibana, S. and Tsuchiyama, A. (2000), Evaporation rates of Na from Na2O-SiO2
+    melt at 1 atm, Lunar and Planetary Science XXXI, abstract 1610.
+  year: 2000
+  source_type: conference_abstract
+extraction:
+  method: layout-preserving pdftotext of 2-page LPSC abstract; printed alpha* values and experimental
+    conditions only; Figures 1-2 curves not digitized
+  date: '2026-09-22'
+  worker: n3-forsterite-evap-2026-09-22
+  provenance_path: ferry/pdfs-n/ta-shirai-2000-lpsc.pdf
+  note: 'Not a forsterite paper: Na evaporation from Na2O-SiO2 melt at 1 atm. Included in N3 corpus lane
+    as assigned; extract reports printed content only.'
+review_status: draft
+fidelity_samples:
+- path: species.Na.observations[shirai_2000_alpha_star_by_T_and_pO2].values.series[0].alpha_star
+  value: 0.13
+  locator:
+    page: 2
+    figure: 1a
+    note: 1300 C pO2=1e-8 alpha*
+- path: species.Na.observations[shirai_2000_alpha_star_by_T_and_pO2].values.series[3].alpha_star
+  value: 0.048
+  locator:
+    page: 2
+    figure: 1b
+    note: 1400 C pO2=1e-8 alpha*
+species:
+  Na:
+    context:
+    - observation_id: shirai_2000_experiments
+      type: apparatus
+      locator:
+        page: 1
+        section: Experiments
+      phase: Na2O-SiO2_melt
+      regime: 1atm_H2_CO2_wire_loop
+      units: as published
+      values:
+        quantity: experimental_conditions
+        method_class: method_only
+        starting_material: synthesized Na2O-SiO2 glass
+        starting_Na2O_wt_pct_range:
+        - 22
+        - 23
+        method: Pt wire loop 2 mm diameter in 1 atm furnace with alumina muffle tube (4 cm ID)
+        atmosphere: H2-CO2 mixed gas streams
+        temperatures_C:
+        - 1300
+        - 1400
+        pO2_bar_setpoints:
+        - 1.0e-08
+        - 1.0e-09
+        - 1.0e-10
+        flow_rates_tested_ml_per_min:
+        - 500
+        - 678
+        - 1000
+        - 1500
+        flow_rate_selected_ml_per_min: 1000
+        flow_rate_selection_conditions: 1400 C, pO2=1e-9 bar, 30 min; Na2O concentration independent of
+          flow 500-1500 ml/min
+        quench: diffusion pump oil
+        analysis: EPMA broad beam 50 um, 15 kV, 12 nA; ZAF; albite and quartz standards
+        reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
+      equipment:
+        cell_material:
+          value: Pt wire loop; alumina muffle tube furnace
+          locator:
+            page: 1
+            section: Experiments
+    observations:
+    - observation_id: shirai_2000_alpha_star_by_T_and_pO2
+      type: alpha
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      phase: Na2O-SiO2_melt
+      regime: 1atm_HBD_apparent_evaporation_coefficient
+      units: dimensionless
+      values:
+        quantity: apparent_evaporation_coefficient_alpha_star
+        method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+        derived: true
+        definition: alpha* includes recondensation at 1 atm; 0 < alpha* <= alpha <= 1
+        activity_model_source: Rego et al. 1985 converted by authors to a(NaO0.5)
+        series:
+        - T_C: 1300
+          pO2_bar: 1.0e-08
+          alpha_star: 0.13
+        - T_C: 1300
+          pO2_bar: 1.0e-09
+          alpha_star: 0.095
+        - T_C: 1300
+          pO2_bar: 1.0e-10
+          alpha_star: 0.08
+        - T_C: 1400
+          pO2_bar: 1.0e-08
+          alpha_star: 0.048
+        - T_C: 1400
+          pO2_bar: 1.0e-09
+          alpha_star: 0.043
+        - T_C: 1400
+          pO2_bar: 1.0e-10
+          alpha_star: 0.05
+        summary_as_printed: alpha* about 0.1 at 1300 C and about 0.05 at 1400 C; higher than the 0.01
+          assumption of Tsuchiyama and Tachibana [4]
+    - observation_id: shirai_2000_jNa_pO2_slopes
+      type: rate_series
+      locator:
+        page: 2
+        figure: '2'
+        section: The dependence of jNa on p(O2)
+      phase: Na2O-SiO2_melt
+      regime: 1atm_HBD
+      units: log-log slopes dimensionless; jNa evaluated at Na2O=20 wt%
+      values:
+        quantity: log_jNa_vs_log_pO2_slope
+        method_class: author_derived_from_alpha_star_and_activity_model
+        derived: true
+        Na2O_wt_pct_reference: 20
+        series:
+        - T_C: 1300
+          slope: -0.153
+          fit_as_printed: jNa = 6.70e13 * x^-0.153
+          R: 0.99653
+        - T_C: 1400
+          slope: -0.26
+          fit_as_printed: jNa = 5.22e13 * x^-0.26
+          R: 0.99426
+        theoretical_slope: -0.25
+        note: 1400 C slope almost consistent with -1/4; 1300 C slope smaller than -1/4. Pre-factors as
+          printed on Fig. 2; x denotes p(O2).
