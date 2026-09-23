@@ -45,6 +45,8 @@ from simulator.battery.waypoints import (  # noqa: E402
     ReadinessGap,
     ReadinessStatus,
     consumer_readiness,
+    is_pure_substance_engine_reference,
+    pure_substance_engine_point_gap,
 )
 
 
@@ -327,7 +329,9 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
 def report(root: Path) -> dict[str, object]:
     works, experiments, observations = load_migrated_store(root)
     by_experiment = defaultdict(list)
+    by_experiment_all: dict[str, list] = defaultdict(list)
     for observation in observations.values():
+        by_experiment_all[observation.experiment_id].append(observation)
         if observation.point_conditions:
             by_experiment[observation.experiment_id].append(observation)
     benches = load_migrated_benches(root)
@@ -398,6 +402,23 @@ def report(root: Path) -> dict[str, object]:
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
                     tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
             readiness = tuple(aggregated)
+        # Own observations only. An alias that shares locator.table does not
+        # lend another source's pure_substance_reference declaration.
+        linked_obs = by_experiment_all.get(experiment.experiment_id, ())
+        if any(is_pure_substance_engine_reference(item) for item in linked_obs):
+            gap = pure_substance_engine_point_gap()
+            readiness = tuple(
+                ConsumerReadiness(
+                    item.consumer,
+                    ReadinessStatus.NOT_APPLICABLE,
+                    (gap,),
+                    item.engine,
+                    item.notices,
+                )
+                if item.consumer == "engine_point"
+                else item
+                for item in readiness
+            )
         consumers = tuple(item for item in readiness if item.engine is None)
         consumers += (_collapse_engines(readiness),)
         engines = tuple(item for item in readiness if item.engine is not None)

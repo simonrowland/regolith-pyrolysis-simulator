@@ -197,6 +197,10 @@ COMPILATION_ROLE = {
     "circularity_warning": (
         "Do not validate an engine against a compilation it consumes."
     ),
+    # Declared engine_point disposition. Copied onto each generated row.
+    # Peer pure-mineral Gibbs tables share the role flags above and do not
+    # set this; readiness selects on the row field, not on a source id.
+    "pure_substance_reference": True,
 }
 
 _NON_FORMULA_FEEDSTOCK_KEYS = frozenset(

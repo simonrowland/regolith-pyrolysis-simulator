@@ -46,6 +46,11 @@ class GapReason(StrEnum):
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
+    # Pure-substance engine-reference tabulation. The generator declares
+    # derivation.pure_substance_reference; identity.composition is
+    # not_applicable. engine_point reproduces a melt composition at a bench
+    # point; that consumer does not apply. Scored by the pure-phase consumer.
+    PURE_SUBSTANCE_REFERENCE = "pure_substance_reference"
     # Permanent typed absence: several apparatuses are cited and the no-select
     # ruling forbids picking one, so no acquisition can ever close this gap.
     UNATTRIBUTABLE_BY_CONSTRUCTION = "unattributable_by_construction"
@@ -1256,6 +1261,75 @@ def _orifice_knudsen(experiment, bench, thermal, pressure):
     return kn, notice_inputs, species, gap
 
 
+PURE_SUBSTANCE_ENGINE_POINT_REASON = (
+    "pure-substance reference table; scored by the pure-phase consumer, not engine_point"
+)
+
+
+def _compilation_role_flags(relation: str) -> dict[str, bool | None]:
+    """Parse compilation_role tokens a derivation.relation already carries.
+
+    Generators stamp ``engine_reference_input=true, scoring_eligible=false``
+    into the relation string. Detection is data-driven on those tokens — never
+    on a source-id substring.
+    """
+
+    flags: dict[str, bool | None] = {
+        "engine_reference_input": None,
+        "scoring_eligible": None,
+    }
+    if not relation:
+        return flags
+    normalized = relation.replace(" ", "").lower()
+    for key in flags:
+        true_token = f"{key}=true"
+        false_token = f"{key}=false"
+        if true_token in normalized:
+            flags[key] = True
+        elif false_token in normalized:
+            flags[key] = False
+    return flags
+
+
+def is_pure_substance_engine_reference(observation: Observation) -> bool:
+    """True when the row declares itself a pure-substance engine reference.
+
+    All required, and none of them is a source id:
+    - ``identity.composition`` is ``not_applicable`` (no melt composition axis)
+    - ``derivation.pure_substance_reference`` is true (declared by the
+      generator; absent on peer Gibbs tables that share the role stamps)
+    - derivation.relation stamps ``engine_reference_input=true``
+    - derivation.relation stamps ``scoring_eligible=false`` (not a melt /
+      engine_point scoring reference; pure-phase scoring is a separate consumer)
+    """
+
+    identity = observation.identity
+    composition = getattr(identity, "composition", None)
+    if composition is None or not composition.is_not_applicable:
+        return False
+    derivation = observation.derivation
+    if derivation is None or derivation.pure_substance_reference is not True:
+        return False
+    if not derivation.relation:
+        return False
+    flags = _compilation_role_flags(derivation.relation)
+    if flags.get("engine_reference_input") is not True:
+        return False
+    # scoring_eligible=false: not a melt/engine_point scoring reference.
+    # (Pure-phase scoring of MAGEMin/ThermoEngine is a separate consumer.)
+    if flags.get("scoring_eligible") is not False:
+        return False
+    return True
+
+
+def pure_substance_engine_point_gap() -> ReadinessGap:
+    return ReadinessGap(
+        "normalized_composition",
+        GapReason.PURE_SUBSTANCE_REFERENCE,
+        (PURE_SUBSTANCE_ENGINE_POINT_REASON,),
+    )
+
+
 def _consumer_constraints(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> tuple[ConsumerReadiness, ...]:
@@ -1329,10 +1403,14 @@ def _consumer_constraints(
             rps_gaps.append(gap)
     engine_gaps = []
     engine_status = None
-    intensive = normalized_composition(experiment, bench, observation)
-    if intensive.selected is not None and len(intensive.selected.value) == 1:
-        engine_gaps = [ReadinessGap("normalized_composition", GapReason.SINGLE_SPECIES_CHARGE)]
+    if observation is not None and is_pure_substance_engine_reference(observation):
+        engine_gaps = [pure_substance_engine_point_gap()]
         engine_status = ReadinessStatus.NOT_APPLICABLE
+    else:
+        intensive = normalized_composition(experiment, bench, observation)
+        if intensive.selected is not None and len(intensive.selected.value) == 1:
+            engine_gaps = [ReadinessGap("normalized_composition", GapReason.SINGLE_SPECIES_CHARGE)]
+            engine_status = ReadinessStatus.NOT_APPLICABLE
     engine_results = tuple(
         build("engine_point", engine_gaps, engine_status, engine)
         for engine in ENGINE_POINT_CONSUMERS

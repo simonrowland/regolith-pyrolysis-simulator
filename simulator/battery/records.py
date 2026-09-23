@@ -396,6 +396,10 @@ class Derivation:
     inputs: tuple[str, ...]
     parameters: tuple[tuple[str, Located[Decimal]], ...]
     output_unit: str
+    # Generator-declared engine_point disposition. True means this row is a
+    # pure-substance reference and engine_point does not apply. Absent means
+    # not declared — never a stamped false.
+    pure_substance_reference: bool | None = None
 
     def __post_init__(self) -> None:
         if not self.relation:
@@ -404,6 +408,10 @@ class Derivation:
             raise ValueError("Derivation.inputs is required")
         if not self.output_unit:
             raise ValueError("Derivation.output_unit is required")
+        if self.pure_substance_reference is not None and not isinstance(
+            self.pure_substance_reference, bool
+        ):
+            raise TypeError("Derivation.pure_substance_reference must be bool or absent")
 
 
 @dataclass(frozen=True)
