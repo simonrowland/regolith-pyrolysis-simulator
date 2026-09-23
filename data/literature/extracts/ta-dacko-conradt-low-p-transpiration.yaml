@@ -1,0 +1,406 @@
+schema_version: literature_extract.v1
+source_id: ta-dacko-conradt-low-p-transpiration
+source:
+  citation: >-
+    Dacko, D., Wilsmann, W. & Conradt, R. (2004), "Low Pressure evaporation
+    from boron containing glass melts by the transpiration method",
+    Glastech. Ber. Glass Sci. Technol. 77 C, 205–212 (Norbert Kreidl Memorial
+    Conference).
+  year: 2004
+  doi: null
+  doi_status: not_printed_in_PDF_and_Crossref_bibliographic_query_returned_no_match
+extraction:
+  method: >-
+    Manual visual transcription from 200–250 dpi pdftoppm renders of the corpus
+    PDF. Printed tables only (Tables 1, 2, 4, 5). Figure 2 not digitized.
+    Equations (2)–(4) retained as author least-squares fits of the
+    quasi-stationary rates (derived). Activities in Table 2 attributed to the
+    thermodynamic model of Conradt [3] (model_derived). Absence is never zero.
+  date: '2026-09-22'
+  worker: n2-hastie-dacko
+  null_hypothesis_check: >-
+    No extract under Dacko/Wilsmann/Conradt or this corpus stem; SOURCE_STATUS
+    lists source_id ta-dacko-conradt-low-p-transpiration as inbox / no extract.
+review_status: draft
+fidelity_samples:
+  - species: glass_melt
+    observable: mass_loss
+    observation_id: dacko_2004_table1_weight_loss_delta_q
+    field: relative_humidity_pct_room_temperature
+    value: 60
+    locator:
+      published_page: 207
+      pdf_page_index: 3
+      table: '1'
+      note: Table 1 header — 60% relative humidity (room temperature)
+  - species: glass_melt
+    observable: mass_loss
+    observation_id: dacko_2004_table1_weight_loss_delta_q
+    field: quantity
+    value: delta_q_weight_loss_per_surface_area
+    locator:
+      published_page: 207
+      pdf_page_index: 3
+      table: '1'
+  - species: Na2O
+    observable: activity_coefficient
+    observation_id: dacko_2004_table2_activities_model
+    field: a_Na2O_1400C
+    value: 1.6e-6
+    locator:
+      published_page: 209
+      pdf_page_index: 5
+      table: '2'
+      note: Table 2 a(Na2O) at 1400 C; model_derived per Conradt [3]
+  - species: condensate
+    observable: gas_speciation
+    observation_id: dacko_2004_table5_evaporated_species_analysis
+    field: quantity
+    value: evaporated_B_and_Na_amounts
+    locator:
+      published_page: 211
+      pdf_page_index: 7
+      table: '5'
+benches:
+- id: low-p-transpiration-rig
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Low-pressure transpiration apparatus (classical transpiration adapted to low pressure)}
+    locator: {published_page: 206, pdf_page_index: 2, section: Experimental, figure: '1'}
+  cell_material_and_liner:
+    state: {tag: value, value: Platinum shuttle 100 x 10 x 10 mm3 inside platinum tube in graphite-tube furnace}
+    locator: {published_page: 206, pdf_page_index: 2, section: Experimental, figure: '1'}
+  geometry:
+    cell_internal_dimensions:
+      length_m:
+        state: {tag: value, value: {kind: point, point: '0.100'}}
+        locator: {published_page: 206, pdf_page_index: 2, note: Printed shuttle 100x10x10 mm3}
+      width_m:
+        state: {tag: value, value: {kind: point, point: '0.010'}}
+        locator: {published_page: 206, pdf_page_index: 2, note: Printed shuttle 100x10x10 mm3}
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.010'}}
+        locator: {published_page: 206, pdf_page_index: 2, note: Printed shuttle 100x10x10 mm3}
+  heating_method:
+    state: {tag: value, value: Graphite tube furnace; platinum tube in isothermal zone}
+    locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+  detector:
+    state: {tag: value, value: Gravimetric weight loss; water-cooled ends and quartz pipe as sublimation trap/filter; chemical analysis of condensate}
+    locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+  other_facts:
+  - name: minimum_operating_pressure
+    unit: hPa
+    value:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      locator: {published_page: 205, pdf_page_index: 1, section: Introduction, note: Adapted to a minimum pressure of 200 hPa}
+  - name: pre_melt_crucible
+    unit: as_printed
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: Platinum crucible 500 ml; max melt T 1500 C; poured in graphite mould; cooled from 200 K above Tg (565 C) at 30 K/h}}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+experiments:
+- experiment_id: alkali-borosilicate-low-p-transpiration-series
+  bench_id: low-p-transpiration-rig
+  method: transpiration
+  locator: {published_page: 207, pdf_page_index: 3, section: Results and Discussion}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: mol_percent_as_printed
+          components:
+            SiO2: 79
+            Na2O: 7
+            B2O3: 10
+            Al2O3: 3
+            minor_constituents: 1
+      locator:
+        published_page: 205
+        pdf_page_index: 1
+        section: Abstract
+        note: >-
+          Also restated Experimental p.206. "the rest to 100 are minor
+          constituents" — abstract lists 1 minor constituents.
+    form:
+      state: {tag: value, value: Pre-melted alkali borosilicate glass cullet in platinum shuttle}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: interval, interval_low: '1673.15', interval_high: '1873.15'}}
+      locator: {published_page: 207, pdf_page_index: 3, note: Printed T 1400 to 1600 C; K endpoints are unit conversion only}
+    atmosphere:
+      relative_humidity_pct_room_temperature:
+        state: {tag: value, value: {kind: point, point: '60'}}
+        locator: {published_page: 207, pdf_page_index: 3, note: All experiments under atmosphere with 60% relative humidity referred to room temperature}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '20000', interval_high: '100000'}}
+      locator: {published_page: 207, pdf_page_index: 3, note: Printed 0.2·10^5 to 1·10^5 Pa (200–1000 hPa)}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 206
+        pdf_page_index: 2
+        section: Experimental
+        note: >-
+          Synthetic atmosphere with gas mixture and water vapour and a flow
+          control unit are printed, but component flows and partial pressures
+          required by SweepGas are not.
+    regime:
+      regime_class: {tag: value, value: low_pressure_transpiration}
+observation_classifications:
+  dacko_2004_table1_weight_loss_delta_q:
+    class_tag: measured
+  dacko_2004_eq2_to_eq4_rate_fits:
+    class_tag: derived
+  dacko_2004_table2_activities_model:
+    class_tag: model
+  dacko_2004_table2_r_calc_model:
+    class_tag: model
+  dacko_2004_table2_r_exp:
+    class_tag: derived
+  dacko_2004_table4_logK_coefficients:
+    class_tag: model
+  dacko_2004_table5_evaporated_species_analysis:
+    class_tag: measured
+  dacko_2004_fig2_weight_loss_vs_time:
+    class_tag: figure_only
+species:
+  glass_melt:
+    observations:
+    - observation_id: dacko_2004_table1_weight_loss_delta_q
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: mass_loss
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: Two independent experimental runs printed as stacked Δq values per T,P,t cell
+      phase: alkali_borosilicate_melt
+      regime: low_pressure_transpiration
+      units: mg/cm2 as printed; T in C; P in hPa; t in h
+      values:
+        quantity: delta_q_weight_loss_per_surface_area
+        method_class: measured_direct
+        relative_humidity_pct_room_temperature: 60
+        rows:
+        - {T_C: 1600, P_hPa: 1000, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 5.55184}
+        - {T_C: 1600, P_hPa: 1000, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 4.89538}
+        - {T_C: 1400, P_hPa: 1000, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 1.23896}
+        - {T_C: 1400, P_hPa: 1000, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 0.97565}
+        - {T_C: 1600, P_hPa: 400, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 7.41033}
+        - {T_C: 1600, P_hPa: 400, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 7.38248}
+        - {T_C: 1400, P_hPa: 400, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 1.25809}
+        - {T_C: 1400, P_hPa: 400, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 1.25211}
+        - {T_C: 1600, P_hPa: 200, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 9.15847}
+        - {T_C: 1600, P_hPa: 200, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 9.6215}
+        - {T_C: 1400, P_hPa: 200, t_h: 0.5, run: 1, delta_q_mg_per_cm2: 2.09631}
+        - {T_C: 1400, P_hPa: 200, t_h: 0.5, run: 2, delta_q_mg_per_cm2: 2.15632}
+        - {T_C: 1600, P_hPa: 1000, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 5.75562}
+        - {T_C: 1600, P_hPa: 1000, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 6.58784}
+        - {T_C: 1400, P_hPa: 1000, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 1.27237}
+        - {T_C: 1400, P_hPa: 1000, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 1.54351}
+        - {T_C: 1600, P_hPa: 400, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 8.3917}
+        - {T_C: 1600, P_hPa: 400, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 8.42132}
+        - {T_C: 1400, P_hPa: 400, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 1.66497}
+        - {T_C: 1400, P_hPa: 400, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 1.56459}
+        - {T_C: 1600, P_hPa: 200, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 11.30269}
+        - {T_C: 1600, P_hPa: 200, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 10.45238}
+        - {T_C: 1400, P_hPa: 200, t_h: 1.0, run: 1, delta_q_mg_per_cm2: 2.54943}
+        - {T_C: 1400, P_hPa: 200, t_h: 1.0, run: 2, delta_q_mg_per_cm2: 2.46536}
+        - {T_C: 1600, P_hPa: 1000, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 9.92987}
+        - {T_C: 1600, P_hPa: 1000, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 9.65671}
+        - {T_C: 1400, P_hPa: 1000, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 3.3041}
+        - {T_C: 1400, P_hPa: 1000, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 3.10237}
+        - {T_C: 1600, P_hPa: 400, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 10.5117}
+        - {T_C: 1600, P_hPa: 400, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 10.48562}
+        - {T_C: 1400, P_hPa: 400, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 2.21093}
+        - {T_C: 1400, P_hPa: 400, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 2.31003}
+        - {T_C: 1600, P_hPa: 200, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 13.03781}
+        - {T_C: 1600, P_hPa: 200, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 13.11232}
+        - {T_C: 1400, P_hPa: 200, t_h: 2.0, run: 1, delta_q_mg_per_cm2: 3.52111}
+        - {T_C: 1400, P_hPa: 200, t_h: 2.0, run: 2, delta_q_mg_per_cm2: 3.61024}
+      uncertainty:
+        note: Two-run replicates printed; no per-cell sigma tabulated.
+    - observation_id: dacko_2004_eq2_to_eq4_rate_fits
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: rate_series
+      locator:
+        published_page: 208
+        pdf_page_index: 4
+        equation: '2-4'
+        note: Least-squares fits on quasi-stationary rates (exposition time >30 min)
+      phase: alkali_borosilicate_melt
+      regime: low_pressure_transpiration
+      units: log r as printed; T in K; P as printed in log P term; EA in kJ/mol
+      values:
+        quantity: log_evaporation_rate_fit
+        method_class: derived
+        derivation: >-
+          Author linear regression on rates read from the quasi-stationary
+          region of Table 1 / Fig. 2 (exposition >30 min). Stamp DERIVED.
+        fits:
+        - equation: '2'
+          exposition_h: 0.5
+          T_C_range: [1400, 1600]
+          P_Pa_range: [2.0e4, 1.0e5]
+          log_r_expression: '3.239 - 10770/T - 0.311 log P'
+          EA_kJ_per_mol: 206.2
+          std_dev_r_pct: 5.79
+          locator_page: 208
+        - equation: '3'
+          exposition_h: 1
+          T_C_range: [1400, 1600]
+          P_Pa_range: [2.0e4, 1.0e5]
+          log_r_expression: '2.843 - 10528/T - 0.458 log P'
+          EA_kJ_per_mol: 201.6
+          std_dev_r_pct: 6.18
+          locator_page: 209
+        - equation: '4'
+          exposition_h: 2
+          T_C_range: [1400, 1600]
+          P_Pa_range: [2.0e4, 1.0e5]
+          log_r_expression: '1.961 - 9003/T - 0.089 log P'
+          EA_kJ_per_mol: 172.4
+          std_dev_r_pct: 9.65
+          locator_page: 209
+      uncertainty:
+        note: Author-printed standard deviations of r retained per fit.
+    context:
+    - observation_id: dacko_2004_fig2_weight_loss_vs_time
+      type: apparatus
+      locator:
+        published_page: 208
+        pdf_page_index: 4
+        figure: '2'
+      units: as printed
+      values:
+        quantity: weight_loss_vs_time_figure
+        method_class: figure_only
+        digitized: false
+        note: >-
+          Figure shows diffusion-barrier formation then stationary rate; numeric
+          curve read-offs not taken. Table 1 holds the printed Δq values.
+  Na2O:
+    observations:
+    - observation_id: dacko_2004_table2_activities_model
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: activity_coefficient
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+      phase: alkali_borosilicate_melt
+      regime: thermodynamic_model
+      units: dimensionless activity as printed
+      values:
+        quantity: oxide_activity
+        method_class: model_derived
+        generator: Conradt thermodynamic model [3] as cited in text
+        a_Na2O_1400C: 1.6e-6
+        a_Na2O_1500C: 5.3e-7
+        a_Na2O_1600C: 1.4e-7
+        a_B2O3_1400C: 3.7e-2
+        a_B2O3_1500C: 3.9e-2
+        a_B2O3_1600C: 4.0e-2
+      uncertainty:
+        note: No activity uncertainty printed.
+  B2O3:
+    observations:
+    - observation_id: dacko_2004_table2_r_calc_model
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: rate_series
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+      phase: alkali_borosilicate_melt
+      regime: mass_transfer_model
+      units: as printed (evaporation rate r; unit not stated in table header)
+      values:
+        quantity: r_calc_from_eq5_and_table3
+        method_class: model_derived
+        generator: Eq. (5) with technological mass-transfer values from Table 3 / VDI-Wärmeatlas [4]
+        rows:
+        - {T_C: 1400, P_bar: 1.0, r_calc: 19}
+        - {T_C: 1400, P_bar: 0.4, r_calc: 30}
+        - {T_C: 1400, P_bar: 0.2, r_calc: 42}
+        - {T_C: 1500, P_bar: 1.0, r_calc: 10}
+        - {T_C: 1500, P_bar: 0.4, r_calc: 16}
+        - {T_C: 1500, P_bar: 0.2, r_calc: 22}
+        - {T_C: 1600, P_bar: 1.0, r_calc: 5}
+        - {T_C: 1600, P_bar: 0.4, r_calc: 8}
+        - {T_C: 1600, P_bar: 0.2, r_calc: 11}
+      uncertainty:
+        note: No uncertainty printed on r_calc.
+    - observation_id: dacko_2004_table2_r_exp
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: rate_series
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+      phase: alkali_borosilicate_melt
+      regime: low_pressure_transpiration
+      units: as printed (evaporation rate r; unit not stated in table header)
+      values:
+        quantity: r_exp
+        method_class: derived
+        derivation: >-
+          Author-reported experimental evaporation rates compared with r_calc
+          in Table 2; lineage is the quasi-stationary rates from the
+          transpiration weight-loss campaign (Table 1 / fits). Stamp DERIVED.
+        rows:
+        - {T_C: 1400, P_bar: 1.0, r_exp: 16}
+        - {T_C: 1400, P_bar: 0.4, r_exp: 23}
+        - {T_C: 1400, P_bar: 0.2, r_exp: 32}
+        - {T_C: 1500, P_bar: 1.0, r_exp: 9}
+        - {T_C: 1500, P_bar: 0.4, r_exp: 14}
+        - {T_C: 1500, P_bar: 0.2, r_exp: 20}
+        - {T_C: 1600, P_bar: 1.0, r_exp: 4}
+        - {T_C: 1600, P_bar: 0.4, r_exp: 5}
+        - {T_C: 1600, P_bar: 0.2, r_exp: 7}
+      uncertainty:
+        note: No per-cell uncertainty printed on r_exp.
+  condensate:
+    observations:
+    - observation_id: dacko_2004_table5_evaporated_species_analysis
+      experiment: alkali-borosilicate-low-p-transpiration-series
+      type: gas_speciation
+      locator:
+        published_page: 211
+        pdf_page_index: 7
+        table: '5'
+        note: Column header printed B/Na; abstract prose says sodium oxide to boron oxide ratio 1.25–1.4
+      phase: condensed_evaporate
+      regime: chemical_analysis_of_trap
+      units: mol as printed; A in cm2; B/Na dimensionless as printed
+      values:
+        quantity: evaporated_B_and_Na_amounts
+        method_class: measured_direct
+        rows:
+        - {T_C: 1400, P_hPa: 400, t_h: 1, A_cm2: 11.483, delta_m_B_mol: 0.00148, delta_m_Na_mol: 0.00113, B_over_Na: 1.308}
+        - {T_C: 1600, P_hPa: 400, t_h: 1, A_cm2: 14.277, delta_m_B_mol: 0.00703, delta_m_Na_mol: 0.00531, B_over_Na: 1.324}
+        - {T_C: 1400, P_hPa: 200, t_h: 1, A_cm2: 9.543, delta_m_B_mol: 0.00167, delta_m_Na_mol: 0.00117, B_over_Na: 1.417}
+        - {T_C: 1600, P_hPa: 200, t_h: 1, A_cm2: 11.501, delta_m_B_mol: 0.01018, delta_m_Na_mol: 0.00809, B_over_Na: 1.257}
+      uncertainty:
+        note: No analytical uncertainty printed.
+    context:
+    - observation_id: dacko_2004_table4_logK_coefficients
+      type: method
+      locator:
+        published_page: 211
+        pdf_page_index: 7
+        table: '4'
+        equation: '19'
+      units: as printed; T in 1000 K in eq. (19)
+      values:
+        quantity: log_Ki_coefficients_humid_atmosphere
+        method_class: model_derived
+        formula: 'log Ki = c0 + c1/T + c2/T^2 with T in 1000 K'
+        rows:
+        - {oxide_j: Na2O, volatile_i: NaOH, c0: 6.034, c1: -9.087, c2: null}
+        - {oxide_j: Na2O, volatile_i: NaBO2, c0: 14.794, c1: -12.270, c2: null}
+        - {oxide_j: B2O3, volatile_i: HBO2, c0: 8.306, c1: -17.355, c2: null}
+        - {oxide_j: B2O3, volatile_i: H3BO3, c0: -6.324, c1: 4.935, c2: -2.185}
