@@ -220,6 +220,42 @@ def _flagged_silica_product_block() -> dict:
     }
 
 
+def test_p11_shows_engine_commissioning_next_to_unchanged_class_totals() -> None:
+    block, classification = _lunar()
+    bare = _render(_wrapped(block))
+    assert "data-engine-commissioning-notice" not in bare
+
+    flagged = copy.deepcopy(block)
+    flagged["engine_commissioning_notice"] = {
+        "authority": "extrapolated",
+        "notices": [
+            {
+                "reason": "temperature_range",
+                "certified_band": {
+                    "sio2_wt_pct": [30.0, 80.0],
+                    "temperature_K": [1073.15, 1700.0],
+                },
+                "authority": "extrapolated",
+                "failed_constraints": ["temperature_range"],
+            }
+        ],
+        "first_hour": 1,
+        "last_hour": 1,
+        "count": 1,
+    }
+    html = _render(_wrapped(flagged))
+    assert 'data-engine-commissioning-notice="true"' in html
+    assert "temperature_range" in html
+    assert "extrapolated" in html
+    assert "Reported numbers are unchanged." in html
+    _assert_traced_kg(
+        _card(html, "metals"),
+        "class_total_kg",
+        classification["metals_plus_O2"]["class_total_kg"],
+        state="qualified-product",
+    )
+
+
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     block, classification = _mars()
     html = _render(_wrapped(block))

@@ -5792,6 +5792,13 @@ def _cache_trace_payload(
         payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
 
     simulator = getattr(run_execution, "simulator", None)
+    notice_reader = getattr(simulator, "engine_commissioning_run_notice", None)
+    if callable(notice_reader):
+        commissioning_notice = notice_reader()
+        if isinstance(commissioning_notice, MappingABC) and commissioning_notice:
+            payload["engine_commissioning_notice"] = _compact_jsonable(
+                dict(commissioning_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
