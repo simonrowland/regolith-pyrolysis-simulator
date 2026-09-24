@@ -177,6 +177,31 @@ def test_yaml_loads_and_schema_valid(renderer, flowsheet):
     assert errs == [], errs
 
 
+def test_external_flowsheet_yaml_1_1_preserves_locked_yes(renderer, tmp_path):
+    path = tmp_path / "legacy-locked-flowsheet.yaml"
+    path.write_text(
+        """schema_version: 1
+title: Legacy locked flowsheet
+locked: yes
+blocks:
+  - id: block
+    title: Block
+    role: terminal
+edges: []
+legend: []
+""",
+        encoding="utf-8",
+    )
+
+    loaded = renderer.load_flowsheet(path)
+
+    assert loaded["locked"] is True
+    assert renderer.validate_schema(loaded) == [
+        "locked flowsheet requires map_version",
+        "locked flowsheet requires locked_at",
+    ]
+
+
 def test_v7_top_blocks_and_bins_present(flowsheet):
     block_ids = {b["id"] for b in flowsheet["blocks"]}
     assert V7_TOP_BLOCKS <= block_ids

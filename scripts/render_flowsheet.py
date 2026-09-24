@@ -194,7 +194,7 @@ GEO_EPS = 0.75
 
 def load_flowsheet(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as fh:
-        data = load_cached_safe_yaml(fh.read())
+        data = yaml.safe_load(fh.read())
     if not isinstance(data, dict):
         raise ValueError(f"flowsheet root must be a mapping: {path}")
     return data
