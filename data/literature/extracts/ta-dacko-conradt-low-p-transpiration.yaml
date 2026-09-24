@@ -1,0 +1,1080 @@
+schema_version: literature_extract.v1
+source_id: ta-dacko-conradt-low-p-transpiration
+source:
+  citation: >-
+    Dacko, D., Wilsmann, W. & Conradt, R. (2004), "Low Pressure evaporation from
+    boron containing glass melts by the transpiration method", Glastech. Ber. Glass
+    Sci. Technol. 77 C, 205-212.
+  year: 2004
+extraction:
+  method: >-
+    Manual transcription from the supplied PDF, checked against rendered PDF pages
+    and MinerU OCR. Every Table 1, Table 2, Table 4, and Table 5 number was checked
+    against the PDF; equations and Table 3 were retained as printed. Table 1 values
+    are two unassigned independent-run replicates. No figure coordinates were
+    digitized. Unit conversions occur only in the typed experiment registries.
+  date: '2026-09-24'
+  worker: extract-ta-dacko-conradt-low-p-transpiration
+  provenance_path: docs-private/research/2026-09-24-inbox-triage/queue.jsonl
+review_status: draft
+
+fidelity_samples:
+- species: Na
+  observation_id: dacko_2004_t1_1600c_1000hpa_0p5h
+  field: delta_q_replicate_1
+  value: 5.55184
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: '1600 C, 1000 hPa, 0.5 h, first printed replicate'
+- species: Na
+  observation_id: dacko_2004_t1_1400c_200hpa_2h
+  field: delta_q_replicate_2
+  value: 3.61024
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: '1400 C, 200 hPa, 2 h, second printed replicate'
+- species: Na
+  observation_id: dacko_2004_table2_activity_na2o_1400c
+  field: activity
+  value: 1.6e-6
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: 'a(Na2O), 1400 C'
+- species: B
+  observation_id: dacko_2004_table2_activity_b2o3_1600c
+  field: activity
+  value: 0.04
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: 'a(B2O3), 1600 C'
+- species: Na
+  observation_id: dacko_2004_table2_rate_calc_1400c_0p2bar
+  field: mass_loss_rate
+  value: 42
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: 'r_calc, 0.2 bar, 1400 C'
+- species: Na
+  observation_id: dacko_2004_table2_rate_exp_1600c_0p2bar
+  field: mass_loss_rate
+  value: 7
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: 'r_exp, 0.2 bar, 1600 C'
+- species: B
+  observation_id: dacko_2004_table5_400hpa_1400c
+  field: B_over_Na_molar_ratio
+  value: 1.308
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 212
+    pdf_page_index: 8
+    table: '5'
+    note: '400 hPa, 1 h, 1400 C, part a'
+- species: B
+  observation_id: dacko_2004_table4_na2o_naoh_coefficients
+  field: c0
+  value: 6.034
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-dacko-conradt-low-p-transpiration/ta-dacko-conradt-low-p-transpiration.pdf
+    published_page: 211
+    pdf_page_index: 7
+    table: '4'
+    note: 'Na2O, NaOH row'
+
+benches:
+- id: rwth-low-pressure-transpiration-line
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Low-pressure transpiration apparatus with gas and water-vapour flow control}
+    locator:
+      published_page: 206
+      pdf_page_index: 2
+      figure: '1'
+      section: Experimental
+  cell_material_and_liner:
+    state: {tag: value, value: Platinum shuttle inside a platinum tube; graphite-tube heated furnace; quartz sublimation trap and filter}
+    locator:
+      published_page: 206
+      pdf_page_index: 2
+      figure: '1'
+      section: Experimental
+  heating_method:
+    state: {tag: value, value: Graphite tube heated furnace with the platinum tube in the isothermal zone}
+    locator: {published_page: 206, pdf_page_index: 2, figure: '1', section: Experimental}
+  pumping_type:
+    state: {tag: value, value: Vacuum devices and vacuum pump; exact pump type not stated}
+    locator: {published_page: 206, pdf_page_index: 2, figure: '1', section: Experimental}
+  other_facts:
+  - name: platinum_shuttle_dimensions
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '100 x 10 x 10'}}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Printed 100x10x10 mm3}
+  - name: starting_crucible_capacity
+    unit: ml
+    value:
+      state: {tag: value, value: {kind: point, point: '500'}}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+  - name: continuous_synthetic_atmosphere
+    unit: null
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: Gas mixture and water-vapour system with continuous flow; exact gas composition and flow not stated}}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+
+experiments:
+- &t1_1600_1000_05
+  experiment_id: t1_1600c_1000hpa_0p5h
+  bench_id: rwth-low-pressure-transpiration-line
+  method: transpiration
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 0.5 h row'}
+  sample: &glass_sample
+    printed_composition:
+      state: {tag: value, value: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+    form:
+      state: {tag: value, value: Pre-melted alkali borosilicate glass melt}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+    container:
+      state: {tag: value, value: Small platinum shuttle, 100x10x10 mm3}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+    characterization:
+      state: {tag: value, value: Alkali borosilicate glass melt}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+    pretreatment:
+      state: {tag: value, value: Cullets melted in a platinum crucible at a maximum 1500 C, poured into graphite mould, then cooled from 200 K above Tg to room temperature at 30 K/h}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1600 C; unit conversion only'}
+  pressure_environment: &p_1000_t1
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '100000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1000 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour are described, but gas components and flow are not printed}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control: &fo2_unknown
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: Oxygen fugacity or oxygen partial pressure is not printed}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '1800'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 0.5 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_1000hpa_0p5h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 0.5 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '1800'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 0.5 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_400hpa_0p5h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 0.5 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_400hpa_0p5h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 0.5 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_200hpa_0p5h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 0.5 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_200hpa_0p5h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 0.5 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_1000hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 1 h row'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_1000hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 1 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_400hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 1 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_400hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 1 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_200hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 1 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_200hpa_1h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 1 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 1 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_1000hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 2 h row'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_1000hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 2 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_400hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 2 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_400hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 2 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1600c_200hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 2 h row'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+- <<: *t1_1600_1000_05
+  experiment_id: t1_1400c_200hpa_2h
+  locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 2 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200'}}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed exposure time 2 h; unit conversion only'}
+
+- &t2_1400_1bar
+  experiment_id: t2_1400c_1bar
+  bench_id: rwth-low-pressure-transpiration-line
+  method: transpiration
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1400 C, 1.0 bar column'}
+  sample: *glass_sample
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1.0 bar; unit conversion only'}}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  fO2_control: *fo2_unknown
+- <<: *t2_1400_1bar
+  experiment_id: t2_1500c_1bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1500 C, 1.0 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1773.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1500 C; unit conversion only'}
+- <<: *t2_1400_1bar
+  experiment_id: t2_1600c_1bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1600 C, 1.0 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1600 C; unit conversion only'}
+- &t2_1400_04bar
+  <<: *t2_1400_1bar
+  experiment_id: t2_1400c_0p4bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1400 C, 0.4 bar column'}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '40000'}}, locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 0.4 bar; unit conversion only'}}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t2_1400_04bar
+  experiment_id: t2_1500c_0p4bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1500 C, 0.4 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1773.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1500 C; unit conversion only'}
+- <<: *t2_1400_04bar
+  experiment_id: t2_1600c_0p4bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1600 C, 0.4 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1600 C; unit conversion only'}
+- &t2_1400_02bar
+  <<: *t2_1400_1bar
+  experiment_id: t2_1400c_0p2bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1400 C, 0.2 bar column'}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '20000'}}, locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 0.2 bar; unit conversion only'}}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t2_1400_02bar
+  experiment_id: t2_1500c_0p2bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1500 C, 0.2 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1773.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1500 C; unit conversion only'}
+- <<: *t2_1400_02bar
+  experiment_id: t2_1600c_0p2bar
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: '1600 C, 0.2 bar column'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1600 C; unit conversion only'}
+
+- &t2_activity_1400
+  experiment_id: t2_activity_1400c
+  bench_id: rwth-low-pressure-transpiration-line
+  method: transpiration
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Activity row at 1400 C; no pressure assignment printed'}
+  sample: *glass_sample
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Activity columns do not print a pressure assignment'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  fO2_control: *fo2_unknown
+- <<: *t2_activity_1400
+  experiment_id: t2_activity_1500c
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Activity row at 1500 C; no pressure assignment printed'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1773.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1500 C; unit conversion only'}
+- <<: *t2_activity_1400
+  experiment_id: t2_activity_1600c
+  locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Activity row at 1600 C; no pressure assignment printed'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'Printed 1600 C; unit conversion only'}
+
+- &t5_400_1400
+  experiment_id: t5_400hpa_1400c_1h
+  bench_id: rwth-low-pressure-transpiration-line
+  method: transpiration
+  locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part a, 400 hPa, 1 h, 1400 C'}
+  sample: *glass_sample
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '40000'}}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 400 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  fO2_control: *fo2_unknown
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 1 h; unit conversion only'}
+- <<: *t5_400_1400
+  experiment_id: t5_400hpa_1600c_1h
+  locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part a, 400 hPa, 1 h, 1600 C'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 1600 C; unit conversion only'}
+- <<: *t5_400_1400
+  experiment_id: t5_200hpa_1400c_1h
+  locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part b, 200 hPa, 1 h, 1400 C'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *t5_400_1400
+  experiment_id: t5_200hpa_1600c_1h
+  locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part b, 200 hPa, 1 h, 1600 C'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 1600 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '20000'}}
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Printed 200 hPa; unit conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour described; gas components and flow are not printed}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+
+species:
+  Na:
+    observations:
+    - observation_id: dacko_2004_t1_1600c_1000hpa_0p5h
+      experiment: t1_1600c_1000hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      standard_state: alkali borosilicate glass melt
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values:
+        method_class: measured_direct
+        evidence_class: printed
+        quantity_as_printed: delta_q
+        T_C: 1600
+        P_hPa: 1000
+        t_h: 0.5
+        relative_humidity_pct: 60
+        reference_temperature: room_temperature
+        replicate_assignment: not_published; two independent experimental runs
+        delta_q_replicate_1: 5.55184
+        delta_q_replicate_2: 4.89538
+    - observation_id: dacko_2004_t1_1400c_1000hpa_0p5h
+      experiment: t1_1400c_1000hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      standard_state: alkali borosilicate glass melt
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 1000, t_h: 0.5, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 1.23896, delta_q_replicate_2: 0.97565}
+    - observation_id: dacko_2004_t1_1600c_400hpa_0p5h
+      experiment: t1_1600c_400hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 400, t_h: 0.5, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 7.41033, delta_q_replicate_2: 7.38248}
+    - observation_id: dacko_2004_t1_1400c_400hpa_0p5h
+      experiment: t1_1400c_400hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 400, t_h: 0.5, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 1.25809, delta_q_replicate_2: 1.25211}
+    - observation_id: dacko_2004_t1_1600c_200hpa_0p5h
+      experiment: t1_1600c_200hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 200, t_h: 0.5, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 9.15847, delta_q_replicate_2: 9.62150}
+    - observation_id: dacko_2004_t1_1400c_200hpa_0p5h
+      experiment: t1_1400c_200hpa_0p5h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 200, t_h: 0.5, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 2.09631, delta_q_replicate_2: 2.15632}
+    - observation_id: dacko_2004_t1_1600c_1000hpa_1h
+      experiment: t1_1600c_1000hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 1000, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 5.75562, delta_q_replicate_2: 6.58784}
+    - observation_id: dacko_2004_t1_1400c_1000hpa_1h
+      experiment: t1_1400c_1000hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 1000, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 1.27237, delta_q_replicate_2: 1.54351}
+    - observation_id: dacko_2004_t1_1600c_400hpa_1h
+      experiment: t1_1600c_400hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 400, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 8.39170, delta_q_replicate_2: 8.42132}
+    - observation_id: dacko_2004_t1_1400c_400hpa_1h
+      experiment: t1_1400c_400hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 400, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 1.66497, delta_q_replicate_2: 1.56459}
+    - observation_id: dacko_2004_t1_1600c_200hpa_1h
+      experiment: t1_1600c_200hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 200, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 11.30269, delta_q_replicate_2: 10.45238}
+    - observation_id: dacko_2004_t1_1400c_200hpa_1h
+      experiment: t1_1400c_200hpa_1h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 1 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 200, t_h: 1, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 2.54943, delta_q_replicate_2: 2.46536}
+    - observation_id: dacko_2004_t1_1600c_1000hpa_2h
+      experiment: t1_1600c_1000hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 1000, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 9.92987, delta_q_replicate_2: 9.65671}
+    - observation_id: dacko_2004_t1_1400c_1000hpa_2h
+      experiment: t1_1400c_1000hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 1000, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 3.30410, delta_q_replicate_2: 3.10237}
+    - observation_id: dacko_2004_t1_1600c_400hpa_2h
+      experiment: t1_1600c_400hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 400 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 400, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 10.51170, delta_q_replicate_2: 10.48562}
+    - observation_id: dacko_2004_t1_1400c_400hpa_2h
+      experiment: t1_1400c_400hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 400, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 2.21093, delta_q_replicate_2: 2.31003}
+    - observation_id: dacko_2004_t1_1600c_200hpa_2h
+      experiment: t1_1600c_200hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1600 C, 200 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1600, P_hPa: 200, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 13.03781, delta_q_replicate_2: 13.11232}
+    - observation_id: dacko_2004_t1_1400c_200hpa_2h
+      experiment: t1_1400c_200hpa_2h
+      type: mass_loss
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 2 h row; columns T, P, t, Δq'}
+      phase: glass
+      regime: transpiration
+      units: mg/cm2; T C; P hPa; t h; relative humidity percent
+      values: {method_class: measured_direct, evidence_class: printed, quantity_as_printed: delta_q, T_C: 1400, P_hPa: 200, t_h: 2, relative_humidity_pct: 60, reference_temperature: room_temperature, replicate_assignment: not_published, delta_q_replicate_1: 3.52111, delta_q_replicate_2: 3.61024}
+
+    - observation_id: dacko_2004_table2_activity_na2o_1400c
+      experiment: t2_activity_1400c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(Na2O), 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: Na2O, T_C: 1400, activity: 1.6e-6, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table2_activity_na2o_1500c
+      experiment: t2_activity_1500c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(Na2O), 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: Na2O, T_C: 1500, activity: 5.3e-7, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table2_activity_na2o_1600c
+      experiment: t2_activity_1600c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(Na2O), 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: Na2O, T_C: 1600, activity: 1.4e-7, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+
+    - observation_id: dacko_2004_table2_rate_calc_1400c_1bar
+      experiment: t2_1400c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 1.0 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1400, pressure_bar: 1.0, mass_loss_rate: 19, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1500c_1bar
+      experiment: t2_1500c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 1.0 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1500, pressure_bar: 1.0, mass_loss_rate: 10, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1600c_1bar
+      experiment: t2_1600c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 1.0 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1600, pressure_bar: 1.0, mass_loss_rate: 5, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1400c_0p4bar
+      experiment: t2_1400c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.4 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1400, pressure_bar: 0.4, mass_loss_rate: 30, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1500c_0p4bar
+      experiment: t2_1500c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.4 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1500, pressure_bar: 0.4, mass_loss_rate: 16, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1600c_0p4bar
+      experiment: t2_1600c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.4 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1600, pressure_bar: 0.4, mass_loss_rate: 8, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1400c_0p2bar
+      experiment: t2_1400c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.2 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1400, pressure_bar: 0.2, mass_loss_rate: 42, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1500c_0p2bar
+      experiment: t2_1500c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.2 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1500, pressure_bar: 0.2, mass_loss_rate: 22, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_calc_1600c_0p2bar
+      experiment: t2_1600c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_calc, 0.2 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: author_derived, evidence_class: printed_author_calculation, rate_label: r_calc, T_C: 1600, pressure_bar: 0.2, mass_loss_rate: 11, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1400c_1bar
+      experiment: t2_1400c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 1.0 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1400, pressure_bar: 1.0, mass_loss_rate: 16, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1500c_1bar
+      experiment: t2_1500c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 1.0 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1500, pressure_bar: 1.0, mass_loss_rate: 9, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1600c_1bar
+      experiment: t2_1600c_1bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 1.0 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1600, pressure_bar: 1.0, mass_loss_rate: 4, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1400c_0p4bar
+      experiment: t2_1400c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.4 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1400, pressure_bar: 0.4, mass_loss_rate: 23, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1500c_0p4bar
+      experiment: t2_1500c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.4 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1500, pressure_bar: 0.4, mass_loss_rate: 14, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1600c_0p4bar
+      experiment: t2_1600c_0p4bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.4 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1600, pressure_bar: 0.4, mass_loss_rate: 5, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1400c_0p2bar
+      experiment: t2_1400c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.2 bar row, 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1400, pressure_bar: 0.2, mass_loss_rate: 32, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1500c_0p2bar
+      experiment: t2_1500c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.2 bar row, 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1500, pressure_bar: 0.2, mass_loss_rate: 20, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+    - observation_id: dacko_2004_table2_rate_exp_1600c_0p2bar
+      experiment: t2_1600c_0p2bar
+      type: rate_series
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'r_exp, 0.2 bar row, 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: as printed; Table 2 does not state the rate unit
+      values: {quantity: mass_loss_rate, method_class: measured_direct, evidence_class: printed_comparison_result, rate_label: r_exp, T_C: 1600, pressure_bar: 0.2, mass_loss_rate: 7, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents', exposure_time: not_stated_in_table}
+
+    - observation_id: dacko_2004_figure2_weight_loss_qualitative
+      type: mass_loss
+      locator: {published_page: 208, pdf_page_index: 4, figure: '2', note: Weight loss per surface area versus time at 0.2, 0.4, and 1 bar; qualitative figure retained without coordinate digitization}
+      phase: glass
+      regime: transpiration
+      units: figure-only qualitative result
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitized: false
+        qualitative_result: Figure 2 shows an initial diffusion-barrier formation and approach to a stationary rate; the 0.2 bar curves are highest and 1 bar curves lowest for the plotted 1400 C and 1600 C series.
+
+    context:
+    - observation_id: dacko_2004_experimental_conditions
+      type: laboratory_conditions
+      locator: {published_page: 207, pdf_page_index: 3, section: Results and Discussion, note: Printed global ranges for all Table 1 experiments}
+      units: as printed
+      values:
+        method_class: measured_direct
+        temperature_range_C: 1400-1600
+        pressure_range_hPa: 200-1000
+        exposure_time_range_h: 0.5-2
+        relative_humidity_pct: 60
+        runs: two independent experimental runs
+        weight_loss_quantity: delta_q in mg/cm2 referred to the glass-melt surface
+    - observation_id: dacko_2004_equations_1_to_5
+      type: thermodynamic_equations
+      locator: {published_page: '208-209', pdf_page_index: '4-5', equation: '1-5', section: Results and Discussion}
+      units: as printed
+      values:
+        method_class: author_derived
+        equations:
+        - {equation: '1', formula: 'log r = -A/T - log P + B', locator: {published_page: 208, pdf_page_index: 4, equation: '1'}}
+        - {equation: '2', formula: 'log r = 3.239 - 10770/T - 0.311 log P; EA = 206.2 kJ/mol; standard deviation of r = +/- 5.79%', locator: {published_page: 208, pdf_page_index: 4, equation: '2'}}
+        - {equation: '3', formula: 'log r = 2.843 - 10528/T - 0.458 log P; EA = 201.6 kJ/mol; standard deviation of r = +/- 6.18%', locator: {published_page: 209, pdf_page_index: 5, equation: '3'}}
+        - {equation: '4', formula: 'log r = 1.961 - 9003/T - 0.089 log P; EA = 172.4 kJ/mol; standard deviation of r = +/- 9.65%', locator: {published_page: 209, pdf_page_index: 5, equation: '4'}}
+        - {equation: '5', formula: 'r_i = beta_i * P_i * M_i / (R * T)', definitions: 'beta_i mass-transfer coefficient; M_i molar mass; P_i partial vapour pressure; T absolute temperature; R gas constant', locator: {published_page: 209, pdf_page_index: 5, equation: '5'}}
+    - observation_id: dacko_2004_table3_mass_transfer_relations
+      type: method
+      locator: {published_page: 210, pdf_page_index: 6, table: '3', note: Technological values for the mass transfer}
+      units: as printed
+      values:
+        method_class: author_derived
+        rows:
+        - {equation: '6', formula: 'beta_i = Sh_i * D_i / L', definitions: 'beta_i mass-transfer coefficient; Sh Sherwood number; D diffusion coefficient in atmosphere; L characteristic surface length', locator: {published_page: 210, pdf_page_index: 6, table: '3', row: '6'}}
+        - {equation: '7', formula: 'Re = v * L * rho / eta', definitions: 'v velocity; L characteristic length; rho density; eta viscosity', locator: {published_page: 210, pdf_page_index: 6, table: '3', row: '7'}}
+        - {equation: '8', formula: 'Sc = eta / (D * rho)', definitions: 'eta viscosity; D diffusion; rho density', locator: {published_page: 210, pdf_page_index: 6, table: '3', row: '8'}}
+        - {equation: '9', formula: 'Sh = 1.615 * (Re * Sc * d/L)^(1/3)', definitions: 'L characteristic length; d tube diameter', locator: {published_page: 210, pdf_page_index: 6, table: '3', row: '9'}}
+    - observation_id: dacko_2004_humid_atmosphere_equations_10_to_21
+      type: thermodynamic_equations
+      locator: {published_page: '210-211', pdf_page_index: '6-7', equation: '10-21', section: Results and Discussion}
+      units: as printed
+      values:
+        method_class: author_derived
+        equations:
+        - {equation: '10', formula: 'Na2O(glass) + B2O3(glass) <-> 2 NaBO2', locator: {published_page: 210, pdf_page_index: 6, equation: '10'}}
+        - {equation: '11', formula: 'Na2O(glass) <-> 2 Na + 1/2 O2', locator: {published_page: 210, pdf_page_index: 6, equation: '11'}}
+        - {equation: '12', formula: 'Na2O(glass) + H2O <-> 2 NaOH', locator: {published_page: 210, pdf_page_index: 6, equation: '12'}}
+        - {equation: '13', formula: 'B2O3(glass) + H2O <-> 2 HBO2', locator: {published_page: 210, pdf_page_index: 6, equation: '13'}}
+        - {equation: '14', formula: 'B2O3(glass) + 3 H2O <-> 2 H3BO3', locator: {published_page: 210, pdf_page_index: 6, equation: '14'}}
+        - {equation: '15', formula: 'P_NaBO2 = sqrt(K_NaBO2 * a_Na2O * a_B2O3)', locator: {published_page: 210, pdf_page_index: 6, equation: '15'}}
+        - {equation: '16', formula: 'P_NaOH = sqrt(K_NaOH * a_Na2O * P_H2O)', locator: {published_page: 211, pdf_page_index: 7, equation: '16'}}
+        - {equation: '17', formula: 'P_HBO2 = sqrt(K_HBO2 * a_B2O3 * P_H2O)', locator: {published_page: 211, pdf_page_index: 7, equation: '17'}}
+        - {equation: '18', formula: 'P_H3BO3 = sqrt(K_H3BO3 * a_B2O3 * P_H2O^3)', locator: {published_page: 211, pdf_page_index: 7, equation: '18'}}
+        - {equation: '19', formula: 'log K_i = c0 + c1/T + c2/T^2; T in 1000 K', locator: {published_page: 211, pdf_page_index: 7, equation: '19'}}
+        - {equation: '20', formula: 'P(Na2O) = 1/2 P(NaBO2) + 1/2 P(NaOH)', locator: {published_page: 211, pdf_page_index: 7, equation: '20'}}
+        - {equation: '21', formula: 'P(B2O3) = 1/2 P(NaBO2) + P(HBO2) + 1/2 P(H3BO3)', locator: {published_page: 211, pdf_page_index: 7, equation: '21'}}
+
+  B:
+    observations:
+    - observation_id: dacko_2004_table2_activity_b2o3_1400c
+      experiment: t2_activity_1400c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(B2O3), 1400 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: B2O3, T_C: 1400, activity: 3.7e-2, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table2_activity_b2o3_1500c
+      experiment: t2_activity_1500c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(B2O3), 1500 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: B2O3, T_C: 1500, activity: 3.9e-2, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table2_activity_b2o3_1600c
+      experiment: t2_activity_1600c
+      type: activity_coefficient
+      locator: {published_page: 209, pdf_page_index: 5, table: '2', note: 'a(B2O3), 1600 C column'}
+      phase: glass
+      regime: transpiration
+      units: dimensionless activity; T C
+      values: {quantity: activity, method_class: author_derived, evidence_class: printed_author_calculation, oxide: B2O3, T_C: 1600, activity: 4.0e-2, pressure_as_printed: not_stated_in_table, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table5_400hpa_1400c
+      experiment: t5_400hpa_1400c_1h
+      type: composition_series
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na'}
+      phase: glass
+      regime: transpiration
+      units: T C; A cm2; delta mB mol; delta mNa mol; B/Na molar ratio
+      values: {method_class: measured_direct, evidence_class: printed_chemical_analysis, T_C: 1400, P_hPa: 400, t_h: 1, A_cm2: 11.483, delta_mB_mol: 0.00148, delta_mNa_mol: 0.00113, B_over_Na_molar_ratio: 1.308, relative_humidity_pct: 60, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table5_400hpa_1600c
+      experiment: t5_400hpa_1600c_1h
+      type: composition_series
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na'}
+      phase: glass
+      regime: transpiration
+      units: T C; A cm2; delta mB mol; delta mNa mol; B/Na molar ratio
+      values: {method_class: measured_direct, evidence_class: printed_chemical_analysis, T_C: 1600, P_hPa: 400, t_h: 1, A_cm2: 14.277, delta_mB_mol: 0.00703, delta_mNa_mol: 0.00531, B_over_Na_molar_ratio: 1.324, relative_humidity_pct: 60, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table5_200hpa_1400c
+      experiment: t5_200hpa_1400c_1h
+      type: composition_series
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na'}
+      phase: glass
+      regime: transpiration
+      units: T C; A cm2; delta mB mol; delta mNa mol; B/Na molar ratio
+      values: {method_class: measured_direct, evidence_class: printed_chemical_analysis, T_C: 1400, P_hPa: 200, t_h: 1, A_cm2: 9.543, delta_mB_mol: 0.00167, delta_mNa_mol: 0.00117, B_over_Na_molar_ratio: 1.417, relative_humidity_pct: 60, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    - observation_id: dacko_2004_table5_200hpa_1600c
+      experiment: t5_200hpa_1600c_1h
+      type: composition_series
+      locator: {published_page: 212, pdf_page_index: 8, table: '5', note: 'Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na'}
+      phase: glass
+      regime: transpiration
+      units: T C; A cm2; delta mB mol; delta mNa mol; B/Na molar ratio
+      values: {method_class: measured_direct, evidence_class: printed_chemical_analysis, T_C: 1600, P_hPa: 200, t_h: 1, A_cm2: 11.501, delta_mB_mol: 0.01018, delta_mNa_mol: 0.00809, B_over_Na_molar_ratio: 1.257, relative_humidity_pct: 60, composition_as_printed: '79 mol% SiO2; 7 mol% Na2O; 10 mol% B2O3; 3 mol% Al2O3; 1 mol% minor constituents'}
+    context:
+    - observation_id: dacko_2004_table4_na2o_naoh_coefficients
+      type: thermodynamic_coefficients
+      locator: {published_page: 211, pdf_page_index: 7, table: '4', note: 'Na2O, NaOH row; C2 cell is blank in the PDF'}
+      units: dimensionless coefficients; T in 1000 K
+      values: {method_class: author_derived, evidence_class: printed, oxide: Na2O, volatile_species: NaOH, c0: 6.034, c1: -9.087, c2_status: not_printed}
+    - observation_id: dacko_2004_table4_na2o_nabo2_coefficients
+      type: thermodynamic_coefficients
+      locator: {published_page: 211, pdf_page_index: 7, table: '4', note: 'Na2O, NaBO2 row; C2 cell is blank in the PDF'}
+      units: dimensionless coefficients; T in 1000 K
+      values: {method_class: author_derived, evidence_class: printed, oxide: Na2O, volatile_species: NaBO2, c0: 14.794, c1: -12.270, c2_status: not_printed}
+    - observation_id: dacko_2004_table4_b2o3_hbo2_coefficients
+      type: thermodynamic_coefficients
+      locator: {published_page: 211, pdf_page_index: 7, table: '4', note: 'B2O3, HBO2 row; C2 cell is blank in the PDF'}
+      units: dimensionless coefficients; T in 1000 K
+      values: {method_class: author_derived, evidence_class: printed, oxide: B2O3, volatile_species: HBO2, c0: 8.306, c1: -17.355, c2_status: not_printed}
+    - observation_id: dacko_2004_table4_b2o3_h3bo3_coefficients
+      type: thermodynamic_coefficients
+      locator: {published_page: 211, pdf_page_index: 7, table: '4', note: 'B2O3, H3BO3 row'}
+      units: dimensionless coefficients; T in 1000 K
+      values: {method_class: author_derived, evidence_class: printed, oxide: B2O3, volatile_species: H3BO3, c0: -6.324, c1: 4.935, c2: -2.185}
+
+refused:
+- what: Typed quantity for Table 1 delta_q
+  why: The current closed quantity vocabulary has no areal mass-loss quantity; values are retained verbatim under mass_loss with source-native delta_q fields, and a schema amendment is proposed.
+  locator: {published_page: 207, pdf_page_index: 3, table: '1'}
+- what: Numeric P(H2O) partial pressure for individual runs
+  why: The paper states variable water-vapour partial pressure and 60% relative humidity, but prints no numeric P(H2O) per run; no value was inferred.
+  locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
+- what: Run-specific oxygen fugacity or oxygen partial pressure
+  why: No fO2, pO2, buffer, or oxygen-gas value is printed; the typed fO2 channel remains unknown.
+  locator: {published_page: 207, pdf_page_index: 3, table: '1'}
+- what: Numeric c2 coefficients for NaOH, NaBO2, and HBO2
+  why: The three Table 4 C2 cells are blank in the PDF; blank is not zero and no value was invented.
+  locator: {published_page: 211, pdf_page_index: 7, table: '4', note: rows Na2O/NaOH, Na2O/NaBO2, B2O3/HBO2}
+- what: Numeric coordinates digitized from Figure 2
+  why: Figure 2 is retained as figure-only qualitative evidence; its plotted points duplicate Table 1 and were not digitized.
+  locator: {published_page: 208, pdf_page_index: 4, figure: '2'}
