@@ -413,15 +413,7 @@ species:
         admission_status: model_output_not_measurement
         gas_species: O2
         mass_yield_percent_about: 1.37
-        T_C_as_printed: 1800
-        T_K:
-          value: 2073.15
-          units: K
-          method_class: calculated
-          inference:
-            relation: celsius_to_kelvin
-            inputs: ['T_K = T_C + 273.15']
-            output_unit: K
+        T_C: 1800
         P_mbar_as_printed: 10
         code: HSC Chemistry version 10
         authors_caveat: Both results appeared to be close, however this comparison would be invalid as

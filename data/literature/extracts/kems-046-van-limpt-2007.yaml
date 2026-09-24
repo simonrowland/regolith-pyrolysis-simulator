@@ -279,6 +279,26 @@ experiments:
         inputs:
         - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
         - 'original_unit=wt_pct'
+        premise: >-
+          Treat the printed oxide values as grams per 100 g charge; use the
+          simulator/CIAAW formula masses below and add no omitted oxide.
+        molar_masses_g_mol: {B2O3: '69.617', Na2O: '61.97853856', Al2O3: '101.960077', SiO2: '60.083', CaO: '56.077'}
+        per_oxide:
+          B2O3: {printed_wt_pct: '2.6', moles_per_100g: '0.037347199678240', normalized_mole_fraction: '0.023489658619'}
+          Na2O: {printed_wt_pct: '0.10', moles_per_100g: '0.001613461729227', normalized_mole_fraction: '0.001014792690'}
+          Al2O3: {printed_wt_pct: '14.1', moles_per_100g: '0.138289420868131', normalized_mole_fraction: '0.086977639950'}
+          SiO2: {printed_wt_pct: '59.7', moles_per_100g: '0.993625484746101', normalized_mole_fraction: '0.624944403663'}
+          CaO: {printed_wt_pct: '23.5', moles_per_100g: '0.419066640512153', normalized_mole_fraction: '0.263573505079'}
+        normalisation:
+          formula: 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+          total_moles_per_100g: '1.589942207533852'
+          sum_mole_fraction: '1.000000000000'
+        round_trip_check:
+          formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
+          printed_total_wt_pct: '100.00'
+          reconstructed_wt_pct: {B2O3: '2.600000000044', Na2O: '0.100000000031', Al2O3: '14.099999999991', SiO2: '59.699999999925', CaO: '23.500000000009'}
+          residual_wt_pct: {B2O3: '4.396e-11', Na2O: '3.092e-11', Al2O3: '-8.699e-12', SiO2: '-7.492e-11', CaO: '8.747e-12'}
+          max_abs_residual_wt_pct: '7.492e-11'
         output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
@@ -313,11 +333,11 @@ experiments:
           basis: printed_oxides
           amount_basis: mole_fraction
           components:
-          - [B2O3, '0.024398429324']
-          - [Na2O, '0.001015014106']
-          - [Al2O3, '0.086996617477']
-          - [SiO2, '0.625080759389']
-          - [CaO, '0.262509179704']
+          - [B2O3, '0.045287606940']
+          - [Na2O, '0.001017380340']
+          - [Al2O3, '0.084725684256']
+          - [SiO2, '0.617092672278']
+          - [CaO, '0.251876656186']
       locator: {page: 142, table: '4.3', note: 'Glass 2 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map'}
       method_class: calculated
       inference:
@@ -325,6 +345,26 @@ experiments:
         inputs:
         - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
         - 'original_unit=wt_pct'
+        premise: >-
+          Treat the printed oxide values as grams per 100 g charge; use the
+          simulator/CIAAW formula masses below and add no omitted oxide.
+        molar_masses_g_mol: {B2O3: '69.617', Na2O: '61.97853856', Al2O3: '101.960077', SiO2: '60.083', CaO: '56.077'}
+        per_oxide:
+          B2O3: {printed_wt_pct: '5.0', moles_per_100g: '0.071821537842768', normalized_mole_fraction: '0.045287606940'}
+          Na2O: {printed_wt_pct: '0.10', moles_per_100g: '0.001613461729227', normalized_mole_fraction: '0.001017380340'}
+          Al2O3: {printed_wt_pct: '13.7', moles_per_100g: '0.134366316730028', normalized_mole_fraction: '0.084725684256'}
+          SiO2: {printed_wt_pct: '58.8', moles_per_100g: '0.978646206081587', normalized_mole_fraction: '0.617092672278'}
+          CaO: {printed_wt_pct: '22.4', moles_per_100g: '0.399450755211584', normalized_mole_fraction: '0.251876656186'}
+        normalisation:
+          formula: 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+          total_moles_per_100g: '1.585898277595194'
+          sum_mole_fraction: '1.000000000000'
+        round_trip_check:
+          formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
+          printed_total_wt_pct: '100.00'
+          reconstructed_wt_pct: {B2O3: '4.999999999986', Na2O: '0.099999999978', Al2O3: '13.699999999966', SiO2: '58.800000000054', CaO: '22.400000000017'}
+          residual_wt_pct: {B2O3: '-1.396e-11', Na2O: '-2.242e-11', Al2O3: '-3.442e-11', SiO2: '5.367e-11', CaO: '1.714e-11'}
+          max_abs_residual_wt_pct: '5.367e-11'
         output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
@@ -359,11 +399,11 @@ experiments:
           basis: printed_oxides
           amount_basis: mole_fraction
           components:
-          - [B2O3, '0.030514869292']
-          - [Na2O, '0.001512160289']
-          - [Al2O3, '0.089468591915']
-          - [SiO2, '0.616667393304']
-          - [CaO, '0.261836985200']
+          - [B2O3, '0.069063983551']
+          - [Na2O, '0.001531098969']
+          - [Al2O3, '0.085625331946']
+          - [SiO2, '0.569638051683']
+          - [CaO, '0.274141533850']
       locator: {page: 142, table: '4.3', note: 'Glass 3 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map'}
       method_class: calculated
       inference:
@@ -371,6 +411,27 @@ experiments:
         inputs:
         - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
         - 'original_unit=wt_pct'
+        premise: >-
+          Treat the printed oxide values as grams per 100 g charge; use the
+          simulator/CIAAW formula masses below and add no omitted oxide.
+        molar_masses_g_mol: {B2O3: '69.617', Na2O: '61.97853856', Al2O3: '101.960077', SiO2: '60.083', CaO: '56.077'}
+        per_oxide:
+          B2O3: {printed_wt_pct: '7.6', moles_per_100g: '0.109168737521008', normalized_mole_fraction: '0.069063983551'}
+          Na2O: {printed_wt_pct: '0.15', moles_per_100g: '0.002420192593841', normalized_mole_fraction: '0.001531098969'}
+          Al2O3: {printed_wt_pct: '13.8', moles_per_100g: '0.135347092764553', normalized_mole_fraction: '0.085625331946'}
+          SiO2: {printed_wt_pct: '54.1', moles_per_100g: '0.900421084166903', normalized_mole_fraction: '0.569638051683'}
+          CaO: {printed_wt_pct: '24.3', moles_per_100g: '0.433332738912567', normalized_mole_fraction: '0.274141533850'}
+        normalisation:
+          formula: 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+          total_moles_per_100g: '1.580689845958871'
+          sum_mole_fraction: '1.000000000000'
+        round_trip_check:
+          formula: 'w_i_check = (x_i M_i / sum_j(x_j M_j)) * sum_i(w_i)'
+          printed_total_wt_pct: '99.95'
+          reconstructed_wt_pct: {B2O3: '7.599999999977', Na2O: '0.149999999976', Al2O3: '13.799999999951', SiO2: '54.100000000081', CaO: '24.300000000015'}
+          residual_wt_pct: {B2O3: '-2.322e-11', Na2O: '-2.365e-11', Al2O3: '-4.916e-11', SiO2: '8.107e-11', CaO: '1.495e-11'}
+          max_abs_residual_wt_pct: '8.107e-11'
+          note: Printed glass-3 values sum to 99.95 wt%; the check preserves that printed total instead of silently renormalising it to 100.
         output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
@@ -614,15 +675,7 @@ species:
       values:
         quantity: measured_total_boron_evaporation_rate_vs_sqrt_water_pressure
         measurement_status: measured_figure_only
-        temperature_C: 1450
-        T_K:
-          value: 1723.15
-          units: K
-          method_class: calculated
-          inference:
-            relation: celsius_to_kelvin
-            inputs: ['T_K = T_C + 273.15']
-            output_unit: K
+        T_C: 1450
         B2O3_mass_pct_range: [4.6, 5.0]
         rows: [{p_H2O_bar: 0.0, boron_rate_mol_s: 3.7e-08}]
         refused_figure_points: "The remaining Fig. 4.8 points were not admitted: the OCR chart table does not preserve the plotted marker count/coordinates reliably, and the thesis prints no numeric point values."

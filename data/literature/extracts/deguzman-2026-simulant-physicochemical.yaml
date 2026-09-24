@@ -247,9 +247,8 @@ species:
         - {sample: LHS-2, CO2_mmol_g: 0.044, N2_mmol_g: 0.0160, H2_mmol_g: 0.0063, CH4_mmol_g: 0.0142, CO2_N2_ratio: 2.75, CO2_H2_ratio: 6.98, CO2_CH4_ratio: 3.10}
         - {sample: Olivine, CO2_mmol_g: 0.012, N2_mmol_g: 0.0029, H2_mmol_g: 0.0024, CH4_mmol_g: not reported, CO2_N2_ratio: 4.14, CO2_H2_ratio: 5.00, CO2_CH4_ratio: not reported}
         - {sample: Pyroxene, CO2_mmol_g: 0.022, N2_mmol_g: 0.0063, H2_mmol_g: 0.0145, CH4_mmol_g: 0.0068, CO2_N2_ratio: 3.49, CO2_H2_ratio: 1.52, CO2_CH4_ratio: 3.24}
-        T_K: 298.15
-        T_K_conversion: 25 C + 273.15 = 298.15 K
-        conditions: {temperature_C: 25, maximum_pressure_bar: 1, gas_identity: CO2, N2, H2, and CH4 single-component experiments}
+        T_C: 25
+        conditions: {maximum_pressure_bar: 1, gas_identity: CO2, N2, H2, and CH4 single-component experiments}
       uncertainty: {note: no uncertainty printed}
       equipment: {note: instrument, activation, sample mass, gas flow, and equilibration duration are not stated}
     - observation_id: deguzman_2026_figure_only_adsorption
