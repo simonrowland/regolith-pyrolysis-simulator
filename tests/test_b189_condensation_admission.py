@@ -16,6 +16,7 @@ from simulator.condensation import (
     CONDENSATION_FLUX_DORMANT_REFUSAL,
     CondensationModel,
     WallSaturationPressureRefusal,
+    _freeze_catalog_value,
     _antoine_psat_pa,
     _condensation_admission_refusal,
     _condensation_catalog,
@@ -30,7 +31,6 @@ from simulator.condensation import (
 from simulator.diagnostic_helpers.extract_reproduction import _engine_pure_psat_pa
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.vapour_rail.catalog import (
-    CatalogCompileError,
     HotTrainInapplicable,
     compiled_catalog_for,
     vapor_pressure_legacy_view,
@@ -92,13 +92,10 @@ def _configured_model(payload: dict, species_id: str) -> CondensationModel:
     return model
 
 
-def test_route_reuses_catalog_but_rechecks_mutations_between_batches(payload, monkeypatch):
+def test_route_catalog_payload_refuses_mutation_between_batches(payload, monkeypatch):
     import simulator.vapour_rail.catalog as catalog_module
 
     model = _configured_model(payload, "Na")
-    family_id = compiled_catalog_for(
-        payload, emit_u0_request_rules=False
-    ).species["Na"].family_id
     original = catalog_module.compiled_catalog_for
     calls = []
 
@@ -111,32 +108,56 @@ def test_route_reuses_catalog_but_rechecks_mutations_between_batches(payload, mo
     model.route(flux, MeltState())
     assert len(calls) == 1
 
-    model.vapor_pressure_data.catalog_payload["families"][family_id][
-        "code_metadata"
-    ]["hot_train_applicability"] = "not_applicable"
-    refused = model.route(flux, MeltState())
-    assert len(calls) == 2
-    assert refused.condensation_refusals_by_species["Na"]["reason"] == (
-        REFUSAL_INAPPLICABLE_PREDICATE
+    with pytest.raises(TypeError, match="catalog payload is immutable"):
+        model.vapor_pressure_data.catalog_payload["families"][
+            compiled_catalog_for(
+                payload, emit_u0_request_rules=False
+            ).species["Na"].family_id
+        ]["code_metadata"]["hot_train_applicability"] = "not_applicable"
+
+
+def test_route_catalog_reuses_by_identity_without_content_snapshot(
+    payload, monkeypatch
+):
+    import simulator.condensation as condensation_module
+    import simulator.vapour_rail.catalog as catalog_module
+
+    model = _configured_model(payload, "Na")
+    calls = []
+    original = catalog_module.compiled_catalog_for
+
+    def counted(*args, **kwargs):
+        calls.append(1)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(catalog_module, "compiled_catalog_for", counted)
+    monkeypatch.setattr(
+        condensation_module,
+        "_catalog_content_snapshot",
+        lambda value: pytest.fail("route lookup performed a content snapshot"),
+        raising=False,
     )
-    with pytest.raises(HotTrainInapplicable):
-        _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+    model.route(
+        EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
+        MeltState(),
+    )
+    assert len(calls) == 1
 
 
-def test_route_sees_mid_batch_catalog_mutation(payload, monkeypatch):
+def test_route_catalog_payload_refuses_mid_batch_mutation(payload, monkeypatch):
     model = _configured_model(payload, "Na")
 
     def mutating_route(*args):
         assert _antoine_psat_pa(
             "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
         ) is not None
-        _set_applicability(
-            model.vapor_pressure_data.catalog_payload, "Na", "not_applicable",
-        )
-        with pytest.raises(HotTrainInapplicable):
-            _antoine_psat_pa(
-                "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
+        with pytest.raises(TypeError, match="catalog payload is immutable"):
+            _set_applicability(
+                model.vapor_pressure_data.catalog_payload, "Na", "not_applicable",
             )
+        assert _antoine_psat_pa(
+            "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
+        ) is not None
 
     monkeypatch.setattr(model, "_route", mutating_route)
     model.route(EvaporationFlux(), MeltState())
@@ -146,6 +167,7 @@ def test_route_distinguishes_catalog_payloads(payload, monkeypatch):
     model = _configured_model(payload, "Na")
     other = deepcopy(model.vapor_pressure_data.catalog_payload)
     _set_applicability(other, "Na", "not_applicable")
+    other = _freeze_catalog_value(other)
 
     def probing_route(*args):
         first = _condensation_catalog(
@@ -161,7 +183,7 @@ def test_route_distinguishes_catalog_payloads(payload, monkeypatch):
     model.route(EvaporationFlux(), MeltState())
 
 
-def test_route_revalidates_equal_valued_type_mutation(payload, monkeypatch):
+def test_route_catalog_payload_refuses_equal_valued_type_mutation(payload, monkeypatch):
     model = _configured_model(payload, "Na")
     owned = model.vapor_pressure_data.catalog_payload
     family_id = compiled_catalog_for(owned).species["Na"].family_id
@@ -171,9 +193,8 @@ def test_route_revalidates_equal_valued_type_mutation(payload, monkeypatch):
 
     def probing_route(*args):
         _condensation_catalog(model.vapor_pressure_data, owned)
-        pressure_model["activity_exponent"] = True
-        with pytest.raises(CatalogCompileError):
-            _condensation_catalog(model.vapor_pressure_data, owned)
+        with pytest.raises(TypeError, match="catalog payload is immutable"):
+            pressure_model["activity_exponent"] = True
 
     assert pressure_model["activity_exponent"] == 1.0
     monkeypatch.setattr(model, "_route", probing_route)
@@ -190,9 +211,9 @@ def test_route_failure_does_not_leave_a_stale_catalog(payload, monkeypatch):
     monkeypatch.setattr(model, "_route", failing_route)
     with pytest.raises(RuntimeError, match="routing interrupted"):
         model.route(EvaporationFlux(), MeltState())
-    _set_applicability(model.vapor_pressure_data.catalog_payload, "Na", "not_applicable")
-    with pytest.raises(HotTrainInapplicable):
-        _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+    with pytest.raises(TypeError, match="catalog payload is immutable"):
+        _set_applicability(model.vapor_pressure_data.catalog_payload, "Na", "not_applicable")
+    assert not hasattr(model.vapor_pressure_data, "_route_catalog")
 
 
 @pytest.mark.parametrize("species_id", DORMANT_CARRIERS)

@@ -2012,14 +2012,34 @@ class CondensationModel:
             self.vapor_pressure_data = None
         else:
             raw = copy.deepcopy(vapor_pressure_data)
+            owned_catalog_payload = getattr(raw, "catalog_payload", None)
             if (
                 isinstance(raw, Mapping)
                 and raw.get("schema_version") == 2
                 and "families" in raw
             ):
-                self.vapor_pressure_data = VaporPressureCompatibilityView(
+                compatibility_view = VaporPressureCompatibilityView(
                     vapor_pressure_legacy_view(raw), raw
                 )
+                # The route cache relies on payload identity after this point.
+                # Freeze the owned copy at construction so a cached compiled
+                # catalog cannot outlive a silent in-place payload mutation.
+                compatibility_view.catalog_payload = _freeze_catalog_value(
+                    compatibility_view.catalog_payload
+                )
+                self.vapor_pressure_data = compatibility_view
+            elif (
+                isinstance(owned_catalog_payload, Mapping)
+                and owned_catalog_payload.get("schema_version") == 2
+                and "families" in owned_catalog_payload
+            ):
+                # Session callers may already provide the legacy facade; its
+                # authoritative schema-v2 payload still needs the same owner
+                # boundary freeze before route-local identity caching.
+                raw.catalog_payload = _freeze_catalog_value(
+                    owned_catalog_payload
+                )
+                self.vapor_pressure_data = raw
             else:
                 self.vapor_pressure_data = raw
         self.materials = copy.deepcopy(
@@ -4777,45 +4797,123 @@ CONDENSATION_ADMISSION_REFUSAL_NO_DATA = "antoine_data_unavailable"
 CONDENSATION_FLUX_DORMANT_REFUSAL = "flux_dormant_never_inventory_debit"
 
 
-class _CatalogNumberSnapshot:
-    __slots__ = ('value',)
+class _FrozenCatalogDict(dict):
+    """Schema-compatible mapping that refuses all in-place mutation."""
 
-    def __init__(self, value):
-        self.value = value
+    def __setitem__(self, key, value):
+        raise TypeError("condensation catalog payload is immutable")
 
-    def __eq__(self, other):
-        return type(self.value) is type(other) and self.value == other
+    def __delitem__(self, key):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def clear(self):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def pop(self, key, default=None):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def popitem(self):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def setdefault(self, key, default=None):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def update(self, *args, **kwargs):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __ior__(self, other):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __deepcopy__(self, memo):
+        clone = {}
+        memo[id(self)] = clone
+        for key, value in self.items():
+            clone[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        return clone
 
 
-def _catalog_content_snapshot(value):
+class _FrozenCatalogList(list):
+    """Schema-compatible sequence that refuses all in-place mutation."""
+
+    def __setitem__(self, index, value):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __delitem__(self, index):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def append(self, value):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def clear(self):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def extend(self, values):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def insert(self, index, value):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def pop(self, index=-1):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def remove(self, value):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def reverse(self):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def sort(self, **kwargs):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __iadd__(self, values):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __imul__(self, count):
+        raise TypeError("condensation catalog payload is immutable")
+
+    def __deepcopy__(self, memo):
+        clone = []
+        memo[id(self)] = clone
+        clone.extend(copy.deepcopy(value, memo) for value in self)
+        return clone
+
+
+def _freeze_catalog_value(value):
     if isinstance(value, Mapping):
-        return {key: _catalog_content_snapshot(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
-        return type(value)(_catalog_content_snapshot(item) for item in value)
-    if isinstance(value, (bool, int, float)):
-        return _CatalogNumberSnapshot(value)
+        frozen = _FrozenCatalogDict()
+        dict.__init__(
+            frozen,
+            ((key, _freeze_catalog_value(item)) for key, item in value.items()),
+        )
+        return frozen
+    if isinstance(value, list):
+        frozen = _FrozenCatalogList()
+        list.__init__(frozen, (_freeze_catalog_value(item) for item in value))
+        return frozen
+    if isinstance(value, tuple):
+        return tuple(_freeze_catalog_value(item) for item in value)
+    # Scalar leaves (including bool/int/float) retain their exact Python type;
+    # they are immutable, so 1.0 and True cannot be changed into one another.
     return value
 
 
 def _condensation_catalog(vapor_pressure_data, catalog_payload):
     cached = getattr(vapor_pressure_data, '_route_catalog', None)
-    # Route-local key: payload identity plus a detached, type-faithful content
-    # snapshot. Numeric wrappers prevent Python's 1.0 == True from bypassing
-    # validation. Compare containers without repeated serialization; any content
-    # change or different payload misses, and route() clears the slot in finally.
-    if (
-        cached is not None
-        and cached[0] is catalog_payload
-        and cached[1] == catalog_payload
+    # The owned route payload is frozen at model construction, so identity is
+    # sufficient: mutation cannot make a cached catalog stale. This remaining
+    # check rejects a different payload, while route() clears the slot in its
+    # finally block so a later route starts from a fresh catalog identity.
+    if hasattr(vapor_pressure_data, '_route_catalog') and not isinstance(
+        catalog_payload, _FrozenCatalogDict
     ):
-        return cached[2]
+        raise TypeError("route condensation catalog payload must be immutable")
+    if cached is not None and cached[0] is catalog_payload:
+        return cached[1]
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
     catalog = compiled_catalog_for(catalog_payload, emit_u0_request_rules=False)
     if hasattr(vapor_pressure_data, '_route_catalog'):
-        vapor_pressure_data._route_catalog = (
-            catalog_payload, _catalog_content_snapshot(catalog_payload), catalog,
-        )
+        vapor_pressure_data._route_catalog = (catalog_payload, catalog)
     return catalog
 
 
