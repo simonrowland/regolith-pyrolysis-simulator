@@ -27,7 +27,7 @@
         <thead><tr><th>Design peak</th><th>Value</th></tr></thead>
         <tbody>
             <tr><td>Hot total vapor</td><td>{{ '%.6g'|format(report.peaks.hot_total_vapor_kg_hr) }} kg/hr</td></tr>
-            <tr><td>Cold melt-offgas O2</td><td>{{ '%.6g'|format(report.peaks.cold_o2_kg_hr) }} kg/hr; {{ '%.6g'|format(report.peaks.cold_o2_mol_hr) }} mol/hr</td></tr>
+            <tr><td>Cold melt-offgas O2</td><td>{% if report.peaks.cold_o2_kg_hr is defined and report.peaks.cold_o2_kg_hr is not none and report.peaks.cold_o2_mol_hr is defined and report.peaks.cold_o2_mol_hr is not none %}{{ '%.6g'|format(report.peaks.cold_o2_kg_hr) }} kg/hr; {{ '%.6g'|format(report.peaks.cold_o2_mol_hr) }} mol/hr{% else %}not measured{% endif %}</td></tr>
         </tbody>
     </table>
     {% endif %}
@@ -48,7 +48,7 @@
                     {% if section.compressor_shaft_W is defined %}{{ '%.6g'|format(section.compressor_shaft_W) }} W shaft{% endif %}
                     {% if section.refrigeration_work_W is defined %}{{ '%.6g'|format(section.refrigeration_work_W) }} W lift{% endif %}
                     {% if section.active_lift_W is defined and section.active_lift_W %}{{ '%.6g'|format(section.active_lift_W) }} W active lift{% endif %}
-                    {% if section.total_J is defined %}{{ '%.6g'|format(section.total_J) }} J/batch{% endif %}
+                    {% if section.total_J is defined and section.total_J is not none %}{{ '%.6g'|format(section.total_J) }} J/batch{% elif section.total_J is defined %}not measured{% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -67,7 +67,7 @@
 
     {% if report.display_costs and report.display_costs.status != 'unavailable' %}
     <p class="config-hint">
-        Display-only installed cost {{ '%.2f'|format(report.display_costs.total_installed_usd) }} USD;
+        Display-only installed cost {% if report.display_costs.total_installed_usd is defined and report.display_costs.total_installed_usd is not none %}{{ '%.2f'|format(report.display_costs.total_installed_usd) }} USD{% else %}not measured{% endif %};
         not an optimizer objective.
     </p>
     {% endif %}

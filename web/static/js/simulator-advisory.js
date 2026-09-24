@@ -892,6 +892,7 @@ function renderCondensationRefusalsPanel(payload) {
 }
 
 function thermalTrainHeadlineMetric(value, unit) {
+    if (value === null || value === undefined) return 'not measured';
     const number = typeof value === 'number' && Number.isFinite(value) ? value : null;
     if (number === null) return 'n/a';
     const absolute = Math.abs(number);
