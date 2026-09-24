@@ -1179,6 +1179,239 @@ def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> Non
     assert author_obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
 
 
+def test_calculated_regime_fallback_still_requires_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["regime"] = "calculated"
+    row["values"].pop("method_class", None)
+    row["values"].pop("series", None)
+    row["values"]["pressure_atm"] = 1.0
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.evidence.class_.is_unknown
+    assert not any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_calculated_rejected_parent_cannot_be_measured_ancestry(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "rejected_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"]["admission_status"] = "typed_refusal"
+    parent["values"]["reason"] = "input measurement invalid: calibration failed"
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = "calculated_child"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["admission_status"] = "admitted"
+    child["values"]["derived_from"] = "rejected_parent"
+    child["values"]["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": ["rejected_parent"],
+        "output_unit": "Pa",
+    }
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    parent_obs = result.observations["fixture-source::rejected_parent"]
+    child_obs = result.observations["fixture-source::calculated_child"]
+
+    assert parent_obs.admission.status is AdmissionStatus.REJECTED
+    assert child_obs.evidence.class_.is_unknown
+    assert not any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_calculated_series_conversion_is_not_author_derivation(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"]["pressure_atm"] = 1.0
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = "calculated_series"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["derived_from"] = "measured_parent"
+    child["values"].pop("pressure_atm", None)
+    child["values"]["series"] = [{"T_K": 1200.0, "pressure_atm": 1.0}]
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "calculated_series" in observation.observation_id
+    ]
+
+    assert len(points) == 1
+    assert points[0].derivation is not None
+    assert points[0].derivation.relation == "atm_to_Pa"
+    assert points[0].evidence.class_.is_unknown
+
+
+def test_calculated_series_as_published_is_not_author_derivation(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"] = {
+        "quantity": "activity_coefficient",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "gamma": 0.8,
+    }
+    child = yaml.safe_load(yaml.safe_dump(base))
+    child.update({"observation_id": "calculated_as_published", "type": "activity_coefficient"})
+    child["values"] = {
+        "quantity": "activity_coefficient",
+        "method_class": "calculated",
+        "admission_status": "admitted",
+        "derived_from": ["measured_parent"],
+        "series": [{"T_K": 1200.0, "gamma": 0.5}],
+    }
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "calculated_as_published" in observation.observation_id
+    ]
+
+    assert len(points) == 1
+    assert points[0].derivation is not None
+    assert points[0].derivation.relation == "as_published"
+    assert points[0].evidence.class_.is_unknown
+
+
+def test_calculated_areal_conversion_keeps_author_derivation(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units="mg/cm2",
+        values={
+            "quantity": "mass_loss_areal_density",
+            "method_class": "calculated",
+            "admission_status": "admitted",
+            "derived_from": ["measured_parent"],
+            "derivation": {
+                "relation": "author_mass_balance_reduction",
+                "inputs": ["measured_parent"],
+                "output_unit": "kg_per_m2",
+            },
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    parent = yaml.safe_load(yaml.safe_dump(extract["species"]["Na"]["observations"][0]))
+    parent["observation_id"] = "measured_parent"
+    parent["values"] = {
+        "quantity": "mass_loss_areal_density",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "delta_q": "1.0",
+    }
+    extract["species"]["Na"]["observations"].insert(0, parent)
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert observation.derivation is not None
+    assert observation.derivation.relation == "author_mass_balance_reduction"
+    assert observation.derivation.output_unit == "kg_per_m2"
+
+
+def test_calculated_lineage_closes_independent_of_row_order(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+
+    def derived_row(observation_id: str, parent_id: str) -> dict:
+        row = yaml.safe_load(yaml.safe_dump(base))
+        row["observation_id"] = observation_id
+        row["values"].pop("series", None)
+        row["values"]["method_class"] = "calculated"
+        row["values"]["derived_from"] = parent_id
+        row["values"]["derivation"] = {
+            "relation": "author_mass_balance_reduction",
+            "inputs": [parent_id],
+            "output_unit": "Pa",
+        }
+        return row
+
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    middle = derived_row("calculated_middle", "measured_parent")
+    child = derived_row("calculated_child", "calculated_middle")
+    extract["species"]["Na"]["observations"] = [child, middle, parent]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    for observation_id in ("calculated_middle", "calculated_child"):
+        observation = result.observations[f"fixture-source::{observation_id}"]
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+
+
+def test_typed_refusal_preserves_admission_reason(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["admission_status"] = "typed_refusal"
+    row["values"]["reason"] = "curves have no printed numeric table"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "curves have no printed numeric table"
+
+
+def test_typed_refusal_preserves_refusal_reason_field(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["admission_status"] = "typed_refusal"
+    row["values"]["refusal_reason"] = "LiquidFractionInvalidError"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "LiquidFractionInvalidError"
+
+
+def test_bare_typed_refusal_method_is_rejected(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"].pop("admission_status", None)
+    row["values"]["method_class"] = "typed_refusal"
+    row["values"]["reason"] = "no printed numeric value"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "no printed numeric value"
+
+
 def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:
     from simulator.battery.migrate import METHOD_CLASS_MAP, evidence_for
 
