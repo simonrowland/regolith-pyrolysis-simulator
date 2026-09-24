@@ -574,7 +574,7 @@ fidelity_samples:
 - species: MgSO4
   observable: composition_series
   observation_id: jgr_2024_fig7_mg_sulfate_ca2
-  field: composition_fraction
+  field: yield_fraction
   value: 0.65
   locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
 - species: Cl
@@ -712,6 +712,15 @@ species:
         - {field: nt1_peak_C, value: 545, locator: {pdf_page_index: 12, figure: '6', row: NT1, column: 'SO2 peak'} }
         - {field: nt2_peak_C, value: 452, locator: {pdf_page_index: 12, figure: '6', row: NT2, column: 'SO2 peak'} }
         - {field: nt2_high_temperature_peak_C, value: 790, locator: {pdf_page_index: 12, figure: '6', row: NT2, column: 'high-temperature sulfate peak'} }
+    - observation_id: jgr_2024_fig6_ca_starkeyite_label
+      type: characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA, column: '2.3 wt.% starkeyite'}
+      units: wt.% as printed
+      values:
+        quantity: printed_starkeyite_abundance
+        method_class: figure_only
+        sample: CA
+        ca_starkeyite_wt_pct: 2.3
     observations:
     - observation_id: jgr_2024_fig6_so3_ca2
       experiment: ca2
@@ -791,61 +800,61 @@ species:
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA2, composition_fraction: 0.65}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA2, yield_fraction: 0.65}
     - observation_id: jgr_2024_fig7_mg_sulfate_ca1
       experiment: ca1
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA1, composition_fraction: 0.65}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA1, yield_fraction: 0.65}
     - observation_id: jgr_2024_fig7_mg_sulfate_av
       experiment: av
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: AV, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: AV, composition_fraction: 0.32}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: AV, yield_fraction: 0.32}
     - observation_id: jgr_2024_fig7_mg_sulfate_ze
       experiment: ze
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: ZE, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: ZE, composition_fraction: 0.50}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: ZE, yield_fraction: 0.50}
     - observation_id: jgr_2024_fig7_mg_sulfate_mg2
       experiment: mg2
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG2, composition_fraction: 0.35}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG2, yield_fraction: 0.35}
     - observation_id: jgr_2024_fig7_mg_sulfate_mg1
       experiment: mg1
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG1, composition_fraction: 0.35}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG1, yield_fraction: 0.35}
     - observation_id: jgr_2024_fig7_mg_sulfate_pt
       experiment: pt
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: PT, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: PT, composition_fraction: 0.10}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: PT, yield_fraction: 0.10}
     - observation_id: jgr_2024_fig7_mg_sulfate_bd
       experiment: bd
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: BD, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: BD, composition_fraction: 0.02}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: BD, yield_fraction: 0.02}
     - observation_id: jgr_2024_fig7_mg_sulfate_nt2
       experiment: nt2
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT2, composition_fraction: 0.48}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT2, yield_fraction: 0.48}
     - observation_id: jgr_2024_fig7_mg_sulfate_nt1
       experiment: nt1
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: condensate_composition, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT1, composition_fraction: 0.48}
+      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT1, yield_fraction: 0.48}
   Cl:
     context:
     - observation_id: jgr_2024_cl_printed_range_and_profile
