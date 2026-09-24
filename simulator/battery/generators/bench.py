@@ -14,11 +14,40 @@ from simulator.battery.waypoints import (
 )
 
 
+_FLAGGED_AUTHORITIES = {"assumed", "bound", "extrapolated"}
+
+
+def _readiness_flags(provenance: Mapping, payload) -> tuple[Mapping[str, object], ...]:
+    if payload is None:
+        return ()
+    flags = []
+    for output, route in (provenance.get("output_routes") or {}).items():
+        if not isinstance(route, Mapping):
+            continue
+        authority = str(route.get("authority") or "")
+        if authority not in _FLAGGED_AUTHORITIES:
+            continue
+        flag = {
+            "waypoint": str(route.get("waypoint") or output),
+            "authority": authority,
+            "flag_id": str(route.get("flag_id") or output),
+        }
+        if route.get("notice") is not None:
+            flag["notice"] = route["notice"]
+        flags.append(flag)
+    return tuple(flags)
+
+
 @dataclass(frozen=True)
 class GeneratedInput:
     readiness: ConsumerReadiness
     payload: Mapping | None
     provenance: Mapping
+
+    def __post_init__(self) -> None:
+        flags = _readiness_flags(self.provenance, self.payload)
+        if flags != self.readiness.flags:
+            object.__setattr__(self, "readiness", replace(self.readiness, flags=flags))
 
 
 def _provenance(inputs):
@@ -133,6 +162,7 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             oxygen_output = {
                 "waypoint": "oxygen_condition",
                 "authority": oxygen_route.authority.value,
+                "flag_id": oxygen_route.route,
             }
             if oxygen_route.notice is not None:
                 oxygen_output.update({"notice": oxygen_route.notice, "method_class": "calculated"})
@@ -236,14 +266,14 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
     provenance["output_routes"] = {
         "lab_geometry.sample.mass_g": {"waypoint": "run_mass_kg", "authority": "derived", "formula": "kg * 1000"},
         "lab_geometry.surfaces.physical_fields": {"waypoint": "surfaces"},
-        "lab_geometry.surfaces.modelling_fields": {"authority": "assumed", "input": "operator.surfaces"},
+        "lab_geometry.surfaces.modelling_fields": {"waypoint": "surfaces", "authority": "assumed", "input": "operator.surfaces", "flag_id": "operator.surfaces"},
         "lab_schedule.melt_temperature_C": {"waypoint": "thermal_path", "authority": "derived", "formula": "(s / 3600, K - 273.15)"},
         "lab_schedule.duration_h": {"waypoint": "thermal_path", "authority": "derived", "formula": "final s / 3600"},
         "lab_schedule.chamber_pressure_mbar": {"waypoint": "run_pressure_boundary", "authority": "derived", "formula": "Pa / 100"},
         "lab_schedule.surface_temperature_C": {"waypoint": "surface_temperature_C"},
         "lab_schedule.gas_boundary": {"waypoint": "gas_boundary"},
-        "lab_schedule.furnace_ceiling_C": {"authority": "assumed", "input": "operator.furnace_ceiling_C"},
-        "pair.faithful.feedstock_id": {"authority": "assumed", "input": "operator.feedstock_id"},
+        "lab_schedule.furnace_ceiling_C": {"waypoint": "furnace_ceiling_C", "authority": "assumed", "input": "operator.furnace_ceiling_C", "flag_id": "operator.furnace_ceiling_C"},
+        "pair.faithful.feedstock_id": {"waypoint": "feedstock_id", "authority": "assumed", "input": "operator.feedstock_id", "flag_id": "operator.feedstock_id"},
     }
     if readiness.status is ReadinessStatus.NOT_APPLICABLE:
         return GeneratedInput(readiness, None, provenance)

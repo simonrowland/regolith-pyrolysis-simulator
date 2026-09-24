@@ -145,6 +145,7 @@ class ConsumerReadiness:
     gaps: tuple[ReadinessGap, ...]
     engine: str | None = None
     notices: tuple[KnudsenConsistencyNotice, ...] = ()
+    flags: tuple[Mapping[str, object], ...] = ()
 
 
 _AUTHORITY_RANK = {

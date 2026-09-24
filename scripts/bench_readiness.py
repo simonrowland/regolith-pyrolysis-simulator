@@ -261,6 +261,7 @@ def _aggregate(
         **({"engine": engine} if engine else {}),
         "status": _status(records).value,
         "gaps": _deduplicated_gaps(selected),
+        "flags": list({repr(flag): flag for item in records for flag in item.flags}.values()),
     }
 
 
@@ -355,7 +356,8 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
             if key not in seen:
                 seen.add(key)
                 gaps.append(gap)
-    return ConsumerReadiness("engine_point", _status(engines), tuple(gaps))
+    flags = tuple({repr(flag): flag for item in engines for flag in item.flags}.values())
+    return ConsumerReadiness("engine_point", _status(engines), tuple(gaps), flags=flags)
 
 
 def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
@@ -440,7 +442,8 @@ def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
                            if item.consumer == base.consumer and item.engine == base.engine]
                 aggregated.append(ConsumerReadiness(base.consumer, _status(records),
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
-                    tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
+                    tuple({repr(notice): notice for item in records for notice in item.notices}.values()),
+                    tuple({repr(flag): flag for item in records for flag in item.flags}.values())))
             readiness = tuple(aggregated)
         # Own observations only. An alias that shares locator.table does not
         # lend another source's pure_substance_reference declaration.
@@ -454,6 +457,7 @@ def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
                     (gap,),
                     item.engine,
                     item.notices,
+                    item.flags,
                 )
                 if item.consumer == "engine_point"
                 else item

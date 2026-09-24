@@ -1112,6 +1112,8 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     import scripts.bench_readiness as module
 
     experiment, bench, observation, modelling_inputs = complete_rps()
+    printed_experiment = replace(experiment, bench_id=bench.id)
+    printed_observation = observation
     observation = replace(
         observation,
         point_conditions={
@@ -1173,10 +1175,91 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     assert not any(
         gap["waypoint"].startswith("operator.") for gap in with_rps["gaps"]
     )
+    assert with_rps["flags"] == [
+        {"waypoint": "surfaces", "authority": "assumed", "flag_id": "operator.surfaces"},
+        {"waypoint": "furnace_ceiling_C", "authority": "assumed", "flag_id": "operator.furnace_ceiling_C"},
+        {"waypoint": "feedstock_id", "authority": "assumed", "flag_id": "operator.feedstock_id"},
+    ]
+    assert consumer_rows(without)["engine_point"]["flags"]
     assert without["summary"]["by_consumer"]["rps"]["ready"] == 0
     assert with_model["summary"]["by_consumer"]["rps"]["ready"] == 1
     for consumer in ("kems", "engine_point"):
         assert consumer_rows(with_model)[consumer]["status"] == direct[consumer].status.value
+
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {printed_experiment.experiment_id: printed_experiment},
+            {printed_observation.observation_id: printed_observation},
+        ),
+    )
+    printed = module.report(tmp_path)
+    assert consumer_rows(printed)["engine_point"]["status"] == ReadinessStatus.READY.value
+    assert consumer_rows(printed)["engine_point"]["flags"] == []
+    assert all(item["flags"] == [] for item in printed["sources"][0]["engines"])
+
+
+def test_readiness_report_carries_vacuum_flag_for_real_source(
+    tmp_path, monkeypatch
+) -> None:
+    from pathlib import Path
+
+    from simulator.battery.migrate import (
+        bench_from_plain,
+        experiment_from_plain,
+        load_yaml,
+        observation_from_plain,
+        work_from_plain,
+    )
+    import scripts.bench_readiness as module
+
+    source_id = "mendybaev-2017-fun-cai-lab-evaporation"
+    root = Path(__file__).parents[2]
+    work_doc = load_yaml(
+        root / "data/literature/works/10.1016_j.gca.2016.08.034.yaml"
+    )
+    work = work_from_plain(work_doc["work"])
+    experiment = experiment_from_plain(work_doc["experiments"][0])
+    bench = bench_from_plain(work_doc["benches"][0])
+    source_doc = load_yaml(root / f"data/literature/extracts-v2/{source_id}.yaml")
+    observations = [
+        observation_from_plain(item) for item in source_doc["observations"]
+    ]
+    observation = next(
+        item
+        for item in observations
+        if oxygen_condition(experiment, bench, item).selected is not None
+        and oxygen_condition(experiment, bench, item).selected.route
+        == "vacuum_total_pressure_upper_bound"
+    )
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {experiment.experiment_id: experiment},
+            {observation.observation_id: observation},
+        ),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+
+    result = module.report(
+        tmp_path,
+        modelling_inputs={"surfaces": {}, "feedstock_id": "test-feed", "furnace_ceiling_C": 1200},
+    )
+    source = next(row for row in result["sources"] if row["source_id"] == source_id)
+    engine = next(
+        row for row in source["engines"] if row["engine"] == "internal-analytical"
+    )
+    assert engine["status"] == ReadinessStatus.READY.value
+    assert len(engine["flags"]) == 1
+    flag = engine["flags"][0]
+    assert flag["waypoint"] == "oxygen_condition"
+    assert flag["authority"] == "extrapolated"
+    assert flag["flag_id"] == "vacuum_total_pressure_upper_bound"
+    assert "bound, not a measurement" in flag["notice"]
 
 
 def test_verdict_no_lead_is_not_an_apparatus_reference(tmp_path, monkeypatch) -> None:
