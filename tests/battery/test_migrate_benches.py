@@ -259,7 +259,7 @@ def test_readiness_reports_per_run_counts_without_changing_source_status(tmp_pat
     }
 
 
-def _aggregation_readiness(experiment, bench, observation=None):
+def _aggregation_readiness(experiment, bench, observation=None, *, modelling_inputs=None):
     from simulator.battery.waypoints import ConsumerReadiness, ReadinessGap, ReadinessStatus, GapReason, ENGINE_POINT_CONSUMERS
     gaps = []
     if experiment.sample.mass_kg is None:

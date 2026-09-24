@@ -1612,21 +1612,24 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
     source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
     stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
     first = {
-        "bischof_2023_gao15_gamma_s1_1low_polytherm": Decimal("0.0632"),
-        "bischof_2023_gao15_gamma_s2_1low_isotherm": Decimal("0.0353"),
-        "bischof_2023_ino15_gamma_s1_1low_polytherm": Decimal("0.0527"),
-        "bischof_2023_ino15_gamma_s2_1low_isotherm": Decimal("0.0211"),
-    }
-    first_ids = {
-        "bischof_2023_gao15_gamma_s1_1low_polytherm": "T=1586.4:h=d85a6d52fc92",
-        "bischof_2023_gao15_gamma_s2_1low_isotherm": "T=1741.9:h=9b2744505ed4",
-        "bischof_2023_ino15_gamma_s1_1low_polytherm": "T=1586.4:h=5d7ac09ddf55",
-        "bischof_2023_ino15_gamma_s2_1low_isotherm": "T=1741.9:h=4913a4df11f4",
+        "bischof_2023_gao15_gamma_s1_1low_polytherm": ("1586.4", Decimal("0.0632")),
+        "bischof_2023_gao15_gamma_s2_1low_isotherm": ("1741.9", Decimal("0.0353")),
+        "bischof_2023_ino15_gamma_s1_1low_polytherm": ("1586.4", Decimal("0.0527")),
+        "bischof_2023_ino15_gamma_s2_1low_isotherm": ("1741.9", Decimal("0.0211")),
     }
     by_id = {o["observation_id"]: o for o in stored["observations"]}
-    for suffix, gamma in first.items():
-        oid = f"kems-137-bischof-2023::{suffix}::{first_ids[suffix]}"
-        obs = by_id[oid]
+    for suffix, (temperature, gamma) in first.items():
+        prefix = f"kems-137-bischof-2023::{suffix}::T={temperature}:"
+        matches = [
+            obs
+            for oid, obs in by_id.items()
+            if oid.startswith(prefix)
+            and (obs.get("identity") or {}).get("quantity", {}).get("value")
+            == "activity_coefficient"
+            and Decimal(str((obs.get("value") or {}).get("point"))) == gamma
+        ]
+        assert len(matches) == 1, (suffix, temperature, gamma, matches)
+        obs = matches[0]
         q = obs["identity"]["quantity"]
         assert q.get("value") == "activity_coefficient"
         assert Decimal(str(obs["value"]["point"])) == gamma

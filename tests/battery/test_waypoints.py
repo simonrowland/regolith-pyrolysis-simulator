@@ -1221,19 +1221,30 @@ def test_readiness_report_carries_vacuum_flag_for_real_source(
         root / "data/literature/works/10.1016_j.gca.2016.08.034.yaml"
     )
     work = work_from_plain(work_doc["work"])
-    experiment = experiment_from_plain(work_doc["experiments"][0])
+    experiments = {
+        experiment.experiment_id: experiment
+        for experiment in (
+            experiment_from_plain(item) for item in work_doc["experiments"]
+        )
+    }
     bench = bench_from_plain(work_doc["benches"][0])
     source_doc = load_yaml(root / f"data/literature/extracts-v2/{source_id}.yaml")
     observations = [
         observation_from_plain(item) for item in source_doc["observations"]
     ]
-    observation = next(
-        item
-        for item in observations
-        if oxygen_condition(experiment, bench, item).selected is not None
-        and oxygen_condition(experiment, bench, item).selected.route
-        == "vacuum_total_pressure_upper_bound"
-    )
+    for item in observations:
+        experiment = experiments.get(item.experiment_id)
+        if experiment is None:
+            continue
+        condition = oxygen_condition(experiment, bench, item)
+        if (
+            condition.selected is not None
+            and condition.selected.route == "vacuum_total_pressure_upper_bound"
+        ):
+            observation = item
+            break
+    else:
+        raise AssertionError("no Mendybaev observation selected for a matching experiment")
     monkeypatch.setattr(
         module,
         "load_migrated_store",
