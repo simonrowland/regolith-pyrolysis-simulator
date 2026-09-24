@@ -496,6 +496,107 @@ def charge_moles_by_species(
     return SpeciesWaypoints(results, absence, tuple(sorted(set(dropped) - set(results))))
 
 
+class _EnginePrintRefused(Exception):
+    """Printed map is a composition the engine must not flatten."""
+
+
+_TOTAL_IRON_AS_FEO = "total_iron_as_FeO"
+_FEOT_FLAG = "total iron reported as FeO; Fe3+/Fe2+ not printed"
+
+
+def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
+    """Typed mass-percent components, or a bare numeric map. None if neither."""
+
+    if not isinstance(raw, Mapping):
+        return None
+    basis = raw.get("amount_basis")
+    if isinstance(basis, AmountBasis):
+        basis = basis.value
+    components = raw.get("components")
+    if str(basis or "") == AmountBasis.MASS_PERCENT.value or "components" in raw:
+        if isinstance(components, Mapping):
+            return [(str(key), value) for key, value in components.items()]
+        if isinstance(components, (list, tuple)):
+            pairs: list[tuple[str, object]] = []
+            for item in components:
+                if not isinstance(item, (list, tuple)) or len(item) != 2:
+                    return None
+                pairs.append((str(item[0]), item[1]))
+            return pairs
+        return None
+    if any(key in raw for key in ("state", "kind", "amount_basis")):
+        return None
+    pairs = []
+    for key, value in raw.items():
+        if isinstance(value, Mapping):
+            return None
+        try:
+            amount = as_decimal(value)
+        except (ValueError, TypeError, ArithmeticError):
+            return None
+        if isinstance(amount, bool) or not amount.is_finite():
+            return None
+        pairs.append((str(key), value))
+    return pairs or None
+
+
+def _engine_printed_oxides(
+    raw: object,
+) -> tuple[dict[str, Decimal], set[str], str | None] | None:
+    """Engine oxide wt% when the print uses FeOT.
+
+    Returns None for an ordinary oxide print. FeOT beside FeO or Fe2O3, and any
+    printed non-oxide, stay unsupported. Printed names are not rewritten.
+    """
+
+    pairs = _printed_component_pairs(raw)
+    if pairs is None:
+        return None
+    names = [name for name, _value in pairs]
+    if len(set(names)) != len(names):
+        return None
+    has_feot = "FeOT" in names
+    non_oxides = [name for name in names if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS]
+    if not has_feot and not non_oxides:
+        return None
+    parsed: list[tuple[str, Decimal]] = []
+    for name, value in pairs:
+        try:
+            amount = as_decimal(value)
+        except (ValueError, TypeError, ArithmeticError):
+            return None
+        if not amount.is_finite() or amount < 0:
+            return None
+        parsed.append((name, amount))
+    by_name = {name: amount for name, amount in parsed}
+    oxides = {name: amount for name, amount in parsed if name in _OXIDE_COMPONENT_KEYS}
+    feot = by_name.get("FeOT")
+    others = [
+        (name, amount)
+        for name, amount in parsed
+        if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS
+    ]
+    omitted_total = sum((amount for _name, amount in others), Decimal("0"))
+    if others:
+        raise _EnginePrintRefused(omitted_total)
+    if feot is not None and ("FeO" in oxides or "Fe2O3" in oxides):
+        raise _EnginePrintRefused("ambiguous total iron")
+    exempt: set[str] = set()
+    notes: list[str] = []
+    if feot is not None:
+        oxides["FeO"] = feot
+        exempt.add("FeOT")
+        notes.append(
+            "calculated from printed FeOT; "
+            f"relation={_TOTAL_IRON_AS_FEO}; "
+            "inputs=FeOT; "
+            f"{_FEOT_FLAG}"
+        )
+    if not oxides or sum(oxides.values(), Decimal("0")) <= 0:
+        return None
+    return oxides, exempt, "; ".join(notes) if notes else None
+
+
 def normalized_composition(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
@@ -511,6 +612,7 @@ def normalized_composition(
     unsupported = False
     printed_species: set[str] | None = None
     printed_path = None
+    printed_basis_exempt: set[str] = set()
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
@@ -520,6 +622,8 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        basis_exempt: set[str] = set()
+        basis_notice: str | None = None
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
             if isinstance(components, Mapping):
@@ -533,8 +637,20 @@ def normalized_composition(
                         "normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM, (path,)))
             if printed_species is not None:
                 printed_path = path
-            raw = _printed_composition_map(raw)
-        if field == "printed_composition" and isinstance(raw, Mapping):
+            try:
+                engine_oxides = _engine_printed_oxides(raw)
+            except _EnginePrintRefused:
+                raw = None
+            else:
+                if engine_oxides is not None:
+                    raw, basis_exempt, basis_notice = engine_oxides
+                    if printed_species is None:
+                        pairs = _printed_component_pairs(located.state.value)
+                        printed_species = {name for name, _value in pairs} if pairs else set()
+                        printed_path = path
+                else:
+                    raw = _printed_composition_map(raw)
+        if field == "printed_composition" and isinstance(raw, Mapping) and printed_species is None:
             printed_species = {str(species) for species in raw}
             printed_path = path
         try:
@@ -587,10 +703,15 @@ def normalized_composition(
                     f"relation={located.inference.relation}; "
                     f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
                 )
+            if basis_notice:
+                notice = f"{notice}; {basis_notice}" if notice else basis_notice
+            route_name = ("observation_" if key in point else "") + "normalized_" + field
             routes.append(Waypoint("normalized_composition",
                 {species: n / total for species, n in amounts.items()},
-                ("observation_" if key in point else "") + "normalized_" + field,
+                route_name,
                 WaypointAuthority.DERIVED, (path,), notice=notice))
+            if field == "printed_composition":
+                printed_basis_exempt = set(basis_exempt)
             # Rank source evidence before normalization makes every output DERIVED.
             # Evidence directness: a printed x_i outranks a printed molar inventory,
             # which outranks a wt%-to-moles derivation (external molar-mass table).
@@ -607,8 +728,10 @@ def normalized_composition(
                                           key=lambda pair: pair[0], reverse=True)]
     result = _result("normalized_composition", routes, tuple(absent))
     if result.selected is not None and printed_species is not None:
-        dropped = tuple(sorted(
-            printed_species - {str(species) for species in result.selected.value}))
+        represented = {str(species) for species in result.selected.value}
+        if str(result.selected.route).endswith("normalized_printed_composition"):
+            represented |= printed_basis_exempt
+        dropped = tuple(sorted(printed_species - represented))
         if dropped:
             # The print names species the selected route dropped; emitting the
             # reduced sibling would silently vanish printed sample mass.

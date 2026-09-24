@@ -11,12 +11,20 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
+from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import ValueKind
+from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.identity import atm_to_pa
 from simulator.battery.migrate import migrate
-from simulator.battery.records import as_decimal
-from simulator.battery.waypoints import GapReason, consumer_readiness
+from simulator.battery.records import Sample, as_decimal
+from simulator.battery.waypoints import (
+    GapReason,
+    _molar_mass_kg_mol,
+    consumer_readiness,
+    normalized_composition,
+)
 from tests.battery import factories
+from tests.battery.test_bench_generators import case
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
 from tests.battery.test_waypoints import _bench
 
@@ -142,4 +150,76 @@ def test_explicit_row_point_conditions_win_over_inferred(tmp_path: Path) -> None
     assert any(
         gap.waypoint == "pressure_boundary" and gap.reason is GapReason.INTERVAL_NEEDS_POINT
         for gap in pressure_gap.gaps
+    )
+
+
+def _printed_experiment(raw: object):
+    experiment, bench, observation = case()
+    experiment = replace(
+        experiment,
+        sample=Sample(printed_composition=factories.located(raw)),
+    )
+    return experiment, bench, observation
+
+
+def test_feot_maps_to_feo_with_notice_and_printed_map_keeps_feot() -> None:
+    raw = {
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "60"], ["Al2O3", "10"], ["FeOT", "14.58"], ["MgO", "15.42"]],
+    }
+    experiment, bench, observation = _printed_experiment(raw)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert "FeOT" not in selected.value
+    assert set(selected.value) == {"SiO2", "FeO", "Al2O3", "MgO"}
+    weights = {"SiO2": Decimal("60"), "Al2O3": Decimal("10"), "FeO": Decimal("14.58"), "MgO": Decimal("15.42")}
+    moles = {name: weight / _molar_mass_kg_mol(name) for name, weight in weights.items()}
+    total = sum(moles.values())
+    assert selected.value == {name: amount / total for name, amount in moles.items()}
+    assert selected.notice is not None
+    assert "total_iron_as_FeO" in selected.notice
+    assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
+    assert "FeOT" in str(experiment.sample.printed_composition.state.value)
+    requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert len(requests) == 8
+    assert all(item.payload is not None for item in requests)
+    assert all(
+        "total_iron_as_FeO" in item.payload["composition_notice"]
+        and "total iron reported as FeO; Fe3+/Fe2+ not printed" in item.payload["composition_notice"]
+        for item in requests
+    )
+    assert all("FeO" in item.payload["composition_mol"] and "FeOT" not in item.payload["composition_mol"] for item in requests)
+
+
+def test_printed_feo_fe2o3_pair_is_not_rewritten() -> None:
+    raw = {"SiO2": Decimal("50"), "FeO": Decimal("30"), "Fe2O3": Decimal("20")}
+    experiment, _bench_unused, _observation = _printed_experiment(raw)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert set(selected.value) == {"SiO2", "FeO", "Fe2O3"}
+    assert selected.notice is None or "total_iron_as_FeO" not in selected.notice
+
+
+def test_feot_beside_feo_stays_unsupported() -> None:
+    raw = {"SiO2": Decimal("40"), "FeO": Decimal("30"), "FeOT": Decimal("30")}
+    experiment, _bench_unused, _observation = _printed_experiment(raw)
+    result = normalized_composition(experiment, _bench())
+    assert result.selected is None
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_non_oxide_above_one_weight_percent_stays_refused() -> None:
+    raw = {"SiO2": Decimal("50"), "MgO": Decimal("39"), "Cl": Decimal("11")}
+    experiment, bench, observation = _printed_experiment(raw)
+    result = normalized_composition(experiment, _bench())
+    assert result.selected is None
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert len(requests) == 8
+    assert all(item.payload is None for item in requests)
+    assert all(
+        any(gap.reason is GapReason.UNSUPPORTED_PRINT_FORM for gap in item.readiness.gaps)
+        for item in requests
     )

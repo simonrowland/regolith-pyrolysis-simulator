@@ -429,7 +429,19 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     sample = M._sample_from_plain(raw)
     sample = M._sample_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(sample))))
     experiment = replace(F.tabulation_experiment(), sample=sample)
-    assert (normalized_composition(experiment, None).selected is not None) == valid
+    selected = normalized_composition(experiment, None).selected
+    feot_printed = any(
+        isinstance(item, (list, tuple)) and str(item[0]) == "FeOT" for item in components
+    )
+    if feot_printed:
+        assert selected is not None
+        assert set(selected.value) == {"SiO2", "FeO"}
+        assert selected.notice is not None
+        assert "total_iron_as_FeO" in selected.notice
+        assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
+        assert "FeOT" in str(sample.printed_composition.state.value)
+    else:
+        assert (selected is not None) == valid
     assert bool(charge_moles_by_species(experiment, None).by_species) == valid
     assert sample.printed_composition.state.is_value
     if not valid:
@@ -502,8 +514,13 @@ def test_row_printed_composition_engine_boundary(monkeypatch, component):
     _, requests = _point_result(monkeypatch, conditions)
     assert len(requests) == 8
     for request in requests:
-        assert (request.payload is not None) == (component == "MgO")
-        if component != "MgO":
+        assert (request.payload is not None) == (component in {"MgO", "FeOT"})
+        if component == "FeOT":
+            assert "total_iron_as_FeO" in request.payload["composition_notice"]
+            assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in request.payload["composition_notice"]
+            assert "FeOT" not in request.payload["composition_mol"]
+            assert "FeO" in request.payload["composition_mol"]
+        elif component != "MgO":
             assert request.readiness.status.value == "gap"
 
 
@@ -613,9 +630,18 @@ def test_review_printed_composition_matrix(boundary, reason, case, components):
     requests = engine_point_requests(inputs)
     valid = case == "valid" or (
         boundary.endswith("with_sample_initial") and case in ("negative", "zero", "infinite", "nan")
+    ) or (
+        case == "ambiguous" and not boundary.endswith("with_sample_initial")
     )
     assert len(requests) == 8
     assert all((request.payload is not None) == valid for request in requests)
+    if valid and case == "ambiguous":
+        assert all(
+            "total_iron_as_FeO" in request.payload["composition_notice"]
+            and "total iron reported as FeO; Fe3+/Fe2+ not printed" in request.payload["composition_notice"]
+            and "FeOT" not in request.payload["composition_mol"]
+            for request in requests
+        )
     if not valid:
         assert inputs.waypoints["normalized_composition"].selected is None
         assert all(request.readiness.status.value == "gap" for request in requests)
