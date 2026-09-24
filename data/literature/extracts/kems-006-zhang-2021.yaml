@@ -35,7 +35,7 @@ benches:
   temperature_measurement:
     sensor: {state: {tag: value, value: two W100/W74Re26 thermocouples and an occasional pyrometer}, locator: {section: '2.2 Vacuum evaporation experiments'}}
   temperature_calibration:
-    uncertainty: {state: {tag: unknown, reason: not_published}, locator: {section: '2.2 Vacuum evaporation experiments', note: Within 5 C is agreement among measured temperatures, not calibration uncertainty}}
+    uncertainty: {state: {tag: unknown, reason: not_published}, locator: {section: '2.2 Vacuum evaporation experiments', note: 'Within 5 C is agreement among measured temperatures, not calibration uncertainty'}}
 experiments:
 - experiment_id: basalt-vacuum-evaporation-series
   bench_id: chicago-vacuum-furnace

@@ -49,7 +49,7 @@ benches:
     state: {tag: value, value: Knudsen cell-quadrupole mass-filter system}
     locator: &nak_apparatus {page: 528, published_page: 528, section: 'Apparatus and experiment', note: Newly constructed apparatus described in this work}
   cell_material_and_liner:
-    state: {tag: value, value: Molybdenum lid, container, and orifice plate; alumina inner crucible}
+    state: {tag: value, value: 'Molybdenum lid, container, and orifice plate; alumina inner crucible'}
     locator: *nak_apparatus
   geometry:
     cell_internal_dimensions:
@@ -88,7 +88,7 @@ experiments:
       state: {tag: value, value: Alloy melt in alumina inner crucible}
       locator: *nak_apparatus
     pretreatment:
-      state: {tag: value, value: Cd acid, water, and ethanol cleaned; alloy prepared under Ar; cell baked at about 450 K overnight after loading}
+      state: {tag: value, value: 'Cd acid, water, and ethanol cleaned; alloy prepared under Ar; cell baked at about 450 K overnight after loading'}
       locator: {page: 528, published_page: 528, section: 'Apparatus and experiment'}
     surface_area_m2:
       state: {tag: unknown, reason: not_published}
@@ -107,7 +107,7 @@ experiments:
       locator: {page: 528, published_page: 528, note: Residual gas pressure during cell heating in the 10^-5 Pa range}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
-      locator: {page: 528, published_page: 528, note: Ar was used for alloy preparation, not as measurement sweep gas}
+      locator: {page: 528, published_page: 528, note: 'Ar was used for alloy preparation, not as measurement sweep gas'}
     regime:
       regime_class: {tag: value, value: molecular}
     pumping:

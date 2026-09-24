@@ -255,7 +255,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 29, section: '3.5', note: Higher temperatures than KMS are stated, but no numerical temperature or interval is printed for this series}
+      locator: {published_page: 29, section: '3.5', note: 'Higher temperatures than KMS are stated, but no numerical temperature or interval is printed for this series'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '30397.5'}}
@@ -273,7 +273,7 @@ experiments:
   thermal_schedule:
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 29, section: '3.5', note: Higher temperatures than KMS stated, but no single duration printed}
+      locator: {published_page: 29, section: '3.5', note: 'Higher temperatures than KMS stated, but no single duration printed'}
 species:
   Na:
     observations:

@@ -144,7 +144,7 @@ species:
         - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, CoO_wt_pct: 0.62, CoO_sd_pct: 5, MgO_wt_pct: 27.3, MgO_sd_pct: 5, gamma_CoO: 6.22}
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
         derived_fields:
-          gamma_CoO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+          gamma_CoO: {method_class: model_derived, generator: 'authors'' equilibrium calculation from measured composition, fO2, and literature thermodynamic data'}
         system_class: silicate_melt
       uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, analytical_errors_Ni_and_Co_below_10_pct: true}
       equipment: {}
@@ -167,7 +167,7 @@ species:
         - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 1.86, CoO_sd_pct: 5, FeO_wt_pct: 1.94, FeO_sd_pct: 10, MgO_wt_pct: 30.5, MgO_sd_pct: 1, Co_wt_pct: 92.8, Co_sd_pct: 1, Fe_wt_pct: 7.28, Fe_sd_pct: 1, gamma_CoO: 1.89, gamma_FeO: 4.01}
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
         derived_fields:
-          gamma_CoO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+          gamma_CoO: {method_class: model_derived, generator: 'authors'' equilibrium calculation from measured composition, fO2, and literature thermodynamic data'}
         system_class: silicate_melt
       uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, alloy_recalculation_uncertainty: true}
       equipment: {}
@@ -199,7 +199,7 @@ species:
         - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 27.5, MgO_sd_pct: 5, gamma_NiO: 3.39}
         analysis_method: instrumental neutron activation analysis for Ni; analytical standard deviations printed in Table 3
         derived_fields:
-          gamma_NiO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+          gamma_NiO: {method_class: model_derived, generator: 'authors'' equilibrium calculation from measured composition, fO2, and literature thermodynamic data'}
         system_class: silicate_melt
       uncertainty: {analytical_errors_Ni_below_10_pct: true, concentration_uncertainty: Table 3 s.d. columns retained per row}
       equipment: {}
@@ -222,7 +222,7 @@ species:
         - {run: V 67, T_K: 1667, duration_h: 75.3, log_fO2: -9.79, NiO_wt_pct: 0.171, NiO_sd_pct: 5, FeO_wt_pct: 0.975, FeO_sd_pct: 5, MgO_wt_pct: 30.0, MgO_sd_pct: 1, Ni_wt_pct: 92.5, Ni_sd_pct: 1, Fe_wt_pct: 6.84, Fe_sd_pct: 3, gamma_NiO: 2.74, gamma_FeO: 3.99}
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
         derived_fields:
-          gamma_NiO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+          gamma_NiO: {method_class: model_derived, generator: 'authors'' equilibrium calculation from measured composition, fO2, and literature thermodynamic data'}
         system_class: silicate_melt
       uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, alloy_recalculation_uncertainty: true}
       equipment: {}
@@ -251,7 +251,7 @@ species:
         - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.313, CoO_sd_pct: 5, NiO_wt_pct: 0.0689, NiO_sd_pct: 6, FeO_wt_pct: 9.56, FeO_sd_pct: 5, MgO_wt_pct: 25.0, MgO_sd_pct: 7, gamma_CoO: 3.06, gamma_NiO: 3.33, gamma_FeO: 5.22}
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
         derived_fields:
-          gamma_FeO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+          gamma_FeO: {method_class: model_derived, generator: 'authors'' equilibrium calculation from measured composition, fO2, and literature thermodynamic data'}
         alloy_note: FeNiCo-alloy runs were recalculated to pure-metal equilibria using literature alloy activity coefficients
         system_class: silicate_melt
       uncertainty: {alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty, concentration_uncertainty: Table 3 s.d. columns retained per row}

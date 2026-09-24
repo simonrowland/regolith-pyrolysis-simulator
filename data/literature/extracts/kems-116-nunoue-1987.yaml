@@ -70,7 +70,7 @@ experiments:
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1473.15', interval_high: '1873.15'}}
-        locator: {published_page: 868, section: Synopsis, note: Printed 1200-1600 C, converted endpoints only}
+        locator: {published_page: 868, section: Synopsis, note: 'Printed 1200-1600 C, converted endpoints only'}
 - experiment_id: cited-results
   locator: {published_page: 872, figure: '1', note: Literature comparison; not this work's bench}
 fidelity_samples:

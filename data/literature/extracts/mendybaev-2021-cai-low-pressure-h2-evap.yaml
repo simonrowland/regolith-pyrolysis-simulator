@@ -25,7 +25,7 @@ benches:
   temperature_measurement:
     sensor: {state: {tag: value, value: Molybdenum-sheathed Type C W5Re-W26Re thermocouple 22.5 mm above sample}, locator: *mendy_h2_apparatus}
   temperature_calibration:
-    method: {state: {tag: value, value: Calibrated with Fe, Ni, and Rh-C melting temperatures at sample location}, locator: *mendy_h2_apparatus}
+    method: {state: {tag: value, value: 'Calibrated with Fe, Ni, and Rh-C melting temperatures at sample location'}, locator: *mendy_h2_apparatus}
   pumping_type: {state: {tag: value, value: Turbomolecular pump}, locator: *mendy_h2_apparatus}
 - id: chicago-high-vacuum-furnace
   identity: {basis: described_in_this_work}
@@ -44,7 +44,7 @@ experiments:
   locator: *mendy_h2_apparatus
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    printed_composition: {state: {tag: value, value: '16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%'}, locator: {published_page: 5, section: '3.1'}}
     form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
   conditions:
     temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 8, note: 1600 C; unit conversion only}}
@@ -64,7 +64,7 @@ experiments:
   locator: *mendy_vacuum_apparatus
   sample:
     mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
-    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    printed_composition: {state: {tag: value, value: '16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%'}, locator: {published_page: 5, section: '3.1'}}
     form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
   conditions:
     temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 7, note: 1600 C; unit conversion only}}
