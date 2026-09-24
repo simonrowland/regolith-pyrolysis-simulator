@@ -2177,9 +2177,15 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
-    assert census.get("p_partial") == 69
+    # Re-pinned once on this tree with _series_census (mismatches 0) against
+    # 7923cfb59. Numeric series counts moved only for:
+    #   jaggi-2021-mercury-atmosphere p_partial +6
+    #   ta-shirai-2000-lpsc evaporation_coefficient_alpha +6
+    #   kems-005-fedkin-2006 evaporation_coefficient_alpha +12
+    # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
+    assert census.get("p_partial") == 75
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 12
+    assert census.get("evaporation_coefficient_alpha") == 30
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -2188,7 +2194,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert census.get("evaporation_rate") == 25
     assert census.get("mass_loss_fraction") == 19
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 274, (n_numeric, census, n_unavailable)
+    assert n_numeric == 298, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
