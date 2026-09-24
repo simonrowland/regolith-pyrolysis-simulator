@@ -234,6 +234,162 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
     assert registry.fallback_for(intent) is None
 
 
+@pytest.mark.parametrize("backend_name", ("alphamelts", "thermoengine"))
+def test_terminal_refusal_rolls_back_chemistry_registry_authority(
+    backend_name: str,
+) -> None:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    intent = ChemistryIntent.GATE_LIQUID_FRACTION
+    registry = ProviderRegistry()
+    registry_before = registry.capability_summary()
+    assert registry_before == {}
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.backend = SimpleNamespace(backend_name=backend_name)
+    sim._chem_registry = registry
+    sim._chem_kernel = object()
+    sim.atom_ledger = FakeLedger()
+    sim._build_chemistry_kernel = lambda: object()
+
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
+
+    def refuse_after_registering_authority() -> None:
+        sim._register_freeze_gate_liquid_fraction_providers()
+        assert registry.authoritative_for(intent) is not None
+        assert registry.fallback_for(intent) is not None
+        raise refusal
+
+    sim._step_one_hour = refuse_after_registering_authority
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert registry.capability_summary() == registry_before
+    assert registry.authoritative_for(intent) is None
+    assert registry.fallback_for(intent) is None
+
+
+def test_terminal_refusal_rolls_back_metal_phase_authority() -> None:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+        def mol_by_account(self, account):
+            if account == "process.metal_phase_bottom_pool":
+                return {"Fe": 1.0}
+            return {}
+
+    intent = ChemistryIntent.METAL_PHASE_STRATIFICATION
+    registry = ProviderRegistry()
+    registry_before = registry.capability_summary()
+    assert registry_before == {}
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.backend = None
+    sim._chem_registry = registry
+    sim._chem_kernel = object()
+    sim.atom_ledger = FakeLedger()
+    sim._dispatch_only = lambda *args, **kwargs: SimpleNamespace(
+        transition=None,
+    )
+    sim._build_chemistry_kernel = lambda: object()
+
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
+
+    def refuse_after_registering_authority() -> None:
+        sim._restore_metal_phase_staging()
+        assert registry.authoritative_for(intent) is not None
+        raise refusal
+
+    sim._step_one_hour = refuse_after_registering_authority
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert registry.capability_summary() == registry_before
+    assert registry.authoritative_for(intent) is None
+
+
+def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    intent = ChemistryIntent.GATE_LIQUID_FRACTION
+    registry = ProviderRegistry()
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.backend = SimpleNamespace(backend_name="alphamelts")
+    sim._chem_registry = registry
+    sim._chem_kernel = object()
+    sim.atom_ledger = FakeLedger()
+    sim._build_chemistry_kernel = lambda: object()
+
+    def complete_after_registering_providers() -> HourSnapshot:
+        sim._register_freeze_gate_liquid_fraction_providers()
+        return HourSnapshot(hour=4)
+
+    sim._step_one_hour = complete_after_registering_providers
+
+    assert sim.step().hour == 4
+    assert registry.capability_summary() == {
+        "gate_liquid_fraction": {
+            "authoritative": "alphamelts-diagnostic",
+            "fallback": "magemin-shadow",
+            "shadows": (),
+        },
+    }
+
+
 def test_shared_mappingproxy_diamond_is_copied_not_live_aliased() -> None:
     """Visited-set skip must not leave a shared proxy unseeded.
 
