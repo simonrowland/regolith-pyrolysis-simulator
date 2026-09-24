@@ -35,7 +35,7 @@ fidelity_samples:
   - path: species.continental_crust.observations[schaefer_2012_table3_cc_extreme_atmospheres].values.rows[0].abundance_as_printed
     value: '49%'
     locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}
-  - path: species.photochemical_gases.observations[schaefer_2012_table4_photochemical_lifetimes].values.rows[0].value_as_printed
+  - path: species.photochemical_gases.observations[schaefer_2012_table4_j1_photolysis_rates].values.rows[0].value_as_printed
     value: '1.18×10^-5'
     locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}
   - path: species.continental_crust.observations[schaefer_2012_cc_100bar_major_gas_summary].values.rows[0].result_as_printed
@@ -113,8 +113,8 @@ species:
             - {planet: '55 Cnc e', column: 'Mass (×M⊕)', value_as_printed: '7.98^5/8.63^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Mass (×M⊕)'}}
             - {planet: '55 Cnc e', column: 'Radius (×R⊕)', value_as_printed: '2.13^5/2.00^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Radius (×R⊕)'}}
             - {planet: '55 Cnc e', column: 'Density (g cm^-3)', value_as_printed: '4.97^5/5.9^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Density (g cm^-3)'}}
-            - {planet: '55 Cnc e', column: 'Orbital Radius (AU)', value_as_printed: '0.01564', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Orbital Radius (AU)'}}
-            - {planet: '55 Cnc e', column: 'Teq (K)', value_as_printed: '1967', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Teq (K)'}}
+            - {planet: '55 Cnc e', column: 'Orbital Radius (AU)', value_as_printed: '0.01564', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Orbital Radius (AU)'}}
+            - {planet: '55 Cnc e', column: 'Teq (K)', value_as_printed: '1967', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Teq (K)'}}
 
   continental_crust:
     context:
@@ -642,66 +642,94 @@ species:
         type: rate_series
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
         derivation: {relation: authors photochemical lifetime calculation from printed photodissociation rates, output_unit: as_printed}
-        locator: {pdf_page_index: 34, table: '4', row: all, column: all}
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'tchem (s) at 1 AU, 0.25 AU, 0.017 AU'}
         phase: gas_phase
         regime: engine_evaluation
-        units: 'J1 s^-1 at 1 AU; tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
         values:
           quantity: photochemical_dissociation_rate_and_chemical_lifetime
           method_class: model_derived
           evidence_class: model_derived
           value_status: derived
-          generator: authors photochemical calculation from photodissociation rates; SiO rate estimated from Matveev (1986)
-          derivation: Table values are transcribed model output; no orbital scaling or lifetime recomputation was performed.
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
           conditions:
             temperature: {tag: unknown, reason: not_published}
             composition: Earth-like atmospheric model
             fO2: {tag: unknown, reason: not_published}
           rows:
-            - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
             - {gas: H2O, column: 'tchem (s), 1 AU', value_as_printed: '8.47×10^4', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 1 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.25 AU', value_as_printed: '5.29×10^3', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.017 AU', value_as_printed: '2.45×10^1', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CO2, column: 'tchem (s), 1 AU', value_as_printed: '4.95×10^5', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 1 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.25 AU', value_as_printed: '3.09×10^4', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.43×10^2', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CO, column: 'tchem (s), 1 AU', value_as_printed: '1.55×10^6', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 1 AU'}}
             - {gas: CO, column: 'tchem (s), 0.25 AU', value_as_printed: '9.68×10^4', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO, column: 'tchem (s), 0.017 AU', value_as_printed: '4.47×10^2', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.017 AU'}}
-            - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: SO2, column: 'tchem (s), 1 AU', value_as_printed: '4.01×10^3', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 1 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.25 AU', value_as_printed: '2.51×10^2', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.16×10^0', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: O2, column: 'tchem (s), 1 AU', value_as_printed: '2.06×10^5', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 1 AU'}}
             - {gas: O2, column: 'tchem (s), 0.25 AU', value_as_printed: '1.29×10^4', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.25 AU'}}
             - {gas: O2, column: 'tchem (s), 0.017 AU', value_as_printed: '5.94×10^1', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CH4, column: 'tchem (s), 1 AU', value_as_printed: '1.28×10^5', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 1 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.25 AU', value_as_printed: '8.02×10^3', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.25 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.017 AU', value_as_printed: '3.71×10^1', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.017 AU'}}
-            - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
             - {gas: NH3, column: 'tchem (s), 1 AU', value_as_printed: '5.73×10^3', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 1 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.25 AU', value_as_printed: '3.58×10^2', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.25 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.017 AU', value_as_printed: '1.66×10^0', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.017 AU'}}
-            - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
             - {gas: H2S, column: 'tchem (s), 1 AU', value_as_printed: '3.03×10^2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 1 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.25 AU', value_as_printed: '1.89×10^1', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.017 AU', value_as_printed: '8.76×10^-2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.017 AU'}}
-            - {gas: 'NO', column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'J1 (s^-1), 1 AU'}}
             - {gas: 'NO', column: 'tchem (s), 1 AU', value_as_printed: '2.83×10^5', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 1 AU'}}
             - {gas: 'NO', column: 'tchem (s), 0.25 AU', value_as_printed: '1.77×10^4', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.25 AU'}}
             - {gas: 'NO', column: 'tchem (s), 0.017 AU', value_as_printed: '8.19×10^1', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.017 AU'}}
-            - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: N2, column: 'tchem (s), 1 AU', value_as_printed: '9.76×10^5', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 1 AU'}}
             - {gas: N2, column: 'tchem (s), 0.25 AU', value_as_printed: '6.10×10^4', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.25 AU'}}
             - {gas: N2, column: 'tchem (s), 0.017 AU', value_as_printed: '2.82×10^2', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: SiO, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.03×10^-3', method_class: quoted_literature, source_attribution: 'Matveev (1986)', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}}
             - {gas: SiO, column: 'tchem (s), 1 AU', value_as_printed: '2.48×10^2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 1 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.55×10^1', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.25 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.017 AU', value_as_printed: '7.17×10^-2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.017 AU'}}
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          quoted_from: 'Levine (1985)'
+          rows:
+            - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: 'NO', column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'J1 (s^-1), 1 AU'}}
+            - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
+      - observation_id: schaefer_2012_table4_sio_j1_photolysis_rate
+        type: rate_series
+        quote: 'Table 4 footnote b: estimated based on data from Matveev (1986).'
+        locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          quoted_from: 'Matveev (1986)'
+          rows:
+            - {gas: SiO, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.03×10^-3', source_attribution: 'Matveev (1986)', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}}
 
   volatile_boundary_map:
     observations:
