@@ -98,6 +98,25 @@ experiments:
           SiO2: '42.9'
           CaO: '7.6'
       locator: *id002
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.493970330792']
+          - [Al2O3, '0.059763722349']
+          - [SiO2, '0.375072728594']
+          - [CaO, '0.071193218264']
+      locator: *id002
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -196,6 +215,25 @@ experiments:
           SiO2: 40.74
           CaO: 10.48
       locator: *id003
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.450676293652']
+          - [Al2O3, '0.080759336817']
+          - [SiO2, '0.367323510463']
+          - [CaO, '0.101240859068']
+      locator: *id003
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -294,6 +332,25 @@ experiments:
           SiO2: 37.16
           CaO: 12.52
       locator: *id004
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.438653511844']
+          - [Al2O3, '0.098034720189']
+          - [SiO2, '0.340422549768']
+          - [CaO, '0.122889218199']
+      locator: *id004
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -392,6 +449,25 @@ experiments:
           SiO2: 35.54
           CaO: 14.77
       locator: *id005
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.414433808648']
+          - [Al2O3, '0.108302347556']
+          - [SiO2, '0.330223177653']
+          - [CaO, '0.147040666143']
+      locator: *id005
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -490,6 +566,25 @@ experiments:
           SiO2: 34.24
           CaO: 16.72
       locator: *id006
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.385790290835']
+          - [Al2O3, '0.120896227157']
+          - [SiO2, '0.323866104394']
+          - [CaO, '0.169447377614']
+      locator: *id006
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -588,6 +683,25 @@ experiments:
           SiO2: 31.63
           CaO: 19.22
       locator: *id007
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.346432176742']
+          - [Al2O3, '0.145145748788']
+          - [SiO2, '0.307936760333']
+          - [CaO, '0.200485314137']
+      locator: *id007
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -686,6 +800,25 @@ experiments:
           SiO2: 28.21
           CaO: 21.37
       locator: *id008
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.290168053761']
+          - [Al2O3, '0.188463289419']
+          - [SiO2, '0.287786788955']
+          - [CaO, '0.233581867865']
+      locator: *id008
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -784,6 +917,25 @@ experiments:
           SiO2: 27.32
           CaO: 24.03
       locator: *id009
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.254720951397']
+          - [Al2O3, '0.196072446390']
+          - [SiO2, '0.282744933016']
+          - [CaO, '0.266461669197']
+      locator: *id009
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -882,6 +1034,25 @@ experiments:
           SiO2: 22.16
           CaO: 26.75
       locator: *id010
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.179756040561']
+          - [Al2O3, '0.260603997822']
+          - [SiO2, '0.244025758411']
+          - [CaO, '0.315614203207']
+      locator: *id010
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state:
         tag: value

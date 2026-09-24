@@ -76,6 +76,30 @@ experiments:
           CO2: 0.9
           Cl: 1.6
       locator: *id002
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.548062944733']
+          - [TiO2, '0.008218835874']
+          - [Al2O3, '0.091833147720']
+          - [FeO, '0.045950844039']
+          - [MgO, '0.148172107553']
+          - [CaO, '0.143332375533']
+          - [Na2O, '0.014224790137']
+          - [K2O, '0.000204954411']
+      locator: *id002
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -159,6 +183,30 @@ experiments:
           CO2: 0.9
           Cl: 2.0
       locator: *id004
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.534284952832']
+          - [TiO2, '0.007972488985']
+          - [Al2O3, '0.082613830075']
+          - [FeO, '0.073116243120']
+          - [MgO, '0.146789805517']
+          - [CaO, '0.141812202519']
+          - [Na2O, '0.013269652337']
+          - [K2O, '0.000140824614']
+      locator: *id004
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -242,6 +290,30 @@ experiments:
           CO2: 0.9
           Cl: 2.57
       locator: *id006
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.532366603603']
+          - [TiO2, '0.008131608794']
+          - [Al2O3, '0.082601877863']
+          - [FeO, '0.073647807785']
+          - [MgO, '0.146715948253']
+          - [CaO, '0.142751766410']
+          - [Na2O, '0.013566666450']
+          - [K2O, '0.000217720842']
+      locator: *id006
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -325,6 +397,30 @@ experiments:
           CO2: 0.4
           Cl: 2.64
       locator: *id008
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.529252930692']
+          - [TiO2, '0.008310442262']
+          - [Al2O3, '0.088813364265']
+          - [FeO, '0.078387998646']
+          - [MgO, '0.143317750742']
+          - [CaO, '0.140857168710']
+          - [Na2O, '0.010920817560']
+          - [K2O, '0.000139527122']
+      locator: *id008
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -408,6 +504,30 @@ experiments:
           CO2: 0.4
           Cl: 2.68
       locator: *id010
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.532513773379']
+          - [TiO2, '0.008268603693']
+          - [Al2O3, '0.090869092190']
+          - [FeO, '0.077762198756']
+          - [MgO, '0.140417535012']
+          - [CaO, '0.138840991503']
+          - [Na2O, '0.011187592541']
+          - [K2O, '0.000140212926']
+      locator: *id010
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -491,6 +611,30 @@ experiments:
           CO2: 0.4
           Cl: 2.85
       locator: *id012
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.536477386426']
+          - [TiO2, '0.008192290572']
+          - [Al2O3, '0.086825868760']
+          - [FeO, '0.078152209315']
+          - [MgO, '0.139973018097']
+          - [CaO, '0.138819203054']
+          - [Na2O, '0.011418269835']
+          - [K2O, '0.000141753943']
+      locator: *id012
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -574,6 +718,30 @@ experiments:
           CO2: 0.4
           Cl: 3.13
       locator: *id014
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.535851442144']
+          - [TiO2, '0.008315350549']
+          - [Al2O3, '0.084474645612']
+          - [FeO, '0.076685106334']
+          - [MgO, '0.142075613976']
+          - [CaO, '0.141629532840']
+          - [Na2O, '0.010824425254']
+          - [K2O, '0.000143883291']
+      locator: *id014
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -657,6 +825,30 @@ experiments:
           CO2: 0.1
           Cl: 2.93
       locator: *id016
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.537350213208']
+          - [TiO2, '0.008313253696']
+          - [Al2O3, '0.086759424042']
+          - [FeO, '0.073659268175']
+          - [MgO, '0.144867728727']
+          - [CaO, '0.140684161476']
+          - [Na2O, '0.008296847701']
+          - [K2O, '0.000069102974']
+      locator: *id016
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -740,6 +932,30 @@ experiments:
           CO2: 0.1
           Cl: 3.25
       locator: *id018
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.550987547165']
+          - [TiO2, '0.008494770246']
+          - [Al2O3, '0.089149690573']
+          - [FeO, '0.055375459495']
+          - [MgO, '0.143488559032']
+          - [CaO, '0.139541239835']
+          - [Na2O, '0.012752954878']
+          - [K2O, '0.000209778776']
+      locator: *id018
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -823,6 +1039,30 @@ experiments:
           CO2: 0.1
           Cl: 3.37
       locator: *id020
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.546335393697']
+          - [TiO2, '0.008413499603']
+          - [Al2O3, '0.082932965787']
+          - [FeO, '0.060376633292']
+          - [MgO, '0.154173782270']
+          - [CaO, '0.140112514352']
+          - [Na2O, '0.007513953608']
+          - [K2O, '0.000141257391']
+      locator: *id020
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        - "oxide projection; printed H2O/CO2/Cl remain in sample.printed_composition"
+        output_unit: mole_fraction
     form:
       state:
         tag: value
