@@ -31,7 +31,7 @@ fidelity_samples:
     locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: O, column: 'Continental Crust (wt%)'}
   - path: species.bulk_silicate_earth.observations[schaefer_2012_table2_bse_bulk_composition].values.rows[14].value_as_printed
     value: '0.88×10^-4'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: N, column: 'Bulk Silicate Earth (wt%)'}
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: 'N', column: 'Bulk Silicate Earth (wt%)'}
   - path: species.continental_crust.observations[schaefer_2012_table3_cc_extreme_atmospheres].values.rows[0].abundance_as_printed
     value: '49%'
     locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}
@@ -58,63 +58,63 @@ species:
           method_class: quoted_prior_work
           evidence_class: quoted_prior_work
           value_status: printed
-          source_attribution: 'References in Table 1 footnotes 1-7; compiled planet properties'
+          source_attribution: 'Per-row footnote attribution below; planets without a footnote are unattributed.'
           rows:
-            - {planet: 'Kepler-11 f', column: 'Mass (×M⊕)', value_as_printed: '2.30', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-11 f', column: 'Radius (×R⊕)', value_as_printed: '2.61', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-11 f', column: 'Density (g cm^-3)', value_as_printed: '0.71', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-11 f', column: 'Orbital Radius (AU)', value_as_printed: '0.25', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-11 f', column: 'Teq (K)', value_as_printed: '544', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Teq (K)'}}
-            - {planet: 'GJ 1214 b', column: 'Mass (×M⊕)', value_as_printed: '6.55', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'GJ 1214 b', column: 'Radius (×R⊕)', value_as_printed: '2.68', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'GJ 1214 b', column: 'Density (g cm^-3)', value_as_printed: '1.88', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'GJ 1214 b', column: 'Orbital Radius (AU)', value_as_printed: '0.014', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'GJ 1214 b', column: 'Teq (K)', value_as_printed: '555', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Teq (K)'}}
-            - {planet: 'HD 97658 b', column: 'Mass (×M⊕)', value_as_printed: '6.40', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'HD 97658 b', column: 'Radius (×R⊕)', value_as_printed: '2.93', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'HD 97658 b', column: 'Density (g cm^-3)', value_as_printed: '1.40', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'HD 97658 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0797', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'HD 97658 b', column: 'Teq (K)', value_as_printed: '510-720', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Teq (K)'}}
-            - {planet: 'Kepler-11 e', column: 'Mass (×M⊕)', value_as_printed: '8.40', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-11 e', column: 'Radius (×R⊕)', value_as_printed: '4.52', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-11 e', column: 'Density (g cm^-3)', value_as_printed: '0.5', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-11 e', column: 'Orbital Radius (AU)', value_as_printed: '0.194', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-11 e', column: 'Teq (K)', value_as_printed: '617', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Teq (K)'}}
-            - {planet: 'Kepler-11 d', column: 'Mass (×M⊕)', value_as_printed: '6.10', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-11 d', column: 'Radius (×R⊕)', value_as_printed: '3.43', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-11 d', column: 'Density (g cm^-3)', value_as_printed: '0.83', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-11 d', column: 'Orbital Radius (AU)', value_as_printed: '0.159', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-11 d', column: 'Teq (K)', value_as_printed: '692', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Teq (K)'}}
-            - {planet: 'Kepler-11 b', column: 'Mass (×M⊕)', value_as_printed: '4.30', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-11 b', column: 'Radius (×R⊕)', value_as_printed: '1.97', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-11 b', column: 'Density (g cm^-3)', value_as_printed: '3.10', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-11 b', column: 'Orbital Radius (AU)', value_as_printed: '0.091', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-11 b', column: 'Teq (K)', value_as_printed: '900', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Teq (K)'}}
-            - {planet: 'Kepler-20 b', column: 'Mass (×M⊕)', value_as_printed: '8.70', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-20 b', column: 'Radius (×R⊕)', value_as_printed: '1.91', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-20 b', column: 'Density (g cm^-3)', value_as_printed: '6.5', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-20 b', column: 'Orbital Radius (AU)', value_as_printed: '0.04537', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-20 b', column: 'Teq (K)', value_as_printed: '1014', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Teq (K)'}}
-            - {planet: 'Kepler-18 b', column: 'Mass (×M⊕)', value_as_printed: '6.90', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-18 b', column: 'Radius (×R⊕)', value_as_printed: '2.00', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-18 b', column: 'Density (g cm^-3)', value_as_printed: '4.9', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-18 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0447', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-18 b', column: 'Teq (K)', value_as_printed: '1179', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Teq (K)'}}
-            - {planet: 'CoRoT-7 b', column: 'Mass (×M⊕)', value_as_printed: '7.42', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'CoRoT-7 b', column: 'Radius (×R⊕)', value_as_printed: '1.58', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'CoRoT-7 b', column: 'Density (g cm^-3)', value_as_printed: '10.4', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'CoRoT-7 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0172', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'CoRoT-7 b', column: 'Teq (K)', value_as_printed: '1810', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Teq (K)'}}
-            - {planet: 'Kepler-10 b', column: 'Mass (×M⊕)', value_as_printed: '4.54', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Mass (×M⊕)'}}
-            - {planet: 'Kepler-10 b', column: 'Radius (×R⊕)', value_as_printed: '1.42', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Radius (×R⊕)'}}
-            - {planet: 'Kepler-10 b', column: 'Density (g cm^-3)', value_as_printed: '8.74', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Density (g cm^-3)'}}
-            - {planet: 'Kepler-10 b', column: 'Orbital Radius (AU)', value_as_printed: '0.01684', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Orbital Radius (AU)'}}
-            - {planet: 'Kepler-10 b', column: 'Teq (K)', value_as_printed: '1833', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Teq (K)'}}
-            - {planet: '55 Cnc e', column: 'Mass (×M⊕)', value_as_printed: '7.98^5/8.63^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Mass (×M⊕)'}}
-            - {planet: '55 Cnc e', column: 'Radius (×R⊕)', value_as_printed: '2.13^5/2.00^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Radius (×R⊕)'}}
-            - {planet: '55 Cnc e', column: 'Density (g cm^-3)', value_as_printed: '4.97^5/5.9^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Density (g cm^-3)'}}
-            - {planet: '55 Cnc e', column: 'Orbital Radius (AU)', value_as_printed: '0.01564', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Orbital Radius (AU)'}}
-            - {planet: '55 Cnc e', column: 'Teq (K)', value_as_printed: '1967', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 f', column: 'Mass (×M⊕)', value_as_printed: '2.30', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 f', column: 'Radius (×R⊕)', value_as_printed: '2.61', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 f', column: 'Density (g cm^-3)', value_as_printed: '0.71', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 f', column: 'Orbital Radius (AU)', value_as_printed: '0.25', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 f', column: 'Teq (K)', value_as_printed: '544', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Teq (K)'}}
+            - {planet: 'GJ 1214 b', column: 'Mass (×M⊕)', value_as_printed: '6.55', source_attribution: 'Charbonneau et al. (2009)', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'GJ 1214 b', column: 'Radius (×R⊕)', value_as_printed: '2.68', source_attribution: 'Charbonneau et al. (2009)', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'GJ 1214 b', column: 'Density (g cm^-3)', value_as_printed: '1.88', source_attribution: 'Charbonneau et al. (2009)', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'GJ 1214 b', column: 'Orbital Radius (AU)', value_as_printed: '0.014', source_attribution: 'Charbonneau et al. (2009)', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'GJ 1214 b', column: 'Teq (K)', value_as_printed: '555', source_attribution: 'Charbonneau et al. (2009)', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Teq (K)'}}
+            - {planet: 'HD 97658 b', column: 'Mass (×M⊕)', value_as_printed: '6.40', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'HD 97658 b', column: 'Radius (×R⊕)', value_as_printed: '2.93', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'HD 97658 b', column: 'Density (g cm^-3)', value_as_printed: '1.40', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'HD 97658 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0797', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'HD 97658 b', column: 'Teq (K)', value_as_printed: '510-720', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 e', column: 'Mass (×M⊕)', value_as_printed: '8.40', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 e', column: 'Radius (×R⊕)', value_as_printed: '4.52', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 e', column: 'Density (g cm^-3)', value_as_printed: '0.5', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 e', column: 'Orbital Radius (AU)', value_as_printed: '0.194', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 e', column: 'Teq (K)', value_as_printed: '617', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 d', column: 'Mass (×M⊕)', value_as_printed: '6.10', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 d', column: 'Radius (×R⊕)', value_as_printed: '3.43', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 d', column: 'Density (g cm^-3)', value_as_printed: '0.83', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 d', column: 'Orbital Radius (AU)', value_as_printed: '0.159', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 d', column: 'Teq (K)', value_as_printed: '692', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 b', column: 'Mass (×M⊕)', value_as_printed: '4.30', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 b', column: 'Radius (×R⊕)', value_as_printed: '1.97', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 b', column: 'Density (g cm^-3)', value_as_printed: '3.10', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 b', column: 'Orbital Radius (AU)', value_as_printed: '0.091', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 b', column: 'Teq (K)', value_as_printed: '900', source_attribution: 'Lissauer et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-20 b', column: 'Mass (×M⊕)', value_as_printed: '8.70', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-20 b', column: 'Radius (×R⊕)', value_as_printed: '1.91', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-20 b', column: 'Density (g cm^-3)', value_as_printed: '6.5', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-20 b', column: 'Orbital Radius (AU)', value_as_printed: '0.04537', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-20 b', column: 'Teq (K)', value_as_printed: '1014', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-18 b', column: 'Mass (×M⊕)', value_as_printed: '6.90', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-18 b', column: 'Radius (×R⊕)', value_as_printed: '2.00', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-18 b', column: 'Density (g cm^-3)', value_as_printed: '4.9', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-18 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0447', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-18 b', column: 'Teq (K)', value_as_printed: '1179', source_attribution: 'unattributed', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Teq (K)'}}
+            - {planet: 'CoRoT-7 b', column: 'Mass (×M⊕)', value_as_printed: '7.42', source_attribution: 'Léger et al. (2009); Hatzes et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'CoRoT-7 b', column: 'Radius (×R⊕)', value_as_printed: '1.58', source_attribution: 'Léger et al. (2009); Hatzes et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'CoRoT-7 b', column: 'Density (g cm^-3)', value_as_printed: '10.4', source_attribution: 'Léger et al. (2009); Hatzes et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'CoRoT-7 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0172', source_attribution: 'Léger et al. (2009); Hatzes et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'CoRoT-7 b', column: 'Teq (K)', value_as_printed: '1810', source_attribution: 'Léger et al. (2009); Hatzes et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-10 b', column: 'Mass (×M⊕)', value_as_printed: '4.54', source_attribution: 'Batalha et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-10 b', column: 'Radius (×R⊕)', value_as_printed: '1.42', source_attribution: 'Batalha et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-10 b', column: 'Density (g cm^-3)', value_as_printed: '8.74', source_attribution: 'Batalha et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-10 b', column: 'Orbital Radius (AU)', value_as_printed: '0.01684', source_attribution: 'Batalha et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-10 b', column: 'Teq (K)', value_as_printed: '1833', source_attribution: 'Batalha et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Teq (K)'}}
+            - {planet: '55 Cnc e', column: 'Mass (×M⊕)', value_as_printed: '7.98^5/8.63^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Mass (×M⊕)'}}
+            - {planet: '55 Cnc e', column: 'Radius (×R⊕)', value_as_printed: '2.13^5/2.00^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Radius (×R⊕)'}}
+            - {planet: '55 Cnc e', column: 'Density (g cm^-3)', value_as_printed: '4.97^5/5.9^6', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Density (g cm^-3)'}}
+            - {planet: '55 Cnc e', column: 'Orbital Radius (AU)', value_as_printed: '0.01564', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Orbital Radius (AU)'}}
+            - {planet: '55 Cnc e', column: 'Teq (K)', value_as_printed: '1967', source_attribution: 'Demory et al. (2011); Winn et al. (2011)', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Teq (K)'}}
 
   continental_crust:
     context:
@@ -169,7 +169,7 @@ species:
             - {element: Mn, value_as_printed: '0.072', locator: {pdf_page_index: 32, table: '2', row: Mn, column: 'Continental Crust (wt%)'}}
             - {element: H, value_as_printed: '0.045', locator: {pdf_page_index: 32, table: '2', row: H, column: 'Continental Crust (wt%)'}}
             - {element: C, value_as_printed: '0.199', locator: {pdf_page_index: 32, table: '2', row: C, column: 'Continental Crust (wt%)'}}
-            - {element: N, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: N, column: 'Continental Crust (wt%)'}}
+            - {element: 'N', value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: 'N', column: 'Continental Crust (wt%)'}}
             - {element: S, value_as_printed: '0.070', locator: {pdf_page_index: 32, table: '2', row: S, column: 'Continental Crust (wt%)'}}
             - {element: F, value_as_printed: '0.053', locator: {pdf_page_index: 32, table: '2', row: F, column: 'Continental Crust (wt%)'}}
             - {element: Cl, value_as_printed: '0.047', locator: {pdf_page_index: 32, table: '2', row: Cl, column: 'Continental Crust (wt%)'}}
@@ -207,7 +207,7 @@ species:
             - {species: H, temperature_as_printed: '3900 K', result_as_printed: '1.1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: atomic hydrogen, column: peak abundance}}
             - {species: N2, temperature_as_printed: '<600 K', result_as_printed: dominantly N2, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: dominant species}}
             - {species: N2, temperature_as_printed: 'up to ~3200 K', result_as_printed: major N-bearing species, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: major species}}
-            - {species: NO, temperature_as_printed: '4000 K', result_as_printed: '~1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: atmospheric abundance}}
+            - {species: 'NO', temperature_as_printed: '4000 K', result_as_printed: '~1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: atmospheric abundance}}
             - {species: SO2, temperature_as_printed: '~1000 K', result_as_printed: enters gas in significant amount, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: onset}}
             - {species: SO2, temperature_as_printed: '1000-4000 K; peak at 2250 K', result_as_printed: '~5%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: peak abundance}}
             - {species: SO, temperature_as_printed: '4000 K', result_as_printed: '~10% of total sulfur', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: total-sulfur fraction}}
@@ -458,7 +458,7 @@ species:
             - {element: Mn, value_as_printed: '0.11', locator: {pdf_page_index: 32, table: '2', row: Mn, column: 'Bulk Silicate Earth (wt%)'}}
             - {element: H, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: H, column: 'Bulk Silicate Earth (wt%)'}}
             - {element: C, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: C, column: 'Bulk Silicate Earth (wt%)'}}
-            - {element: N, value_as_printed: '0.88×10^-4', locator: {pdf_page_index: 32, table: '2', row: N, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: 'N', value_as_printed: '0.88×10^-4', locator: {pdf_page_index: 32, table: '2', row: 'N', column: 'Bulk Silicate Earth (wt%)'}}
             - {element: S, value_as_printed: '0.027', locator: {pdf_page_index: 32, table: '2', row: S, column: 'Bulk Silicate Earth (wt%)'}}
             - {element: F, value_as_printed: '0.002', locator: {pdf_page_index: 32, table: '2', row: F, column: 'Bulk Silicate Earth (wt%)'}}
             - {element: Cl, value_as_printed: '0.004', locator: {pdf_page_index: 32, table: '2', row: Cl, column: 'Bulk Silicate Earth (wt%)'}}
@@ -658,47 +658,47 @@ species:
             composition: Earth-like atmospheric model
             fO2: {tag: unknown, reason: not_published}
           rows:
-            - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
             - {gas: H2O, column: 'tchem (s), 1 AU', value_as_printed: '8.47×10^4', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 1 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.25 AU', value_as_printed: '5.29×10^3', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.017 AU', value_as_printed: '2.45×10^1', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CO2, column: 'tchem (s), 1 AU', value_as_printed: '4.95×10^5', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 1 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.25 AU', value_as_printed: '3.09×10^4', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.43×10^2', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CO, column: 'tchem (s), 1 AU', value_as_printed: '1.55×10^6', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 1 AU'}}
             - {gas: CO, column: 'tchem (s), 0.25 AU', value_as_printed: '9.68×10^4', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO, column: 'tchem (s), 0.017 AU', value_as_printed: '4.47×10^2', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.017 AU'}}
-            - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: SO2, column: 'tchem (s), 1 AU', value_as_printed: '4.01×10^3', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 1 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.25 AU', value_as_printed: '2.51×10^2', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.16×10^0', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: O2, column: 'tchem (s), 1 AU', value_as_printed: '2.06×10^5', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 1 AU'}}
             - {gas: O2, column: 'tchem (s), 0.25 AU', value_as_printed: '1.29×10^4', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.25 AU'}}
             - {gas: O2, column: 'tchem (s), 0.017 AU', value_as_printed: '5.94×10^1', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
             - {gas: CH4, column: 'tchem (s), 1 AU', value_as_printed: '1.28×10^5', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 1 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.25 AU', value_as_printed: '8.02×10^3', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.25 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.017 AU', value_as_printed: '3.71×10^1', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.017 AU'}}
-            - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
             - {gas: NH3, column: 'tchem (s), 1 AU', value_as_printed: '5.73×10^3', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 1 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.25 AU', value_as_printed: '3.58×10^2', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.25 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.017 AU', value_as_printed: '1.66×10^0', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.017 AU'}}
-            - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
             - {gas: H2S, column: 'tchem (s), 1 AU', value_as_printed: '3.03×10^2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 1 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.25 AU', value_as_printed: '1.89×10^1', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.017 AU', value_as_printed: '8.76×10^-2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.017 AU'}}
-            - {gas: NO, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'J1 (s^-1), 1 AU'}}
-            - {gas: NO, column: 'tchem (s), 1 AU', value_as_printed: '2.83×10^5', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 1 AU'}}
-            - {gas: NO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.77×10^4', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 0.25 AU'}}
-            - {gas: NO, column: 'tchem (s), 0.017 AU', value_as_printed: '8.19×10^1', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 0.017 AU'}}
-            - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: 'NO', column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'J1 (s^-1), 1 AU'}}
+            - {gas: 'NO', column: 'tchem (s), 1 AU', value_as_printed: '2.83×10^5', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 1 AU'}}
+            - {gas: 'NO', column: 'tchem (s), 0.25 AU', value_as_printed: '1.77×10^4', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.25 AU'}}
+            - {gas: 'NO', column: 'tchem (s), 0.017 AU', value_as_printed: '8.19×10^1', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.017 AU'}}
+            - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', method_class: quoted_literature, source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
             - {gas: N2, column: 'tchem (s), 1 AU', value_as_printed: '9.76×10^5', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 1 AU'}}
             - {gas: N2, column: 'tchem (s), 0.25 AU', value_as_printed: '6.10×10^4', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.25 AU'}}
             - {gas: N2, column: 'tchem (s), 0.017 AU', value_as_printed: '2.82×10^2', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.017 AU'}}
-            - {gas: SiO, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.03×10^-3', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: SiO, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.03×10^-3', method_class: quoted_literature, source_attribution: 'Matveev (1986)', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}}
             - {gas: SiO, column: 'tchem (s), 1 AU', value_as_printed: '2.48×10^2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 1 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.55×10^1', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.25 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.017 AU', value_as_printed: '7.17×10^-2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.017 AU'}}
@@ -725,61 +725,58 @@ species:
           rows:
             - {species: H, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-6 bars boundary temperature (K)'}}
             - {species: H, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: H, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: H, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: H, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2600', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: 0.5, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'near log P=0.5 bars panel exit (K)'}}
             - {species: OH, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-6 bars boundary temperature (K)'}}
             - {species: OH, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-4 bars boundary temperature (K)'}}
             - {species: OH, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-2 bars boundary temperature (K)'}}
             - {species: OH, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: OH, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=2 bars boundary temperature (K)'}}
-            - {species: CO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: CO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: CO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: CO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: CO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1900', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2200', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2700', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3300', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=2 bars boundary temperature (K)'}}
             - {species: CO2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-6 bars boundary temperature (K)'}}
             - {species: CO2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-4 bars boundary temperature (K)'}}
             - {species: CO2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: CO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: CO2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3100', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=2 bars boundary temperature (K)'}}
             - {species: CH4, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8b', row: CH4, column: 'log P=2 bars low-temperature boundary (K)'}}
             - {species: CH4, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~600', locator: {pdf_page_index: 47, figure: '8b', row: CH4, column: 'log P=2 bars upper boundary (K)'}}
             - {species: S, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-6 bars boundary temperature (K)'}}
             - {species: S, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: S, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: S, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: S, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=2 bars boundary temperature (K)'}}
-            - {species: SO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: SO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: SO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: SO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: SO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=2 bars boundary temperature (K)'}}
-            - {species: N, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2900', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: N, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~3200', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: N, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: N, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3800', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: N, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=2 bars boundary temperature (K)'}}
-            - {species: NO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: NO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: NO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2800', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: NO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: NO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3200', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=2 bars boundary temperature (K)'}}
-            - {species: SO2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: SO2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: SO2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-2 bars boundary temperature (K)'}}
-            - {species: SO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: SO2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3100', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'near log P=0 bars panel exit (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2400', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2900', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3600', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: 0.8, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'near log P=0.8 bars panel exit (K)'}}
+            - {species: 'N', log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2800', locator: {pdf_page_index: 47, figure: '8d', row: 'N', column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: 'N', log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~3300', locator: {pdf_page_index: 47, figure: '8d', row: 'N', column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: -5.7, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'near curve start at log P=-5.7 bars (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: -5, temperature_K_as_plotted: '~1900', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'minimum near log P=-5 bars (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2400', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~2700', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: 'NO', log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~2800', locator: {pdf_page_index: 47, figure: '8d', row: 'NO', column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2050', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2450', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2850', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3700', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: 0.8, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'near log P=0.8 bars panel exit (K)'}}
             - {species: N2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-6 bars boundary temperature (K)'}}
-            - {species: N2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2000', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-4 bars boundary temperature (K)'}}
-            - {species: N2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2200', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~1900', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-2 bars boundary temperature (K)'}}
             - {species: N2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~2400', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: N2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~2600', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~2700', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=2 bars boundary temperature (K)'}}
             - {species: H2S, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-6 bars boundary temperature (K)'}}
             - {species: H2S, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~600', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-4 bars boundary temperature (K)'}}
             - {species: H2S, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~700', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-2 bars boundary temperature (K)'}}
             - {species: H2S, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~800', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=0 bars boundary temperature (K)'}}
-            - {species: H2S, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~1000', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~1400', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=2 bars boundary temperature (K)'}}
             - {species: NH3, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8d', row: NH3, column: 'log P=2 bars boundary temperature (K)'}}
       - observation_id: schaefer_2012_figure9_temperature_pressure_profiles
         type: composition_series
@@ -798,8 +795,8 @@ species:
           rows:
             - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~500', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈500 K / P≈10^-2 bar'}}
             - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1000', total_pressure_bar_as_plotted: '10^0', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1000 K / P≈10^0 bar'}}
-            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1050', total_pressure_bar_as_plotted: '10^-1', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1050 K / P≈10^-1 bar'}}
-            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1350', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1350 K / P≈10^-2 bar'}}
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1050', total_pressure_bar_as_plotted: '10^1', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1050 K / P≈10^1 bar'}}
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1350', total_pressure_bar_as_plotted: '10^2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1350 K / P≈10^2 bar'}}
             - {profile: b/c, composition: 'continental crust / BSE', temperature_K_as_plotted: '2500', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: b and c, column: 'surface start T=2500 K / P=10^-2 bar'}}
 
   observable_gases:
@@ -898,6 +895,9 @@ refused:
   - what: fO2 values for all model runs
     why: the source specifies total pressure and bulk composition but does not print oxygen fugacity or oxygen partial pressure; no fO2 was inferred from composition
     locator: {pdf_page_index: 7, section: '2. Computational Methods', row: model conditions, column: fO2}
+  - what: sulfide dotted curve and sulfate boundary in Figure 8c
+    why: the page labels these aggregate curves as “sulfides” and “sulfates” rather than identifying a canonical species-specific boundary; no coordinates are promoted without that mapping
+    locator: {pdf_page_index: 47, figure: '8c', row: 'sulfides and sulfates', column: 'aggregate boundary curves'}
   - what: laboratory bench and experiment registry
     why: no physical experiment or apparatus is reported; this is an equilibrium-model paper
     locator: {pdf_page_index: 7, section: '2. Computational Methods', row: model method, column: apparatus}
