@@ -823,7 +823,10 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
             )
         ),
         factories.loc(),
-        Derivation("estimated_point", ("assumed",), (), "mol_fraction"),
+        Derivation(
+            "calculated_from_printed_recipe_or_aimed_target",
+            ("assumed",), (), "mol_fraction",
+        ),
     )
     observation = replace(
         factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),

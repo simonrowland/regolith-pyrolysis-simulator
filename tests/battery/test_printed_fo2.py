@@ -213,8 +213,12 @@ def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
     )
     stem = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
     parent = f"{stem}::holzheid_1997_table3a_ad_co_variable_mgo"
-    points = _exploded_points(result, parent)
-    assert len(points) == 8
+    run_points = [
+        _exploded_points(result, f"{parent}_1_{run}")
+        for run in range(1, 9)
+    ]
+    assert [len(points) for points in run_points] == [1] * 8
+    points = [run[0] for run in run_points]
     first = points[0]
     located = first.point_conditions["fO2_log"]
     assert located.state.value == Decimal("-9.63")
