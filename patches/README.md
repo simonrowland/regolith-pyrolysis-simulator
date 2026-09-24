@@ -1,9 +1,9 @@
 # Engine patches
 
 Local fixes and features for the third-party thermodynamic engines, held here **pending
-upstream adoption**. The engine checkouts live outside this repo (`../VapoRock`,
-`../ThermoEngine`, `../PySulfSat`), so their working trees are not version-controlled by us —
-which means an unpatched local edit is invisible drift. This directory is the tracked record.
+upstream adoption**. The engine checkouts live outside this repo and may be editable installs
+anywhere on disk, so their working trees are not version-controlled by us — which means an
+unpatched local edit is invisible drift. This directory is the tracked record.
 
 **Rule: no engine edit lives only in a sibling working tree.** If it matters, it is a patch here.
 
@@ -30,9 +30,25 @@ Same rule applies — an edited site-packages with no patch here is invisible dr
 
 Patches are ordered and cumulative: `0002` applies on top of `0001`.
 
+## Checkout resolution
+
+`patches/scripts/enginepatch.sh` resolves checkout-based engines from the interpreter that
+runs the simulator. Use `--python PATH` to select it; without that option the tool tries the
+repo's `.venv/bin/python`, the main checkout's `.venv/bin/python` when running from a pooled
+worktree, then `python3`. It uses import-spec lookup for the engine's top-level package and
+walks from the package source to the Git toplevel, so editable installs are checked where the
+simulator actually loads them. Every `status` and `verify` line prints `RESOLVED=...`.
+
+If a package is not importable, set its explicit checkout override:
+`VAPOROCK_CHECKOUT`, `THERMOENGINE_CHECKOUT`, `PYSULFSAT_CHECKOUT`, or `SULFLIQ_CHECKOUT`
+(the latter retains its `~/Repos/sulfliq` default). `status` and `verify` fail when an importable checkout is not a
+Git tree at its pinned `UPSTREAM.pin` `base_sha`; they do not fall back to a sibling clone.
+`apply` and `refresh` act on the resolved tree and refuse an override path the selected
+interpreter does not load unless `--force-path` is supplied.
+
 ## Inventory
 
-### vaporock — `../VapoRock` @ `0159678`
+### vaporock — package `vaporock` @ `0159678`
 
 | # | patch | status | ref |
 |---|---|---|---|
@@ -58,7 +74,7 @@ with default-argument capture. Also removes a leftover `Mg2(g)` debug `print`.
 Verified on all 11 multi-interval species (`O2, Mg, Mg2, AlO, AlO2, SiO, Si2, K, CrO, CrO2,
 CrO3`): 0 of 11 now evaluate to the wrong interval. Pre-fix `Mg2(g)` worst absolute error: **5.838 MJ/mol** (fresh 2026-08-09 re-verification; an earlier note said ~3.5).
 
-### thermoengine — `../ThermoEngine` @ `df7a5f4`
+### thermoengine — package `thermoengine` @ `df7a5f4`
 
 | # | patch | STATUS | note |
 |---|---|---|---|
@@ -91,7 +107,7 @@ Each engine dir carries a `STATUS` file mapping patch → `applied | unapplied |
 `verify` skips anything marked `unapplied`, so a deliberately-parked patch does not cry wolf
 forever — but the state is explicit and reviewable rather than implied by absence.
 
-### pysulfsat — `../PySulfSat` @ `ed7c4a0`
+### pysulfsat — package `PySulfSat` @ `ed7c4a0`
 
 Clean. No local patches.
 
