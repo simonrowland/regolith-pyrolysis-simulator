@@ -674,6 +674,8 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
 
     if isinstance(payload, Located):
         return payload
+    if isinstance(payload, Mapping) and "state" not in payload and "kind" in payload:
+        return _located_from_plain(payload, _value_or_point_from_plain)
     if not isinstance(payload, Mapping) or "state" not in payload:
         return _located_from_plain(payload, as_decimal)
     state_payload = payload.get("state")
@@ -684,6 +686,8 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
         "amount_basis" in value or "components" in value
     ):
         return _located_from_plain(payload, _composition_from_plain)
+    if isinstance(value, Mapping) and "kind" in value:
+        return _located_from_plain(payload, _value_or_point_from_plain)
 
     def _as_printed_map(raw: object) -> dict[str, Any]:
         assert isinstance(raw, Mapping)
@@ -8993,6 +8997,17 @@ class Migrator:
                 extra_pc["composition"] = residual
             if extra_pc:
                 point_conditions = {**(point_conditions or {}), **extra_pc}
+        if isinstance(raw_item, Mapping):
+            raw_point_conditions = raw_item.get("point_conditions")
+            if isinstance(raw_point_conditions, Mapping):
+                explicit_point_conditions = {
+                    str(key): _point_condition_from_plain(value)
+                    for key, value in raw_point_conditions.items()
+                }
+                point_conditions = {
+                    **(point_conditions or {}),
+                    **explicit_point_conditions,
+                }
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
