@@ -234,6 +234,24 @@ experiments:
     printed_composition:
       state: {tag: value, value: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 1_low; total 99.90; trace additions excluded from oxide columns'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.502765581893791']
+          - [Al2O3, '0.0902838404302310']
+          - [MgO, '0.154740292206590']
+          - [CaO, '0.252210285469388']
+      locator: {page: 15, table: '6', note: 'Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - sample.printed_composition
+        output_unit: mole_fraction
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
@@ -256,6 +274,24 @@ experiments:
     printed_composition:
       state: {tag: value, value: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.502765581893791']
+          - [Al2O3, '0.0902838404302310']
+          - [MgO, '0.154740292206590']
+          - [CaO, '0.252210285469388']
+      locator: {page: 15, table: '6', note: 'Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - sample.printed_composition
+        output_unit: mole_fraction
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
@@ -276,6 +312,24 @@ experiments:
     printed_composition:
       state: {tag: value, value: {SiO2: '49.72', Al2O3: '15.15', MgO: '10.27', CaO: '23.28'}}
       locator: {page: 15, table: '6', note: 'Start EPMA wt%; row 3_high; total oxide columns 98.42; trace Ga/In oxides excluded'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.502726948745817']
+          - [Al2O3, '0.0902682729887964']
+          - [MgO, '0.154801423150046']
+          - [CaO, '0.252203355115340']
+      locator: {page: 15, table: '6', note: 'Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - sample.printed_composition
+        output_unit: mole_fraction
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
@@ -672,6 +726,11 @@ species:
         gamma: 0.0632
         series:
         - T_K: 1586.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0632
           gamma_SD: 0.0558
           delta_IW: 1.66
@@ -680,6 +739,11 @@ species:
           p_Ga_Pa: 4.04e-05
           p_O2_calc_Pa: 0.000112
         - T_K: 1598.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0478
           gamma_SD: 0.0418
           delta_IW: 1.62
@@ -688,6 +752,11 @@ species:
           p_Ga_Pa: 4.37e-05
           p_O2_calc_Pa: 0.000137
         - T_K: 1608.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0369
           gamma_SD: 0.0322
           delta_IW: 1.61
@@ -696,6 +765,11 @@ species:
           p_Ga_Pa: 4.49e-05
           p_O2_calc_Pa: 0.000174
         - T_K: 1619.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0305
           gamma_SD: 0.0264
           delta_IW: 1.57
@@ -704,6 +778,11 @@ species:
           p_Ga_Pa: 5.16e-05
           p_O2_calc_Pa: 0.000206
         - T_K: 1630.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0285
           gamma_SD: 0.0246
           delta_IW: 1.57
@@ -712,6 +791,11 @@ species:
           p_Ga_Pa: 6.45e-05
           p_O2_calc_Pa: 0.00027
         - T_K: 1642.5
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0367
           gamma_SD: 0.0317
           delta_IW: 1.57
@@ -720,6 +804,11 @@ species:
           p_Ga_Pa: 0.00011
           p_O2_calc_Pa: 0.000355
         - T_K: 1653.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0248
           gamma_SD: 0.0213
           delta_IW: 1.54
@@ -728,6 +817,11 @@ species:
           p_Ga_Pa: 9.98e-05
           p_O2_calc_Pa: 0.000429
         - T_K: 1664.7
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0272
           gamma_SD: 0.0233
           delta_IW: 1.54
@@ -736,6 +830,11 @@ species:
           p_Ga_Pa: 0.000145
           p_O2_calc_Pa: 0.000555
         - T_K: 1674.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0248
           gamma_SD: 0.0212
           delta_IW: 1.54
@@ -744,6 +843,11 @@ species:
           p_Ga_Pa: 0.000166
           p_O2_calc_Pa: 0.000681
         - T_K: 1684.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0239
           gamma_SD: 0.0204
           delta_IW: 1.53
@@ -752,6 +856,11 @@ species:
           p_Ga_Pa: 0.000207
           p_O2_calc_Pa: 0.000844
         - T_K: 1695.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0246
           gamma_SD: 0.021
           delta_IW: 1.53
@@ -786,6 +895,11 @@ species:
         gamma: 0.0353
         series:
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0353
           gamma_SD: 0.0299
           delta_IW: 1.51
@@ -794,6 +908,11 @@ species:
           p_Ga_Pa: 0.000881
           p_O2_calc_Pa: 0.002761
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0384
           gamma_SD: 0.0326
           delta_IW: 1.52
@@ -802,6 +921,11 @@ species:
           p_Ga_Pa: 0.000946
           p_O2_calc_Pa: 0.002805
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0426
           gamma_SD: 0.0363
           delta_IW: 1.52
@@ -810,6 +934,11 @@ species:
           p_Ga_Pa: 0.00104
           p_O2_calc_Pa: 0.002834
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0497
           gamma_SD: 0.0425
           delta_IW: 1.54
@@ -818,6 +947,11 @@ species:
           p_Ga_Pa: 0.00119
           p_O2_calc_Pa: 0.002919
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0527
           gamma_SD: 0.045
           delta_IW: 1.54
@@ -826,6 +960,11 @@ species:
           p_Ga_Pa: 0.00126
           p_O2_calc_Pa: 0.002937
         - T_K: 1743.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0484
           gamma_SD: 0.0413
           delta_IW: 1.53
@@ -834,6 +973,11 @@ species:
           p_Ga_Pa: 0.00121
           p_O2_calc_Pa: 0.002915
         - T_K: 1743.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0522
           gamma_SD: 0.0446
           delta_IW: 1.53
@@ -842,6 +986,11 @@ species:
           p_Ga_Pa: 0.00129
           p_O2_calc_Pa: 0.002952
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0488
           gamma_SD: 0.0416
           delta_IW: 1.54
@@ -850,6 +999,11 @@ species:
           p_Ga_Pa: 0.00113
           p_O2_calc_Pa: 0.002877
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0499
           gamma_SD: 0.0425
           delta_IW: 1.54
@@ -858,6 +1012,11 @@ species:
           p_Ga_Pa: 0.00116
           p_O2_calc_Pa: 0.002881
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0518
           gamma_SD: 0.0442
           delta_IW: 1.54
@@ -866,6 +1025,11 @@ species:
           p_Ga_Pa: 0.0012
           p_O2_calc_Pa: 0.002905
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0523
           gamma_SD: 0.0446
           delta_IW: 1.54
@@ -874,6 +1038,11 @@ species:
           p_Ga_Pa: 0.00121
           p_O2_calc_Pa: 0.002896
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0455
           gamma_SD: 0.0388
           delta_IW: 1.53
@@ -882,6 +1051,11 @@ species:
           p_Ga_Pa: 0.00111
           p_O2_calc_Pa: 0.00286
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0466
           gamma_SD: 0.0396
           delta_IW: 1.53
@@ -890,6 +1064,11 @@ species:
           p_Ga_Pa: 0.00109
           p_O2_calc_Pa: 0.002839
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0427
           gamma_SD: 0.0362
           delta_IW: 1.53
@@ -898,6 +1077,11 @@ species:
           p_Ga_Pa: 0.00101
           p_O2_calc_Pa: 0.002801
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.044
           gamma_SD: 0.0374
           delta_IW: 1.53
@@ -906,6 +1090,11 @@ species:
           p_Ga_Pa: 0.00104
           p_O2_calc_Pa: 0.002813
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0403
           gamma_SD: 0.0342
           delta_IW: 1.52
@@ -941,156 +1130,286 @@ species:
           plateau for the preferred 0.036 value.
         series:
         - T_K: 1425.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 270.0
           gamma_SD: 265.0
           delta_IW: 3.71
           K_Ga: 6.71e-15
           K_Ga_SD: 4.41e-15
         - T_K: 1437.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 248.0
           gamma_SD: 243.0
           delta_IW: 3.67
           K_Ga: 1.16e-14
           K_Ga_SD: 7.66e-15
         - T_K: 1449.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 244.0
           gamma_SD: 239.0
           delta_IW: 3.65
           K_Ga: 2.27e-14
           K_Ga_SD: 1.49e-14
         - T_K: 1461.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 230.0
           gamma_SD: 225.0
           delta_IW: 3.61
           K_Ga: 3.95e-14
           K_Ga_SD: 2.6e-14
         - T_K: 1474.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 195.0
           gamma_SD: 191.0
           delta_IW: 3.55
           K_Ga: 6.48e-14
           K_Ga_SD: 4.27e-14
         - T_K: 1486.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 145.0
           gamma_SD: 142.0
           delta_IW: 3.45
           K_Ga: 9.21e-14
           K_Ga_SD: 6.04e-14
         - T_K: 1498.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 112.0
           gamma_SD: 110.0
           delta_IW: 3.34
           K_Ga: 1.28e-13
           K_Ga_SD: 8.43e-14
         - T_K: 1511.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 74.7
           gamma_SD: 73.0
           delta_IW: 3.22
           K_Ga: 1.6e-13
           K_Ga_SD: 1.05e-13
         - T_K: 1522.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 45.8
           gamma_SD: 44.8
           delta_IW: 3.03
           K_Ga: 1.73e-13
           K_Ga_SD: 1.13e-13
         - T_K: 1535.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 24.3
           gamma_SD: 23.7
           delta_IW: 2.87
           K_Ga: 1.69e-13
           K_Ga_SD: 1.1e-13
         - T_K: 1548.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 13.0
           gamma_SD: 12.6
           delta_IW: 2.73
           K_Ga: 1.64e-13
           K_Ga_SD: 1.06e-13
         - T_K: 1557.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 5.34
           gamma_SD: 5.18
           delta_IW: 2.61
           K_Ga: 1.05e-13
           K_Ga_SD: 6.74e-14
         - T_K: 1571.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.581
           gamma_SD: 0.55
           delta_IW: 2.17
           K_Ga: 2.14e-14
           K_Ga_SD: 1.3e-14
         - T_K: 1588.5
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.426
           gamma_SD: 0.4
           delta_IW: 2.1
           K_Ga: 3.36e-14
           K_Ga_SD: 2.01e-14
         - T_K: 1601.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.22
           gamma_SD: 0.204
           delta_IW: 1.95
           K_Ga: 3.04e-14
           K_Ga_SD: 1.75e-14
         - T_K: 1613.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.151
           gamma_SD: 0.138
           delta_IW: 1.86
           K_Ga: 3.6e-14
           K_Ga_SD: 2.01e-14
         - T_K: 1626.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0996
           gamma_SD: 0.0899
           delta_IW: 1.77
           K_Ga: 4.1e-14
           K_Ga_SD: 2.2e-14
         - T_K: 1638.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0779
           gamma_SD: 0.0695
           delta_IW: 1.71
           K_Ga: 5.23e-14
           K_Ga_SD: 2.71e-14
         - T_K: 1650.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0634
           gamma_SD: 0.056
           delta_IW: 1.66
           K_Ga: 7.21e-14
           K_Ga_SD: 3.61e-14
         - T_K: 1662.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0559
           gamma_SD: 0.0489
           delta_IW: 1.63
           K_Ga: 1.02e-13
           K_Ga_SD: 4.98e-14
         - T_K: 1674.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0502
           gamma_SD: 0.0436
           delta_IW: 1.59
           K_Ga: 1.47e-13
           K_Ga_SD: 6.99e-14
         - T_K: 1685.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0447
           gamma_SD: 0.0386
           delta_IW: 1.57
           K_Ga: 2.07e-13
           K_Ga_SD: 9.7e-14
         - T_K: 1699.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0382
           gamma_SD: 0.0328
           delta_IW: 1.55
           K_Ga: 3.03e-13
           K_Ga_SD: 1.39e-13
         - T_K: 1712.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0377
           gamma_SD: 0.0322
           delta_IW: 1.54
           K_Ga: 4.87e-13
           K_Ga_SD: 2.21e-13
         - T_K: 1719.7
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0377
           gamma_SD: 0.0322
           delta_IW: 1.54
           K_Ga: 6.46e-13
           K_Ga_SD: 2.92e-13
         - T_K: 1733.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0385
           gamma_SD: 0.0329
           delta_IW: 1.54
@@ -1122,60 +1441,110 @@ species:
         gamma: 0.356
         series:
         - T_K: 1538.8
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.356
           gamma_SD: 0.297
           delta_IW: 2.98
           K_Ga: 2.87e-15
           K_Ga_SD: 1.18e-15
         - T_K: 1547.2
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.25
           gamma_SD: 0.208
           delta_IW: 2.89
           K_Ga: 3.0e-15
           K_Ga_SD: 1.23e-15
         - T_K: 1555.7
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.209
           gamma_SD: 0.174
           delta_IW: 2.84
           K_Ga: 3.73e-15
           K_Ga_SD: 1.53e-15
         - T_K: 1564.2
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.146
           gamma_SD: 0.122
           delta_IW: 2.74
           K_Ga: 3.84e-15
           K_Ga_SD: 1.57e-15
         - T_K: 1577.9
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.147
           gamma_SD: 0.122
           delta_IW: 2.68
           K_Ga: 7.23e-15
           K_Ga_SD: 2.93e-15
         - T_K: 1587.4
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.127
           gamma_SD: 0.105
           delta_IW: 2.6
           K_Ga: 9.53e-15
           K_Ga_SD: 3.84e-15
         - T_K: 1598.0
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0955
           gamma_SD: 0.0792
           delta_IW: 2.55
           K_Ga: 1.15e-14
           K_Ga_SD: 4.59e-15
         - T_K: 1609.7
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.08
           gamma_SD: 0.0661
           delta_IW: 2.47
           K_Ga: 1.59e-14
           K_Ga_SD: 6.32e-15
         - T_K: 1618.1
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0711
           gamma_SD: 0.0587
           delta_IW: 2.43
           K_Ga: 2.04e-14
           K_Ga_SD: 8.04e-15
         - T_K: 1631.9
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0529
           gamma_SD: 0.0435
           delta_IW: 2.33
@@ -1997,6 +2366,11 @@ species:
         gamma: 0.0527
         series:
         - T_K: 1586.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0527
           gamma_SD: 0.0437
           delta_IW: 1.66
@@ -2005,6 +2379,11 @@ species:
           p_In_Pa: 6.69e-05
           p_O2_calc_Pa: 0.000112
         - T_K: 1598.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.044
           gamma_SD: 0.0361
           delta_IW: 1.62
@@ -2013,6 +2392,11 @@ species:
           p_In_Pa: 7.25e-05
           p_O2_calc_Pa: 0.000137
         - T_K: 1608.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0486
           gamma_SD: 0.0397
           delta_IW: 1.61
@@ -2021,6 +2405,11 @@ species:
           p_In_Pa: 9.76e-05
           p_O2_calc_Pa: 0.000174
         - T_K: 1619.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0349
           gamma_SD: 0.0281
           delta_IW: 1.57
@@ -2029,6 +2418,11 @@ species:
           p_In_Pa: 8.9e-05
           p_O2_calc_Pa: 0.000206
         - T_K: 1630.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0377
           gamma_SD: 0.0303
           delta_IW: 1.57
@@ -2037,6 +2431,11 @@ species:
           p_In_Pa: 0.000117
           p_O2_calc_Pa: 0.00027
         - T_K: 1642.5
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0329
           gamma_SD: 0.0265
           delta_IW: 1.57
@@ -2045,6 +2444,11 @@ species:
           p_In_Pa: 0.000123
           p_O2_calc_Pa: 0.000355
         - T_K: 1653.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0315
           gamma_SD: 0.0252
           delta_IW: 1.54
@@ -2053,6 +2457,11 @@ species:
           p_In_Pa: 0.000146
           p_O2_calc_Pa: 0.000429
         - T_K: 1664.7
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0286
           gamma_SD: 0.0228
           delta_IW: 1.54
@@ -2061,6 +2470,11 @@ species:
           p_In_Pa: 0.00016
           p_O2_calc_Pa: 0.000555
         - T_K: 1674.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0301
           gamma_SD: 0.0239
           delta_IW: 1.54
@@ -2069,6 +2483,11 @@ species:
           p_In_Pa: 0.000197
           p_O2_calc_Pa: 0.000681
         - T_K: 1684.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0265
           gamma_SD: 0.021
           delta_IW: 1.53
@@ -2077,6 +2496,11 @@ species:
           p_In_Pa: 0.000207
           p_O2_calc_Pa: 0.000844
         - T_K: 1695.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0254
           gamma_SD: 0.0201
           delta_IW: 1.53
@@ -2110,6 +2534,11 @@ species:
         gamma: 0.0211
         series:
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0211
           gamma_SD: 0.0166
           delta_IW: 1.51
@@ -2118,6 +2547,11 @@ species:
           p_In_Pa: 0.00032
           p_O2_calc_Pa: 0.002761
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0231
           gamma_SD: 0.0183
           delta_IW: 1.52
@@ -2126,6 +2560,11 @@ species:
           p_In_Pa: 0.000347
           p_O2_calc_Pa: 0.002805
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0197
           gamma_SD: 0.0157
           delta_IW: 1.52
@@ -2134,6 +2573,11 @@ species:
           p_In_Pa: 0.000294
           p_O2_calc_Pa: 0.002834
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.022
           gamma_SD: 0.0175
           delta_IW: 1.54
@@ -2142,6 +2586,11 @@ species:
           p_In_Pa: 0.000321
           p_O2_calc_Pa: 0.002919
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0194
           gamma_SD: 0.0155
           delta_IW: 1.54
@@ -2150,6 +2599,11 @@ species:
           p_In_Pa: 0.000282
           p_O2_calc_Pa: 0.002937
         - T_K: 1743.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0194
           gamma_SD: 0.0154
           delta_IW: 1.53
@@ -2158,6 +2612,11 @@ species:
           p_In_Pa: 0.000292
           p_O2_calc_Pa: 0.002915
         - T_K: 1743.0
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0188
           gamma_SD: 0.015
           delta_IW: 1.53
@@ -2166,6 +2625,11 @@ species:
           p_In_Pa: 0.000281
           p_O2_calc_Pa: 0.002952
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.02
           gamma_SD: 0.0159
           delta_IW: 1.54
@@ -2174,6 +2638,11 @@ species:
           p_In_Pa: 0.000286
           p_O2_calc_Pa: 0.002877
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0186
           gamma_SD: 0.0148
           delta_IW: 1.54
@@ -2182,6 +2651,11 @@ species:
           p_In_Pa: 0.000265
           p_O2_calc_Pa: 0.002881
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0196
           gamma_SD: 0.0156
           delta_IW: 1.54
@@ -2190,6 +2664,11 @@ species:
           p_In_Pa: 0.000277
           p_O2_calc_Pa: 0.002905
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0167
           gamma_SD: 0.0133
           delta_IW: 1.54
@@ -2198,6 +2677,11 @@ species:
           p_In_Pa: 0.000237
           p_O2_calc_Pa: 0.002896
         - T_K: 1741.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0189
           gamma_SD: 0.015
           delta_IW: 1.53
@@ -2206,6 +2690,11 @@ species:
           p_In_Pa: 0.00028
           p_O2_calc_Pa: 0.00286
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0169
           gamma_SD: 0.0134
           delta_IW: 1.53
@@ -2214,6 +2703,11 @@ species:
           p_In_Pa: 0.000244
           p_O2_calc_Pa: 0.002839
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0173
           gamma_SD: 0.0137
           delta_IW: 1.53
@@ -2222,6 +2716,11 @@ species:
           p_In_Pa: 0.000252
           p_O2_calc_Pa: 0.002801
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0167
           gamma_SD: 0.0132
           delta_IW: 1.53
@@ -2230,6 +2729,11 @@ species:
           p_In_Pa: 0.000242
           p_O2_calc_Pa: 0.002813
         - T_K: 1740.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0154
           gamma_SD: 0.0122
           delta_IW: 1.52
@@ -2263,168 +2767,308 @@ species:
         gamma: 29.6
         series:
         - T_K: 1401.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 29.6
           gamma_SD: 37.7
           delta_IW: 3.86
           K_In: 5.54e-13
           K_In_SD: 6.23e-13
         - T_K: 1413.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 16.6
           gamma_SD: 21.2
           delta_IW: 3.67
           K_In: 5.54e-13
           K_In_SD: 6.29e-13
         - T_K: 1425.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 18.8
           gamma_SD: 24.4
           delta_IW: 3.71
           K_In: 1.06e-12
           K_In_SD: 1.22e-12
         - T_K: 1437.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 18.2
           gamma_SD: 23.7
           delta_IW: 3.67
           K_In: 1.72e-12
           K_In_SD: 1.99e-12
         - T_K: 1449.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 17.9
           gamma_SD: 23.2
           delta_IW: 3.65
           K_In: 2.93e-12
           K_In_SD: 3.39e-12
         - T_K: 1461.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 16.5
           gamma_SD: 21.4
           delta_IW: 3.61
           K_In: 4.45e-12
           K_In_SD: 5.13e-12
         - T_K: 1474.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 14.4
           gamma_SD: 18.8
           delta_IW: 3.55
           K_In: 6.64e-12
           K_In_SD: 7.68e-12
         - T_K: 1486.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 10.3
           gamma_SD: 13.4
           delta_IW: 3.45
           K_In: 8.04e-12
           K_In_SD: 9.27e-12
         - T_K: 1498.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 6.63
           gamma_SD: 8.61
           delta_IW: 3.34
           K_In: 8.27e-12
           K_In_SD: 9.56e-12
         - T_K: 1511.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 4.27
           gamma_SD: 5.54
           delta_IW: 3.22
           K_In: 8.86e-12
           K_In_SD: 1.02e-11
         - T_K: 1522.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 1.82
           gamma_SD: 2.36
           delta_IW: 3.03
           K_In: 5.96e-12
           K_In_SD: 6.87e-12
         - T_K: 1535.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.987
           gamma_SD: 1.28
           delta_IW: 2.87
           K_In: 5.3e-12
           K_In_SD: 6.09e-12
         - T_K: 1548.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.648
           gamma_SD: 0.837
           delta_IW: 2.73
           K_In: 5.64e-12
           K_In_SD: 6.46e-12
         - T_K: 1557.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.586
           gamma_SD: 0.753
           delta_IW: 2.61
           K_In: 7.29e-12
           K_In_SD: 8.31e-12
         - T_K: 1571.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.102
           gamma_SD: 0.128
           delta_IW: 2.17
           K_In: 2.12e-12
           K_In_SD: 2.34e-12
         - T_K: 1588.5
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0814
           gamma_SD: 0.102
           delta_IW: 2.1
           K_In: 3.12e-12
           K_In_SD: 3.41e-12
         - T_K: 1601.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.045
           gamma_SD: 0.0552
           delta_IW: 1.95
           K_In: 2.7e-12
           K_In_SD: 2.9e-12
         - T_K: 1613.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0307
           gamma_SD: 0.0373
           delta_IW: 1.86
           K_In: 2.89e-12
           K_In_SD: 3.05e-12
         - T_K: 1626.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0202
           gamma_SD: 0.0241
           delta_IW: 1.77
           K_In: 2.94e-12
           K_In_SD: 3.04e-12
         - T_K: 1638.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.0135
           gamma_SD: 0.0158
           delta_IW: 1.71
           K_In: 2.91e-12
           K_In_SD: 2.95e-12
         - T_K: 1650.9
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00941
           gamma_SD: 0.0109
           delta_IW: 1.66
           K_In: 3.11e-12
           K_In_SD: 3.11e-12
         - T_K: 1662.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00626
           gamma_SD: 0.00721
           delta_IW: 1.63
           K_In: 3.04e-12
           K_In_SD: 2.99e-12
         - T_K: 1674.2
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00462
           gamma_SD: 0.00528
           delta_IW: 1.59
           K_In: 3.28e-12
           K_In_SD: 3.19e-12
         - T_K: 1685.8
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00354
           gamma_SD: 0.00401
           delta_IW: 1.57
           K_In: 3.65e-12
           K_In_SD: 3.52e-12
         - T_K: 1699.6
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00285
           gamma_SD: 0.00321
           delta_IW: 1.55
           K_In: 4.53e-12
           K_In_SD: 4.33e-12
         - T_K: 1712.3
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00216
           gamma_SD: 0.00243
           delta_IW: 1.54
           K_In: 5.11e-12
           K_In_SD: 4.86e-12
         - T_K: 1719.7
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00196
           gamma_SD: 0.0022
           delta_IW: 1.54
           K_In: 5.83e-12
           K_In_SD: 5.54e-12
         - T_K: 1733.4
+          composition_wt_pct:
+            SiO2: 50.47
+            Al2O3: 15.38
+            MgO: 10.42
+            CaO: 23.63
           gamma: 0.00145
           gamma_SD: 0.00162
           delta_IW: 1.54
@@ -2456,60 +3100,110 @@ species:
         gamma: 0.0335
         series:
         - T_K: 1538.8
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0335
           gamma_SD: 0.0275
           delta_IW: 2.98
           K_In: 2.03e-13
           K_In_SD: 1.14e-13
         - T_K: 1547.2
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.025
           gamma_SD: 0.0204
           delta_IW: 2.89
           K_In: 2.09e-13
           K_In_SD: 1.17e-13
         - T_K: 1555.7
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0211
           gamma_SD: 0.0173
           delta_IW: 2.84
           K_In: 2.43e-13
           K_In_SD: 1.36e-13
         - T_K: 1564.2
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0154
           gamma_SD: 0.0125
           delta_IW: 2.74
           K_In: 2.42e-13
           K_In_SD: 1.35e-13
         - T_K: 1577.9
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.0127
           gamma_SD: 0.0103
           delta_IW: 2.68
           K_In: 3.31e-13
           K_In_SD: 1.84e-13
         - T_K: 1587.4
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.00978
           gamma_SD: 0.00794
           delta_IW: 2.6
           K_In: 3.6e-13
           K_In_SD: 1.99e-13
         - T_K: 1598.0
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.00845
           gamma_SD: 0.00685
           delta_IW: 2.55
           K_In: 4.54e-13
           K_In_SD: 2.5e-13
         - T_K: 1609.7
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.00646
           gamma_SD: 0.00522
           delta_IW: 2.47
           K_In: 5.23e-13
           K_In_SD: 2.86e-13
         - T_K: 1618.1
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.00581
           gamma_SD: 0.00469
           delta_IW: 2.43
           K_In: 6.32e-13
           K_In_SD: 3.44e-13
         - T_K: 1631.9
+          composition_wt_pct:
+            SiO2: 49.72
+            Al2O3: 15.15
+            MgO: 10.27
+            CaO: 23.28
           gamma: 0.00398
           gamma_SD: 0.00319
           delta_IW: 2.33

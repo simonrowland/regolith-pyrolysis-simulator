@@ -94,8 +94,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1802.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1529 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 1].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -152,8 +158,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1802.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1529 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 3].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -210,8 +222,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1802.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1529 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 2].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -275,8 +293,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1805.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1532 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 27].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -340,8 +364,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1805.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1532 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 28].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -398,8 +428,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 29].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -456,8 +492,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 30].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -514,8 +556,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 31].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -572,8 +620,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 8].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -630,8 +684,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 10].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -688,8 +748,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1825.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1552 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 11].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -746,8 +812,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1834.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1561 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 5].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -804,8 +876,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1834.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1561 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 6].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -862,8 +940,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1834.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1561 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 7].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -920,8 +1004,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1858.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1585 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 12].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -978,8 +1068,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1858.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1585 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 13].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1036,8 +1132,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1858.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1585 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 14].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1094,8 +1196,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1858.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1585 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 15].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1152,8 +1260,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1860.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1587 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 16].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1210,8 +1324,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1860.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1587 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 17].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1268,8 +1388,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1860.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1587 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 18].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1326,8 +1452,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1870.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1597 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 19].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1384,8 +1516,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1870.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1597 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 20].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1442,8 +1580,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1870.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1597 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 21].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1500,8 +1644,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1870.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1597 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 48].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1565,8 +1715,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1870.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1597 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 49].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1630,8 +1786,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1874.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1601 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 59].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1688,8 +1850,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1875.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1602 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 57].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1753,8 +1921,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1877.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1604 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 56].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1818,8 +1992,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1877.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1604 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 51].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1883,8 +2063,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1881.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1608 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 55].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -1948,8 +2134,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1882.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1609 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 54].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2013,8 +2205,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1883.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1610 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 53].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2071,8 +2269,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1883.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1610 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 23].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2129,8 +2333,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1884.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1611 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 60].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2194,8 +2404,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1887.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1614 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 52].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2259,8 +2475,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1891.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1618 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 37].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2324,8 +2546,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1891.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1618 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 38].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2382,8 +2610,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1895.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1622 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 24].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2440,8 +2674,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1895.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1622 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 25].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
@@ -2498,8 +2738,14 @@ experiments:
     channel: {tag: unknown, reason: not_published}
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 558, table: '1', note: 'Per-sample annealing T in Table 1; not collapsed here'}
+      state: {tag: value, value: '1895.15'}
+      locator: {published_page: 558, pdf_page_index: 3, table: '1', note: 'T_C=1622 printed; T_K=T_C+273.15 (derived)'}
+      method_class: calculated
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - "values.rows[SH 26].T_C"
+        output_unit: K
   thermal_schedule:
     method:
       state: {tag: value, value: Furnace anneal followed by water quench}
