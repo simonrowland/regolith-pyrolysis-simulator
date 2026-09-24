@@ -1653,6 +1653,23 @@ def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Pat
     assert exp.sample.form.state.value == "powder"
 
 
+def test_h01_sample_volume_cm3_is_stored_as_m3(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "sample_volume_cm3": {"value": 0.25, "locator": {"table": "2"}},
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    volume = result.experiments[obs.experiment_id].sample.volume_m3
+    assert volume is not None and volume.state.is_value
+    assert volume.state.value.kind is ValueKind.POINT
+    assert volume.state.value.point == as_decimal("0.00000025")
+    assert volume.inference is not None
+    assert volume.inference.relation == "cm3_to_m3"
+    assert volume.locator is not None and volume.locator.table == "2"
+
+
 def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"] = [
