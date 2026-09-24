@@ -58,6 +58,23 @@ def _git(*args: str) -> str:
     ).stdout
 
 
+def _require_git_history(*revisions: str) -> None:
+    """Skip history-only mutation proofs when CI copied a shallow worktree."""
+    for revision in revisions:
+        result = subprocess.run(
+            ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            pytest.skip(
+                "git_history_unavailable: required mutation revision "
+                f"{revision!r} is absent"
+            )
+
+
 def _load_freshness():
     path = REPO_ROOT / "scripts" / "check_store_freshness.py"
     spec = importlib.util.spec_from_file_location("check_store_freshness", path)
@@ -131,6 +148,7 @@ def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:
     must show zero ``fO2_log`` keys — the defect R16 P1 named. If this
     ever goes green against that tip, the census no longer guards the hole.
     """
+    _require_git_history(STALE_TIP)
     for stem in PRINTED_FO2_STEMS:
         blob = _git(
             "show",
@@ -176,6 +194,7 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     migrate-input commits after ``2e9e17c3d`` would be reported. Guarding
     this keeps the freshness assertion from going vacuous.
     """
+    _require_git_history(STALE_TIP)
     freshness = _load_freshness()
     head = _git("rev-parse", STALE_TIP).strip()
     last_store = _git(

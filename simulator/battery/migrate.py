@@ -9853,10 +9853,42 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
+        series_summary = False
         if column_series:
+            mapped_quantities = {series.quantity for series in column_series}
+            needs_refusal = any(
+                numeric_count
+                and not _is_temperature_column_label(column)
+                and (
+                    (quantity := _quantity_for_compilation_column_label(column)) is None
+                    or quantity not in mapped_quantities
+                )
+                for column, numeric_count in _printed_column_counts(doc).items()
+            )
+            rows_for_shape = doc.get("rows")
+            first_cells = (
+                rows_for_shape[0].get("cells")
+                if isinstance(rows_for_shape, list)
+                and rows_for_shape
+                and isinstance(rows_for_shape[0], Mapping)
+                else None
+            )
+            fully_mapped_list = not isinstance(first_cells, Mapping) and not needs_refusal
+            series_notice_reason = None
+            if fully_mapped_list:
+                census = _printed_column_counts(doc)
+                if census:
+                    columns = ", ".join(
+                        f"{column}: {numeric_count} numeric cells"
+                        for column, numeric_count in census.items()
+                    )
+                    series_notice_reason = (
+                        f"source column census ({columns}); "
+                        "all numeric cells retained in mapped compilation series"
+                    )
             # One observation per declared mapped series; never first-numeric-cell.
             read_from = choose_read_from(work, locator)
-            for series in column_series:
+            for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
                 self._generic_obs(
                     work=work,
@@ -9877,6 +9909,17 @@ class Migrator:
                         locator,
                         read_from,
                     ),
+                    notices=(
+                        Notice(
+                            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                            affected_quantities=(series.quantity,),
+                            reason=series_notice_reason,
+                            origin=f"{source_id}:{record_id}:{suffix}",
+                            source=rel,
+                        ),
+                    )
+                    if index == 0 and series_notice_reason is not None
+                    else (),
                 )
             for column, numeric_count in _printed_column_counts(doc).items():
                 if (
@@ -9892,7 +9935,9 @@ class Migrator:
                         source=rel,
                         observation_id=f"{source_id}:{record_id}",
                     )
-            return
+            if fully_mapped_list:
+                return
+            series_summary = True
         rows = doc.get("rows")
         series_items: list[dict[str, Any]] = []
         if isinstance(rows, list):
@@ -9963,6 +10008,11 @@ class Migrator:
                 original_value,
                 locator,
                 read_from,
+            ),
+            value_reason=(
+                "mapped compilation series retained; table-level scalar value is not selected"
+                if series_summary and value.kind is ValueKind.UNAVAILABLE
+                else None
             ),
         )
 
