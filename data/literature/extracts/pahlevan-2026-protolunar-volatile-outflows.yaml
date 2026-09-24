@@ -12,12 +12,12 @@ extraction:
 review_status: draft
 fidelity_samples:
 - path: species.H2O.observations[pahlevan_2026_fig1a_h2o_partial_pressure].values.series[0].P_bar
-  value: 199.5
+  value: 0.02512
   locator:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
     page: 28
     figure: "1a"
-    row: "H2O marker at log10 P(bar)=2.3"
+    row: "H2O marker at log10 P(bar)=-1.6"
     column: P_bar
 benches:
 - id: pahlevan_c_o_h_equilibrium_outflow_model
@@ -281,34 +281,42 @@ species:
         derivation_method: "Digitized marker coordinates from Figure 1a; P_bar = 10^(digitized log10 P(bar)); mole fraction retained as the plotted log10 value."
         composition: "C-O-H equilibrium vapor"
         series:
-        - P_bar: 199.5
-          log10_P_bar: 2.3
-          log10_mole_fraction: -1.99
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=2.3", column: "P_bar, log mole fraction"}
-        - P_bar: 63.10
-          log10_P_bar: 1.8
-          log10_mole_fraction: -1.78
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=1.8", column: "P_bar, log mole fraction"}
-        - P_bar: 19.95
-          log10_P_bar: 1.3
-          log10_mole_fraction: -1.68
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=1.3", column: "P_bar, log mole fraction"}
-        - P_bar: 6.310
-          log10_P_bar: 0.8
-          log10_mole_fraction: -1.70
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=0.8", column: "P_bar, log mole fraction"}
-        - P_bar: 1.995
-          log10_P_bar: 0.3
-          log10_mole_fraction: -1.78
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=0.3", column: "P_bar, log mole fraction"}
-        - P_bar: 0.6310
-          log10_P_bar: -0.2
-          log10_mole_fraction: -1.95
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=-0.2", column: "P_bar, log mole fraction"}
-        - P_bar: 0.1995
-          log10_P_bar: -0.7
-          log10_mole_fraction: -2.23
-          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O marker at log10 P=-0.7", column: "P_bar, log mole fraction"}
+        - P_bar: 0.02512
+          log10_P_bar: -1.6
+          log10_mole_fraction: -3.2
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=-1.6", column: "P_bar, log mole fraction"}
+        - P_bar: 0.07943
+          log10_P_bar: -1.1
+          log10_mole_fraction: -2.6
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=-1.1", column: "P_bar, log mole fraction"}
+        - P_bar: 0.2512
+          log10_P_bar: -0.6
+          log10_mole_fraction: -2.2
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=-0.6", column: "P_bar, log mole fraction"}
+        - P_bar: 0.7943
+          log10_P_bar: -0.1
+          log10_mole_fraction: -1.9
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=-0.1", column: "P_bar, log mole fraction"}
+        - P_bar: 2.512
+          log10_P_bar: 0.4
+          log10_mole_fraction: -1.7
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=0.4", column: "P_bar, log mole fraction"}
+        - P_bar: 7.943
+          log10_P_bar: 0.9
+          log10_mole_fraction: -1.6
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=0.9", column: "P_bar, log mole fraction"}
+        - P_bar: 25.12
+          log10_P_bar: 1.4
+          log10_mole_fraction: -1.7
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=1.4", column: "P_bar, log mole fraction"}
+        - P_bar: 79.43
+          log10_P_bar: 1.9
+          log10_mole_fraction: -1.7
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=1.9", column: "P_bar, log mole fraction"}
+        - P_bar: 251.2
+          log10_P_bar: 2.4
+          log10_mole_fraction: -2.0
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "H2O open-circle marker at log10 P=2.4", column: "P_bar, log mole fraction"}
   H2:
     observations:
     - observation_id: pahlevan_2026_fig1a_h2_partial_pressure
@@ -380,8 +388,8 @@ species:
         derivation_method: "Digitized marker coordinates from Figure 1a; P_bar = 10^(digitized log10 P(bar)); mole fraction retained as the plotted log10 value."
         composition: "C-O-H equilibrium vapor"
         series:
-        - {P_bar: 199.5, log10_P_bar: 2.3, log10_mole_fraction: -3.45, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O2 marker at log10 P=2.3", column: "P_bar, log mole fraction"}}
-        - {P_bar: 63.10, log10_P_bar: 1.8, log10_mole_fraction: -3.80, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O2 marker at log10 P=1.8", column: "P_bar, log mole fraction"}}
+        - {P_bar: 79.43, log10_P_bar: 1.9, log10_mole_fraction: -3.8, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O2 open-circle marker at log10 P=1.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 251.2, log10_P_bar: 2.4, log10_mole_fraction: -3.4, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O2 open-circle marker at log10 P=2.4", column: "P_bar, log mole fraction"}}
   CO2:
     observations:
     - observation_id: pahlevan_2026_fig1a_co2_partial_pressure
@@ -410,8 +418,80 @@ species:
         - {P_bar: 0.1995, log10_P_bar: -0.7, log10_mole_fraction: -1.49, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO2 marker at log10 P=-0.7", column: "P_bar, log mole fraction"}}
         - {P_bar: 0.06310, log10_P_bar: -1.2, log10_mole_fraction: -1.44, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO2 marker at log10 P=-1.2", column: "P_bar, log mole fraction"}}
         - {P_bar: 0.01995, log10_P_bar: -1.7, log10_mole_fraction: -1.42, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO2 marker at log10 P=-1.7", column: "P_bar, log mole fraction"}}
+  OH:
+    observations:
+    - observation_id: pahlevan_2026_fig1a_oh_partial_pressure
+      type: partial_pressure
+      experiment: earth_volatile_atmosphere_5000K
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 28
+        figure: "1a"
+        row: "OH open-circle markers"
+        column: "log mole fraction, log10 P(bar)"
+      units: "bar as printed on figure; P_bar is derived from the plotted log10 P(bar) axis"
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: "figure-only / digitized"
+        derivation_method: "Digitized open-circle marker coordinates from Figure 1a; P_bar = 10^(digitized log10 P(bar)); mole fraction retained as the plotted log10 value."
+        composition: "C-O-H equilibrium vapor"
+        series:
+        - {P_bar: 7.943, log10_P_bar: 0.9, log10_mole_fraction: -3.6, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "OH open-circle marker at log10 P=0.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 25.12, log10_P_bar: 1.4, log10_mole_fraction: -2.6, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "OH open-circle marker at log10 P=1.4", column: "P_bar, log mole fraction"}}
+        - {P_bar: 79.43, log10_P_bar: 1.9, log10_mole_fraction: -2.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "OH open-circle marker at log10 P=1.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 251.2, log10_P_bar: 2.4, log10_mole_fraction: -1.9, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "OH open-circle marker at log10 P=2.4", column: "P_bar, log mole fraction"}}
+  O:
+    observations:
+    - observation_id: pahlevan_2026_fig1a_o_partial_pressure
+      type: partial_pressure
+      experiment: earth_volatile_atmosphere_5000K
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 28
+        figure: "1a"
+        row: "O open-circle markers"
+        column: "log mole fraction, log10 P(bar)"
+      units: "bar as printed on figure; P_bar is derived from the plotted log10 P(bar) axis"
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: "figure-only / digitized"
+        derivation_method: "Digitized open-circle marker coordinates from Figure 1a; P_bar = 10^(digitized log10 P(bar)); mole fraction retained as the plotted log10 value."
+        composition: "C-O-H equilibrium vapor"
+        series:
+        - {P_bar: 25.12, log10_P_bar: 1.4, log10_mole_fraction: -3.5, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O open-circle marker at log10 P=1.4", column: "P_bar, log mole fraction"}}
+        - {P_bar: 79.43, log10_P_bar: 1.9, log10_mole_fraction: -2.6, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O open-circle marker at log10 P=1.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 251.2, log10_P_bar: 2.4, log10_mole_fraction: -2.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "O open-circle marker at log10 P=2.4", column: "P_bar, log mole fraction"}}
   CO:
-    observations: []
+    observations:
+    - observation_id: pahlevan_2026_fig1a_co_partial_pressure
+      type: partial_pressure
+      experiment: earth_volatile_atmosphere_5000K
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 28
+        figure: "1a"
+        row: "CO open-circle markers"
+        column: "log mole fraction, log10 P(bar)"
+      units: "bar as printed on figure; P_bar is derived from the plotted log10 P(bar) axis"
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        evidence_class: "figure-only / digitized"
+        derivation_method: "Digitized open-circle marker coordinates from Figure 1a; P_bar = 10^(digitized log10 P(bar)); mole fraction retained as the plotted log10 value."
+        composition: "C-O-H equilibrium vapor"
+        series:
+        - {P_bar: 0.01, log10_P_bar: -2.0, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=-2.0", column: "P_bar, log mole fraction"}}
+        - {P_bar: 0.02512, log10_P_bar: -1.6, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=-1.6", column: "P_bar, log mole fraction"}}
+        - {P_bar: 0.07943, log10_P_bar: -1.1, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=-1.1", column: "P_bar, log mole fraction"}}
+        - {P_bar: 0.2512, log10_P_bar: -0.6, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=-0.6", column: "P_bar, log mole fraction"}}
+        - {P_bar: 0.7943, log10_P_bar: -0.1, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=-0.1", column: "P_bar, log mole fraction"}}
+        - {P_bar: 2.512, log10_P_bar: 0.4, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=0.4", column: "P_bar, log mole fraction"}}
+        - {P_bar: 7.943, log10_P_bar: 0.9, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=0.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 25.12, log10_P_bar: 1.4, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=1.4", column: "P_bar, log mole fraction"}}
+        - {P_bar: 79.43, log10_P_bar: 1.9, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=1.9", column: "P_bar, log mole fraction"}}
+        - {P_bar: 251.2, log10_P_bar: 2.4, log10_mole_fraction: -0.1, locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1a", row: "CO open-circle marker at log10 P=2.4", column: "P_bar, log mole fraction"}}
     context:
     - observation_id: pahlevan_2026_pcoh_estimate
       type: thermodynamic_example
@@ -426,9 +506,98 @@ species:
         quantity: total_COH_vapor_pressure
         method_class: authors_estimate
         evidence_class: author_estimate
-        P_bar: 250
+        P_bar: {kind: point, point: '250', approximate: true}
         printed_form: "approximately 250 bars"
         derivation_method: "Retained as the authors' estimate for the pressure of a C-O-H atmosphere above Earth; no independent recalculation."
+    - observation_id: pahlevan_2026_fig1_mean_molecular_weight
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 28
+        figure: "1 caption"
+        row: "Earth and disk mean molecular weight"
+        column: "mean molecular weight"
+      units: amu
+      values:
+        quantity: mean_molecular_weight
+        method_class: figure_only
+        evidence_class: figure_only
+        mean_molecular_weight: {kind: interval, interval_low: '23.2', interval_high: '24.7'}
+        printed_form: "μ̄ = 23.2-24.7 amu"
+        derivation_method: "Printed Figure 1 caption value; no graph read or recomputation."
+    - observation_id: pahlevan_2026_fig3_mean_molecular_weight_bound
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 30
+        figure: "3 caption"
+        row: "disk mean molecular weight"
+        column: "mean molecular weight"
+      units: amu
+      values:
+        quantity: mean_molecular_weight
+        method_class: figure_only
+        evidence_class: figure_only
+        mean_molecular_weight: {kind: bound, bound_operator: '<=', bound_value: '7', approximate: true}
+        printed_form: "μ̄ ≲ 7 amu"
+        derivation_method: "Printed Figure 3 caption bound; no graph read or recomputation."
+    - observation_id: pahlevan_2026_eq1_h2o_solubility
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 11
+        section: "2.3 Chemical equilibrium"
+        row: "equation (1)"
+        column: "H2O solubility"
+      units: as printed
+      values:
+        quantity: equation
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Pan et al. (1991)"]
+        equation: "p_H2O (bars) = (2.9 × 10^4)(x_L^H / 0.01)^2"
+        printed_form: "p_H2O (bars) = (2.9 × 10^4)(x_L^H / 0.01)^2"
+        derivation_method: "Equation transcribed from the source; no algebraic rearrangement."
+    - observation_id: pahlevan_2026_eq2_co2_solubility
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 11
+        section: "2.3 Chemical equilibrium"
+        row: "equation (2)"
+        column: "CO2 solubility"
+      units: as printed
+      values:
+        quantity: equation
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Sossi et al. (2023)"]
+        equation: "p_CO2 (bars) = (6.7 × 10^6)(x_L^C)"
+        printed_form: "p_CO2 (bars) = (6.7 × 10^6)(x_L^C)"
+        derivation_method: "Equation transcribed from the source; no algebraic rearrangement."
+    - observation_id: pahlevan_2026_dissociation_energies
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 11
+        section: "2.3 Chemical equilibrium"
+        row: "molecular dissociation energies"
+        column: "species and energy"
+      units: eV as printed
+      values:
+        quantity: dissociation_energy
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Chase (1998)"]
+        energies_eV:
+          CO2: '5.5'
+          O2: '5.2'
+          H2O: '5.2'
+          H2: '4.5'
+          OH: '4.4'
+          CO: '11.2'
+        printed_form: "CO2 5.5 eV; O2 5.2 eV; H2O 5.2 eV; H2 4.5 eV; OH 4.4 eV; CO 11.2 eV"
+        derivation_method: "Dissociation energies transcribed from the source; no conversion or recalculation."
     - observation_id: pahlevan_2026_bse_h2o_inventory
       type: composition
       locator:
@@ -445,6 +614,23 @@ species:
         H2O_ppm: 900
         H_ppm: 100
         derivation_method: "Adopted source input: 900 ppm H2O, stated as equivalently 100 ppm H; values are retained as printed, not recomputed."
+    - observation_id: pahlevan_2026_modern_bse_h2o_range
+      type: composition
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 8
+        section: "2.1 Initial conditions"
+        row: "modern BSE water range"
+        column: "H2O abundance"
+      units: ppm by mass
+      values:
+        quantity: bulk_silicate_earth_H2O_inventory
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Hirschmann (2018)", "Marty (2012)"]
+        H2O_ppm: {kind: interval, interval_low: '700', interval_high: '3000'}
+        printed_form: "700-3000 ppm H2O"
+        derivation_method: "Quoted modern BSE range cited by the authors; not treated as the paper's selected 900 ppm model input."
     - observation_id: pahlevan_2026_hc_atomic_ratio
       type: composition
       locator:
@@ -456,10 +642,12 @@ species:
       units: atomic H/C ratio
       values:
         quantity: H_C_atomic_ratio
-        method_class: model_derived_assumption
-        evidence_class: printed_model_assumption
-        ratio: 12
-        derivation_method: "Adopted source composition ratio; retained as printed."
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Hirschmann and Dasgupta (2009)"]
+        ratio: {kind: point, point: '12'}
+        printed_form: "H/C atomic ratio 12"
+        derivation_method: "Quoted modern Earth H/C ratio cited by the authors; retained as printed."
     - observation_id: pahlevan_2026_vapor_pressure_fits
       type: thermodynamic_example
       locator:
@@ -480,7 +668,7 @@ species:
         metallic_iron_vapor:
           P0_bar: 2300000
           T0_K: 46000
-        crossover_temperature_K: 5000
+        crossover_temperature_K: {kind: point, point: '5000', approximate: true}
         derivation_method: "Parameters and crossover are transcribed from the source's adopted fits; no new fit performed."
     - observation_id: pahlevan_2026_redox_range
       type: thermodynamic_example
@@ -495,8 +683,9 @@ species:
         quantity: log_fO2_IW_offset
         method_class: quoted_literature
         evidence_class: quoted_prior_work
-        interval_low: -2
-        interval_high: -1
+        quoted_sources: ["Wadhwa (2008)", "Frost (1991)", "Frost et al. (2008)"]
+        log_fO2_IW_offset: {kind: interval, interval_low: '-2', interval_high: '-1'}
+        printed_form: "1-2 log units below IW"
         derivation_method: "Quoted range from prior estimates summarized by the authors; not recalculated."
     - observation_id: pahlevan_2026_redox_species_ratios
       type: thermodynamic_example
@@ -511,8 +700,10 @@ species:
         quantity: reduced_vapor_ratios
         method_class: quoted_literature
         evidence_class: quoted_prior_work
-        pH2_pH2O_interval: [3, 10]
-        pCO_pCO2_interval: [9, 30]
+        quoted_sources: ["Visscher and Fegley (2013)"]
+        pH2_pH2O: {kind: interval, interval_low: '3', interval_high: '10'}
+        pCO_pCO2: {kind: interval, interval_low: '9', interval_high: '30'}
+        printed_form: "pH2/pH2O = 3-10; pCO/pCO2 = 9-30"
         derivation_method: "Quoted ranges from prior equilibrium estimates; no new equilibrium solve performed."
     - observation_id: pahlevan_2026_temperature_regimes
       type: thermodynamic_example
@@ -521,18 +712,66 @@ species:
         page: 9
         section: "2.2 Liquid-vapor equilibrium"
         row: "temperature regimes"
-        column: "impact, atmosphere onset, critical BSE"
+        column: "adopted structure temperatures"
       units: K
       values:
         quantity: model_temperature_regimes
         method_class: model_derived_assumption
         evidence_class: printed_model_assumption
-        impact_temperature_interval: [4000, 8000]
-        prior_atmosphere_onset_K: 3000
-        critical_BSE_materials_K: 6000
         disk_structure_temperature_K: 3000
         earth_structure_temperature_K: 5000
-        derivation_method: "Temperatures are source model regimes and adopted structure points, retained as printed."
+        derivation_method: "Disk and Earth structure temperatures are the source paper's adopted model points, retained as printed."
+    - observation_id: pahlevan_2026_quoted_impact_temperature_range
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 8
+        section: "2.1 Initial conditions"
+        row: "impact temperature range"
+        column: temperature
+      units: K
+      values:
+        quantity: impact_temperature
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Canup (2004)", "Pahlevan et al. (2011)", "Visscher and Fegley (2013)"]
+        temperature_K: {kind: interval, interval_low: '4000', interval_high: '8000'}
+        printed_form: "4000-8000 K"
+        derivation_method: "Quoted impact-temperature range cited by the authors."
+    - observation_id: pahlevan_2026_quoted_volatile_atmosphere_onset
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 9
+        section: "2.2 Liquid-vapor equilibrium"
+        row: "volatile atmosphere onset"
+        column: temperature
+      units: K
+      values:
+        quantity: volatile_atmosphere_onset_temperature
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Visscher and Fegley (2013)"]
+        temperature_K: {kind: point, point: '3000', approximate: true}
+        printed_form: "approximately 3000 K"
+        derivation_method: "Quoted onset temperature cited by the authors."
+    - observation_id: pahlevan_2026_quoted_critical_bse_temperature
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 10
+        section: "2.2 Liquid-vapor equilibrium"
+        row: "critical BSE materials temperature"
+        column: temperature
+      units: K
+      values:
+        quantity: critical_BSE_materials_temperature
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Caracas (2024)"]
+        temperature_K: {kind: point, point: '6000', approximate: true}
+        printed_form: "~6000 K"
+        derivation_method: "Quoted critical temperature cited by the authors."
     - observation_id: pahlevan_2026_escape_parameter_limits
       type: thermodynamic_example
       locator:
@@ -544,13 +783,15 @@ species:
       units: dimensionless
       values:
         quantity: generalized_escape_parameter_limits
-        method_class: model_derived_assumption
-        evidence_class: printed_model_assumption
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Waters and Proga (2012)", "Parker (1963)"]
         Gamma_iso: 1
         Lambda_crit_disk: 2
         Lambda_crit_nonrotating_planet: 1
         Gamma_range: "1 < Gamma < Gamma_ad"
-        derivation_method: "Equation and limiting values transcribed from the model description; no new wind integration performed."
+        printed_form: "Lambda_crit = 2 for the disk, 1 for a nonrotating planet; 1 < Gamma < Gamma_ad"
+        derivation_method: "Quoted limiting values and polytropic limits attributed by the authors; no new wind integration performed."
     - observation_id: pahlevan_2026_fig3_escape_parameter_digitized
       type: figure_model_output
       locator:
@@ -562,17 +803,23 @@ species:
       units: "T in K approximately read from the plotted log T axis; Lambda dimensionless"
       values:
         quantity: generalized_escape_parameter
-        method_class: model_derived
+        method_class: figure_only
         evidence_class: "figure-only / digitized"
         derivation_method: "Marker coordinates digitized from Figure 3 panels; values are approximate graph reads, not printed table values."
         earth:
-        - {T_K: 5200, Lambda: 8.9, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth blue marker", column: "T, Lambda"}}
+        - {T_K: 5200, Lambda: 6.8, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth blue marker", column: "T, Lambda"}}
         - {T_K: 5000, Lambda: 7.8, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth blue marker", column: "T, Lambda"}}
-        - {T_K: 4800, Lambda: 6.8, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth blue marker", column: "T, Lambda"}}
+        - {T_K: 4800, Lambda: 8.9, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth blue marker", column: "T, Lambda"}}
+        - {T_K: 5200, Lambda: 6.8, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth red marker", column: "T, Lambda"}}
+        - {T_K: 5000, Lambda: 7.6, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth red marker", column: "T, Lambda"}}
+        - {T_K: 4800, Lambda: 8.4, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3a", row: "Earth red marker", column: "T, Lambda"}}
         disk:
-        - {T_K: 3200, Lambda: 0.95, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk blue marker", column: "T, Lambda"}}
+        - {T_K: 3200, Lambda: 0.40, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk blue marker", column: "T, Lambda"}}
         - {T_K: 3000, Lambda: 0.65, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk blue marker", column: "T, Lambda"}}
-        - {T_K: 2800, Lambda: 0.40, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk blue marker", column: "T, Lambda"}}
+        - {T_K: 2800, Lambda: 0.95, redox: "IW-1", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk blue marker", column: "T, Lambda"}}
+        - {T_K: 3200, Lambda: 0.40, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk red marker", column: "T, Lambda"}}
+        - {T_K: 3000, Lambda: 0.50, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk red marker", column: "T, Lambda"}}
+        - {T_K: 2800, Lambda: 0.60, redox: "IW-2", locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 30, figure: "3b", row: "disk red marker", column: "T, Lambda"}}
     - observation_id: pahlevan_2026_fig4_sodium_digitized
       type: figure_model_output
       experiment: sodium_entrainment_3000K
@@ -585,7 +832,7 @@ species:
       units: "radius in Earth radii; fraction dimensionless; Mach dimensionless"
       values:
         quantity: sodium_vaporized_fraction
-        method_class: model_derived
+        method_class: figure_only
         evidence_class: "figure-only / digitized"
         derivation_method: "Marker centers digitized from Figure 4; plotted fractions and Mach labels retained, with no interpolation between points."
         points:
@@ -614,13 +861,61 @@ species:
         quantity: sodium_model_summary
         method_class: model_derived_assumption
         evidence_class: printed_model_assumption
-        lunar_BSE_Na_wt_percent: 0.3
-        lunar_bulk_silicate_Moon_Na_wt_percent: 0.03
-        entrained_BSE_scaled_Na_fraction_interval: [0.15, 0.60]
-        wind_base_radius_R_E_interval: [2, 3]
-        recent_isotope_model_vapor_saturation_percent: 99
-        midplane_Mach_number: 0.01
+        entrained_BSE_scaled_Na_fraction_interval: {kind: interval, interval_low: '0.15', interval_high: '0.60'}
+        wind_base_radius_R_E_interval: {kind: interval, interval_low: '2', interval_high: '3'}
         derivation_method: "Printed source summary of the sodium calculation and comparison; interval values retained without interpolation."
+    - observation_id: pahlevan_2026_bse_and_lunar_na_abundances
+      type: composition
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 20
+        section: "3.4 Sodium"
+        row: "BSE and bulk silicate Moon sodium abundances"
+        column: "Na abundance"
+      units: wt% as printed
+      values:
+        quantity: Na_abundance_comparison
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["McDonough and Sun (1995)", "Ringwood and Kesson (1977)"]
+        bse_Na_wt_percent: {kind: point, point: '0.3', approximate: true}
+        bulk_silicate_Moon_Na_wt_percent: {kind: point, point: '0.03', approximate: true}
+        printed_form: "approximately 0.3 wt% BSE Na; approximately 0.03 wt% bulk silicate Moon Na"
+        derivation_method: "Quoted abundances attributed by the authors; not treated as model-derived values."
+    - observation_id: pahlevan_2026_isotope_vapor_saturation
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 20
+        section: "3.4 Sodium"
+        row: "recent isotope model vapor saturation"
+        column: saturation
+      units: percent
+      values:
+        quantity: vapor_saturation
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Dauphas et al. (2022)", "Nie and Dauphas (2019)"]
+        vapor_saturation_percent: {kind: point, point: '99', approximate: true}
+        printed_form: "~99% saturated"
+        derivation_method: "Quoted comparison value attributed by the authors."
+    - observation_id: pahlevan_2026_midplane_mach_number
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+        page: 20
+        section: "3.4 Sodium"
+        row: "midplane Mach number"
+        column: Mach
+      units: dimensionless
+      values:
+        quantity: midplane_Mach_number
+        method_class: quoted_literature
+        evidence_class: quoted_prior_work
+        quoted_sources: ["Pritchard and Stevenson (2000)"]
+        Mach_number: {kind: point, point: '0.01', approximate: true}
+        printed_form: "~0.01 Mach"
+        derivation_method: "Quoted comparison value attributed by the authors."
     - observation_id: pahlevan_2026_earth_disk_outcomes
       type: thermodynamic_example
       locator:
@@ -634,14 +929,14 @@ species:
         quantity: earth_disk_outflow_summary
         method_class: model_derived_assumption
         evidence_class: printed_model_assumption
-        earth_H_dissolved_fraction_percent: 97
-        earth_C_outgassed_fraction_percent: 99
-        earth_scale_height_km: 180
-        disk_H_outgassed_fraction_percent: 97
-        disk_scale_height_km: 8900
+        earth_H_dissolved_fraction_percent: {kind: bound, bound_operator: '>', bound_value: '97'}
+        earth_C_outgassed_fraction_percent: {kind: bound, bound_operator: '>', bound_value: '99'}
+        earth_scale_height_km: {kind: point, point: '180', approximate: true}
+        disk_H_outgassed_fraction_percent: {kind: bound, bound_operator: '>', bound_value: '97'}
+        disk_scale_height_km: {kind: point, point: '8900', approximate: true}
         earth_Gamma_ad: 1.26
         disk_Gamma_ad: 1.11
-        disk_gravity_relative_to_earth_interval: [0.01, 0.1]
+        disk_gravity_relative_to_earth_interval: {kind: interval, interval_low: '0.01', interval_high: '0.1'}
         derivation_method: "Printed model outcomes and characteristic scales; no independent wind solution."
     - observation_id: pahlevan_2026_refused_unmapped_outputs
       type: refusal
@@ -662,6 +957,9 @@ species:
         - item: "Unmarked continuous curves in Figures 1-3"
           reason: "Only marker coordinates were digitized; interpolating the curves would invent values between plotted evidence."
           locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1"}
+        - item: "Figure 1b square-marker series"
+          reason: "The x axis is labeled log T(K), but the panel ordinate has no numeric tick labels; assigning Gamma values from pixel positions would invent an unprinted scale."
+          locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 28, figure: "1b", row: "square markers", column: "log T, Gamma"}
         - item: "Engine-point-ready per-run pressure and composition records"
           reason: "This is a model paper with Earth/disk scenarios, not a printed experimental run registry; local plotted pressure is retained only where digitized and independent base pressure remains unknown."
           locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf, page: 7, section: "2. Model description"}
