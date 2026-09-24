@@ -4315,6 +4315,17 @@ def lineage_parents_from_source(
 _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 
+def _is_extractor_derivation(derivation: Derivation) -> bool:
+    """Return whether a derivation only records extractor representation work."""
+
+    relation = derivation.relation.strip().lower()
+    if relation == "identity" or relation.startswith("identity:"):
+        return True
+    return relation == "as_published" or relation in {
+        key.lower() for key in _CONVERSION_META
+    }
+
+
 def source_derivation_from_source(
     obs: Mapping[str, Any], values: Mapping[str, Any]
 ) -> Derivation | None:
@@ -4337,27 +4348,47 @@ def source_derivation_from_source(
 def conditional_reduced_lineage_is_measured(
     observation: Observation,
     observations: Mapping[str, Observation],
+    *,
+    _seen: frozenset[str] = frozenset(),
 ) -> bool:
     """Whether a calculated observation has admissible measured ancestry."""
 
     method_class = observation.evidence.original_method_class
     if method_class not in _CONDITIONAL_REDUCED_METHODS:
         return False
+    if observation.observation_id in _seen:
+        return False
+    if observation.admission.status is not AdmissionStatus.ADMITTED:
+        return False
     derivation = observation.derivation
-    if derivation is None or not observation.derived_from:
+    if (
+        derivation is None
+        or _is_extractor_derivation(derivation)
+        or not observation.derived_from
+    ):
         return False
     relation = derivation.relation.lower().replace("-", "_").replace(" ", "_")
     if "recipe" in relation or "aimed_target" in relation:
         return False
+    seen = _seen | {observation.observation_id}
     for parent_id in observation.derived_from:
         parent = observations.get(parent_id)
-        if parent is None or not parent.evidence.class_.is_value:
+        if parent is None or parent.admission.status is not AdmissionStatus.ADMITTED:
             return False
-        if parent.evidence.class_.value not in {
-            EvidenceClass.MEASURED_DIRECT,
-            EvidenceClass.MEASURED_TABULATED,
-            EvidenceClass.MEASURED_REDUCED,
-        }:
+        if parent.evidence.original_method_class in _CONDITIONAL_REDUCED_METHODS:
+            if not conditional_reduced_lineage_is_measured(
+                parent, observations, _seen=seen
+            ):
+                return False
+        elif (
+            not parent.evidence.class_.is_value
+            or parent.evidence.class_.value
+            not in {
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_TABULATED,
+                EvidenceClass.MEASURED_REDUCED,
+            }
+        ):
             return False
     return True
 
@@ -4400,6 +4431,19 @@ def evidence_for(
         if regime_text:
             mapped_regime = METHOD_CLASS_MAP.get(regime_text)
             if mapped_regime is not None:
+                if (
+                    regime_text in _CONDITIONAL_REDUCED_METHODS
+                    and not lineage_valid
+                ):
+                    return (
+                        Evidence(
+                            class_=State.unknown(
+                                f"{regime_text} requires measured derived_from lineage and derivation"
+                            ),
+                            original_method_class=regime_text,
+                        ),
+                        f"conditional method_class {regime_text} lacks measured lineage",
+                    )
                 return (
                     Evidence(
                         class_=State.of(mapped_regime),
@@ -8785,9 +8829,10 @@ class Migrator:
             obs, values, source_id, local_ids
         )
         derived_from = derived_parents or None
+        conditional_method = str(method_class or regime or "")
         source_derivation = (
             source_derivation_from_source(obs, values)
-            if str(method_class or "") in _CONDITIONAL_REDUCED_METHODS
+            if conditional_method in _CONDITIONAL_REDUCED_METHODS
             else None
         )
         evidence, ev_reason = self._evidence_for(
@@ -8818,7 +8863,16 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        typed_refusal = str(values.get("status") or obs.get("status") or "") == "typed_refusal"
+        typed_refusal = any(
+            str(candidate or "") == "typed_refusal"
+            for candidate in (
+                values.get("status"),
+                obs.get("status"),
+                values.get("admission_status"),
+                obs.get("admission_status"),
+                method_class,
+            )
+        )
         raw_adm = "typed_refusal" if typed_refusal else values.get("admission_status")
         if raw_adm is None and obs.get("admission_status") is None:
             measured.absent_admissions += 1
@@ -8854,8 +8908,19 @@ class Migrator:
             extraction=extraction,
             locator=locator,
             refusal_reason=(
-                str(values.get("reason") or obs.get("reason"))
-                if typed_refusal and (values.get("reason") or obs.get("reason"))
+                str(
+                    values.get("reason")
+                    or obs.get("reason")
+                    or values.get("refusal_reason")
+                    or obs.get("refusal_reason")
+                )
+                if typed_refusal
+                and (
+                    values.get("reason")
+                    or obs.get("reason")
+                    or values.get("refusal_reason")
+                    or obs.get("refusal_reason")
+                )
                 else None
             ),
         )
@@ -8877,16 +8942,7 @@ class Migrator:
         q_token = quantity.value if quantity.is_value else None
         value_derivation = source_derivation
         if (
-            q_token is Quantity.MASS_LOSS_AREAL_DENSITY
-            and value_sel.available
-            and value_sel.field_name
-        ):
-            original_raw = values.get(value_sel.field_name)
-            value_derivation = conversion_derivation(
-                value_sel.unit_trail, original_raw, locator
-            )
-        elif (
-            q_token is Quantity.FUGACITY
+            q_token in {Quantity.MASS_LOSS_AREAL_DENSITY, Quantity.FUGACITY}
             and value_sel.available
             and value_sel.field_name
         ):
@@ -9404,10 +9460,8 @@ class Migrator:
             )
             derivation = None
         if source_derivation is not None:
-            derivation = (
-                _merge_source_conversion_derivation(source_derivation, converted)
-                if q_token_point is Quantity.FUGACITY
-                else source_derivation
+            derivation = _merge_source_conversion_derivation(
+                source_derivation, converted
             )
         unc = uncertainty
         if extra_unc is not None:
@@ -11044,18 +11098,29 @@ class Migrator:
                         entry.work_id = exp.work_id
 
     def _close_conditional_method_classes(self) -> None:
-        for observation_id, observation in list(self.result.observations.items()):
-            if not conditional_reduced_lineage_is_measured(
-                observation, self.result.observations
-            ):
-                continue
-            evidence = replace(
-                observation.evidence,
-                class_=State.of(EvidenceClass.MEASURED_REDUCED),
-            )
-            self.result.observations[observation_id] = replace(
-                observation, evidence=evidence
-            )
+        while True:
+            changed = False
+            for observation_id, observation in list(self.result.observations.items()):
+                if not conditional_reduced_lineage_is_measured(
+                    observation, self.result.observations
+                ):
+                    continue
+                if (
+                    observation.evidence.class_.is_value
+                    and observation.evidence.class_.value
+                    is EvidenceClass.MEASURED_REDUCED
+                ):
+                    continue
+                evidence = replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_REDUCED),
+                )
+                self.result.observations[observation_id] = replace(
+                    observation, evidence=evidence
+                )
+                changed = True
+            if not changed:
+                return
 
     def finalize(self) -> None:
         self._rebuild_works()
