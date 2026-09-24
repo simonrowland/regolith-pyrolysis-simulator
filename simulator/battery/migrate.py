@@ -670,13 +670,91 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     )
 
 
-def _point_condition_from_plain(payload: object) -> Located[Any]:
+def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    body: object = payload
+    if "state" in payload:
+        state = payload.get("state")
+        if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+            return None
+        body = state.get("value")
+    if not isinstance(body, Mapping):
+        return None
+    basis = body.get("amount_basis")
+    if isinstance(basis, AmountBasis):
+        basis = basis.value
+    if str(basis or "") != AmountBasis.MASS_PERCENT.value:
+        return None
+    components = body.get("components")
+    if isinstance(components, Mapping):
+        items = components.items()
+    elif isinstance(components, (list, tuple)):
+        items = components
+    else:
+        return None
+    result: dict[str, Decimal] = {}
+    for item in items:
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            return None
+        name = str(item[0])
+        amount = _as_dec_or_none(item[1])
+        if name not in _OXIDE_COMPONENT_KEYS or amount is None:
+            return None
+        result[name] = amount
+    return result or None
+
+
+def _mass_percent_printed_from_plain(
+    payload: object,
+) -> Located[Mapping[str, Any]] | None:
+    wt = _mass_percent_components(payload)
+    if wt is None:
+        return None
+    locator = (
+        _locator_from_plain(payload.get("locator"))
+        if isinstance(payload, Mapping)
+        else None
+    )
+    return located_value(_printed_map_payload(wt), locator)
+
+
+def _composition_located_from_plain(payload: object) -> Located[Composition]:
+    wt = _mass_percent_components(payload)
+    if wt is not None:
+        if isinstance(payload, Mapping) and "state" not in payload:
+            locator = _locator_from_plain(payload.get("locator"))
+        else:
+            source = _located_from_plain(payload, lambda value: value)
+            locator = source.locator
+        return Located(
+            State.of(wt_pct_to_mole_fraction(wt)),
+            locator=locator,
+            inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        )
+    if isinstance(payload, Mapping) and "state" not in payload:
+        return located_value(
+            _composition_from_plain(payload), _locator_from_plain(payload.get("locator"))
+        )
+    return _located_from_plain(payload, _composition_from_plain)
+
+
+def _point_condition_from_plain(
+    payload: object, *, key: str | None = None
+) -> Located[Any]:
     """Decimal lab axes, or a printed/derived composition map."""
 
     if isinstance(payload, Located):
         return payload
-    if isinstance(payload, Mapping) and "state" not in payload and "kind" in payload:
-        return _located_from_plain(payload, _value_or_point_from_plain)
+    if isinstance(payload, Mapping) and "state" not in payload:
+        if "kind" in payload:
+            return _located_from_plain(payload, _value_or_point_from_plain)
+        if "amount_basis" in payload or "components" in payload:
+            if key == "printed_composition":
+                printed = _mass_percent_printed_from_plain(payload)
+                if printed is not None:
+                    return printed
+            return _composition_located_from_plain(payload)
     if not isinstance(payload, Mapping) or "state" not in payload:
         return _located_from_plain(payload, as_decimal)
     state_payload = payload.get("state")
@@ -686,7 +764,11 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
     if isinstance(value, Mapping) and (
         "amount_basis" in value or "components" in value
     ):
-        return _located_from_plain(payload, _composition_from_plain)
+        if key == "printed_composition":
+            printed = _mass_percent_printed_from_plain(payload)
+            if printed is not None:
+                return printed
+        return _composition_located_from_plain(payload)
     if isinstance(value, Mapping) and "kind" in value:
         return _located_from_plain(payload, _value_or_point_from_plain)
 
@@ -809,10 +891,15 @@ def _composition_from_plain(payload: object) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
     pairs = tuple((str(k), as_decimal(v)) for k, v in components)
+    amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
+    if amount_basis is AmountBasis.MASS_PERCENT:
+        wt = _mass_percent_components(payload)
+        if wt is not None:
+            return wt_pct_to_mole_fraction(wt)
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
-        amount_basis=_enum(AmountBasis, payload.get("amount_basis")) or AmountBasis.MOLE_FRACTION,
+        amount_basis=amount_basis or AmountBasis.MOLE_FRACTION,
     )
 
 
@@ -1093,18 +1180,24 @@ def _sample_from_plain(payload: object) -> Sample:
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
+    printed_located = (
+        None
+        if printed is None
+        else _located_from_plain(printed, lambda value: value)
+    )
+    initial_located = (
+        None if initial is None else _composition_located_from_plain(initial)
+    )
+    if printed_located is None and initial is not None:
+        printed_located = _mass_percent_printed_from_plain(initial)
     return Sample(
         mass_kg=None
         if mass is None
         else _located_from_plain(mass, _value_or_point_from_plain),
         form=None if form is None else _located_from_plain(form, str),
         container=None if container is None else _located_from_plain(container, str),
-        printed_composition=None
-        if printed is None
-        else _located_from_plain(printed, lambda v: v),
-        initial_composition=None
-        if initial is None
-        else _located_from_plain(initial, _composition_from_plain),
+        printed_composition=printed_located,
+        initial_composition=initial_located,
         composition_class=None
         if composition_class is None
         else _located_from_plain(composition_class, str),
@@ -1499,7 +1592,8 @@ def observation_from_plain(payload: object) -> Observation:
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
         point_conditions = {
-            str(k): _point_condition_from_plain(v) for k, v in raw_pc.items()
+            str(k): _point_condition_from_plain(v, key=str(k))
+            for k, v in raw_pc.items()
         }
     derived_from = payload.get("derived_from")
     annotations = None
@@ -9096,7 +9190,7 @@ class Migrator:
             raw_point_conditions = raw_item.get("point_conditions")
             if isinstance(raw_point_conditions, Mapping):
                 explicit_point_conditions = {
-                    str(key): _point_condition_from_plain(value)
+                    str(key): _point_condition_from_plain(value, key=str(key))
                     for key, value in raw_point_conditions.items()
                 }
                 point_conditions = {
