@@ -12993,12 +12993,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         registry = getattr(self, '_chem_registry', None)
         registry_tables = (
             {
-                table_name: dict(getattr(registry, table_name))
-                for table_name in (
-                    '_authoritative',
-                    '_fallback',
-                    '_shadows',
-                )
+                '_authoritative': dict(registry._authoritative),
+                '_fallback': dict(registry._fallback),
+                # The table values are provider lists. Copy the containers so
+                # a refused registration cannot append into the snapshot.
+                '_shadows': {
+                    intent: list(providers)
+                    for intent, providers in registry._shadows.items()
+                },
             }
             if registry is not None
             and all(
