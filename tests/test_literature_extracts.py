@@ -15,6 +15,7 @@ import copy
 import hashlib
 import math
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -109,6 +110,48 @@ def test_van_limpt_fig46_keeps_measured_markers_separate_from_model() -> None:
     ]
     assert model["values"]["measurement_status"] == "model_output_not_measurement"
     assert model["admission_status"] == "rejected_model_output_not_measurement"
+
+
+def test_plante_split_registry_foreign_keys_resolve() -> None:
+    """The split series keep every source-level registry FK resolvable."""
+
+    doc = yaml.safe_load((EXTRACTS / "kems-042-plante-1979.yaml").read_text())
+    bench_ids = {bench["id"] for bench in doc["benches"]}
+    experiments = {item["experiment_id"]: item for item in doc["experiments"]}
+
+    assert set(experiments) == {
+        "k2o-sio2-s1104",
+        "k2o-sio2-s1110",
+        "k2o-sio2-s1115",
+        "k2o-sio2-s1122",
+        "k2o-sio2-s1123",
+        "k2o-sio2-s1126",
+        "k2o-sio2-s1129",
+        "k2o-sio2-s1214",
+        "k2o-sio2-effusion-series",
+    }
+    assert all(item["bench_id"] in bench_ids for item in experiments.values())
+
+    experiment_refs = Counter(
+        row["experiment"]
+        for block in doc["species"].values()
+        for section in ("observations", "context")
+        for row in block.get(section, [])
+        if "experiment" in row
+    )
+    assert set(experiment_refs) <= set(experiments)
+    assert experiment_refs == Counter(
+        {
+            "k2o-sio2-s1104": 56,
+            "k2o-sio2-s1110": 76,
+            "k2o-sio2-s1115": 52,
+            "k2o-sio2-s1122": 36,
+            "k2o-sio2-s1123": 60,
+            "k2o-sio2-s1126": 38,
+            "k2o-sio2-s1129": 28,
+            "k2o-sio2-s1214": 37,
+        }
+    )
 
 
 def test_tsukihashi_split_temperature_locators_use_figure7() -> None:

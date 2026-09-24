@@ -81,6 +81,14 @@ benches:
         section: 2.1 Experimental
         note: Eurotherm controller stable to better than +/-0.5 C
 experiments:
+- experiment_id: cu-zn-evaporation-series
+  bench_id: sossi-vertical-tube-furnace
+  method: 1-atm_vertical_tube_furnace_evaporation
+  locator:
+    published_page: 318
+    pdf_page_index: 2
+    section: '2.1 Experimental'
+    note: 'Series-level Cu-Zn evaporation context; per-run experiments remain declared below'
 - experiment_id: sossi-2020-p-5-04-17b
   bench_id: sossi-vertical-tube-furnace
   method: 1-atm_vertical_tube_furnace_evaporation

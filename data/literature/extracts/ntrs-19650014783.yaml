@@ -74,6 +74,14 @@ benches:
         pdf_page_index: 6
         section: Temperature measurements
 experiments:
+- experiment_id: sodium-vapor-pressure-series
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator:
+    published_page: 2
+    pdf_page_index: 4
+    section: 'Experiment - Apparatus and Procedure'
+    note: 'Series-level sodium vapor-pressure context; per-run experiments remain declared below'
 - experiment_id: sodium-static-run-1
   bench_id: static-sodium-capsule
   method: static_capsule_vapor_pressure

@@ -44,6 +44,13 @@ benches:
       published_page: 210
       section: 3. Analytical procedures
 experiments:
+- experiment_id: icb-series
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator:
+    published_page: 212
+    table: '2'
+    note: 'Series-level ICB context; per-run experiments remain declared below'
 - experiment_id: icb-1
   bench_id: oxford-piston-cylinder
   method: melt_equilibration_quench

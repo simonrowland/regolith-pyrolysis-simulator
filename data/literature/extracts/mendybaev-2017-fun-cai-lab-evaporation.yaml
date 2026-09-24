@@ -67,6 +67,13 @@ benches:
       pdf_page_index: 9
       note: Residue chemical and isotopic analyses
 experiments:
+- experiment_id: func-evaporation-series
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator:
+    section: '3.1'
+    pdf_page_index: 8
+    note: 'Series-level FUNC evaporation summary; per-run experiments remain declared below'
 - experiment_id: func-5
   bench_id: chicago-high-vacuum-furnace
   method: vacuum_pyrolysis
