@@ -7,11 +7,10 @@ import json
 from pathlib import Path
 import sys
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.accounting.queries import AccountingQueries
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
@@ -22,7 +21,7 @@ OUTPUT = DATA / "fixtures" / "thermal_train" / "default-v2.json"
 
 
 def _load(name: str) -> dict:
-    return yaml.safe_load((DATA / name).read_text(encoding="utf-8")) or {}
+    return load_cached_safe_yaml((DATA / name).read_text(encoding="utf-8")) or {}
 
 
 def main() -> int:

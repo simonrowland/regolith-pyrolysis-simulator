@@ -13,12 +13,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.core import PyrolysisSimulator
 from simulator.state import Atmosphere
 
@@ -33,7 +32,7 @@ FE_LOW_CONFIDENCE_NOTE = (
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
 
 
 def _parse_additive(value: str) -> tuple[str, float]:

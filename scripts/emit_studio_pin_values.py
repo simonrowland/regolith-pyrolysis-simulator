@@ -24,6 +24,8 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+
 REPORT_PATH = ROOT / "studio-pin-report.json"
 
 # Laptop-config (committed) baselines for honesty-gate comparison in the report.
@@ -41,14 +43,13 @@ LAPTOP_BASELINES: dict[str, float] = {
 
 
 def _emit_capacity() -> dict:
-    import yaml
     from simulator.state import CampaignPhase
     from tests.chemistry.conftest import _build_sim
 
     data = ROOT / "data"
 
     def load(name: str) -> dict:
-        return yaml.safe_load((data / name).read_text())
+        return load_cached_safe_yaml((data / name).read_text())
 
     sim = _build_sim(
         "lunar_mare_low_ti",

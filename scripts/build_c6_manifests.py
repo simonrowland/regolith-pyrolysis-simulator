@@ -8,9 +8,12 @@ import json
 import sys
 from pathlib import Path
 
-import yaml
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+
 GRIND_DIR = REPO_ROOT / "docs-private" / "grind"
 MOON_EXTRA = frozenset({"targeted_super_kreep_ore"})
 S_TYPE_FEEDSTOCK = "s_type_asteroid_silicate"
@@ -51,7 +54,7 @@ def is_mars_stype_feedstock(feedstock: str) -> bool:
 
 
 def load_feedstock_keys(path: Path) -> list[str]:
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     return list(data.keys())
 
 

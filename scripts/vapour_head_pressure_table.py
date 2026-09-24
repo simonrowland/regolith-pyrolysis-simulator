@@ -8,12 +8,10 @@ import math
 import sys
 from pathlib import Path
 
-import yaml
-
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.evaporation import _pre_rg_effective_pressure_source  # noqa: E402
 from simulator.state import CampaignPhase  # noqa: E402
 from simulator.vapour_rail.batch import PressureValue  # noqa: E402
@@ -24,7 +22,7 @@ from tests.chemistry.conftest import _build_sim  # noqa: E402
 
 
 def _load_yaml(name: str) -> dict:
-    return yaml.safe_load((ROOT / "data" / name).read_text())
+    return load_cached_safe_yaml((ROOT / "data" / name).read_text())
 
 
 def _active_pressure_rows(temperature_C: float) -> list[dict[str, object]]:

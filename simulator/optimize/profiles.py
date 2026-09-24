@@ -10,6 +10,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
+import yaml
+
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,

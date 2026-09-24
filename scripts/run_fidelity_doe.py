@@ -31,12 +31,11 @@ import traceback
 from collections.abc import Mapping
 from pathlib import Path
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_FIDELITY_DIAGNOSTIC_ENV,
@@ -166,7 +165,7 @@ def main() -> int:
     # Fresh timing log each run.
     Path(TIMING_LOG).write_text("", encoding="utf-8")
 
-    profile = yaml.safe_load(Path(PROFILE).read_text())
+    profile = load_cached_safe_yaml(Path(PROFILE).read_text())
     feedstock = profile["feedstock"]
 
     _validate_high_backend_selection(

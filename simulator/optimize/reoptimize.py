@@ -218,7 +218,7 @@ def _load_yaml_mapping(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise ReoptimizeError(f"re-optimize requires {path.name}")
     try:
-        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
+        payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
         raise ReoptimizeError(f"{path.name} is not valid YAML") from exc
     if not isinstance(payload, dict):

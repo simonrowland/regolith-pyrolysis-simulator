@@ -11,6 +11,7 @@ from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
+from simulator.optimize import profiles
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet
 from simulator.optimize.sso2_evidence import (
@@ -266,6 +267,33 @@ def test_malformed_seed_recipe_raises_named_error() -> None:
 
     with pytest.raises(ProfileValidationError, match="malformed seed recipe"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+@pytest.mark.parametrize(
+    ("reader", "message"),
+    [
+        (lambda path: profiles._load_yaml_mapping(path), "invalid YAML"),
+        (
+            lambda path: profiles._canonical_mre_ladder_for_profile(path),
+            "invalid .* C5 MRE target validation",
+        ),
+        (
+            lambda path: profiles._campaign_max_hold_hr_for_profile(path, "C2A"),
+            "invalid .* thermal window validation",
+        ),
+    ],
+)
+def test_malformed_profile_yaml_raises_named_error_for_each_reader(
+    tmp_path: Path, reader, message: str
+) -> None:
+    profile_dir = tmp_path / "optimize_profiles"
+    profile_dir.mkdir()
+    profile_path = profile_dir / "malformed.yaml"
+    profile_path.write_text("broken: [", encoding="utf-8")
+    (tmp_path / "setpoints.yaml").write_text("broken: [", encoding="utf-8")
+
+    with pytest.raises(ProfileValidationError, match=message):
+        reader(profile_path)
 
 
 def test_unknown_profile_key_raises_named_error() -> None:

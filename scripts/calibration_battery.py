@@ -24,6 +24,8 @@ import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from simulator.yaml_cache import load_cached_safe_yaml
+
 AUTHORITIES = ("certified", "bridge", "extrapolated", "refused")
 # Production adapters never query engine intent-and-condition certification.
 # envelope() can still emit the token when a caller passes it explicitly.
@@ -309,10 +311,9 @@ def extract_rows():
 
 
 def vp_rows():
-    import yaml
     from tests.chemistry import test_corpus_anchored_parity as c
     from tests.chemistry.corpus_fixtures import grid_25_anchors
-    data = [yaml.safe_load((ROOT / "data" / f).read_text()) for f in
+    data = [load_cached_safe_yaml((ROOT / "data" / f).read_text()) for f in
             ("vapor_pressures.yaml", "setpoints.yaml", "feedstocks.yaml")]
     anchors = grid_25_anchors()
     # Historical §25 residual report is the VapoRock peer. ThermoEngine/VapoRock
@@ -477,16 +478,15 @@ def run_command(name, args, out, timeout=240):
 
 
 def bench_rows(out, receipts):
-    import yaml
     from simulator.diagnostic_helpers.vacuum_pyrolysis import evaluate_vacuum_pyrolysis_comparison, load_vacuum_pyrolysis_observations
     sidecar = load_vacuum_pyrolysis_observations(ROOT / "data/literature/vacuum_pyrolysis_measurements.yaml")
-    feedstocks = yaml.safe_load((ROOT / "data/feedstocks.yaml").read_text())
+    feedstocks = load_cached_safe_yaml((ROOT / "data/feedstocks.yaml").read_text())
     rows = []
     for path in sorted((ROOT / "data/presets/vacuum_pyrolysis").glob("*.yaml")):
         name = "bench-" + path.stem
         receipt = run_command(name, ["-m", "simulator.runner", "--preset", str(path), "--compare", "--output", "{out}/run.json"], out)
         receipts.append(receipt)
-        preset = yaml.safe_load(path.read_text())
+        preset = load_cached_safe_yaml(path.read_text())
         measurement = sidecar["measurements"][preset["measurement_id"]]
         result_path = out / name / "run.json"
         runtime = json.loads(result_path.read_text()) if result_path.exists() else {"status": "failed"}
@@ -980,8 +980,7 @@ def v21_view_section(old_rows):
     new_rows = list(load_residuals_jsonl(residuals_path))
     key_map = {}
     if pins_path.is_file():
-        import yaml
-        doc = yaml.safe_load(pins_path.read_text()) or {}
+        doc = load_cached_safe_yaml(pins_path.read_text()) or {}
         key_map = dict(doc.get("key_map") or {})
     diffs, unmapped = status_diff_rows(old_rows=old_rows, new_rows=new_rows, key_map=key_map)
     lines = ["## status_diff (v2.1 residuals.jsonl view)", ""]

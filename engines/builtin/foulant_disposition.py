@@ -13,7 +13,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 GAS_CONSTANT_J_PER_MOL_K = 8.314462618
 PA_PER_BAR = 100_000.0
@@ -162,11 +162,8 @@ def _load_vapor_payload(yaml_path: Path) -> Any:
     cached = _VAPOR_PAYLOAD_CACHE.get(key)
     if cached is not None:
         return cached
-    # CSafeLoader is the libyaml binding and parses this file ~4.2x faster
-    # (0.65 s vs 2.72 s measured); fall back when the C extension is absent.
-    loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
     with yaml_path.open(encoding="utf-8") as handle:
-        payload = yaml.load(handle, Loader=loader) or {}
+        payload = load_cached_safe_yaml(handle.read()) or {}
     _VAPOR_PAYLOAD_CACHE[key] = payload
     return payload
 
@@ -667,7 +664,7 @@ def load_foulant_registry(foulant_thermo_yaml: str | Path) -> FoulantRegistry:
     """Load carrier identity, aliases, group, and fate names; build alias index."""
     path = Path(foulant_thermo_yaml)
     with path.open(encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+        payload = load_cached_safe_yaml(handle.read()) or {}
 
     foulant_dG = dict(payload.get("foulant_dG", {}) or {})
     carriers: dict[str, FoulantCarrierEntry] = {}
