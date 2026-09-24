@@ -3751,7 +3751,8 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
     canonical_experiment_ids.update(
         {
             "10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series",
-            "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series",
+            "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series",
+            "10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series",
             "902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series",
             "7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C",
             "8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::standard-pyrolysis-600C",
@@ -3767,9 +3768,11 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
     assert shirai.fO2_control.channel.value is FO2Channel.GAS_MIX
 
     ueshima = experiments[
-        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series"
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series"
     ]
-    temperature = ueshima.conditions["temperature_K"]
+    assert ueshima.thermal_schedule is not None
+    assert ueshima.thermal_schedule.setpoints_and_holds
+    temperature = ueshima.thermal_schedule.setpoints_and_holds[0].temperature_K
     assert temperature.state.is_value
     assert temperature.state.value.kind is ValueKind.INTERVAL
 
@@ -3780,7 +3783,11 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
         for obs in loaded_observations.values()
     )
     assert (
-        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series"
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series"
+        in loaded_experiments
+    )
+    assert (
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series"
         in loaded_experiments
     )
 
