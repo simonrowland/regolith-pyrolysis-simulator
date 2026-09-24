@@ -174,6 +174,45 @@ def is_reagent_bookkeeping_product(species: Any) -> bool:
     )
 
 
+def _annotate_thermal_train_unmeasured_hours(
+    report: dict[str, Any],
+    unmeasured_hours: list[dict[str, Any]],
+    *,
+    oxygen_measured: bool,
+    vented_measured: bool,
+) -> dict[str, Any]:
+    """Mark absent O2 rates; explicit zero remains a measured value.
+
+    Series policy: retain measured hours, expose missing fields by hour, and
+    withhold the affected peak instead of taking a maximum over a hole.
+    """
+    report["unmeasured_hours"] = list(unmeasured_hours)
+    peaks = report.setdefault("peaks", {})
+    observed = report.setdefault("observed_upstream_state", {})
+    oxygen_missing = any(
+        row.get("field") == "melt_offgas_O2_mol_hr" for row in unmeasured_hours
+    )
+    vented_missing = any(
+        row.get("field") == "O2_vented_kg_hr" for row in unmeasured_hours
+    )
+    if oxygen_missing:
+        peaks["cold_o2_mol_hr"] = None
+        peaks["cold_o2_kg_hr"] = None
+        peaks["cold_o2_status"] = (
+            "unmeasured" if not oxygen_measured else "partial_unmeasured_hours"
+        )
+    else:
+        peaks["cold_o2_status"] = "complete"
+    if vented_missing:
+        observed["O2_vented_peak_kg_hr"] = None
+        observed["O2_vented_peak_status"] = (
+            "unmeasured" if not vented_measured else "partial_unmeasured_hours"
+        )
+    else:
+        observed["O2_vented_peak_status"] = "complete"
+    return report
+
+
 class AccountingQueries:
     """Single read-side facade for simulator accounting/scoring queries."""
 
@@ -200,6 +239,7 @@ class AccountingQueries:
         saturation_series: list[float] = []
         vented_series: list[float] = []
         overhead_state_series: list[dict[str, Any]] = []
+        unmeasured_hours: list[dict[str, Any]] = []
         for snapshot in snapshots:
             evap_flux = getattr(snapshot, "evap_flux", None)
             species_rates = getattr(evap_flux, "species_kg_hr", {})
@@ -209,11 +249,28 @@ class AccountingQueries:
                     for species, rate in dict(species_rates or {}).items()
                 }
             )
-            oxygen_series.append(float(getattr(snapshot, "melt_offgas_O2_mol_hr", 0.0)))
+            hour = int(getattr(snapshot, "hour", len(hot_series)))
+            raw_oxygen = getattr(snapshot, "melt_offgas_O2_mol_hr", None)
+            if raw_oxygen is None:
+                unmeasured_hours.append({
+                    "hour": hour,
+                    "field": "melt_offgas_O2_mol_hr",
+                    "reason": "missing-melt-offgas-o2-flow",
+                })
+            else:
+                oxygen_series.append(float(raw_oxygen))
             temperature_series.append(float(getattr(snapshot, "temperature_C", 0.0)) + 273.15)
             overhead = getattr(snapshot, "overhead", None)
             saturation_series.append(float(getattr(overhead, "transport_saturation_pct", 0.0)))
-            vented_series.append(float(getattr(snapshot, "O2_vented_kg_hr", 0.0)))
+            raw_vented = getattr(snapshot, "O2_vented_kg_hr", None)
+            if raw_vented is None:
+                unmeasured_hours.append({
+                    "hour": hour,
+                    "field": "O2_vented_kg_hr",
+                    "reason": "missing-o2-vented-flow",
+                })
+            else:
+                vented_series.append(float(raw_vented))
             upstream_partials_mbar = dict(
                 getattr(snapshot, "melt_headspace_composition_mbar", {}) or {}
             )
@@ -231,7 +288,7 @@ class AccountingQueries:
             })
 
         setpoints = getattr(self.sim, "setpoints", {})
-        return report_from_recorded_series(
+        report = report_from_recorded_series(
             hot_series,
             oxygen_series,
             temperature_series,
@@ -239,6 +296,12 @@ class AccountingQueries:
             observed_transport_saturation_pct=saturation_series,
             observed_o2_vented_kg_hr=vented_series,
             overhead_state_series=overhead_state_series,
+        )
+        return _annotate_thermal_train_unmeasured_hours(
+            report,
+            unmeasured_hours,
+            oxygen_measured=bool(oxygen_series),
+            vented_measured=bool(vented_series),
         )
 
     def product_ledger(self) -> dict[str, float]:

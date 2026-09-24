@@ -551,6 +551,119 @@ def test_report_without_history_is_typed_no_data() -> None:
     }
 
 
+def _bare_carrier(**fields) -> SimpleNamespace:
+    """A non-HourSnapshot carrier. Missing O2 fields are the defect under test."""
+    payload = {
+        "hour": 1,
+        "temperature_C": 1500.0,
+        "evap_flux": None,
+        "overhead": None,
+    }
+    payload.update(fields)
+    return SimpleNamespace(**payload)
+
+
+def test_thermal_train_report_marks_absent_vented_o2_rate_unmeasured() -> None:
+    """An ABSENT O2_vented_kg_hr is not a proven zero (b-293).
+
+    pumping_cost already refuses missing-o2-vented-flow. The series
+    builder used to getattr-default the same absence to 0.0, which
+    understates the peak mass flow the train is sized on. The series
+    itself still reports (a declared melt-offgas rate stays a number);
+    the missing field is marked on that hour and its peak is withheld.
+    Reason is asserted by name so a different honest mark cannot
+    satisfy this test.
+    """
+    report = AccountingQueries(
+        _sim(BatchRecord(snapshots=[
+            _bare_carrier(melt_offgas_O2_mol_hr=100.0),
+        ]))
+    ).thermal_train_report()
+    assert report["status"] != "no_data"
+    assert report["unmeasured_hours"] == [{
+        "hour": 1,
+        "field": "O2_vented_kg_hr",
+        "reason": "missing-o2-vented-flow",
+    }]
+    assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] is None
+    assert report["observed_upstream_state"]["O2_vented_peak_status"] == "unmeasured"
+    assert report["peaks"]["cold_o2_mol_hr"] == 100.0
+    assert report["peaks"]["cold_o2_status"] == "complete"
+
+
+def test_thermal_train_report_marks_absent_melt_offgas_o2_rate_unmeasured() -> None:
+    """An ABSENT melt_offgas_O2_mol_hr is not a proven zero (b-293)."""
+    report = AccountingQueries(
+        _sim(BatchRecord(snapshots=[
+            _bare_carrier(O2_vented_kg_hr=0.5),
+        ]))
+    ).thermal_train_report()
+    assert report["status"] != "no_data"
+    assert report["unmeasured_hours"] == [{
+        "hour": 1,
+        "field": "melt_offgas_O2_mol_hr",
+        "reason": "missing-melt-offgas-o2-flow",
+    }]
+    assert report["peaks"]["cold_o2_mol_hr"] is None
+    assert report["peaks"]["cold_o2_kg_hr"] is None
+    assert report["peaks"]["cold_o2_status"] == "unmeasured"
+    assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.5
+    assert report["observed_upstream_state"]["O2_vented_peak_status"] == "complete"
+
+
+def test_thermal_train_report_does_not_publish_understated_o2_peak() -> None:
+    """A holey hour must not leave max(measured) as a proven O2 peak."""
+    healthy = _snapshot(1, na_kg_hr=1.0, unknown_kg_hr=0.0, o2_mol_hr=250.0)
+    holey = _bare_carrier(hour=2, O2_vented_kg_hr=0.1)
+    report = AccountingQueries(
+        _sim(BatchRecord(snapshots=[healthy, holey]))
+    ).thermal_train_report()
+    assert report["status"] != "no_data"
+    assert report["unmeasured_hours"] == [{
+        "hour": 2,
+        "field": "melt_offgas_O2_mol_hr",
+        "reason": "missing-melt-offgas-o2-flow",
+    }]
+    assert report["peaks"]["cold_o2_mol_hr"] is None
+    assert report["peaks"]["cold_o2_status"] == "partial_unmeasured_hours"
+
+
+def test_thermal_train_report_explicit_zero_o2_rates_are_proven_zeros() -> None:
+    """What would make b-293 wrong: treating a declared 0.0 as unmeasured."""
+    snapshot = HourSnapshot(
+        hour=1,
+        temperature_C=1500.0,
+        evap_flux=EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
+        overhead=OverheadGas(transport_saturation_pct=12.0),
+        melt_offgas_O2_mol_hr=0.0,
+        O2_vented_kg_hr=0.0,
+    )
+    report = AccountingQueries(
+        _sim(BatchRecord(snapshots=[snapshot]))
+    ).thermal_train_report()
+    assert report["status"] != "no_data"
+    assert report["unmeasured_hours"] == []
+    assert report["peaks"]["cold_o2_mol_hr"] == 0.0
+    assert report["peaks"]["cold_o2_status"] == "complete"
+    assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.0
+    assert report["observed_upstream_state"]["O2_vented_peak_status"] == "complete"
+
+
+def test_thermal_train_report_explicit_positive_o2_rates_still_size() -> None:
+    """A declared positive rate on a non-snapshot carrier still reports."""
+    report = AccountingQueries(
+        _sim(BatchRecord(snapshots=[
+            _bare_carrier(melt_offgas_O2_mol_hr=100.0, O2_vented_kg_hr=0.5),
+        ]))
+    ).thermal_train_report()
+    assert report["status"] != "no_data"
+    assert report["unmeasured_hours"] == []
+    assert report["peaks"]["cold_o2_mol_hr"] == 100.0
+    assert report["peaks"]["cold_o2_status"] == "complete"
+    assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.5
+    assert report["observed_upstream_state"]["O2_vented_peak_status"] == "complete"
+
+
 def test_structured_hardware_minimum_drives_separate_overflow_diagnostic() -> None:
     payload = yaml.safe_load(Path("data/thermal_train_params.yaml").read_text(encoding="utf-8"))
     payload["cold_train"]["rating"]["compressor_mass_flow_limit_kg_hr"]["value"] = 10.0
