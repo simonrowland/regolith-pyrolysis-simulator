@@ -26,7 +26,7 @@ fidelity_samples:
     table: '1'
     record: row 3
     column: 3 (20Ne/22Ne)
-- path: species.He.observations[busemann_2000_table3_he].values.rows[0].cells[3].value
+- path: species.He.observations[busemann_2000_table3_he].values.rows[0].cells[1].value
   value: 1.41(1)
   locator:
     page: 954
@@ -1624,30 +1624,6 @@ species:
               table: '3'
               record: row 2
               column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '0.32'
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 2
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Eugster et al. (1998)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 2
-              column: 3 (Source)
           - column: 4
             heading: ^3He/^4He ( × 10^-4 )
             value: 1.41(1)
@@ -1695,30 +1671,6 @@ species:
               table: '3'
               record: row 4
               column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '1.7'
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 4
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Scherer and Schultz (2000)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 4
-              column: 3 (Source)
           - column: 4
             heading: ^3He/^4He ( × 10^-4 )
             value: 1.45(1)
@@ -1766,30 +1718,6 @@ species:
               table: '3'
               record: row 6
               column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '0.15'
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 6
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Scherer and Schultz (2000)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 6
-              column: 3 (Source)
           - column: 4
             heading: ^3He/^4He ( × 10^-4 )
             value: 1.23(2)
@@ -2097,6 +2025,53 @@ species:
             table: '3'
             note: Table 3 footnote 12
         rows:
+        - row_number: 2
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 2
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Cold Bokkeveld
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '0.32'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Eugster et al. (1998)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 3 (Source)
         - row_number: 3
           method_class: quoted_prior_work
           evidence_class: printed_table
@@ -2168,6 +2143,53 @@ species:
               table: '3'
               record: row 3
               column: 5 (Source)
+        - row_number: 4
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 4
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Grosnaja
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '1.7'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Scherer and Schultz (2000)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 3 (Source)
         - row_number: 5
           method_class: quoted_prior_work
           evidence_class: printed_table
@@ -2239,6 +2261,53 @@ species:
               table: '3'
               record: row 5
               column: 5 (Source)
+        - row_number: 6
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 6
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Isna (steps 1–11, 13)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '0.15'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Scherer and Schultz (2000)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 3 (Source)
         - row_number: 9
           method_class: quoted_prior_work
           evidence_class: printed_table
