@@ -12990,6 +12990,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if name not in preserved_names
         }
         state = _deepcopy_refusal_state(state_source, memo)
+        registry = getattr(self, '_chem_registry', None)
+        registry_fallback = (
+            dict(registry._fallback)
+            if registry is not None and hasattr(registry, '_fallback')
+            else None
+        )
+        if registry_fallback is not None:
+            # A refused hour leaves no registry trace. Only the fallback table
+            # mutates on this path; authoritative and shadow entries remain
+            # preserved by reference.
+            state['_terminal_refusal_chem_registry_fallback'] = (
+                registry_fallback
+            )
         ledger = snapshot_atom_ledger(self.atom_ledger)
         cost_state = None
         if hasattr(self, 'cost_ledger'):
@@ -13020,6 +13033,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'cost_ledger',
             'vapour_rail_catalog',
         }
+        registry_fallback = state.get(
+            '_terminal_refusal_chem_registry_fallback'
+        )
+        restored_state = {
+            name: value
+            for name, value in state.items()
+            if name != '_terminal_refusal_chem_registry_fallback'
+        }
         preserved = {
             name: self.__dict__[name]
             for name in preserved_names
@@ -13027,8 +13048,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         self.__dict__.clear()
         self.__dict__.update(preserved)
-        self.__dict__.update(state)
+        self.__dict__.update(restored_state)
         self.atom_ledger = ledger
+        if registry_fallback is not None:
+            self._chem_registry._fallback.clear()
+            self._chem_registry._fallback.update(registry_fallback)
         if cost_state is not None:
             self.cost_ledger.__dict__.clear()
             self.cost_ledger.__dict__.update(cost_state)

@@ -22,6 +22,7 @@ from simulator.accounting.ledger import (
 )
 from simulator.accounting.lots import MaterialLot
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
+from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
 from simulator.condensation import knudsen_regime_diagnostic
 from simulator.campaigns import CampaignManager
 from simulator.core import (
@@ -55,6 +56,8 @@ from simulator.thermal_train import (
     integrate_molar_sensible_enthalpy_j_per_mol,
     oxygen_cp_shomate_j_per_mol_k,
 )
+from engines.alphamelts import AlphaMELTSProvider
+from engines.magemin import MAGEMinShadowProvider
 
 
 def test_authority_opt_ins_reject_truthy_strings() -> None:
@@ -175,6 +178,60 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     slotted_schedule = sim.runtime_state["slotted_holder"].schedule
     assert isinstance(slotted_schedule, MappingProxyType)
     assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
+
+
+def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    intent = ChemistryIntent.GATE_LIQUID_FRACTION
+    registry = ProviderRegistry()
+    authoritative = AlphaMELTSProvider(backend=None)
+    shadow = MAGEMinShadowProvider()
+    registry.register(authoritative, [intent])
+    registry.register(shadow, [intent], shadow=True)
+    registry_before = registry.capability_summary()
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.backend = None
+    sim._chem_registry = registry
+    sim._chem_kernel = object()
+    sim.atom_ledger = FakeLedger()
+    sim._build_chemistry_kernel = lambda: object()
+
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
+
+    def refuse_after_registering_fallback() -> None:
+        sim._register_freeze_gate_liquid_fraction_providers()
+        assert registry.fallback_for(intent) is not None
+        raise refusal
+
+    sim._step_one_hour = refuse_after_registering_fallback
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert registry.capability_summary() == registry_before
+    assert registry.authoritative_for(intent) is authoritative
+    assert registry.shadows_for(intent) == (shadow,)
+    assert registry.fallback_for(intent) is None
 
 
 def test_shared_mappingproxy_diamond_is_copied_not_live_aliased() -> None:
