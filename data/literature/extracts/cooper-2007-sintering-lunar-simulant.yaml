@@ -63,6 +63,8 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         quoted_from: Allen et al. (1992a)
+        T_K: 1373.15
+        T_K_conversion: 1100 C + 273.15 = 1373.15 K
         temperature_C: 1100
         onset_time: a matter of minutes
         sample_form: compressed JSC-1 samples
@@ -79,6 +81,8 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         quoted_from: Allen et al. (1996a)
+        T_K: 1323.15
+        T_K_conversion: 1050 C + 273.15 = 1323.15 K
         temperature_C: 1050
         duration_h: 3
         sample_form: uncompressed samples
@@ -162,6 +166,8 @@ species:
         quantity: sintering_onset_conditions
         method_class: quoted_attributed
         quoted_from: Wozinski et al. (1972)
+        T_K: 1073.15
+        T_K_conversion: 800 C + 273.15 = 1073.15 K
         temperature_C: 800
         duration: within minutes
         sample_condition: packed and undisturbed soil
@@ -180,6 +186,8 @@ species:
         method_class: model_derived
         generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
         material: JSC-1A
+        T_K: 1273.15
+        T_K_conversion: 1000 C + 273.15 = 1273.15 K
         hydrogen_temperature_C: 1000
         fluidizing_fraction_pct: approximately 70
         flow_rate_axis: 0.01 to 100 L/min as plotted
