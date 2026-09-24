@@ -140,6 +140,30 @@ experiments:
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.000717'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.717 g; unit conversion only'}}
     printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
   conditions:
     temperature_K: {state: {tag: value, value: '1815.15'}, locator: {page: 105, table: '5.3', note: 'MS1 Tmax 1542 C; unit conversion only'}}
   pressure_environment:
@@ -155,6 +179,30 @@ experiments:
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.000991'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.991 g; unit conversion only'}}
     printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
   conditions:
     temperature_K: {state: {tag: value, value: '1836.15'}, locator: {page: 105, table: '5.3', note: 'MS2 Tmax 1563 C; unit conversion only'}}
   pressure_environment:
@@ -170,6 +218,30 @@ experiments:
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.001002'}}, locator: {page: 105, table: '5.3', note: 'Printed 1.002 g; unit conversion only'}}
     printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
   conditions:
     temperature_K: {state: {tag: value, value: '1698.15'}, locator: {page: 105, table: '5.3', note: 'MS4 Tmax 1425 C; unit conversion only'}}
   pressure_environment:
@@ -185,6 +257,30 @@ experiments:
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.007856'}}, locator: {page: 105, table: '5.3', note: 'Printed 7.856 g; unit conversion only'}}
     printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
   conditions:
     temperature_K: {state: {tag: value, value: '1853.15'}, locator: {page: 105, table: '5.3', note: 'MS5 Tmax 1580 C; unit conversion only'}}
   pressure_environment:
@@ -201,6 +297,30 @@ experiments:
     printed_composition:
       state: {tag: value, value: NASA JSC-1 basaltic lunar soil simulant}
       locator: {page: 17, section: '2.1.2 Mondstaub-Simulat JSC-1'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Powder or granulate}
       locator: {page: 54, section: '4.1.2 Pulverproben'}
@@ -672,6 +792,7 @@ species:
         splash_oxygen_atom_pct_as_published: ueber 65
         blank_foil_Na_mean: 0.6
         Tmax_C_from_table53: 1542
+        Tmax_C: 1542
         note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
       uncertainty:
         note: printed Standardabweichung on foil means; splash is a single Wert
@@ -794,6 +915,7 @@ species:
         Si_as_published: '-'
         Si_note: 'footnote 10: Si lines overlapped by dominant Ta; no concrete value for a weak Si signal'
         Tmax_C_from_table53: 1563
+        Tmax_C: 1563
         scans_exclude_splashes: true
         note: 'Tantalum foil. Caption: values > 1 atom% lie in background-noise error except the stated
           Na (and possible P) rise and the O/Ta oxidation of the foil.'
@@ -2415,6 +2537,7 @@ species:
         splash_oxygen_atom_pct_as_published: ueber 65
         blank_foil_Na_mean: 0.6
         Tmax_C_from_table53: 1542
+        Tmax_C: 1542
         note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
         evidence_class: measured
       uncertainty:
@@ -2681,6 +2804,7 @@ species:
         Si_as_published: '-'
         Si_note: 'footnote 10: Si lines overlapped by dominant Ta; no concrete value for a weak Si signal'
         Tmax_C_from_table53: 1563
+        Tmax_C: 1563
         scans_exclude_splashes: true
         note: 'Tantalum foil. Caption: values > 1 atom% lie in background-noise error except the stated Na (and
           possible P) rise and the O/Ta oxidation of the foil.'
@@ -5108,6 +5232,7 @@ species:
           Fe: 0.0
           Ta: 48.9
         Tmax_C_from_table51: 1638
+        Tmax_C: 1638
         note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air
           Ca(OH)2.
       uncertainty:
@@ -5776,6 +5901,7 @@ species:
           Fe: 0.0
           Ta: 48.9
         Tmax_C_from_table51: 1638
+        Tmax_C: 1638
         note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air Ca(OH)2.
         evidence_class: measured
       uncertainty:

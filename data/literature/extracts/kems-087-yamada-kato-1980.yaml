@@ -238,6 +238,14 @@ species:
         - 31P2+
         - 54Fe+
         temperature_C: 1600.0
+        T_K:
+          value: 1873.15
+          units: K
+          method_class: calculated
+          inference:
+            relation: celsius_to_kelvin
+            inputs: ['T_K = T_C + 273.15']
+            output_unit: K
         temperature_uncertainty_C: 1.0
         temperature_method: two W-5%Re/W-26%Re thermocouples; calibrated via 54Fe+ intensity (Furukawa
           and Kato)

@@ -260,6 +260,26 @@ experiments:
         page: 142
         table: '4.3'
         note: 'Glass 1 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [B2O3, '0.023489658619']
+          - [Na2O, '0.001014792690']
+          - [Al2O3, '0.086977639950']
+          - [SiO2, '0.624944403663']
+          - [CaO, '0.263573505079']
+      locator: {page: 142, table: '4.3', note: 'Glass 1 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
       locator: {page: 127, section: '3.2.1'}
@@ -286,6 +306,26 @@ experiments:
         page: 142
         table: '4.3'
         note: 'Glass 2 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 2'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [B2O3, '0.024398429324']
+          - [Na2O, '0.001015014106']
+          - [Al2O3, '0.086996617477']
+          - [SiO2, '0.625080759389']
+          - [CaO, '0.262509179704']
+      locator: {page: 142, table: '4.3', note: 'Glass 2 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
       locator: {page: 127, section: '3.2.1'}
@@ -312,6 +352,26 @@ experiments:
         page: 142
         table: '4.3'
         note: 'Glass 3 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 3'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [B2O3, '0.030514869292']
+          - [Na2O, '0.001512160289']
+          - [Al2O3, '0.089468591915']
+          - [SiO2, '0.616667393304']
+          - [CaO, '0.261836985200']
+      locator: {page: 142, table: '4.3', note: 'Glass 3 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched cullet grains, 5-10 mm}
       locator: {page: 127, section: '3.2.1'}
@@ -555,6 +615,14 @@ species:
         quantity: measured_total_boron_evaporation_rate_vs_sqrt_water_pressure
         measurement_status: measured_figure_only
         temperature_C: 1450
+        T_K:
+          value: 1723.15
+          units: K
+          method_class: calculated
+          inference:
+            relation: celsius_to_kelvin
+            inputs: ['T_K = T_C + 273.15']
+            output_unit: K
         B2O3_mass_pct_range: [4.6, 5.0]
         rows: [{p_H2O_bar: 0.0, boron_rate_mol_s: 3.7e-08}]
         refused_figure_points: "The remaining Fig. 4.8 points were not admitted: the OCR chart table does not preserve the plotted marker count/coordinates reliably, and the thesis prints no numeric point values."

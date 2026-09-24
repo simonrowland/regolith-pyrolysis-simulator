@@ -45,6 +45,25 @@ experiments:
         page: 525
         table: '1'
         note: 'B-133-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.178943498170']
+          - [SiO2, '0.462853393482']
+          - [CaO, '0.243866079966']
+          - [Al2O3, '0.114337028381']
+      locator: {page: 525, table: '1', note: 'B-133-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
       locator: {page: 525, section: '5.1 Starting Materials'}
@@ -86,6 +105,25 @@ experiments:
         page: 525
         table: '1'
         note: 'B-113-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.189830084551']
+          - [SiO2, '0.481315451853']
+          - [CaO, '0.211707048832']
+          - [Al2O3, '0.117147414764']
+      locator: {page: 525, table: '1', note: 'B-113-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
       locator: {page: 525, section: '5.1 Starting Materials'}
@@ -111,6 +149,25 @@ experiments:
         page: 525
         table: '1'
         note: 'BCAI-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue rows not landed as start'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.260506723746']
+          - [SiO2, '0.362820323228']
+          - [CaO, '0.258284936966']
+          - [Al2O3, '0.118388016060']
+      locator: {page: 525, table: '1', note: 'BCAI-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
       locator: {page: 525, section: '5.1 Starting Materials'}
