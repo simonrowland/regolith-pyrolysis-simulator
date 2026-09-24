@@ -2756,12 +2756,14 @@
     },
     "observed_upstream_state": {
       "O2_vented_peak_kg_hr": 0.0,
+      "O2_vented_peak_status": "complete",
       "note": "observed legacy upstream diagnostics; not thermal-train overflow",
       "transport_saturation_peak_pct": 4.732274008197835
     },
     "peaks": {
       "cold_o2_kg_hr": 0.0,
       "cold_o2_mol_hr": 0.0,
+      "cold_o2_status": "complete",
       "hot_species_basis": "per_species_design_maxima_not_concurrent_sum",
       "hot_species_kg_hr": {},
       "hot_total_vapor_basis": "maximum_concurrent_snapshot_total",
@@ -3233,7 +3235,8 @@
     },
     "snapshot_count": 12,
     "status": "closed",
-    "train_closes_for_run": true
+    "train_closes_for_run": true,
+    "unmeasured_hours": []
   },
   "stage_purity_report": {
     "stage_0": {
