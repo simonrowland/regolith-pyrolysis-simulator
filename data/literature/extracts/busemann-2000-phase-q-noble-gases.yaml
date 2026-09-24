@@ -1922,6 +1922,7 @@ species:
         pdf_page_index: 6
         table: '3'
         note: Table 3; full table row matrix
+      quote: "Eugster et al. (1998); Wieler et al. (1992); Scherer and Schultz (2000); Wieler et al. (1991); Benkert et al. (1993); e.g., Black (1972); Eberhardt (1978); Reynolds et al. (1978); Huss and Lewis (1994a)"
       units: T21 in Ma and 3He/4He × 10^-4, as printed
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
@@ -2025,53 +2026,6 @@ species:
             table: '3'
             note: Table 3 footnote 12
         rows:
-        - row_number: 2
-          method_class: quoted_prior_work
-          evidence_class: printed_table
-          locator:
-            page: 954
-            published_page: 954
-            pdf_page_index: 6
-            table: '3'
-            record: row 2
-            note: T21 exposure-age cells; cells below retain column locators.
-          cells:
-          - column: 1
-            heading: Sample
-            value: Cold Bokkeveld
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 2
-              column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '0.32'
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 2
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Eugster et al. (1998)
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 2
-              column: 3 (Source)
         - row_number: 3
           method_class: quoted_prior_work
           evidence_class: printed_table
@@ -2143,53 +2097,6 @@ species:
               table: '3'
               record: row 3
               column: 5 (Source)
-        - row_number: 4
-          method_class: quoted_prior_work
-          evidence_class: printed_table
-          locator:
-            page: 954
-            published_page: 954
-            pdf_page_index: 6
-            table: '3'
-            record: row 4
-            note: T21 exposure-age cells; cells below retain column locators.
-          cells:
-          - column: 1
-            heading: Sample
-            value: Grosnaja
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 4
-              column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '1.7'
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 4
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Scherer and Schultz (2000)
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 4
-              column: 3 (Source)
         - row_number: 5
           method_class: quoted_prior_work
           evidence_class: printed_table
@@ -2261,53 +2168,6 @@ species:
               table: '3'
               record: row 5
               column: 5 (Source)
-        - row_number: 6
-          method_class: quoted_prior_work
-          evidence_class: printed_table
-          locator:
-            page: 954
-            published_page: 954
-            pdf_page_index: 6
-            table: '3'
-            record: row 6
-            note: T21 exposure-age cells; cells below retain column locators.
-          cells:
-          - column: 1
-            heading: Sample
-            value: Isna (steps 1–11, 13)
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 6
-              column: 1 (Sample)
-          - column: 2
-            heading: T_21 (Ma)
-            value: '0.15'
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 6
-              column: 2 (T_21 (Ma))
-          - column: 3
-            heading: Source
-            value: Scherer and Schultz (2000)
-            printed_blank: false
-            method_class: quoted_prior_work
-            locator:
-              page: 954
-              published_page: 954
-              pdf_page_index: 6
-              table: '3'
-              record: row 6
-              column: 3 (Source)
         - row_number: 9
           method_class: quoted_prior_work
           evidence_class: printed_table
@@ -2734,6 +2594,187 @@ species:
               table: '3'
               record: row 14
               column: 5 (Source)
+      uncertainty:
+        note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+    - observation_id: busemann_2000_table3_he_quoted_eugster_1998
+      type: concentration_series
+      locator:
+        page: 954
+        published_page: 954
+        pdf_page_index: 6
+        table: '3'
+        note: Table 3; source-specific quoted row fragments
+      quote: "Eugster et al. (1998)"
+      units: T21 in Ma and 3He/4He × 10^-4, as printed
+      phase: gas
+      regime: closed_system_stepped_etching_and_comparison_tables
+      values:
+        quantity: source_table_rows
+        method_class: quoted_prior_work
+        quoted_from: ["Eugster et al. (1998)"]
+        evidence_class: measured_tabulated
+        rows:
+        - row_number: 2
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 2
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Cold Bokkeveld
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '0.32'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Eugster et al. (1998)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 2
+              column: 3 (Source)
+      uncertainty:
+        note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+    - observation_id: busemann_2000_table3_he_quoted_scherer_schultz_2000
+      type: concentration_series
+      locator:
+        page: 954
+        published_page: 954
+        pdf_page_index: 6
+        table: '3'
+        note: Table 3; source-specific quoted row fragments
+      quote: "Scherer and Schultz (2000)"
+      units: T21 in Ma and 3He/4He × 10^-4, as printed
+      phase: gas
+      regime: closed_system_stepped_etching_and_comparison_tables
+      values:
+        quantity: source_table_rows
+        method_class: quoted_prior_work
+        quoted_from: ["Scherer and Schultz (2000)"]
+        evidence_class: measured_tabulated
+        rows:
+        - row_number: 4
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 4
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Grosnaja
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '1.7'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Scherer and Schultz (2000)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 4
+              column: 3 (Source)
+        - row_number: 6
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 954
+            published_page: 954
+            pdf_page_index: 6
+            table: '3'
+            record: row 6
+            note: T21 exposure-age cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Isna (steps 1–11, 13)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 1 (Sample)
+          - column: 2
+            heading: T_21 (Ma)
+            value: '0.15'
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 2 (T_21 (Ma))
+          - column: 3
+            heading: Source
+            value: Scherer and Schultz (2000)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 954
+              published_page: 954
+              pdf_page_index: 6
+              table: '3'
+              record: row 6
+              column: 3 (Source)
       uncertainty:
         note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
     - observation_id: busemann_2000_table7_he
@@ -3213,90 +3254,6 @@ species:
               record: row 5
               column: 2 (Steps)
             absence_reason: not_published
-          - column: 3
-            heading: ^4He/^20Ne
-            value: 141(9)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 3 (^4He/^20Ne)
-          - column: 4
-            heading: ^4He/^36Ar
-            value: 9.07(4)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 4 (^4He/^36Ar)
-          - column: 5
-            heading: ^20Ne/^36Ar
-            value: 0.065(6)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 5 (^20Ne/^36Ar)
-          - column: 6
-            heading: ^4He/^132Xe
-            value: 567(25)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 6 (^4He/^132Xe)
-          - column: 7
-            heading: ^20Ne/^132Xe
-            value: 4.08(4)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 7 (^20Ne/^132Xe)
-          - column: 8
-            heading: ^36Ar/^132Xe
-            value: 62.5(10)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 8 (^36Ar/^132Xe)
-          - column: 9
-            heading: ^84Kr/^132Xe
-            value: 0.744(8)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 5
-              column: 9 (^84Kr/^132Xe)
         - row_number: 6
           method_class: measured
           evidence_class: printed_table
@@ -3695,90 +3652,6 @@ species:
               record: row 9
               column: 2 (Steps)
             absence_reason: not_published
-          - column: 3
-            heading: ^4He/^20Ne
-            value: 96(10)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 3 (^4He/^20Ne)
-          - column: 4
-            heading: ^4He/^36Ar
-            value: 5.55(18)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 4 (^4He/^36Ar)
-          - column: 5
-            heading: ^20Ne/^36Ar
-            value: 0.058(4)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 5 (^20Ne/^36Ar)
-          - column: 6
-            heading: ^4He/^132Xe
-            value: 498(8)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 6 (^4He/^132Xe)
-          - column: 7
-            heading: ^20Ne/^132Xe
-            value: 5.3(6)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 7 (^20Ne/^132Xe)
-          - column: 8
-            heading: ^36Ar/^132Xe
-            value: 90(4)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 8 (^36Ar/^132Xe)
-          - column: 9
-            heading: ^84Kr/^132Xe
-            value: 0.96(5)
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 957
-              published_page: 957
-              pdf_page_index: 9
-              table: '7'
-              record: row 9
-              column: 9 (^84Kr/^132Xe)
         - row_number: 10
           method_class: measured
           evidence_class: printed_table
@@ -5347,6 +5220,260 @@ species:
               pdf_page_index: 9
               table: '7'
               record: row 22
+              column: 9 (^84Kr/^132Xe)
+      uncertainty:
+        note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+    - observation_id: busemann_2000_table7_he_quoted_wieler_1992
+      type: concentration_series
+      locator:
+        page: 957
+        published_page: 957
+        pdf_page_index: 9
+        table: '7'
+        note: Table 7; source-specific quoted row fragment
+      quote: "Wieler et al. (1992)"
+      units: isotope or elemental ratios, as printed; denominator convention is in the table caption
+      phase: gas
+      regime: closed_system_stepped_etching_and_comparison_tables
+      values:
+        quantity: source_table_rows
+        method_class: quoted_prior_work
+        quoted_from: ["Wieler et al. (1992)"]
+        evidence_class: measured_tabulated
+        rows:
+        - row_number: 5
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 957
+            published_page: 957
+            pdf_page_index: 9
+            table: '7'
+            record: row 5
+            note: Prior-work average-ratio cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Murchison‡
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 1 (Sample)
+          - column: 3
+            heading: ^4He/^20Ne
+            value: 141(9)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 3 (^4He/^20Ne)
+          - column: 4
+            heading: ^4He/^36Ar
+            value: 9.07(4)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 4 (^4He/^36Ar)
+          - column: 5
+            heading: ^20Ne/^36Ar
+            value: 0.065(6)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 5 (^20Ne/^36Ar)
+          - column: 6
+            heading: ^4He/^132Xe
+            value: 567(25)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 6 (^4He/^132Xe)
+          - column: 7
+            heading: ^20Ne/^132Xe
+            value: 4.08(4)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 7 (^20Ne/^132Xe)
+          - column: 8
+            heading: ^36Ar/^132Xe
+            value: 62.5(10)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 8 (^36Ar/^132Xe)
+          - column: 9
+            heading: ^84Kr/^132Xe
+            value: 0.744(8)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 5
+              column: 9 (^84Kr/^132Xe)
+      uncertainty:
+        note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+    - observation_id: busemann_2000_table7_he_quoted_wieler_1991
+      type: concentration_series
+      locator:
+        page: 957
+        published_page: 957
+        pdf_page_index: 9
+        table: '7'
+        note: Table 7; source-specific quoted row fragment
+      quote: "Wieler et al. (1991)"
+      units: isotope or elemental ratios, as printed; denominator convention is in the table caption
+      phase: gas
+      regime: closed_system_stepped_etching_and_comparison_tables
+      values:
+        quantity: source_table_rows
+        method_class: quoted_prior_work
+        quoted_from: ["Wieler et al. (1991)"]
+        evidence_class: measured_tabulated
+        rows:
+        - row_number: 9
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 957
+            published_page: 957
+            pdf_page_index: 9
+            table: '7'
+            record: row 9
+            note: Prior-work average-ratio cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Allende§
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 1 (Sample)
+          - column: 3
+            heading: ^4He/^20Ne
+            value: 96(10)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 3 (^4He/^20Ne)
+          - column: 4
+            heading: ^4He/^36Ar
+            value: 5.55(18)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 4 (^4He/^36Ar)
+          - column: 5
+            heading: ^20Ne/^36Ar
+            value: 0.058(4)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 5 (^20Ne/^36Ar)
+          - column: 6
+            heading: ^4He/^132Xe
+            value: 498(8)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 6 (^4He/^132Xe)
+          - column: 7
+            heading: ^20Ne/^132Xe
+            value: 5.3(6)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 7 (^20Ne/^132Xe)
+          - column: 8
+            heading: ^36Ar/^132Xe
+            value: 90(4)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
+              column: 8 (^36Ar/^132Xe)
+          - column: 9
+            heading: ^84Kr/^132Xe
+            value: 0.96(5)
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 957
+              published_page: 957
+              pdf_page_index: 9
+              table: '7'
+              record: row 9
               column: 9 (^84Kr/^132Xe)
       uncertainty:
         note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
@@ -35319,18 +35446,6 @@ species:
               table: '1'
               record: row 7
               column: 3 (^20Ne/^22Ne)
-          - column: 4
-            heading: ^21Ne/^22Ne
-            value: 0.0294*
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 950
-              published_page: 950
-              pdf_page_index: 2
-              table: '1'
-              record: row 7
-              column: 4 (^21Ne/^22Ne)
           - column: 5
             heading: Source
             value: This work
@@ -35461,18 +35576,6 @@ species:
               table: '1'
               record: row 9
               column: 3 (^20Ne/^22Ne)
-          - column: 4
-            heading: ^21Ne/^22Ne
-            value: 0.0294*
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 950
-              published_page: 950
-              pdf_page_index: 2
-              table: '1'
-              record: row 9
-              column: 4 (^21Ne/^22Ne)
           - column: 5
             heading: Source
             value: This work
@@ -35532,18 +35635,6 @@ species:
               table: '1'
               record: row 10
               column: 3 (^20Ne/^22Ne)
-          - column: 4
-            heading: ^21Ne/^22Ne
-            value: 0.0294*
-            printed_blank: false
-            method_class: measured
-            locator:
-              page: 950
-              published_page: 950
-              pdf_page_index: 2
-              table: '1'
-              record: row 10
-              column: 4 (^21Ne/^22Ne)
           - column: 5
             heading: Source
             value: This work
@@ -35638,6 +35729,7 @@ species:
         pdf_page_index: 2
         table: '1'
         note: Table 1; full table row matrix
+      quote: "Wieler et al. (1992); Wieler et al. (1991); Schelhaas et al. (1990); Ott et al. (1985a); Alaerts et al. (1979a); Huss et al. (1996); Wacker (1986); Eberhardt et al. (1965); Benkert et al. (1993); Pepin (1967); Huss and Lewis (1994a); Amari et al. (1995); Lewis et al. (1994); typical chondritic value"
       units: 20Ne/22Ne and 21Ne/22Ne isotope ratios, as printed
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
@@ -37220,6 +37312,131 @@ species:
               column: 5 (Source)
       uncertainty:
         note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+    - observation_id: busemann_2000_table1_ne_quoted_wieler_1992
+      type: concentration_series
+      locator:
+        page: 950
+        published_page: 950
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1; source-specific quoted cell fragments
+      quote: "Wieler et al. (1992)"
+      units: 20Ne/22Ne and 21Ne/22Ne isotope ratios, as printed
+      phase: gas
+      regime: closed_system_stepped_etching_and_comparison_tables
+      values:
+        quantity: source_table_rows
+        method_class: quoted_prior_work
+        quoted_from: ["Wieler et al. (1992)"]
+        evidence_class: measured_tabulated
+        rows:
+        - row_number: 7
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 950
+            published_page: 950
+            pdf_page_index: 2
+            table: '1'
+            record: row 7
+            note: Starred ^21Ne/^22Ne cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Lancé
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 7
+              column: 1 (Sample)
+          - column: 4
+            heading: ^21Ne/^22Ne
+            value: 0.0294*
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 7
+              column: 4 (^21Ne/^22Ne)
+        - row_number: 9
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 950
+            published_page: 950
+            pdf_page_index: 2
+            table: '1'
+            record: row 9
+            note: Starred ^21Ne/^22Ne cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Chainpur
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 9
+              column: 1 (Sample)
+          - column: 4
+            heading: ^21Ne/^22Ne
+            value: 0.0294*
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 9
+              column: 4 (^21Ne/^22Ne)
+        - row_number: 10
+          method_class: quoted_prior_work
+          evidence_class: printed_table
+          locator:
+            page: 950
+            published_page: 950
+            pdf_page_index: 2
+            table: '1'
+            record: row 10
+            note: Starred ^21Ne/^22Ne cells; cells below retain column locators.
+          cells:
+          - column: 1
+            heading: Sample
+            value: Dimmitt
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 10
+              column: 1 (Sample)
+          - column: 4
+            heading: ^21Ne/^22Ne
+            value: 0.0294*
+            printed_blank: false
+            method_class: quoted_prior_work
+            locator:
+              page: 950
+              published_page: 950
+              pdf_page_index: 2
+              table: '1'
+              record: row 10
+              column: 4 (^21Ne/^22Ne)
+      uncertainty:
+        note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
     - observation_id: busemann_2000_table1_ne_derived
       type: concentration_series
       locator:
@@ -37635,6 +37852,7 @@ species:
         pdf_page_index: 17
         table: '9'
         note: Table 9; full table row matrix
+      quote: "Huss and Lewis (1995); Wieler et al. (1992)"
       units: 10^-10 cm^3 STP/g residue and 10^-10 cm^3 STP/g meteorite, as printed
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
@@ -38578,6 +38796,7 @@ species:
         pdf_page_index: 7
         table: '4'
         note: Table 4; full table row matrix
+      quote: "Wieler et al. (1992); Wieler et al. (1991); Nier (1950); Benkert et al. (1993); Reynolds et al. (1978); Huss and Lewis (1994a); Alaerts et al. (1979a)"
       units: isotope or elemental ratios, as printed; denominator convention is in the table caption
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
@@ -40256,6 +40475,7 @@ species:
         pdf_page_index: 9
         table: '6'
         note: Table 6; full table row matrix
+      quote: "Wieler et al. (1992); Wieler et al. (1991); Huss and Lewis (1994a); Ott et al. (1988); Basford et al. (1973); Eugster et al. (1967)"
       units: isotope or elemental ratios, as printed; denominator convention is in the table caption
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
@@ -42527,6 +42747,7 @@ species:
         pdf_page_index: 8
         table: '5'
         note: Table 5; full table row matrix
+      quote: "Wieler et al. (1992); Wieler et al. (1991); Huss and Lewis (1994a); Ott et al. (1988); Pepin (1991); Basford et al. (1973); Eugster et al. (1967)"
       units: isotope or elemental ratios, as printed; denominator convention is in the table caption
       phase: gas
       regime: closed_system_stepped_etching_and_comparison_tables
