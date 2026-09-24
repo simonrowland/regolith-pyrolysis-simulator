@@ -358,7 +358,7 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
     return ConsumerReadiness("engine_point", _status(engines), tuple(gaps))
 
 
-def report(root: Path) -> dict[str, object]:
+def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
     works, experiments, observations = load_migrated_store(root)
     by_experiment = defaultdict(list)
     by_experiment_all: dict[str, list] = defaultdict(list)
@@ -415,14 +415,22 @@ def report(root: Path) -> dict[str, object]:
         readiness = (
             _missing_bench_readiness(implicit=implicit)
             if bench is None
-            else consumer_readiness(experiment, bench)
+            else consumer_readiness(experiment, bench, modelling_inputs=modelling_inputs)
         )
         if bench is not None and by_experiment[experiment.experiment_id]:
             contexts = {}
             for observation in by_experiment[experiment.experiment_id]:
                 key = repr(observation.point_conditions)
                 contexts.setdefault(key, observation)
-            groups = [consumer_readiness(experiment, bench, observation) for observation in contexts.values()]
+            groups = [
+                consumer_readiness(
+                    experiment,
+                    bench,
+                    observation,
+                    modelling_inputs=modelling_inputs,
+                )
+                for observation in contexts.values()
+            ]
             aggregated = []
             for base in readiness:
                 if base.consumer == "rps":
@@ -681,8 +689,14 @@ def report(root: Path) -> dict[str, object]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--modelling-inputs", type=Path, help="Explicit operator inputs for RPS, JSON")
     args = parser.parse_args(argv)
-    print(json.dumps(report(args.root), sort_keys=True, separators=(",", ":")))
+    modelling_inputs = json.loads(args.modelling_inputs.read_text()) if args.modelling_inputs else None
+    print(json.dumps(
+        report(args.root, modelling_inputs=modelling_inputs),
+        sort_keys=True,
+        separators=(",", ":"),
+    ))
     return 0
 
 

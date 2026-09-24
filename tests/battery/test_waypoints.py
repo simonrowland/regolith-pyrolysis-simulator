@@ -1105,6 +1105,80 @@ def _report_with_work(tmp_path, monkeypatch, work, experiment) -> "object":
     return module.report(tmp_path)
 
 
+def test_readiness_report_passes_modelling_inputs_to_consumer_path(
+    tmp_path, monkeypatch
+) -> None:
+    from tests.battery.test_bench_generators import complete_rps
+    import scripts.bench_readiness as module
+
+    experiment, bench, observation, modelling_inputs = complete_rps()
+    observation = replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "fO2_log"
+        },
+    )
+    pressure = factories.located(
+        Value.point_of(Decimal("1")),
+        note="printed vacuum during run",
+    )
+    experiment = replace(
+        experiment,
+        bench_id=bench.id,
+        conditions={
+            **experiment.conditions,
+            "surfaces": observation.point_conditions["surfaces"],
+            "gas_boundary": observation.point_conditions["gas_boundary"],
+        },
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=pressure
+        ),
+    )
+    work = factories.work()
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {experiment.experiment_id: experiment},
+            {observation.observation_id: observation},
+        ),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+
+    direct = {
+        item.consumer: item
+        for item in consumer_readiness(
+            experiment, bench, observation, modelling_inputs=modelling_inputs
+        )
+    }
+    assert oxygen_condition(experiment, bench, observation).selected.route == (
+        "vacuum_total_pressure_upper_bound"
+    )
+    without = module.report(tmp_path)
+    with_model = module.report(tmp_path, modelling_inputs=modelling_inputs)
+
+    def consumer_rows(result):
+        return {
+            item["consumer"]: item
+            for item in result["sources"][0]["consumers"]
+        }
+
+    without_rps = consumer_rows(without)["rps"]
+    with_rps = consumer_rows(with_model)["rps"]
+    assert without_rps["status"] == ReadinessStatus.GAP.value
+    assert with_rps["status"] == direct["rps"].status.value == ReadinessStatus.READY.value
+    assert not any(
+        gap["waypoint"].startswith("operator.") for gap in with_rps["gaps"]
+    )
+    assert without["summary"]["by_consumer"]["rps"]["ready"] == 0
+    assert with_model["summary"]["by_consumer"]["rps"]["ready"] == 1
+    for consumer in ("kems", "engine_point"):
+        assert consumer_rows(with_model)[consumer]["status"] == direct[consumer].status.value
+
+
 def test_verdict_no_lead_is_not_an_apparatus_reference(tmp_path, monkeypatch) -> None:
     work = _lead_corpus(
         tmp_path,
