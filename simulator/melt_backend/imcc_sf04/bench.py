@@ -58,6 +58,28 @@ from simulator.melt_backend.imcc_sf04 import (
     load_datapack,
 )
 
+
+_YAML_BASE_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+class _BenchYAML12SafeLoader(_YAML_BASE_LOADER):
+    # Copy resolvers so YAML 1.1 booleans cannot coerce chemistry identifiers.
+    yaml_implicit_resolvers = {
+        key: [
+            (tag, regexp)
+            for tag, regexp in resolvers
+            if tag != "tag:yaml.org,2002:bool"
+        ]
+        for key, resolvers in _YAML_BASE_LOADER.yaml_implicit_resolvers.items()
+    }
+
+
+_BenchYAML12SafeLoader.add_implicit_resolver(
+    "tag:yaml.org,2002:bool",
+    re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"),
+    list("tTfF"),
+)
+
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 POINT_STATUSES = (
     "ok",
@@ -252,7 +274,7 @@ def composition_wt_pct_for_point(
 
 
 def load_bench_set(path: Path) -> dict[str, Any]:
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data = yaml.load(path.read_text(encoding="utf-8"), Loader=_BenchYAML12SafeLoader)
     if not isinstance(data, dict) or data.get("schema_version") != "melt-activity-bench.v1":
         raise ValueError(f"unsupported melt activity bench set: {path}")
     if not data.get("compositions") or not data.get("points"):

@@ -13,6 +13,8 @@ import yaml
 
 from simulator.melt_backend.imcc_sf04.bench import (
     _single_cation_gas_activities,
+    composition_wt_pct_for_point,
+    load_bench_set,
     main,
     render_report,
     run_bench,
@@ -98,6 +100,39 @@ def _three_point_fixture(path: Path) -> Path:
             },
         ],
     )
+
+
+def test_load_bench_set_preserves_yaml_12_chemistry_identifiers(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "bench.yaml"
+    path.write_text(
+        """\
+schema_version: melt-activity-bench.v1
+compositions:
+  no:
+    composition_wt_pct:
+      SiO2: 100.0
+points:
+  - id: no
+    composition_id: no
+    species: NO
+    enabled: true
+""",
+        encoding="utf-8",
+    )
+
+    fixture = load_bench_set(path)
+    point = fixture["points"][0]
+
+    assert "no" in fixture["compositions"]
+    assert point["id"] == "no"
+    assert point["composition_id"] == "no"
+    assert point["species"] == "NO"
+    assert point["enabled"] is True
+    assert composition_wt_pct_for_point(point, fixture["compositions"]) == {
+        "SiO2": 100.0
+    }
 
 
 def test_run_bench_ok_out_of_domain_and_refused(tmp_path: Path) -> None:
