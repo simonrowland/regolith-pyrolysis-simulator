@@ -45,11 +45,7 @@ MIN_FO2_LOG_HITS = {
 }
 
 # Parent tip that shipped the stale store (R16 evidence SHA).
-STALE_TIP = "ce650a3d5^"
-
-# These post-c2ba15805 inputs are proven store-neutral: the bench payload and
-# ledger/sticking changes are not consumed by battery_migrate or build_index.
-STORE_NEUTRAL_INPUT_COMMITS = {"1b78b5697", "574800443", "149df2858"}
+STALE_TIP = "07ad01dae"
 
 
 def _git(*args: str) -> str:
@@ -108,28 +104,12 @@ def test_committed_printed_fo2_stems_land_fO2_log_in_extracts_v2() -> None:
 
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """Reject unacknowledged post-regen migrate-input commits.
+    """No migrate-input commit may land after the last store-output touch.
 
     Mirrors the STALE half of ``scripts/check_store_freshness.py`` so a
     mid-series regen followed by extract/migrate edits without a tip regen
-    fails in CI. Three acknowledged I1 commits are store-neutral. Does not
-    assert UNTRACED (pre-existing, out of R16 P1).
+    fails in CI. Does not assert UNTRACED (pre-existing, out of R16 P1).
     """
-    if _git("rev-parse", "--is-shallow-repository").strip() == "true":
-        pytest.skip("git_history_unavailable: freshness requires a full checkout")
-    _require_git_history(*sorted(STORE_NEUTRAL_INPUT_COMMITS))
-    for revision in STORE_NEUTRAL_INPUT_COMMITS:
-        if subprocess.run(
-            ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        ).returncode != 0:
-            pytest.skip(
-                "git_history_unavailable: acknowledged store-neutral input "
-                f"{revision} is not in HEAD history"
-            )
     freshness = _load_freshness()
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
@@ -154,10 +134,11 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
             commit, subject = line.split("\x00", 1)
         elif line.strip() and commit is not None and freshness._is_input(line.strip()):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
-    unexpected = {
-        key.split(" ", 1)[0] for key in stale
-    } - STORE_NEUTRAL_INPUT_COMMITS
-    assert not unexpected, f"unacknowledged post-regen migrate inputs: {unexpected}"
+    assert not stale, (
+        "store is STALE w.r.t. migrate inputs; regenerate with "
+        "scripts/battery_migrate.py + build_index --write-store-summary:\n"
+        + "\n".join(f"  {k}: {v[:3]}" for k, v in stale.items())
+    )
 
 
 def test_mutation_pre_regen_tip_extracts_v2_have_zero_fo2_log() -> None:
@@ -239,4 +220,4 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
         elif line.strip() and commit is not None and freshness._is_input(line.strip()):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
-    assert any("41d3166f0" in k for k in stale), stale
+    assert any("d4f91337f" in k for k in stale), stale

@@ -1,0 +1,322 @@
+schema_version: literature_extract.v1
+source_id: ntrs-20250004626
+source:
+  citation: >-
+    Yu, Kevin; West, William; Stokes, Jamesa; Harder, Bryan; Reidy, Lorlyn;
+    Dominguez, Jesus; Faber, Katherine T. (2025), "Improving molten regolith
+    electrolysis with zirconia-based hollow anode technology", Acta Astronautica
+    235, 723–735. DOI 10.1016/j.actaastro.2025.06.028. NASA NTRS 20250004626
+    (accepted manuscript / NTRS copy).
+  doi: 10.1016/j.actaastro.2025.06.028
+  url: https://ntrs.nasa.gov/citations/20250004626
+  year: 2025
+extraction:
+  method: >-
+    AQ-acquired OA PDF ferry-inbox/acquired/ntrs-20250004626.pdf
+    (sha256 ba46da63295be1cf1774bc268b6a63b632a199a61f1f8d663449676bc96b3ab5;
+    40-page born-digital NTRS copy). pdftotext -layout of Tables 1–5. Printed
+    MEASURED tables landed (Table 2 efficiencies/O2 mass; Table 3 post-electrolysis
+    EDS at%; Table 4 YSZ recession; Table 5 cell resistances). Table 1 LHS-1 /
+    Apollo 16 #64501 oxide wt% landed as secondary_compilation composition_series.
+    FactSage model (§2.3.4 / §3.4 / Fig. 6 / S7–S8) → typed_absence (not ingested).
+    Figs 2–5, 7 figure-only curves/maps not digitized. Parallel store
+    data/literature/mre_measurements.yaml::yu_2025_hollow_anode_measurements
+    already cites this DOI/NTRS; this file is the literature_extract.v1 landing
+    for SOURCE_STATUS source_id ntrs-20250004626 (no prior extract YAML).
+  date: '2026-09-23'
+  worker: n16-aq-oa-batch-b
+  provenance_path: data/literature/extracts/ntrs-20250004626.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: peer-reviewed MRE hollow-anode experiment paper (NTRS OA copy)
+  scored_observations: 5
+  note: >-
+    STEP 0 DOI 10.1016/j.actaastro.2025.06.028 unique among literature extracts.
+    works/ALIASES and mre_measurements reference yu_2025_hollow_anode_measurements
+    for the same DOI/NTRS — parallel MRE store, not a literature_extract duplicate.
+typed_absences:
+- kind: model_output
+  reason: owner_blocked_model_derived_cohort
+  item: FactSage 8.3 thermochemical O2-removal model (§2.3.4, §3.4, Fig. 6, S7–S8)
+  locator:
+    pdf_page_index: 21
+    section: '3.4'
+    figure: '6'
+  note: >-
+    Author FactSage equilibrium slag/metal compositions vs extraction efficiency
+    at 1600°C. Model outputs deliberately not ingested under measured-only rule.
+- kind: figure_only
+  reason: not_digitized
+  item: Figures 2–5 outlet O2 / cell potential / optical+EDS maps; Figure 7 YSZ grain histogram
+  locator:
+    note: figure captions throughout Results
+  note: Curves and maps figure-only; table/prose numbers used instead.
+fidelity_samples:
+- species: LHS-1_MRE_hollow_anode
+  observable: composition_series
+  observation_id: yu_2025_table2_electrolysis_efficiencies
+  field: O2_mass_produced_g_1hr
+  value: 0.070
+  locator:
+    pdf_page_index: 15
+    table: '2'
+    note: Table 2 1 hr Mass of O2 produced 0.070 g
+- species: LHS-1_MRE_hollow_anode
+  observable: composition_series
+  observation_id: yu_2025_table3_post_electrolysis_at_pct
+  field: Fe_at_pct_12hr
+  value: 0.00
+  locator:
+    pdf_page_index: 21
+    table: '3'
+    note: Table 3 12 hr Fe 0.00 at%
+- species: LHS-1_MRE_hollow_anode
+  observable: composition_series
+  observation_id: yu_2025_table4_ysz_wall_recession
+  field: recession_um_12hr
+  value: 85
+  locator:
+    pdf_page_index: 24
+    table: '4'
+    note: Table 4 12 hr YSZ recession 85 ± 19 μm
+species:
+  LHS-1_MRE_hollow_anode:
+    observations:
+    - observation_id: yu_2025_table1_lhs1_apollo16_oxide_wt_pct
+      type: composition_series
+      locator:
+        pdf_page_index: 7
+        table: '1'
+        note: Table 1 Major abundances of LHS-1 simulant and highlands lunar regolith (wt%) [26,27]
+      phase: bulk_oxide_composition
+      regime: compiled_simulant_and_apollo_composition
+      units: wt% as printed
+      values:
+        quantity: major_oxide_abundances_LHS1_vs_Apollo16_64501
+        method_class: secondary_compilation
+        admission_status: authors_table_from_cited_LHS1_and_Apollo16_sources_not_this_work_instrument
+        semantics: compiled_composition_input_not_model_output
+        caption_as_published: Table 1 Major abundances of LHS-1 simulant and highlands lunar regolith (wt%) [26,27]
+        rows:
+        - sample: LHS-1_Simulant
+          SiO2_wt_pct: 51.2
+          FeO_wt_pct: 2.7
+          MgO_wt_pct: 1.6
+          CaO_wt_pct: 12.8
+          Al2O3_wt_pct: 26.6
+          TiO2_wt_pct: 0.6
+          Na2O_wt_pct: 2.9
+          K2O_wt_pct: 0.5
+          MnO_wt_pct: 0.1
+          P2O5_wt_pct: 0.1
+        - sample: Apollo_16_64501
+          SiO2_wt_pct: 45.3
+          FeO_wt_pct: 4.2
+          MgO_wt_pct: 4.9
+          CaO_wt_pct: 17.2
+          Al2O3_wt_pct: 27.7
+          TiO2_wt_pct: 0.4
+          Na2O_wt_pct: 0.4
+          K2O_wt_pct: 0.1
+          MnO_wt_pct_as_printed: '< 0.1'
+          P2O5_wt_pct_as_printed: '-'
+      uncertainty:
+        note: none printed on Table 1 oxide cells
+    - observation_id: yu_2025_table2_electrolysis_efficiencies
+      type: composition_series
+      locator:
+        pdf_page_index: 15
+        table: '2'
+        note: Table 2 Summary of cathodic products and regolith electrolysis efficiencies
+      phase: MRE_cell_products
+      regime: inverted_hollow_anode_YSZ_constant_current
+      units: as printed (g O2; % efficiencies)
+      values:
+        quantity: cathodic_products_Faradaic_and_extraction_efficiency
+        method_class: measured_reduced
+        evidence_class: authors_own_MRE_RGA_and_EDS
+        T_C_as_printed: 1600
+        current_A_as_printed: 0.5
+        Ar_flow_sccm_as_printed: 100
+        LHS1_load_g_approx_as_printed: 20
+        O2_mass_produced_g_1hr: 0.070
+        O2_mass_produced_g_3hr: 0.237
+        O2_mass_produced_g_12hr: 0.749
+        rows:
+        - electrolysis_duration_hr: 1
+          cathodic_products_observed_as_printed: Fe
+          anodic_Faradaic_efficiency_pct: 47
+          mass_O2_produced_g: 0.070
+          extraction_efficiency_pct: 0.4
+        - electrolysis_duration_hr: 3
+          cathodic_products_observed_as_printed: Fe, P, Si
+          anodic_Faradaic_efficiency_pct: 53
+          mass_O2_produced_g: 0.237
+          extraction_efficiency_pct: 1.2
+        - electrolysis_duration_hr: 12
+          cathodic_products_observed_as_printed: Fe, P, Si, Ti, Mn
+          anodic_Faradaic_efficiency_pct: 42
+          mass_O2_produced_g: 0.749
+          extraction_efficiency_pct: 3.7
+        note_as_printed: >-
+          RGA-measured O2 is a lower bound because O2 generated inside the cell
+          can reoxidize Mo; Faradaic efficiency <100% attributed to YSZ electronic conductivity.
+      uncertainty:
+        note: none printed on Table 2 efficiency / O2-mass cells
+    - observation_id: yu_2025_table3_post_electrolysis_at_pct
+      type: composition_series
+      locator:
+        pdf_page_index: 21
+        table: '3'
+        note: Table 3 Average regolith composition after melting and electrolysis (at%)
+      phase: solidified_LHS1_electrolyte
+      regime: EDS_average_post_electrolysis
+      units: at% as printed
+      values:
+        quantity: average_regolith_elemental_composition_after_electrolysis
+        method_class: measured_direct
+        evidence_class: authors_own_EDS
+        Fe_at_pct_12hr: 0.00
+        headers_as_published: Species | Si | Fe | Mg | Ca | Al | Ti | Na | K | Y | Zr | O
+        rows:
+        - condition: BOL_ref_19
+          Si: 18.17
+          Fe: 1.01
+          Mg: 1.32
+          Ca: 5.36
+          Al: 11.68
+          Ti: 0.23
+          Na: 1.87
+          K: 0.31
+          Y: 0.24
+          Zr: 0.60
+          O: 59.20
+        - condition: 1_hr
+          Si: 18.21
+          Fe: 0.47
+          Mg: 1.30
+          Ca: 5.23
+          Al: 11.70
+          Ti: 0.22
+          Na: 1.90
+          K: 0.32
+          Y: 0.17
+          Zr: 0.47
+          O: 60.01
+        - condition: 3_hr
+          Si: 18.06
+          Fe: 0.04
+          Mg: 1.45
+          Ca: 5.87
+          Al: 12.41
+          Ti: 0.22
+          Na: 1.87
+          K: 0.31
+          Y: 0.24
+          Zr: 0.63
+          O: 58.91
+        - condition: 12_hr
+          Si: 15.23
+          Fe: 0.00
+          Mg: 1.78
+          Ca: 7.21
+          Al: 12.95
+          Ti: 0.17
+          Na: 2.32
+          K: 0.34
+          Y: 0.37
+          Zr: 0.66
+          O: 58.97
+      uncertainty:
+        note: none printed on Table 3 at% cells; BOL cited from prior work [19]
+    - observation_id: yu_2025_table4_ysz_wall_recession
+      type: composition_series
+      locator:
+        pdf_page_index: 24
+        table: '4'
+        note: Table 4 YSZ wall recession due to dissolution by molten LHS-1
+      phase: YSZ_hollow_anode_wall
+      regime: optical_ImageJ_wall_recession
+      units: μm as printed
+      values:
+        quantity: YSZ_wall_recession_vs_thermal_exposure
+        method_class: measured_direct
+        evidence_class: authors_own_optical_metrology
+        recession_um_12hr: 85
+        rows:
+        - electrolysis_duration_hr: 1
+          time_at_1600C_hr: 3
+          YSZ_recession_um: 22
+          YSZ_recession_uncertainty_um: 10
+          as_printed: 22 ± 10
+        - electrolysis_duration_hr: 3
+          time_at_1600C_hr: 5
+          YSZ_recession_um: 54
+          YSZ_recession_uncertainty_um: 12
+          as_printed: 54 ± 12
+        - electrolysis_duration_hr: 12
+          time_at_1600C_hr: 14
+          YSZ_recession_um: 85
+          YSZ_recession_uncertainty_um: 19
+          as_printed: 85 ± 19
+        note_as_printed: thermal exposure to molten LHS-1 (not electrolysis itself) causes YSZ dissolution
+      uncertainty:
+        note: per-row ± as printed in Table 4
+    - observation_id: yu_2025_table5_cell_resistances
+      type: composition_series
+      locator:
+        pdf_page_index: 28
+        table: '5'
+        note: Table 5 Cell resistances at 1600°C before and after electrolysis
+      phase: MRE_cell
+      regime: electrochemical_cell_resistance_at_1600C
+      units: ohm and % as printed
+      values:
+        quantity: cell_resistance_before_and_after_electrolysis
+        method_class: measured_direct
+        evidence_class: authors_own_electrochemistry
+        T_C_as_printed: 1600
+        rows:
+        - electrolysis_duration_hr: 1
+          initial_resistance_ohm: 1.54
+          final_resistance_ohm: 1.44
+          change_pct: -6.5
+        - electrolysis_duration_hr: 3
+          initial_resistance_ohm: 1.59
+          final_resistance_ohm: 1.12
+          change_pct: -29.6
+        - electrolysis_duration_hr: 12
+          initial_resistance_ohm: 1.46
+          final_resistance_ohm: 0.78
+          change_pct: -46.6
+      uncertainty:
+        note: none printed on Table 5 resistance cells
+    context:
+    - observation_id: yu_2025_mre_method_conditions
+      type: method
+      locator:
+        pdf_page_index: 8
+        section: '2.2.2'
+      phase: inverted_hollow_anode_MRE
+      regime: constant_current_Ar_carrier
+      units: as printed
+      values:
+        quantity: electrolysis_operating_conditions
+        method_class: method_only
+        T_C: 1600
+        durations_hr_as_printed: [1, 3, 12]
+        pre_and_post_hold_hr_as_printed: 1
+        Ar_flow_sccm: 100
+        current_A: 0.5
+        cathode_area_cm2_approx: 10
+        anode_pad_area_cm2_approx: 1
+        anodic_current_density_A_per_cm2_approx: 0.5
+        LHS1_load_g_approx: 20
+        solid_electrolyte_as_printed: 10.5 wt% YSZ tube
+        cathode_as_printed: Mo
+        anode_current_collector_as_printed: Pt
+        carrier_gas_as_printed: Ar
+        RGA_as_printed: Hiden Analytical HPR-20
+      uncertainty:
+        note: 'tilde-approx printed on areas / current density / ~20 g load'

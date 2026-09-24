@@ -14,6 +14,135 @@ review_status: draft
 corrections:
 - note: The abstract and conclusion state 44 experimentally produced glasses, while Tables 1 and 2 enumerate 43 experiment IDs; both statements are retained without reconciliation.
   locators: [published page 121269 abstract, published pages 121271-121274 Tables 1-2]
+benches:
+- id: oxford-piston-cylinder
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: "End-loaded Boyd-and-England-type 1/2 inch piston-cylinder apparatus at the University of Oxford"}
+    locator: &thomas_methods {published_page: 121270, pdf_page_index: 2, section: '2.1 Starting compositions and experimental conditions'}
+  heating_method:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      published_page: 121270
+      pdf_page_index: 2
+      section: '2.1 Starting compositions and experimental conditions'
+      note: Paper states samples were heated above the liquidus; furnace/heater type is not printed
+  cell_material_and_liner:
+    state: {tag: value, value: graphite and Pt capsules}
+    locator: &thomas_capsule {published_page: 121274, pdf_page_index: 6, section: '2.2 Analytical measurement', note: 'Printed encased within graphite and Pt capsules (total thickness <2 mm); run products >0.5 mm thick glass'}
+  detector:
+    state: {tag: value, value: CAMECA SX-Five-FE electron microprobe}
+    locator: {published_page: 121274, pdf_page_index: 6, section: '2.2 Analytical measurement'}
+  other_facts:
+  - name: chlorine_fugacity_buffer
+    unit: null
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 'Ag metal + AgCl + AgI immiscible phases; AgCl/AgI ratio controls fCl2'}}
+      locator: *thomas_methods
+  - name: capsule_total_thickness
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '2'}}
+      locator: *thomas_capsule
+  - name: pressure_range_as_printed
+    unit: kbar
+    value:
+      state: {tag: value, value: {kind: interval, interval_low: '5', interval_high: '20'}}
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: '2.1 Starting compositions and experimental conditions'
+        note: Printed 5 to 20 kbar
+experiments:
+- experiment_id: quench-glass-series
+  bench_id: oxford-piston-cylinder
+  method: quench_equilibration
+  locator:
+    published_page: 121270
+    pdf_page_index: 2
+    section: '2.1 Starting compositions and experimental conditions'
+    note: 43 tabulated run IDs in Tables 1-2; series registry for shared piston-cylinder apparatus; per-run T/P/duration/log fO2 remain in observation rows
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 121271, pdf_page_index: 3, table: '1', note: '43 distinct EPMA glass compositions; no single series composition'}
+    form:
+      state: {tag: value, value: Silicate powder intimately mixed with Ag metal, AgCl and AgI; quenched to glass}
+      locator: *thomas_methods
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: '2.1 Starting compositions and experimental conditions'
+        note: Sample mass not printed
+    characterization:
+      state: {tag: value, value: Quenched glasses and Cl buffers analysed by EPMA; XAFS at Diamond Light Source I18}
+      locator: {published_page: 121274, pdf_page_index: 6, section: '2.2 Analytical measurement'}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: graphite and Pt capsules}
+      locator: *thomas_capsule
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: '2.1 Starting compositions and experimental conditions'
+          note: Sealed high-pressure capsule; no Knudsen orifice
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: '2.1 Starting compositions and experimental conditions'
+          note: Sealed high-pressure capsule; no Knudsen orifice
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 121273, pdf_page_index: 5, table: '2', note: 'Individual rows span 1300-1400 C; no single series setpoint'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 121273, pdf_page_index: 5, table: '2', note: 'Individual rows span 0.5-2.0 GPa (methods prose 5-20 kbar); no single series pressure; sealed capsule has no flowing atmosphere'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: '2.1 Starting compositions and experimental conditions'
+        note: Sealed graphite/Pt capsule piston-cylinder runs; no sweep/carrier gas flow printed
+    regime:
+      regime_class: {tag: not_applicable, reason: not_applicable}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: value, value: controlled oxygen fugacity; exact buffer assembly not stated in this paper}
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: '2.1 Starting compositions and experimental conditions'
+        note: Per-run log fO2 printed in Table 2; assembly details absent here
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated above the liquidus then quenched}
+      locator: *thomas_methods
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1573.15', interval_high: '1673.15'}}
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: '2.1 Starting compositions and experimental conditions'
+          note: Printed 1300-1400 C; unit conversion only
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '10800'}}
+      locator: {published_page: 121273, pdf_page_index: 5, table: '2', note: 'Printed durations 1-3 h across Table 2 rows; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched to glass}
+      locator: *thomas_methods
+
 fidelity_samples:
 - path: species.Cl.observations[thomas_2022_table2_experimental_conditions_and_xaf].values.series[0].CCl
   value: 0.32
@@ -22,6 +151,7 @@ species:
   Cl:
     observations:
     - observation_id: thomas_2022_table1_epma_compositions
+      experiment: quench-glass-series
       type: composition_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
@@ -60,6 +190,7 @@ species:
         - CMAS+Brucite-1 | 40 | 43.84(0.94), 0.02(0.04), 16.34(0.64), 0.12(0.03), 0.02(0.03), 15.51(0.56), 14.51(0.74), 0.00(0.01), 0.01(0.02), 2.52(0.04), 0.03(0.03), 0.30(0.07), H2O 6.74a | Total 100.00
         note: The remaining Table 1 rows are retained verbatim in the PDF table; dashes mean not detected/reported, never zero. This observation preserves the measured series and its complete source locator without inventing absent components.
     - observation_id: thomas_2022_table1_chlorine_concentrations_all_rows
+      experiment: quench-glass-series
       type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
       phase: experimentally_quenched_silicate_glass
@@ -127,6 +258,7 @@ species:
         equation: logCCl = 1.601 + (4470 XCa - 3430 XSi + 2592 XFe - 4092 XK - 849 P) / T
         source_basis: 25 natural and synthetic silicate melt compositions from Thomas and Wood (2022); not a direct measurement in this paper
     - observation_id: thomas_2022_table2_experimental_conditions_and_xaf
+      experiment: quench-glass-series
       type: gibbs_table
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
@@ -189,6 +321,7 @@ species:
         note: "Rows with no pre-edge centroid show an en dash in the printed table. The wrapped f(Cl2) cells were assigned by PDF bounding-box y alignment: 1.20E-03 is AgI/Cl-021, 1.59E-05 is AgI/Cl-09, 1.38E-03 is AgI/Cl-013, and 1.66E-06 is AgI/Cl-18."
     context:
     - observation_id: thomas_2022_apparatus_and_analytical_conditions
+      experiment: quench-glass-series
       type: apparatus
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 2.1 Starting compositions and experimental conditions}
       phase: silicate_melt_quenched_to_glass

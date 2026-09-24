@@ -12990,6 +12990,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if name not in preserved_names
         }
         state = _deepcopy_refusal_state(state_source, memo)
+        registry = getattr(self, '_chem_registry', None)
+        registry_tables = (
+            {
+                table_name: dict(getattr(registry, table_name))
+                for table_name in (
+                    '_authoritative',
+                    '_fallback',
+                    '_shadows',
+                )
+            }
+            if registry is not None
+            and all(
+                hasattr(registry, table_name)
+                for table_name in (
+                    '_authoritative',
+                    '_fallback',
+                    '_shadows',
+                )
+            )
+            else None
+        )
+        if registry_tables is not None:
+            # A refused hour leaves no registry trace; restore every mutable
+            # provider table before rebuilding the chemistry kernel.
+            state['_terminal_refusal_chem_registry_tables'] = registry_tables
         ledger = snapshot_atom_ledger(self.atom_ledger)
         cost_state = None
         if hasattr(self, 'cost_ledger'):
@@ -13020,6 +13045,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'cost_ledger',
             'vapour_rail_catalog',
         }
+        registry_tables = state.get(
+            '_terminal_refusal_chem_registry_tables'
+        )
+        restored_state = {
+            name: value
+            for name, value in state.items()
+            if name != '_terminal_refusal_chem_registry_tables'
+        }
         preserved = {
             name: self.__dict__[name]
             for name in preserved_names
@@ -13027,8 +13060,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         self.__dict__.clear()
         self.__dict__.update(preserved)
-        self.__dict__.update(state)
+        self.__dict__.update(restored_state)
         self.atom_ledger = ledger
+        if registry_tables is not None:
+            for table_name, table_snapshot in registry_tables.items():
+                table = getattr(self._chem_registry, table_name)
+                table.clear()
+                table.update(table_snapshot)
         if cost_state is not None:
             self.cost_ledger.__dict__.clear()
             self.cost_ledger.__dict__.update(cost_state)

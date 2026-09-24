@@ -335,6 +335,9 @@ PHASE_MAP: dict[str, Phase] = {
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
+    # Published parenthetical spellings (Kelley / Pankratz tables).
+    "(g)": Phase.G,
+    "(c)": Phase.CR,
 }
 
 TYPE_QUANTITY = {
@@ -361,6 +364,9 @@ QUANTITY_ALIASES = {
     "deltafG": Quantity.DELTA_FG,
     "delta_fG": Quantity.DELTA_FG,
     "delta_fG_kJ_mol": Quantity.DELTA_FG,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "delta_f_H": Quantity.DELTA_FH,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "activity": Quantity.ACTIVITY,
@@ -692,14 +698,43 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
     return _located_from_plain(payload, as_decimal)
 
 
+def _condition_value_from_plain(payload: object) -> object:
+    if isinstance(payload, Mapping) and payload.get("kind") is not None:
+        return _value_from_plain(payload)
+    return as_decimal(payload)
+
+
+def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
+    raw_locator = payload.get("locator")
+    locator_note = (
+        raw_locator.get("note")
+        if isinstance(raw_locator, Mapping)
+        else None
+    )
+    detail = str(
+        payload.get("inference")
+        or locator_note
+        or "extract marks inferred; derivation not supplied"
+    )
+    return Derivation(
+        relation="extract_inference",
+        inputs=("inferred=true", detail),
+        parameters=(),
+        output_unit="as_published",
+    )
+
+
 def _located_from_plain(payload: object, cast) -> Located:
     if isinstance(payload, Located):
         return payload
     if not isinstance(payload, Mapping) or "state" not in payload:
         return Located(_state_from_plain(payload, cast))
     inference = None
-    if payload.get("inference"):
-        inference = _derivation_from_plain(payload.get("inference"))
+    raw_inference = payload.get("inference")
+    if isinstance(raw_inference, Mapping):
+        inference = _derivation_from_plain(raw_inference)
+    elif payload.get("inferred") is True:
+        inference = _inferred_derivation_from_plain(payload)
     else:
         inference = _inference_for_printed_conversion(payload)
     return Located(
@@ -1402,7 +1437,22 @@ def experiment_from_plain(payload: object) -> Experiment:
     assert isinstance(payload, Mapping)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
-        conditions[str(key)] = _located_from_plain(value, as_decimal)
+        try:
+            conditions[str(key)] = _located_from_plain(
+                value, _condition_value_from_plain
+            )
+        except (ArithmeticError, TypeError, ValueError):
+            locator = (
+                _locator_from_plain(value.get("locator"))
+                if isinstance(value, Mapping)
+                else None
+            )
+            conditions[str(key)] = Located(
+                State.unknown(
+                    f"condition {key} is not a scalar numeric value"
+                ),
+                locator=locator,
+            )
     fo2 = payload.get("fO2_control")
     fo2_control = None
     if isinstance(fo2, Mapping):
@@ -1920,6 +1970,24 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "min_to_s": (Decimal("60"), "t_s = t_min × 60", "s", "min"),
     "h_to_s": (Decimal("3600"), "t_s = t_h × 3600", "s", "h"),
     "ks_to_s": (Decimal("1000"), "t_s = t_ks × 1000", "s", "ks"),
+    "thermochemical_calorie_to_J_exact": (
+        Decimal("4.184"),
+        "Q_J_per_declared_mol_basis_per_K = Q_cal_per_mol_K × 4.184",
+        "J_per_declared_mol_basis_per_K",
+        "cal/mol/K",
+    ),
+    "thermochemical_kcal_to_kJ_exact": (
+        Decimal("4.184"),
+        "H_kJ_per_declared_mol_basis = H_kcal_per_mol × 4.184",
+        "kJ_per_declared_mol_basis",
+        "kcal/mol",
+    ),
+    "J_to_kJ_exact": (
+        Decimal("1000"),
+        "H_kJ_per_declared_mol_basis = H_J_per_mol / 1000",
+        "kJ_per_declared_mol_basis",
+        "J/mol",
+    ),
     "C_per_min_to_K_per_s": (
         Decimal("60"),
         "rate_K_s = rate_C_per_min / 60",
@@ -2199,6 +2267,23 @@ def conversion_derivation(
         parameters=tuple(params),
         output_unit=output_unit,
     )
+
+
+def _compilation_conversion_derivation(
+    trail: str | None,
+    original_value: object,
+    locator: Locator | None,
+    read_from: str,
+) -> Derivation | None:
+    """Attach a compilation unit conversion to its registered source asset."""
+
+    derivation = conversion_derivation(trail, original_value, locator)
+    if derivation is None:
+        return None
+    # Observation derivation inputs are referential links, not free-form
+    # arithmetic text. The relation/output/parameters retain the conversion
+    # trail while the source asset supplies the resolvable input.
+    return replace(derivation, inputs=(read_from,))
 
 
 def _converted_temperature(
@@ -2815,6 +2900,12 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "table_kJ_mol": Quantity.DELTA_FG,
     "Gf": Quantity.DELTA_FG,
     "formation_gibbs_energy": Quantity.DELTA_FG,
+    "delta_f_H_298_15": Quantity.DELTA_FH,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "formation_enthalpy_298_15_K_as_published": Quantity.DELTA_FH,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
@@ -3423,10 +3514,38 @@ _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
     "Gf": Quantity.DELTA_FG,
     "formation_gibbs_energy": Quantity.DELTA_FG,
     "formation_gibbs": Quantity.DELTA_FG,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_f_H_298_15": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "formation_enthalpy_298_15_K_as_published": Quantity.DELTA_FH,
+    "delta_g": Quantity.DELTA_FG,
+    "delta_f_H": Quantity.DELTA_FH,
+    "delta_fH": Quantity.DELTA_FH,
+    "deltafH": Quantity.DELTA_FH,
+    "delta_h": Quantity.DELTA_FH,
+    "formation_enthalpy": Quantity.DELTA_FH,
+    "cp": Quantity.CP,
+    "heat_capacity": Quantity.CP,
+    "cp_10_k": Quantity.CP,
+    "cp_25_k": Quantity.CP,
+    "cp_50_k": Quantity.CP,
+    "cp_100_k": Quantity.CP,
+    "cp_150_k": Quantity.CP,
+    "cp_200_k": Quantity.CP,
+    "cp_298_15_k": Quantity.CP,
+    "entropy": Quantity.S,
+    "entropy_third_law": Quantity.S,
+    "entropy_spectrographic_or_molecular_constants": Quantity.S,
+    "entropy_other_sources": Quantity.S,
+    "entropy_recommended": Quantity.S,
+    "enthalpy_increment": Quantity.H_MINUS_H298,
     "log_kf": Quantity.LOG10_KF,
     "log_Kf": Quantity.LOG10_KF,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
+    "log_k": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
 }
 _COMPILATION_KIND_NOT_QUANTITY = frozenset(
@@ -3446,6 +3565,403 @@ _COMPILATION_KIND_NOT_QUANTITY = frozenset(
     }
 )
 _COMPILATION_UNKNOWN_REASON = "printed compilation columns are not mapped to a closed quantity"
+
+# Published multi-column census labels (Pankratz-style headings) → closed Quantity.
+# Keys are normalized by _normalize_compilation_column_label.
+_COMPILATION_HEADING_QUANTITY: dict[str, Quantity] = {
+    "cp": Quantity.CP,
+    "cpo": Quantity.CP,
+    "heat_capacity": Quantity.CP,
+    "s": Quantity.S,
+    "so": Quantity.S,
+    "entropy": Quantity.S,
+    "h-h298": Quantity.H_MINUS_H298,
+    "ho-h298o": Quantity.H_MINUS_H298,
+    "enthalpy_increment": Quantity.H_MINUS_H298,
+    "deltahf": Quantity.DELTA_FH,
+    "deltahfo": Quantity.DELTA_FH,
+    "delta_h": Quantity.DELTA_FH,
+    "deltagf": Quantity.DELTA_FG,
+    "deltagfo": Quantity.DELTA_FG,
+    "delta_g": Quantity.DELTA_FG,
+    "log_k": Quantity.LOG10_KF,
+    "logk": Quantity.LOG10_KF,
+    "log10_kf": Quantity.LOG10_KF,
+}
+
+# Kelley low-T Cp columns encode the temperature in the key (cp_10_k → 10 K).
+_CP_COLUMN_TEMPERATURE_RE = re.compile(r"^cp_(\d+)(?:_(\d+))?_k$", re.IGNORECASE)
+_KELLEY_ENTROPY_COLUMNS = (
+    "entropy_third_law",
+    "entropy_spectrographic_or_molecular_constants",
+    "entropy_other_sources",
+    "entropy_recommended",
+)
+_KELLEY_ENTROPY_T_K = Decimal("298.15")
+_TEMPERATURE_COLUMN_KEYS = frozenset({"t", "temperature", "temperature_k", "t_k"})
+
+
+@dataclass(frozen=True)
+class CompilationColumnSeries:
+    """One declared compilation column/series projected onto a closed Quantity."""
+
+    quantity: Quantity
+    series_key: str
+    value: Value
+    temperature_K: State[Decimal]
+    unit_trail: str | None = None
+
+
+def _normalize_compilation_column_label(label: str) -> str:
+    """Collapse published heading spellings (LaTeX / unicode) to a map key."""
+
+    raw = str(label).strip()
+    lowered = raw.lower().replace(" ", "")
+    # Prefer already-canonical cell/column ids (underscores retained).
+    if lowered in _COMPILATION_CELL_QUANTITY or lowered in {
+        "enthalpy_increment",
+        "heat_capacity",
+        "delta_h",
+        "delta_g",
+        "log_k",
+        "log10_kf",
+        "temperature",
+        "temperature_k",
+        "t_k",
+    }:
+        return lowered
+    s = raw.lower()
+    s = s.replace("\\\\", "\\")
+    s = s.replace("\\delta", "delta").replace("\\Delta", "delta")
+    s = s.replace("δ", "delta").replace("Δ", "delta")
+    s = s.replace("\\circ", "o")
+    s = s.replace("°", "o").replace("^{o}", "o").replace("^o", "o")
+    s = s.replace("$", "").replace("{", "").replace("}", "").replace("\\", "")
+    s = s.replace(" ", "").replace("_", "")
+    return s
+
+def _quantity_for_compilation_column_label(label: str) -> Quantity | None:
+    raw = str(label).strip()
+    if raw in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[raw]
+    lowered = raw.lower()
+    if lowered in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[lowered]
+    norm = _normalize_compilation_column_label(raw)
+    if norm in _COMPILATION_HEADING_QUANTITY:
+        return _COMPILATION_HEADING_QUANTITY[norm]
+    if norm in _COMPILATION_CELL_QUANTITY:
+        return _COMPILATION_CELL_QUANTITY[norm]
+    return None
+
+
+def _temperature_from_cp_column_key(key: str) -> Decimal | None:
+    match = _CP_COLUMN_TEMPERATURE_RE.fullmatch(str(key).strip())
+    if match is None:
+        return None
+    whole, frac = match.group(1), match.group(2)
+    if frac is None:
+        return Decimal(whole)
+    return Decimal(f"{whole}.{frac}")
+
+
+def _series_temperature_state(label: str) -> State[Decimal]:
+    return State.unknown(
+        f"source prints a temperature grid ({label}); "
+        "series coordinate, not a single identity temperature_K"
+    )
+
+
+def _consistent_series_trail(trails: Iterable[str]) -> str | None:
+    values = tuple(str(trail) for trail in trails)
+    if not values or any(
+        trail == "as_published" or trail.startswith("identity") for trail in values
+    ):
+        return None
+    return values[0] if len(set(values)) == 1 else None
+
+
+def _cell_numeric_amount(cell: object) -> Decimal | None:
+    if isinstance(cell, Mapping):
+        return _as_dec_or_none(cell.get("value"))
+    return _as_dec_or_none(cell)
+
+
+def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    rows = doc.get("rows")
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if isinstance(row, Mapping)]
+
+
+def _heading_columns(doc: Mapping[str, Any]) -> list[tuple[int, str, Quantity | None, str | None]]:
+    columns = doc.get("columns") or []
+    out: list[tuple[int, str, Quantity | None, str | None]] = []
+    if not isinstance(columns, list):
+        return out
+    for index, col in enumerate(columns):
+        if isinstance(col, Mapping):
+            heading = str(
+                col.get("heading_as_published")
+                or col.get("heading_raw")
+                or col.get("id")
+                or index
+            )
+        else:
+            heading = str(col)
+        quantity = _quantity_for_compilation_column_label(heading)
+        unit = col.get("units_as_published") if isinstance(col, Mapping) else None
+        out.append((index, heading, quantity, str(unit) if unit else None))
+    return out
+
+
+def _is_temperature_column_label(label: str) -> bool:
+    norm = _normalize_compilation_column_label(label)
+    compact = norm.replace("_", "")
+    return compact in _TEMPERATURE_COLUMN_KEYS or compact == "t"
+
+
+def _emit_series_or_point(
+    quantity: Quantity,
+    series_key: str,
+    points: list[tuple[Decimal, Decimal]],
+    *,
+    point_temperature: Decimal | None = None,
+    unit_trail: str | None = None,
+) -> CompilationColumnSeries | None:
+    if not points:
+        return None
+    if len(points) == 1 and point_temperature is not None:
+        return CompilationColumnSeries(
+            quantity=quantity,
+            series_key=series_key,
+            value=Value.point_of(points[0][1]),
+            temperature_K=State.of(point_temperature),
+            unit_trail=unit_trail,
+        )
+    return CompilationColumnSeries(
+        quantity=quantity,
+        series_key=series_key,
+        value=Value(ValueKind.SERIES, series=tuple(points)),
+        temperature_K=_series_temperature_state(series_key),
+        unit_trail=unit_trail,
+    )
+
+
+def _column_series_from_list_cells(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    headings = _heading_columns(doc)
+    if not headings:
+        return ()
+    temp_index = next(
+        (i for i, heading, _q, _unit in headings if _is_temperature_column_label(heading)),
+        None,
+    )
+    # Group value column indices by quantity; retain first heading as series_key.
+    by_quantity: dict[Quantity, list[tuple[int, str]]] = {}
+    for index, heading, quantity, _unit in headings:
+        if quantity is None or index == temp_index:
+            continue
+        by_quantity.setdefault(quantity, []).append((index, heading))
+    if not by_quantity or temp_index is None:
+        return ()
+    emitted: list[CompilationColumnSeries] = []
+    rows = _compilation_rows(doc)
+    for quantity, cols in by_quantity.items():
+        # One observation per quantity for T-grid tables (Cp/S/H/ΔHf/ΔGf).
+        # Multiple columns mapping to the same quantity are refused rather than
+        # silently merged or first-column-picked.
+        if len(cols) != 1:
+            continue
+        index, heading = cols[0]
+        unit = next(item[3] for item in headings if item[0] == index)
+        points: list[tuple[Decimal, Decimal]] = []
+        trails: list[str] = []
+        for row in rows:
+            cells = row.get("cells")
+            if not isinstance(cells, list):
+                continue
+            if temp_index >= len(cells) or index >= len(cells):
+                continue
+            t_amt = _cell_numeric_amount(cells[temp_index])
+            v_amt = _cell_numeric_amount(cells[index])
+            if t_amt is None or v_amt is None:
+                continue
+            converted = _convert_compilation_amount(v_amt, quantity, unit)
+            if converted is None:
+                points = []
+                break
+            v_amt, trail = converted
+            points.append((t_amt, v_amt))
+            trails.append(trail)
+        series = _emit_series_or_point(
+            quantity,
+            heading,
+            points,
+            unit_trail=_consistent_series_trail(trails),
+        )
+        if series is not None:
+            emitted.append(series)
+    return tuple(emitted)
+
+
+def _column_series_from_named_cells(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    rows = _compilation_rows(doc)
+    if not rows:
+        return ()
+    # Detect named-cell shape (Kelley / Pankratz-1987).
+    sample_cells = rows[0].get("cells")
+    if not isinstance(sample_cells, Mapping):
+        # Some records put named fields directly on the row.
+        if not any(
+            key in rows[0] and key in _COMPILATION_CELL_QUANTITY for key in rows[0]
+        ):
+            return ()
+
+    def row_cells(row: Mapping[str, Any]) -> Mapping[str, Any]:
+        cells = row.get("cells")
+        if isinstance(cells, Mapping):
+            return cells
+        return row
+
+    # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
+    cp_points: list[tuple[Decimal, Decimal]] = []
+    cp_trails: list[str] = []
+    entropy_series: list[CompilationColumnSeries] = []
+    grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
+    grid_keys: dict[Quantity, str] = {}
+    grid_trails: dict[Quantity, list[str]] = {}
+
+    for row in rows:
+        cells = row_cells(row)
+        t_amt = None
+        for t_key in ("temperature", "T_K", "T", "temperature_K"):
+            if t_key in cells:
+                t_amt = _cell_numeric_amount(cells.get(t_key))
+                if t_amt is not None:
+                    break
+            if t_key in row:
+                t_amt = _cell_numeric_amount(row.get(t_key))
+                if t_amt is not None:
+                    break
+
+        for key, cell in cells.items():
+            if key in {"substance", "raw", "source_row_index", "index", "locator"}:
+                continue
+            amount = _cell_numeric_amount(cell)
+            if amount is None:
+                continue
+            cp_t = _temperature_from_cp_column_key(key)
+            if cp_t is not None:
+                converted = _convert_compilation_amount(
+                    amount, Quantity.CP, _printed_unit_for_field(doc, key)
+                )
+                if converted is not None:
+                    cp_points.append((cp_t, converted[0]))
+                    cp_trails.append(converted[1])
+                continue
+            if key in _KELLEY_ENTROPY_COLUMNS:
+                converted = _convert_compilation_amount(
+                    amount, Quantity.S, _printed_unit_for_field(doc, key)
+                )
+                if converted is None:
+                    continue
+                series = _emit_series_or_point(
+                    Quantity.S,
+                    key,
+                    [(_KELLEY_ENTROPY_T_K, converted[0])],
+                    point_temperature=_KELLEY_ENTROPY_T_K,
+                    unit_trail=converted[1]
+                    if not converted[1].startswith("identity")
+                    and converted[1] != "as_published"
+                    else None,
+                )
+                if series is not None:
+                    entropy_series.append(series)
+                continue
+            quantity = _COMPILATION_CELL_QUANTITY.get(key) or _quantity_for_compilation_column_label(
+                key
+            )
+            if quantity is None or t_amt is None:
+                continue
+            converted = _convert_compilation_amount(
+                amount, quantity, _printed_unit_for_field(doc, key)
+            )
+            if converted is not None:
+                grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
+                grid_trails.setdefault(quantity, []).append(converted[1])
+            grid_keys.setdefault(quantity, key)
+
+    emitted: list[CompilationColumnSeries] = []
+    if cp_points:
+        # Stable order by printed temperature.
+        cp_points.sort(key=lambda item: item[0])
+        series = _emit_series_or_point(
+            Quantity.CP,
+            "cp_temperature_grid",
+            cp_points,
+            unit_trail=_consistent_series_trail(cp_trails),
+        )
+        if series is not None:
+            emitted.append(series)
+    emitted.extend(entropy_series)
+    for quantity, points in grid_points.items():
+        series = _emit_series_or_point(
+            quantity,
+            grid_keys.get(quantity, quantity.value),
+            points,
+            unit_trail=_consistent_series_trail(grid_trails.get(quantity, ())),
+        )
+        if series is not None:
+            emitted.append(series)
+    return tuple(emitted)
+
+
+def _compilation_series_obs_suffix(series: CompilationColumnSeries) -> str:
+    """Stable observation-id suffix from quantity + declared series key."""
+
+    key = str(series.series_key).strip()
+    q = series.quantity.value
+    compact = (
+        key.lower()
+        .replace(" ", "_")
+        .replace("$", "")
+        .replace("\\", "")
+        .replace("{", "")
+        .replace("}", "")
+        .replace("^", "")
+    )
+    if not compact or compact in {q.lower(), q.lower().replace("_", "")}:
+        return q
+    if series.quantity is Quantity.S and compact.startswith("entropy"):
+        return f"{q}:{compact}"
+    if series.quantity is Quantity.CP and compact.startswith("cp_"):
+        return f"{q}:{compact}"
+    return q
+
+
+
+def compilation_column_series_from_record(
+    doc: Mapping[str, Any],
+) -> tuple[CompilationColumnSeries, ...]:
+    """Map multi-column Cp/S/H/ΔHf/ΔGf censuses to one series per closed Quantity.
+
+    Never selects the first numeric cell. Unmapped or ambiguous columns are
+    omitted; the caller falls back to the single-quantity refusal path when
+    this returns empty.
+    """
+
+    kind = str(doc.get("record_kind") or "")
+    table_kind = str(doc.get("table_kind") or "")
+    if kind in _COMPILATION_KIND_NOT_QUANTITY or table_kind in _COMPILATION_KIND_NOT_QUANTITY:
+        return ()
+    named = _column_series_from_named_cells(doc)
+    if named:
+        return named
+    return _column_series_from_list_cells(doc)
 
 
 def _compilation_cell_quantities(payload: Mapping[str, Any]) -> set[Quantity]:
@@ -3471,12 +3987,16 @@ def compilation_quantity_from_record(
     if kind in _COMPILATION_KIND_NOT_QUANTITY or table_kind in _COMPILATION_KIND_NOT_QUANTITY:
         return State.unknown(_COMPILATION_UNKNOWN_REASON), _COMPILATION_UNKNOWN_REASON
     named: set[Quantity] = set()
+    named.update(_compilation_cell_quantities(doc))
     labels = doc.get("column_labels_as_published") or doc.get("column_labels") or ()
     if isinstance(labels, (list, tuple)):
         joined = " ".join(str(x) for x in labels).lower()
-        if "delta_fg" in joined.replace(" ", "") or "δfg" in joined or "dfg" in joined:
+        compact = joined.replace(" ", "")
+        if "delta_fg" in compact or "δfg" in joined or "dfg" in compact:
             named.add(Quantity.DELTA_FG)
-        if "log_kf" in joined.replace(" ", "") or "log10_kf" in joined.replace(" ", ""):
+        if "delta_fh" in compact or "δfh" in joined or "dfh" in compact:
+            named.add(Quantity.DELTA_FH)
+        if "log_kf" in compact or "log10_kf" in compact:
             named.add(Quantity.LOG10_KF)
     units = doc.get("units_as_published")
     if isinstance(units, Mapping):
@@ -3488,6 +4008,8 @@ def compilation_quantity_from_record(
         for row in rows:
             if isinstance(row, Mapping):
                 named.update(_compilation_cell_quantities(row))
+    # Preserve historical DELTA_FG preference when co-named; otherwise admit a
+    # single closed quantity (including DELTA_FH from printed formation enthalpy).
     if Quantity.DELTA_FG in named:
         return State.of(Quantity.DELTA_FG), None
     if len(named) == 1:
@@ -3780,6 +4302,54 @@ def uncertainty_for(raw: object) -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
 
 
+
+_VAPORIZATION_DFG_RE = re.compile(
+    r"dfG\(g\)-dfG\((cr|l)\)"
+)
+_VAPORIZATION_P0_RE = re.compile(
+    r"P0=([0-9.+(?:eE][0-9.+-]*)\s*Pa"
+)
+_VAPORIZATION_CONDENSED_PHASE = {
+    "cr": Phase.CR,
+    "l": Phase.L,
+}
+
+
+def lift_vaporization_reaction_from_ledger_note(
+    formula: str, note: object
+) -> tuple[Reaction, Decimal | None] | None:
+    """Lift condensed→gas vaporization reaction identity from a ledger note.
+
+    Ledger vapour-rail points print
+    ``ln(P_sat/P0)=-[dfG(g)-dfG(cr|l)]/(R T)`` with ``P0=... Pa``. The table
+    cell is ΔvapG, not log10(Psat/P0). Returns None when that reaction
+    identity is not printed.
+    """
+
+    if note is None:
+        return None
+    flat = " ".join(str(note).split())
+    if not flat:
+        return None
+    match = _VAPORIZATION_DFG_RE.search(flat)
+    if match is None:
+        return None
+    condensed_phase = _VAPORIZATION_CONDENSED_PHASE[match.group(1)]
+    gas = make_species(formula, Phase.G)
+    condensed = make_species(formula, condensed_phase)
+    reaction = Reaction(
+        terms=(
+            ReactionTerm(species=gas, coefficient=Fraction(1)),
+            ReactionTerm(species=condensed, coefficient=Fraction(-1)),
+        )
+    )
+    p0: Decimal | None = None
+    p0_match = _VAPORIZATION_P0_RE.search(flat)
+    if p0_match is not None:
+        p0 = as_decimal(p0_match.group(1))
+    return reaction, p0
+
+
 def make_species(
     formula: str,
     phase: Phase | State[Phase],
@@ -3900,12 +4470,48 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha",),
+    Quantity.CP: (
+        "cp",
+        "heat_capacity",
+        "cp_10_k",
+        "cp_25_k",
+        "cp_50_k",
+        "cp_100_k",
+        "cp_150_k",
+        "cp_200_k",
+        "cp_298_15_k",
+        "value",
+    ),
+    Quantity.S: (
+        "entropy",
+        "entropy_recommended",
+        "entropy_third_law",
+        "entropy_spectrographic_or_molecular_constants",
+        "entropy_other_sources",
+        "value",
+    ),
+    Quantity.H_MINUS_H298: (
+        "enthalpy_increment",
+        "H_minus_H298",
+        "value",
+    ),
+    Quantity.DELTA_FH: (
+        "delta_h",
+        "delta_f_H",
+        "delta_fH",
+        "deltafH",
+        "formation_enthalpy",
+        "delta_f_H_298_15",
+        "formation_enthalpy_298_15_K_as_published",
+        "value",
+    ),
     Quantity.DELTA_FG: (
         "delta_fG",
         "delta_fG_298_kJ_mol",
         "Delta_f_G_298_kJ_mol",
         "deltafG",
         "delta_fG_kJ_mol",
+        "delta_g",
         "table_kJ_mol",
         "Gf",
         "formation_gibbs_energy",
@@ -3915,6 +4521,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "table_log10_Kf",
         "log10_Kf",
         "log10_kf",
+        "log_k",
         "log10_formation_equilibrium_constant",
         "value",
     ),
@@ -4058,6 +4665,65 @@ def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
     if isinstance(raw, Mapping):
         raw = raw.get("value")
     return _as_dec_or_none(raw)
+
+
+def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
+    raw = payload.get(key)
+    if isinstance(raw, Mapping):
+        unit = raw.get("units") or raw.get("unit") or raw.get("units_as_published")
+        if unit not in (None, ""):
+            return str(unit)
+    for units_key in ("units_as_published", "units"):
+        units = payload.get(units_key)
+        if isinstance(units, Mapping):
+            unit = units.get(key)
+            if unit not in (None, ""):
+                return str(unit)
+        elif isinstance(units, str) and units not in (None, ""):
+            return str(units)
+    return None
+
+
+def _convert_compilation_amount(
+    amount: Decimal, quantity: Quantity, unit: str | None
+) -> tuple[Decimal, str] | None:
+    """Normalize explicit thermochemical compilation units to ledger units.
+
+    Pankratz and Kelley print the thermochemical calorie (4.184 J exactly),
+    the calorie convention used by their tabulated cal/mol units. The
+    conversion is derived from the printed unit and is never printed evidence.
+    """
+    if unit is None:
+        if quantity in {
+            Quantity.CP,
+            Quantity.S,
+            Quantity.H_MINUS_H298,
+            Quantity.DELTA_FH,
+            Quantity.DELTA_FG,
+        }:
+            # A printed thermodynamic number without its source unit cannot be
+            # grounded as SI or safely converted; refuse instead of assuming.
+            return None
+        return amount, "as_published"
+    token = re.sub(r"\s+", "", str(unit).lower()).replace("·", "")
+    token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
+    energy = quantity in {Quantity.H_MINUS_H298, Quantity.DELTA_FH, Quantity.DELTA_FG}
+    heat = quantity in {Quantity.CP, Quantity.S}
+    if not energy and not heat:
+        return amount, "as_published"
+    with localcontext() as ctx:
+        ctx.prec = 80
+        if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
+            return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
+        if heat and token in {"j/mol/k", "j/molk", "j/deg-mole", "j/degmole"}:
+            return amount, "identity:J_per_mol_K"
+        if energy and token in {"kcal/mol", "kcal/mole"}:
+            return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
+        if energy and token in {"j/mol", "j/mole"}:
+            return amount / Decimal("1000"), "J_to_kJ_exact"
+        if energy and token in {"kj/mol", "kj/mole", "kjpermol"}:
+            return amount, "identity:kJ_per_mol"
+    return None
 
 
 def _formation_gibbs_cell_flags(cell: object) -> tuple[bool, bool, bool]:
@@ -4409,7 +5075,22 @@ def _selection_from_named_field(
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
-        trail = "as_published"
+        converted = _convert_compilation_amount(
+            amount, q_token, _printed_unit_for_field(payload, key) or units
+        )
+        if converted is None:
+            reason = (
+                f"missing printed unit for {key}; refusing ungrounded numeric value"
+                if _printed_unit_for_field(payload, key) is None and units is None
+                else f"unsupported printed unit for {key}"
+            )
+            return _unavailable_selection(
+                reason,
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        amount, trail = converted
         if q_token is Quantity.LOG10_KF and key == "value":
             trail = "identity"
         if q_token in {
@@ -4432,7 +5113,22 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
-        trail = "as_published"
+        converted = _convert_compilation_amount(
+            amount, q_token, _printed_unit_for_field(payload, key) or units
+        )
+        if converted is None:
+            reason = (
+                f"missing printed unit for {key}; refusing ungrounded numeric value"
+                if _printed_unit_for_field(payload, key) is None and units is None
+                else f"unsupported printed unit for {key}"
+            )
+            return _unavailable_selection(
+                reason,
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        amount, trail = converted
         if q_token in {
             Quantity.MASS_LOSS_FRACTION,
             Quantity.MASS_LOSS_FRACTION_VS_T,
@@ -6270,6 +6966,31 @@ def _locator_layer(loc_path: str) -> str | None:
     return None
 
 
+def is_compilation_record_path(path: str) -> bool:
+    """True when *path* names a literature compilation record JSON file."""
+    lowered = path.replace("\\", "/").lower()
+    return (
+        "/compilations/" in lowered
+        and "/records/" in lowered
+        and lowered.endswith(".json")
+    )
+
+
+def compilation_record_asset_id(source_path: str) -> str:
+    rel = source_path.replace("\\", "/")
+    return f"compilation_record:{rel}"
+
+
+def compilation_record_source_file(source_path: str) -> SourceFile:
+    rel = source_path.replace("\\", "/")
+    return SourceFile(
+        asset_id=compilation_record_asset_id(rel),
+        role=AssetRole.COMPILATION_RECORD,
+        path=rel,
+        sha256=State.unknown("compilation record asset has no INDEX sha256"),
+    )
+
+
 def choose_read_from(work: Work, locator: Locator | None) -> str:
     files = work.source_files.files
     loc_path = locator.source_path if locator is not None else None
@@ -6279,6 +7000,24 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
                 asset.path in str(loc_path) or str(loc_path) in asset.path
             ):
                 return asset.asset_id
+        # Compilation record JSON locators resolve to a registered Work asset
+        # (exact record or compilation parent). Never fall through to PDF.
+        if is_compilation_record_path(str(loc_path)):
+            for asset in files:
+                if asset.role is not AssetRole.COMPILATION_RECORD:
+                    continue
+                if asset.path == "unknown":
+                    continue
+                asset_path = asset.path.replace("\\", "/")
+                needle = str(loc_path).replace("\\", "/")
+                if (
+                    asset_path == needle
+                    or needle.startswith(asset_path.rstrip("/") + "/")
+                    or asset_path in needle
+                    or needle in asset_path
+                ):
+                    return asset.asset_id
+            return _unknown_asset_id(files)
         layer = _locator_layer(str(loc_path))
         if layer == "table":
             for asset in files:
@@ -6403,6 +7142,58 @@ def iter_extract_observations(
                     yield str(formula), dict(obs)
 
 
+# b-555: absence may be correct; silence is not. Extract-level typed refusal
+# reasons for the migration-queue (never ingested as observations).
+SILENT_REASON_TABLE_SHAPED = "table-shaped extract not consumed"
+SILENT_REASON_MODEL_COHORT = "model-derived cohort excluded by ruling"
+SILENT_REASON_NO_OBSERVATIONS = "extract yielded no observations"
+
+
+def silent_extract_reason(doc: Mapping[str, Any]) -> str:
+    """Why a zero-observation extract must still leave a typed queue record.
+
+    Table-shaped sidecars the migrator does not walk, and model-derived
+    cohort extracts excluded by owner ruling, keep their specific reasons.
+    Every other silent extract still gets a catch-all so the class is
+    impossible (zero observations AND zero typed records).
+    """
+    schema = str(doc.get("schema_version") or "")
+    has_obs = any(True for _ in iter_extract_observations(doc))
+    if schema == "literature_extract_table.v1" or (
+        isinstance(doc.get("rows"), (list, tuple)) and not has_obs
+    ):
+        return SILENT_REASON_TABLE_SHAPED
+
+    policy = doc.get("evidence_policy")
+    classification = ""
+    if isinstance(policy, Mapping):
+        classification = str(policy.get("classification") or "").strip().lower()
+    if (
+        classification == "model"
+        or classification.startswith("model_")
+        or classification.startswith("mixed_model")
+        or "model_derived" in classification
+        or isinstance(doc.get("model_tables"), (list, tuple))
+        or isinstance(doc.get("model_conditions"), (list, tuple))
+    ):
+        return SILENT_REASON_MODEL_COHORT
+
+    return SILENT_REASON_NO_OBSERVATIONS
+
+
+def _silent_extract_locator(
+    doc: Mapping[str, Any], rel: str
+) -> dict[str, object]:
+    raw = doc.get("locator")
+    if isinstance(raw, Mapping) and raw:
+        return {k: v for k, v in raw.items() if v is not None}
+    extraction = doc.get("extraction")
+    note = "extract-level typed absence"
+    if isinstance(extraction, Mapping) and extraction.get("source_pdf"):
+        note = f"{note}; source_pdf={extraction['source_pdf']}"
+    return {"source_path": rel, "note": note}
+
+
 def _is_nist_janaf_table(path: Path, doc: Mapping[str, Any]) -> bool:
     if not isinstance(doc.get("table"), Mapping):
         return False
@@ -6520,6 +7311,8 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
+        # Compilation record JSON paths registered as Work assets (not INDEX).
+        self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -6527,6 +7320,33 @@ class Migrator:
             rec = SourceCount(path=path)
             self.result.source_counts[path] = rec
         return rec
+
+    def _merge_extra_assets(
+        self, work_id: str, files: list[SourceFile]
+    ) -> list[SourceFile]:
+        seen = {asset.asset_id for asset in files}
+        for asset in self._work_extra_assets.get(work_id, {}).values():
+            if asset.asset_id in seen:
+                continue
+            files.append(asset)
+            seen.add(asset.asset_id)
+        return files
+
+    def _register_compilation_record_asset(
+        self, work: Work, loc_path: str | None
+    ) -> Work:
+        """Attach a compilation record JSON path as a Work INDEX asset."""
+        if not loc_path or not is_compilation_record_path(str(loc_path)):
+            return work
+        asset = compilation_record_source_file(str(loc_path))
+        self._work_extra_assets[work.work_id][asset.asset_id] = asset
+        merged = self._merge_extra_assets(work.work_id, list(work.source_files.files))
+        new_work = replace(
+            work,
+            source_files=replace(work.source_files, files=tuple(merged)),
+        )
+        self.result.works[work.work_id] = new_work
+        return new_work
 
     def _ensure_work(
         self,
@@ -6554,12 +7374,13 @@ class Migrator:
             self._work_index_row[work_id] = index_row
         if source_id not in self._work_source_ids[work_id]:
             self._work_source_ids[work_id].append(source_id)
-        files = source_files_for(source_id, index_row)
+        pack = source_files_for(source_id, index_row)
+        merged = self._merge_extra_assets(work_id, list(pack.files))
         work = Work(
             work_id=work_id,
             citation=self._work_citations[work_id] or citation,
             source_ids=tuple(self._work_source_ids[work_id]),
-            source_files=files,
+            source_files=replace(pack, files=tuple(merged)),
             doi=self._work_dois[work_id],
         )
         self.result.works[work_id] = work
@@ -6585,6 +7406,7 @@ class Migrator:
                 files = list(
                     source_files_for(work_id, self._work_index_row.get(work_id)).files
                 )
+            files = self._merge_extra_assets(work_id, files)
             rebuilt[work_id] = Work(
                 work_id=work_id,
                 citation=work.citation,
@@ -7209,6 +8031,37 @@ class Migrator:
                 local_ids=local_ids,
                 declared_experiment_id=declared_experiment_id,
             )
+        # b-555: do not leave a silent extract — absence is fine, silence is not.
+        self._record_silent_extract_if_needed(
+            doc=doc, work=work, source_key=rel, path_stem=path.stem
+        )
+
+    def _record_silent_extract_if_needed(
+        self,
+        *,
+        doc: Mapping[str, Any],
+        work: Work,
+        source_key: str,
+        path_stem: str,
+    ) -> None:
+        """Emit one typed queue record when an extract lands nothing.
+
+        Correct outcomes for the named b-555 cohort are zero observations
+        (not ingested). The migrator must still leave a typed refusal so
+        check_store_freshness / migration-report cannot show silence.
+        """
+        if self._count(source_key).observations_out > 0:
+            return
+        if any(entry.source == source_key for entry in self.result.queue):
+            return
+        self.result.add_queue(
+            work_id=work.work_id,
+            locator=_silent_extract_locator(doc, source_key),
+            axes=["document"],
+            why=silent_extract_reason(doc),
+            source=source_key,
+            observation_id=f"{path_stem}::typed_absence",
+        )
 
     def _migrate_extract_observation(
         self,
@@ -7609,6 +8462,10 @@ class Migrator:
             oxygen_roots,
             locator,
             skip_tables=True,
+        )
+        work = self._register_compilation_record_asset(
+            work,
+            locator.source_path if locator is not None else None,
         )
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
@@ -8133,6 +8990,7 @@ class Migrator:
         source_row_index: int | None = None,
         derivation: Derivation | None = None,
         per: PerBasis | State[PerBasis] | None = None,
+        reaction: Reaction | State[Reaction] | None = None,
         notices: tuple[Notice, ...] = (),
         value_reason: str | None = None,
     ) -> Observation:
@@ -8145,6 +9003,10 @@ class Migrator:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
+        if reaction is not None:
+            ident_kwargs["reaction"] = (
+                reaction if isinstance(reaction, State) else State.of(reaction)
+            )
         q_for_comp = (
             quantity
             if isinstance(quantity, Quantity)
@@ -8194,6 +9056,10 @@ class Migrator:
         point_conditions = None
         if temperature_K is not None and not isinstance(temperature_K, State):
             point_conditions = {"temperature_K": located_value(temperature_K, locator)}
+        work = self._register_compilation_record_asset(
+            work,
+            locator.source_path if locator is not None else None,
+        )
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
@@ -8737,18 +9603,48 @@ class Migrator:
             derivation = None
             notices: tuple[Notice, ...] = ()
             value_reason = None
+            reaction: Reaction | None = None
+            standard_pressure_Pa: Decimal | None = None
+            obs_species = make_species(formula, map_phase(point.get("phase"))[0])
             if stated_q == "log10_Psat_over_P0":
-                ledger_quantity = State.unknown(log10_psat_reason)
-                self.result.add_queue(
-                    work.work_id,
-                    loc,
-                    ["quantity", "value"],
-                    log10_psat_reason,
-                    source=rel,
-                    observation_id=obs_id,
-                )
-                table_sel = _unavailable_selection(log10_psat_reason)
-                value_reason = log10_psat_reason
+                note = str(point.get("note") or "")
+                lifted = lift_vaporization_reaction_from_ledger_note(formula, note)
+                if lifted is None:
+                    ledger_quantity = State.unknown(log10_psat_reason)
+                    self.result.add_queue(
+                        work.work_id,
+                        loc,
+                        ["quantity", "value"],
+                        log10_psat_reason,
+                        source=rel,
+                        observation_id=obs_id,
+                    )
+                    table_sel = _unavailable_selection(log10_psat_reason)
+                    value_reason = log10_psat_reason
+                else:
+                    reaction, p0 = lifted
+                    ledger_quantity = State.of(Quantity.DELTA_FG)
+                    per = PerBasis.MOL_SPECIES
+                    obs_species = make_species(formula, Phase.G)
+                    if p0 is not None:
+                        standard_pressure_Pa = p0
+                    units = "kJ_per_mol" if energy_unit_ok else None
+                    if not energy_unit_ok:
+                        table_sel = _unavailable_selection(
+                            f"ledger header metric_units {metric_units!r} is not kJ/mol"
+                        )
+                        value_reason = table_sel.reason
+                    else:
+                        table_sel = select_declared_source(
+                            Quantity.DELTA_FG, units, point
+                        )
+                    if note:
+                        derivation = Derivation(
+                            relation=note,
+                            inputs=(choose_read_from(work, loc),),
+                            parameters=(),
+                            output_unit="kJ/mol",
+                        )
             else:
                 quantity_payload = dict(point)
                 if stated_q and not quantity_payload.get("quantity"):
@@ -8850,14 +9746,16 @@ class Migrator:
                 observation_id=obs_id,
                 locator=loc,
                 quantity=ledger_quantity,
-                species=make_species(formula, map_phase(point.get("phase"))[0]),
+                species=obs_species,
                 value=value,
                 evidence=evidence,
                 temperature_K=t if t is not None and t > 0 else None,
+                standard_pressure_Pa=standard_pressure_Pa,
                 method=map_method(point.get("method") or point.get("regime")),
                 source_row_index=row_index,
                 derivation=derivation,
                 per=per,
+                reaction=reaction,
                 notices=notices,
                 value_reason=value_reason,
             )
@@ -8914,6 +9812,7 @@ class Migrator:
         citation = str((src or {}).get("citation") or source_id)
         doi = extract_doi((src or {}).get("doi"), citation)
         work = self._work_from_citation(citation, doi, source_id)
+        work = self._register_compilation_record_asset(work, rel)
         role = doc.get("compilation_role") if isinstance(doc.get("compilation_role"), Mapping) else {}
         evidence = Evidence(
             class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
@@ -8943,7 +9842,9 @@ class Migrator:
             return
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
-        formula = str(doc.get("formula") or record_id)
+        formula = str(
+            doc.get("formula") or doc.get("formula_as_published") or record_id
+        )
         phase, _unmapped = map_phase(compilation_phase_text(doc))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
@@ -8951,6 +9852,92 @@ class Migrator:
             locator = replace(locator, source_path=rel)
         t = _compilation_temperature_state(doc)
         p_std = None
+        column_series = compilation_column_series_from_record(doc)
+        series_summary = False
+        if column_series:
+            mapped_quantities = {series.quantity for series in column_series}
+            needs_refusal = any(
+                numeric_count
+                and not _is_temperature_column_label(column)
+                and (
+                    (quantity := _quantity_for_compilation_column_label(column)) is None
+                    or quantity not in mapped_quantities
+                )
+                for column, numeric_count in _printed_column_counts(doc).items()
+            )
+            rows_for_shape = doc.get("rows")
+            first_cells = (
+                rows_for_shape[0].get("cells")
+                if isinstance(rows_for_shape, list)
+                and rows_for_shape
+                and isinstance(rows_for_shape[0], Mapping)
+                else None
+            )
+            fully_mapped_list = not isinstance(first_cells, Mapping) and not needs_refusal
+            series_notice_reason = None
+            if fully_mapped_list:
+                census = _printed_column_counts(doc)
+                if census:
+                    columns = ", ".join(
+                        f"{column}: {numeric_count} numeric cells"
+                        for column, numeric_count in census.items()
+                    )
+                    series_notice_reason = (
+                        f"source column census ({columns}); "
+                        "all numeric cells retained in mapped compilation series"
+                    )
+            # One observation per declared mapped series; never first-numeric-cell.
+            read_from = choose_read_from(work, locator)
+            for index, series in enumerate(column_series):
+                suffix = _compilation_series_obs_suffix(series)
+                self._generic_obs(
+                    work=work,
+                    source_id=source_id,
+                    source_key=rel,
+                    observation_id=f"{source_id}:{record_id}:{suffix}",
+                    locator=locator,
+                    quantity=State.of(series.quantity),
+                    species=make_species(formula, phase),
+                    value=series.value,
+                    evidence=evidence,
+                    temperature_K=series.temperature_K,
+                    standard_pressure_Pa=p_std,
+                    method=State.of(MethodToken.TABULATION),
+                    derivation=_compilation_conversion_derivation(
+                        series.unit_trail,
+                        None,
+                        locator,
+                        read_from,
+                    ),
+                    notices=(
+                        Notice(
+                            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                            affected_quantities=(series.quantity,),
+                            reason=series_notice_reason,
+                            origin=f"{source_id}:{record_id}:{suffix}",
+                            source=rel,
+                        ),
+                    )
+                    if index == 0 and series_notice_reason is not None
+                    else (),
+                )
+            for column, numeric_count in _printed_column_counts(doc).items():
+                if (
+                    numeric_count
+                    and not _is_temperature_column_label(column)
+                    and _quantity_for_compilation_column_label(column) is None
+                ):
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        ["value"],
+                        f"printed compilation column {column} is not mapped to a closed Quantity",
+                        source=rel,
+                        observation_id=f"{source_id}:{record_id}",
+                    )
+            if fully_mapped_list:
+                return
+            series_summary = True
         rows = doc.get("rows")
         series_items: list[dict[str, Any]] = []
         if isinstance(rows, list):
@@ -8991,16 +9978,17 @@ class Migrator:
         else:
             sel = select_declared_source(quantity, None, doc)
         value = sel.value
-        if sel.field_name in {"delta_f_H_298_15"} or "formation_enthalpy_298_15_K_as_published" in doc:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["quantity"],
-                "delta_fH is not a v2.1 Quantity token; stored as expression"
-                if "formation_enthalpy_298_15_K_as_published" not in doc
-                else "ATcT formation enthalpy is not a v2.1 Quantity token",
-                source=rel,
-                observation_id=f"{source_id}:{record_id}",
+        # Quantity.DELTA_FH is a closed v2.1 token; formation-enthalpy fields are
+        # projected above via compilation_quantity_from_record / QUANTITY_SOURCE_FIELDS.
+        # Do not re-queue a "not a v2.1 Quantity token" refusal here.
+        read_from = choose_read_from(work, locator)
+        original_value = None
+        if sel.field_name:
+            raw_original = doc.get(sel.field_name)
+            original_value = (
+                raw_original.get("value")
+                if isinstance(raw_original, Mapping)
+                else raw_original
             )
         self._generic_obs(
             work=work,
@@ -9015,6 +10003,17 @@ class Migrator:
             temperature_K=t,
             standard_pressure_Pa=p_std,
             method=State.of(MethodToken.TABULATION),
+            derivation=_compilation_conversion_derivation(
+                sel.unit_trail,
+                original_value,
+                locator,
+                read_from,
+            ),
+            value_reason=(
+                "mapped compilation series retained; table-level scalar value is not selected"
+                if series_summary and value.kind is ValueKind.UNAVAILABLE
+                else None
+            ),
         )
 
     def _lift_janaf_from_generator(
@@ -9030,6 +10029,12 @@ class Migrator:
         generated = generate_table(doc, source_path=rel)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -9108,6 +10113,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -9186,6 +10197,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:
@@ -9264,6 +10281,12 @@ class Migrator:
         generated = generate_record(doc)
         count.rows_in += 1
         for observation in generated.observations:
+            work = self._register_compilation_record_asset(
+                self.result.works.get(work.work_id, work),
+                observation.locator.source_path
+                if observation.locator is not None
+                else rel,
+            )
             read_from = choose_read_from(work, observation.locator)
             updates: dict[str, Any] = {}
             if read_from != observation.read_from:

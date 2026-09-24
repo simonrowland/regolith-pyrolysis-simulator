@@ -96,10 +96,124 @@ fidelity_samples:
   locator:
     table: '6'
     note: AgO.5 ΔS*=85.326954 J/mol K (abstract 85)
+
+benches:
+- id: gas-mixing-furnace-1atm
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: gas-mixing furnace}
+    locator: &heck_abstract
+      paragraph: abstract
+      note: 'LSU Scholarly Repository / publisher abstract (PDF unseen). Printed wording: subject MVCE-bearing silicate melt to variable T, fO2, fS2, and duration using a gas-mixing furnace where evaporation can occur.'
+  heating_method:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      paragraph: abstract
+      note: Abstract names a gas-mixing furnace but does not print the heating element, hot-zone geometry, or temperature-control hardware. Typeset Methods PDF was not obtained this round (ScienceDirect/LSU JS challenge), so heating_method is left unknown rather than invented.
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        paragraph: abstract
+        note: No thermocouple or pyrometer statement in the abstract or in Tables 1/S1 column headers.
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        paragraph: abstract
+        note: No printed calibration uncertainty for the furnace temperature sensor.
+  detector:
+    state: {tag: value, value: 'EPMA majors (Table S1) and LA-ICP-MS MVCE profiles (Table S2); not a Knudsen-cell mass spectrometer'}
+    locator:
+      table: S1
+      note: Table S1 is run conditions + EPMA majors; Table S2 is MVCE Analyses (LA-ICP-MS counts). Abstract states chemical analyses completed using core to rim transects for major elements and MVCEs.
+  other_facts:
+  - name: wire_loop_diameters_offered_mm
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.061 or 0.075 or 0.076 or 0.079'}}
+      locator:
+        table: S1
+        note: Loop Size, (mm) column as printed in Mendeley/Elsevier Table S1; discrete per-run values, not a continuous range. Not paired here to individual Exp Numbers.
+  - name: gas_flow_unit_as_printed
+    unit: as_printed
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: cubic centimeters per minute}}
+      locator:
+        table: S1
+        note: 'Footnote: flow rates in cubic centimeters per minute. Columns CO Flow rate, CO2 Flow, N2 flow, SO2 flow.'
+experiments:
+- experiment_id: open-furnace-mvce-degassing-series
+  bench_id: gas-mixing-furnace-1atm
+  method: langmuir_free_evaporation
+  locator:
+    table: '1'
+    note: 81 tabulated runs (Tables 1 and S1). Per-run T, log10 fO2, log10 fS2, duration, bulk composition, loop, gas flows, and quench remain in observation rows; this experiment record is the series instrument assignment.
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000015', interval_high: '0.000050'}}
+      locator:
+        table: S1
+        note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to kg).
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        table: '1'
+        note: Multiple Bulk Comp labels (MVE O2, KFCMAS 3, KFCMAS 3 S, KFCMAS 4, …); no single series composition. Compositions remain on observation rows / Table 2.
+    form:
+      state: {tag: value, value: silicate melt bead on a Pt or Re wire loop}
+      locator:
+        table: S1
+        note: Loop Comp column Pt or Re; bead & loop mass (mg) column. Not a Knudsen cell.
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: 'Pt or Re wire loop; run assignment varies (Table S1 Loop Comp)'}
+      locator:
+        table: S1
+        note: Loop Comp Pt / Re as printed
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1480', interval_high: '1773'}}
+        locator:
+          paragraph: abstract
+          note: Abstract prints 1480–1773 K; Table 1/S1 Temperature K column matches that envelope.
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '83880'}}
+      locator:
+        table: S1
+        note: Printed Time, minutes column spans 5 to 1398 min across 81 runs; SI conversion only. Abstract envelope is 5 min to 24 h.
+    cooling_or_quench:
+      state: {tag: value, value: 'drop or air quench; run assignment varies (Table S1 quench type)'}
+      locator:
+        table: S1
+        note: quench type column prints drop or air
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      inferred: true
+      locator:
+        table: '1'
+        note: Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not printed.
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        table: S1
+        note: Per-run CO/CO2/N2/SO2 flows (cm3/min) or atmospheric air with all flows 0 (footnote atm=atmospheric air). SweepGas cannot hold the full 81-row flow matrix or the air-vs-mixture alternative set at series level without selecting a single mixture; printed flows remain in Table S1 observation rows.
+    regime:
+      regime_class: {tag: value, value: viscous}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'gas mixing and atmospheric air; printed log10 fO2 from -9 to -0.68 (air)'}
+      locator:
+        table: '1'
+        note: Table 1/S1 log10 fO2 column; abstract fO2 10^−9 to atmospheric. Air rows print -0.68. fS2 0 or 10^−3 to 10^−2 where SO2 flow is used.
 species:
   Cu:
     observations:
     - observation_id: heck_2025_abstract_reported_ranges
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         paragraph: abstract
@@ -156,6 +270,7 @@ species:
           quote: atm=atmospheric air
           quote_air_row: Ex 7  -0.68  NA  5  1673  MVE O2
     - observation_id: heck_2025_t1_experimental_conditions
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '1'
@@ -747,6 +862,7 @@ species:
         note: Table 1 prints no sigma on T, t, or fugacity
       equipment: *id001
     - observation_id: heck_2025_t3_initial_cu_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -801,6 +917,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t5_logKstar_CuOp5_Cug_cu
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -846,6 +963,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_cuop5_cug_cu_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -878,6 +996,7 @@ species:
         delta_Sstar_sigma_minus_J_mol_K: 26.79426
         note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
     - observation_id: heck_2025_s1_experimental_conditions_epma
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: S1
@@ -904,6 +1023,7 @@ species:
         note: S1 (±)σ on EPMA majors as printed
       equipment: *id001
     - observation_id: heck_2025_s2_mvce_laicpms_profiles
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: S2
@@ -940,6 +1060,7 @@ species:
         note: S2 ±σ columns as printed beside each isotope
       equipment: *id001
     - observation_id: heck_2025_s3_kstar_fitting_concentrations
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: S3
@@ -962,6 +1083,7 @@ species:
       uncertainty:
         note: S3 (+)σ (-)σ as printed
     - observation_id: heck_2025_s5_3L_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: S5
@@ -983,6 +1105,7 @@ species:
       uncertainty:
         note: S5 (+)σ (-)σ as printed
     - observation_id: heck_2025_fig1_printed_bead_radii
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         figure: '1'
@@ -1009,6 +1132,7 @@ species:
       uncertainty:
         note: no sigma printed on the figure labels
     - observation_id: heck_2025_fig2_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '2'
@@ -1032,6 +1156,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig3_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '3'
@@ -1055,6 +1180,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig4_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '4'
@@ -1077,6 +1203,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig5_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '5'
@@ -1100,6 +1227,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig6_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '6'
@@ -1123,6 +1251,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig7_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '7'
@@ -1145,6 +1274,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig8_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '8'
@@ -1167,6 +1297,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig9_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '9'
@@ -1189,6 +1320,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig10_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '10'
@@ -1212,6 +1344,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig11_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '11'
@@ -1235,6 +1368,7 @@ species:
       uncertainty:
         note: not applicable; figure not digitised
     - observation_id: heck_2025_fig12_figure_only
+      experiment: open-furnace-mvce-degassing-series
       type: rate_series
       locator:
         figure: '12'
@@ -1262,6 +1396,7 @@ species:
   Fe:
     observations:
     - observation_id: heck_2025_t2_starting_major_compositions
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '2'
@@ -1342,6 +1477,7 @@ species:
   Zn:
     observations:
     - observation_id: heck_2025_t3_initial_zn_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -1383,6 +1519,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_zn_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -1416,6 +1553,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_ZnO_Zng_zn
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -1453,6 +1591,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_zno_zng_zn_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -1485,6 +1624,7 @@ species:
         delta_Sstar_sigma_minus_J_mol_K: 38.651822
         note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
     - observation_id: heck_2025_s4_metal_wire_mvce
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: S4
@@ -1514,6 +1654,7 @@ species:
   Ge:
     observations:
     - observation_id: heck_2025_t3_initial_ge_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -1567,6 +1708,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_ge_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -1600,6 +1742,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_GeO2_GeOg_ge
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -1644,6 +1787,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_geo2_geog_ge_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -1678,6 +1822,7 @@ species:
   As:
     observations:
     - observation_id: heck_2025_t3_initial_as_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -1719,6 +1864,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_as_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -1759,6 +1905,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_AsO1p5_AsOg_as
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -1803,6 +1950,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_aso1p5_asog_as_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -1837,6 +1985,7 @@ species:
   Ag:
     observations:
     - observation_id: heck_2025_t3_initial_ag_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -1878,6 +2027,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_ag_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -1917,6 +2067,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_AgOp5_Agg_ag
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -1961,6 +2112,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_agop5_agg_ag_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -1995,6 +2147,7 @@ species:
   Cd:
     observations:
     - observation_id: heck_2025_t3_initial_cd_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -2024,6 +2177,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_cd_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -2057,6 +2211,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_CdO_Cdg_cd
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -2096,6 +2251,7 @@ species:
   In:
     observations:
     - observation_id: heck_2025_t3_initial_in_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -2137,6 +2293,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t5_logKstar_InO1p5_InOg_in
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -2160,6 +2317,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_InO1p5_Ing_in
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -2197,6 +2355,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_ino1p5_inog_in_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -2229,6 +2388,7 @@ species:
         delta_Sstar_sigma_minus_J_mol_K: 322.0
         note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
     - observation_id: heck_2025_t6_ino1p5_ing_in_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -2262,6 +2422,7 @@ species:
   Pb:
     observations:
     - observation_id: heck_2025_t3_initial_pb_ppm
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '3'
@@ -2297,6 +2458,7 @@ species:
       uncertainty:
         note: Table 3 (+)σ and (-)σ as printed; empty cells are true absence, not 0
     - observation_id: heck_2025_t4_pb_diffusivity_inverse_model
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '4'
@@ -2330,6 +2492,7 @@ species:
       uncertainty:
         note: Table 4 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_PbO_PbOg_pb
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -2367,6 +2530,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t5_logKstar_PbO_Pbg_pb
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '5'
@@ -2404,6 +2568,7 @@ species:
       uncertainty:
         note: Table 5 (+)σ (-)σ as printed
     - observation_id: heck_2025_t6_pbo_pbog_pb_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'
@@ -2435,6 +2600,7 @@ species:
         delta_Sstar_sigma_minus_J_mol_K: 0.0
         note: asymmetric (+)σ (-)σ as printed; a printed 0 is retained (PbO(g) minus-side)
     - observation_id: heck_2025_t6_pbo_pbg_pb_HS
+      experiment: open-furnace-mvce-degassing-series
       type: gibbs_table
       locator:
         table: '6'

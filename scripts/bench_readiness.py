@@ -402,6 +402,10 @@ def report(root: Path) -> dict[str, object]:
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
                     tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
             readiness = tuple(aggregated)
+        # Pure-substance engine-reference tabulations (identity.composition
+        # not_applicable + compilation_role engine_reference_input /
+        # scoring_eligible on derivation.relation) are not engine_point
+        # candidates. Mark before aggregating consumers so gaps are not counted.
         # Own observations only. An alias that shares locator.table does not
         # lend another source's pure_substance_reference declaration.
         linked_obs = by_experiment_all.get(experiment.experiment_id, ())

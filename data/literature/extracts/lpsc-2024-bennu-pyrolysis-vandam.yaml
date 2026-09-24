@@ -1,0 +1,297 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2024-bennu-pyrolysis-vandam
+source:
+  citation: >-
+    Mojarro, A., Aponte, J. C., Dworkin, J. P., Glavin, D. P., Elsila, J. E.,
+    Connolly Jr, H. C. & Lauretta, D. S. (2024), "Early OSIRIS-REx Mission Results
+    from Standard and Wet Chemistry Pyrolysis of Samples Returned from Asteroid
+    Bennu", 55th Lunar and Planetary Science Conference, LPI Contribution No. 3040,
+    abstract 1219.
+  url: https://www.hou.usra.edu/meetings/lpsc2024/pdf/1219.pdf
+  year: 2024
+  conference: 55th Lunar and Planetary Science Conference
+extraction:
+  method: >-
+    Corpus PDF raw/lpsc-2024-bennu-pyrolysis-vandam/lpsc-2024-bennu-pyrolysis-vandam.pdf
+    (one-page LPSC abstract 1219.pdf). Clean text layer transcribed with
+    pdftotext -layout; no OCR and no figure digitisation (no figures present).
+    CORPUS-DIR NOTE: folder name contains "vandam" but p1 authors are Mojarro
+    et al.; no VanDam author appears. Sidecar had no citation field. Extract
+    retains corpus source_id as filename/source_id and records the printed
+    Mojarro citation. Printed temperatures in C retained as printed; Kelvin
+    companions carry derived stamps (T_K = T_C + 273.15). Relative QL vs
+    Murchison "more than 100x" retained as a printed bound, not a point.
+    Qualitative compound-detection lists and apparatus strings live in context
+    (d-032 Option A) unless they carry a printed numeric comparison.
+  date: '2026-09-22'
+  worker: n1-vacuum-pyrolysis
+  provenance_path: data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: one-page LPSC conference abstract (py-GC-QqQ-MS organic pyrolysis)
+  measured_direct_observations: 1
+  method_observations: 3
+  figure_only_observations: 0
+  absent_from_source:
+  - absolute analyte abundances or calibration curves
+  - chromatograms / RGA traces
+  - chamber pressure or vacuum level
+  - heating ramp rates and hold times at 600 C / 250 C beyond the stated setpoints
+  - per-compound numeric peak areas except the printed >100x alanine/glycine claim
+  corpus_identity_note: >-
+    source_id stem "vandam" does not match any printed author; PDF is Mojarro
+    et al. LPSC 2024 abstract 1219 (confirmed against HOU 1219.pdf title/authors).
+benches:
+- id: gsfc-cds6200-py-gc-qqq
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: CDS 6200 pyroprobe interfaced to Thermo TRACE 1600 GC and TSQ 9610 MS}
+    locator: &methods_loc {pdf_page_index: 1, section: Methods}
+  heating_method:
+    state: {tag: value, value: CDS 6200 pyroprobe flash/setpoint pyrolysis}
+    locator: *methods_loc
+  detector:
+    state: {tag: value, value: TSQ 9610 triple-quadrupole MS; simultaneous MRM and full scan 50-500 m/z}
+    locator: *methods_loc
+  gc_column:
+    state: {tag: value, value: 30 m Rtx-5ms}
+    locator: *methods_loc
+experiments:
+- experiment_id: standard-pyrolysis-600C
+  bench_id: gsfc-cds6200-py-gc-qqq
+  method: standard_pyrolysis_gc_qqq_ms
+  locator: {pdf_page_index: 1, section: Samples, note: standard pyrolysis at 600 C to target insoluble organic matter}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000001', approximate: true}}
+      locator: {pdf_page_index: 1, section: Samples, note: Two ~1 mg subsamples; unit conversion only, DERIVED kg = 1e-6 kg from ~1 mg}
+    printed_composition:
+      state: {tag: value, value: Bennu QL fines OREX-500002-0 and TAGSAM aggregate OREX-800031-0; co-analyzed Murchison}
+      locator: {pdf_page_index: 1, section: Samples}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '873.15'}}
+      locator: {pdf_page_index: 1, section: Samples, note: 'DERIVED: 600 C + 273.15 = 873.15 K; setpoint as printed 600 C'}
+- experiment_id: wet-chemistry-pyrolysis-250C
+  bench_id: gsfc-cds6200-py-gc-qqq
+  method: wet_chemistry_silylation_pyrolysis_gc_qqq_ms
+  locator: {pdf_page_index: 1, section: Samples, note: wet chemistry pyrolysis at 250 C with silylation reagent}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000001', approximate: true}}
+      locator: {pdf_page_index: 1, section: Samples, note: Two ~1 mg subsamples from each parent; same mass claim as standard series}
+    printed_composition:
+      state: {tag: value, value: Bennu QL and TAGSAM aggregate; silylated amino acids and N-heterocycles targeted}
+      locator: {pdf_page_index: 1, section: Samples}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '523.15'}}
+      locator: {pdf_page_index: 1, section: Samples, note: 'DERIVED: 250 C + 273.15 = 523.15 K; setpoint as printed 250 C'}
+fidelity_samples:
+- species: Bennu_QL_fines
+  observable: gas_speciation
+  observation_id: mojarro_2024_ql_alanine_glycine_vs_murchison
+  field: quantitation_signal_ratio_vs_murchison_bound
+  value: more than 100x
+  locator:
+    pdf_page_index: 1
+    section: Results & Discussion
+    note: QL quantitation signals more than 100x relative to co-analyzed Murchison for alanine and glycine
+- species: Bennu_QL_fines
+  observable: laboratory_conditions
+  observation_id: mojarro_2024_standard_pyrolysis_conditions
+  field: pyrolysis_T_C_as_printed
+  value: 600
+  locator:
+    pdf_page_index: 1
+    section: Samples
+    note: standard pyrolysis at 600 C
+- species: Bennu_QL_fines
+  observable: laboratory_conditions
+  observation_id: mojarro_2024_standard_pyrolysis_conditions
+  field: subsample_mass_mg_as_printed
+  value: ~1
+  locator:
+    pdf_page_index: 1
+    section: Samples
+    note: Two ~1 mg subsamples were collected from each parent aggregate sample
+species:
+  Bennu_QL_fines:
+    observations:
+    - observation_id: mojarro_2024_ql_alanine_glycine_vs_murchison
+      experiment: wet-chemistry-pyrolysis-250C
+      type: gas_speciation
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+        note: Wet-chemistry pyrolysis quantitation signals for QL vs co-analyzed Murchison
+      T_range_K:
+      - 523.15
+      - 523.15
+      phase: Bennu_returned_QL_fines_OREX-500002-0
+      standard_state: relative quantitation signal vs Murchison as printed
+      regime: wet_chemistry_silylation_py_gc_qqq_ms
+      units: relative signal ratio as published (unitless bound)
+      uncertainty:
+        note: >-
+          Printed bound "more than 100x"; no absolute calibration uncertainty printed.
+          Bound retained; not converted to a point.
+      values:
+        quantity: relative_amino_acid_quantitation_signal_vs_murchison
+        method_class: measured_direct
+        evidence_class: authors_own_py_gc_qqq_ms
+        analytes_as_printed:
+        - alanine
+        - glycine
+        quantitation_signal_ratio_vs_murchison_bound: more than 100x
+        comparator_as_printed: co-analyzed Murchison carbonaceous chondrite
+        sample_id_as_printed: OREX-500002-0
+        temperature_C_as_printed: 250
+        temperature_K_derived:
+          value: 523.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 250
+    context:
+    - observation_id: mojarro_2024_standard_pyrolysis_conditions
+      type: laboratory_conditions
+      experiment: standard-pyrolysis-600C
+      locator:
+        pdf_page_index: 1
+        section: Samples
+      phase: Bennu_QL_and_TAGSAM_subsamples
+      regime: standard_pyrolysis_targeting_IOM
+      units: as published
+      values:
+        quantity: standard_and_wet_chemistry_pyrolysis_sample_conditions
+        method_class: method_only
+        subsample_mass_mg_as_printed: '~1'
+        subsample_count_per_parent_as_printed: 2
+        pyrolysis_T_C_as_printed: 600
+        pyrolysis_T_K_derived:
+          value: 873.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 600
+        wet_chemistry_pyrolysis_T_C_as_printed: 250
+        wet_chemistry_pyrolysis_T_K_derived:
+          value: 523.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 250
+        target_as_printed:
+          standard_pyrolysis: insoluble organic matter
+          wet_chemistry_pyrolysis: soluble organic matter via silylation
+        parent_sample_ids_as_printed:
+          QL_fines: OREX-500002-0
+          TAGSAM_aggregate: OREX-800031-0
+        comparator_and_blanks_as_printed: similar quantities of Murchison plus procedural and reagent blanks
+    - observation_id: mojarro_2024_apparatus_and_wet_prep
+      type: apparatus
+      experiment: wet-chemistry-pyrolysis-250C
+      locator:
+        pdf_page_index: 1
+        section: Methods
+      phase: instrument_and_derivatization
+      regime: py_gc_qqq_ms
+      units: as published
+      values:
+        quantity: pyroprobe_gc_ms_and_silylation_prep
+        method_class: method_only
+        pyroprobe_as_printed: CDS 6200 pyroprobe
+        gc_as_printed: Thermo TRACE 1600 GC with 30 m Rtx-5ms column
+        ms_as_printed: TSQ 9610 MS operated in simultaneous MRM and full scan (50-500 m/z) modes
+        silylation_reagent_as_printed: 5 µL MTBSTFA with DMF (4:1, v/v)
+        incubation_as_printed: capped 2 mL vial on a heating block at 85 C for 1 hr, passively cooled to room temperature
+        incubation_T_K_derived:
+          value: 358.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 85
+        identification_as_printed: retention time and three MRM transitions of standards
+    - observation_id: mojarro_2024_standard_pyrolysis_detections_ql
+      type: characterization
+      experiment: standard-pyrolysis-600C
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+      phase: Bennu_QL_fines_standard_pyrolysis_products
+      regime: standard_py_gc_qqq_ms
+      units: as published (qualitative detections)
+      values:
+        quantity: detected_organic_classes_and_named_pahs
+        method_class: method_only
+        evidence_class: authors_qualitative_detection_list_not_calibrated_abundances
+        primary_classes_as_printed:
+        - 1-4 ring polycyclic aromatic hydrocarbons (PAHs)
+        - S-containing compounds
+        - O-containing compounds
+        - N-containing compounds
+        named_pahs_as_printed:
+        - benzene
+        - naphthalene
+        - anthracene
+        - phenanthrene
+        - fluoranthene
+        - pyrene
+        alkylation_as_printed: C1 up to C5 alkylated species characteristic of meteoritic samples like Murchison
+  Bennu_TAGSAM_aggregate:
+    observations: []
+    context:
+    - observation_id: mojarro_2024_tagsam_standard_pyrolysis_contrast
+      type: characterization
+      experiment: standard-pyrolysis-600C
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+      phase: Bennu_TAGSAM_aggregate_OREX-800031-0
+      regime: standard_py_gc_qqq_ms
+      units: as published (qualitative / relative prose)
+      values:
+        quantity: tagsam_vs_murchison_and_ql_contrast
+        method_class: method_only
+        evidence_class: authors_qualitative_relative_claims
+        sample_id_as_printed: OREX-800031-0
+        lower_naphthalene_signal_vs_murchison_as_printed: true
+        detection_of_3_to_4_ring_pahs_as_printed: no detection
+        O_and_N_compounds_as_printed: traces
+        C1_C4_alkylbenzenes_and_alkylthiophenes_as_printed: molecular distribution remained comparable to QL and Murchison
+    - observation_id: mojarro_2024_tagsam_wet_chemistry_response
+      type: characterization
+      experiment: wet-chemistry-pyrolysis-250C
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+      phase: Bennu_TAGSAM_aggregate_OREX-800031-0
+      regime: wet_chemistry_silylation_py_gc_qqq_ms
+      units: as published (relative prose)
+      values:
+        quantity: tagsam_wet_chemistry_response_vs_murchison
+        method_class: method_only
+        evidence_class: authors_qualitative_relative_claims
+        response_vs_murchison_as_printed: either comparable or slightly below those detected in Murchison
+        detected_silylated_species_shared_list_note: >-
+          Same named amino-acid and N-heterocycle list as QL (glycine, alanine, leucine,
+          isoleucine, valine, methionine, aspartic acid, proline, serine, threonine,
+          phenylalanine, pyroglutamic and glutamic acid, asparagine, imidazole, isocytosine,
+          5-methylcytosine, cytosine, 2- and 4-imidazole carboxylic acid, uracil, thymine,
+          1- and 6-methyluracil) printed for both QL and TAGSAM.
+  Murchison_comparator:
+    observations: []
+    context:
+    - observation_id: mojarro_2024_murchison_parallel_analyses
+      type: method
+      locator:
+        pdf_page_index: 1
+        section: Samples
+      phase: Murchison_carbonaceous_chondrite_comparator
+      regime: parallel_py_gc_qqq_ms
+      units: as published
+      values:
+        quantity: coanalyzed_comparator_and_blanks
+        method_class: method_only
+        comparator_as_printed: Murchison carbonaceous chondrite at similar quantities
+        blanks_as_printed:
+        - procedural blanks
+        - reagent blanks

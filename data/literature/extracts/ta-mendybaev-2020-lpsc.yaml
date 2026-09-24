@@ -1,0 +1,304 @@
+schema_version: literature_extract.v1
+source_id: ta-mendybaev-2020-lpsc
+source:
+  citation: >-
+    Mendybaev, R. A., Shornikov, S. I., Jacobson, N. S. & Kowalski, B. (2020),
+    "Thermodynamics and Evaporation Kinetics of CAI-like Melts", 51st Lunar and
+    Planetary Science Conference, abstract 2168.
+  url: https://www.hou.usra.edu/meetings/lpsc2020/pdf/2168.pdf
+  year: 2020
+  conference: 51st Lunar and Planetary Science Conference
+extraction:
+  method: >-
+    Corpus PDF raw/ta-mendybaev-2020-lpsc/ta-mendybaev-2020-lpsc.pdf (2-page LPSC
+    abstract 2168). Clean text layer via pdftotext -layout; no OCR and no figure
+    digitisation. Landed the NASA Glenn TGA free-surface vs Knudsen SiO2 rates
+    and the resulting experimental gamma_Si ~0.04. Model-fit gamma_Mg/gamma_Si
+    values used to match CMAS evaporation profiles (Figs 1-2) are retained only
+    as context (author fits assuming a thermodynamic model), not as measured
+    alpha observations. Figure 1-3 curves not digitized.
+  date: '2026-09-22'
+  worker: n4-cai-liquid-evaporation
+  provenance_path: data/literature/extracts/ta-mendybaev-2020-lpsc.yaml
+review_status: draft
+corrections: []
+scope_assessment:
+  document_type: 2-page LPSC conference abstract (CAI-like melt thermodynamics / TGA kinetics)
+  measured_direct_observations: 3
+  method_observations: 2
+  figure_only_observations: 0
+  model_fit_context_rows: 1
+  absent_from_source:
+  - digitized Fig. 1a/1b evaporation profiles
+  - digitized Fig. 2 multi-composition trajectories
+  - digitized Fig. 3 TGA weight-loss curve points
+  - activities a_i measured for CAI-like compositions (authors state none available)
+  - gamma_Mg experimental determination (deferred to future work)
+  - absolute sample masses and Ir-loop surface areas beyond diameter/orifice claims
+  note: >-
+    Distinguishes true evaporation coefficients (gamma_i = J_i,free / J_i,eq from
+    Langmuir vs Knudsen TGA) from profile-fit gammas that absorb thermodynamic-
+    model error. Only the TGA-derived gamma_Si and the two printed SiO2 rates are
+    scored.
+benches:
+- id: nasa-glenn-vacuum-tga
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Vacuum thermogravimetric apparatus (TGA) at NASA Glenn Research Center}
+    locator: &tga_loc {pdf_page_index: 2, section: The proper way of determining true evaporation coefficients}
+  heating_method:
+    state: {tag: value, value: High-temperature vacuum furnace; temperature controlled by W5Re/W26Re thermocouple next to sample or sample assembly}
+    locator: *tga_loc
+  temperature_measurement:
+    sensor: {state: {tag: value, value: W5Re/W26Re thermocouple located next to the sample or sample assembly}, locator: *tga_loc}
+  mass_recording:
+    state: {tag: value, value: Recording microbalance every 6 sec}
+    locator: *tga_loc
+  pumping_type:
+    state: {tag: value, value: "Total pressure 5x10^-6 torr or less"}
+    locator: *tga_loc
+  apparatus_detail_deferred_to:
+    state: {tag: value, value: "Jacobson N. et al. (2017) J. Eur. Ceram. Soc. 37, 2245-2252 [13]"}
+    locator: *tga_loc
+experiments:
+- experiment_id: sio2-langmuir-ir-loop-1800C
+  bench_id: nasa-glenn-vacuum-tga
+  method: vacuum_tga_free_surface_langmuir
+  locator: {pdf_page_index: 2, section: The proper way of determining true evaporation coefficients}
+  sample:
+    printed_composition:
+      state: {tag: value, value: SiO2 powder 99.995% pure with 1 wt% ultrafine-grained Ir metal}
+      locator: {pdf_page_index: 2, paragraph: As a starting material in Langmuir experiments}
+    form:
+      state: {tag: value, value: Loaded onto 2.5 mm diameter Ir-wire loop}
+      locator: {pdf_page_index: 2}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '2073.15'}}
+      locator: {pdf_page_index: 2, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 2, note: '5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa'}
+    sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *tga_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: sio2-knudsen-ir-cell-1800C
+  bench_id: nasa-glenn-vacuum-tga
+  method: vacuum_tga_knudsen_equilibrium_cell
+  locator: {pdf_page_index: 2}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Pure SiO2 or SiO2 + 1 wt% Ir}
+      locator: {pdf_page_index: 2}
+    form:
+      state: {tag: value, value: Ir cell with 1 mm diameter orifice}
+      locator: {pdf_page_index: 2}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: point, point: '2073.15'}}
+      locator: {pdf_page_index: 2, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; same conditions as loop arm'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 2, note: '5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa'}
+    sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *tga_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+fidelity_samples:
+- species: SiO2
+  observable: rate_series
+  observation_id: mendybaev_2020_sio2_langmuir_rate_loop
+  field: rate_mg_per_mm2_per_hr_as_printed
+  value: 0.3
+  locator:
+    pdf_page_index: 2
+    section: The proper way of determining true evaporation coefficients
+    note: free-surface TGA loop technique; linear weight loss
+- species: SiO2
+  observable: rate_series
+  observation_id: mendybaev_2020_sio2_knudsen_rate_cell
+  field: rate_mg_per_mm2_per_hr_as_printed
+  value: 6.8
+  locator:
+    pdf_page_index: 2
+    note: Ir-cell equilibrium evaporation under the same conditions
+- species: Si
+  observable: alpha
+  observation_id: mendybaev_2020_gamma_si_from_tga
+  field: gamma_Si_as_printed
+  value: '~0.04'
+  locator:
+    pdf_page_index: 2
+    note: 'gamma_Si ~0.04 from Ji,free / Ji,eq'
+- species: CAI_like_CMAS_melt
+  observable: laboratory_conditions
+  observation_id: mendybaev_2020_profile_fit_gammas_context
+  field: gamma_Mg_1900C_as_printed
+  value: 0.18
+  locator:
+    pdf_page_index: 1
+    section: Results
+species:
+  SiO2:
+    observations:
+    - observation_id: mendybaev_2020_sio2_langmuir_rate_loop
+      experiment: sio2-langmuir-ir-loop-1800C
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+        figure: '3'
+        note: prose value; Fig. 3 curve not digitized
+      T_range_K: [2073.15, 2073.15]
+      phase: molten_SiO2_with_1wtpct_Ir
+      regime: vacuum_tga_free_surface_langmuir
+      units: mg/mm^2-hr as printed
+      uncertainty:
+        note: No numeric uncertainty printed on the 0.3 mg/mm^2-hr rate.
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_nasa_glenn_tga
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        pressure_as_printed: '5x10^-6 torr or less'
+        support_as_printed: 2.5 mm diameter Ir-wire loop
+        starting_material_as_printed: SiO2 powder 99.995% pure with 1 wt% ultrafine-grained Ir
+        rate_mg_per_mm2_per_hr_as_printed: 0.3
+        rate_mg_per_mm2_per_hr: 0.3
+        time_dependence_as_printed: linear weight loss of SiO2 with time
+        flux_symbol_as_printed: Ji,free
+    - observation_id: mendybaev_2020_sio2_knudsen_rate_cell
+      experiment: sio2-knudsen-ir-cell-1800C
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+      T_range_K: [2073.15, 2073.15]
+      phase: molten_SiO2_or_SiO2_plus_Ir
+      regime: vacuum_tga_knudsen_equilibrium
+      units: mg/mm^2-hr as printed
+      uncertainty:
+        note: No numeric uncertainty printed on the 6.8 mg/mm^2-hr rate.
+      values:
+        quantity: surface_normalized_weight_loss_rate
+        method_class: measured_direct
+        evidence_class: authors_own_nasa_glenn_tga
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        pressure_as_printed: '5x10^-6 torr or less'
+        cell_as_printed: Ir cell with 1 mm diameter orifice
+        starting_material_as_printed: pure SiO2 or SiO2 + 1 wt% Ir
+        rate_mg_per_mm2_per_hr_as_printed: 6.8
+        rate_mg_per_mm2_per_hr: 6.8
+        time_dependence_as_printed: linear weight loss with time
+        flux_symbol_as_printed: Ji,eq
+  Si:
+    observations:
+    - observation_id: mendybaev_2020_gamma_si_from_tga
+      experiment: sio2-langmuir-ir-loop-1800C
+      type: alpha
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+      T_range_K: [2073.15, 2073.15]
+      phase: molten_SiO2
+      regime: langmuir_over_knudsen_ratio
+      units: dimensionless
+      uncertainty:
+        note: "Printed as gamma_Si ~0.04 (approximate); authors say close to crystalline SiO2 values in [13]."
+      values:
+        quantity: evaporation_coefficient_gamma_Si
+        method_class: measured_direct
+        evidence_class: authors_own_nasa_glenn_tga
+        definition_as_printed: 'gamma_i = Ji,free / Ji,eq'
+        gamma_Si_as_printed: '~0.04'
+        gamma_Si: 0.04
+        qualifier: approximate
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        from_rates_as_printed:
+          Ji_free_mg_per_mm2_per_hr: 0.3
+          Ji_eq_mg_per_mm2_per_hr: 6.8
+        comparator_as_printed: close to crystalline SiO2 values ([13] and references therein)
+        note: >-
+          This is the authors' experimental true evaporation coefficient for
+          molten SiO2, distinct from the profile-fit gammas in the Results
+          section that absorb thermodynamic-model uncertainty.
+  CAI_like_CMAS_melt:
+    observations: []
+    context:
+    - observation_id: mendybaev_2020_profile_fit_gammas_context
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 1
+        section: Results
+        figure: '1'
+      phase: Type_B_CAI_like_CAIB_melilitic_melt
+      regime: vacuum_evaporation_model_fit
+      units: as published
+      values:
+        quantity: profile_fit_evaporation_coefficients_not_true_gamma
+        method_class: author_fit_to_profiles
+        evidence_class: model_dependent_fit
+        semantics: not_a_direct_gamma_measurement
+        note: >-
+          Authors state these fitted gamma values are required to match
+          experimental profiles when using Berman CMAS [11], and are NOT true
+          evaporation coefficients usable across compositions. Retained as
+          context only.
+        CMAS_model_assumed_ratio_as_printed: 'gamma_Mg / gamma_Si = 0.74'
+        fit_at_1900C_as_printed:
+          gamma_Mg: 0.18
+          gamma_Si: 0.16
+        fit_at_1800C_as_printed:
+          gamma_Mg: ~0.13
+          gamma_Si: ~0.13
+        fit_at_1600C_as_printed:
+          gamma_Mg: 0.06
+          gamma_Si: 0.07
+        forsteritic_melt_ratio_1900C_as_printed: 'gamma_Si / gamma_Mg ~2.1'
+        gamma_Mg_1900C_as_printed: 0.18
+        Shornikov_IAS_model_assumption_as_printed: 'gamma_Si / gamma_Mg = 1'
+        IAS_model_offset_as_printed: calculated profiles plot slightly above experiments within 5 wt% SiO2
+    - observation_id: mendybaev_2020_tga_method_context
+      type: apparatus
+      experiment: sio2-langmuir-ir-loop-1800C
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+      phase: instrument_and_protocol
+      regime: vacuum_tga
+      units: as published
+      values:
+        quantity: nasa_glenn_tga_protocol
+        method_class: method_only
+        apparatus_as_printed: vacuum thermogravimetric apparatus (TGA) at NASA Glenn Research Center
+        apparatus_detail_ref: Jacobson et al. (2017) J. Eur. Ceram. Soc. 37, 2245-2252 [13]
+        temperature_C_as_printed: 1800
+        temperature_K_derived:
+          value: 2073.15
+          stamp: DERIVED
+          formula: T_K = T_C + 273.15
+          from_printed_C: 1800
+        pressure_as_printed: '5x10^-6 torr or less'
+        thermocouple_as_printed: W5Re/W26Re next to sample or sample assembly
+        microbalance_interval_as_printed: every 6 sec
+        langmuir_geometry_as_printed: 2.5 mm diameter Ir-wire loop
+        knudsen_geometry_as_printed: Ir cell with 1 mm diameter orifice
+        future_work_as_printed: >-
+          Same experiments on molten gehlenite and anorthite; then CMAS melts
+          for gamma_Mg; experimental activities a_i on the same melts.
