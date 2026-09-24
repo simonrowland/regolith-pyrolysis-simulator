@@ -333,7 +333,9 @@ def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice()
     root = Path(__file__).parents[2]
     path = root / "data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml"
     extract = yaml.safe_load(path.read_text(encoding="utf-8"))
-    experiments = {item["experiment_id"]: item for item in extract["experiments"]}
+    experiments = {
+        item["experiment_id"]: item for item in extract["experiments"] if item.get("sample")
+    }
     mixes = {}
     recipe_extract = yaml.safe_load(
         (root / "data/literature/extracts/yam1983.yaml").read_text(encoding="utf-8")
