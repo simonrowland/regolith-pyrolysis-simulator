@@ -114,7 +114,7 @@ def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical(
     sample = _sample_from_plain(raw)
 
     assert sample.printed_composition is not None
-    assert sample.printed_composition.state.value == {"SiO2": "60", "Cl": "40"}
+    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
     assert sample.initial_composition is not None
     assert sample.initial_composition.state.is_unknown
 

@@ -705,8 +705,10 @@ def _mass_percent_components(
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
-    wt = _mass_percent_components(payload, known_oxides_only=False)
-    if wt is None:
+    wt = _mass_percent_components(payload)
+    if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
+        if _mass_percent_components(payload, known_oxides_only=False) is not None:
+            return _located_from_plain(payload, lambda value: value)
         return None
     locator = (
         _locator_from_plain(payload.get("locator"))
@@ -2411,17 +2413,26 @@ def conversion_derivation(
 def _merge_source_conversion_derivation(
     source: Derivation | None,
     conversion: Derivation | None,
+    read_from: str,
 ) -> Derivation | None:
     """Retain author lineage while recording a canonical-unit conversion."""
 
-    if source is None:
-        return conversion
     if conversion is None:
         return source
+    if source is None:
+        source = replace(conversion, inputs=(read_from,), parameters=())
+    parameters = tuple(
+        (name, replace(value, inference=conversion) if name == "original" else value)
+        for name, value in conversion.parameters
+    )
+    if not any(name == "original" for name, _ in parameters):
+        parameters += (("conversion", Located(
+            State.unknown("extractor transform does not state its original numeric input"),
+            inference=conversion,
+        )),)
     return replace(
         source,
-        inputs=source.inputs + conversion.inputs,
-        parameters=source.parameters + conversion.parameters,
+        parameters=source.parameters + parameters,
         output_unit=conversion.output_unit,
     )
 
@@ -3818,69 +3829,53 @@ def lineage_parents_from_source(
 _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 
-def _is_extractor_derivation(derivation: Derivation) -> bool:
-    """Return whether a derivation only records extractor representation work."""
-
-    relation = derivation.relation.strip().lower()
-    if relation == "identity" or relation.startswith("identity:"):
-        return True
-    return relation == "as_published" or relation in {
-        key.lower() for key in _CONVERSION_META
-    }
-
-
 def source_derivation_from_source(
     obs: Mapping[str, Any], values: Mapping[str, Any]
 ) -> Derivation | None:
     """Read an author-supplied derivation without inventing one."""
 
     for payload in (values, obs):
-        for key in ("derivation", "inference"):
-            raw = payload.get(key)
-            if not isinstance(raw, Mapping):
-                continue
-            if not raw.get("relation") or not raw.get("inputs"):
-                continue
-            try:
-                return _derivation_from_plain(raw)
-            except (TypeError, ValueError):
-                continue
+        raw = payload.get("derivation")
+        if not isinstance(raw, Mapping):
+            continue
+        if not raw.get("relation") or not raw.get("inputs"):
+            continue
+        try:
+            return _derivation_from_plain(raw)
+        except (TypeError, ValueError):
+            continue
     return None
 
 
 def conditional_reduced_lineage_is_measured(
     observation: Observation,
     observations: Mapping[str, Observation],
+    author_derivations: Mapping[str, Derivation],
     *,
     _seen: frozenset[str] = frozenset(),
 ) -> bool:
     """Whether a calculated observation has admissible measured ancestry."""
 
-    method_class = observation.evidence.original_method_class
-    if method_class not in _CONDITIONAL_REDUCED_METHODS:
-        return False
     if observation.observation_id in _seen:
         return False
-    if observation.admission.status is not AdmissionStatus.ADMITTED:
-        return False
-    derivation = observation.derivation
+    derivation = author_derivations.get(observation.observation_id)
     if (
         derivation is None
-        or _is_extractor_derivation(derivation)
         or not observation.derived_from
+        or not set(derivation.inputs).issubset(observation.derived_from)
     ):
-        return False
-    relation = derivation.relation.lower().replace("-", "_").replace(" ", "_")
-    if "recipe" in relation or "aimed_target" in relation:
         return False
     seen = _seen | {observation.observation_id}
     for parent_id in observation.derived_from:
         parent = observations.get(parent_id)
         if parent is None or parent.admission.status is not AdmissionStatus.ADMITTED:
             return False
-        if parent.evidence.original_method_class in _CONDITIONAL_REDUCED_METHODS:
+        if (
+            parent.evidence.original_method_class in _CONDITIONAL_REDUCED_METHODS
+            or parent.evidence.class_ == State.of(EvidenceClass.MEASURED_REDUCED)
+        ):
             if not conditional_reduced_lineage_is_measured(
-                parent, observations, _seen=seen
+                parent, observations, author_derivations, _seen=seen
             ):
                 return False
         elif (
@@ -3888,8 +3883,6 @@ def conditional_reduced_lineage_is_measured(
             or parent.evidence.class_.value
             not in {
                 EvidenceClass.MEASURED_DIRECT,
-                EvidenceClass.MEASURED_TABULATED,
-                EvidenceClass.MEASURED_REDUCED,
             }
         ):
             return False
@@ -3920,6 +3913,8 @@ def evidence_for(
     """Return Evidence and an optional queue reason."""
 
     original = None if method_class is None else str(method_class)
+    if not original and isinstance(regime, str) and regime.strip() in _CONDITIONAL_REDUCED_METHODS:
+        original = regime.strip()
     if evaluator_family:
         return (
             Evidence(
@@ -3934,19 +3929,6 @@ def evidence_for(
         if regime_text:
             mapped_regime = METHOD_CLASS_MAP.get(regime_text)
             if mapped_regime is not None:
-                if (
-                    regime_text in _CONDITIONAL_REDUCED_METHODS
-                    and not lineage_valid
-                ):
-                    return (
-                        Evidence(
-                            class_=State.unknown(
-                                f"{regime_text} requires measured derived_from lineage and derivation"
-                            ),
-                            original_method_class=regime_text,
-                        ),
-                        f"conditional method_class {regime_text} lacks measured lineage",
-                    )
                 return (
                     Evidence(
                         class_=State.of(mapped_regime),
@@ -7099,6 +7081,7 @@ class Migrator:
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
+        self._author_derivations: dict[str, Derivation] = {}
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
@@ -8001,12 +7984,38 @@ class Migrator:
             obs, values, source_id, local_ids
         )
         derived_from = derived_parents or None
-        conditional_method = str(method_class or regime or "")
-        source_derivation = (
-            source_derivation_from_source(obs, values)
-            if conditional_method in _CONDITIONAL_REDUCED_METHODS
-            else None
-        )
+        source_derivation = source_derivation_from_source(obs, values)
+        if source_derivation is not None:
+            source_derivation = replace(
+                source_derivation,
+                inputs=tuple(
+                    f"{source_id}::{item}" if item in local_ids else item
+                    for item in source_derivation.inputs
+                ),
+            )
+            if not derived_prose:
+                self._author_derivations[obs_id] = source_derivation
+        conditional_method = str(method_class) if method_class else str(regime or "").strip()
+        if conditional_method not in _CONDITIONAL_REDUCED_METHODS:
+            source_derivation = None
+        for payload in (values, obs):
+            if not isinstance(payload.get("inference"), Mapping):
+                continue
+            try:
+                extractor_derivation = _derivation_from_plain(payload["inference"])
+            except (TypeError, ValueError):
+                continue
+            source_derivation = _merge_source_conversion_derivation(
+                source_derivation or Derivation(
+                    relation="as_published",
+                    inputs=(choose_read_from(work, locator),),
+                    parameters=(),
+                    output_unit="as_published",
+                ),
+                extractor_derivation,
+                choose_read_from(work, locator),
+            )
+            break
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -8124,6 +8133,7 @@ class Migrator:
             value_derivation = _merge_source_conversion_derivation(
                 source_derivation,
                 conversion_derivation(value_sel.unit_trail, original_raw, locator),
+                choose_read_from(work, locator),
             )
         if initial_oxide_map:
             ident_kwargs["composition"] = State.of(
@@ -8629,8 +8639,10 @@ class Migrator:
             derivation = None
         if source_derivation is not None:
             derivation = _merge_source_conversion_derivation(
-                source_derivation, converted
+                source_derivation, converted, read_from
             )
+        if parent_id in self._author_derivations:
+            self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
@@ -10100,29 +10112,21 @@ class Migrator:
                         entry.work_id = exp.work_id
 
     def _close_conditional_method_classes(self) -> None:
-        while True:
-            changed = False
-            for observation_id, observation in list(self.result.observations.items()):
-                if not conditional_reduced_lineage_is_measured(
-                    observation, self.result.observations
-                ):
-                    continue
-                if (
-                    observation.evidence.class_.is_value
-                    and observation.evidence.class_.value
-                    is EvidenceClass.MEASURED_REDUCED
-                ):
-                    continue
-                evidence = replace(
+        for observation_id, observation in self.result.observations.items():
+            if observation.evidence.original_method_class not in _CONDITIONAL_REDUCED_METHODS:
+                continue
+            admitted = conditional_reduced_lineage_is_measured(
+                observation, self.result.observations, self._author_derivations
+            )
+            self.result.observations[observation_id] = replace(
+                observation,
+                evidence=replace(
                     observation.evidence,
-                    class_=State.of(EvidenceClass.MEASURED_REDUCED),
-                )
-                self.result.observations[observation_id] = replace(
-                    observation, evidence=evidence
-                )
-                changed = True
-            if not changed:
-                return
+                    class_=State.of(EvidenceClass.MEASURED_REDUCED) if admitted else State.unknown(
+                        "author reduction requires an author derivation and admitted measured lineage"
+                    ),
+                ),
+            )
 
     def finalize(self) -> None:
         self._rebuild_works()

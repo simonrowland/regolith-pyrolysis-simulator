@@ -323,14 +323,13 @@ def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
         return None
     if any(name not in _OXIDE_COMPONENT_KEYS for name, _value in pairs):
         return None
+    try:
+        amounts = [as_decimal(value) for _, value in pairs]
+    except (ValueError, TypeError, ArithmeticError):
+        return None
+    if any(not n.is_finite() or n < 0 for n in amounts) or sum(amounts) <= 0:
+        return None
     return dict(pairs)
-
-
-def _ambiguous_mass_percent_initial(located: Located | None) -> bool:
-    if located is None or not located.state.is_unknown:
-        return False
-    reason = str(located.state.reason or "").lower()
-    return reason.startswith("mass-percent composition")
 
 
 def charge_moles_by_species(
@@ -375,7 +374,6 @@ def charge_moles_by_species(
     dropped: list[str] = []
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
-    ambiguous_initial = _ambiguous_mass_percent_initial(composition)
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
@@ -425,7 +423,6 @@ def charge_moles_by_species(
         mass is not None
         and printed is not None
         and printed.state.is_value
-        and not ambiguous_initial
     ):
         raw = _printed_composition_map(printed.state.value)
         if isinstance(raw, Mapping):
@@ -512,21 +509,11 @@ def normalized_composition(
     unsupported = False
     printed_species: set[str] | None = None
     printed_path = None
-    initial_located = (
-        point.get("composition")
-        if "composition" in point
-        else experiment.sample.initial_composition
-    )
-    ambiguous_initial = _ambiguous_mass_percent_initial(initial_located)
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
         path = (f"observation[{observation.observation_id}].point_conditions.{key}"
                 if key in point else f"experiment.sample.{field}")
-        if field == "printed_composition" and ambiguous_initial:
-            unsupported = True
-            missing.append(path)
-            continue
         if located is None or not located.state.is_value:
             absent.append(path)
             continue
