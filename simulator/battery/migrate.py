@@ -58,6 +58,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExperimentKind,
     FO2Channel,
+    MEASURED_EVIDENCE,
     MethodToken,
     NoticeKind,
     PerBasis,
@@ -665,9 +666,7 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     )
 
 
-def _mass_percent_components(
-    payload: object, *, known_oxides_only: bool = True
-) -> dict[str, Decimal] | None:
+def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
     if not isinstance(payload, Mapping):
         return None
     body: object = payload
@@ -690,16 +689,26 @@ def _mass_percent_components(
         items = components
     else:
         return None
-    result: dict[str, Decimal] = {}
+    result: list[tuple[str, Decimal]] = []
     for item in items:
         if not isinstance(item, (list, tuple)) or len(item) != 2:
             return None
         name = str(item[0])
         amount = _as_dec_or_none(item[1])
-        if amount is None or (known_oxides_only and name not in _OXIDE_COMPONENT_KEYS):
+        if amount is None:
             return None
-        result[name] = amount
+        result.append((name, amount))
     return result or None
+
+
+def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names) or any(name not in _OXIDE_COMPONENT_KEYS for name in names):
+        return None
+    return dict(pairs)
 
 
 def _mass_percent_printed_from_plain(
@@ -707,7 +716,7 @@ def _mass_percent_printed_from_plain(
 ) -> Located[Mapping[str, Any]] | None:
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
-        if _mass_percent_components(payload, known_oxides_only=False) is not None:
+        if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
     locator = (
@@ -738,12 +747,11 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             locator=locator,
             inference=wt_pct_to_mole_fraction_derivation(wt, locator),
         )
-    printed = _mass_percent_components(payload, known_oxides_only=False)
-    if printed is not None:
+    if _mass_percent_pairs(payload) is not None:
         source = _located_from_plain(payload, lambda value: value)
         return Located(
             State.unknown(
-                "mass-percent composition contains unsupported or ambiguous components"
+                "mass-percent composition contains invalid, duplicate, unsupported or ambiguous components"
             ),
             locator=source.locator,
         )
@@ -1182,7 +1190,7 @@ def _sample_from_plain(payload: object) -> Sample:
     if printed_located is None and initial is not None:
         printed_located = _mass_percent_printed_from_plain(initial)
     if initial_located is None and printed is not None:
-        if _mass_percent_components(printed, known_oxides_only=False) is not None:
+        if _mass_percent_pairs(printed) is not None:
             initial_located = _composition_located_from_plain(printed)
     return Sample(
         mass_kg=None
@@ -3807,7 +3815,11 @@ def lineage_parents_from_source(
     if isinstance(raw, str):
         items = [raw]
     elif isinstance(raw, (list, tuple)):
-        items = [str(x) for x in raw if x]
+        items = []
+        for index, item in enumerate(raw):
+            if not isinstance(item, str) or not item.strip():
+                raise ValueError(f"malformed derived_from[{index}]: {item!r}")
+            items.append(item)
     else:
         return (), ()
     parents: list[str] = []
@@ -3881,9 +3893,7 @@ def conditional_reduced_lineage_is_measured(
         elif (
             not parent.evidence.class_.is_value
             or parent.evidence.class_.value
-            not in {
-                EvidenceClass.MEASURED_DIRECT,
-            }
+            not in MEASURED_EVIDENCE
         ):
             return False
     return True
@@ -3908,7 +3918,6 @@ def evidence_for(
     attribution: str | None = None,
     model: str | None = None,
     regime: object = None,
-    lineage_valid: bool = False,
 ) -> tuple[Evidence, str | None]:
     """Return Evidence and an optional queue reason."""
 
@@ -3960,7 +3969,7 @@ def evidence_for(
             ),
             f"PAGE method_class {original}",
         )
-    if original in _CONDITIONAL_REDUCED_METHODS and not lineage_valid:
+    if original in _CONDITIONAL_REDUCED_METHODS:
         return (
             Evidence(
                 class_=State.unknown(
@@ -7980,9 +7989,17 @@ class Migrator:
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
-        derived_parents, derived_prose = lineage_parents_from_source(
-            obs, values, source_id, local_ids
-        )
+        try:
+            derived_parents, derived_prose = lineage_parents_from_source(
+                obs, values, source_id, local_ids
+            )
+        except ValueError as exc:
+            derived_parents, derived_prose = (), (str(exc),)
+            self.result.registry_issues.append(ValidationIssue(
+                path=f"observations.{obs_id}.derived_from",
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=str(exc),
+            ))
         derived_from = derived_parents or None
         source_derivation = source_derivation_from_source(obs, values)
         if source_derivation is not None:

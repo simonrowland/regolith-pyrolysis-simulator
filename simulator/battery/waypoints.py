@@ -321,6 +321,8 @@ def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
             return None
     else:
         return None
+    if len({name for name, _value in pairs}) != len(pairs):
+        return None
     if any(name not in _OXIDE_COMPONENT_KEYS for name, _value in pairs):
         return None
     try:
@@ -519,6 +521,18 @@ def normalized_composition(
             continue
         raw = located.state.value
         if field == "printed_composition":
+            components = raw.get("components") if isinstance(raw, Mapping) else None
+            if isinstance(components, Mapping):
+                printed_species = {str(species) for species in components}
+            elif isinstance(components, (list, tuple)):
+                names = [str(item[0]) for item in components
+                         if isinstance(item, (list, tuple)) and len(item) == 2]
+                printed_species = set(names)
+                if len(printed_species) != len(names):
+                    return WaypointResult("normalized_composition", None, (), WaypointAbsence(
+                        "normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM, (path,)))
+            if printed_species is not None:
+                printed_path = path
             raw = _printed_composition_map(raw)
         if field == "printed_composition" and isinstance(raw, Mapping):
             printed_species = {str(species) for species in raw}

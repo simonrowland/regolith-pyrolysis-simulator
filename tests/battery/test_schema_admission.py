@@ -9,9 +9,9 @@ import yaml
 
 from simulator.battery import migrate as M
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import AdmissionStatus, EvidenceClass, Quantity
+from simulator.battery.enums import AdmissionStatus, EvidenceClass, Quantity, RefusalReason
 from simulator.battery.generators.bench import engine_point_requests
-from simulator.battery.waypoints import charge_moles_by_species, normalized_composition
+from simulator.battery.waypoints import GapReason, charge_moles_by_species, normalized_composition
 from tests.battery import factories as F
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
 
@@ -82,6 +82,7 @@ def test_author_reduction_positive_controls(tmp_path, method, shape):
 @pytest.mark.parametrize("relation", [
     "unit_conversion", "identity", "identity:Pa", "as_published", "atm_to_Pa",
     "wt_pct_to_mole_fraction", "buffer_to_fO2", "author_mass_balance",
+    "calculated_from_printed_recipe_or_aimed_target", "aimed_target_conversion",
 ])
 @pytest.mark.parametrize("origin", ["derivation", "inference", "top_inference"])
 def test_author_origin_not_relation_spelling(tmp_path, relation, origin):
@@ -236,19 +237,131 @@ def test_every_reduced_ancestor_must_pass_admission(tmp_path, method, parent_sta
         assert evidence.is_unknown
 
 
-@pytest.mark.parametrize("method,admitted", [("measured_direct", True), ("measured_tabulated", False)])
-def test_only_direct_measurements_terminate_reduction_ancestry(tmp_path, method, admitted):
+@pytest.mark.parametrize("evidence_class", [EvidenceClass.MEASURED_DIRECT, EvidenceClass.MEASURED_TABULATED])
+@pytest.mark.parametrize("status", [AdmissionStatus.ADMITTED, AdmissionStatus.REJECTED])
+def test_typed_measured_parents_terminate_reduction_ancestry(tmp_path, evidence_class, status):
     rejected = _row("rejected", "measured_direct", relation=None)
     rejected["values"]["admission_status"] = "rejected"
-    parent = _row("parent", method, ["rejected"])
+    parent = _row("parent", "measured_direct", ["rejected"])
     result = _migrate(tmp_path, [rejected, parent, _row("child", parents=["parent"])])
-    assert (_child(result).evidence.class_.value is EvidenceClass.MEASURED_REDUCED) == admitted
+    typed_parent = _child(result, "parent")
+    result.observations[typed_parent.observation_id] = replace(
+        typed_parent,
+        evidence=replace(typed_parent.evidence, class_=M.State.of(evidence_class)),
+        admission=replace(typed_parent.admission, status=status),
+    )
+    child = _child(result)
+    assert M.conditional_reduced_lineage_is_measured(
+        child, result.observations, {child.observation_id: child.derivation}
+    ) == (status is AdmissionStatus.ADMITTED)
+    assert not result.validation.hard_issues
+
+
+@pytest.mark.parametrize("slot", [None, "", False, 0])
+@pytest.mark.parametrize("method", ["calculated", "author_derived"])
+@pytest.mark.parametrize("series", [False, True])
+def test_malformed_lineage_slots_refuse_promotion_with_typed_issue(tmp_path, slot, method, series):
+    parent = _row("parent", "measured_direct", relation=None)
+    child = _row("child", method, ["parent"])
+    child["values"]["derived_from"].append(slot)
+    if series:
+        _series(child)
+    result = _migrate(tmp_path, [parent, child])
+    observation = _child(result)
+    assert observation.evidence.class_.is_unknown
+    loaded = M.observation_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(observation))))
+    assert loaded.evidence.class_.is_unknown
+    issues = result.validation.hard_issues
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].path == "observations.fixture-source::child.derived_from"
+    assert issues[0].detail == f"malformed derived_from[1]: {slot!r}"
+    assert any("derived_from" in entry.axes for entry in result.queue)
+
+
+@pytest.mark.parametrize("method", ["calculated", "author_derived"])
+@pytest.mark.parametrize("shape", ["scalar", "series", "regime_scalar", "regime_series"])
+@pytest.mark.parametrize("case", ["author_and_extractor", "inference_forged_origin", "extra_rejected_lineage", "evaluator_without_author", "partial_prose"])
+def test_review_author_provenance_matrix(tmp_path, method, shape, case):
+    parent = _row("parent", "measured_direct", relation=None)
+    other = _row("other", "measured_direct", relation=None)
+    other["values"]["admission_status"] = "rejected"
+    child = _row("child", method, ["parent"])
+    if shape.endswith("series"):
+        _series(child)
+    if shape.startswith("regime"):
+        child["values"]["regime"] = f" {child['values'].pop('method_class')} "
+        child.pop("regime", None)
+    if case in ("author_and_extractor", "inference_forged_origin"):
+        child["inference"] = {
+            "relation": "wt_pct_to_mole_fraction", "inputs": ["extractor arithmetic, no observation"],
+            "output_unit": "Pa", "origin": "author",
+        }
+        if case == "inference_forged_origin":
+            child["values"].pop("derivation")
+    elif case == "extra_rejected_lineage":
+        child["values"]["derived_from"].append("other")
+    elif case == "evaluator_without_author":
+        child["values"].pop("derivation")
+        child["values"]["evaluator_family"] = "author_like_evaluator"
+    else:
+        child["values"]["derived_from"].append("not an observation")
+    result = _migrate(tmp_path, [parent, other, child])
+    evidence = _child(result).evidence.class_
+    if case == "author_and_extractor":
+        assert evidence.value is EvidenceClass.MEASURED_REDUCED
+        assert _child(result).derivation.inputs == ("fixture-source::parent",)
+    else:
+        assert evidence.is_unknown
+    assert not result.validation.hard_issues
+
+
+@pytest.mark.parametrize("method", [
+    "authors_preferred_average_of_kems_derived_gammas", "derived_from_measured_kems_hertz_knudsen",
+    "derived_third_law_from_measured_kems_and_janaf_fef", "directly_reduced_measurement",
+])
+@pytest.mark.parametrize("case", ["valid", "input_mismatch", "inference_only", "ancestor_rejected", "mixed_cycle"])
+def test_review_nonconditional_reduced_ancestry_matrix(tmp_path, method, case):
+    parent = _row("parent", "measured_direct", relation=None)
+    other = _row("other", "measured_direct", relation=None)
+    middle = _series(_row("middle", method, ["parent"]))
+    middle_id = _child(_migrate(tmp_path / "ids", [parent, middle]), "middle").observation_id
+    if case == "input_mismatch":
+        middle["values"]["derivation"]["inputs"] = ["fixture-source::other"]
+    elif case == "inference_only":
+        middle["values"]["inference"] = middle["values"].pop("derivation")
+    elif case == "ancestor_rejected":
+        parent["values"]["admission_status"] = "rejected"
+    elif case == "mixed_cycle":
+        middle["values"]["derived_from"] = ["child"]
+        middle["values"]["derivation"]["inputs"] = ["child"]
+    result = _migrate(tmp_path / "run", [parent, other, middle, _row("child", parents=[middle_id])])
+    evidence = _child(result).evidence.class_
+    if case == "valid":
+        assert evidence.value is EvidenceClass.MEASURED_REDUCED
+    else:
+        assert evidence.is_unknown
+    if case == "mixed_cycle":
+        assert {i.reason for i in result.validation.hard_issues} == {RefusalReason.CYCLIC_DERIVATION}
+    else:
+        assert not result.validation.hard_issues
+
+
+@pytest.mark.parametrize("method", ["calculated", "author_derived"])
+def test_conditional_helper_cannot_promote_without_ancestry(method):
+    evidence, reason = M.evidence_for(method)
+    assert evidence.class_.is_unknown
+    assert reason
 
 
 @pytest.mark.parametrize("shape", ["forward", "reverse", "diamond", "cycle"])
-def test_lineage_graph_order_and_cycles(tmp_path, shape):
+@pytest.mark.parametrize("mixed_methods", [False, True])
+def test_lineage_graph_order_and_cycles(tmp_path, shape, mixed_methods):
     rows = [_row("parent", "measured_direct", relation=None)]
     rows += [_row(f"c{i}", parents=["parent" if i == 0 else f"c{i-1}"]) for i in range(8)]
+    if mixed_methods:
+        for row in rows[1::2]:
+            row["values"]["method_class"] = "author_derived"
     rows.append(_row("child", parents=["c7", "c2"] if shape == "diamond" else ["c7"]))
     if shape == "cycle":
         rows[1]["values"]["derived_from"] = ["child"]
@@ -257,7 +370,7 @@ def test_lineage_graph_order_and_cycles(tmp_path, shape):
         rows.reverse()
     result = _migrate(tmp_path, rows)
     for observation in result.observations.values():
-        if observation.evidence.original_method_class != "calculated":
+        if observation.evidence.original_method_class not in ("calculated", "author_derived"):
             continue
         if shape == "cycle":
             assert observation.evidence.class_.is_unknown
@@ -304,6 +417,9 @@ def _typed(components):
     ([["SiO2", "60"], ["FeOT", "40"]], False),
     ([["SiO2", "-1"], ["MgO", "101"]], False),
     ([["SiO2", "0"], ["MgO", "0"]], False),
+    ([["SiO2", "-10"], ["SiO2", "60"], ["MgO", "40"]], False),
+    ([["SiO2", "60"], ["SiO2", "-10"], ["MgO", "40"]], False),
+    ([["SiO2", "10"], ["SiO2", "60"], ["MgO", "40"]], False),
 ])
 @pytest.mark.parametrize("existing_unknown", [False, True])
 def test_typed_sample_composition_survives_serialized_consumption(field, components, valid, existing_unknown):
@@ -324,19 +440,29 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
         assert composition_wt_pct(sample.initial_composition.state.value) == pytest.approx({"SiO2": 60, "MgO": 40})
 
 
-def _point_result(monkeypatch, conditions):
+def _point_result(monkeypatch, conditions, sample=None):
     source = M.REPO_ROOT / "data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
     document = M.load_yaml(source)
     row = deepcopy(document["species"]["CoO"]["observations"][0])
     document["species"] = {"CoO": {"observations": [row]}}
+    if sample is not None:
+        experiment = next(e for e in document["experiments"] if e["experiment_id"] == row["experiment"])
+        experiment["sample"] = sample
+        document["experiments"] = [experiment]
     row["values"]["series"] = row["values"]["series"][:1]
     if conditions is not None:
+        if sample is not None:
+            conditions = deepcopy(conditions)
+            conditions["temperature_K"] = _located({"kind": "point", "point": str(row["values"]["series"][0]["T_K"])})
         row["values"]["series"][0]["point_conditions"] = conditions
     migrator = M.Migrator(M.REPO_ROOT)
     load = M.load_yaml
     with monkeypatch.context() as patch:
         patch.setattr(M, "load_yaml", lambda path: document if path == source else load(path))
         migrator._migrate_extract(source)
+    if sample is not None:
+        migrator.finalize()
+        assert not migrator.result.validation.hard_issues
     observation = next(iter(migrator.result.observations.values()))
     experiment = migrator.result.experiments[observation.experiment_id]
     bench = migrator.result.benches[experiment.bench_id]
@@ -356,6 +482,18 @@ def _conditions():
             "printed_composition": _located({"SiO2": "60", "MgO": "40"})}
 
 
+def _serialized_consumer_inputs(sample, conditions):
+    from tests.battery.test_waypoints import _bench
+
+    experiment = replace(F.tabulation_experiment(), sample=M._sample_from_plain(sample))
+    raw = M.to_plain(F.observation("row", experiment.experiment_id, F.o2_identity(), "1"))
+    raw["point_conditions"] = conditions
+    observation = M.observation_from_plain(yaml.safe_load(yaml.safe_dump(raw)))
+    experiment = M.experiment_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(experiment))))
+    observation = M.observation_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(observation))))
+    return collect_consumer_inputs(experiment, _bench(), observation)
+
+
 @pytest.mark.parametrize("component", ["MgO", "Cl", "FeOT"])
 def test_row_printed_composition_engine_boundary(monkeypatch, component):
     conditions = _conditions()
@@ -367,6 +505,120 @@ def test_row_printed_composition_engine_boundary(monkeypatch, component):
         assert (request.payload is not None) == (component == "MgO")
         if component != "MgO":
             assert request.readiness.status.value == "gap"
+
+
+@pytest.mark.parametrize("boundary", ["sample_printed", "row_printed_sample_initial", "row_printed_row_initial"])
+@pytest.mark.parametrize("component", ["MgO", "FeOT", "Cl"])
+@pytest.mark.parametrize("source_extract", [False, True])
+def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, boundary, component, source_extract):
+    conditions = _conditions()
+    canonical = conditions.pop("composition")
+    printed = _typed([["SiO2", "60"], [component, "40"]])
+    sample = {"initial_composition": canonical}
+    conditions["printed_composition"] = printed
+    if boundary == "sample_printed":
+        sample["printed_composition"] = conditions.pop("printed_composition")
+    elif boundary == "row_printed_row_initial":
+        conditions["composition"] = canonical
+    if source_extract:
+        _, requests = _point_result(monkeypatch, conditions, sample)
+    else:
+        inputs = _serialized_consumer_inputs(sample, conditions)
+        waypoint = inputs.waypoints["normalized_composition"]
+        if component != "MgO":
+            assert waypoint.selected is None
+            assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            assert any(path.endswith(f".{component}") for path in waypoint.absence.missing)
+        requests = engine_point_requests(inputs)
+    assert len(requests) == 8
+    for request in requests:
+        assert (request.payload is not None) == (component == "MgO")
+        if component != "MgO":
+            assert request.readiness.status.value == "gap"
+
+
+@pytest.mark.parametrize("row_field", ["composition", "printed_composition"])
+def test_row_composition_override_fallback_controls(row_field):
+    conditions = _conditions()
+    sample = {"initial_composition": conditions.pop("composition")}
+    del conditions["printed_composition"]
+    conditions[row_field] = (
+        _typed([["SiO2", "60"], ["FeOT", "40"]]) if row_field == "composition"
+        else _located({"SiO2": "60", "FeOT": "40"})
+    )
+    inputs = _serialized_consumer_inputs(sample, conditions)
+    requests = engine_point_requests(inputs)
+    assert len(requests) == 8
+    assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
+
+
+@pytest.mark.parametrize("boundary", ["sample_printed", "sample_initial", "row_printed"])
+@pytest.mark.parametrize("first,last", [("-10", "60"), ("60", "-10"), ("10", "60")])
+@pytest.mark.parametrize("canonical_sibling", [False, True])
+def test_duplicate_printed_components_refused_at_all_parsers(monkeypatch, boundary, first, last, canonical_sibling):
+    from simulator.battery.waypoints import _printed_composition_map
+
+    printed = _typed([["SiO2", first], ["SiO2", last], ["MgO", "40"]])
+    assert M._mass_percent_components(printed) is None
+    assert _printed_composition_map(printed["state"]["value"]) is None
+    conditions = _conditions()
+    canonical = conditions.pop("composition")
+    del conditions["printed_composition"]
+    sample = {}
+    if boundary == "row_printed":
+        conditions["printed_composition"] = printed
+    else:
+        sample["initial_composition" if boundary == "sample_initial" else "printed_composition"] = printed
+    if canonical_sibling:
+        if boundary == "sample_initial":
+            conditions["composition"] = canonical
+        else:
+            sample["initial_composition"] = canonical
+    _, requests = _point_result(monkeypatch, conditions, sample)
+    assert len(requests) == 8
+    assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
+
+
+@pytest.mark.parametrize("boundary", ["sample_printed", "sample_initial", "row_printed", "row_printed_with_sample_initial"])
+@pytest.mark.parametrize("reason", [None, "not printed on a molar basis", "unrelated reason"])
+@pytest.mark.parametrize("case,components", [
+    ("valid", [["SiO2", "60"], ["MgO", "40"]]),
+    ("unsupported", [["SiO2", "60"], ["Cl", "40"]]),
+    ("ambiguous", [["SiO2", "60"], ["FeOT", "40"]]),
+    ("negative", [["SiO2", "-60"], ["MgO", "40"]]),
+    ("zero", [["SiO2", "0"], ["MgO", "0"]]),
+    ("infinite", [["SiO2", "Infinity"], ["MgO", "40"]]),
+    ("nan", [["SiO2", "NaN"], ["MgO", "40"]]),
+    ("duplicate", [["SiO2", "-10"], ["SiO2", "60"], ["MgO", "40"]]),
+    ("malformed", [["SiO2", "60"], ["MgO", "40", "ignored"]]),
+])
+def test_review_printed_composition_matrix(boundary, reason, case, components):
+    conditions = _conditions()
+    canonical = conditions.pop("composition")
+    del conditions["printed_composition"]
+    sample = {"mass_kg": _located({"kind": "point", "point": "0.001"})}
+    if boundary.startswith("sample"):
+        sample["initial_composition" if boundary == "sample_initial" else "printed_composition"] = _typed(components)
+    else:
+        conditions["printed_composition"] = _typed(components)
+    if boundary.endswith("with_sample_initial"):
+        sample["initial_composition"] = canonical
+    elif reason is not None and boundary != "sample_initial":
+        sample["initial_composition"] = {"state": {"tag": "unknown", "reason": reason}}
+    if case == "malformed" and boundary != "sample_printed":
+        with pytest.raises(ValueError):
+            _serialized_consumer_inputs(sample, conditions)
+        return
+    inputs = _serialized_consumer_inputs(sample, conditions)
+    requests = engine_point_requests(inputs)
+    valid = case == "valid" or (
+        boundary.endswith("with_sample_initial") and case in ("negative", "zero", "infinite", "nan")
+    )
+    assert len(requests) == 8
+    assert all((request.payload is not None) == valid for request in requests)
+    if not valid:
+        assert inputs.waypoints["normalized_composition"].selected is None
+        assert all(request.readiness.status.value == "gap" for request in requests)
 
 
 @pytest.mark.parametrize("mode", ["unmodified", "point", "pressure_interval", "pressure_bound", "temperature_interval", "oxygen_bound", "approximate"])
