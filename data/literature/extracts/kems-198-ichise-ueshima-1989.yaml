@@ -563,13 +563,13 @@ species:
         figure: '7'
         published_page: 304
         pdf_page_index: 10
-        note: Relation between heat of reaction absorbed and composition. q in arbitrary unit
+        note: 'Three printed series on the shared axes: Reaction A, Reaction B, Reaction C; q x 10^-2 versus atomic fraction of Mn'
       T_range_K:
       - 1261.0
       - 1416.0
       phase: Ag-Mn_binary_alloy
       regime: kems_ion_intensity_thermal_analysis
-      units: q x 10^2 arbitrary vs atomic fraction of Mn
+      units: q x 10^-2 arbitrary vs atomic fraction of Mn
       values:
         quantity: relative_heat_q_vs_composition
         method_class: measured
@@ -669,8 +669,7 @@ species:
           Hansen_1958_K: ~1260
           Hansen_1958_qualifier: approximately as printed ~1260
       uncertainty:
-        note: quoted literature values have no sigma in Table V; present-study column is this work's Table
-          II means
+        note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding Table II mean is 1491 K, so the Present study column is not exactly the Table II means
   Ag:
     observations:
     - observation_id: ichise_1989_ag_tm_tb_table1

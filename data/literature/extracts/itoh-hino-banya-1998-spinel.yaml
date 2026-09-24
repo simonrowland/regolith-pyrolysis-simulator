@@ -79,7 +79,7 @@ laboratory_parameters:
 fidelity_samples:
   - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_o_Mg_Al
     value: -150
-    locator: {published_page: 88, equation: '19', figure: '4', note: 'Printed value γ_o^(Mg,Al) = −150 at 1873 K.'}
+    locator: {published_page: 88, equation: '19', figure: '4', note: 'Printed value r_O^(Mg,Al) = −150 at 1873 K.'}
   - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_Mg_O_Al
     value: -230
     locator: {published_page: 88, equation: '19', note: 'Printed value r_Mg^(O,Al) = −230 at 1873 K.'}
@@ -122,7 +122,7 @@ species:
         locator:
           <<: *results
           section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
-          figure: '1'
+          note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
         phase: oxide_deoxidation_products_at_1873K
         regime: Al_deoxidation_equilibrium
         T_range_K: [1873.0, 1873.0]
@@ -147,7 +147,7 @@ species:
           published_page: 88
           equations: '7-20'
           figure: '4'
-          note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; symbols retain the paper's interaction-coefficient notation.
+          note: 'Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure 4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.'
         T_range_K: [1873.0, 1873.0]
         phase: dilute_liquid_iron
         standard_state: dissolved-element concentration in mass% with infinite-dilution activity coefficients
@@ -162,8 +162,8 @@ species:
           r_o_Ca_Mg: 0
           r_Mg_O_Al: -230
           r_Al_O_Mg: -260
-          r_o_Ca_Al_note: 'The paper says γ_o^(Ca,Al) can be set to zero from the slope.'
-          r_o_Ca_Mg_note: 'The paper says γ_o^(Ca,Mg) can be set to zero from the slope.'
+          r_o_Ca_Al_note: 'The paper says r_O^(Ca,Al) can be set to zero from the slope.'
+          r_o_Ca_Mg_note: 'The paper says r_O^(Ca,Mg) can be set to zero from the slope.'
         uncertainty:
           note: No numerical uncertainty printed for the fitted interaction coefficients.
       - observation_id: itoh_1998_spinel_equilibrium_constants
@@ -285,13 +285,30 @@ species:
         locator:
           source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
           published_page: 86
-          figures: '1-2'
-          note: Dissolved Mg/O versus dolomite MgO/CaO and concentration versus time are plotted; points were not digitised.
+          figure: '1'
+          note: 'Four printed series: filled circles Present work [Mg], filled squares Present work [O], open circles Degawa [Mg], open squares Degawa [O]; x-axis dolomite MgO/CaO; points not digitised'
         phase: liquid_iron
         regime: Al_deoxidation_equilibrium
         units: mass% as plotted
         values:
-          quantity: dissolved_element_concentration_plots
+          quantity: dissolved_Mg_O_vs_dolomite_MgO_CaO
+          method_class: figure_only
+          admission_status: figure_only
+          not_digitised: true
+        uncertainty:
+          note: Figure error bars or point uncertainties were not transcribed.
+      - observation_id: itoh_1998_fig2_measured_concentration_time_plots
+        type: transition_point
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 86
+          figure: '2'
+          note: 'Four printed series versus time: [Al] circles, [Mg] squares, [O] triangles, [Ca] diamonds; [Al]init = 0.5 mass%; crucible (%MgO)0.4(%CaO)0.6; points not digitised'
+        phase: liquid_iron
+        regime: Al_deoxidation_equilibrium
+        units: mass% as plotted
+        values:
+          quantity: dissolved_element_concentration_vs_time
           method_class: figure_only
           admission_status: figure_only
           not_digitised: true

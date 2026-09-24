@@ -182,6 +182,7 @@ species:
         source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
         published_page: '63'
         figure: '3'
+        note: Dotted KEMS contours at 1650 K; printed log10 activity levels -5, -4, -3, -2
       phase: BaO-B2O3-SiO2_melt
       standard_state: B2O3 activity; standard-state definition not restated in this review figure
       regime: kems_effusion_compiled_experiment
@@ -194,12 +195,12 @@ species:
         status: figure_only
         admission_status: rejected_no_complete_figure_digitization
         temperature_K_as_published: '1650'
-        contour_levels_as_printed: ['-3', '-4', '-5']
+        contour_levels_as_printed: ['-5', '-4', '-3', '-2']
         line_style_as_published: dotted
         locator: {published_page: '63', figure: '3'}
         quote: >-
           The B2O3 isoactivities lines in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
-          -3; -4; -5.
+          -5; -4; -3; -2.
         completeness_note: Unique printed levels retained; dotted contour coordinates were not digitised.
       uncertainty:
         reported_status: not_reported
@@ -210,6 +211,7 @@ species:
         source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
         published_page: '63'
         figure: '3'
+        note: Solid GLTAS model contours at 1650 K; printed log10 activity levels -8, -6, -4, -1
       phase: BaO-B2O3-SiO2_GLTAS_model
       standard_state: B2O3 activity model output
       regime: thermodynamic_model
@@ -224,12 +226,12 @@ species:
         admission_status: rejected_model_output_not_measurement
         refusal_reason: model_output_not_measurement
         temperature_K_as_published: '1650'
-        contour_levels_as_printed: ['-1', '-2', '-3', '-4', '-6', '-8']
+        contour_levels_as_printed: ['-8', '-6', '-4', '-1']
         line_style_as_published: solid
         locator: {published_page: '63', figure: '3'}
         quote: >-
           The B2O3 isoactivities lines in melts of the BaO-B2O3-SiO2 system at the temperature 1650 K: solid lines are results of modeling using GLTAS and dotted lines are the experimental data obtained by the Knudsen effusion mass spectrometric method [27, 29, 30].
-          -1; -2; -3; -4; -6; -8.
+          -8; -6; -4; -1.
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
   SiO2:
@@ -562,7 +564,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
     table: '1'
 - path: species.B2O3.observations[stolyarova_2013_fig3_b2o3_kems_contours_figure_only].values.contour_levels_as_printed
-  value: ['-3', '-4', '-5']
+  value: ['-5', '-4', '-3', '-2']
   note: Figure 3 dotted experimental labels only, checked against the rendered publisher PDF
   locator:
     source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
