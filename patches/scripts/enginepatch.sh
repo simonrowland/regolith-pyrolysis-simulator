@@ -2,7 +2,7 @@
 # Engine patch manager. Engine checkouts are outside this repo and are NOT
 # version-controlled by us, so local edits are invisible drift unless captured here.
 #
-#   enginepatch.sh [--python PATH] verify  [engine]   # engine tree == patch set? (default: all)
+#   enginepatch.sh [--python PATH] [--allow-not-loaded] verify [engine] # tree == patch set?
 #   enginepatch.sh [--python PATH] apply   <engine>   # apply patches onto a clean checkout
 #   enginepatch.sh [--python PATH] refresh <engine>   # re-capture patches from a dirty tree
 #   enginepatch.sh [--python PATH] status  [engine]   # base SHA, drift, patch list
@@ -28,6 +28,7 @@ fi
 PYTHON_ARG=""
 PYTHON=""
 FORCE_PATH=0
+ALLOW_NOT_LOADED=0
 
 engine_package() {
   case "$1" in
@@ -54,9 +55,16 @@ engine_override() {
     vaporock)     echo "${VAPOROCK_CHECKOUT:-}" ;;
     thermoengine) echo "${THERMOENGINE_CHECKOUT:-}" ;;
     pysulfsat)    echo "${PYSULFSAT_CHECKOUT:-}" ;;
-    # Preserve sulfliq's historical default, but actions against it still
-    # require --force-path when the selected interpreter cannot import it.
-    sulfliq)      echo "${SULFLIQ_CHECKOUT:-$HOME/Repos/sulfliq}" ;;
+    sulfliq)      echo "${SULFLIQ_CHECKOUT:-}" ;;
+    *)            echo "" ;;
+  esac
+}
+
+engine_fallback() {
+  case "$1" in
+    # Preserve sulfliq's historical default for inspection, but do not treat
+    # it as the tree loaded by an interpreter that cannot import SulfLiq.
+    sulfliq)      echo "$HOME/Repos/sulfliq" ;;
     *)            echo "" ;;
   esac
 }
@@ -111,16 +119,21 @@ RESOLVED_PATH=""
 IMPORTABLE=0
 RESOLVE_ERROR=""
 CHECKOUT_STATUS=""
+RESOLUTION_KIND=""
+OVERRIDE_VAR=""
 
 resolve_engine() {
-  local e="$1" package source override top override_var
+  local e="$1" package source override fallback top override_var
   RESOLVED_PATH=""
   IMPORTABLE=0
   RESOLVE_ERROR=""
+  RESOLUTION_KIND="not-loaded"
+  OVERRIDE_VAR=""
 
   package="$(engine_package "$e")"
   if [ -n "$package" ] && source="$(python_import_root "$package" 2>/dev/null)"; then
     IMPORTABLE=1
+    RESOLUTION_KIND="imported"
     if top="$(git -C "$source" rev-parse --show-toplevel 2>/dev/null)"; then
       RESOLVED_PATH="$(cd "$top" && pwd -P)"
     else
@@ -132,7 +145,9 @@ resolve_engine() {
 
   override="$(engine_override "$e")"
   override_var="$(engine_override_var "$e")"
+  OVERRIDE_VAR="$override_var"
   if [ -n "$override" ]; then
+    RESOLUTION_KIND="override"
     if [ -d "$override" ]; then
       override="$(cd "$override" && pwd -P)"
       if top="$(git -C "$override" rev-parse --show-toplevel 2>/dev/null)"; then
@@ -143,6 +158,13 @@ resolve_engine() {
     else
       RESOLVED_PATH="$override"
     fi
+    return 0
+  fi
+
+  fallback="$(engine_fallback "$e")"
+  if [ -n "$fallback" ]; then
+    RESOLUTION_KIND="fallback"
+    RESOLVED_PATH="$fallback"
     return 0
   fi
 
@@ -245,6 +267,36 @@ cmd_status() {
   return $rc
 }
 
+PATCH_STATE=""
+
+patch_norm() { grep -E '^[+-]' "$1" | grep -Ev '^(\+\+\+|---)' | sort; }
+
+compare_patchset() {
+  local e="$1" live want p
+  live="$(mktemp)"; want="$(mktemp)"
+  git -C "$RESOLVED_PATH" diff HEAD > "$live"
+  : > "$want"
+  for p in "$PATCHES/$e"/*.patch; do
+    [ -e "$p" ] || continue
+    # skip patches explicitly declared unapplied in STATUS (documented, not in tree)
+    if [ -f "$PATCHES/$e/STATUS" ] && \
+       awk -v f="$(basename "$p")" '$1==f && $2=="unapplied"{found=1} END{exit !found}' "$PATCHES/$e/STATUS"; then
+      continue
+    fi
+    cat "$p" >> "$want"
+  done
+  # compare the set of changed +/- lines, not byte-identical headers: patch
+  # files are captured at different times and carry differing index/context lines.
+  if diff -q <(patch_norm "$live") <(patch_norm "$want") >/dev/null 2>&1; then
+    PATCH_STATE="MATCH"
+  else
+    PATCH_STATE="DRIFT"
+    echo "  in tree but not in patches:"; comm -23 <(patch_norm "$live") <(patch_norm "$want") | head -8 | sed 's/^/    /'
+    echo "  in patches but not in tree:"; comm -13 <(patch_norm "$live") <(patch_norm "$want") | head -8 | sed 's/^/    /'
+  fi
+  rm -f "$live" "$want"
+}
+
 # verify: does the engine's current diff equal the concatenated patch set?
 cmd_verify() {
   rc=0
@@ -267,34 +319,36 @@ cmd_verify() {
     fi
     resolve_engine "$e" || true
     if ! validate_checkout "$e"; then
-      echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
-      rc=1
+      if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
+        echo "$e: NOT-LOADED ($PYTHON) FALLBACK=$CHECKOUT_STATUS RESOLVED=${RESOLVED_PATH:-unresolved}"
+        rc=1
+      elif [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "not-loaded" ]; then
+        echo "$e: NOT-LOADED ($PYTHON) FALLBACK=UNRESOLVED RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        if [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
+          rc=1
+        fi
+      else
+        echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        rc=1
+      fi
       continue
     fi
-    live="$(mktemp)"; want="$(mktemp)"
-    git -C "$RESOLVED_PATH" diff HEAD > "$live"
-    : > "$want"
-    for p in "$PATCHES/$e"/*.patch; do
-      [ -e "$p" ] || continue
-      # skip patches explicitly declared unapplied in STATUS (documented, not in tree)
-      if [ -f "$PATCHES/$e/STATUS" ] && \
-         awk -v f="$(basename "$p")" '$1==f && $2=="unapplied"{found=1} END{exit !found}' "$PATCHES/$e/STATUS"; then
-        continue
+    compare_patchset "$e"
+    if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
+      echo "$e: NOT-LOADED ($PYTHON) FALLBACK=$PATCH_STATE RESOLVED=$RESOLVED_PATH"
+      if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
+        rc=1
       fi
-      cat "$p" >> "$want"
-    done
-    # compare the set of changed +/- lines, not byte-identical headers: patch
-    # files are captured at different times and carry differing index/context lines.
-    norm() { grep -E '^[+-]' "$1" | grep -Ev '^(\+\+\+|---)' | sort; }
-    if diff -q <(norm "$live") <(norm "$want") >/dev/null 2>&1; then
-      echo "$e: MATCH RESOLVED=$RESOLVED_PATH"
+    elif [ "$PATCH_STATE" = "MATCH" ]; then
+      if [ "$RESOLUTION_KIND" = "override" ]; then
+        echo "$e: MATCH RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; interpreter loads engine here)"
+      else
+        echo "$e: MATCH RESOLVED=$RESOLVED_PATH"
+      fi
     else
       echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$RESOLVED_PATH"
-      echo "  in tree but not in patches:"; comm -23 <(norm "$live") <(norm "$want") | head -8 | sed 's/^/    /'
-      echo "  in patches but not in tree:"; comm -13 <(norm "$live") <(norm "$want") | head -8 | sed 's/^/    /'
       rc=1
     fi
-    rm -f "$live" "$want"
   done
   return $rc
 }
@@ -373,6 +427,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --force-path)
       FORCE_PATH=1
+      shift
+      ;;
+    --allow-not-loaded)
+      ALLOW_NOT_LOADED=1
       shift
       ;;
     --help|-h)

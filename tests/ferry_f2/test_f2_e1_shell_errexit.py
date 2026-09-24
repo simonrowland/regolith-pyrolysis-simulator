@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -131,7 +132,13 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
         encoding="utf-8",
     )
 
-    env = {**os.environ, "PYTHONPATH": str(editable_site)}
+    temp_dir = tmp_path / "tmp"
+    temp_dir.mkdir()
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(editable_site),
+        "TMPDIR": str(temp_dir),
+    }
     verify = [
         "bash",
         str(script),
@@ -166,6 +173,96 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
     )
     assert staged_drift.returncode != 0
     assert "vaporock: DRIFT" in staged_drift.stdout
+
+
+def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
+    tmp_path: Path,
+) -> None:
+    """A matching historical fallback is not evidence for an unloaded engine."""
+
+    project = tmp_path / "project"
+    script = project / "patches" / "scripts" / "enginepatch.sh"
+    script.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
+
+    home = tmp_path / "home"
+    fallback = home / "Repos" / "sulfliq"
+    base_contents = "LOADED = False\n"
+    base_file = fallback / "src" / "SulfLiq" / "__init__.py"
+    base_sha = _init_git_checkout(
+        fallback,
+        "src/SulfLiq/__init__.py",
+        base_contents,
+    )
+    base_file.write_text("LOADED = True\n", encoding="utf-8")
+    patch_text = _git("diff", cwd=fallback)
+
+    patch_dir = project / "patches" / "sulfliq"
+    patch_dir.mkdir(parents=True)
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {base_sha}\n", encoding="utf-8"
+    )
+    (patch_dir / "0001-test.patch").write_text(patch_text, encoding="utf-8")
+
+    no_import_python = tmp_path / "no-import-python"
+    no_import_python.write_text(
+        f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -S \"$@\"\n",
+        encoding="utf-8",
+    )
+    no_import_python.chmod(0o755)
+    temp_dir = tmp_path / "tmp"
+    temp_dir.mkdir()
+    env = {
+        **os.environ,
+        "HOME": str(home),
+        "PYTHONPATH": "",
+        "TMPDIR": str(temp_dir),
+    }
+    verify = [
+        "bash",
+        str(script),
+        "--python",
+        str(no_import_python),
+        "verify",
+        "sulfliq",
+    ]
+
+    proc = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+
+    assert proc.returncode != 0
+    assert f"sulfliq: NOT-LOADED ({no_import_python})" in proc.stdout
+    assert "FALLBACK=MATCH" in proc.stdout
+    assert "sulfliq: MATCH" not in proc.stdout
+    assert f"RESOLVED={fallback}" in proc.stdout
+
+    allowed = subprocess.run(
+        ["bash", str(script), "--allow-not-loaded", *verify[2:]],
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+    assert allowed.returncode == 0, allowed.stdout + allowed.stderr
+
+    overridden = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**env, "SULFLIQ_CHECKOUT": str(fallback)},
+    )
+    assert overridden.returncode == 0, overridden.stdout + overridden.stderr
+    assert (
+        f"sulfliq: MATCH RESOLVED={fallback} "
+        "(explicit SULFLIQ_CHECKOUT override; interpreter loads engine here)"
+        in overridden.stdout
+    )
 
 
 def test_scripts_enable_errexit() -> None:
