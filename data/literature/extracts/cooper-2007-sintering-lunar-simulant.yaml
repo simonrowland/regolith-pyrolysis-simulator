@@ -63,7 +63,7 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         quoted_from: Allen et al. (1992a)
-        temperature_C: 1100
+        T_C: 1100
         onset_time: a matter of minutes
         sample_form: compressed JSC-1 samples
         outcome: high-strength sintered bricks
@@ -79,7 +79,7 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         quoted_from: Allen et al. (1996a)
-        temperature_C: 1050
+        T_C: 1050
         duration_h: 3
         sample_form: uncompressed samples
         outcome: lightly-sintered material disaggregable with gentle pressure
@@ -162,7 +162,7 @@ species:
         quantity: sintering_onset_conditions
         method_class: quoted_attributed
         quoted_from: Wozinski et al. (1972)
-        temperature_C: 800
+        T_C: 800
         duration: within minutes
         sample_condition: packed and undisturbed soil
         note: The prose reports the cited result; this paper does not provide the cited apparatus details.
@@ -180,7 +180,7 @@ species:
         method_class: model_derived
         generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
         material: JSC-1A
-        hydrogen_temperature_C: 1000
+        T_C: 1000
         fluidizing_fraction_pct: approximately 70
         flow_rate_axis: 0.01 to 100 L/min as plotted
         note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.

@@ -27,6 +27,7 @@ from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_
 class WaypointAuthority(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
+    EXTRAPOLATED = "extrapolated"
     ASSUMED = "assumed"
 
 
@@ -59,6 +60,10 @@ class GapReason(StrEnum):
     NO_SCOREABLE_OBSERVATIONS = "no_scoreable_observations"
 
 
+class UnknownCompositionRelationError(ValueError):
+    """A composition derivation relation lacks an explicit provenance mapping."""
+
+
 class ReadinessStatus(StrEnum):
     READY = "ready"
     PARTIAL = "partial"
@@ -74,6 +79,7 @@ class Waypoint:
     authority: WaypointAuthority
     inputs: tuple[str, ...]
     flags: tuple[WaypointFlag, ...] = ()
+    notice: str | None = None
 
 
 @dataclass(frozen=True)
@@ -139,11 +145,13 @@ class ConsumerReadiness:
     gaps: tuple[ReadinessGap, ...]
     engine: str | None = None
     notices: tuple[KnudsenConsistencyNotice, ...] = ()
+    flags: tuple[Mapping[str, object], ...] = ()
 
 
 _AUTHORITY_RANK = {
     WaypointAuthority.PRINTED: 3,
     WaypointAuthority.DERIVED: 2,
+    WaypointAuthority.EXTRAPOLATED: 1,
     WaypointAuthority.ASSUMED: 1,
 }
 _PI = Decimal("3.141592653589793238462643383279502884197")
@@ -503,10 +511,33 @@ def normalized_composition(
                 raise ValueError("empty charge")
             # n_i/sum(n_j) is dimensionless and invariant under n -> k*n, k>0.
             # A one-mole reference charge preserves ratios at specified T/P/fO2.
+            notice = None
+            if located.inference is not None:
+                locator = located.locator
+                locator_text = str(locator) if locator is not None else "source locator unavailable"
+                origins = {
+                    "wt_pct_to_mole_fraction":
+                        "printed oxide wt% composition",
+                    "calculated_from_printed_recipe_or_aimed_target":
+                        "printed recipe/aimed target",
+                    "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
+                        "measured composition",
+                }
+                try:
+                    origin = origins[located.inference.relation]
+                except KeyError as exc:
+                    raise UnknownCompositionRelationError(
+                        f"unknown normalized composition relation: {located.inference.relation!r}"
+                    ) from exc
+                notice = (
+                    f"calculated from {origin}; "
+                    f"relation={located.inference.relation}; "
+                    f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
+                )
             routes.append(Waypoint("normalized_composition",
                 {species: n / total for species, n in amounts.items()},
                 ("observation_" if key in point else "") + "normalized_" + field,
-                WaypointAuthority.DERIVED, (path,)))
+                WaypointAuthority.DERIVED, (path,), notice=notice))
             # Rank source evidence before normalization makes every output DERIVED.
             # Evidence directness: a printed x_i outranks a printed molar inventory,
             # which outranks a wt%-to-moles derivation (external molar-mass table).
@@ -514,6 +545,8 @@ def normalized_composition(
             if field == "initial_composition":
                 directness = 2 if raw.amount_basis is AmountBasis.MOLE_FRACTION else 1
             evidence_ranks.append((not bool(located.inference), directness))
+        except UnknownCompositionRelationError:
+            raise
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
             missing.append(path)
@@ -884,6 +917,52 @@ def thermal_path(
     )
 
 
+def _c_co_pressure_Pa(
+    experiment: Experiment, bench: Bench, observation: Observation | None
+) -> tuple[Value, tuple[str, ...]] | None:
+    """Printed P_CO in Pa, or total P when the paper states CO is the gas.
+
+    Prefer a single-species CO sweep (or a mixture with exactly one printed CO
+    component partial pressure). Fall back to pressure_boundary when the C–CO
+    buffer token already asserts that CO is the buffering gas — never invent a
+    mole fraction or pick among CO/Ar alternatives.
+    """
+    sweep = experiment.pressure_environment.sweep_gas
+    if sweep.state.is_value and sweep.state.value.alternatives is None:
+        gas = sweep.state.value
+        if gas.species == "CO" and gas.partial_pressure_Pa.is_value:
+            return (
+                Value.point_of(gas.partial_pressure_Pa.value),
+                ("experiment.pressure_environment.sweep_gas",),
+            )
+        if gas.components is not None:
+            printed_co = [
+                component
+                for component in gas.components
+                if component.species == "CO" and component.partial_pressure_Pa.is_value
+            ]
+            if len(printed_co) == 1:
+                return (
+                    Value.point_of(printed_co[0].partial_pressure_Pa.value),
+                    ("experiment.pressure_environment.sweep_gas",),
+                )
+    boundary = pressure_boundary(experiment, bench, observation).selected
+    if boundary is not None and boundary.value.kind is ValueKind.POINT:
+        return boundary.value, boundary.inputs
+    return None
+
+
+def _is_pressure_unit_conversion(inference: object) -> bool:
+    return (
+        inference is not None
+        and str(getattr(inference, "relation", "")).endswith("_to_Pa")
+        and any(
+            str(item).startswith("original_unit=")
+            for item in getattr(inference, "inputs", ())
+        )
+    )
+
+
 def oxygen_condition(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
@@ -967,31 +1046,121 @@ def oxygen_condition(
                                 (f"observation[{observation.observation_id}].point_conditions.gas_composition", *thermal.inputs)))
                     except OffgasFO2Unavailable:
                         pass
-    # The buffer relation is a heavier derivation (published table + thermal +
-    # pressure waypoints) than any printed pO2 above, so it ranks last.
+    # Buffer relations (graphite C–CO and Frost condensed buffers) are heavier
+    # derivations than any printed pO2 above, so they rank last.
     if control is not None and control.buffer is not None and control.buffer.state.is_value:
+        from simulator.chemistry.graphite_c_co import (
+            is_c_co_buffer_token,
+            log10_fo2_c_co_bar,
+        )
         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
 
-        buffer = PUBLISHED_BUFFERS.get(str(control.buffer.state.value).upper())
+        buffer_token = str(control.buffer.state.value)
         thermal = thermal_path(experiment, bench, observation).selected
-        pressure = pressure_boundary(experiment, bench, observation).selected
-        if buffer is not None and thermal is not None and pressure is not None:
-            temperature = thermal.value
-            if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
-                temperature = Value.point_of(temperature.series[0][1])
-            if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
-                    and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
-                T = temperature.point
-                P = pressure.value.point / Decimal(100000)
-                # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
-                # condensed buffer equilibrium inside its published T domain.
-                # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
-                # Units: K/K and (K/bar)*bar/K are dimensionless.
-                # Sanity: IW at 1000 K, 1 bar gives -20.787.
-                value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
-                routes.append(Waypoint("oxygen_condition", Value.point_of(value),
-                    "buffer_relation", WaypointAuthority.DERIVED,
-                    ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+        if is_c_co_buffer_token(buffer_token):
+            p_co = _c_co_pressure_Pa(experiment, bench, observation)
+            if thermal is not None and p_co is not None:
+                temperature = thermal.value
+                if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
+                    temperature = Value.point_of(temperature.series[0][1])
+                pressure_value, pressure_inputs = p_co
+                if temperature.kind is ValueKind.POINT and pressure_value.kind is ValueKind.POINT:
+                    T = temperature.point
+                    # Premise: paper states graphite / C–CO buffering and prints
+                    # T and P_CO (or total P when CO is the stated gas). The
+                    # named half-reaction is C + 1/2 O2 = CO; at graphite
+                    # saturation the lab C–O fluid is the published CCO buffer
+                    # (Jakobsson & Oskarsson 1994 via LEPR) — see
+                    # simulator.chemistry.graphite_c_co.
+                    # Algebra: log10(fO2)=log10(fO2_ref)
+                    # +2*log10(P_CO/P_ref) from K=P_CO/sqrt(fO2).
+                    # Units: Pa/1e5 → bar; pressure ratio is dimensionless.
+                    # Sanity: at 1473.15 K, 1 atm → -10.475 and
+                    # 0.1 atm → -12.475.
+                    P_bar = pressure_value.point / Decimal(100000)
+                    log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
+                    routes.append(Waypoint(
+                        "oxygen_condition",
+                        Value.point_of(log_fo2),
+                        "graphite_c_co_buffer",
+                        WaypointAuthority.DERIVED,
+                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
+                    ))
+        else:
+            buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
+            pressure = pressure_boundary(experiment, bench, observation).selected
+            if buffer is not None and thermal is not None and pressure is not None:
+                temperature = thermal.value
+                if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
+                    temperature = Value.point_of(temperature.series[0][1])
+                if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
+                        and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
+                    T = temperature.point
+                    P = pressure.value.point / Decimal(100000)
+                    # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
+                    # condensed buffer equilibrium inside its published T domain.
+                    # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
+                    # Units: K/K and (K/bar)*bar/K are dimensionless.
+                    # Sanity: IW at 1000 K, 1 bar gives -20.787.
+                    value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
+                    routes.append(Waypoint("oxygen_condition", Value.point_of(value),
+                        "buffer_relation", WaypointAuthority.DERIVED,
+                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+    # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
+    # bound is therefore a usable engine point only at its bound, with an
+    # extrapolation notice. The bound is method_class calculated, never printed:
+    # pO2 [bar] <= P_total [Pa] / 100000 Pa/bar, so log10(fO2/bar) <= log10(...).
+    # Sanity: P_total=1e-4 Pa=1e-9 bar gives log10(fO2/bar) <= -9.
+    # Only the run pressure waypoint is inspected. Apparatus ultimate vacuum is
+    # deliberately absent from pressure_boundary and cannot create this route.
+    boundary = pressure_boundary(experiment, bench, observation).selected
+    if boundary is not None and boundary.route in {"printed_run_pressure", "observation_total_pressure_Pa"}:
+        pressure = boundary.value
+        located_pressure = experiment.pressure_environment.total_pressure_Pa
+        if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+            located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
+        locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
+        vacuum_evidence = (
+            located_pressure is not None
+            and (
+                located_pressure.inference is None
+                or _is_pressure_unit_conversion(located_pressure.inference)
+            )
+            and any(
+                token in locator_note
+                for token in (
+                    "vacuum",
+                    "residual",
+                    "chamber pressure",
+                    "during evaporation",
+                )
+            )
+        )
+        upper_pa: Decimal | None = None
+        if pressure.kind is ValueKind.POINT:
+            upper_pa = pressure.point
+        elif (pressure.kind is ValueKind.BOUND
+              and pressure.bound_operator in {"<", "<=", "≤"}):
+            upper_pa = pressure.bound_value
+        if vacuum_evidence and upper_pa is not None and upper_pa >= 0 and upper_pa <= Decimal("1"):
+            locator = experiment.pressure_environment.total_pressure_Pa.locator
+            locator_text = repr(locator) if locator is not None else boundary.inputs[0]
+            if boundary.route == "observation_total_pressure_Pa" and observation is not None:
+                located = (observation.point_conditions or {}).get("total_pressure_Pa")
+                locator_text = repr(located.locator) if located is not None and located.locator is not None else boundary.inputs[0]
+            value = _log_pressure(
+                Value(ValueKind.POINT, point=upper_pa, approximate=pressure.approximate)
+            )
+            if value is not None:
+                qualification = "approximate " if pressure.approximate else ""
+                routes.append(Waypoint(
+                    "oxygen_condition",
+                    value,
+                    "vacuum_total_pressure_upper_bound",
+                    WaypointAuthority.EXTRAPOLATED,
+                    (*boundary.inputs, "Dalton: pO2 <= P_total"),
+                    notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
+                ))
     if routes:
         # A fired route is the decision. The OR-set is consulted only for the gap text.
         return _result(

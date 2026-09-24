@@ -133,14 +133,194 @@ benches:
       state: {tag: value, value: IR camera through special optics and vacuum window}
       locator: {page: 34, section: '3.1 Überblick und Layout'}
 experiments:
+- experiment_id: jsc1-ms1
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS1; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.000717'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.717 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
+  conditions:
+    temperature_K: {state: {tag: value, value: '1815.15'}, locator: {page: 105, table: '5.3', note: 'MS1 Tmax 1542 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '77'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms2
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS2; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.000991'}}, locator: {page: 105, table: '5.3', note: 'Printed 0.991 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
+  conditions:
+    temperature_K: {state: {tag: value, value: '1836.15'}, locator: {page: 105, table: '5.3', note: 'MS2 Tmax 1563 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '55'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms4
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS4; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.001002'}}, locator: {page: 105, table: '5.3', note: 'Printed 1.002 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
+  conditions:
+    temperature_K: {state: {tag: value, value: '1698.15'}, locator: {page: 105, table: '5.3', note: 'MS4 Tmax 1425 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '38'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
+- experiment_id: jsc1-ms5
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 105, table: '5.3', note: 'Physical run MS5; paper labels the run explicitly'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.007856'}}, locator: {page: 105, table: '5.3', note: 'Printed 7.856 g; unit conversion only'}}
+    printed_composition: {state: {tag: value, value: 'NASA JSC-1 basaltic lunar soil simulant'}, locator: {page: 17, section: '2.1.2 Mondstaub-Simulant JSC-1'}}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
+  conditions:
+    temperature_K: {state: {tag: value, value: '1853.15'}, locator: {page: 105, table: '5.3', note: 'MS5 Tmax 1580 C; unit conversion only'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '174'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-solar-series
   bench_id: dlr-solar-vacuum-system
   method: solar_furnace_pyrolysis
-  locator: {page: 105, table: '5.3', note: JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration}
+  locator: {page: 105, table: '5.3', note: 'JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration'}
   sample:
     printed_composition:
       state: {tag: value, value: NASA JSC-1 basaltic lunar soil simulant}
       locator: {page: 17, section: '2.1.2 Mondstaub-Simulat JSC-1'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.513465703174']
+          - [Al2O3, '0.095149338825']
+          - [CaO, '0.119948062719']
+          - [MgO, '0.144423887155']
+          - [FeO, '0.066617125028']
+          - [Fe2O3, '0.013770636852']
+          - [K2O, '0.005492929698']
+          - [TiO2, '0.012957110341']
+          - [Na2O, '0.028175206207']
+      locator: {page: 17, figure: '2.2', note: 'JSC-1 oxide wt% feedstock composition as printed; normalized mole fractions derived from the complete map'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        - 'original_unit=wt_pct'
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Powder or granulate}
       locator: {page: 54, section: '4.1.2 Pulverproben'}
@@ -551,7 +731,7 @@ species:
       uncertainty:
         note: IR-camera surface temperatures; no printed sigma on Tmax
     - observation_id: sauerborn_2005_table54_ms1_cold_trap_edx
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms1
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -612,6 +792,7 @@ species:
         splash_oxygen_atom_pct_as_published: ueber 65
         blank_foil_Na_mean: 0.6
         Tmax_C_from_table53: 1542
+        Tmax_C: 1542
         note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
       uncertainty:
         note: printed Standardabweichung on foil means; splash is a single Wert
@@ -667,7 +848,7 @@ species:
       uncertainty:
         note: printed Standardabweichung on blank-foil means
     - observation_id: sauerborn_2005_table55_ms2_cold_trap_edx
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms2
       type: rate_series
       locator:
         table: '5.5'
@@ -734,6 +915,7 @@ species:
         Si_as_published: '-'
         Si_note: 'footnote 10: Si lines overlapped by dominant Ta; no concrete value for a weak Si signal'
         Tmax_C_from_table53: 1563
+        Tmax_C: 1563
         scans_exclude_splashes: true
         note: 'Tantalum foil. Caption: values > 1 atom% lie in background-noise error except the stated
           Na (and possible P) rise and the O/Ta oxidation of the foil.'
@@ -786,7 +968,7 @@ species:
       uncertainty:
         note: none printed
     - observation_id: sauerborn_2005_fig523_ms1_epma_glass
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms1
       type: gibbs_table
       locator:
         figure: '5.23'
@@ -2355,6 +2537,7 @@ species:
         splash_oxygen_atom_pct_as_published: ueber 65
         blank_foil_Na_mean: 0.6
         Tmax_C_from_table53: 1542
+        Tmax_C: 1542
         note: Copper foil; Cu is substrate. Oxygen omitted from the table by author.
         evidence_class: measured
       uncertainty:
@@ -2621,6 +2804,7 @@ species:
         Si_as_published: '-'
         Si_note: 'footnote 10: Si lines overlapped by dominant Ta; no concrete value for a weak Si signal'
         Tmax_C_from_table53: 1563
+        Tmax_C: 1563
         scans_exclude_splashes: true
         note: 'Tantalum foil. Caption: values > 1 atom% lie in background-noise error except the stated Na (and
           possible P) rise and the O/Ta oxidation of the foil.'
@@ -3584,7 +3768,7 @@ species:
   Fe:
     observations:
     - observation_id: sauerborn_2005_table56_ms5c_epma
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms5
       type: gibbs_table
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -3634,7 +3818,7 @@ species:
       uncertainty:
         note: none printed; mixed-analysis sums >100 are source format, not transcription error
     - observation_id: sauerborn_2005_table56_ms5c_epma_full_grid
-      experiment: jsc1-solar-series
+      experiment: jsc1-ms5
       type: gibbs_table
       locator:
         table: '5.6'
@@ -5048,6 +5232,7 @@ species:
           Fe: 0.0
           Ta: 48.9
         Tmax_C_from_table51: 1638
+        Tmax_C: 1638
         note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air
           Ca(OH)2.
       uncertainty:
@@ -5716,6 +5901,7 @@ species:
           Fe: 0.0
           Ta: 48.9
         Tmax_C_from_table51: 1638
+        Tmax_C: 1638
         note: Author states XRD found no pyrolysis products in the CaO residue, only CaO plus post-air Ca(OH)2.
         evidence_class: measured
       uncertainty:

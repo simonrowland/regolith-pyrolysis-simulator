@@ -15,6 +15,7 @@ import copy
 import hashlib
 import math
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -32,6 +33,209 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+
+
+def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
+    )
+    assert doc["source"]["url"] == "https://pmc.ncbi.nlm.nih.gov/articles/PMC6485635/"
+    expected = {
+        "SiO2": "50.66",
+        "TiO2": "0.96",
+        "Al2O3": "15.11",
+        "FeO": "9.69",
+        "MnO": "0.20",
+        "MgO": "8.90",
+        "CaO": "12.28",
+        "Na2O": "1.96",
+        "K2O": "0.07",
+    }
+    for experiment in doc["experiments"]:
+        composition = experiment["sample"]["printed_composition"]
+        assert composition["state"] == {"tag": "value", "value": expected}
+        assert composition["locator"]["table"] == "Extended Data Table 1"
+        assert composition["locator"].get("pdf_page_index") is None
+        assert "PMC6485635 online" in composition["locator"]["note"]
+
+
+def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
+    )
+    experiments = doc["experiments"]
+    baseline = experiments[0]
+    for experiment in experiments[1:]:
+        for field in ("mass_kg", "form", "pretreatment"):
+            assert experiment["sample"][field] == baseline["sample"][field]
+        assert (
+            experiment["thermal_schedule"]["cooling_or_quench"]
+            == baseline["thermal_schedule"]["cooling_or_quench"]
+        )
+
+
+def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
+    observation = next(
+        item
+        for item in doc["species"]["K"]["observations"]
+        if item["observation_id"]
+        == "van_limpt_2007_table42_potassium_bearing_glasses"
+    )
+    assert observation["locator"]["section"] == "4.4.2"
+    assert observation["locator"]["figure"] == "4.15"
+    assert "table" not in observation["locator"]
+    assert observation["values"]["K2O_mass_pct_range"] == [4.8, 7.8]
+    assert observation["values"]["source_locators"] == {
+        "4.8": {"page": 172, "section": "4.4.2", "figure": "4.15"},
+        "7.8": {"page": 172, "section": "4.4.2", "figure": "4.15"},
+    }
+
+
+def test_van_limpt_fig46_keeps_measured_markers_separate_from_model() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
+    observations = {
+        item["observation_id"]: item
+        for item in doc["species"]["Na"]["observations"]
+    }
+    measured = observations["van_limpt_2007_fig46_elemental_sodium_measured"]
+    model = observations["van_limpt_2007_fig46_elemental_sodium_model_output"]
+    assert [
+        row["p_Na_Pa_approx"]
+        for row in measured["values"]["rows"]
+        if row["temperature_C"] == 1462
+    ] == [2.2, 3.0, 3.5]
+    assert model["values"]["rows"] == [
+        {"temperature_C": 1462, "p_Na_Pa_approx": 2.6}
+    ]
+    assert model["values"]["measurement_status"] == "model_output_not_measurement"
+    assert model["admission_status"] == "rejected_model_output_not_measurement"
+
+
+def test_plante_split_registry_foreign_keys_resolve() -> None:
+    """One loaded charge keeps its eight analysis series under one experiment."""
+
+    doc = yaml.safe_load((EXTRACTS / "kems-042-plante-1979.yaml").read_text())
+    bench_ids = {bench["id"] for bench in doc["benches"]}
+    experiments = {item["experiment_id"]: item for item in doc["experiments"]}
+
+    assert set(experiments) == {"k2o-sio2-effusion-series"}
+    assert all(item["bench_id"] in bench_ids for item in experiments.values())
+
+    rows = [
+        row
+        for block in doc["species"].values()
+        for section in ("observations", "context")
+        for row in block.get(section, [])
+        if "experiment" in row
+    ]
+    experiment_refs = Counter(row["experiment"] for row in rows)
+    assert experiment_refs == Counter({"k2o-sio2-effusion-series": 383})
+
+    series_refs = Counter(
+        f"k2o-sio2-s{row['values']['series']}"
+        for row in rows
+        if row.get("values", {}).get("series") is not None
+    )
+    assert series_refs == Counter(
+        {
+            "k2o-sio2-s1104": 56,
+            "k2o-sio2-s1110": 76,
+            "k2o-sio2-s1115": 52,
+            "k2o-sio2-s1122": 36,
+            "k2o-sio2-s1123": 60,
+            "k2o-sio2-s1126": 38,
+            "k2o-sio2-s1129": 28,
+            "k2o-sio2-s1214": 37,
+        }
+    )
+
+
+def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
+    doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
+    experiments = [
+        item
+        for item in doc["experiments"]
+        if item["experiment_id"].startswith("na2o-sio2-xna2o-")
+    ]
+    assert len(experiments) == 12
+    for experiment in experiments:
+        locator = experiment["conditions"]["temperature_K"]["locator"]
+        assert locator["figure"] == "7"
+        assert "table" not in locator
+        assert locator["note"].startswith("Figure 7 isotherm at ")
+
+
+def test_run_split_observations_keep_source_species_bucket() -> None:
+    split_extracts = (
+        "kems-200-ueshima-1983.yaml",
+        "wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml",
+        "sossi-2020-cu-zn-isotope-evap-formalism.yaml",
+        "mendybaev-2017-fun-cai-lab-evaporation.yaml",
+        "ntrs-19650014783.yaml",
+        "kems-015-hashimoto-1983.yaml",
+        "kems-012-sossi-2019.yaml",
+    )
+    removed_sources = {
+        "wimpenny_2019_table1_experimental_zn_rows": "Zn",
+        "sossi_2020_cu_table1_measured_runs": "Cu",
+        "sossi_2020_zn_table1_measured_runs": "Zn",
+        "mendybaev_2017_func_table1_mass_loss": "FUNC",
+        "bowles_rosenblum_1965_na_table1_static_capsule": "Na",
+    }
+    checked = 0
+    for filename in split_extracts:
+        doc = yaml.safe_load((EXTRACTS / filename).read_text())
+        species_by_id = {
+            observation["observation_id"]: species
+            for species, block in doc["species"].items()
+            for observation in block.get("observations", [])
+            if observation.get("observation_id")
+        }
+        for observation_id, species in species_by_id.items():
+            delimiter = "__run_" if "__run_" in observation_id else "::"
+            if delimiter not in observation_id:
+                continue
+            source_id = observation_id.split(delimiter, 1)[0]
+            expected = species_by_id.get(source_id, removed_sources.get(source_id))
+            assert expected is not None, (filename, observation_id, source_id)
+            assert species == expected, (filename, observation_id, species, expected)
+            checked += 1
+    assert checked == 389
+
+
+def test_sossi_split_compositions_point_to_table1_page() -> None:
+    doc = yaml.safe_load((EXTRACTS / "kems-012-sossi-2019.yaml").read_text())
+    assert len(doc["experiments"]) == 43
+    for experiment in doc["experiments"]:
+        locator = experiment["sample"]["printed_composition"]["locator"]
+        assert locator["table"] == "1"
+        assert locator["pdf_page_index"] == 52
+
+
+def test_split_aggregate_locator_notes_preserve_commas() -> None:
+    cases = {
+        "kems-035-sauerborn-2005.yaml": (
+            "jsc1-solar-series",
+            "JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, "
+            "peak temperature, and high-temperature duration",
+        ),
+        "kems-137-bischof-2023.yaml": (
+            "an-di-series",
+            "Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge",
+        ),
+    }
+    for filename, (experiment_id, expected_note) in cases.items():
+        doc = yaml.safe_load((EXTRACTS / filename).read_text())
+        experiment = next(
+            item for item in doc["experiments"]
+            if item["experiment_id"] == experiment_id
+        )
+        assert experiment["locator"] == {
+            "page": experiment["locator"]["page"],
+            "table": experiment["locator"]["table"],
+            "note": expected_note,
+        }
 
 # Frozen closed-set hash at t-510 policy adoption (sorted source_ids joined by \n).
 # Null-hypothesis: an extract can be ADDED to the allowlist later → closed set

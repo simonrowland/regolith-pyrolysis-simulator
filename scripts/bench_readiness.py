@@ -261,7 +261,30 @@ def _aggregate(
         **({"engine": engine} if engine else {}),
         "status": _status(records).value,
         "gaps": _deduplicated_gaps(selected),
+        "flags": list({repr(flag): flag for item in records for flag in item.flags}.values()),
     }
+
+
+def _run_counts(
+    items: list[tuple[str, tuple[ConsumerReadiness, ...]]],
+    *,
+    consumer: str,
+    engine: str | None = None,
+) -> dict[str, int]:
+    counts = {status.value: 0 for status in ReadinessStatus}
+    for _, group in items:
+        selected = [
+            item for item in group
+            if item.consumer == consumer and item.engine == engine
+        ]
+        if consumer == "engine_point" and engine is None:
+            status = _collapse_engines(group).status
+        elif len(selected) == 1:
+            status = selected[0].status
+        else:
+            continue
+        counts[status.value] += 1
+    return counts
 
 
 def _sources_without_scoreable_observations(works, listed: set[str]) -> tuple[str, ...]:
@@ -308,6 +331,16 @@ def _no_scoreable_observations_row(source_id: str) -> dict[str, object]:
         "source_id": source_id,
         "consumers": consumers,
         "engines": engines,
+        "run_counts": {
+            "by_consumer": {
+                consumer: {status.value: 0 for status in ReadinessStatus}
+                for consumer in ("kems", "rps", "engine_point")
+            },
+            "by_engine": {
+                engine: {status.value: 0 for status in ReadinessStatus}
+                for engine in ENGINE_POINT_CONSUMERS
+            },
+        },
         "informational_gaps": [dict(gap)],
         "experiments": [],
     }
@@ -323,10 +356,11 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
             if key not in seen:
                 seen.add(key)
                 gaps.append(gap)
-    return ConsumerReadiness("engine_point", _status(engines), tuple(gaps))
+    flags = tuple({repr(flag): flag for item in engines for flag in item.flags}.values())
+    return ConsumerReadiness("engine_point", _status(engines), tuple(gaps), flags=flags)
 
 
-def report(root: Path) -> dict[str, object]:
+def report(root: Path, *, modelling_inputs=None) -> dict[str, object]:
     works, experiments, observations = load_migrated_store(root)
     by_experiment = defaultdict(list)
     by_experiment_all: dict[str, list] = defaultdict(list)
@@ -383,14 +417,22 @@ def report(root: Path) -> dict[str, object]:
         readiness = (
             _missing_bench_readiness(implicit=implicit)
             if bench is None
-            else consumer_readiness(experiment, bench)
+            else consumer_readiness(experiment, bench, modelling_inputs=modelling_inputs)
         )
         if bench is not None and by_experiment[experiment.experiment_id]:
             contexts = {}
             for observation in by_experiment[experiment.experiment_id]:
                 key = repr(observation.point_conditions)
                 contexts.setdefault(key, observation)
-            groups = [consumer_readiness(experiment, bench, observation) for observation in contexts.values()]
+            groups = [
+                consumer_readiness(
+                    experiment,
+                    bench,
+                    observation,
+                    modelling_inputs=modelling_inputs,
+                )
+                for observation in contexts.values()
+            ]
             aggregated = []
             for base in readiness:
                 if base.consumer == "rps":
@@ -400,7 +442,8 @@ def report(root: Path) -> dict[str, object]:
                            if item.consumer == base.consumer and item.engine == base.engine]
                 aggregated.append(ConsumerReadiness(base.consumer, _status(records),
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
-                    tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
+                    tuple({repr(notice): notice for item in records for notice in item.notices}.values()),
+                    tuple({repr(flag): flag for item in records for flag in item.flags}.values())))
             readiness = tuple(aggregated)
         # Pure-substance engine-reference tabulations (identity.composition
         # not_applicable + compilation_role engine_reference_input /
@@ -418,6 +461,7 @@ def report(root: Path) -> dict[str, object]:
                     (gap,),
                     item.engine,
                     item.notices,
+                    item.flags,
                 )
                 if item.consumer == "engine_point"
                 else item
@@ -479,6 +523,12 @@ def report(root: Path) -> dict[str, object]:
     by_engine: dict[str, dict[str, int]] = {
         engine: dict(empty_counts) for engine in ENGINE_POINT_CONSUMERS
     }
+    by_consumer_runs: dict[str, dict[str, int]] = {
+        consumer: dict(empty_counts) for consumer in ("kems", "rps", "engine_point")
+    }
+    by_engine_runs: dict[str, dict[str, int]] = {
+        engine: dict(empty_counts) for engine in ENGINE_POINT_CONSUMERS
+    }
     blockers: dict[tuple[str, str], dict[str, set[str]]] = {}
     for source_id in sorted(by_source):
         source_items = source_readiness[source_id]
@@ -514,6 +564,16 @@ def report(root: Path) -> dict[str, object]:
             _aggregate(source_items, engine=engine)
             for engine in ENGINE_POINT_CONSUMERS
         ]
+        run_counts = {
+            "by_consumer": {
+                consumer: _run_counts(source_items, consumer=consumer)
+                for consumer in ("kems", "rps", "engine_point")
+            },
+            "by_engine": {
+                engine: _run_counts(source_items, consumer="engine_point", engine=engine)
+                for engine in ENGINE_POINT_CONSUMERS
+            },
+        }
         info_ids = sorted(source_information.get(source_id, set()))
         informational_gaps: list[dict[str, object]] = []
         if info_ids:
@@ -542,6 +602,7 @@ def report(root: Path) -> dict[str, object]:
                 "source_id": source_id,
                 "consumers": consumer_rows,
                 "engines": engine_rows,
+                "run_counts": run_counts,
                 "informational_gaps": informational_gaps,
                 "experiments": by_source[source_id],
             }
@@ -554,6 +615,12 @@ def report(root: Path) -> dict[str, object]:
             counts = by_engine[str(item["engine"])]
             status = str(item["status"])
             counts[status] = counts.get(status, 0) + 1
+        for consumer, counts in run_counts["by_consumer"].items():
+            for status, count in counts.items():
+                by_consumer_runs[consumer][status] += count
+        for engine, counts in run_counts["by_engine"].items():
+            for status, count in counts.items():
+                by_engine_runs[engine][status] += count
         for experiment_id, group in source_items:
             seen = set()
             for item in group:
@@ -600,6 +667,8 @@ def report(root: Path) -> dict[str, object]:
         "summary": {
             "by_consumer": by_consumer,
             "by_engine": by_engine,
+            "by_consumer_runs": by_consumer_runs,
+            "by_engine_runs": by_engine_runs,
             "top_blocking_waypoints": top_blockers,
             # The two bench_identity verdicts, counted separately so a caller can
             # tell how much of the gap acquisition could ever close: permanent
@@ -628,8 +697,14 @@ def report(root: Path) -> dict[str, object]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--modelling-inputs", type=Path, help="Explicit operator inputs for RPS, JSON")
     args = parser.parse_args(argv)
-    print(json.dumps(report(args.root), sort_keys=True, separators=(",", ":")))
+    modelling_inputs = json.loads(args.modelling_inputs.read_text()) if args.modelling_inputs else None
+    print(json.dumps(
+        report(args.root, modelling_inputs=modelling_inputs),
+        sort_keys=True,
+        separators=(",", ":"),
+    ))
     return 0
 
 

@@ -51,17 +51,311 @@ benches:
       state: {tag: value, value: {kind: point, point: '200'}}
       locator: {published_page: 116, pdf_page_index: 2, section: '4. Experimental Procedure'}
 experiments:
-- experiment_id: fes-kems-series
+- experiment_id: fe-s-0p31-wtpct
   bench_id: ichise-rm6k
   method: knudsen_effusion
-  locator: {published_page: 116, pdf_page_index: 2, section: '3. Samples and Analysis; 4. Experimental Procedure'}
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=0.31'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
       locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
     printed_composition:
-      state: {tag: value, value: 'Fe-S alloys prepared from Fe-23% S mother alloy and pure iron'}
+      state:
+        tag: value
+        value:
+          S: '0.31'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
       locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-0p42-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=0.42'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '0.42'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-0p65-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=0.65'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '0.65'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-1p01-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=1.01'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '1.01'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-1p59-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=1.59'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '1.59'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-2p19-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=2.19'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '2.19'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-3p37-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=3.37'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '3.37'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
+    characterization:
+      state: {tag: value, value: Coulomatic sulfur analysis}
+      locator: {published_page: 116, pdf_page_index: 2}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0005332894736842105263157894737', interval_high: '0.0007999342105263157894736842105'}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Cell chamber 4-6 x 10^-6 Torr; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 116, pdf_page_index: 2, note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'Just over alloy melting point to about 1650 C; no single applicable setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Held 30 min just over melting point, then temperature raised about 20 C after each constant-temperature measurement'}
+      locator: {published_page: 116, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '7200', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About two hours; unit conversion only'}
+- experiment_id: fe-s-4p32-wtpct
+  bench_id: ichise-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 117, pdf_page_index: 3, table: '2', note: 'Fe-S alloy Table 2 row %S=4.32'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {published_page: 116, pdf_page_index: 2, note: 'About 10 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          S: '4.32'
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        table: '2'
+        note: 'Table 2 %S (Coulomatic) as printed; elemental wt%; Fe balance not printed; TRAP: Table 1 is pure-iron impurity assay, not the alloy; label retained: Fe-S alloys from Fe-23% S mother alloy and pure iron'
     characterization:
       state: {tag: value, value: Coulomatic sulfur analysis}
       locator: {published_page: 116, pdf_page_index: 2}
@@ -123,7 +417,6 @@ species:
   S:
     observations:
     - observation_id: ichise_1975_kems_geometry_and_calibration
-      experiment: fes-kems-series
       type: rate_series
       locator:
         published_page: 116
@@ -224,7 +517,6 @@ species:
             pdf_page_index: 2
             section: '4'
     - observation_id: ichise_1975_table1_pure_iron_composition
-      experiment: fes-kems-series
       type: rate_series
       locator:
         table: '1'
@@ -262,7 +554,6 @@ species:
         O: <0.005
         N: 0.0014
     - observation_id: ichise_1975_ion_ratio_table2
-      experiment: fes-kems-series
       type: rate_series
       locator:
         table: '2'
@@ -376,7 +667,6 @@ species:
             pdf_page_index: 2
             section: '4'
     - observation_id: ichise_1975_epsilon_e_table3
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         table: '3'
@@ -468,7 +758,6 @@ species:
             pdf_page_index: 2
             section: '4'
     - observation_id: ichise_1975_ls_integrand_equations_7_to_9
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         published_page: 117
@@ -499,7 +788,6 @@ species:
         eq8_1600C: (1-N_S)/(2-N_S) = -0.0206 ln(I_Fe+ N_S^2 / I_S2+ N_Fe) + 0.375
         eq9_1650C: (1-N_S)/(2-N_S) = -0.0216 ln(I_Fe+ N_S^2 / I_S2+ N_Fe) + 0.376
     - observation_id: ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
-      experiment: fes-kems-series
       type: rate_series
       locator:
         figure: '3'
@@ -529,7 +817,6 @@ species:
         caption: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
         note: ln(I_Fe+/I_S2+) vs 1/T; %S labels 0.31 to 4.32. Numerics in Table 2.
     - observation_id: ichise_1975_fig4_integration_1550C_figure_only
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -559,7 +846,6 @@ species:
         caption: Fig. 4. Integration curve for the Fe-S system at 1550 C
         note: LS line is eq (7). Not digitised.
     - observation_id: ichise_1975_fig5_integration_1600C_figure_only
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         figure: '5'
@@ -589,7 +875,6 @@ species:
         caption: Fig. 5. Integration curve for the Fe-S system at 1600 C
         note: LS line is eq (8). Not digitised.
     - observation_id: ichise_1975_fig6_integration_1650C_figure_only
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -619,7 +904,6 @@ species:
         caption: Fig. 6. Integration curve for the Fe-S system at 1650 C
         note: LS line is eq (9). Not digitised.
     - observation_id: ichise_1975_fig7_log_gamma_S_figure_only
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -649,7 +933,6 @@ species:
         caption: Fig. 7. Activity coefficient of sulfur in liquid iron
         note: log gamma_S vs %S at 1550, 1600, 1650 C. No numeric table. Not digitised.
     - observation_id: ichise_1975_fig8_pure_iron_figure_only
-      experiment: fes-kems-series
       type: psat_series
       locator:
         figure: '8'
@@ -679,7 +962,6 @@ species:
         caption: Fig. 8. Experimental results for pure iron
         note: ln(I+_Fe T) vs 1/T; mp marked. Numeric slope is 82.4 kcal/g-atom.
     - observation_id: ichise_1975_fig9_holder_heating_figure_only
-      experiment: fes-kems-series
       type: rate_series
       locator:
         figure: '9'
@@ -712,7 +994,6 @@ species:
           emission current: 0.68 A)'
         note: T vs (lower-upper) emission current; points A, B, C.
     - observation_id: ichise_1975_fig10_e_S_comparison_figure_only
-      experiment: fes-kems-series
       type: activity_coefficient
       locator:
         figure: '10'
@@ -742,7 +1023,6 @@ species:
         caption: Fig. 10. Interaction parameters of sulfur in liquid iron
         note: This study vs Morris, Sherman, Cordier, Yoshii, Adachi, Yoshida, Banya, Fuwa, Ikada overlays.
     - observation_id: ichise_1975_fig1_chamber_figure_only
-      experiment: fes-kems-series
       type: rate_series
       locator:
         figure: '1'
@@ -772,7 +1052,6 @@ species:
         caption: Fig. 1. Knudsen cell chamber
         note: Schematic of ionization chamber, shutter, ring filament, alumina cell.
     - observation_id: ichise_1975_fig2_cell_figure_only
-      experiment: fes-kems-series
       type: rate_series
       locator:
         figure: '2'
@@ -804,7 +1083,6 @@ species:
   Fe:
     observations:
     - observation_id: ichise_1975_fe_heat_of_vaporization_fig8
-      experiment: fes-kems-series
       type: gibbs_table
       locator:
         figure: '8'

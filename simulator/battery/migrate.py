@@ -5951,7 +5951,24 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         )
         for key in ("inference", "qualifier", "note", "quote")
     )
-    state = State.of(si)
+    approximate = (
+        _lab_kind(hit.entry.field) == "pressure"
+        and isinstance(mapping, Mapping)
+        and (
+            str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
+            or bool(mapping.get("approximate"))
+            or bool(re.search(r"\b(?:about|approximately)\b|[~≈]", str(mapping.get("as_printed") or ""), re.I))
+        )
+    )
+    state = (
+        State.of(
+            _value_from_plain(
+                {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
+            )
+        )
+        if approximate
+        else State.of(si)
+    )
     if non_point:
         state = State.unknown(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
@@ -6200,6 +6217,18 @@ def _prefer_located(
         return new
     if old.state.is_unknown and new.state.is_value:
         return new
+    if old.state.is_value and new.state.is_value:
+        old_value = old.state.value
+        new_value = new.state.value
+        if (
+            isinstance(old_value, Value)
+            and isinstance(new_value, Value)
+            and old_value.kind is ValueKind.POINT
+            and new_value.kind is ValueKind.POINT
+            and old_value.point == new_value.point
+            and old_value.approximate != new_value.approximate
+        ):
+            return new if new_value.approximate else old
     if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
         return None
     if (
@@ -6562,6 +6591,15 @@ def _sample_matched_roots(equipment: object, series_item: object) -> list[object
 # not a printed fugacity, and must not be relabelled printed (b-526).
 _PRINTED_LOG_FO2_KEYS = frozenset({"log_fO2", "log10_fO2", "logfO2"})
 _PRINTED_PO2_KEYS = frozenset({"oxygen_partial_pressure"})
+# Author stoichiometric ratio × printed companion pressure (Plante 1979
+# ``P_O2 = 0.226 P_K``). Not a printed partial-pressure key: the product is
+# derived and must keep a Derivation stamp (t951 remainder).
+_AUTHOR_RATIO_PO2_KEYS = (
+    "po2_over_pK_as_published",
+    "P_K_atm_as_published",
+    "P_O2_atm",
+)
+_AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
 _OXYGEN_LOG_UNITS = frozenset({
     "",
@@ -6822,6 +6860,83 @@ def _unique_oxygen(candidates: list[tuple[Decimal, object]]) -> object | None:
     if len(values) != 1:
         return None
     return candidates[0][1]
+
+
+def collect_author_ratio_oxygen(
+    payloads: Iterable[object],
+    fallback_locator: Locator | None,
+) -> Located[Value] | None:
+    """Land stoichiometric ratio × printed P as derived ``fO2_Pa``.
+
+    Plante 1979 prints ``P_O2 = 0.226 P_K`` (eq. context p. 279) and tabulates
+    ``P_K``. The extract stores the ratio, the printed ``P_K``, and the
+    arithmetic product ``P_O2_atm``. That product is not a printed cell: it is
+    derived from the printed ratio and printed ``P_K``, so the Located carries
+    a Derivation and never enters the printed-oxygen allowlist.
+
+    Engine-inferred siblings (``pO2_inference``) and ``inferred: true`` nodes
+    stay refusals. Disagreeing ratio × P_K vs stored ``P_O2_atm`` refuses.
+    Distinct per-row products must not collapse onto experiment.fO2_control.
+    """
+
+    if fallback_locator is None:
+        return None
+    for payload in payloads:
+        if not isinstance(payload, Mapping):
+            continue
+        if payload.get("pO2_inference") not in (None, ""):
+            continue
+        if payload.get("inferred") is True:
+            continue
+        ratio = _printed_decimal(payload.get("po2_over_pK_as_published"))
+        p_k = _printed_decimal(payload.get("P_K_atm_as_published"))
+        p_o2 = _printed_decimal(payload.get("P_O2_atm"))
+        if ratio is None or p_k is None or p_o2 is None:
+            continue
+        if ratio <= 0 or p_k <= 0 or p_o2 <= 0:
+            continue
+        expected = ratio * p_k
+        if abs(p_o2 - expected) / expected > _AUTHOR_RATIO_REL_TOLERANCE:
+            continue
+        si, trail = convert_pressure_to_pa(p_o2, "atm")
+        if si is None or si <= 0 or trail is None:
+            continue
+        unit = conversion_derivation(trail, p_o2, fallback_locator)
+        # Premise: author states P_O2 / P_K = r (printed ratio) with both
+        # pressures in atm; extract stores r, P_K, and the product.
+        # Algebra: P_O2_atm = r * P_K_atm; P_O2_Pa = P_O2_atm * 101325.
+        # Sanity: r=0.226, P_K=6.91e-7 atm -> P_O2=1.56166e-7 atm = 0.015824 Pa.
+        relation = (
+            "author_ratio_P_O2_atm=po2_over_pK_as_published*P_K_atm_as_published;"
+            f"{trail}"
+        )
+        params: list[tuple[str, Located[Decimal]]] = [
+            ("po2_over_pK_as_published", Located(State.of(ratio), locator=fallback_locator)),
+            ("P_K_atm_as_published", Located(State.of(p_k), locator=fallback_locator)),
+            ("P_O2_atm", Located(State.of(p_o2), locator=fallback_locator)),
+        ]
+        if unit is not None:
+            params.extend(unit.parameters)
+        inference = Derivation(
+            relation=relation,
+            inputs=(
+                "values.po2_over_pK_as_published",
+                "values.P_K_atm_as_published",
+                "values.P_O2_atm",
+            ),
+            parameters=tuple(params),
+            output_unit="Pa",
+        )
+        point = _point_selection(si, "P_O2_atm", trail, {}, ())
+        return Located(
+            State.of(point.value),
+            locator=_locator_with_note(
+                fallback_locator,
+                "author ratio P_O2=r*P_K (derived; not a printed pO2 cell)",
+            ),
+            inference=inference,
+        )
+    return None
 
 
 def collect_printed_oxygen(
@@ -7598,8 +7713,14 @@ class Migrator:
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None and fallback:
             facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+        ratio_oxygen = None
         if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
-            return point_conditions
+            # Printed allowlist empty: try author-ratio product (derived only).
+            ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
+            if ratio_oxygen is None and fallback:
+                ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
+            if ratio_oxygen is None:
+                return point_conditions
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -7611,6 +7732,10 @@ class Migrator:
             self._land_experiment_oxygen_pressure(
                 experiment_id, facts.oxygen_partial_pressure_Pa
             )
+        elif ratio_oxygen is not None and "fO2_Pa" not in merged:
+            # Per-row derived products span orders of magnitude; never collapse
+            # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
+            merged["fO2_Pa"] = ratio_oxygen
         return merged or None
 
     def _add_observation(

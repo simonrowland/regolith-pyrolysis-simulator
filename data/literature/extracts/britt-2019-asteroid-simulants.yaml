@@ -24,14 +24,43 @@ benches:
     state: {tag: value, value: ThermoStar quadrupole mass spectrometer}
     locator: *tga_locator
 experiments:
-- experiment_id: tga-ega-simulant-series
+- experiment_id: tga-ega-ci
   bench_id: labsys-evo-thermostar
   method: thermogravimetry_evolved_gas_analysis
   locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI, CM, and CR prototype simulants measured at NASA JSC ARES}
   sample:
     printed_composition:
-      state: {tag: value, value: CI, CM, and CR asteroid-simulant prototypes}
-      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+      state:
+        tag: value
+        value: {SiO2: 25.0, TiO2: 0.5, Al2O3: 3.1, FeOT: 25.8, MnO: 0.3, MgO: 30.2, CaO: 3.0, Na2O: 6.4, K2O: 0.4, P2O5: 0.4, Cr2O3: 0.2, SO3: 4.9}
+      locator: {pdf_page_index: 9, table: '3', note: 'CI Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.2322263749183867']
+          - [TiO2, '0.0034941106327481']
+          - [Al2O3, '0.0169689387665278']
+          - [FeO, '0.2004252090267317']
+          - [MnO, '0.0023603223079137']
+          - [MgO, '0.4181979852952432']
+          - [CaO, '0.0298579252475448']
+          - [Na2O, '0.0576317471781426']
+          - [K2O, '0.0023700227669609']
+          - [P2O5, '0.0015727895366566']
+          - [Cr2O3, '0.0007344130916787']
+          - [SO3, '0.0341601612314651']
+      locator: {pdf_page_index: 9, table: '3', note: 'Derived from the printed CI XRF oxide wt% map; FeOT is represented as FeO equivalent; SO3 retained.'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'printed CI XRF oxide wt% map in sample.printed_composition; FeOT treated as FeO equivalent'
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        output_unit: mole_fraction
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '3000'}}
@@ -54,6 +83,132 @@ experiments:
     method:
       state: {tag: value, value: Heated from ambient to 1000 C at 35 C/min under 10 sccm helium}
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.5833333333333333333333333333'}}
+        locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 'Printed 35 C/min; unit conversion only.'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
+- experiment_id: tga-ega-cm
+  bench_id: labsys-evo-thermostar
+  method: thermogravimetry_evolved_gas_analysis
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CM prototype simulant measured at NASA JSC ARES}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 32.5, TiO2: 0.3, Al2O3: 3.1, FeOT: 20.2, MnO: 0.2, MgO: 32.1, CaO: 3.1, Na2O: 6.2, K2O: 0.2, P2O5: 0.4, Cr2O3: 0.2, SO3: 1.5}
+      locator: {pdf_page_index: 9, table: '3', note: 'CM Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.2946468272894386']
+          - [TiO2, '0.0020461373171879']
+          - [Al2O3, '0.0165615719766917']
+          - [FeO, '0.1531548952411563']
+          - [MnO, '0.0015357726384089']
+          - [MgO, '0.4338373109761246']
+          - [CaO, '0.0301125087644583']
+          - [Na2O, '0.0544904476038852']
+          - [K2O, '0.0011565632707346']
+          - [P2O5, '0.0015350321828556']
+          - [Cr2O3, '0.0007167823189069']
+          - [SO3, '0.0102061504201514']
+      locator: {pdf_page_index: 9, table: '3', note: 'Derived from the printed CM XRF oxide wt% map; FeOT is represented as FeO equivalent; SO3 retained.'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'printed CM XRF oxide wt% map in sample.printed_composition; FeOT treated as FeO equivalent'
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        output_unit: mole_fraction
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '3000'}}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 30-mbar helium atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: value, value: {species: Helium, flow_sccm: {tag: value, value: '10'}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Helium flow 10 sccm}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_numeric}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Starts at ambient; no numerical start temperature printed}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated from ambient to 1000 C at 35 C/min under 10 sccm helium}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.5833333333333333333333333333'}}
+        locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 'Printed 35 C/min; unit conversion only.'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
+- experiment_id: tga-ega-cr
+  bench_id: labsys-evo-thermostar
+  method: thermogravimetry_evolved_gas_analysis
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CR prototype simulant measured at NASA JSC ARES}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 19.3, TiO2: 0.4, Al2O3: 1.2, FeOT: 42.9, MnO: 0.3, MgO: 30.1, CaO: 0.8, Na2O: 3.3, K2O: 0.1, P2O5: 0.4, Cr2O3: 0.1, SO3: 0.9}
+      locator: {pdf_page_index: 9, table: '3', note: 'CR Simulant column; XRF major-element bulk oxide wt% as printed; FeOT and SO3 retained as printed; Table 2 mineral-recipe wt% is not the sample bulk analysis'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.1815358528346534']
+          - [TiO2, '0.0028304807486635']
+          - [Al2O3, '0.0066513193686194']
+          - [FeO, '0.3374609292410370']
+          - [MnO, '0.0023900383943826']
+          - [MgO, '0.4220608366576207']
+          - [CaO, '0.0080623551542347']
+          - [Na2O, '0.0300904940567234']
+          - [K2O, '0.0005999652451707']
+          - [P2O5, '0.0015925907094507']
+          - [Cr2O3, '0.0003718296184729']
+          - [SO3, '0.0063533079709710']
+      locator: {pdf_page_index: 9, table: '3', note: 'Derived from the printed CR XRF oxide wt% map; FeOT is represented as FeO equivalent; SO3 retained.'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - 'printed CR XRF oxide wt% map in sample.printed_composition; FeOT treated as FeO equivalent'
+        - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
+        output_unit: mole_fraction
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '3000'}}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 30-mbar helium atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: value, value: {species: Helium, flow_sccm: {tag: value, value: '10'}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Helium flow 10 sccm}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_numeric}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Starts at ambient; no numerical start temperature printed}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated from ambient to 1000 C at 35 C/min under 10 sccm helium}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.5833333333333333333333333333'}}
+        locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 'Printed 35 C/min; unit conversion only.'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
@@ -161,7 +316,6 @@ species:
             Nickel metal: 0.5
         note: The table also prints future-update recipes; they are retained only as quoted recipe data, not treated as measurements of the prototype samples.
     - observation_id: britt_2019_tga_ega_thermal_program
-      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -203,7 +357,6 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed for the TG/EGA conditions or total integrated mass losses.
     - observation_id: britt_2019_tga_ega_release_patterns
-      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -271,7 +424,7 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed in Table 3.
     - observation_id: britt_2019_ci_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: tga-ega-ci
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -318,7 +471,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cm_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: tga-ega-cm
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CM total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]
@@ -349,7 +502,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cr_tg_integrated_mass_loss
-      experiment: tga-ega-simulant-series
+      experiment: tga-ega-cr
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CR total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]

@@ -49,22 +49,44 @@ benches:
           state: {tag: value, value: {kind: categorical, categorical: 'Ar 0.3 bar; H2 0.01 bar; total stated 0.3 bar'}}
           locator: {page: 3, section: Apparatus, note: 'Printed operands retained without deriving a combined pressure.'}
 experiments:
-  - experiment_id: laser-boiling-series
+  - &nakano_laser_common
+    experiment_id: allende-laser-boiling
     bench_id: co2-laser-boiling-chamber
     method: laser_boiling
-    locator: {page: 3, section: 'Experimental methods; Apparatus', note: 'Own laser-heating and inert-gas-cooling experiments.'}
+    locator: {page: 3, section: 'Experimental methods; Apparatus', note: 'Allende charges in the own laser-heating and inert-gas-cooling experiments.'}
     sample:
       mass_kg:
         state: {tag: value, value: {kind: point, point: '0.000015', approximate: true}}
         locator: {page: 3, section: 'Experimental methods', note: 'Printed approximately 15 mg; unit conversion only'}
       printed_composition:
-        state: {tag: value, value: 'Allende meteorite powder or synthetic Lsil'}
-        locator: {page: 2, table: '1'}
+        state: {tag: value, value: Allende meteorite powder}
+        locator: {page: 2, table: '1', note: 'Label retained; numeric mol% of MOx in initial_composition; Total row omitted'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [NaO0.5, '0.0084']
+            - [MgO, '0.3519']
+            - [AlO1.5, '0.0340']
+            - [SiO2, '0.3282']
+            - [KO0.5, '0.0004']
+            - [CaO, '0.0247']
+            - [TiO2, '0.0010']
+            - [CrO1.5, '0.0039']
+            - [MnO, '0.0015']
+            - [FeO, '0.2460']
+        locator:
+          page: 2
+          table: '1'
+          note: 'Allende row; mol% of MOx as printed (NaO0.5 0.84, MgO 35.19, AlO1.5 3.40, SiO2 32.82, KO0.5 0.04, CaO 2.47, TiO2 0.10, CrO1.5 0.39, MnO 0.15, FeO 24.60, Total 100); stored as mole_fraction by /100 unit conversion only; not renormalised; later evaporation-product tables not used as the charge'
       form:
         state: {tag: value, value: cylindrical pressed and fired charge}
         locator: {page: 3, section: 'Experimental methods'}
       pretreatment:
-        state: {tag: value, value: 'Fired 12 h at 1100 C (Lsil) or 1000 C (Allende) in H2/CO2'}
+        state: {tag: value, value: 'Fired 12 h at 1000 C in H2/CO2 = 1/2'}
         locator: {page: 2, section: 'Experimental methods'}
     pressure_environment:
       total_pressure_Pa:
@@ -89,6 +111,59 @@ experiments:
       cooling_or_quench:
         state: {tag: value, value: Cu plate and chamber-wall quench of droplets}
         locator: {page: 4, section: 'Experimental methods'}
+  - <<: *nakano_laser_common
+    experiment_id: lsil-laser-boiling
+    locator: {page: 3, section: 'Experimental methods; Apparatus', note: 'Synthetic Lsil charges in the own laser-heating and inert-gas-cooling experiments.'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.000015', approximate: true}}
+        locator: {page: 3, section: 'Experimental methods', note: 'Printed approximately 15 mg; unit conversion only'}
+      printed_composition:
+        state: {tag: value, value: synthetic Lsil}
+        locator: {page: 2, table: '1', note: 'Label retained; numeric mol% of MOx in initial_composition; Total row omitted'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [NaO0.5, '0.0182']
+            - [MgO, '0.3729']
+            - [AlO1.5, '0.0288']
+            - [SiO2, '0.4098']
+            - [KO0.5, '0.0068']
+            - [CaO, '0.0222']
+            - [TiO2, '0.0078']
+            - [CrO1.5, '0.0041']
+            - [MnO, '0.0046']
+            - [FeO, '0.1248']
+        locator:
+          page: 2
+          table: '1'
+          note: 'Lsil row; mol% of MOx as printed (NaO0.5 1.82, MgO 37.29, AlO1.5 2.88, SiO2 40.98, KO0.5 0.68, CaO 2.22, TiO2 0.78, CrO1.5 0.41, MnO 0.46, FeO 12.48, Total 100); stored as mole_fraction by /100 unit conversion only; not renormalised; later evaporation-product tables not used as the charge'
+      form:
+        state: {tag: value, value: cylindrical pressed and fired charge}
+        locator: {page: 3, section: 'Experimental methods'}
+      pretreatment:
+        state: {tag: value, value: 'Fired 12 h at 1100 C in H2/CO2 = 1'}
+        locator: {page: 2, section: 'Experimental methods'}
+  - <<: *nakano_laser_common
+    experiment_id: laser-boiling-series
+    locator: {page: 3, section: 'Experimental methods; Apparatus', note: 'Mixed Allende and Lsil observation bags; no single-charge oxide map assigned here'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.000015', approximate: true}}
+        locator: {page: 3, section: 'Experimental methods', note: 'Printed approximately 15 mg; unit conversion only'}
+      printed_composition:
+        state: {tag: value, value: 'Allende meteorite powder or synthetic Lsil'}
+        locator: {page: 2, table: '1', note: 'Label retained on the mixed series; numeric maps live on allende-laser-boiling and lsil-laser-boiling'}
+      form:
+        state: {tag: value, value: cylindrical pressed and fired charge}
+        locator: {page: 3, section: 'Experimental methods'}
+      pretreatment:
+        state: {tag: value, value: 'Fired 12 h at 1100 C (Lsil) or 1000 C (Allende) in H2/CO2'}
+        locator: {page: 2, section: 'Experimental methods'}
 fidelity_samples:
   - species: SiO2
     observable: rate_series

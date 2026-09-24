@@ -95,17 +95,646 @@ benches:
       state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
       locator: {page: 2, published_page: 56, note: Printed fluctuations were +/-1 C}
 experiments:
+- experiment_id: fe-sn-nsn-0p010
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.010 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.010; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.010']
+          - [Fe, '0.990']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.010; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p020
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.020 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.020; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.020']
+          - [Fe, '0.980']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.020; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p030
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.030 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.030; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.030']
+          - [Fe, '0.970']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.030; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p040
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.040 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.040; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.040']
+          - [Fe, '0.960']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.040; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p050
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.050 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.050; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.050']
+          - [Fe, '0.950']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.050; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p060
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.060 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.060; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.060']
+          - [Fe, '0.940']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.060; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p070
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.070 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.070; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.070']
+          - [Fe, '0.930']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.070; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p080
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.080 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.080; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.080']
+          - [Fe, '0.920']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.080; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p089
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.089 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.089; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.089']
+          - [Fe, '0.911']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.089; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+
+- experiment_id: fe-sn-nsn-0p100
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 4, published_page: 59, table: '4', note: 'Table 4 dilute Fe-Sn charge N_Sn=0.100 at 1600 C'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to N_Sn=0.100; Table 1 is starting-metal impurity assay, not this charge'}
+      locator: {published_page: 59, pdf_page_index: 4, table: '4', note: 'Label retained; numeric mole fractions in initial_composition; Table 1 impurity assay not used as charge'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: Fe-Sn_alloy
+          amount_basis: mole_fraction
+          components:
+          - [Sn, '0.100']
+          - [Fe, '0.900']
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 N_Sn as printed (mole fraction); N_Fe = 1 - N_Sn from binary Fe-Sn; not renormalised'
+      method_class: calculated
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - "printed recipe/aimed target: Pure Fe and pure Sn weighed to N_Sn=0.100; Table 1 is starting-metal impurity assay, not this charge"
+        - "component values retained exactly in initial_composition; locator above"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 59, table: '4', note: 'Table 4 ion ratios reported at 1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
 - experiment_id: fe-sn-series
   bench_id: rm-6e
   method: knudsen_effusion
-  locator: {page: 2, published_page: 56, note: Fe-Sn measurements; individual alloy charges are not separately specified}
+  locator: {page: 2, published_page: 56, note: 'Fe-Sn multi-charge series (Table 2/3 broader N_Sn grid); dilute Table 4 charges are on fe-sn-nsn-* experiments'}
   sample:
     mass_kg:
       state: {tag: unknown, reason: not_published}
       locator: *yam_apparatus
     printed_composition:
       state: {tag: value, value: Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays, not charge composition}
-      locator: *yam_apparatus
+      locator: {page: 2, published_page: 56, note: 'Series label retained; dilute Table 4 N_Sn grid is on fe-sn-nsn-* experiments; Table 1 impurity assay is not the charge'}
     form:
       state: {tag: value, value: Alloys melted in situ}
       locator: *yam_apparatus
@@ -145,8 +774,8 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: *yam_apparatus
     printed_composition:
-      state: {tag: value, value: Pure Fe, pure Sn, and OFHC Cu weighed to desired composition}
-      locator: *yam_apparatus
+      state: {tag: value, value: 'Pure Fe, pure Sn, and OFHC Cu; N_Sn held at 0.03, N_Cu stepped 0-0.08 by row'}
+      locator: {published_page: 60, pdf_page_index: 5, table: '5', note: 'Series label; N_Sn=0.03 held as printed; N_Cu varies per Table 5 row so no single initial_composition map is landed here'}
     form:
       state: {tag: value, value: Alloys melted in situ}
       locator: *yam_apparatus
