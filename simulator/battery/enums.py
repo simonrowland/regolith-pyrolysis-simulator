@@ -58,6 +58,7 @@ class Quantity(StrEnum):
 
     P_SAT = "p_sat"
     P_PARTIAL = "p_partial"
+    FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
     ACTIVITY = "activity"
@@ -395,6 +396,7 @@ class StateTag(StrEnum):
 QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.P_SAT: "Pa",
     Quantity.P_PARTIAL: "Pa",
+    Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",

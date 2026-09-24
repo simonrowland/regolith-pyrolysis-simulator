@@ -340,6 +340,7 @@ PHASE_MAP: dict[str, Phase] = {
 
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
+    "fugacity_series": Quantity.FUGACITY,
     "gibbs_table": Quantity.DELTA_FG,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
@@ -2353,6 +2354,24 @@ def conversion_derivation(
     )
 
 
+def _merge_source_conversion_derivation(
+    source: Derivation | None,
+    conversion: Derivation | None,
+) -> Derivation | None:
+    """Retain author lineage while recording a canonical-unit conversion."""
+
+    if source is None:
+        return conversion
+    if conversion is None:
+        return source
+    return replace(
+        source,
+        inputs=source.inputs + conversion.inputs,
+        parameters=source.parameters + conversion.parameters,
+        output_unit=conversion.output_unit,
+    )
+
+
 def _converted_temperature(
     amount: Decimal,
     trail: str | None,
@@ -2970,6 +2989,10 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
+    "fCl2_bar": Quantity.FUGACITY,
+    "fugacity_bar": Quantity.FUGACITY,
+    "fugacity_Pa": Quantity.FUGACITY,
+    "fugacity": Quantity.FUGACITY,
 }
 
 
@@ -3183,6 +3206,19 @@ def _quantity_contradiction(
             if "kg/m" not in units_l and "kg_per_m" not in units_l:
                 return f"source units {units!r} do not denote areal mass loss"
 
+    if candidate is Quantity.FUGACITY:
+        if isinstance(values, Mapping):
+            if any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]):
+                return None
+            series = values.get("series") or values.get("points")
+            if isinstance(series, list) and any(
+                isinstance(item, Mapping)
+                and any(key in item for key in QUANTITY_SOURCE_FIELDS[candidate])
+                for item in series
+            ):
+                return None
+        return f"source does not name a fugacity field"
+
     if semantics in {"bound_not_point_ordering", "bound_not_point"} and candidate not in {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.ACTIVITY_COEFFICIENT,
@@ -3251,6 +3287,16 @@ def _quantity_corroborated(
     if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
         return values.get("quantity_as_printed") == "delta_q" or any(
             key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
+        )
+    if candidate is Quantity.FUGACITY:
+        series = values.get("series") or values.get("points")
+        return any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]) or (
+            isinstance(series, list)
+            and any(
+                isinstance(item, Mapping)
+                and any(key in item for key in QUANTITY_SOURCE_FIELDS[candidate])
+                for item in series
+            )
         )
     return False
 
@@ -4176,6 +4222,13 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "delta_q_replicate_1",
         "delta_q_replicate_2",
     ),
+    Quantity.FUGACITY: (
+        "fCl2_bar",
+        "fugacity_bar",
+        "fugacity_Pa",
+        "fugacity",
+        "value",
+    ),
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
@@ -4638,6 +4691,32 @@ def _selection_from_named_field(
                 )
             return _unavailable_selection(
                 trail or "series P is not grounded in a source pressure unit",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+                unit_trail=trail or "identity",
+            )
+        return None
+    if q_token is Quantity.FUGACITY:
+        for key in QUANTITY_SOURCE_FIELDS[q_token]:
+            if key not in payload:
+                continue
+            raw = payload.get(key)
+            field_units = units
+            if isinstance(raw, Mapping):
+                field_units = str(raw.get("units") or field_units or "")
+                raw = raw.get("value")
+            if key.endswith("_bar"):
+                field_units = "bar"
+            elif key.endswith("_Pa"):
+                field_units = "Pa"
+            amount, trail = convert_pressure_to_pa(raw, field_units)
+            if amount is not None:
+                return _point_selection(
+                    amount, key, trail or "identity:Pa", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                trail or f"{key} is not a grounded fugacity",
                 condition_ranges=condition_ranges,
                 unused_ancillary=_unused_ancillary(payload, key),
                 field_name=key,
@@ -7904,6 +7983,18 @@ class Migrator:
             value_derivation = conversion_derivation(
                 value_sel.unit_trail, original_raw, locator
             )
+        elif (
+            q_token is Quantity.FUGACITY
+            and value_sel.available
+            and value_sel.field_name
+        ):
+            original_raw = values.get(value_sel.field_name)
+            if isinstance(original_raw, Mapping):
+                original_raw = original_raw.get("value")
+            value_derivation = _merge_source_conversion_derivation(
+                source_derivation,
+                conversion_derivation(value_sel.unit_trail, original_raw, locator),
+            )
         if initial_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
@@ -8369,11 +8460,14 @@ class Migrator:
                     composition_unknown_reason()
                 )
         identity = fill_identity(quantity, species, **ident_kwargs)
+        converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
             original_raw = None
             if isinstance(raw_item, Mapping) and value_sel.field_name:
                 original_raw = raw_item.get(value_sel.field_name)
+                if isinstance(original_raw, Mapping):
+                    original_raw = original_raw.get("value")
             converted = conversion_derivation(trail, original_raw, point_locator)
             derivation = Derivation(
                 relation=trail if converted is None else converted.relation,
@@ -8404,7 +8498,11 @@ class Migrator:
             )
             derivation = None
         if source_derivation is not None:
-            derivation = source_derivation
+            derivation = (
+                _merge_source_conversion_derivation(source_derivation, converted)
+                if q_token_point is Quantity.FUGACITY
+                else source_derivation
+            )
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
