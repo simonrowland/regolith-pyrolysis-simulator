@@ -249,6 +249,9 @@ class DuplicateContextIdError(ValueError):
 METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
     "authors_estimate": EvidenceClass.AUTHOR_ESTIMATE,
     "authors_hypothesis": EvidenceClass.AUTHOR_ESTIMATE,
+    "calculated": EvidenceClass.MEASURED_REDUCED,
+    "author_derived": EvidenceClass.MEASURED_REDUCED,
+    "derived": EvidenceClass.MODEL_DERIVED,
     "authors_preferred_average_of_kems_derived_gammas": EvidenceClass.MEASURED_REDUCED,
     "derived_from_measured_kems_hertz_knudsen": EvidenceClass.MEASURED_REDUCED,
     "derived_gibbs_duhem": EvidenceClass.MODEL_DERIVED,
@@ -295,10 +298,8 @@ METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
 # PAGE tokens: class stays unknown pending page adjudication.
 PAGE_METHOD_CLASSES = frozenset(
     {
-        "author_derived",
         "author_reported_envelope",
         "authors_reduced_from_ion_intensities",
-        "derived",
         "derived_from_figure_8_linear_portion",
         "derived_from_kems_equilibrium_constants",
         "measured_and_compiled_calorimetry",
@@ -3547,6 +3548,56 @@ def lineage_parents_from_source(
     return tuple(parents), tuple(prose)
 
 
+_CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
+
+
+def source_derivation_from_source(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> Derivation | None:
+    """Read an author-supplied derivation without inventing one."""
+
+    for payload in (values, obs):
+        for key in ("derivation", "inference"):
+            raw = payload.get(key)
+            if not isinstance(raw, Mapping):
+                continue
+            if not raw.get("relation") or not raw.get("inputs"):
+                continue
+            try:
+                return _derivation_from_plain(raw)
+            except (TypeError, ValueError):
+                continue
+    return None
+
+
+def conditional_reduced_lineage_is_measured(
+    observation: Observation,
+    observations: Mapping[str, Observation],
+) -> bool:
+    """Whether a calculated observation has admissible measured ancestry."""
+
+    method_class = observation.evidence.original_method_class
+    if method_class not in _CONDITIONAL_REDUCED_METHODS:
+        return False
+    derivation = observation.derivation
+    if derivation is None or not observation.derived_from:
+        return False
+    relation = derivation.relation.lower().replace("-", "_").replace(" ", "_")
+    if "recipe" in relation or "aimed_target" in relation:
+        return False
+    for parent_id in observation.derived_from:
+        parent = observations.get(parent_id)
+        if parent is None or not parent.evidence.class_.is_value:
+            return False
+        if parent.evidence.class_.value not in {
+            EvidenceClass.MEASURED_DIRECT,
+            EvidenceClass.MEASURED_TABULATED,
+            EvidenceClass.MEASURED_REDUCED,
+        }:
+            return False
+    return True
+
+
 def map_method(regime: object) -> State[MethodToken]:
     if not isinstance(regime, str) or not regime.strip():
         return State.unknown("source does not state method")
@@ -3566,6 +3617,7 @@ def evidence_for(
     attribution: str | None = None,
     model: str | None = None,
     regime: object = None,
+    lineage_valid: bool = False,
 ) -> tuple[Evidence, str | None]:
     """Return Evidence and an optional queue reason."""
 
@@ -3615,6 +3667,16 @@ def evidence_for(
             ),
             f"PAGE method_class {original}",
         )
+    if original in _CONDITIONAL_REDUCED_METHODS and not lineage_valid:
+        return (
+            Evidence(
+                class_=State.unknown(
+                    f"{original} requires measured derived_from lineage and derivation"
+                ),
+                original_method_class=original,
+            ),
+            f"conditional method_class {original} lacks measured lineage",
+        )
     mapped = METHOD_CLASS_MAP.get(original)
     if mapped is None:
         return (
@@ -3663,6 +3725,7 @@ def admission_for(
     superseded_by: str | None,
     extraction: Mapping[str, Any] | None,
     locator: Locator | None,
+    refusal_reason: str | None = None,
 ) -> Admission:
     if superseded_by:
         decided = None
@@ -3710,6 +3773,19 @@ def admission_for(
         return Admission(
             status=AdmissionStatus.REJECTED,
             reason=f"source admission_status={text}",
+            decided_by=decided,
+        )
+    if text == "typed_refusal":
+        decided = None
+        if isinstance(extraction, Mapping) and locator is not None:
+            decided = AdmissionDecision(
+                worker=str(extraction.get("worker") or "extract"),
+                date=str(extraction.get("date") or "unspecified"),
+                evidence=locator,
+            )
+        return Admission(
+            status=AdmissionStatus.REJECTED,
+            reason=refusal_reason or "source status=typed_refusal",
             decided_by=decided,
         )
     return Admission(
@@ -7520,9 +7596,20 @@ class Migrator:
                 measured.gibbs_reference_101325 += 1
 
         method_class = values.get("method_class")
+        if method_class is None:
+            method_class = obs.get("method_class")
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
+        derived_parents, derived_prose = lineage_parents_from_source(
+            obs, values, source_id, local_ids
+        )
+        derived_from = derived_parents or None
+        source_derivation = (
+            source_derivation_from_source(obs, values)
+            if str(method_class or "") in _CONDITIONAL_REDUCED_METHODS
+            else None
+        )
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -7551,7 +7638,8 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        raw_adm = values.get("admission_status")
+        typed_refusal = str(values.get("status") or obs.get("status") or "") == "typed_refusal"
+        raw_adm = "typed_refusal" if typed_refusal else values.get("admission_status")
         if raw_adm is None and obs.get("admission_status") is None:
             measured.absent_admissions += 1
         else:
@@ -7585,6 +7673,11 @@ class Migrator:
             superseded_by=None,
             extraction=extraction,
             locator=locator,
+            refusal_reason=(
+                str(values.get("reason") or obs.get("reason"))
+                if typed_refusal and (values.get("reason") or obs.get("reason"))
+                else None
+            ),
         )
 
         if obs.get("equipment"):
@@ -7750,10 +7843,6 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        derived_parents, derived_prose = lineage_parents_from_source(
-            obs, values, source_id, local_ids
-        )
-        derived_from = derived_parents or None
         for prose_item in derived_prose:
             self.result.add_queue(
                 work.work_id,
@@ -7831,6 +7920,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    source_derivation=source_derivation,
                     notices=point_notices,
                     equipment=obs.get("equipment"),
                     parent_values=values,
@@ -7855,6 +7945,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    source_derivation=source_derivation,
                     equipment=obs.get("equipment"),
                     parent_values=values,
                 )
@@ -7908,6 +7999,7 @@ class Migrator:
             read_from=read_from,
             point_conditions=point_conditions,
             derived_from=derived_from,
+            derivation=source_derivation,
         )
         self._queue_unstated_derived_lineage(
             work.work_id,
@@ -7916,7 +8008,7 @@ class Migrator:
             obs_id,
             evidence,
             derived_from,
-            None,
+            source_derivation,
         )
         self._add_observation(observation, source_key)
 
@@ -7937,6 +8029,7 @@ class Migrator:
         units: str,
         read_from: str,
         derived_from: tuple[str, ...] | None = None,
+        source_derivation: Derivation | None = None,
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
         parent_values: object = None,
@@ -8101,6 +8194,8 @@ class Migrator:
                 observation_id=point_id,
             )
             derivation = None
+        if source_derivation is not None:
+            derivation = source_derivation
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
@@ -9569,10 +9664,25 @@ class Migrator:
                     if exp is not None and exp.work_id in works:
                         entry.work_id = exp.work_id
 
+    def _close_conditional_method_classes(self) -> None:
+        for observation_id, observation in list(self.result.observations.items()):
+            if not conditional_reduced_lineage_is_measured(
+                observation, self.result.observations
+            ):
+                continue
+            evidence = replace(
+                observation.evidence,
+                class_=State.of(EvidenceClass.MEASURED_REDUCED),
+            )
+            self.result.observations[observation_id] = replace(
+                observation, evidence=evidence
+            )
+
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
         self._resolve_queue_ids()
+        self._close_conditional_method_classes()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by

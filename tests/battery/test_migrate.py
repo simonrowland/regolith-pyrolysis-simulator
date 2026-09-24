@@ -1136,6 +1136,49 @@ def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
     assert child_obs.derived_from == ("fixture-source::raw_parent",)
 
 
+def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+
+    measured = yaml.safe_load(yaml.safe_dump(base))
+    measured["observation_id"] = "measured_parent"
+    measured["values"].pop("series", None)
+    measured["values"]["method_class"] = "measured_direct"
+    measured["values"]["pressure_atm"] = 1.0
+
+    recipe = yaml.safe_load(yaml.safe_dump(measured))
+    recipe["observation_id"] = "recipe_composition"
+    recipe["values"]["method_class"] = "calculated"
+    recipe["values"]["derived_from"] = "measured_parent"
+    recipe["values"]["composition_wt_pct"] = {"SiO2": 60.0, "MgO": 40.0}
+    recipe["values"]["derivation"] = {
+        "relation": "recipe_to_mole_fraction",
+        "inputs": ["measured_parent"],
+        "output_unit": "mole_fraction",
+    }
+
+    author = yaml.safe_load(yaml.safe_dump(measured))
+    author["observation_id"] = "author_calculation"
+    author["values"]["method_class"] = "calculated"
+    author["values"]["derived_from"] = "measured_parent"
+    author["values"]["composition_wt_pct"] = {"SiO2": 60.0, "MgO": 40.0}
+    author["values"]["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": ["measured_parent"],
+        "output_unit": "Pa",
+    }
+
+    extract["species"]["Na"]["observations"] = [measured, recipe, author]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+
+    recipe_obs = result.observations["fixture-source::recipe_composition"]
+    author_obs = result.observations["fixture-source::author_calculation"]
+    assert recipe_obs.evidence.class_.is_unknown
+    assert author_obs.evidence.class_.is_value
+    assert author_obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+
+
 def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:
     from simulator.battery.migrate import METHOD_CLASS_MAP, evidence_for
 
