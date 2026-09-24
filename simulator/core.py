@@ -1538,9 +1538,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     @staticmethod
     def _load_species_formula_registry() -> dict:
         catalog = Path(__file__).resolve().parents[1] / 'data' / 'species_catalog.yaml'
-        import yaml
+        from simulator.yaml_cache import load_cached_safe_yaml
 
-        payload = yaml.safe_load(catalog.read_text(encoding='utf-8')) or {}
+        payload = load_cached_safe_yaml(catalog.read_text(encoding='utf-8')) or {}
         # VR-3 collision-only gas IDs close the catalog namespace but remain
         # dormant until manifest request rules land. Do not let those metadata
         # rows perturb the live formula-registry identity or physical outputs.
@@ -11502,12 +11502,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return cached
 
     def _load_carbon_partition_config(self) -> dict:
-        import yaml
+        from simulator.yaml_cache import load_cached_safe_yaml
 
         cached = getattr(self, "_cached_carbon_partition_config", None)
         if cached is None:
             with self._carbon_partition_path().open(encoding="utf-8") as handle:
-                cached = yaml.safe_load(handle) or {}
+                cached = load_cached_safe_yaml(handle.read()) or {}
             self._cached_carbon_partition_config = cached
         return cached
 

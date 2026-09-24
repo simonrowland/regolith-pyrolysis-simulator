@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Any, Final
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.melt_backend.melt_envelope import (
@@ -1917,7 +1918,7 @@ def load_vapour_rail_calibration_sidecar(
         raise CalibrationSidecarError(
             f"calibration sidecar missing: {sidecar_path}"
         )
-    payload = yaml.safe_load(sidecar_path.read_text())
+    payload = load_cached_safe_yaml(sidecar_path.read_text())
     if not isinstance(payload, Mapping):
         raise CalibrationSidecarError("sidecar root must be a mapping")
     if int(payload.get("schema_version", -1)) != SIDECAR_SCHEMA_VERSION:

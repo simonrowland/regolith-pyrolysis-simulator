@@ -11,7 +11,8 @@ import math
 from pathlib import Path
 
 import pytest
-import yaml
+
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.condensation import _species_has_antoine_data
 from simulator.chemistry.ellingham_thermo import (
@@ -700,7 +701,7 @@ def test_phase_transition_breakpoints_remain_ellingham_single_home() -> None:
 
 
 def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     active_thermo = []
     for sp_id, sp in catalog.species.items():
@@ -771,8 +772,8 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
 
 
 def test_production_phosphorus_thermo_matches_local_cea_extract() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
-    store = yaml.safe_load(
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
+    store = load_cached_safe_yaml(
         (DATA / "literature" / "extracts" / "nasa-cea-thermo.yaml").read_text()
     )
     anchors = payload["cea_phosphorus_thermo"]
@@ -822,7 +823,7 @@ def test_production_phosphorus_thermo_matches_local_cea_extract() -> None:
 
 
 def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     expected = {
         "PO": (-0.75, 0.5),
@@ -874,7 +875,7 @@ def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
 
 
 def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
     T_K = 2000.0  # inside the shared Ti base/composite validated domain
     pO2_bar = 1.0e-6
@@ -993,7 +994,7 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
 
 
 def test_production_al2o_activity_power_is_stoichiometric_square() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     evaluator = compile_vapour_rail_catalog(
         payload, emit_u0_request_rules=False
     ).evaluator_for("Al2O")
@@ -1007,7 +1008,7 @@ def test_production_al2o_activity_power_is_stoichiometric_square() -> None:
 
 
 def test_production_al2o_depletion_underflow_is_typed_positive_floor() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     evaluator = compile_vapour_rail_catalog(
         payload, emit_u0_request_rules=False
     ).evaluator_for("Al2O")
@@ -1022,7 +1023,7 @@ def test_production_al2o_depletion_underflow_is_typed_positive_floor() -> None:
 
 
 def test_production_extract_reference_fails_closed_on_unknown_observation() -> None:
-    payload = yaml.safe_load((DATA / "vapor_pressures.yaml").read_text())
+    payload = load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text())
     model = payload["families"]["oxide_vapors_tio_family"]["physical_properties"][
         "species"
     ]["TiO"]["pressure_models"][0]
@@ -1290,11 +1291,11 @@ def test_cea_ingest_T_min_T_max_domain_shape_compiles() -> None:
 
 
 def test_t622_reviewed_ivtan_shomate_rows_compile_on_declared_intersections() -> None:
-    extract = yaml.safe_load(
+    extract = load_cached_safe_yaml(
         (DATA / "literature" / "extracts" / "ivtan-mno-coo-thermo.yaml").read_text()
     )
     catalog = compile_vapour_rail_catalog(
-        yaml.safe_load((DATA / "vapor_pressures.yaml").read_text()),
+        load_cached_safe_yaml((DATA / "vapor_pressures.yaml").read_text()),
         emit_u0_request_rules=False,
     )
     expected = {

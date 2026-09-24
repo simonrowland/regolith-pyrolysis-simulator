@@ -6,9 +6,8 @@ import os
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from simulator.feedstock_guard import loadable_feedstocks
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -35,7 +34,7 @@ def load_yaml(filename: str) -> dict[str, Any]:
     if not path.exists():
         return {}
     with open(path) as f:
-        return yaml.safe_load(f) or {}
+        return load_cached_safe_yaml(f.read()) or {}
 
 
 def load_feedstock_groups(

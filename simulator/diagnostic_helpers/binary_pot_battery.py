@@ -33,14 +33,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-import yaml
-
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     CELSIUS_TO_KELVIN_OFFSET,
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -434,7 +433,7 @@ def load_binary_pots(
     """Load pots and the T/pO2 grid from data, not from code."""
 
     pots_path = Path(path) if path is not None else DEFAULT_POTS_PATH
-    payload = yaml.safe_load(pots_path.read_text(encoding="utf-8")) or {}
+    payload = load_cached_safe_yaml(pots_path.read_text(encoding="utf-8")) or {}
     if not isinstance(payload, Mapping):
         raise BinaryPotBatteryError(f"{pots_path} must be a mapping")
 

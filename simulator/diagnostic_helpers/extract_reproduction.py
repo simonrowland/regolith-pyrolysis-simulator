@@ -30,8 +30,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-import yaml
-
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -59,6 +57,7 @@ from simulator.diagnostic_helpers.reproduction_compare import (
     ComparisonRecord,
     compare_values,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
@@ -295,7 +294,7 @@ def load_vapor_pressure_data(
     path: Path | None = None,
 ) -> dict[str, Any]:
     p = path or VAPOR_PRESSURES_PATH
-    data = yaml.safe_load(p.read_text(encoding="utf-8"))
+    data = load_cached_safe_yaml(p.read_text(encoding="utf-8"))
     if not isinstance(data, Mapping):
         raise ExtractReproductionError(f"vapor_pressures.yaml is not a mapping: {p}")
     return dict(data)
@@ -2639,7 +2638,7 @@ def load_condensed_form_corrections(
     p = path or CONDENSED_FORM_CORRECTIONS_PATH
     if not p.is_file():
         return {}
-    raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    raw = load_cached_safe_yaml(p.read_text(encoding="utf-8")) or {}
     if not isinstance(raw, Mapping):
         return {}
     corrections = raw.get("corrections") or {}
@@ -3588,7 +3587,7 @@ def _melt_recipe_mol(
     if not isinstance(raw_wt, Mapping) and (
         "apollo_12" in material or "lunar_basalt_120" in material
     ):
-        feedstocks = yaml.safe_load(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
+        feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
         feedstock = feedstocks.get("lunar_mare_low_ti") or {}
         raw_wt = feedstock.get("composition_wt_pct")
         provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
@@ -4316,7 +4315,7 @@ def _evaluate_ordering(
         # actually checked.
         system_class = observation_system_class(obs)
         if system_class == "silicate_melt":
-            feedstocks = yaml.safe_load(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
+            feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
             feedstock = feedstocks.get("lunar_mare_low_ti") or {}
             raw_wt = feedstock.get("composition_wt_pct")
             if isinstance(raw_wt, Mapping) and raw_wt:

@@ -12,8 +12,6 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-import yaml
-
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -26,6 +24,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
@@ -2092,7 +2091,7 @@ def observations_from_table(
 
 
 def _sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping) or not isinstance(payload.get("files"), list):
         raise ValueError(f"{path}: invalid JANAF source sidecar")
     result: dict[str, str] = {}

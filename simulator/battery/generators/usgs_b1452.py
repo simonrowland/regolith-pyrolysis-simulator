@@ -16,9 +16,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-import yaml
-
 from simulator.accounting.formulas import parse_formula
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -410,7 +409,9 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
 
 @lru_cache(maxsize=1)
 def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
-    manifest = yaml.safe_load((COMPILATION_ROOT / "manifest.yaml").read_text(encoding="utf-8"))
+    manifest = load_cached_safe_yaml(
+        (COMPILATION_ROOT / "manifest.yaml").read_text(encoding="utf-8")
+    )
     index: dict[tuple[str, str, str], Mapping[str, Any]] = {}
     for item in manifest.get("corrections") or ():
         if not isinstance(item, Mapping):

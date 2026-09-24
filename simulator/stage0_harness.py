@@ -16,8 +16,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
 
-import yaml
-
 from engines.builtin.foulant_disposition import FoulantRegistry, load_foulant_registry
 from engines.builtin.foulant_disposition import refractory_fraction_interval
 from engines.builtin.melt_effect_adjustment import build_harness_verdicts
@@ -39,6 +37,7 @@ from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import CampaignPhase, DecisionType
+from simulator.yaml_cache import load_cached_safe_yaml
 
 STAGE0_CAMPAIGNS = frozenset({CampaignPhase.C0, CampaignPhase.C0B})
 
@@ -174,7 +173,7 @@ def _carbon_partition_interval_event(
         return None
 
     with _DEFAULT_CARBON_PARTITION.open(encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+        payload = load_cached_safe_yaml(handle.read()) or {}
     matches: list[tuple[str, Mapping[str, Any], tuple[float, float]]] = []
     for key, row in (payload.get("phase_partitions", {}) or {}).items():
         if not isinstance(row, Mapping):
@@ -649,4 +648,4 @@ def run_stage0_harness_from_config(
 def load_harness_yaml(name: str) -> dict[str, Any]:
     path = _REPO_ROOT / "data" / name
     with path.open(encoding="utf-8") as handle:
-        return yaml.safe_load(handle) or {}
+        return load_cached_safe_yaml(handle.read()) or {}

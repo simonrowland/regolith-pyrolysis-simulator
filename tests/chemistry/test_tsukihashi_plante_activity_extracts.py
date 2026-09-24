@@ -12,6 +12,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.diagnostic_helpers.extract_reproduction import (
     evaluate_observation,
     load_adopted_observations,
@@ -25,7 +27,7 @@ PLANTE = EXTRACTS / "kems-042-plante-1979.yaml"
 
 
 def _load(path: Path) -> dict:
-    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     assert isinstance(doc, dict)
     return doc
 

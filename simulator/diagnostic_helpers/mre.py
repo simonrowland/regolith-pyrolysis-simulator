@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_ARTIFACT_SCHEMA_VERSION,
@@ -108,7 +109,7 @@ class MREComparisonRun:
 def load_mre_observations(path: str | Path) -> dict[str, Any]:
     sidecar_path = Path(path)
     try:
-        loaded = yaml.safe_load(sidecar_path.read_text(encoding="utf-8"))
+        loaded = load_cached_safe_yaml(sidecar_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise MREComparisonError(
             f"cannot load MRE observations {sidecar_path}: {exc}"

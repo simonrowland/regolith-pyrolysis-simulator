@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.accounting.formulas import parse_formula
 from simulator.state import OXIDE_SPECIES
@@ -790,7 +791,7 @@ def _gas_closure_contribution_rows() -> list[dict[str, Any]]:
 def parse_refractory_rows(path: Path) -> list[dict[str, Any]]:
     """Load the 22 refractory gas IDs and emit collision-canonicalized rows."""
 
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     gas_species = payload.get("gas_species")
     if not isinstance(gas_species, Mapping):
         raise ValueError(f"{path} missing gas_species mapping")
@@ -1048,7 +1049,7 @@ def load_u0_manifest(path: Path | None = None) -> dict[str, Any]:
         # the cache; nested species rows stay shared (treat as immutable).
         return dict(cached[2])
 
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise ValueError(f"U0 manifest at {path} is not a mapping")
     stored = dict(payload)

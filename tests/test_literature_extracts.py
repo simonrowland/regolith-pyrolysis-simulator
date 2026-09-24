@@ -20,6 +20,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOOLS = REPO_ROOT / "tools"
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
@@ -581,7 +583,7 @@ def test_repo_extracts_validate_green():
 
 
 def _repo_observation(filename: str, observation_id: str) -> dict:
-    doc = yaml.safe_load((EXTRACTS / filename).read_text())
+    doc = load_cached_safe_yaml((EXTRACTS / filename).read_text())
     for species in doc["species"].values():
         for observation in species["observations"]:
             if observation["observation_id"] == observation_id:
@@ -628,7 +630,7 @@ def test_wetzel_model_tables_and_uncertainties_are_typed_first_class():
     superseded by a gibbs_table model row; the Table 3 printed uncertainties
     live first-class on the superseding row. No corrections entry may claim a
     parent change that is not applied."""
-    doc = yaml.safe_load(
+    doc = load_cached_safe_yaml(
         (EXTRACTS / "kems-011-wetzel-gail-2013.yaml").read_text(encoding="utf-8")
     )
     observations = doc["species"]["SiO"]["observations"]
@@ -663,7 +665,7 @@ def test_wetzel_model_tables_and_uncertainties_are_typed_first_class():
         ), "stale correction claims an unapplied parent change"
 
 def test_recovered_qualitative_sequences_cannot_become_numeric_rates():
-    hashimoto_doc = yaml.safe_load(
+    hashimoto_doc = load_cached_safe_yaml(
         (EXTRACTS / "kems-015-hashimoto-1983.yaml").read_text()
     )
     ca_ids = {
@@ -731,7 +733,7 @@ def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
 def test_source_priority_file_present_and_valid():
     errs = vle.validate_source_priority_file()
     assert errs == []
-    doc = yaml.safe_load((EXTRACTS / "_source_priority.yaml").read_text())
+    doc = load_cached_safe_yaml((EXTRACTS / "_source_priority.yaml").read_text())
     for fam in vle.OBSERVATION_TYPES:
         assert fam in doc["source_priority"]
         assert doc["source_priority"][fam], f"empty family {fam}"
@@ -1153,7 +1155,7 @@ def test_merge_cli_writes_and_uses_custom_priority(tmp_path: Path, tmp_extracts:
     assert (outdir / "by_species.yaml").is_file()
     assert (outdir / "coverage.yaml").is_file()
     assert (outdir / "consistency.yaml").is_file()
-    view = yaml.safe_load((outdir / "by_species.yaml").read_text())
+    view = load_cached_safe_yaml((outdir / "by_species.yaml").read_text())
     winners = [
         o for o in view["species"]["Fe"]["observations"] if o.get("is_priority_winner")
     ]
@@ -1177,7 +1179,7 @@ def _corpus_stems_including_aliases() -> set[str]:
     present: set[str] = set()
     for path in vle.discover_extracts():
         present.add(path.stem)
-        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         if not isinstance(doc, dict):
             continue
         aliases = doc.get("aliases") or []
@@ -1220,7 +1222,7 @@ def test_pilot_extract_count_exact_and_merge_smoke():
 
 def test_alpha_form_retained_in_pilot_extracts():
     """Null-hypothesis (P1-F1): alpha_form dropped → null alphas for Wetzel/Richter."""
-    w = yaml.safe_load(
+    w = load_cached_safe_yaml(
         (EXTRACTS / "wetzel-gail-2013-sio-arrhenius.yaml").read_text(encoding="utf-8")
     )
     form = w["species"]["SiO"]["observations"][0]["values"].get("alpha_form")
@@ -1230,7 +1232,7 @@ def test_alpha_form_retained_in_pilot_extracts():
     unc = w["species"]["SiO"]["observations"][0].get("uncertainty") or {}
     assert unc.get("uncertainty_envelope") == [0.003, 0.067]
 
-    r = yaml.safe_load((EXTRACTS / "richter-et-al-2007.yaml").read_text(encoding="utf-8"))
+    r = load_cached_safe_yaml((EXTRACTS / "richter-et-al-2007.yaml").read_text(encoding="utf-8"))
     assert r["source"]["year"] == 2007
     mg = r["species"]["Mg"]["observations"][0]["values"]["alpha_form"]
     assert mg["c0"] == pytest.approx(143.0)
@@ -1238,7 +1240,7 @@ def test_alpha_form_retained_in_pilot_extracts():
 
 def test_janaf_species_not_list_index_keys():
     """Null-hypothesis (P1-F2): PO rows keyed as tabulated_delta_fG_kJ_mol[0]."""
-    j = yaml.safe_load((EXTRACTS / "janaf-4th.yaml").read_text(encoding="utf-8"))
+    j = load_cached_safe_yaml((EXTRACTS / "janaf-4th.yaml").read_text(encoding="utf-8"))
     assert "PO" in j["species"]
     assert not any("[" in k or k.startswith("tabulated_") for k in j["species"])
     po_obs = j["species"]["PO"]["observations"]
@@ -1256,7 +1258,7 @@ def test_janaf_species_not_list_index_keys():
 
 def test_datz_recorded_disagreement_retained():
     """Null-hypothesis (P1): competing JANAF/WebBook observation dropped pre-merge."""
-    d = yaml.safe_load(
+    d = load_cached_safe_yaml(
         (EXTRACTS / "datz-and-smith-1961.yaml").read_text(encoding="utf-8")
     )
     ids = [o["observation_id"] for o in d["species"]["Na2Cl2"]["observations"]]
@@ -1266,7 +1268,7 @@ def test_datz_recorded_disagreement_retained():
 
 def test_cea_source_ref_and_relative_provenance():
     """Null-hypothesis (P2): Ag source_ref_code truncated; absolute Dropbox path."""
-    c = yaml.safe_load((EXTRACTS / "nasa-cea-thermo.yaml").read_text(encoding="utf-8"))
+    c = load_cached_safe_yaml((EXTRACTS / "nasa-cea-thermo.yaml").read_text(encoding="utf-8"))
     assert c["species"]["Ag"]["observations"][0]["values"]["source_ref_code"] == "g10/97"
     prov = c["extraction"]["provenance_path"]
     assert not prov.startswith("/")
@@ -1277,7 +1279,7 @@ def test_lh84_top_level_payloads_not_empty():
     """Null-hypothesis (P1-F3): top-level coefficients/points migrated as values:{}."""
     # Stull Se Antoine must not live under LH84 (wrong-source); coefficients retained
     # under nist-webbook or a dedicated extract.
-    nist = yaml.safe_load((EXTRACTS / "nist-webbook.yaml").read_text(encoding="utf-8"))
+    nist = load_cached_safe_yaml((EXTRACTS / "nist-webbook.yaml").read_text(encoding="utf-8"))
     # Se may be under Se_n_ladder
     found_coeff = False
     for sid, block in nist.get("species", {}).items():
@@ -1289,12 +1291,12 @@ def test_lh84_top_level_payloads_not_empty():
                 assert coeffs  # non-empty
     br = EXTRACTS / "behrens-rosenblatt-1972.yaml"
     assert br.is_file()
-    br_doc = yaml.safe_load(br.read_text(encoding="utf-8"))
+    br_doc = load_cached_safe_yaml(br.read_text(encoding="utf-8"))
     as4 = br_doc["species"]["As4O6"]["observations"][0]["values"]
     assert "coefficients" in as4
     assert as4["coefficients"].get("A") is not None or "A" in str(as4["coefficients"])
 
-    lh = yaml.safe_load(
+    lh = load_cached_safe_yaml(
         (EXTRACTS / "lamoreaux-hildenbrand-1984.yaml").read_text(encoding="utf-8")
     )
     for sid, block in lh["species"].items():
@@ -1323,7 +1325,7 @@ def test_every_extract_has_fidelity_sample():
     silent strip does not go unnoticed.
     """
     for path in vle.discover_extracts():
-        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         n_obs = sum(
             len(b.get("observations") or [])
             for b in (doc.get("species") or {}).values()
@@ -1340,7 +1342,7 @@ def test_every_extract_has_fidelity_sample():
 
 def _fidelity_policy_doc() -> dict:
     assert FIDELITY_POLICY.is_file(), f"missing {FIDELITY_POLICY}"
-    doc = yaml.safe_load(FIDELITY_POLICY.read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(FIDELITY_POLICY.read_text(encoding="utf-8"))
     assert isinstance(doc, dict)
     return doc
 
@@ -2067,7 +2069,7 @@ def test_fidelity_exact_match_rejects_sequence_type_drift(expected, actual):
 def _extract_paths_with_samples() -> list[Path]:
     paths: list[Path] = []
     for path in vle.discover_extracts():
-        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         samples = doc.get("fidelity_samples") or []
         if samples:
             paths.append(path)
@@ -2086,7 +2088,7 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     migrator regression) leaves samples stale while the file stays
     schema-valid — this test must go RED.
     """
-    doc = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
     errs = vle.check_all_fidelity_samples_match(doc, label=extract_path.stem)
     assert errs == [], "\n".join(errs)
 
@@ -2099,7 +2101,7 @@ def test_fidelity_sample_mutation_reds():
     """
     path = EXTRACTS / "costa-jacobson-2015.yaml"
     assert path.is_file(), "costa-jacobson-2015 extract required for mutation pin"
-    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     samples = doc.get("fidelity_samples") or []
     assert samples, "costa extract must carry at least one fidelity sample"
     # Baseline green with independent (non-aliased) pins.

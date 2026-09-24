@@ -22,6 +22,7 @@ from scipy.optimize import minimize_scalar
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 EXTRACT = ROOT / "data/literature/extracts/nasa-cea-thermo.yaml"
 OUTPUT = (
     ROOT
@@ -45,7 +46,7 @@ def _package_version(name: str) -> str:
 def _load_cea_gas(name: str) -> Any:
     from simulator.vapour_rail.nasa_cea import NasaCeaPolynomial, Nasa9Segment
 
-    raw = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    raw = load_cached_safe_yaml(EXTRACT.read_text(encoding="utf-8"))
     expected_id = f"cea_{name}_gibbs"
     observations = raw["species"][name]["observations"]
     matches = [

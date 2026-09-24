@@ -27,8 +27,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Mapping
 
-import yaml
-
 from simulator.reference_data.janaf import (
     ELEMENT_SYMBOLS,
     FEEDSTOCKS_PATH,
@@ -38,11 +36,7 @@ from simulator.reference_data.janaf import (
     formula_elements,
     formula_normalised,
 )
-
-try:
-    _YAML_LOADER = yaml.CSafeLoader
-except AttributeError:  # pragma: no cover
-    _YAML_LOADER = yaml.SafeLoader
+from simulator.yaml_cache import load_cached_safe_yaml
 
 TIER_MAJOR = "major"
 TIER_MINOR = "minor"
@@ -187,7 +181,7 @@ def element_occupancy(
     """How many feedstocks carry a ``composition_wt_pct`` species containing each element."""
 
     path = feedstocks_path or FEEDSTOCKS_PATH
-    payload = yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise ValueError(f"{path}: expected a mapping")
     counts: Counter[str] = Counter()

@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.vapour_rail.u0_manifest import canonicalize_gas_id  # noqa: E402
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 
 DEFAULT_OUTPUT = ROOT / "data" / "vapour_rail_demand_manifest.yaml"
 DEFAULT_FEEDSTOCKS = ROOT / "data" / "feedstocks.yaml"
@@ -46,7 +47,7 @@ _KEMS_CARRIER_FIELDS = frozenset(
 
 
 def _load_yaml(path: Path) -> Mapping[str, Any]:
-    payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
     if not isinstance(payload, Mapping):
         raise ValueError(f"{path}: expected a YAML mapping")
     return payload

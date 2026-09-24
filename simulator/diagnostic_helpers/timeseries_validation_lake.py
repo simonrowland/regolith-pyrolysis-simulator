@@ -26,6 +26,7 @@ from statistics import median
 from typing import Any
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
@@ -136,7 +137,7 @@ class _ObservedProxy:
 
 
 def load_catalog(data_root: Path = DEFAULT_DATA_ROOT) -> dict[str, Any]:
-    return yaml.safe_load((data_root / CATALOG).read_text()) or {}
+    return load_cached_safe_yaml((data_root / CATALOG).read_text()) or {}
 
 
 def load_dataset_rows(dataset_id: str, data_root: Path = DEFAULT_DATA_ROOT) -> list[dict[str, str]]:
@@ -572,7 +573,7 @@ def _vapor_pressure_row(model_species: str) -> Mapping[str, Any]:
 
 @lru_cache(maxsize=1)
 def _vapor_pressure_data() -> dict[str, Any]:
-    payload = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text()) or {}
+    payload = load_cached_safe_yaml(VAPOR_PRESSURES_PATH.read_text()) or {}
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     return vapor_pressure_legacy_view(payload)

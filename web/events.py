@@ -11,7 +11,7 @@ import time
 import uuid
 from pathlib import Path
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 try:
     from flask import request, session as flask_session
 except ModuleNotFoundError:
@@ -115,7 +115,7 @@ def _load_yaml(filename):
     if not path.exists():
         return {}
     with open(path) as f:
-        return yaml.safe_load(f) or {}
+        return load_cached_safe_yaml(f.read()) or {}
 
 
 # Active simulations keyed by session ID

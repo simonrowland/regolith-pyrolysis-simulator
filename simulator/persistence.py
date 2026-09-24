@@ -27,6 +27,7 @@ from typing import Dict, List, Optional
 import yaml
 
 from simulator.core import BatchRecord, CampaignPhase
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -43,7 +44,7 @@ class RunHistory:
         if not self.file.exists():
             return {'runs': []}
         with open(self.file) as f:
-            data = yaml.safe_load(f) or {}
+            data = load_cached_safe_yaml(f.read()) or {}
         if 'runs' not in data:
             data['runs'] = []
         return data
@@ -130,7 +131,7 @@ class CustomCompositions:
         if not self.file.exists():
             return {}
         with open(self.file) as f:
-            data = yaml.safe_load(f) or {}
+            data = load_cached_safe_yaml(f.read()) or {}
         return data
 
     def _save_all(self, data: dict):

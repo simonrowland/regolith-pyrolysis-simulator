@@ -18,7 +18,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Final
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -391,7 +391,7 @@ def _load_regime_sidecar(
 ) -> tuple[KineticsAnchorRecord, ...]:
     if not path.is_file():
         raise KineticsAnchorError(f"kinetics anchor sidecar missing: {path}")
-    payload = yaml.safe_load(path.read_text())
+    payload = load_cached_safe_yaml(path.read_text())
     if not isinstance(payload, Mapping):
         raise KineticsAnchorError(f"{path}: root must be a mapping")
     declared = str(payload.get("experimental_regime") or "").strip()

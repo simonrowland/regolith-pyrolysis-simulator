@@ -18,7 +18,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Final
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.vapour_rail.activity import (
@@ -665,7 +665,7 @@ class MeltActivityRegistry:
             if path is not None
             else Path(__file__).resolve().parents[2] / REGISTRY_RELATIVE_PATH
         )
-        payload = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+        payload = load_cached_safe_yaml(source_path.read_text(encoding="utf-8"))
         if not isinstance(payload, Mapping):
             raise MeltActivityRegistryError("registry root must be a mapping")
         return cls(payload, source_path=source_path)
@@ -1182,7 +1182,7 @@ class MeltActivityRegistry:
             if vapor_pressure_path is not None
             else self.source_path.parent / "vapor_pressures.yaml"
         )
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         failures: list[str] = []
         checked: list[tuple[str, CatalogStandardStateRoles]] = []
 

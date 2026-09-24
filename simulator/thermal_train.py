@@ -17,7 +17,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation import (
@@ -287,7 +287,7 @@ class ThermalTrainParameters:
 def load_thermal_train_parameters(path: str | Path | None = None) -> dict[str, Any]:
     source = Path(path) if path is not None else DEFAULT_THERMAL_TRAIN_PARAMETERS_PATH
     try:
-        payload = yaml.safe_load(source.read_text(encoding="utf-8"))
+        payload = load_cached_safe_yaml(source.read_text(encoding="utf-8"))
     except OSError as exc:
         raise FileNotFoundError(f"thermal-train parameter config unreadable: {source}") from exc
     if not isinstance(payload, Mapping):

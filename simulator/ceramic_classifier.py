@@ -5,8 +5,6 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-import yaml
-
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
@@ -17,6 +15,7 @@ from simulator.terminal_product_taxonomy import (
     DEFAULT_TAXONOMY_PATH,
     load_terminal_product_taxonomy,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -116,7 +115,7 @@ def load_glass_types(path: Path | str = DEFAULT_GLASS_TYPES_PATH) -> dict[str, A
 
 def _load_types(path: Path | str, key: str, label: str) -> dict[str, Any]:
     with Path(path).open() as handle:
-        data = yaml.safe_load(handle)
+        data = load_cached_safe_yaml(handle.read())
     if not isinstance(data, dict) or not isinstance(data.get(key), dict):
         raise ValueError(f"{label} type data is malformed: {path}")
     return data

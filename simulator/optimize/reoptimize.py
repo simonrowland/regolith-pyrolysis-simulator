@@ -19,6 +19,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GATE_ORDER
 from simulator.optimize.profiles import KNOWN_OBJECTIVE_METRICS, PROFILE_DIRNAME
 from simulator.optimize.recipe import PATH_ALIASES, RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.yaml_cache import load_cached_safe_yaml
 
 GOALS_SOURCE_BUNDLED = "bundled_profile"
 GOALS_SOURCE_CURRENT = "current_local_profile"
@@ -217,7 +218,7 @@ def _load_yaml_mapping(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise ReoptimizeError(f"re-optimize requires {path.name}")
     try:
-        payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
     except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
         raise ReoptimizeError(f"{path.name} is not valid YAML") from exc
     if not isinstance(payload, dict):
@@ -310,7 +311,7 @@ def _current_local_profile(
     if profiles_dir.is_dir():
         for path in sorted(profiles_dir.glob("*.yaml")):
             try:
-                payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+                payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
             except (OSError, UnicodeDecodeError, yaml.YAMLError):
                 continue
             if not isinstance(payload, Mapping):
