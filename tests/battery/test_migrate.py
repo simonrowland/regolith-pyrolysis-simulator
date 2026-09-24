@@ -1160,7 +1160,7 @@ def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> Non
     recipe["values"]["method_class"] = "calculated"
     recipe["values"]["derived_from"] = "measured_parent"
     recipe["values"]["composition_wt_pct"] = {"SiO2": 60.0, "MgO": 40.0}
-    recipe["values"]["derivation"] = {
+    recipe["values"]["inference"] = {
         "relation": "recipe_to_mole_fraction",
         "inputs": ["measured_parent"],
         "output_unit": "mole_fraction",
@@ -1343,6 +1343,7 @@ def test_calculated_areal_conversion_keeps_author_derivation(tmp_path: Path) -> 
     assert observation.derivation is not None
     assert observation.derivation.relation == "author_mass_balance_reduction"
     assert observation.derivation.output_unit == "kg_per_m2"
+    assert not result.validation.hard_issues
 
 
 def test_calculated_lineage_closes_independent_of_row_order(tmp_path: Path) -> None:
@@ -5504,6 +5505,7 @@ def test_fugacity_series_routes_bar_to_pa_without_partial_pressure(tmp_path: Pat
     original = dict(obs.derivation.parameters)["original"]
     assert original.state.value == as_decimal("3.37E-04")
     assert original.locator == obs.locator
+    assert not result.validation.hard_issues
 
 
 def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None:
