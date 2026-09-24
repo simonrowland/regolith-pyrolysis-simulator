@@ -26,10 +26,13 @@ import tempfile
 from types import ModuleType, SimpleNamespace
 from typing import Any, Mapping, Sequence
 
-import yaml
-
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+
 DEFAULT_EXTRACT = (
     ROOT
     / "data"
@@ -144,8 +147,7 @@ def _vaporock_checkout_identity(source_path: Path) -> dict[str, str]:
 
 
 def load_extract(path: Path = DEFAULT_EXTRACT) -> dict[str, Any]:
-    with path.open() as handle:
-        document = yaml.safe_load(handle) or {}
+    document = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
     if document.get("source_id") != "sf04-magma-companion-workbook":
         raise ValueError(f"unexpected SF04 extract at {path}")
     return document

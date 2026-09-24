@@ -18,9 +18,6 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, MutableMapping, Sequence
 from unittest import mock
 
-import yaml
-
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
@@ -36,6 +33,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
     canonical_json,
     utc_now,
 )
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
 from engines.alphamelts.thermoengine import (  # noqa: E402
     THERMOENGINE_HEALTH_TIMEOUT_S,
@@ -274,7 +272,7 @@ def load_feedstock_box(
     step_pct: float = 10.0,
     margin_pct: float = 5.0,
 ) -> dict[str, tuple[float, float]]:
-    data = yaml.safe_load(Path(path).read_text())
+    data = load_cached_safe_yaml(Path(path).read_text())
     minima = {oxide: 100.0 for oxide in MAJOR_OXIDES}
     maxima = {oxide: 0.0 for oxide in MAJOR_OXIDES}
     for anchor in anchors:
@@ -387,7 +385,7 @@ def expand_composition_axes(
     *,
     anchors: Sequence[str] = DEFAULT_FEEDSTOCK_ANCHORS,
 ) -> tuple[list[dict[str, float]], dict[str, Any]]:
-    data = yaml.safe_load(Path(path).read_text())
+    data = load_cached_safe_yaml(Path(path).read_text())
     nominal_vectors: list[dict[str, float]] = []
     cr_candidates: list[float] = []
     for anchor in anchors:

@@ -25,6 +25,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.chemistry.melt_activity import melt_oxide_activity  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
     GAS_CONSTANT,
@@ -176,7 +177,7 @@ def _historic_catalog_payload(catalog_fixture: Path) -> dict:
 
 def _render(*, catalog_fixture: Path) -> str:
     payload = _historic_catalog_payload(catalog_fixture)
-    feedstocks = yaml.safe_load((ROOT / "data" / "feedstocks.yaml").read_text())
+    feedstocks = load_cached_safe_yaml((ROOT / "data" / "feedstocks.yaml").read_text())
     composition = feedstocks["lunar_mare_low_ti"]["composition_wt_pct"]
     account_mol = {
         oxide: float(wt) / float(MOLAR_MASS[oxide])

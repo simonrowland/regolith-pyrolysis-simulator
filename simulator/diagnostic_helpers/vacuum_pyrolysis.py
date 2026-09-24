@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -92,7 +93,7 @@ class VacuumPyrolysisComparisonRun:
 def load_vacuum_pyrolysis_observations(path: str | Path) -> dict[str, Any]:
     sidecar_path = Path(path)
     try:
-        loaded = yaml.safe_load(sidecar_path.read_text(encoding="utf-8"))
+        loaded = load_cached_safe_yaml(sidecar_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise VacuumPyrolysisComparisonError(
             f"cannot load vacuum-pyrolysis observations {sidecar_path}: {exc}"

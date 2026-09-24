@@ -23,14 +23,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Final, Literal
 
-import yaml
-
 from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.yaml_cache import load_cached_safe_yaml
 
 # ---------------------------------------------------------------------------
 # Paths / store
@@ -1181,7 +1180,7 @@ def _runtime_alpha_map(
 ) -> dict[str, Any]:
     if vapor_pressure_data is None:
         with _VAPOR_PRESSURES_PATH.open(encoding="utf-8") as fh:
-            vapor_pressure_data = yaml.safe_load(fh) or {}
+            vapor_pressure_data = load_cached_safe_yaml(fh.read()) or {}
     return _load_evaporation_alpha_by_species(dict(vapor_pressure_data))
 
 
@@ -1389,7 +1388,7 @@ def _index_extract_observation_ids(
     for path in sorted(root.glob("*.yaml")):
         if path.name.startswith("_"):
             continue
-        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        data = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
         source_id = str(data.get("source_id") or path.stem)
         for sp, block in (data.get("species") or {}).items():
             if not isinstance(block, Mapping):

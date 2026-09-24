@@ -19,8 +19,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
-import yaml
-
 from simulator.reference_data.nasa_glenn import (
     COMPILATION_ROLE,
     ELEMENT_SYMBOLS,
@@ -37,6 +35,7 @@ from simulator.reference_data.nasa_glenn import (
     published_float_pairs,
     resolve_phase,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data" / "literature" / "compilations" / "burcat"
@@ -647,13 +646,13 @@ def peer_formula_sets(
     janaf: set[str] = set()
     glenn: set[str] = set()
     if janaf_path.is_file():
-        payload = yaml.safe_load(janaf_path.read_text(encoding="utf-8")) or {}
+        payload = load_cached_safe_yaml(janaf_path.read_text(encoding="utf-8")) or {}
         for entry in payload.get("entries") or []:
             formula = str(entry.get("formula") or "").strip()
             if formula:
                 janaf.add(formula)
     if glenn_path.is_file():
-        payload = yaml.safe_load(glenn_path.read_text(encoding="utf-8")) or {}
+        payload = load_cached_safe_yaml(glenn_path.read_text(encoding="utf-8")) or {}
         for entry in payload.get("entries") or []:
             formula = str(entry.get("formula") or "").strip()
             if formula:
@@ -701,7 +700,7 @@ def load_record_document(path: Path) -> dict[str, Any]:
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
     manifest_path = path or (COMPILATION_ROOT / "manifest.yaml")
-    payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise BurcatParseError(f"{manifest_path}: manifest is not a mapping")
     return payload

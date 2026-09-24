@@ -9,9 +9,8 @@ from itertools import combinations
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-import yaml
-
 from simulator.state import MOLAR_MASS
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -39,7 +38,7 @@ def load_terminal_product_taxonomy(
     path: Path | str = DEFAULT_TAXONOMY_PATH,
 ) -> dict[str, Any]:
     with Path(path).open() as handle:
-        data = yaml.safe_load(handle)
+        data = load_cached_safe_yaml(handle.read())
     _validate_taxonomy(data, path)
     return data
 

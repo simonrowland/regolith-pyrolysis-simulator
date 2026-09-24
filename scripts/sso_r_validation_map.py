@@ -14,12 +14,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-import yaml
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     PyrolysisSimulator,
@@ -148,7 +147,7 @@ class DoseCalibration:
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
 
 
 def _load_data() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:

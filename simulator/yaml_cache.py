@@ -16,8 +16,35 @@ import yaml
 
 
 _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
-_CACHE_FORMAT = 1
+_CACHE_FORMAT = 2
 _CACHE_MISS = object()
+
+
+_YAML_BASE_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+class YAML12SafeLoader(_YAML_BASE_LOADER):
+    """SafeLoader with YAML 1.2 core-schema implicit booleans."""
+
+    # PyYAML's default resolver follows YAML 1.1 and turns chemistry/statistics
+    # tokens such as ``yes`` and ``NO`` into bools; YAML 1.2 core only does that
+    # for the six case variants of ``true`` and ``false``. Copy the resolver
+    # table so the C loader stays fast and its parent class remains untouched.
+    yaml_implicit_resolvers = {
+        key: [
+            (tag, regexp)
+            for tag, regexp in resolvers
+            if tag != "tag:yaml.org,2002:bool"
+        ]
+        for key, resolvers in _YAML_BASE_LOADER.yaml_implicit_resolvers.items()
+    }
+
+
+YAML12SafeLoader.add_implicit_resolver(
+    "tag:yaml.org,2002:bool",
+    re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"),
+    list("tTfF"),
+)
 
 
 def load_cached_safe_yaml(
@@ -41,7 +68,7 @@ def load_cached_safe_yaml(
     if cached is not _CACHE_MISS:
         return cached
 
-    parsed = yaml.safe_load(payload)
+    parsed = yaml.load(payload, Loader=YAML12SafeLoader)
     if _json_roundtrip_safe(parsed):
         _write_cache(cache_path, digest, parsed)
     return parsed

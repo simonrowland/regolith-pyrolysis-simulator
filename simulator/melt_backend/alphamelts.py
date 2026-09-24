@@ -86,6 +86,7 @@ from simulator.melt_backend.liquidus import (
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 logger = logging.getLogger(__name__)
@@ -4875,7 +4876,6 @@ class _MELTSBackendSupport(MeltBackend):
                 'missing solved liquid composition for positive liquid fraction',
             )
 
-        import yaml
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -4888,7 +4888,7 @@ class _MELTSBackendSupport(MeltBackend):
                 / 'vapor_pressures.yaml'
             )
             with data_path.open(encoding='utf-8') as handle:
-                vapor_data = yaml.safe_load(handle) or {}
+                vapor_data = load_cached_safe_yaml(handle.read()) or {}
             provider = BuiltinVaporPressureProvider(vapor_data)
             self._subprocess_vapor_pressure_provider = provider
         melt_mol = {}
@@ -5518,15 +5518,13 @@ class _MELTSBackendSupport(MeltBackend):
     def _load_vapor_pressure_table(self) -> dict:
         if self._vapor_pressure_table is not None:
             return self._vapor_pressure_table
-        import yaml
-
         path = (
             Path(__file__).parent.parent.parent
             / 'data'
             / 'vapor_pressures.yaml'
         )
         with open(path) as f:
-            data = yaml.safe_load(f) or {}
+            data = load_cached_safe_yaml(f.read()) or {}
         from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
         data = vapor_pressure_legacy_view(data)

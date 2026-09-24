@@ -25,6 +25,7 @@ import yaml
 from simulator.accounting.formulas import load_species_formulas
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.melt_regime import MeltRegime
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 SCHEMA_VARIANT = "alphamelts-expedited-v1"
@@ -552,7 +553,7 @@ def canonical_json(value: Any) -> str:
 def _load_corpus_version() -> str:
     path = Path(__file__).resolve().parents[1] / "data" / "corpus_version.yaml"
     try:
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise ValueError(f"cannot load corpus version from {path}: {exc}") from exc
     value = payload.get("corpus_version") if isinstance(payload, Mapping) else None
@@ -568,8 +569,8 @@ def _cache_v2_species_dictionary() -> tuple[str, ...]:
     catalog_path = root / "data" / "species_catalog.yaml"
     vapor_path = root / "data" / "vapor_pressures.yaml"
     try:
-        species_payload = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
-        vapor_payload = yaml.safe_load(vapor_path.read_text(encoding="utf-8"))
+        species_payload = load_cached_safe_yaml(catalog_path.read_text(encoding="utf-8"))
+        vapor_payload = load_cached_safe_yaml(vapor_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError, ValueError) as exc:
         raise ValueError(f"cannot enumerate cache_v2 species registries: {exc}") from exc
     if not isinstance(species_payload, Mapping) or not isinstance(

@@ -15,6 +15,7 @@ from typing import Any
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 OPTIMIZE_COSTS_SCHEMA_VERSION = "optimize-costs-v1"
@@ -84,7 +85,7 @@ class CostParameters:
 def load_cost_parameters(path: str | Path | None = None) -> dict[str, Any]:
     cost_path = Path(path) if path is not None else DEFAULT_COST_PARAMETERS_PATH
     try:
-        payload = yaml.safe_load(cost_path.read_text(encoding="utf-8"))
+        payload = load_cached_safe_yaml(cost_path.read_text(encoding="utf-8"))
     except OSError as exc:
         raise FileNotFoundError(f"cost parameter config unreadable: {cost_path}") from exc
     if not isinstance(payload, Mapping):

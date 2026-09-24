@@ -21,7 +21,7 @@ from pathlib import Path
 from statistics import median
 from typing import Any, Final
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -127,7 +127,7 @@ def load_crosscheck_composition(
 ) -> CrosscheckComposition:
     """Load a canonical feedstock and convert its oxide wt% to an oxide-mol map."""
 
-    payload = yaml.safe_load(feedstock_path.read_text()) or {}
+    payload = load_cached_safe_yaml(feedstock_path.read_text()) or {}
     try:
         raw = payload[feedstock_id]["composition_wt_pct"]
     except (KeyError, TypeError) as exc:
@@ -201,7 +201,7 @@ def load_rail_provider(
 ) -> tuple[BuiltinVaporPressureProvider, Mapping[str, Any]]:
     """Load the live builtin pressure provider and its schema-v2 catalog payload."""
 
-    payload = yaml.safe_load(vapor_pressure_path.read_text()) or {}
+    payload = load_cached_safe_yaml(vapor_pressure_path.read_text()) or {}
     if not isinstance(payload, Mapping):
         raise EngineCrosscheckError("vapor pressure catalog must be a mapping")
     return BuiltinVaporPressureProvider(payload), payload

@@ -39,6 +39,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     observation_admission_reason,
 )
 from simulator.state import MOLAR_MASS
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -386,7 +387,7 @@ def build_scoring_pots_from_extracts(
     paths = tuple(extract_paths) if extract_paths is not None else SCORING_EXTRACTS
     grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
     for path in paths:
-        extract = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+        extract = load_cached_safe_yaml(Path(path).read_text(encoding="utf-8")) or {}
         if not isinstance(extract, Mapping):
             raise BinaryPotScoringError(f"{path} is not a mapping")
         source_id = str(extract.get("source_id") or "")
@@ -488,7 +489,7 @@ def build_scoring_pots_from_extracts(
 
 def load_scoring_pots(path: Path | None = None) -> tuple[ScoringPot, ...]:
     pots_path = Path(path) if path is not None else DEFAULT_POTS_PATH
-    payload = yaml.safe_load(pots_path.read_text(encoding="utf-8")) or {}
+    payload = load_cached_safe_yaml(pots_path.read_text(encoding="utf-8")) or {}
     block = payload.get("scoring_pots")
     if not isinstance(block, Mapping) or not block:
         raise BinaryPotScoringError(f"{pots_path} has no scoring_pots mapping")
@@ -697,7 +698,7 @@ def iter_activity_comparators(
     paths = tuple(extract_paths) if extract_paths is not None else SCORING_EXTRACTS
     found: list[ActivityComparator] = []
     for path in paths:
-        extract = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+        extract = load_cached_safe_yaml(Path(path).read_text(encoding="utf-8")) or {}
         if not isinstance(extract, Mapping):
             continue
         source_id = str(extract.get("source_id") or "")
@@ -1523,4 +1524,3 @@ def write_scoring_reports(
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True, default=str) + "\n")
     md_path.write_text(render_scoring_report_markdown(report))
     return json_path, md_path
-

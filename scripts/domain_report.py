@@ -36,12 +36,13 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+
 RAIL_PATH = REPO / "data" / "vapor_pressures.yaml"
 
 
 def _load_rail() -> dict[str, Any]:
-    import yaml
-    return yaml.safe_load(RAIL_PATH.read_text())
+    return load_cached_safe_yaml(RAIL_PATH.read_text(encoding="utf-8"))
 
 
 def _species_rows(rail: dict[str, Any]) -> dict[str, dict[str, Any]]:

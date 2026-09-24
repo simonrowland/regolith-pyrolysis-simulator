@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 class CorpusVersionConfigError(RuntimeError):
@@ -39,7 +39,7 @@ def load_corpus_version_config(
         raise CorpusVersionConfigError(
             f"corpus version config missing: {config_path}"
         )
-    raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    raw = load_cached_safe_yaml(config_path.read_text(encoding="utf-8"))
     if not isinstance(raw, Mapping):
         raise CorpusVersionConfigError(
             f"corpus version config must be a mapping: {config_path}"

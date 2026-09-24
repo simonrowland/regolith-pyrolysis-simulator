@@ -18,7 +18,6 @@ from typing import Any
 
 import numpy as np
 import vaporock
-import yaml
 from scipy.optimize import linprog, minimize_scalar
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +29,7 @@ from simulator.melt_backend.melt_envelope import (
     melt_extrapolation_diagnostic,
 )
 from simulator.state import GAS_CONSTANT
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 SUPPORTED_VAPOROCK_OXIDES = {
@@ -110,7 +110,7 @@ def parse_args() -> argparse.Namespace:
 
 def load_yaml(path: Path) -> Any:
     with path.open() as handle:
-        return yaml.safe_load(handle) or {}
+        return load_cached_safe_yaml(handle.read()) or {}
 
 
 def clean_silicate_composition(composition_wt_pct: dict[str, Any]) -> dict[str, float]:

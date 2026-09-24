@@ -27,6 +27,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     canonical_objective_metric,
@@ -352,7 +353,7 @@ def _load_base_profile(feedstock: str) -> dict[str, Any]:
     src = REPO_ROOT / "data" / "optimize_profiles" / f"{feedstock}.yaml"
     if not src.exists():
         raise SystemExit(f"no shipped profile: {src}")
-    profile = yaml.safe_load(src.read_text())
+    profile = load_cached_safe_yaml(src.read_text())
     if not isinstance(profile, dict):
         raise SystemExit(f"invalid shipped profile: {src}")
     return profile
@@ -587,7 +588,7 @@ def _setpoint_campaign_key(campaign: str) -> str:
 
 def _setpoint_campaign_config(campaign: str) -> Mapping[str, Any]:
     src = REPO_ROOT / "data" / "setpoints.yaml"
-    loaded = yaml.safe_load(src.read_text())
+    loaded = load_cached_safe_yaml(src.read_text())
     if not isinstance(loaded, Mapping):
         raise SystemExit(f"invalid setpoints file: {src}")
     campaigns = loaded.get("campaigns")
@@ -763,7 +764,7 @@ def _campaign_window_disposition(campaign: str) -> str | None:
 
 def _vapor_pressure_entry(species: str) -> Mapping[str, Any] | None:
     src = REPO_ROOT / "data" / "vapor_pressures.yaml"
-    loaded = yaml.safe_load(src.read_text())
+    loaded = load_cached_safe_yaml(src.read_text())
     if not isinstance(loaded, Mapping):
         raise SystemExit(f"invalid vapor-pressure sidecar: {src}")
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view

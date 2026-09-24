@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Iterator, Mapping
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -113,7 +114,7 @@ class PublishedNumber:
 
 
 def load_manifest(root: Path = COMPILATION_ROOT) -> dict[str, Any]:
-    manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    manifest = load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
     if manifest["source_id"] != SOURCE_ID or manifest["compilation_role"] != ROLE:
         raise ValueError("Bulletin 1452 manifest identity or role differs from the loader contract")
     return manifest
@@ -306,7 +307,9 @@ def feedstock_coverage(records: list[dict[str, Any]]) -> dict[str, int]:
     from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 
     registry = load_species_formulas(ROOT / "data" / "species_catalog.yaml")
-    feedstocks = yaml.safe_load((ROOT / "data" / "feedstocks.yaml").read_text(encoding="utf-8"))
+    feedstocks = load_cached_safe_yaml(
+        (ROOT / "data" / "feedstocks.yaml").read_text(encoding="utf-8")
+    )
     elements = set()
     for feedstock in feedstocks.values():
         for species in feedstock.get("composition_wt_pct", {}):

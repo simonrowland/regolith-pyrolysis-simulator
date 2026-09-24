@@ -6,7 +6,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/pankratz-1984-usbm-b677"
@@ -22,7 +22,7 @@ class UntranscribedTableError(LookupError):
 
 @lru_cache(maxsize=None)
 def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
-    return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    return load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
 
 
 def load_records(root: Path = COMPILATION_ROOT):

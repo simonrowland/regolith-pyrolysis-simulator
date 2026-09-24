@@ -28,9 +28,8 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
-import yaml
-
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import classify_products
@@ -47,7 +46,7 @@ SUPPORTED_FORMATS = ('markdown', 'json')
 
 def _load_yaml(data_dir: Path, name: str) -> dict:
     with (data_dir / name).open() as f:
-        return yaml.safe_load(f) or {}
+        return load_cached_safe_yaml(f.read()) or {}
 
 
 def _build_session(

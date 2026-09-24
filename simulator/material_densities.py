@@ -11,9 +11,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping
 
-import yaml
-
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.yaml_cache import load_cached_safe_yaml
 
 _DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "material_densities.yaml"
 
@@ -21,7 +20,7 @@ _DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "material_densities.
 @lru_cache(maxsize=1)
 def material_density_data() -> dict[str, Any]:
     with _DATA_PATH.open("r", encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+        payload = load_cached_safe_yaml(handle.read()) or {}
     if int(payload.get("schema_version", 0)) != 1:
         raise ValueError("material_densities.yaml schema_version must be 1")
     return payload

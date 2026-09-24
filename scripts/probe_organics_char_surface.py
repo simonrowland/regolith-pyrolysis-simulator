@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.organics_pyrolysis import (
     apply_organics_source,
@@ -28,9 +29,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 def _load_yaml(name: str) -> dict:
-    import yaml
-
-    return yaml.safe_load((ROOT / "data" / name).read_text())
+    return load_cached_safe_yaml((ROOT / "data" / name).read_text())
 
 
 def _total_atoms(sim: PyrolysisSimulator) -> dict[str, float]:

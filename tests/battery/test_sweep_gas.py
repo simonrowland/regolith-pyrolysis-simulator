@@ -10,6 +10,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import (
     Migrator,
@@ -49,7 +51,9 @@ def _extract_with_gas(gas: object) -> dict:
 
 
 def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
-    doc = yaml.safe_load((EXTRACTS / "kems-027-plante-hastie-1983.yaml").read_text())
+    doc = load_cached_safe_yaml(
+        (EXTRACTS / "kems-027-plante-hastie-1983.yaml").read_text()
+    )
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     experiment = next(e for e in result.experiments.values()
                       if e.experiment_id.endswith("::tms-n2-glass-series"))
@@ -116,7 +120,7 @@ def test_component_quantities_round_trip() -> None:
 
 
 def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
-    doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
+    doc = load_cached_safe_yaml((EXTRACTS / "ts1985.yaml").read_text())
     assert validate_extract_document(doc) == []
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     experiment = next(e for e in result.experiments.values()

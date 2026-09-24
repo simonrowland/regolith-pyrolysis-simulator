@@ -20,6 +20,7 @@ from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
     COMPOSITION_TARGET_TYPE,
@@ -517,7 +518,7 @@ def _resolve_profile_path(feedstock_or_path: str | Path, *, data_dir: Path) -> P
 
 def _load_yaml_mapping(path: Path) -> Mapping[str, Any]:
     try:
-        loaded = yaml.safe_load(path.read_text())
+        loaded = load_cached_safe_yaml(path.read_text())
     except OSError as exc:
         raise ProfileValidationError(f"{path}: cannot read profile") from exc
     except yaml.YAMLError as exc:
@@ -529,7 +530,7 @@ def _load_yaml_mapping(path: Path) -> Mapping[str, Any]:
 
 def _feedstock_ids(data_dir: Path, *, include_blocked: bool = True) -> tuple[str, ...]:
     path = data_dir / "feedstocks.yaml"
-    loaded = yaml.safe_load(path.read_text())
+    loaded = load_cached_safe_yaml(path.read_text())
     if not isinstance(loaded, Mapping):
         raise ProfileValidationError(f"{path}: feedstocks.yaml must be a mapping")
     return tuple(
@@ -922,7 +923,7 @@ def _canonical_mre_ladder_for_profile(source: str | Path) -> list[dict[str, Any]
         data_dir = source_path.parent.parent
     setpoints_path = data_dir / "setpoints.yaml"
     try:
-        loaded = yaml.safe_load(setpoints_path.read_text())
+        loaded = load_cached_safe_yaml(setpoints_path.read_text())
     except OSError as exc:
         raise ProfileValidationError(
             f"{source}: cannot read {setpoints_path} for C5 MRE target validation"
@@ -1260,7 +1261,7 @@ def _campaign_max_hold_hr_for_profile(source: str | Path, campaign: str) -> floa
     data_dir = _data_dir_for_profile_source(source)
     setpoints_path = data_dir / "setpoints.yaml"
     try:
-        loaded = yaml.safe_load(setpoints_path.read_text())
+        loaded = load_cached_safe_yaml(setpoints_path.read_text())
     except OSError as exc:
         raise ProfileValidationError(
             f"{source}: cannot read {setpoints_path} for thermal window validation"

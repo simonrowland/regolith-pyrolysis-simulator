@@ -12,8 +12,6 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-import yaml
-
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -22,6 +20,7 @@ from simulator.chemistry.kernel.config import (
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.canonical import canonical_json_dumps
 from simulator.state import CondensationTrain
+from simulator.yaml_cache import load_cached_safe_yaml
 
 KeyPath = tuple[str, ...]
 
@@ -134,7 +133,7 @@ def _c5_allow_mre_voltage_cap_upper_bound() -> float:
     path = DEFAULT_DATA_DIR / "setpoints.yaml"
     try:
         with path.open("r", encoding="utf-8") as handle:
-            loaded = yaml.safe_load(handle) or {}
+            loaded = load_cached_safe_yaml(handle.read()) or {}
     except OSError:
         return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
     if not isinstance(loaded, Mapping):
@@ -2772,7 +2771,7 @@ def _validate_pressure_pair(
 def _default_setpoints() -> Mapping[str, Any]:
     path = DEFAULT_DATA_DIR / "setpoints.yaml"
     with path.open("r", encoding="utf-8") as handle:
-        loaded = yaml.safe_load(handle) or {}
+        loaded = load_cached_safe_yaml(handle.read()) or {}
     if not isinstance(loaded, Mapping):
         raise RecipeValidationError(
             f"recipe default setpoints must be a mapping: {path}"

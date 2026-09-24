@@ -26,12 +26,11 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
-import yaml
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -128,7 +127,7 @@ def _wall_deadline(deadline: float) -> Iterator[None]:
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
-    return yaml.safe_load(path.read_text()) or {}
+    return load_cached_safe_yaml(path.read_text()) or {}
 
 
 def _resolve_profile(path: Path) -> Path:
