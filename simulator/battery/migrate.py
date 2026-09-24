@@ -1909,6 +1909,9 @@ def convert_pressure_to_pa(
     if lowered in {"kpa"}:
         # Premise: 1 kPa = 1000 Pa exactly (SI).
         return amount * Decimal("1000"), "kPa_to_Pa"
+    if lowered in {"gpa"}:
+        # Premise: 1 GPa = 1e9 Pa exactly (SI).
+        return amount * Decimal("1000000000"), "GPa_to_Pa"
     if lowered in {"bar"}:
         return bar_to_pa(amount), "bar_to_Pa"
     if lowered in {"atm", "atmosphere", "atmospheres"}:
@@ -2091,6 +2094,7 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     ),
     "bar_to_Pa": (Decimal("100000"), "P_Pa = P_bar × 1e5", "Pa", "bar"),
     "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
+    "GPa_to_Pa": (Decimal("1000000000"), "P_Pa = P_GPa × 1e9", "Pa", "GPa"),
     "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
     "celsius_to_kelvin": (
         Decimal("273.15"),

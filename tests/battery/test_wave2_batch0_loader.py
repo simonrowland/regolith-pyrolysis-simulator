@@ -248,6 +248,51 @@ def test_non_oxide_above_one_weight_percent_stays_refused() -> None:
     )
 
 
+def _pressure(obs):
+    located = obs.point_conditions["total_pressure_Pa"]
+    value = located.state.value
+    return getattr(value, "point", value), located.inference
+
+
+def test_row_pressure_columns_convert_through_the_unit_route(tmp_path: Path) -> None:
+    _, gpa = _migrate_obs(tmp_path / "gpa", {"rows": [{"T_K": 1673.15, "P_GPa": 1.5, "run": "a"}]})
+    obs = next(iter(gpa.observations.values()))
+    pascals, inference = _pressure(obs)
+    assert pascals == Decimal("1500000000")
+    assert inference is not None
+    assert inference.relation == "GPa_to_Pa"
+    assert "1e9" in " ".join(inference.inputs) or any(
+        "1e9" in str(item) or "1000000000" in str(item) for item in inference.inputs
+    )
+
+    _, atm = _migrate_obs(
+        tmp_path / "atm",
+        {"rows": [{"T_K": 1673.15, "total_pressure_atm": 1, "run": "b"}]},
+    )
+    obs = next(iter(atm.observations.values()))
+    pascals, inference = _pressure(obs)
+    assert pascals == Decimal("101325")
+    assert inference is not None
+    assert inference.relation == "atm_to_Pa"
+
+    _, bare = _migrate_obs(
+        tmp_path / "bare",
+        {"rows": [{"T_K": 1673.15, "total_pressure_Pa": 1, "run": "c"}]},
+    )
+    obs = next(iter(bare.observations.values()))
+    pascals, inference = _pressure(obs)
+    assert pascals == Decimal("1")
+    assert inference is None or not str(inference.relation).endswith("atm_to_Pa")
+
+    _, vapor = _migrate_obs(
+        tmp_path / "vapor",
+        {"rows": [{"T_K": 1673.15, "P_atm": 1, "run": "d"}]},
+    )
+    obs = next(iter(vapor.observations.values()))
+    assert "total_pressure_Pa" not in (obs.point_conditions or {})
+    assert obs.value.point == atm_to_pa("1")
+
+
 def test_non_oxide_total_at_one_weight_percent_is_omitted() -> None:
     raw = {"SiO2": "60", "MgO": "39", "F": "1.0"}
     experiment, _bench_unused, _observation = _printed_experiment(raw)
