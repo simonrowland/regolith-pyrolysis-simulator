@@ -3347,9 +3347,9 @@ def _quantity_contradiction(
             return "source units name partial pressure, not mass_loss_rate"
 
     if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
-        if not any(token in units_l for token in ("/cm", "per_cm", "cm-2")):
-            if "kg/m" not in units_l and "kg_per_m" not in units_l:
-                return f"source units {units!r} do not denote areal mass loss"
+        converted, _trail = convert_areal_mass_to_kg_per_m2("1", units)
+        if converted is None:
+            return f"source units {units!r} do not denote areal mass loss"
 
     if candidate is Quantity.FUGACITY:
         if isinstance(values, Mapping):

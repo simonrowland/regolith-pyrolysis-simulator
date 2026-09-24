@@ -5424,6 +5424,37 @@ def test_areal_mass_loss_routes_delta_q_to_kg_per_m2(tmp_path: Path) -> None:
     assert obs.derivation.output_unit == "kg_per_m2"
 
 
+@pytest.mark.parametrize(
+    ("units", "expected", "relation"),
+    [
+        ("g/m2", "0.00555184", "g_per_m2_to_kg_per_m2"),
+        ("mg/m2", "0.00000555184", "mg_per_m2_to_kg_per_m2"),
+    ],
+)
+def test_areal_mass_loss_contradiction_matches_converter(
+    tmp_path: Path, units: str, expected: str, relation: str
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units=units,
+        values={
+            "quantity_as_printed": "delta_q",
+            "method_class": "measured_direct",
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    obs = result.observations["fixture-source::na_psat"]
+
+    assert quantity_token(obs.identity) is Quantity.MASS_LOSS_AREAL_DENSITY
+    assert obs.value.point == as_decimal(expected)
+    assert obs.derivation is not None
+    assert obs.derivation.relation == relation
+
+
 def test_fugacity_series_routes_bar_to_pa_without_partial_pressure(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     base = extract["species"]["Na"]["observations"][0]
