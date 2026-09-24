@@ -1138,6 +1138,7 @@ def _sample_from_plain(payload: object) -> Sample:
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
+    volume = payload.get("volume_m3")
     form = payload.get("form")
     container = payload.get("container")
     printed = payload.get("printed_composition")
@@ -1160,6 +1161,9 @@ def _sample_from_plain(payload: object) -> Sample:
         mass_kg=None
         if mass is None
         else _located_from_plain(mass, _value_or_point_from_plain),
+        volume_m3=None
+        if volume is None
+        else _located_from_plain(volume, _value_or_point_from_plain),
         form=None if form is None else _located_from_plain(form, str),
         container=None if container is None else _located_from_plain(container, str),
         printed_composition=printed_located,
@@ -2009,6 +2013,31 @@ def convert_volumetric_flow_to_m3_s(
     if lowered in {"l/s", "l_s", "ls", "liter/s", "litre/s", "l/sec"}:
         return amount / Decimal("1000"), "L_s_to_m3_s"
     return None, f"unmapped volumetric-flow unit {units!r}"
+
+
+def convert_volume_to_m3(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Return (m³, conversion relation name) for printed sample volumes."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "volume value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing volume unit"
+    lowered = (
+        str(units)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("³", "3")
+        .replace("^", "")
+    )
+    if lowered in {"m3", "m_3"}:
+        return amount, "identity:m3"
+    if lowered in {"cm3", "cm_3"}:
+        return amount / Decimal("1000000"), "cm3_to_m3"
+    return None, f"unmapped volume unit {units!r}"
 
 
 # trail -> (factor, arithmetic, output_unit, original_unit)
@@ -5289,6 +5318,8 @@ def _lab_kind(field: str) -> str:
         return "composition"
     if field.endswith("mass_kg"):
         return "mass"
+    if field.endswith("volume_m3"):
+        return "volume"
     if field.endswith("area_m2"):
         return "area"
     if field.endswith("_Pa"):
@@ -5310,6 +5341,8 @@ def _convert_lab_value(
     kind = _lab_kind(field)
     if kind == "mass":
         return convert_mass_to_kg(amount, units)
+    if kind == "volume":
+        return convert_volume_to_m3(amount, units)
     if kind == "area":
         return convert_area_to_m2(amount, units)
     if kind == "length":
@@ -5330,6 +5363,7 @@ def _output_unit_for(field: str) -> str:
     kind = _lab_kind(field)
     return {
         "mass": "kg",
+        "volume": "m3",
         "area": "m2",
         "length": "m",
         "pressure": "Pa",
@@ -5347,6 +5381,8 @@ def _looked_for_reason(field: str, vocabulary: tuple[VocabEntry, ...]) -> str:
         noun = "pressure"
     elif kind == "mass":
         noun = "mass"
+    elif kind == "volume":
+        noun = "volume"
     elif kind == "area":
         noun = "area"
     elif kind == "length":
@@ -6014,6 +6050,7 @@ def _merge_experiment_lab_params(
 ) -> Experiment:
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
+        volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
         initial_composition=_prefer_located(
             existing.sample.initial_composition, sample.initial_composition
         ),
@@ -6108,6 +6145,7 @@ def sample_from_equipment(
     roots = _lab_roots(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
+    volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
     form_located = _unique_text_located(_hits_for(hits, "sample.form"))
     container_located = _unique_text_located(_hits_for(hits, "sample.container"))
     hard_form, hard_container = _form_and_container(equipment)
@@ -6132,6 +6170,7 @@ def sample_from_equipment(
                 _, initial = _located_printed_and_initial(wt, printed.locator or locator)
     if (
         mass_located is None
+        and volume_located is None
         and form_located is None
         and container_located is None
         and printed is None
@@ -6140,6 +6179,7 @@ def sample_from_equipment(
         return Sample()
     return Sample(
         mass_kg=mass_located,
+        volume_m3=volume_located,
         form=form_located,
         container=container_located,
         printed_composition=printed,
@@ -7166,6 +7206,15 @@ class Migrator:
                 locator,
                 ["sample.mass_kg"],
                 sample.mass_kg.state.reason or "missing mass unit",
+                source=source,
+                observation_id=observation_id,
+            )
+        if sample.volume_m3 is not None and sample.volume_m3.state.is_unknown:
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["sample.volume_m3"],
+                sample.volume_m3.state.reason or "missing volume unit",
                 source=source,
                 observation_id=observation_id,
             )
