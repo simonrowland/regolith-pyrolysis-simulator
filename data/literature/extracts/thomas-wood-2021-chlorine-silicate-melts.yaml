@@ -1,739 +1,1119 @@
 schema_version: literature_extract.v1
 source_id: thomas-wood-2021-chlorine-silicate-melts
 source:
-  citation: Thomas, R. W. & Wood, B. J. (2021), "The chemical behaviour of chlorine in silicate melts",
-    Geochimica et Cosmochimica Acta 294:28–42, DOI 10.1016/j.gca.2020.11.018
+  citation: 'Thomas, Richard W. & Wood, Bernard J. (2021), "The chemical behaviour of chlorine in silicate melts", Geochimica et Cosmochimica Acta.'
   doi: 10.1016/j.gca.2020.11.018
   url: https://doi.org/10.1016/j.gca.2020.11.018
   year: 2021
 extraction:
-  method: pdftotext -layout of publisher article-in-press PDF (GCA 11993; encrypted, text layer present)
-    cross-checked against 150 dpi pdftoppm PNG of Table 1 (PDF p.4) and Table 2 (PDF p.7). Verbatim numbers
-    retained. Parenthetical Clglass uncertainties as printed. Unit companions T_K = T_C + 273.15 and P_Pa
-    = P_GPa * 1e9 carry derived stamps. Author Henry-region logClmelt regressions stay in context (model_derived
-    cohort not scored). Supplementary Table 1 glass majors not present as numbers in the supplied PDF
-    body and were not reconstructed.
-  date: '2026-09-22'
-  worker: n6-thomas-ueshima-jaggi
-  audited_by: y6-audit-n6-2026-09-22
+  method: 'MinerU OCR and PDF text, with every tabular number checked against the PDF pages and figure images visually read for digitized series.'
+  date: '2026-09-24'
+  worker: extract-thomas-wood-2021-chlorine-silicate-melts
+  provenance_path: corpus/raw/thomas-wood-2021-chlorine-silicate-melts/
 review_status: draft
 corrections:
-- note: Table 2 reprints AgI/Cl-005 in the pressure series with Measured Clglass wt% printed as 2.55 (0.4);
-    the same experiment ID is printed as 2.55 (0.04) in the time, f(Cl2), and temperature series blocks.
-    Both spellings retained without reconciliation.
+- note: Table 2 reprints AgI/Cl-005 in the pressure series with measured Clglass wt% printed as 2.55 (0.4); the same experiment is printed as 2.55 (0.04) in the time, f(Cl2), and temperature series blocks. Both spellings are retained as printed.
   locators:
-  - pdf_page_index 7 Table 2
-- note: 'Y6 cross-audit 2026-09-22: fixed thermocouple (alumina-sheathed C-type W95Re5–W74Re26) and +1 cover-offset pdf_page_index locators. Table 1 majors and Table 2 Clglass/f(Cl2)/FeO/molar ratios spot-checked PASS vs B3 PDF; AgI/Cl-005 pressure-series (0.4) reprint retained as printed.'
-  locators:
-  - pdf_page_index 4 section 2 Experimental methods
-  - pdf_page_index 7 Table 2
+  - {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005}
 benches:
-- id: oxford-boyd-england-piston-cylinder
-  identity:
-    basis: described_in_this_work
+- id: oxford_end_loaded_piston_cylinder
+  identity: {basis: described_in_this_work}
   apparatus_family:
-    state:
-      tag: value
-      value: End-loaded Boyd and England type 1/2 inch piston-cylinder apparatus
-    locator:
-      pdf_page_index: 4
-      section: 2. Experimental methods
+    state: {tag: value, value: 'End-loaded Boyd and England-type 1/2 inch piston-cylinder apparatus at the University of Oxford'}
+    locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  heating_method:
+    state: {tag: value, value: graphite furnace}
+    locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  cell_material_and_liner:
+    state: {tag: value, value: 'CaF2 pressure medium, graphite furnace, MgO spacers, and 3 mm outer-diameter capsule'}
+    locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
   temperature_measurement:
     sensor:
-      state:
-        tag: value
-        value: Alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
-      locator:
-        pdf_page_index: 4
-        section: 2. Experimental methods
-        note: Methods prose prints the alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
+      state: {tag: value, value: 'Alumina-sheathed C-type W95Re5-W74Re26 thermocouple'}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  temperature_calibration:
+    pressure:
+      state: {tag: value, value: 'McDade et al. calibration at 1 GPa and above; Vlach et al. calibration below 1 GPa'}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
   detector:
-    state:
-      tag: value
-      value: CAMECA SX-Five-FE and JEOL-8600 electron microprobes (University of Oxford)
-    locator:
-      pdf_page_index: 6
-      section: 2.3. Analytical techniques
+    state: {tag: value, value: 'CAMECA SX-Five-FE and JEOL-8600 electron microprobes'}
+    locator: {pdf_page_index: 6, published_page: 5, section: '2.3 Analytical procedures'}
+  other_facts:
+  - name: pressure_medium_length
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '32'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: pressure_medium_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '12.5'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: pressure_medium_inner_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '8'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: graphite_furnace_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '8'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: graphite_furnace_inner_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '6'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: capsule_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '3'}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+  - name: cooling_rate
+    unit: °C/s
+    value:
+      state: {tag: value, value: {kind: point, point: '110', approximate: true}}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure', note: 'Cooling rate is approximately 110 °C/s'}
 experiments:
-- experiment_id: cl-solubility-cmas-icb-series
-  bench_id: oxford-boyd-england-piston-cylinder
-  method: melt_equilibration_quench
-  locator:
-    pdf_page_index: 4
-    section: 2. Experimental methods
+- experiment_id: table2_anhydrous_chlorine_series
+  bench_id: oxford_end_loaded_piston_cylinder
+  method: quench_equilibration
+  locator: {pdf_page_index: 4, published_page: 3, section: '2. Experimental methodology'}
   sample:
     printed_composition:
-      state:
-        tag: value
-        value: CMAS An50Di28Fo22 haplobasalt and Icelandic basalt (ICB); Ag-AgCl-AgI chlorine buffer
-      locator:
-        pdf_page_index: 4
-        table: '1'
+      state: {tag: value, value: 'CMAS An50Di28Fo22 or natural Icelandic basalt; row-specific composition is retained in Table 2 observation points'}
+      locator: {pdf_page_index: 4, published_page: 3, table: '1'}
     form:
-      state:
-        tag: value
-        value: Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies
-      locator:
-        pdf_page_index: 4
-        section: 2. Experimental methods
+      state: {tag: value, value: 'Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies'}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2. Experimental procedure'}
   apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 4
-          note: Piston-cylinder capsule; no Knudsen orifice
-      orifice_channel_length_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 4
-          note: Piston-cylinder capsule; no effusion channel
+    cell_material_and_liner:
+      state: {tag: value, value: 'CaF2 pressure medium, graphite furnace, MgO spacers, alumina thermocouple sheath'}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
   conditions:
     temperature_K:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        pdf_page_index: 7
-        table: '2'
-        note: Per-row T_C in Table 2; no single series setpoint
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 7, published_page: 6, table: '2', note: 'Table 2 contains row-specific temperatures from 1200 to 1500 °C'}
   pressure_environment:
     total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        pdf_page_index: 7
-        table: '2'
-        note: Per-row P_GPa in Table 2; no single series pressure
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 7, published_page: 6, table: '2', note: 'Table 2 contains row-specific pressures from 0.5 to 2.0 GPa'}
     sweep_gas:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        pdf_page_index: 4
-        note: Solid-media piston-cylinder; no sweep gas
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure', note: 'Piston-cylinder charge; no sweep gas is used'}
     regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
+      regime_class: {tag: unknown, reason: not_published}
   fO2_control:
-    channel:
-      tag: value
-      value: buffer
+    channel: {tag: value, value: buffer}
     buffer:
-      state:
-        tag: value
-        value: CCO (C-CO-CO2) or RRO (Re-ReO2) as printed per Table 2 row
-      locator:
-        pdf_page_index: 7
-        table: '2'
+      state: {tag: value, value: 'CCO or Re-ReO2, as printed per Table 2 row'}
+      locator: {pdf_page_index: 7, published_page: 6, table: '2', column: 'f(O2) buffer'}
 fidelity_samples:
-- path: species.Cl.observations[thomas_wood_2021_table1_starting_compositions].values.rows[0].SiO2_wt_pct
-  value: 46.53
-  locator:
-    pdf_page_index: 4
-    table: '1'
-    note: CMAS (An50Di28Fo22) SiO2 wt%
-- path: species.Cl.observations[thomas_wood_2021_table2_clglass].values.rows[2].Clglass_wt_pct
-  value: 2.55
-  locator:
-    pdf_page_index: 7
-    table: '2'
-    note: AgI/Cl-005 time-series Measured Clglass wt%
+- species: Cl
+  observation_id: thomas_wood_2021_table1_compositions
+  field: n_compositions
+  value: 2
+  locator: {pdf_page_index: 4, published_page: 3, table: '1', column: 'composition rows'}
+- species: Cl
+  observation_id: thomas_wood_2021_table2_experimental_rows
+  field: n_rows
+  value: 37
+  locator: {pdf_page_index: 7, published_page: 6, table: '2', column: 'all'}
+- species: Cl
+  observation_id: thomas_wood_2021_figure3_time_series
+  field: n_points
+  value: 4
+  locator: {pdf_page_index: 8, published_page: 7, figure: '3'}
+- species: Cl
+  observation_id: thomas_wood_2021_figure4_fugacity_series
+  field: n_points
+  value: 12
+  locator: {pdf_page_index: 8, published_page: 7, figure: '4'}
+- species: Cl
+  observation_id: thomas_wood_2021_figure11_sodalite_field
+  field: n_points
+  value: 12
+  locator: {pdf_page_index: 14, published_page: 13, figure: '11'}
 species:
   Cl:
     observations:
-    - observation_id: thomas_wood_2021_table1_starting_compositions
-      experiment: cl-solubility-cmas-icb-series
+    - observation_id: thomas_wood_2021_table1_compositions
       type: composition_series
-      locator:
-        pdf_page_index: 4
-        table: '1'
-        section: 2. Experimental methods
-        note: Table 1. Silicate melt compositions used for measuring chlorine solubility.
+      locator: {pdf_page_index: 4, published_page: 3, table: '1', section: '2. Experimental procedure'}
       phase: silicate_melt_starting_material
-      regime: high_pressure_piston_cylinder
-      units: wt% oxide as printed; en-dash means not reported, never zero
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: wt% oxide as printed; dashes are retained as not printed
+      experiment: table2_anhydrous_chlorine_series
       values:
-        quantity: starting_material_composition
-        method_class: measured_direct
-        evidence_class: authors_own_experiment
-        caption_as_printed: Table 1 Silicate melt compositions used for measuring chlorine solubility.
+        method_class: measured
+        evidence_class: measured_tabulated
+        n_compositions: 2
+        composition_basis: 'Silicate melt compositions used for measuring chlorine solubility'
         rows:
-        - sample: CMAS (An50Di28Fo22)
-          SiO2_wt_pct: 46.53
-          Al2O3_wt_pct: 18.33
-          MgO_wt_pct: 17.82
-          CaO_wt_pct: 17.33
-          note: 'Footnote a: 1.5 GPa approximate eutectic composition (Presnall et al., 1978). En-dash
-            oxides not reported.'
-        - sample: Icelandic Basalt
-          SiO2_wt_pct: 50.76
-          TiO2_wt_pct: 1.02
-          Al2O3_wt_pct: 15.32
-          FeO_wt_pct: 9.61
-          MgO_wt_pct: 9.19
-          CaO_wt_pct: 12.26
-          Na2O_wt_pct: 2.01
+        - composition: CMAS An50Di28Fo22
+          composition_wt_pct: &cmas_oxides
+            SiO2: 46.53
+            Al2O3: 18.33
+            MgO: 17.82
+            CaO: 17.33
+            locator: {pdf_page_index: 4, published_page: 3, table: '1', row: 'CMAS An50Di28Fo22', column: 'SiO2, Al2O3, MgO, CaO'}
+          not_printed: [TiO2, FeO, Na2O]
+          note: 'Footnote a: CMAS is an approximate 1.5 GPa eutectic composition (Presnall et al., 1978).'
+          locator: {pdf_page_index: 4, published_page: 3, table: '1', row: 'CMAS An50Di28Fo22', column: all}
+        - composition: Icelandic Basalt
+          composition_wt_pct: &icb_oxides
+            SiO2: 50.76
+            TiO2: 1.02
+            Al2O3: 15.32
+            FeO: 9.61
+            MgO: 9.19
+            CaO: 12.26
+            Na2O: 2.01
+            locator: {pdf_page_index: 4, published_page: 3, table: '1', row: 'Icelandic Basalt', column: 'SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O'}
           note: 'Footnote b: Natural Icelandic Basalt (Norris and Wood, 2017).'
-    - observation_id: thomas_wood_2021_table2_clglass
-      experiment: cl-solubility-cmas-icb-series
-      type: composition_series
-      locator:
-        pdf_page_index: 7
-        table: '2'
-        note: Table 2 Experimental conditions and compositions; Measured Clglass wt% is EPMA of quench
-          glass. f(Cl2) column is author-calculated from the Ag-AgCl-AgI buffer equilibrium, not a direct
-          gas measurement.
-      phase: experimentally_quenched_silicate_glass
-      regime: high_pressure_piston_cylinder
-      units: Clglass wt%; parenthetical values are printed uncertainties (std dev of EPMA spots); T_C
-        and P_GPa as printed; log f(O2) as printed; f(Cl2) as printed scientific notation
-      uncertainty:
-        note: Parenthetical Clglass uncertainties retained verbatim per row; FeO wt% parentheticals likewise
-          when present.
+          locator: {pdf_page_index: 4, published_page: 3, table: '1', row: 'Icelandic Basalt', column: all}
+    - observation_id: thomas_wood_2021_table2_experimental_rows
+      type: concentration_series
+      locator: {pdf_page_index: 7, published_page: 6, table: '2', section: 'Experimental results'}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'T in °C; P in GPa; log f(O2) dimensionless; Clglass and FeO in wt%; ratios dimensionless; f(Cl2) in bar'
+      experiment: table2_anhydrous_chlorine_series
       values:
-        quantity: chlorine_concentration_in_quench_glass
-        method_class: measured_direct
-        evidence_class: authors_own_EPMA
-        caption_as_printed: Table 2 Experimental conditions and compositions.
-        rows:
-        - series: time
-          experiment: AgI/Cl-007
-          silicate: CMAS
+        method_class: measured
+        evidence_class: measured_tabulated
+        n_rows: 37
+        first_experiment: AgI/Cl-007
+        fCl2_derivation: 'The paper calculates f(Cl2) from the final molar Cl/(Cl+I), initial AgI/AgCl mixture, and molar Ag/(Ag+Pt), with ideal-mixture correction (Eq. 11); the resulting values are printed in Table 2.'
+        table_footer: 'Cl% error in () is 2 stdev.'
+        series:
+        - experiment: AgI/Cl-007
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 5
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 2.24
-          Clglass_uncertainty_wt_pct: 0.05
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.22
-          molar_Ag_over_Ag_plus_Pt: 0.924
-          f_Cl2: 0.000337
-        - series: time
-          experiment: AgI/Cl-002
-          silicate: CMAS
+          Cl_wt_pct: 2.24
+          Cl_uncertainty_wt_pct: 0.05
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.220
+          molar_Ag_over_Ag_Pt: 0.924
+          fCl2_bar: {value: 3.37e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: all}
+        - experiment: AgI/Cl-002
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 30
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 2.74
-          Clglass_uncertainty_wt_pct: 0.14
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.183
-          molar_Ag_over_Ag_plus_Pt: 0.837
-          f_Cl2: 0.000282
-        - series: time
-          experiment: AgI/Cl-005
-          silicate: CMAS
+          Cl_wt_pct: 2.74
+          Cl_uncertainty_wt_pct: 0.14
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.183
+          molar_Ag_over_Ag_Pt: 0.837
+          fCl2_bar: {value: 2.82e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: all}
+        - experiment: AgI/Cl-005
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 2.55
-          Clglass_uncertainty_wt_pct: 0.04
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.198
-          molar_Ag_over_Ag_plus_Pt: 0.844
-          f_Cl2: 0.000324
-        - series: time
-          experiment: AgI/Cl-006
-          silicate: CMAS
+          Cl_wt_pct: 2.55
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.844
+          fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
+        - experiment: AgI/Cl-006
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 120
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 2.56
-          Clglass_uncertainty_wt_pct: 0.07
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.198
-          molar_Ag_over_Ag_plus_Pt: 0.861
-          f_Cl2: 0.000311
-        - series: f_Cl2
-          experiment: AgI/Cl-018
-          silicate: CMAS
+          Cl_wt_pct: 2.56
+          Cl_uncertainty_wt_pct: 0.07
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.861
+          fCl2_bar: {value: 3.11e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: all}
+        - experiment: AgI/Cl-018
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.18
-          Clglass_uncertainty_wt_pct: 0.01
-          buffer_silicate_mass_ratio: 65/35
-          initial_molar_Cl_over_Cl_plus_I: 0.032
-          final_molar_Cl_over_Cl_plus_I: 0.014
-          molar_Ag_over_Ag_plus_Pt: 0.856
-          f_Cl2: 1.66e-06
-        - series: f_Cl2
-          experiment: AgI/Cl-010
-          silicate: CMAS
+          Cl_wt_pct: 0.18
+          Cl_uncertainty_wt_pct: 0.01
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 65/35
+          initial_molar_Cl_over_Cl_I: 0.032
+          final_molar_Cl_over_Cl_I: 0.014
+          molar_Ag_over_Ag_Pt: 0.856
+          fCl2_bar: {value: 1.66e-06, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: all}
+        - experiment: AgI/Cl-010
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.21
-          Clglass_uncertainty_wt_pct: 0.01
-          buffer_silicate_mass_ratio: 90/10
-          initial_molar_Cl_over_Cl_plus_I: 0.032
-          final_molar_Cl_over_Cl_plus_I: 0.017
-          molar_Ag_over_Ag_plus_Pt: 0.864
-          f_Cl2: 2.29e-06
-        - series: f_Cl2
-          experiment: AgI/Cl-009
-          silicate: CMAS
+          Cl_wt_pct: 0.21
+          Cl_uncertainty_wt_pct: 0.01
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 90/10
+          initial_molar_Cl_over_Cl_I: 0.032
+          final_molar_Cl_over_Cl_I: 0.017
+          molar_Ag_over_Ag_Pt: 0.864
+          fCl2_bar: {value: 2.29e-06, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: all}
+        - experiment: AgI/Cl-009
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.5
-          Clglass_uncertainty_wt_pct: 0.03
-          buffer_silicate_mass_ratio: 90/10
-          initial_molar_Cl_over_Cl_plus_I: 0.079
-          final_molar_Cl_over_Cl_plus_I: 0.045
-          molar_Ag_over_Ag_plus_Pt: 0.869
-          f_Cl2: 1.59e-05
-        - series: f_Cl2
-          experiment: AgI/Cl-008
-          silicate: CMAS
+          Cl_wt_pct: 0.50
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 90/10
+          initial_molar_Cl_over_Cl_I: 0.079
+          final_molar_Cl_over_Cl_I: 0.045
+          molar_Ag_over_Ag_Pt: 0.869
+          fCl2_bar: {value: 1.59e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: all}
+        - experiment: AgI/Cl-008
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 1.02
-          Clglass_uncertainty_wt_pct: 0.03
-          buffer_silicate_mass_ratio: 80/20
-          initial_molar_Cl_over_Cl_plus_I: 0.154
-          final_molar_Cl_over_Cl_plus_I: 0.082
-          molar_Ag_over_Ag_plus_Pt: 0.851
-          f_Cl2: 5.43e-05
-        - series: f_Cl2
-          experiment: AgI/Cl-013
-          silicate: CMAS
+          Cl_wt_pct: 1.02
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 80/20
+          initial_molar_Cl_over_Cl_I: 0.154
+          final_molar_Cl_over_Cl_I: 0.082
+          molar_Ag_over_Ag_Pt: 0.851
+          fCl2_bar: {value: 5.43e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: all}
+        - experiment: AgI/Cl-005
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 3.59
-          Clglass_uncertainty_wt_pct: 0.09
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.621
-          final_molar_Cl_over_Cl_plus_I: 0.407
-          molar_Ag_over_Ag_plus_Pt: 0.843
-          f_Cl2: 0.00138
-        - series: f_Cl2
-          experiment: AgI/Cl-027
-          silicate: ICB
+          Cl_wt_pct: 2.55
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.844
+          fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
+        - experiment: AgI/Cl-013
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 1.6
-          Clglass_uncertainty_wt_pct: 0.03
-          FeO_wt_pct_in_melt: 0.5
+          Cl_wt_pct: 3.59
+          Cl_uncertainty_wt_pct: 0.09
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.621
+          final_molar_Cl_over_Cl_I: 0.407
+          molar_Ag_over_Ag_Pt: 0.843
+          fCl2_bar: {value: 1.38e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: all}
+        - experiment: AgI/Cl-027
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 1.60
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: 0.5
           FeO_uncertainty_wt_pct: 0.13
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.209
-          molar_Ag_over_Ag_plus_Pt: 0.778
-          f_Cl2: 0.000424
-        - series: f_Cl2
-          experiment: AgI/Cl-023
-          silicate: ICB
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.209
+          molar_Ag_over_Ag_Pt: 0.778
+          fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
+        - experiment: AgI/Cl-023
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-023, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.77
-          Clglass_uncertainty_wt_pct: 0.06
-          FeO_wt_pct_in_melt: 3.24
+          Cl_wt_pct: 0.77
+          Cl_uncertainty_wt_pct: 0.06
+          FeO_wt_pct: 3.24
           FeO_uncertainty_wt_pct: 0.89
-          buffer_silicate_mass_ratio: 80/20
-          initial_molar_Cl_over_Cl_plus_I: 0.154
-          final_molar_Cl_over_Cl_plus_I: 0.1
-          molar_Ag_over_Ag_plus_Pt: 0.799
-          f_Cl2: 9.32e-05
-        - series: f_Cl2
-          experiment: AgI/Cl-037
-          silicate: ICB
+          buffer_silicate_by_mass: 80/20
+          initial_molar_Cl_over_Cl_I: 0.154
+          final_molar_Cl_over_Cl_I: 0.100
+          molar_Ag_over_Ag_Pt: 0.799
+          fCl2_bar: {value: 9.32e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-023, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-023, column: all}
+        - experiment: AgI/Cl-037
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-037, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.41
-          Clglass_uncertainty_wt_pct: 0.09
-          FeO_wt_pct_in_melt: 1.67
+          Cl_wt_pct: 0.41
+          Cl_uncertainty_wt_pct: 0.09
+          FeO_wt_pct: 1.67
           FeO_uncertainty_wt_pct: 0.17
-          buffer_silicate_mass_ratio: 90/10
-          initial_molar_Cl_over_Cl_plus_I: 0.079
-          final_molar_Cl_over_Cl_plus_I: 0.052
-          molar_Ag_over_Ag_plus_Pt: 0.823
-          f_Cl2: 2.31e-05
-        - series: f_Cl2
-          experiment: AgI/Cl-039
-          silicate: ICB
+          buffer_silicate_by_mass: 90/10
+          initial_molar_Cl_over_Cl_I: 0.079
+          final_molar_Cl_over_Cl_I: 0.052
+          molar_Ag_over_Ag_Pt: 0.823
+          fCl2_bar: {value: 2.31e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-037, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-037, column: all}
+        - experiment: AgI/Cl-039
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-039, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 0.32
-          Clglass_uncertainty_wt_pct: 0.01
-          FeO_wt_pct_in_melt: 2.6
+          Cl_wt_pct: 0.32
+          Cl_uncertainty_wt_pct: 0.01
+          FeO_wt_pct: 2.6
           FeO_uncertainty_wt_pct: 0.18
-          buffer_silicate_mass_ratio: 60/40
-          initial_molar_Cl_over_Cl_plus_I: 0.079
-          final_molar_Cl_over_Cl_plus_I: 0.038
-          molar_Ag_over_Ag_plus_Pt: 0.793
-          f_Cl2: 1.36e-05
-        - series: f_O2
-          experiment: AgI/Cl-029
-          silicate: CMAS
+          buffer_silicate_by_mass: 60/40
+          initial_molar_Cl_over_Cl_I: 0.079
+          final_molar_Cl_over_Cl_I: 0.038
+          molar_Ag_over_Ag_Pt: 0.793
+          fCl2_bar: {value: 1.36e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-039, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-039, column: all}
+        - experiment: AgI/Cl-029
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: Pressure}}
           fO2_buffer: RRO
           log_fO2: -3.75
-          Clglass_wt_pct: 0.69
-          Clglass_uncertainty_wt_pct: 0.04
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.317
-          molar_Ag_over_Ag_plus_Pt: 0.742
-          f_Cl2: 0.00108
-        - series: f_O2
-          experiment: AgI/Cl-031
-          silicate: ICB
+          Cl_wt_pct: 0.69
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.317
+          molar_Ag_over_Ag_Pt: 0.742
+          fCl2_bar: {value: 1.08e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: all}
+        - experiment: AgI/Cl-031
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-031, column: Pressure}}
           fO2_buffer: RRO
           log_fO2: -3.75
-          Clglass_wt_pct: 0.33
-          Clglass_uncertainty_wt_pct: 0.02
-          FeO_wt_pct_in_melt: 3.48
+          Cl_wt_pct: 0.33
+          Cl_uncertainty_wt_pct: 0.02
+          FeO_wt_pct: 3.48
           FeO_uncertainty_wt_pct: 0.1
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.329
-          molar_Ag_over_Ag_plus_Pt: 0.823
-          f_Cl2: 0.000945
-        - series: temperature
-          experiment: AgI/Cl-028
-          silicate: CMAS
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.329
+          molar_Ag_over_Ag_Pt: 0.823
+          fCl2_bar: {value: 9.45e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-031, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-031, column: all}
+        - experiment: AgI/Cl-028
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1500
-          T_K: 1773.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -6.52
-          Clglass_wt_pct: 2.66
-          Clglass_uncertainty_wt_pct: 0.07
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.189
-          molar_Ag_over_Ag_plus_Pt: 0.786
-          f_Cl2: 0.000672
-        - series: temperature
-          experiment: AgI/Cl-020
-          silicate: CMAS
+          Cl_wt_pct: 2.66
+          Cl_uncertainty_wt_pct: 0.07
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.189
+          molar_Ag_over_Ag_Pt: 0.786
+          fCl2_bar: {value: 6.72e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: all}
+        - experiment: AgI/Cl-005
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 2.55
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.844
+          fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
+        - experiment: AgI/Cl-020
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 420
           T_C: 1300
-          T_K: 1573.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: Pressure}}
           fO2_buffer: CCO
-          log_fO2: -7.9
-          Clglass_wt_pct: 2.41
-          Clglass_uncertainty_wt_pct: 0.16
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.208
-          molar_Ag_over_Ag_plus_Pt: 0.931
-          f_Cl2: 0.000138
-        - series: temperature
-          experiment: AgI/Cl-043
-          silicate: ICB
+          log_fO2: -7.90
+          Cl_wt_pct: 2.41
+          Cl_uncertainty_wt_pct: 0.16
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.208
+          molar_Ag_over_Ag_Pt: 0.931
+          fCl2_bar: {value: 1.38e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: all}
+        - experiment: AgI/Cl-043
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1500
-          T_K: 1773.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-043, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -6.52
-          Clglass_wt_pct: 1.77
-          Clglass_uncertainty_wt_pct: 0.09
-          FeO_wt_pct_in_melt: 8.52
+          Cl_wt_pct: 1.77
+          Cl_uncertainty_wt_pct: 0.09
+          FeO_wt_pct: 8.52
           FeO_uncertainty_wt_pct: 0.13
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.189
-          molar_Ag_over_Ag_plus_Pt: 0.702
-          f_Cl2: 0.000844
-        - series: temperature
-          experiment: AgI/Cl-044
-          silicate: ICB
-          time_min: 3
-          T_C: 1300
-          T_K: 1573.15
-          T_K_provenance: derived
-          P_GPa: 1.5
-          fO2_buffer: CCO
-          log_fO2: -7.9
-          Clglass_wt_pct: 1.52
-          Clglass_uncertainty_wt_pct: 0.02
-          FeO_wt_pct_in_melt: 1.15
-          FeO_uncertainty_wt_pct: 0.08
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.217
-          molar_Ag_over_Ag_plus_Pt: 0.814
-          f_Cl2: 0.000197
-        - series: temperature
-          experiment: AgI/Cl-045
-          silicate: ICB
-          time_min: 31
-          T_C: 1200
-          T_K: 1473.15
-          T_K_provenance: derived
-          P_GPa: 1.5
-          fO2_buffer: CCO
-          log_fO2: -8.73
-          Clglass_wt_pct: 1.48
-          Clglass_uncertainty_wt_pct: 0.17
-          FeO_wt_pct_in_melt: 8.19
-          FeO_uncertainty_wt_pct: 0.36
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.222
-          molar_Ag_over_Ag_plus_Pt: 0.832
-          f_Cl2: 8.3e-05
-        - series: pressure
-          experiment: AgI/Cl-032
-          silicate: CMAS
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.189
+          molar_Ag_over_Ag_Pt: 0.702
+          fCl2_bar: {value: 8.44e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-043, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-043, column: all}
+        - experiment: AgI/Cl-027
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 0.5
-          fO2_buffer: CCO
-          log_fO2: -8.2
-          Clglass_wt_pct: 3.39
-          Clglass_uncertainty_wt_pct: 0.04
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.128
-          molar_Ag_over_Ag_plus_Pt: 0.909
-          f_Cl2: 1.09e-05
-        - series: pressure
-          experiment: AgI/Cl-019
-          silicate: CMAS
-          time_min: 60
-          T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 1.0
-          fO2_buffer: CCO
-          log_fO2: -7.68
-          Clglass_wt_pct: 2.93
-          Clglass_uncertainty_wt_pct: 0.04
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.169
-          molar_Ag_over_Ag_plus_Pt: 0.858
-          f_Cl2: 7.46e-05
-        - series: pressure
-          experiment: AgI/Cl-005
-          silicate: CMAS
-          time_min: 60
-          T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.17
-          Clglass_wt_pct: 2.55
-          Clglass_uncertainty_wt_pct: 0.4
-          Clglass_uncertainty_note: Printed parenthetical on this pressure-series reprint is (0.4); same
-            ID printed as (0.04) elsewhere in Table 2
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.198
-          molar_Ag_over_Ag_plus_Pt: 0.844
-          f_Cl2: 0.000324
-        - series: pressure
-          experiment: AgI/Cl-021
-          silicate: CMAS
-          time_min: 60
-          T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 2.0
+          Cl_wt_pct: 1.60
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: 0.5
+          FeO_uncertainty_wt_pct: 0.13
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.209
+          molar_Ag_over_Ag_Pt: 0.778
+          fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
+        - experiment: AgI/Cl-044
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
+          time_min: 3
+          T_C: 1300
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-044, column: Pressure}}
           fO2_buffer: CCO
-          log_fO2: -6.66
-          Clglass_wt_pct: 2.12
-          Clglass_uncertainty_wt_pct: 0.03
-          buffer_silicate_mass_ratio: 75/25
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.229
-          molar_Ag_over_Ag_plus_Pt: 0.83
-          f_Cl2: 0.0012
-        - series: pressure
-          experiment: AgI/Cl-051
-          silicate: CMAS
+          log_fO2: -7.90
+          Cl_wt_pct: 1.52
+          Cl_uncertainty_wt_pct: 0.02
+          FeO_wt_pct: 1.15
+          FeO_uncertainty_wt_pct: 0.08
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.217
+          molar_Ag_over_Ag_Pt: 0.814
+          fCl2_bar: {value: 1.97e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-044, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-044, column: all}
+        - experiment: AgI/Cl-045
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
+          time_min: 31
+          T_C: 1200
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-045, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -8.73
+          Cl_wt_pct: 1.48
+          Cl_uncertainty_wt_pct: 0.17
+          FeO_wt_pct: 8.19
+          FeO_uncertainty_wt_pct: 0.36
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.222
+          molar_Ag_over_Ag_Pt: 0.832
+          fCl2_bar: {value: 8.30e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-045, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-045, column: all}
+        - experiment: AgI/Cl-032
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 1.0
+          P_GPa: 0.5
+          total_pressure_Pa: {value: 500000000, units: Pa, inferred: true, inference: '0.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -8.20
+          Cl_wt_pct: 3.39
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.128
+          molar_Ag_over_Ag_Pt: 0.909
+          fCl2_bar: {value: 1.09e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: all}
+        - experiment: AgI/Cl-019
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1
+          total_pressure_Pa: {value: 1000000000, units: Pa, inferred: true, inference: '1 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.68
-          Clglass_wt_pct: 1.23
-          Clglass_uncertainty_wt_pct: 0.03
-          buffer_silicate_mass_ratio: 80/20
-          initial_molar_Cl_over_Cl_plus_I: 0.154
-          final_molar_Cl_over_Cl_plus_I: 0.065
-          molar_Ag_over_Ag_plus_Pt: 0.865
-          f_Cl2: 1.07e-05
-        - series: pressure
-          experiment: AgI/Cl-052
-          silicate: CMAS
+          Cl_wt_pct: 2.93
+          Cl_uncertainty_wt_pct: 0.04
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.169
+          molar_Ag_over_Ag_Pt: 0.858
+          fCl2_bar: {value: 7.46e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: all}
+        - experiment: AgI/Cl-005
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 2.55
+          Cl_uncertainty_wt_pct: 0.4
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.844
+          fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
+        - experiment: AgI/Cl-021
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 2
+          total_pressure_Pa: {value: 2000000000, units: Pa, inferred: true, inference: '2 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -6.66
+          Cl_wt_pct: 2.12
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.229
+          molar_Ag_over_Ag_Pt: 0.830
+          fCl2_bar: {value: 1.20e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: all}
+        - experiment: AgI/Cl-051
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1
+          total_pressure_Pa: {value: 1000000000, units: Pa, inferred: true, inference: '1 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.68
+          Cl_wt_pct: 1.23
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 80/20
+          initial_molar_Cl_over_Cl_I: 0.154
+          final_molar_Cl_over_Cl_I: 0.065
+          molar_Ag_over_Ag_Pt: 0.865
+          fCl2_bar: {value: 1.07e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: all}
+        - experiment: AgI/Cl-008
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 1.02
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 80/20
+          initial_molar_Cl_over_Cl_I: 0.154
+          final_molar_Cl_over_Cl_I: 0.082
+          molar_Ag_over_Ag_Pt: 0.851
+          fCl2_bar: {value: 5.43e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: all}
+        - experiment: AgI/Cl-052
+          composition_label: CMAS
+          composition_wt_pct: *cmas_oxides
           time_min: 120
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 2.0
+          P_GPa: 2
+          total_pressure_Pa: {value: 2000000000, units: Pa, inferred: true, inference: '2 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -6.66
-          Clglass_wt_pct: 0.81
-          Clglass_uncertainty_wt_pct: 0.02
-          buffer_silicate_mass_ratio: 80/20
-          initial_molar_Cl_over_Cl_plus_I: 0.154
-          final_molar_Cl_over_Cl_plus_I: 0.097
-          molar_Ag_over_Ag_plus_Pt: 0.852
-          f_Cl2: 0.000205
-        - series: pressure
-          experiment: AgI/Cl-050
-          silicate: ICB
+          Cl_wt_pct: 0.81
+          Cl_uncertainty_wt_pct: 0.02
+          FeO_wt_pct: {state: {tag: not_applicable, reason: not_applicable}, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: 'FeO wt% in melt'}}
+          buffer_silicate_by_mass: 80/20
+          initial_molar_Cl_over_Cl_I: 0.154
+          final_molar_Cl_over_Cl_I: 0.097
+          molar_Ag_over_Ag_Pt: 0.852
+          fCl2_bar: {value: 2.05e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: all}
+        - experiment: AgI/Cl-050
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
           P_GPa: 0.5
+          total_pressure_Pa: {value: 500000000, units: Pa, inferred: true, inference: '0.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-050, column: Pressure}}
           fO2_buffer: CCO
-          log_fO2: -8.2
-          Clglass_wt_pct: 2.19
-          Clglass_uncertainty_wt_pct: 0.11
-          FeO_wt_pct_in_melt: 8.24
+          log_fO2: -8.20
+          Cl_wt_pct: 2.19
+          Cl_uncertainty_wt_pct: 0.11
+          FeO_wt_pct: 8.24
           FeO_uncertainty_wt_pct: 0.15
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.14
-          molar_Ag_over_Ag_plus_Pt: 0.879
-          f_Cl2: 1.37e-05
-        - series: pressure
-          experiment: AgI/Cl-048
-          silicate: ICB
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.140
+          molar_Ag_over_Ag_Pt: 0.879
+          fCl2_bar: {value: 1.37e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-050, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-050, column: all}
+        - experiment: AgI/Cl-048
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 60
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 1.0
+          P_GPa: 1
+          total_pressure_Pa: {value: 1000000000, units: Pa, inferred: true, inference: '1 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-048, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -7.68
-          Clglass_wt_pct: 2.05
-          Clglass_uncertainty_wt_pct: 0.12
-          FeO_wt_pct_in_melt: 7.57
+          Cl_wt_pct: 2.05
+          Cl_uncertainty_wt_pct: 0.12
+          FeO_wt_pct: 7.57
           FeO_uncertainty_wt_pct: 0.17
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.156
-          molar_Ag_over_Ag_plus_Pt: 0.821
-          f_Cl2: 6.95e-05
-        - series: pressure
-          experiment: AgI/Cl-049
-          silicate: ICB
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.156
+          molar_Ag_over_Ag_Pt: 0.821
+          fCl2_bar: {value: 6.95e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-048, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-048, column: all}
+        - experiment: AgI/Cl-027
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 1.60
+          Cl_uncertainty_wt_pct: 0.03
+          FeO_wt_pct: 0.5
+          FeO_uncertainty_wt_pct: 0.13
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.209
+          molar_Ag_over_Ag_Pt: 0.778
+          fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
+        - experiment: AgI/Cl-049
+          composition_label: ICB
+          composition_wt_pct: *icb_oxides
           time_min: 150
           T_C: 1400
-          T_K: 1673.15
-          T_K_provenance: derived
-          P_GPa: 2.0
+          P_GPa: 2
+          total_pressure_Pa: {value: 2000000000, units: Pa, inferred: true, inference: '2 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-049, column: Pressure}}
           fO2_buffer: CCO
           log_fO2: -6.66
-          Clglass_wt_pct: 1.62
-          Clglass_uncertainty_wt_pct: 0.14
-          FeO_wt_pct_in_melt: 8.22
+          Cl_wt_pct: 1.62
+          Cl_uncertainty_wt_pct: 0.14
+          FeO_wt_pct: 8.22
           FeO_uncertainty_wt_pct: 0.19
-          buffer_silicate_mass_ratio: 50/50
-          initial_molar_Cl_over_Cl_plus_I: 0.353
-          final_molar_Cl_over_Cl_plus_I: 0.206
-          molar_Ag_over_Ag_plus_Pt: 0.657
-          f_Cl2: 0.00155
-    context:
-    - observation_id: thomas_wood_2021_henry_region_logCl_regressions
-      type: thermodynamic_example
-      locator:
-        pdf_page_index: 2
-        section: Abstract
-        note: Also restated in Results; author regressions over own data
-      units: logClmelt with Cl in wt%; P in GPa; T in K; f(O2) and f(Cl2) standard state pure gas at 0.1
-        MPa and T of interest
+          buffer_silicate_by_mass: 50/50
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.206
+          molar_Ag_over_Ag_Pt: 0.657
+          fCl2_bar: {value: 1.55e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-049, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-049, column: all}
+        - experiment: AgI/Cl-024
+          composition_label: CMAS + FeO
+          composition_status: partial_printed_composition
+          composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-024, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 2.54
+          Cl_uncertainty_wt_pct: 0.06
+          FeO_wt_pct: 8.68
+          FeO_uncertainty_wt_pct: 0.19
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.198
+          molar_Ag_over_Ag_Pt: 0.887
+          fCl2_bar: {value: 2.96e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-024, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-024, column: all}
+        - experiment: AgI/Cl-025
+          composition_label: CMAS + FeO
+          composition_status: partial_printed_composition
+          composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-025, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 2.7
+          Cl_uncertainty_wt_pct: 0.19
+          FeO_wt_pct: 15.69
+          FeO_uncertainty_wt_pct: 0.46
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.184
+          molar_Ag_over_Ag_Pt: 0.864
+          fCl2_bar: {value: 2.46e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-025, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-025, column: all}
+        - experiment: AgI/Cl-026
+          composition_label: CMAS + FeO
+          composition_status: partial_printed_composition
+          composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
+          time_min: 60
+          T_C: 1400
+          P_GPa: 1.5
+          total_pressure_Pa: {value: 1500000000, units: Pa, inferred: true, inference: '1.5 GPa × 10^9 Pa/GPa; declared SI pressure home', method_class: calculated, locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-026, column: Pressure}}
+          fO2_buffer: CCO
+          log_fO2: -7.17
+          Cl_wt_pct: 3.49
+          Cl_uncertainty_wt_pct: 0.28
+          FeO_wt_pct: 20.88
+          FeO_uncertainty_wt_pct: 0.49
+          buffer_silicate_by_mass: 75/25
+          initial_molar_Cl_over_Cl_I: 0.353
+          final_molar_Cl_over_Cl_I: 0.120
+          molar_Ag_over_Ag_Pt: 0.903
+          fCl2_bar: {value: 1.04e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-026, column: 'f(Cl2)'}}
+          locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-026, column: all}
+    - observation_id: thomas_wood_2021_figure3_time_series
+      type: concentration_series
+      locator: {pdf_page_index: 8, published_page: 7, figure: '3', section: Results}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'time in h; Clglass in wt%; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
       values:
-        quantity: henry_region_logClmelt_regression
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization from plotted symbols; not measured-printed and not interpolated.'
+        n_points: 4
+        series:
+        - {time_h: 0.1, Cl_wt_pct: 2.23, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '3', point: '0.1 h'}}
+        - {time_h: 0.5, Cl_wt_pct: 2.70, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '3', point: '0.5 h'}}
+        - {time_h: 1.0, Cl_wt_pct: 2.55, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '3', point: '1.0 h'}}
+        - {time_h: 2.0, Cl_wt_pct: 2.56, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '3', point: '2.0 h'}}
+    - observation_id: thomas_wood_2021_figure4_fugacity_series
+      type: concentration_series
+      locator: {pdf_page_index: 8, published_page: 7, figure: '4', section: Results}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'sqrt(f(Cl2) in bar) and Clglass in wt%; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of plotted data and regression-line checks; values are figure-only.'
+        n_points: 12
+        series:
+        - {dataset: CMAS, sqrt_fCl2_bar: 0.002, Cl_wt_pct: 0.2, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: CMAS-1}}
+        - {dataset: CMAS, sqrt_fCl2_bar: 0.004, Cl_wt_pct: 0.5, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: CMAS-2}}
+        - {dataset: CMAS, sqrt_fCl2_bar: 0.008, Cl_wt_pct: 1.0, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: CMAS-3}}
+        - {dataset: CMAS, sqrt_fCl2_bar: 0.018, Cl_wt_pct: 2.5, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: CMAS-4}}
+        - {dataset: CMAS, sqrt_fCl2_bar: 0.037, Cl_wt_pct: 3.6, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: CMAS-5}}
+        - {dataset: ICB, sqrt_fCl2_bar: 0.002, Cl_wt_pct: 0.05, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: ICB-1}}
+        - {dataset: ICB, sqrt_fCl2_bar: 0.004, Cl_wt_pct: 0.3, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: ICB-2}}
+        - {dataset: ICB, sqrt_fCl2_bar: 0.006, Cl_wt_pct: 0.4, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: ICB-3}}
+        - {dataset: ICB, sqrt_fCl2_bar: 0.010, Cl_wt_pct: 0.75, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: ICB-4}}
+        - {dataset: ICB, sqrt_fCl2_bar: 0.020, Cl_wt_pct: 1.6, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: ICB-5}}
+        - {dataset: 'CMAS + 8.7 wt% FeO', sqrt_fCl2_bar: 0.018, Cl_wt_pct: 2.5, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: FeO-8.7}}
+        - {dataset: 'CMAS + 15.7 wt% FeO', sqrt_fCl2_bar: 0.016, Cl_wt_pct: 2.7, approximate: true, locator: {pdf_page_index: 8, published_page: 7, figure: '4', point: FeO-15.7}}
+        fits:
+        - {dataset: CMAS, equation: 'Cl wt% = 140.52 sqrt(f(Cl2))', R2: 0.99, method_class: model_derived, locator: {pdf_page_index: 8, published_page: 7, figure: '4', note: 'printed regression'}}
+        - {dataset: ICB, equation: 'Cl wt% = 78.56 sqrt(f(Cl2))', R2: 0.99, method_class: model_derived, locator: {pdf_page_index: 8, published_page: 7, figure: '4', note: 'printed regression'}}
+    - observation_id: thomas_wood_2021_figure5_oxygen_series
+      type: concentration_series
+      locator: {pdf_page_index: 9, published_page: 8, figure: '5', section: Results}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'log f(O2) as plotted; log10(Cl wt% melt) as plotted; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization; CCO and RRO coordinates follow the plotted buffer labels.'
+        n_points: 4
+        series:
+        - {dataset: CMAS, log_fO2: -7.3, log10_Cl_wt_pct: 0.66, approximate: true, locator: {pdf_page_index: 9, published_page: 8, figure: '5', point: CMAS-CCO}}
+        - {dataset: ICB, log_fO2: -7.3, log10_Cl_wt_pct: 0.38, approximate: true, locator: {pdf_page_index: 9, published_page: 8, figure: '5', point: ICB-CCO}}
+        - {dataset: CMAS, log_fO2: -3.9, log10_Cl_wt_pct: -0.16, approximate: true, locator: {pdf_page_index: 9, published_page: 8, figure: '5', point: CMAS-RRO}}
+        - {dataset: ICB, log_fO2: -3.9, log10_Cl_wt_pct: -0.48, approximate: true, locator: {pdf_page_index: 9, published_page: 8, figure: '5', point: ICB-RRO}}
+    - observation_id: thomas_wood_2021_figure6_pressure_series
+      type: concentration_series
+      locator: {pdf_page_index: 10, published_page: 9, figure: '6', section: Results}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'P in GPa; log K dimensionless; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of points and printed fit lines.'
+        n_points: 11
+        series:
+        - {dataset: 'CMAS 75/25', P_GPa: 0.5, log_K: 0.96, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-75-0.5}}
+        - {dataset: 'CMAS 75/25', P_GPa: 1.0, log_K: 0.61, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-75-1.0}}
+        - {dataset: 'CMAS 75/25', P_GPa: 1.5, log_K: 0.36, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-75-1.5}}
+        - {dataset: 'CMAS 75/25', P_GPa: 2.0, log_K: 0.12, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-75-2.0}}
+        - {dataset: 'CMAS 90/10', P_GPa: 1.0, log_K: 0.65, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-90-1.0}}
+        - {dataset: 'CMAS 90/10', P_GPa: 1.5, log_K: 0.35, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-90-1.5}}
+        - {dataset: 'CMAS 90/10', P_GPa: 2.0, log_K: 0.08, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: CMAS-90-2.0}}
+        - {dataset: ICB, P_GPa: 0.5, log_K: 0.72, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: ICB-0.5}}
+        - {dataset: ICB, P_GPa: 1.0, log_K: 0.47, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: ICB-1.0}}
+        - {dataset: ICB, P_GPa: 1.5, log_K: 0.10, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: ICB-1.5}}
+        - {dataset: ICB, P_GPa: 2.0, log_K: -0.06, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '6', point: ICB-2.0}}
+    - observation_id: thomas_wood_2021_figure7_temperature_series
+      type: concentration_series
+      locator: {pdf_page_index: 10, published_page: 9, figure: '7', section: Results}
+      phase: glass
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: '1/T × 10^-4 K; log K dimensionless; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of plotted points.'
+        n_points: 7
+        series:
+        - {dataset: CMAS, inverse_T_1e4_K: 5.65, log_K: 0.38, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: CMAS-5.65}}
+        - {dataset: CMAS, inverse_T_1e4_K: 6.0, log_K: 0.36, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: CMAS-6.0}}
+        - {dataset: CMAS, inverse_T_1e4_K: 6.35, log_K: 0.34, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: CMAS-6.35}}
+        - {dataset: ICB, inverse_T_1e4_K: 5.65, log_K: 0.15, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: ICB-5.65}}
+        - {dataset: ICB, inverse_T_1e4_K: 6.0, log_K: 0.10, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: ICB-6.0}}
+        - {dataset: ICB, inverse_T_1e4_K: 6.35, log_K: 0.06, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: ICB-6.35}}
+        - {dataset: ICB, inverse_T_1e4_K: 6.8, log_K: 0.03, approximate: true, locator: {pdf_page_index: 10, published_page: 9, figure: '7', point: ICB-6.8}}
+    - observation_id: thomas_wood_2021_figure8_pressure_speciation
+      type: gas_speciation
+      locator: {pdf_page_index: 11, published_page: 10, figure: '8', section: 'Volcanic gas implications'}
+      phase: gas
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'P in MPa; HCl mole fraction and cumulative Cl loss are dimensionless; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of four curves; figure-only.'
+        n_points: 36
+        series:
+        - {P_MPa: 0, HCl_x_0.5pct_Cl: 0.25, HCl_x_0.2pct_Cl: 0.08, HCl_x_0.05pct_Cl: 0.02, cumulative_Cl_loss_0.05pct: 0.02, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P0}}
+        - {P_MPa: 5, HCl_x_0.5pct_Cl: 0.04, HCl_x_0.2pct_Cl: 0.02, HCl_x_0.05pct_Cl: 0.004, cumulative_Cl_loss_0.05pct: 0.005, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P5}}
+        - {P_MPa: 10, HCl_x_0.5pct_Cl: 0.03, HCl_x_0.2pct_Cl: 0.015, HCl_x_0.05pct_Cl: 0.003, cumulative_Cl_loss_0.05pct: 0.003, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P10}}
+        - {P_MPa: 15, HCl_x_0.5pct_Cl: 0.025, HCl_x_0.2pct_Cl: 0.012, HCl_x_0.05pct_Cl: 0.0025, cumulative_Cl_loss_0.05pct: 0.0025, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P15}}
+        - {P_MPa: 20, HCl_x_0.5pct_Cl: 0.02, HCl_x_0.2pct_Cl: 0.01, HCl_x_0.05pct_Cl: 0.002, cumulative_Cl_loss_0.05pct: 0.002, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P20}}
+        - {P_MPa: 25, HCl_x_0.5pct_Cl: 0.018, HCl_x_0.2pct_Cl: 0.008, HCl_x_0.05pct_Cl: 0.0018, cumulative_Cl_loss_0.05pct: 0.0018, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P25}}
+        - {P_MPa: 30, HCl_x_0.5pct_Cl: 0.016, HCl_x_0.2pct_Cl: 0.007, HCl_x_0.05pct_Cl: 0.0016, cumulative_Cl_loss_0.05pct: 0.0015, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P30}}
+        - {P_MPa: 35, HCl_x_0.5pct_Cl: 0.015, HCl_x_0.2pct_Cl: 0.006, HCl_x_0.05pct_Cl: 0.0015, cumulative_Cl_loss_0.05pct: 0.0012, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P35}}
+        - {P_MPa: 40, HCl_x_0.5pct_Cl: 0.014, HCl_x_0.2pct_Cl: 0.005, HCl_x_0.05pct_Cl: 0.0014, cumulative_Cl_loss_0.05pct: 0.0005, approximate: true, locator: {pdf_page_index: 11, published_page: 10, figure: '8', point: P40}}
+    - observation_id: thomas_wood_2021_figure9_fugacity_speciation
+      type: gas_speciation
+      locator: {pdf_page_index: 11, published_page: 10, figure: '9', section: 'Volcanic gas implications'}
+      phase: gas
+      regime: high_pressure_anhydrous_piston_cylinder
+      units: 'log f(Cl2) in bar; HCl mole fraction dimensionless; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of curves; values at or below plot resolution are explicitly not asserted as numeric zeros.'
+        n_points: 7
+        series:
+        - {log_fCl2_bar: -11, FMQ_minus_2_HCl_x: 0.0, FMQ_HCl_x: 0.0, FMQ_plus_2_HCl_x: 0.0, below_plot_resolution: true, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-11}}
+        - {log_fCl2_bar: -10, FMQ_minus_2_HCl_x: 0.01, FMQ_HCl_x: 0.0, FMQ_plus_2_HCl_x: 0.0, below_plot_resolution: true, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-10}}
+        - {log_fCl2_bar: -9, FMQ_minus_2_HCl_x: 0.03, FMQ_HCl_x: 0.01, FMQ_plus_2_HCl_x: 0.0, below_plot_resolution: true, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-9}}
+        - {log_fCl2_bar: -8, FMQ_minus_2_HCl_x: 0.10, FMQ_HCl_x: 0.03, FMQ_plus_2_HCl_x: 0.01, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-8}}
+        - {log_fCl2_bar: -7, FMQ_minus_2_HCl_x: 0.25, FMQ_HCl_x: 0.10, FMQ_plus_2_HCl_x: 0.03, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-7}}
+        - {log_fCl2_bar: -6, FMQ_minus_2_HCl_x: 0.40, FMQ_HCl_x: 0.25, FMQ_plus_2_HCl_x: 0.10, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-6}}
+        - {log_fCl2_bar: -5, FMQ_minus_2_HCl_x: 0.40, FMQ_HCl_x: 0.40, FMQ_plus_2_HCl_x: 0.25, locator: {pdf_page_index: 11, published_page: 10, figure: '9', point: logf-5}}
+    - observation_id: thomas_wood_2021_figure10_hydrous_basalt_check
+      type: concentration_series
+      locator: {pdf_page_index: 12, published_page: 11, figure: '10', section: 'Hydrous basalt comparison'}
+      phase: glass
+      regime: high_pressure_hydrous_basalt_comparison
+      units: 'calculated and observed Cl in wt%; pressure in MPa; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of Beermann et al. comparison points; not this work''s direct measurements.'
+        n_points: 12
+        series:
+        - {pressure_MPa: 200, calculated_Cl_wt_pct: 0.15, observed_Cl_wt_pct: 0.05, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 200-1}}
+        - {pressure_MPa: 200, calculated_Cl_wt_pct: 0.18, observed_Cl_wt_pct: 0.15, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 200-2}}
+        - {pressure_MPa: 200, calculated_Cl_wt_pct: 0.20, observed_Cl_wt_pct: 0.18, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 200-3}}
+        - {pressure_MPa: 200, calculated_Cl_wt_pct: 0.55, observed_Cl_wt_pct: 0.58, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 200-4}}
+        - {pressure_MPa: 200, calculated_Cl_wt_pct: 1.05, observed_Cl_wt_pct: 0.55, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 200-5}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 0.05, observed_Cl_wt_pct: 0.05, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-1}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 0.08, observed_Cl_wt_pct: 0.15, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-2}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 0.10, observed_Cl_wt_pct: 0.12, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-3}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 0.60, observed_Cl_wt_pct: 0.45, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-4}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 0.65, observed_Cl_wt_pct: 0.42, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-5}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 1.40, observed_Cl_wt_pct: 1.25, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-6}}
+        - {pressure_MPa: 100, calculated_Cl_wt_pct: 1.60, observed_Cl_wt_pct: 1.25, approximate: true, locator: {pdf_page_index: 12, published_page: 11, figure: '10', point: 100-7}}
+    - observation_id: thomas_wood_2021_figure11_sodalite_field
+      type: gas_speciation
+      locator: {pdf_page_index: 14, published_page: 13, figure: '11', section: 'Sodalite stability'}
+      phase: gas
+      regime: thermodynamic_sodalite_model
+      units: 'log f(O2) and log f(Cl2) in bar; log aNa2O dimensionless; digitized from figure'
+      experiment: table2_anhydrous_chlorine_series
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        digitization: 'Approximate visual digitization of two log f(Cl2) contours at log aNa2O = -11.5 and -13.5.'
+        n_points: 12
+        series:
+        - {log_fO2: -13, log_fCl2_at_log_aNa2O_minus_11_5: -7.7, log_fCl2_at_log_aNa2O_minus_13_5: -9.7, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-13}}
+        - {log_fO2: -12, log_fCl2_at_log_aNa2O_minus_11_5: -7.2, log_fCl2_at_log_aNa2O_minus_13_5: -9.3, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-12}}
+        - {log_fO2: -11, log_fCl2_at_log_aNa2O_minus_11_5: -6.7, log_fCl2_at_log_aNa2O_minus_13_5: -8.9, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-11}}
+        - {log_fO2: -10, log_fCl2_at_log_aNa2O_minus_11_5: -6.2, log_fCl2_at_log_aNa2O_minus_13_5: -8.5, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-10}}
+        - {log_fO2: -9, log_fCl2_at_log_aNa2O_minus_11_5: -5.7, log_fCl2_at_log_aNa2O_minus_13_5: -8.1, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-9}}
+        - {log_fO2: -8, log_fCl2_at_log_aNa2O_minus_11_5: -5.2, log_fCl2_at_log_aNa2O_minus_13_5: -7.7, approximate: true, locator: {pdf_page_index: 14, published_page: 13, figure: '11', point: fO2-8}}
+    context:
+    - observation_id: thomas_wood_2021_chlorine_buffer_method
+      type: method
+      locator: {pdf_page_index: 4, published_page: 3, section: '2.1 Experimental procedure'}
+      units: 'reaction and buffer description as printed'
+      values:
+        method_class: method_only
+        description: 'Ag/AgCl/AgI chlorine buffer; chlorine fugacity is controlled by the AgCl-AgI exchange and quantified after quench from molar ratios.'
+        reaction: 'AgCl + 1/2 I2 = AgI + 1/2 Cl2'
+    - observation_id: thomas_wood_2021_oxygen_buffer_method
+      type: method
+      locator: {pdf_page_index: 5, published_page: 4, section: '2.2 Oxygen fugacity'}
+      units: 'buffer descriptions and equations as printed'
+      values:
+        method_class: method_only
+        buffers: [CCO, Re-ReO2]
+        log_fO2_CCO_equation: 'log f(O2) = 4.325 - 21803/T + 0.171((P-1)/T), with P in bar and T in K'
+        sensor_test: 'At 1350 °C and 1.5 GPa, Pt-Fe bead XFe = 0.31 (11.34 wt% Fe) and silicate FeO = 5.22 wt%; measured fO2 was 1.79 log units below FMQ versus expected 1.82.'
+    - observation_id: thomas_wood_2021_analytical_method
+      type: method
+      locator: {pdf_page_index: 6, published_page: 5, section: '2.3 Analytical procedures'}
+      units: 'analytical settings and detection limits as printed'
+      values:
+        method_class: method_only
+        instruments: 'CAMECA SX-Five-FE and JEOL-8600 electron microprobes'
+        settings: '20 nA, 15 kV, 10 μm defocused beam; Cl/Na/Si analysed first; 80 s peak and 40 s background on Cl'
+        chlorine_detection_limit: '120 ppm'
+        glass_points: '>40 per glass; 10-20 buffer/metal points; standard deviation <0.2 wt%'
+        durango_check: '0.41 wt% standard measured 0.415 ± 0.015 wt% for 98 analyses'
+    - observation_id: thomas_wood_2021_thermodynamic_fits
+      type: thermodynamic_fit
+      locator: {pdf_page_index: 10, published_page: 9, section: Results, equation: '16-17'}
+      units: 'T in K; P in GPa; log K dimensionless'
+      values:
         method_class: model_derived
-        evidence_class: author_regression_not_scored
-        as_printed_An50Di28Fo22: logClmelt = 1.206(32) - 940(T40)P - 0.25log(f(O2)) + 0.5log(f(Cl2))
-        as_printed_anhydrous_basalt: logClmelt = 0.984(64) - 930(T70)P - 0.25log(f(O2)) + 0.5log(f(Cl2))
-        note: Parenthetical coefficients are 1 standard error as printed. Retained as unscored context
-          per model_derived cohort ruling.
+        derivation: 'Author regressions to the tabulated experimental constants; equations are printed, not newly fitted here.'
+        standard_state_note: 'f(O2) and f(Cl2) use pure-gas standard states at 0.1 MPa and the temperature of interest.'
+        fits:
+        - {composition: CMAS, equation: 'log K_PT = 1.206(32) - 940(40) P/T', standard_error: 0.030, locator: {pdf_page_index: 10, published_page: 9, equation: '16'}}
+        - {composition: Icelandic Basalt, equation: 'log K_PT = 0.984(64) - 930(70) P/T', standard_error: 0.053, locator: {pdf_page_index: 10, published_page: 9, equation: '17'}}
+        - {composition: CMAS, equation: 'log K = -0.561 P + 1.21', locator: {pdf_page_index: 10, published_page: 9, figure: '6', note: 'printed fit line'}}
+        - {composition: Icelandic Basalt, equation: 'log K = -0.539 P + 0.98', locator: {pdf_page_index: 10, published_page: 9, figure: '6', note: 'printed fit line'}}
+    - observation_id: thomas_wood_2021_refusals
+      type: refusal
+      locator: {pdf_page_index: 7, published_page: 6, table: '2', section: 'source coverage limits'}
+      units: 'typed absence/refusal records'
+      values:
+        method_class: typed_refusal
+        refusals:
+        - {item: complete analytical compositions from supplementary Table 1, reason: not_published, locator: {pdf_page_index: 7, published_page: 6, table: '2', note: 'The complete analyses are cited as supplementary but are not present in the supplied corpus PDF/OCR.'}}
+        - {item: numeric apparatus values from Figures 1-2, reason: not_numeric, locator: {pdf_page_index: 5, published_page: 4, figure: '1-2', note: 'Images show apparatus/BSE context; no numeric result series extracted.'}}
+        - {item: typed f(Cl2) observable, reason: would_invent, locator: {pdf_page_index: 7, published_page: 6, table: '2', column: 'f(Cl2)', note: 'Current schema has no fugacity quantity; values retained in each row with calculated method class and proposed amendment.'}}
+        - {item: full Fe-bearing melt composition, reason: not_published, locator: {pdf_page_index: 8, published_page: 7, table: '2', row: 'AgI/Cl-024 to AgI/Cl-026', note: 'Only CMAS label and FeO wt% are printed.'}}

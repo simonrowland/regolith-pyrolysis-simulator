@@ -3385,6 +3385,7 @@ def test_g1_delta_fh_mapping_mutation_proof() -> None:
 def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -> None:
     names = (
         "jaggi-2021-mercury-atmosphere.yaml",
+        "ta-shirai-2000-lpsc.yaml",
         "thomas-wood-2021-chlorine-silicate-melts.yaml",
         "ueshima-1982-fe-mo-thermal.yaml",
         "ta-mendybaev-2002-lpsc.yaml",
@@ -3402,25 +3403,40 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
         assert any(obs.source_id == source_id for obs in result.observations.values())
 
     experiments = result.experiments
-    assert any(eid.endswith("::experiment::mercury-magma-ocean-model-cases") for eid in experiments)
-    assert any(eid.endswith("::experiment::cl-solubility-cmas-icb-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::femo-thermal-analysis-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::b133-vacuum-1800C-loop-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::sio2-langmuir-ir-loop-1800C") for eid in experiments)
-    assert any(eid.endswith("::experiment::standard-pyrolysis-600C") for eid in experiments)
-
-    jaggi = next(
-        exp for eid, exp in experiments.items()
-        if eid.endswith("::experiment::mercury-magma-ocean-model-cases")
+    shirai_work_id = "c31f435ac3571abcf67819bf20c1353e15212bf08549e6c62bc389b6c5667bbf"
+    canonical_experiment_ids = {
+        f"{shirai_work_id}::experiment::{experiment_id}"
+        for experiment_id in (
+            "shirai-fig1a-1300-pO2-1e-8",
+            "shirai-fig1a-1300-pO2-1e-9",
+            "shirai-fig1a-1300-pO2-1e-10",
+            "shirai-fig1b-1400-pO2-1e-8",
+            "shirai-fig1b-1400-pO2-1e-9",
+            "shirai-fig1b-1400-pO2-1e-10",
+            "shirai-flow-check-1400-pO2-1e-9",
+        )
+    }
+    canonical_experiment_ids.update(
+        {
+            "10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series",
+            "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series",
+            "902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series",
+            "7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C",
+            "8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::standard-pyrolysis-600C",
+        }
     )
-    assert jaggi.fO2_control is not None
-    assert jaggi.fO2_control.channel.is_value
-    assert jaggi.fO2_control.channel.value is FO2Channel.BUFFER
+    assert canonical_experiment_ids <= set(experiments)
 
-    ueshima = next(
-        exp for eid, exp in experiments.items()
-        if eid.endswith("::experiment::femo-thermal-analysis-series")
-    )
+    shirai = experiments[
+        f"{shirai_work_id}::experiment::shirai-fig1a-1300-pO2-1e-8"
+    ]
+    assert shirai.fO2_control is not None
+    assert shirai.fO2_control.channel.is_value
+    assert shirai.fO2_control.channel.value is FO2Channel.GAS_MIX
+
+    ueshima = experiments[
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series"
+    ]
     temperature = ueshima.conditions["temperature_K"]
     assert temperature.state.is_value
     assert temperature.state.value.kind is ValueKind.INTERVAL
@@ -3431,9 +3447,9 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
         obs.source_id == "ueshima-1982-fe-mo-thermal"
         for obs in loaded_observations.values()
     )
-    assert any(
-        eid.endswith("::experiment::femo-thermal-analysis-series")
-        for eid in loaded_experiments
+    assert (
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series"
+        in loaded_experiments
     )
 
 

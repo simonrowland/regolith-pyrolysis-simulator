@@ -1,259 +1,935 @@
 schema_version: literature_extract.v1
 source_id: jaggi-2021-mercury-atmosphere
 source:
-  citation: Jäggi, N., Gamborino, D., Bower, D. J., Sossi, P. A., Wolf, A. S., Oza, A. V., Vorburger,
-    A., Galli, A. & Wurz, P. (2021), "Evolution of Mercury's Earliest Atmosphere", The Planetary Science
-    Journal 2:230, DOI 10.3847/PSJ/ac2dfb
+  citation: >-
+    Jäggi, N., Gamborino, D., Bower, D. J., Sossi, P. A., Wolf, A. S., Oza, A. V.,
+    Vorburger, A., Galli, A. & Wurz, P. (2021), "Evolution of Mercury's Earliest
+    Atmosphere", The Planetary Science Journal.
   doi: 10.3847/PSJ/ac2dfb
   url: https://doi.org/10.3847/PSJ/ac2dfb
   year: 2021
 extraction:
-  method: arXiv/PSJ PDF (Draft version October 18, 2021; arXiv:2110.08093v1). pdftotext -layout plus 120
-    dpi pdftoppm of Tables 1-2. This is a coupled interior-atmosphere MODEL paper. Only printed tabulated
-    INPUT compositions (Table 2 literature compilations) are scored. Table 1 case parameters retained
-    as unscored context. Tables 3-5 and all escape/mass-loss/atmosphere-evolution outputs are model-derived
-    cohort — recorded as typed absence, not ingested as observations (BACKLOG N7 ruling applied to this
-    model paper).
-  date: '2026-09-22'
-  worker: n6-thomas-ueshima-jaggi
-  audited_by: y6-audit-n6-2026-09-22
+  method: >-
+    Manual transcription from the source PDF with direct PDF text and rendered-page
+    verification of Tables 1-5 and A1-D4. Model outputs retain model_derived
+    method_class and an explicit derivation note. Printed dashes remain absence;
+    approximate figure coordinates are marked figure_only and un-digitized curves
+    are refused below.
+  date: '2026-09-24'
+  worker: extract-jaggi-2021-mercury-atmosphere
+  provenance_path: docs-private/research/2026-09-24-inbox-triage/queue.jsonl
 review_status: draft
-corrections:
-- note: 'Y6 cross-audit 2026-09-22: Table 2 magma-ocean input compositions and Table 1 case parameters spot-checked PASS vs B3 PDF. Model outputs remain typed_absence (not observations).'
-  locators:
-  - pdf_page_index 5 Table 2
-benches:
-- id: spider-vaporock-vulcan-model-stack
-  identity:
-    basis: described_in_this_work
-  apparatus_family:
-    state:
-      tag: value
-      value: Coupled SPIDER (interior) + VapoRock (evaporation) + VULCAN/FactSage (atmospheric chemistry)
-        model stack — not a laboratory instrument
-    locator:
-      pdf_page_index: 3
-      section: 2. Methods
-experiments:
-- experiment_id: mercury-magma-ocean-model-cases
-  bench_id: spider-vaporock-vulcan-model-stack
-  method: coupled_interior_atmosphere_model
-  locator:
-    pdf_page_index: 3
-    section: 2. Methods
-  sample:
-    printed_composition:
-      state:
-        tag: value
-        value: EH4, CB, NSP source, and NSP lava compositions as printed in Table 2
-      locator:
-        pdf_page_index: 5
-        table: '2'
-    form:
-      state:
-        tag: value
-        value: Model magma-ocean surface compositions (literature compilations)
-      locator:
-        pdf_page_index: 5
-        table: '2'
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 3
-          note: Numerical model; no Knudsen orifice
-      orifice_channel_length_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 3
-          note: Numerical model; no effusion channel
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        pdf_page_index: 4
-        table: '1'
-        note: Case parameters quote pressures at 2000 K; no single laboratory setpoint
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        pdf_page_index: 4
-        table: '1'
-        note: Table 1 lists species partial pressures at 2000 K per model case; not a lab total pressure
-    sweep_gas:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        pdf_page_index: 3
-        note: Model atmosphere; no laboratory sweep gas
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  fO2_control:
-    channel:
-      tag: value
-      value: buffer
-    buffer:
-      state:
-        tag: value
-        value: fO2 set to IW-1 in the evaporation model (O'Neill & Eggins 2002)
-      locator:
-        pdf_page_index: 4
-        section: 2.3 Evaporation from the magma ocean
 fidelity_samples:
-- path: species.Mercury_magma_ocean.observations[jaggi_2021_table2_magma_ocean_compositions].values.rows[0].SiO2_wt_pct
-  value: 62.73
-  locator:
-    pdf_page_index: 5
-    table: '2'
-    note: EH4 SiO2 wt% from Table 2
-- path: species.Mercury_magma_ocean.observations[jaggi_2021_table2_magma_ocean_compositions].values.rows[3].Na2O_wt_pct
-  value: 7.0
-  locator:
-    pdf_page_index: 5
-    table: '2'
-    note: NSP lava Na2O wt% from Table 2
+- path: species.Mercury_model.observations[jaggi_2021_table1_h2_partial_pressure].values.series[0].pressure_bar
+  value: '3.2'
+  locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SV; H2 pressure'}
+- path: species.Mercury_model.observations[jaggi_2021_table1_sio_partial_pressure].values.series[0].pressure_bar
+  value: '1.4E-4'
+  locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN5; SiO pressure'}
+- path: species.Mercury_model.observations[jaggi_2021_table1_h2_partial_pressure].values.series[1].pressure_bar
+  value: '5.8'
+  locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LV; H2 pressure'}
+- species: Mercury_model
+  observation_id: jaggi_2021_table5_time_averaged_loss
+  field: series
+  value:
+  - {process: Mdot_P, size: S, N5_N3_log10_kg_s: '3.4', V_log10_kg_s: '3.1', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_P; S row; N5,N3 and V columns'}}
+  - {process: Mdot_P, size: L, N5_N3_log10_kg_s: '3.4', V_log10_kg_s: '3.2', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_P; L row; N5,N3 and V columns'}}
+  - {process: 'Mdot_ion (Mdot_diff,i)', size: S, N5_N3_log10_kg_s: '5.6', V_log10_kg_s: '5.6', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_ion; S row; N5,N3 and V columns'}}
+  - {process: 'Mdot_ion (Mdot_diff,i)', size: L, N5_N3_log10_kg_s: '5.2', V_log10_kg_s: '5.8', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_ion; L row; N5,N3 and V columns'}}
+  - {process: Mdot_U, size: S, eta_EUV: '10^-3', t_1_Myr_log10_kg_s: '7.5', t_5_Myr_log10_kg_s: '6.6', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-3; S row'}}
+  - {process: Mdot_U, size: L, eta_EUV: '10^-3', t_1_Myr_log10_kg_s: '7.6', t_5_Myr_log10_kg_s: '6.7', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-3; L row'}}
+  - {process: Mdot_U, size: S, eta_EUV: '10^-1', t_1_Myr_log10_kg_s: '9.5', t_5_Myr_log10_kg_s: '8.6', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-1; S row'}}
+  - {process: Mdot_U, size: L, eta_EUV: '10^-1', t_1_Myr_log10_kg_s: '9.6', t_5_Myr_log10_kg_s: '8.7', locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-1; L row'}}
+  locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'complete printed Table 5 log10 matrix'}
 species:
-  Mercury_magma_ocean:
+  Mercury_model:
     observations:
-    - observation_id: jaggi_2021_table2_magma_ocean_compositions
-      experiment: mercury-magma-ocean-model-cases
+    - observation_id: jaggi_2021_table2_magma_ocean_composition_input
       type: composition_series
       locator:
+        published_page: 5
         pdf_page_index: 5
         table: '2'
-        note: Table 2. Magma ocean surface composition. Literature compilations used as model inputs,
-          not measurements by these authors.
-      phase: model_magma_ocean_surface
-      regime: mercury_magma_ocean_model_input
-      units: wt% oxide as printed
+        section: 2.4 Magma ocean composition
+        note: Typed parent records the printed composition-input set; complete oxide rows remain in context below.
+      phase: condensed_liquid
+      regime: magma_ocean_model_input
+      units: wt% as printed in Table 2
       values:
-        quantity: magma_ocean_surface_composition
-        method_class: secondary_compilation
-        evidence_class: literature_compilation_model_input
-        caption_as_printed: Table 2. Magma ocean surface composition.
-        note_as_printed: Compositions based on Enstatite chondrites (EH4) (Wiik 1956); CB chondrite chondrule
-          data with bulk CB Na and K mass balanced for chondrules to fit bulk meteorite iron-silicate
-          ratio (Lauretta et al. 2007; Weisberg et al. 2000, 1990); and northern smooth plains (NSP) composition
-          for the lava and source (Nittler & Weider 2019; Namur et al. 2016).
-        rows:
-        - sample: EH4
-          SiO2_wt_pct: 62.73
-          Al2O3_wt_pct: 2.58
-          MgO_wt_pct: 30.24
-          CaO_wt_pct: 1.99
-          FeO_wt_pct: 0.0
-          Na2O_wt_pct: 1.71
-          K2O_wt_pct: 0.2
-          Total_wt_pct: 99.45
-        - sample: CB
-          SiO2_wt_pct: 50.7
-          Al2O3_wt_pct: 4.6
-          MgO_wt_pct: 36.9
-          CaO_wt_pct: 3.3
-          FeO_wt_pct: 3.5
-          Na2O_wt_pct: 0.19
-          K2O_wt_pct: 0.05
-          Total_wt_pct: 99.24
-        - sample: NSP source
-          SiO2_wt_pct: 53.67
-          Al2O3_wt_pct: 4.75
-          MgO_wt_pct: 36.89
-          CaO_wt_pct: 2.26
-          FeO_wt_pct: 0.02
-          Na2O_wt_pct: 1.97
-          K2O_wt_pct: 0.05
-          Total_wt_pct: 99.61
-        - sample: NSP lava
-          SiO2_wt_pct: 58.7
-          Al2O3_wt_pct: 13.8
-          MgO_wt_pct: 13.9
-          CaO_wt_pct: 5.81
-          FeO_wt_pct: 0.04
-          Na2O_wt_pct: 7.0
-          K2O_wt_pct: 0.2
-          Total_wt_pct: 99.45
-    context:
-    - observation_id: jaggi_2021_table1_case_parameters
-      type: laboratory_conditions
+        quantity: liquidus_composition
+        method_class: compilation_derived
+        evidence_class: compilation_assessed
+        source_compositions: [EH4, CB, NSP source, NSP lava]
+    - observation_id: jaggi_2021_table1_h2_partial_pressure
+      type: partial_pressure
       locator:
+        published_page: 4
         pdf_page_index: 4
         table: '1'
-      units: R_P in km; g in m/s^2; species pressures in bar at 2000 K
+        section: 2.2 Cooling of the magma ocean
+        note: Typed H2 partial-pressure rows; the complete Table 1 case matrix remains in context below.
+      phase: gas
+      regime: coupled_interior_atmosphere_model
+      derived_from:
+      - jaggi_2021_table2_magma_ocean_composition_input
+      derivation:
+        relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set
+        inputs:
+        - jaggi_2021_table2_magma_ocean_composition_input
+        output_unit: bar
+      units: bar as printed at Tsurf=2000 K
       values:
-        quantity: magma_ocean_model_case_parameters
-        method_class: model_input
-        evidence_class: author_model_setup_not_scored
-        caption_as_printed: Table 1. Parameters for the magma ocean cases.
-        rows_as_printed:
-        - case: SN5
-          R_P_km: 2440
-          g_m_s2: 3.7
-          SiO_bar_at_2000K: '1.4E-4'
-        - case: SN3
-          R_P_km: 2440
-          g_m_s2: 3.7
-          SiO_bar_at_2000K: '1.4E-4'
-        - case: SV
-          R_P_km: 2440
-          g_m_s2: 3.7
-          H2O_bar: 0.7
-          H2_bar: 3.2
-          CO2_bar: 0.05
-          CO_bar: 1.1
-        - case: LN5
-          R_P_km: 3290
-          g_m_s2: 4.0
-          SiO_bar_at_2000K: '1.4E-4'
-        - case: LN3
-          R_P_km: 3290
-          g_m_s2: 4.0
-          SiO_bar_at_2000K: '1.4E-4'
-        - case: LV
-          R_P_km: 3290
-          g_m_s2: 4.0
-          H2O_bar: 1.2
-          H2_bar: 5.8
-          CO2_bar: 0.2
-          CO_bar: 4.9
-        naming_note: S/L = small/large Mercury; V/N = with/without volatiles; 5/3 = SiO opacity 1e-5 /
-          1e-3 m2 kg^-1 for non-volatile cases
-    - observation_id: jaggi_2021_model_outputs_typed_absence
-      type: scope_note
+        quantity: p_partial
+        method_class: model_derived
+        evidence_class: model_derived
+        formula: H2
+        series:
+        - run: SV
+          T_K: '2000'
+          pressure_bar: '3.2'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SV row; H2 pressure column'}
+        - run: LV
+          T_K: '2000'
+          pressure_bar: '5.8'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LV row; H2 pressure column'}
+    - observation_id: jaggi_2021_table1_sio_partial_pressure
+      type: partial_pressure
       locator:
-        pdf_page_index: 5
-        note: Tables 3-5 and figures of escape/mass-loss
-      units: not applicable
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        section: 2.2 Cooling of the magma ocean
+        note: Typed SiO partial-pressure rows; the complete Table 1 case matrix remains in context below.
+      phase: gas
+      regime: coupled_interior_atmosphere_model
+      derived_from:
+      - jaggi_2021_table2_magma_ocean_composition_input
+      derivation:
+        relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set
+        inputs:
+        - jaggi_2021_table2_magma_ocean_composition_input
+        output_unit: bar
+      units: bar as printed at Tsurf=2000 K
       values:
-        quantity: model_derived_outputs_not_extracted
-        method_class: typed_absence
-        evidence_class: model_derived_cohort_blocked
-        absent_tables:
-        - Table 3 surface element ratios at 2000 K (SPIDER/VapoRock)
-        - Table 4 escape parameters
-        - Table 5 time-averaged mass loss rates
-        absent_observables:
-        - photoevaporation and plasma-heating mass-loss rates
-        - homopause/exobase altitudes
-        - atmospheric mixing-ratio profiles
-        - integrated cumulative atmospheric loss
-        ruling: 'BACKLOG 3 N7 model-paper rule applied: model outputs are the model-derived cohort the
-          owner BLOCKED — typed absence, not observations.'
+        quantity: p_partial
+        method_class: model_derived
+        evidence_class: model_derived
+        formula: SiO
+        series:
+        - run: SN5
+          T_K: '2000'
+          pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN5 row; SiO pressure column'}
+        - run: SN3
+          T_K: '2000'
+          pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN3 row; SiO pressure column'}
+        - run: LN5
+          T_K: '2000'
+          pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN5 row; SiO pressure column'}
+        - run: LN3
+          T_K: '2000'
+          pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN3 row; SiO pressure column'}
+    context:
+    - observation_id: jaggi_2021_table1_magma_ocean_cases
+      type: table1_model_case_matrix
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        section: 2.2 Cooling of the magma ocean
+        note: Model case parameters and gas pressures at Tsurf=2000 K; printed em dashes are not zero.
+      phase: gas
+      regime: coupled_interior_atmosphere_model
+      derived_from:
+      - jaggi_2021_table2_magma_ocean_compositions
+      derivation:
+        relation: SPIDER/VapoRock model case outputs generated from the listed magma-ocean composition inputs
+        inputs:
+        - jaggi_2021_table2_magma_ocean_compositions
+        output_unit: as_published
+      units: >-
+        RP km; g m/s2; H2O, H2, CO2, CO and SiO pressures in bar at 2000 K as
+        printed
+      values:
+        quantity: magma_ocean_case_parameters_and_surface_gas_pressures
+        method_class: model_derived
+        evidence_class: model_derived
+        derivation: >-
+          Values are the authors' SPIDER/VapoRock model case inputs and outputs,
+          transcribed from the printed table; no laboratory measurement is claimed.
+        temperature_K: '2000'
+        series:
+        - case: SN5
+          RP_km: '2440'
+          gravity_m_s2: '3.7'
+          H2O_pressure_bar: '—'
+          H2_pressure_bar: '—'
+          CO2_pressure_bar: '—'
+          CO_pressure_bar: '—'
+          SiO_pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN5 row; RP through SiO columns'}
+        - case: SN3
+          RP_km: '2440'
+          gravity_m_s2: '3.7'
+          H2O_pressure_bar: '—'
+          H2_pressure_bar: '—'
+          CO2_pressure_bar: '—'
+          CO_pressure_bar: '—'
+          SiO_pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SN3 row; RP through SiO columns'}
+        - case: SV
+          RP_km: '2440'
+          gravity_m_s2: '3.7'
+          H2O_pressure_bar: '0.7'
+          H2_pressure_bar: '3.2'
+          CO2_pressure_bar: '0.05'
+          CO_pressure_bar: '1.1'
+          SiO_pressure_bar: '—'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'SV row; RP through SiO columns'}
+        - case: LN5
+          RP_km: '3290'
+          gravity_m_s2: '4.0'
+          H2O_pressure_bar: '—'
+          H2_pressure_bar: '—'
+          CO2_pressure_bar: '—'
+          CO_pressure_bar: '—'
+          SiO_pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN5 row; RP through SiO columns'}
+        - case: LN3
+          RP_km: '3290'
+          gravity_m_s2: '4.0'
+          H2O_pressure_bar: '—'
+          H2_pressure_bar: '—'
+          CO2_pressure_bar: '—'
+          CO_pressure_bar: '—'
+          SiO_pressure_bar: '1.4E-4'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LN3 row; RP through SiO columns'}
+        - case: LV
+          RP_km: '3290'
+          gravity_m_s2: '4.0'
+          H2O_pressure_bar: '1.2'
+          H2_pressure_bar: '5.8'
+          CO2_pressure_bar: '0.2'
+          CO_pressure_bar: '4.9'
+          SiO_pressure_bar: '—'
+          locator: {published_page: 4, pdf_page_index: 4, table: '1', record: 'LV row; RP through SiO columns'}
+    - observation_id: jaggi_2021_table2_magma_ocean_compositions
+      type: table2_composition_table
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        table: '2'
+        section: 2.4 Magma ocean composition
+        note: Printed oxide mass percentages; source compositions are attributed in the table note.
+      phase: condensed_liquid
+      regime: magma_ocean_model_input
+      units: wt% as printed
+      values:
+        quantity: magma_ocean_surface_composition
+        method_class: quoted_literature
+        evidence_class: quoted_unattributed
+        quoted_from:
+        - Wiik (1956)
+        - Lauretta et al. (2007)
+        - Weisberg et al. (2000)
+        - Weisberg et al. (1990)
+        - Nittler & Weider (2019)
+        - Namur et al. (2016)
+        derivation: >-
+          Printed compositions compiled from the cited EH4, CB and NSP
+          literature sources (Wiik 1956; Lauretta et al. 2007; Weisberg et al.
+          2000, 1990; Nittler & Weider 2019; Namur et al. 2016) and used as
+          model inputs; not new EPMA measurements.
+        columns: [Oxide (wt%), EH4, CB, NSP source, NSP lava]
+        rows:
+        - oxide: SiO2
+          EH4_wt_pct: '62.73'
+          CB_wt_pct: '50.70'
+          NSP_source_wt_pct: '53.67'
+          NSP_lava_wt_pct: '58.70'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'SiO2 row; EH4 through NSP lava columns'}
+        - oxide: Al2O3
+          EH4_wt_pct: '2.58'
+          CB_wt_pct: '4.60'
+          NSP_source_wt_pct: '4.75'
+          NSP_lava_wt_pct: '13.80'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'Al2O3 row; EH4 through NSP lava columns'}
+        - oxide: MgO
+          EH4_wt_pct: '30.24'
+          CB_wt_pct: '36.90'
+          NSP_source_wt_pct: '36.89'
+          NSP_lava_wt_pct: '13.90'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'MgO row; EH4 through NSP lava columns'}
+        - oxide: CaO
+          EH4_wt_pct: '1.99'
+          CB_wt_pct: '3.30'
+          NSP_source_wt_pct: '2.26'
+          NSP_lava_wt_pct: '5.81'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'CaO row; EH4 through NSP lava columns'}
+        - oxide: FeO
+          EH4_wt_pct: '0.00'
+          CB_wt_pct: '3.50'
+          NSP_source_wt_pct: '0.02'
+          NSP_lava_wt_pct: '0.04'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'FeO row; EH4 through NSP lava columns'}
+        - oxide: Na2O
+          EH4_wt_pct: '1.71'
+          CB_wt_pct: '0.19'
+          NSP_source_wt_pct: '1.97'
+          NSP_lava_wt_pct: '7.00'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'Na2O row; EH4 through NSP lava columns'}
+        - oxide: K2O
+          EH4_wt_pct: '0.20'
+          CB_wt_pct: '0.05'
+          NSP_source_wt_pct: '0.05'
+          NSP_lava_wt_pct: '0.20'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'K2O row; EH4 through NSP lava columns'}
+        - oxide: Total
+          EH4_wt_pct: '99.45'
+          CB_wt_pct: '99.24'
+          NSP_source_wt_pct: '99.61'
+          NSP_lava_wt_pct: '99.45'
+          locator: {published_page: 5, pdf_page_index: 5, table: '2', record: 'Total row; EH4 through NSP lava columns'}
+    - observation_id: jaggi_2021_table3_surface_element_ratios
+      type: table3_element_ratio_table
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        table: '3'
+        section: 2.5 Atmospheric structure
+        note: >-
+          Surface element ratios at Tsurf=2000 K. C/H and O/H are printed once
+          per case as grouped cells; other ratios are printed per composition row.
+      phase: gas
+      regime: coupled_atmosphere_model
+      derived_from:
+      - jaggi_2021_table1_magma_ocean_cases
+      - jaggi_2021_table2_magma_ocean_compositions
+      derivation:
+        relation: SPIDER/VapoRock surface element-ratio outputs for the listed model cases and composition inputs
+        inputs:
+        - jaggi_2021_table1_magma_ocean_cases
+        - jaggi_2021_table2_magma_ocean_compositions
+        output_unit: as_published
+      units: dimensionless element ratios as printed at Tsurf=2000 K
+      values:
+        quantity: surface_element_to_hydrogen_ratios
+        method_class: model_derived
+        evidence_class: model_derived
+        derivation: >-
+          SPIDER and VapoRock model outputs for the Table 2 compositions; Al and
+          Ca are omitted because their vapor pressure is below 10^-9 bar at 2000 K.
+        cases:
+        - case: SV
+          C_H: '1.532E-01'
+          O_H: '2.472E-01'
+          locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'SV case grouped C/H and O/H cells'}
+          compositions:
+          - composition: EH4
+            Mg_H: '1.251E-06'
+            Si_H: '1.469E-05'
+            Na_H: '1.254E-04'
+            K_H: '1.121E-05'
+            Fe_H: '1.053E-08'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'SV; EH4 row; Mg/H through Fe/H columns'}
+          - composition: CB
+            Mg_H: '1.680E-06'
+            Si_H: '1.039E-05'
+            Na_H: '7.155E-05'
+            K_H: '5.785E-06'
+            Fe_H: '9.388E-06'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'SV; CB row; Mg/H through Fe/H columns'}
+          - composition: NSP source
+            Mg_H: '1.740E-06'
+            Si_H: '1.020E-05'
+            Na_H: '2.282E-04'
+            K_H: '5.254E-06'
+            Fe_H: '7.155E-07'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'SV; NSP source row; Mg/H through Fe/H columns'}
+          - composition: NSP melt
+            Mg_H: '9.642E-07'
+            Si_H: '1.161E-05'
+            Na_H: '3.480E-04'
+            K_H: '7.139E-06'
+            Fe_H: '1.351E-06'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'SV; NSP melt row; Mg/H through Fe/H columns'}
+        - case: LV
+          C_H: '3.608E-01'
+          O_H: '4.641E-01'
+          locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'LV case grouped C/H and O/H cells'}
+          compositions:
+          - composition: EH4
+            Mg_H: '6.806E-07'
+            Si_H: '7.997E-06'
+            Na_H: '6.825E-05'
+            K_H: '6.104E-06'
+            Fe_H: '5.732E-09'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'LV; EH4 row; Mg/H through Fe/H columns'}
+          - composition: CB
+            Mg_H: '9.144E-07'
+            Si_H: '5.653E-06'
+            Na_H: '3.894E-05'
+            K_H: '3.148E-06'
+            Fe_H: '5.109E-06'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'LV; CB row; Mg/H through Fe/H columns'}
+          - composition: NSP source
+            Mg_H: '9.469E-07'
+            Si_H: '5.551E-06'
+            Na_H: '1.242E-04'
+            K_H: '2.859E-06'
+            Fe_H: '3.894E-07'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'LV; NSP source row; Mg/H through Fe/H columns'}
+          - composition: NSP melt
+            Mg_H: '5.248E-07'
+            Si_H: '6.321E-06'
+            Na_H: '1.894E-04'
+            K_H: '3.886E-06'
+            Fe_H: '7.354E-07'
+            locator: {published_page: 6, pdf_page_index: 6, table: '3', record: 'LV; NSP melt row; Mg/H through Fe/H columns'}
+    - observation_id: jaggi_2021_table4_escape_parameters
+      type: table4_escape_parameter_table
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+        table: '4'
+        section: 2.7 Atmospheric loss
+        note: Escape parameters are model outputs at Tsurf=2000 K, not laboratory observations.
+      phase: gas
+      regime: exospheric_escape_model
+      derived_from:
+      - jaggi_2021_table1_magma_ocean_cases
+      - jaggi_2021_table3_surface_element_ratios
+      derivation:
+        relation: SPIDER/VULCAN atmospheric-structure and escape-model outputs for the listed magma-ocean cases
+        inputs:
+        - jaggi_2021_table1_magma_ocean_cases
+        - jaggi_2021_table3_surface_element_ratios
+        output_unit: as_published
+      units: lambda0 dimensionless; mu_atm amu; Texo K; zexo km; RH/RP dimensionless
+      values:
+        quantity: exospheric_escape_parameters
+        method_class: model_derived
+        evidence_class: model_derived
+        derivation: >-
+          SPIDER/VULCAN atmospheric structure coupled to the authors' escape
+          calculation; table values are printed model outputs.
+        Tsurf_K: '2000'
+        series:
+        - size: small
+          Hill_radius_RP: '72'
+          species_group: 'Na, K, Fe'
+          lambda_0: '7.8'
+          mu_atm_amu: '24.1'
+          T_exo_K: '1613'
+          z_exo_km: '2670'
+          cases: 'SN5, SN3'
+          locator: {published_page: 8, pdf_page_index: 8, table: '4', record: 'small Mercury; Na, K, Fe row'}
+        - size: small
+          Hill_radius_RP: '72'
+          species_group: 'H, C, O'
+          lambda_0: '7.6'
+          mu_atm_amu: '14.3'
+          T_exo_K: '1021'
+          z_exo_km: '2370'
+          cases: SV
+          locator: {published_page: 8, pdf_page_index: 8, table: '4', record: 'small Mercury; H, C, O row'}
+        - size: large
+          Hill_radius_RP: '90'
+          species_group: 'Na, K, Fe'
+          lambda_0: '15.7'
+          mu_atm_amu: '24.1'
+          T_exo_K: '1615'
+          z_exo_km: '1890'
+          cases: 'LN5, LN3'
+          locator: {published_page: 8, pdf_page_index: 8, table: '4', record: 'large Mercury; Na, K, Fe row'}
+        - size: large
+          Hill_radius_RP: '90'
+          species_group: 'H, C, O'
+          lambda_0: '15.3'
+          mu_atm_amu: '14.3'
+          T_exo_K: '893'
+          z_exo_km: '2160'
+          cases: LV
+          locator: {published_page: 8, pdf_page_index: 8, table: '4', record: 'large Mercury; H, C, O row'}
+    - observation_id: jaggi_2021_table5_time_averaged_loss
+      type: table5_time_averaged_loss_table
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+        table: '5'
+        section: 4.1 Mass loss of proto-Mercury
+        note: Values are log10 mass loss rates in kg/s as printed.
+      phase: gas
+      regime: exospheric_escape_model
+      derived_from:
+      - jaggi_2021_table4_escape_parameters
+      derivation:
+        relation: Time-averaged escape-model rates associated with the atmospheric escape parameters reported in Table 4
+        inputs:
+        - jaggi_2021_table4_escape_parameters
+        output_unit: as_published
+      units: log10 mass loss [kg/s] as printed; N5,N3/V emissivity and LEUV age columns retained
+      values:
+        quantity: log10_mass_loss_rate
+        method_class: model_derived
+        evidence_class: model_derived
+        derivation: >-
+          Time-averaged outputs of the authors' plasma-heating, photoionization
+          and photoevaporation escape models; table cells are log10 rates, not
+          rates converted to linear units.
+        series:
+        - process: Mdot_P
+          size: S
+          N5_N3_log10_kg_s: '3.4'
+          V_log10_kg_s: '3.1'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_P; S row; N5,N3 and V columns'}
+        - process: Mdot_P
+          size: L
+          N5_N3_log10_kg_s: '3.4'
+          V_log10_kg_s: '3.2'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_P; L row; N5,N3 and V columns'}
+        - process: Mdot_ion (Mdot_diff,i)
+          size: S
+          N5_N3_log10_kg_s: '5.6'
+          V_log10_kg_s: '5.6'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_ion; S row; N5,N3 and V columns'}
+        - process: Mdot_ion (Mdot_diff,i)
+          size: L
+          N5_N3_log10_kg_s: '5.2'
+          V_log10_kg_s: '5.8'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_ion; L row; N5,N3 and V columns'}
+        - process: Mdot_U
+          size: S
+          eta_EUV: '10^-3'
+          t_1_Myr_log10_kg_s: '7.5'
+          t_5_Myr_log10_kg_s: '6.6'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-3; S row'}
+        - process: Mdot_U
+          size: L
+          eta_EUV: '10^-3'
+          t_1_Myr_log10_kg_s: '7.6'
+          t_5_Myr_log10_kg_s: '6.7'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-3; L row'}
+        - process: Mdot_U
+          size: S
+          eta_EUV: '10^-1'
+          t_1_Myr_log10_kg_s: '9.5'
+          t_5_Myr_log10_kg_s: '8.6'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-1; S row'}
+        - process: Mdot_U
+          size: L
+          eta_EUV: '10^-1'
+          t_1_Myr_log10_kg_s: '9.6'
+          t_5_Myr_log10_kg_s: '8.7'
+          locator: {published_page: 17, pdf_page_index: 17, table: '5', record: 'Mdot_U; eta_EUV=10^-1; L row'}
+    - observation_id: jaggi_2021_model_chain_and_run_conditions
+      type: model_conditions
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        section: 2.1 Overview and 2.2 Cooling of the magma ocean
+        note: Computational model scope; no physical bench or run is reported.
+      units: as printed
+      values:
+        quantity: model_chain_and_global_conditions
+        method_class: model_derived
+        derivation: Printed model definitions and global conditions; no values inferred from absent apparatus data.
+        model_chain:
+        - {name: SPIDER, role: coupled interior-atmosphere cooling, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
+        - {name: VapoRock, role: equilibrium partial pressures of metal-bearing gas species, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
+        - {name: VULCAN, role: atmospheric equilibrium chemistry versus altitude, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
+        - {name: DISHOOM, role: atmospheric mass loss, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
+        - {name: E-MC, role: Jeans escape and photoionization particle tracking, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
+        conditions:
+        - {name: surface_temperature_range_K, value_as_printed: '2400-1500', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: surface_temperature_for_atmosphere_outputs_K, value_as_printed: '2000', locator: {published_page: 4, pdf_page_index: 4, section: 2.3}}
+        - {name: oxygen_fugacity, value_as_printed: 'IW-1; one log unit below the iron-wustite buffer', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: H2O_abundance, value_as_printed: '330 ppmw', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: CO2_abundance, value_as_printed: '120 ppmw', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: target_CO2_atmosphere_bar, value_as_printed: '100', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: target_H2O_atmosphere_bar, value_as_printed: '270', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: SiO_opacity_reference_pressure_bar, value_as_printed: '3E-6', locator: {published_page: 3, pdf_page_index: 3, section: 2.2}}
+        - {name: volatile_case_eddy_diffusion_upper_limit_m2_s, value_as_printed: '320', locator: {published_page: 6, pdf_page_index: 6, section: 2.5.1}}
+        - {name: homopause_number_density_m3, value_as_printed: '10^18-10^19', locator: {published_page: 6, pdf_page_index: 6, section: 2.5.1}}
+        - {name: homopause_pressure_bar, value_as_printed: 'about 10^-6', locator: {published_page: 5, pdf_page_index: 5, section: 2.5.1}}
+        - {name: exobase_number_density_m3, value_as_printed: '10^12-10^13', locator: {published_page: 7, pdf_page_index: 7, section: 2.5.2}}
+        - {name: exobase_pressure_bar, value_as_printed: 'about 10^-12', locator: {published_page: 7, pdf_page_index: 7, section: 2.5.2}}
+        - {name: magnetic_pressure_nPa, value_as_printed: '1.7', locator: {published_page: 8, pdf_page_index: 8, section: 2.7}}
+        - {name: magnetic_moment_T_m3, value_as_printed: '2.76E12', locator: {published_page: 8, pdf_page_index: 8, section: 2.7}}
+        - {name: solar_wind_ram_pressure_nPa, value_as_printed: '10-30', locator: {published_page: 8, pdf_page_index: 8, section: 2.7}}
+        - {name: total_plasma_pressure_nPa, value_as_printed: '12-32', locator: {published_page: 8, pdf_page_index: 8, section: 2.7}}
+    - observation_id: jaggi_2021_appendix_a1_standard_parameters
+      type: model_parameters
+      locator: {published_page: 21, pdf_page_index: 21, table: A1, appendix: A}
+      units: as printed in Table A1
+      values:
+        quantity: standard_magma_ocean_model_parameters
+        method_class: model_derived
+        derivation: Printed SPIDER model parameters; Table 1 references remain references, not substituted values.
+        rows:
+        - {parameter: Core heat capacity, value_as_printed: '850', units_as_printed: 'J kg^-1 K^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Core heat capacity'}}
+        - {parameter: Core density, value_as_printed: '7200', units_as_printed: 'kg m^-3', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Core density'}}
+        - {parameter: Core radius, value_as_printed: '2000', units_as_printed: km, locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Core radius'}}
+        - {parameter: Equilibrium temperature T_infinity, value_as_printed: '440', units_as_printed: K, locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Equilibrium temperature'}}
+        - {parameter: Gravity g, value_as_printed: Table 1, units_as_printed: 'm s^-2', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Gravity'}}
+        - {parameter: Planetary radius RP, value_as_printed: Table 1, units_as_printed: km, locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Planetary radius'}}
+        - {parameter: Boundary layer scaling b, value_as_printed: '10^-7', units_as_printed: 'K^-2', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Boundary layer scaling'}}
+        - {parameter: 26Al/Al zero time, value_as_printed: '5.25E-5', units_as_printed: '—', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: '26Al/Al zero time'}}
+        - {parameter: H2 mass absorption (CIA), value_as_printed: '5E-5', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'H2 mass absorption'}}
+        - {parameter: H2 solubility law, value_as_printed: '*', units_as_printed: '—', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'H2 solubility law'}}
+        - {parameter: H2O mass absorption, value_as_printed: '1E-2', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'H2O mass absorption'}}
+        - {parameter: H2O solubility law, value_as_printed: '**', units_as_printed: '—', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'H2O solubility law'}}
+        - {parameter: CO mass absorption, value_as_printed: '1E-5', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'CO mass absorption'}}
+        - {parameter: CO solubility law, value_as_printed: '*', units_as_printed: '—', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'CO solubility law'}}
+        - {parameter: CO2 mass absorption, value_as_printed: '1E-4', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'CO2 mass absorption'}}
+        - {parameter: CO2 solubility law, value_as_printed: '**', units_as_printed: '—', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'CO2 solubility law'}}
+        - {parameter: SiO mass absorption (large), value_as_printed: '1E-3', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'SiO mass absorption large'}}
+        - {parameter: SiO mass absorption (small), value_as_printed: '1E-5', units_as_printed: 'm2 kg^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'SiO mass absorption small'}}
+        - {parameter: Initial surface temp, value_as_printed: '2400', units_as_printed: K, locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Initial surface temp'}}
+        footnotes:
+        - {marker: dagger-dagger, text: Average Al abundance based on EH4 and NSP source (Table 2), locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'footnote dagger-dagger'}}
+        - {marker: '*', text: Lichtenberg et al. (2021), locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'footnote star'}}
+        - {marker: '**', text: Bower et al. (2019), locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'footnote double-star'}}
+    - observation_id: jaggi_2021_appendix_a1_quoted_dagger_parameters
+      type: quoted_parameters
+      locator: {published_page: 21, pdf_page_index: 21, table: A1, appendix: A}
+      units: as printed in Table A1
+      values:
+        quantity: quoted_standard_magma_ocean_parameters
+        method_class: quoted_literature
+        evidence_class: quoted_unattributed
+        quoted_from:
+        - Tosi et al. (2013)
+        - Ruedas (2017)
+        - Bhatia & Sahijpal (2017)
+        - EH4 and NSP source (Table 2)
+        derivation: >-
+          Table A1 dagger and double-dagger values are retained as quoted
+          literature inputs; the Al abundance is the printed average based on
+          the EH4 and NSP source (Table 2); no replacement or recalculation is supplied.
+        rows:
+        - {parameter: Al abundance, value_as_printed: '19500', units_as_printed: ppmw, quoted_from: [EH4 and NSP source (Table 2)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Al abundance; footnote dagger-dagger'}}
+        - {parameter: K abundance, value_as_printed: '403', units_as_printed: ppmw, quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'K abundance; footnote dagger'}}
+        - {parameter: 40K/K present time, value_as_printed: '1.17E-4', units_as_printed: '—', quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: '40K/K present time; footnote dagger'}}
+        - {parameter: Th abundance, value_as_printed: '49', units_as_printed: ppbw, quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Th abundance; footnote dagger'}}
+        - {parameter: 232Th/Th present time, value_as_printed: '1', units_as_printed: '—', quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: '232Th/Th present time; footnote dagger'}}
+        - {parameter: U abundance, value_as_printed: '28', units_as_printed: ppbw, quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'U abundance; footnote dagger'}}
+        - {parameter: 235U/U present time, value_as_printed: '0.007', units_as_printed: '—', quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: '235U/U present time; footnote dagger'}}
+        - {parameter: 238U/U present time, value_as_printed: '0.993', units_as_printed: '—', quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: '238U/U present time; footnote dagger'}}
+        - {parameter: Initial surface temp, value_as_printed: '2400', units_as_printed: K, quoted_from: [Bhatia & Sahijpal (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Initial surface temp; footnote double-dagger'}}
+        footnotes:
+        - {marker: dagger, text: 'Average current estimates for bulk heat source from Tosi et al. (2013) and natural abundances from Ruedas (2017).', quoted_from: [Tosi et al. (2013), Ruedas (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'footnote dagger'}}
+        - {marker: double-dagger, text: 'Similar to maximum temperature estimate of Mercury surface during accretion and differentiation (Bhatia & Sahijpal 2017).', quoted_from: [Bhatia & Sahijpal (2017)], locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'footnote double-dagger'}}
+    - observation_id: jaggi_2021_appendix_b2_vaporock_species
+      type: model_species_inventory
+      locator: {published_page: 21, pdf_page_index: 21, table: B2, appendix: B}
+      units: species identifiers as printed
+      values:
+        quantity: vaporock_species_inventory
+        method_class: compilation_derived
+        evidence_class: compilation_assessed
+        derivation: Printed list of species included in the cited VapoRock model.
+        rows:
+        - {element: Al, species: [Al, AlO, AlO2, Al2, Al2O, Al2O2], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Al row}}
+        - {element: Si, species: [Si, SiO, SiO2, Si2, Si2O2, Si3], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Si row}}
+        - {element: K, species: [K, KO, KO2, K2, K2O], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: K row}}
+        - {element: Na, species: [Na, NaO, Na2, Na2O], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Na row}}
+        - {element: Mg, species: [Mg, MgO, Mg2], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Mg row}}
+        - {element: Ca, species: [Ca, CaO, Ca2], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Ca row}}
+        - {element: Fe, species: [Fe, FeO], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Fe row}}
+        - {element: O, species: [O, O2], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: O row}}
+    - observation_id: jaggi_2021_appendix_c3_vulcan_reactions
+      type: model_reaction_inventory
+      locator: {published_page: 22, pdf_page_index: 22, table: C3, appendix: C}
+      units: reactions as printed; T K and P bar in note
+      values:
+        quantity: modified_vulcan_reaction_inventory
+        method_class: model_derived
+        derivation: >-
+          Printed reactions added to VULCAN; the authors state that the listed
+          network affects speciation between 2000 and 873 K and 11.7 and 10^-7 bar.
+        rows:
+        - {reaction: 'OH + SiO -> SiO2 + H', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 1'}}
+        - {reaction: 'OH + Si -> SiO + H', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 2'}}
+        - {reaction: 'Si + O2 -> SiO + O', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 3'}}
+        - {reaction: 'NaO + O -> Na + O2', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 4'}}
+        - {reaction: 'Na + H2O -> NaOH + H', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 5'}}
+        - {reaction: 'H2O + NaO -> NaOH + OH', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 6'}}
+        - {reaction: 'H2 + NaO -> NaOH + H', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 7'}}
+        - {reaction: 'HCO + Na -> CO + NaH', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 8'}}
+        - {reaction: 'Mg + O2 -> MgO + O', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 9'}}
+        - {reaction: 'H2O + KO -> KOH + OH', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 10'}}
+        - {reaction: 'CO2 + Fe -> CO + FeO', class: two_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: 'row 11'}}
+        - {reaction: 'OH + K + M -> KOH + M', class: three_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: '3-body row 1'}}
+        - {reaction: 'Na + O2 + M -> NaO2 + M', class: three_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: '3-body row 2'}}
+        - {reaction: 'NaOH + M -> OH + Na + M', class: three_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: '3-body row 3'}}
+        - {reaction: 'FeO + H2O + M -> Fe(OH)2 + M', class: three_body, locator: {published_page: 22, pdf_page_index: 22, table: C3, record: '3-body row 4'}}
+        note: The printed note states these reactions affect Si, Mg, Fe, Na and K speciation from T=2000-873 K and P=11.7-10^-7 bar.
+    - observation_id: jaggi_2021_appendix_d4_collision_cross_sections
+      type: model_parameters
+      locator: {published_page: 22, pdf_page_index: 22, table: D4, appendix: D}
+      units: cross section in Angstrom^2 as printed
+      values:
+        quantity: atmospheric_species_collision_cross_sections
+        method_class: quoted_literature
+        evidence_class: quoted_unattributed
+        quoted_from:
+        - Clementi et al. (1967)
+        - Pyykkö & Atsumi (2009a)
+        - Pyykkö & Atsumi (2009b)
+        - Pyykkö et al. (2005)
+        derivation: >-
+          Source-printed cross sections are approximated as circular areas with
+          radius equal to atom or bond length; all bonds are treated as covalent,
+          using Clementi et al. (1967), Pyykkö & Atsumi (2009a,b), and Pyykkö et
+          al. (2005).
+        rows:
+        - {species_left: H, CS_left_A2: '0.88', species_right: CO2, CS_right_A2: '10.3', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'H 0.88; CO2 10.3'}}
+        - {species_left: H2, CS_left_A2: '1.29', species_right: KOH, CS_right_A2: '19.6', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'H2 1.29; KOH 19.6'}}
+        - {species_left: H2O, CS_left_A2: '2.84', species_right: Na, CS_right_A2: '11.3', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'H2O 2.84; Na 11.3'}}
+        - {species_left: O, CS_left_A2: '1.13', species_right: K, CS_right_A2: '18.6', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'O 1.13; K 18.6'}}
+        - {species_left: O2, CS_left_A2: '4.08', species_right: SiO, CS_right_A2: '8.45', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'O2 4.08; SiO 8.45'}}
+        - {species_left: C, CS_left_A2: '1.41', species_right: Mg, CS_right_A2: '6.61', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'C 1.41; Mg 6.61'}}
+        - {species_left: CO, CS_left_A2: '4.01', species_right: Fe, CS_right_A2: '7.65', locator: {published_page: 22, pdf_page_index: 22, table: D4, record: 'CO 4.01; Fe 7.65'}}
+    - observation_id: jaggi_2021_equations_and_derivation
+      type: model_equations
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        section: 2.3-2.7 Methods
+        note: Equations are source-printed governing equations; no coefficients refit.
+      units: as printed in each equation and surrounding text
+      values:
+        quantity: printed_model_governing_equations
+        method_class: model_derived
+        derivation: Source-printed equations transcribed verbatim in symbolic form; no arithmetic values computed here.
+        equations:
+        - {number: 1, expression: 'M^(x+n) O_((x+n)/2)(l) = M^x O_(x/2)(g) + (n/4) O2(g)', locator: {published_page: 4, pdf_page_index: 4, equation: '1'}}
+        - {number: 2, expression: 'p(M^x O_(x/2)) = K_(1) X(M^(x+n) O_((x+n)/2)) gamma(M^(x+n) O_((x+n)/2)) / (fO2)^(n/4)', locator: {published_page: 4, pdf_page_index: 4, equation: '2'}}
+        - {number: 3, expression: 'log fO2(IW) = 2[-244118 + 115.559 T - 8.474 T ln(T)]/[ln(10) R T]', locator: {published_page: 4, pdf_page_index: 4, equation: '3'}}
+        - {number: 4, expression: 'D_ik = [3 sqrt(kB Tskin)/(8 nhom sigma_ik^2 Omega_ik)] sqrt[(1/(2 pi))((mi+mk)/(mi mk))]', locator: {published_page: 5, pdf_page_index: 5, equation: '4'}}
+        - {number: 5, expression: 'Mdot_diff,i = -D_ik (Delta n_exo-hom / Delta z_exo-hom) mi (ni/nhom) A_hom', locator: {published_page: 6, pdf_page_index: 6, equation: '5'}}
+        - {number: 6, expression: 'ni,exo = 1/(Hi sigma_i) = mi g(h)/(kB Tskin sigma_i)', locator: {published_page: 6, pdf_page_index: 6, equation: '6'}}
+        - {number: 7, expression: 'Tskin = [epsilon (Tsurf^4 - Tinfinity^4)/2 + Tinfinity^4]^(1/4)', locator: {published_page: 7, pdf_page_index: 7, equation: '7'}}
+        - {number: 8, expression: 'LEUV = (4.7E25) t^(-1.18)', locator: {published_page: 7, pdf_page_index: 7, equation: '8'}}
+        - {number: 9, expression: 'Mdot_ion = sum_i psi_i^source xi_i mi A_exo', locator: {published_page: 7, pdf_page_index: 7, equation: '9'}}
+        - {number: 10, expression: 'Mdot_U = eta_EUV LEUV 2 pi z_abs^2 / U_env', locator: {published_page: 8, pdf_page_index: 8, equation: '10'}}
+        - {number: 11, expression: 'Mdot_P,i = (xi / Mdot_i,Io) P_hat U_hat v_hat_ion (h_hat_exo)^2', locator: {published_page: 8, pdf_page_index: 8, equation: '11'}}
+        - {number: 12, expression: 'Mdot_evap,i = Mi dni/dt = -4 pi RP^2 Mi (gamma_ev Pi,eq - gamma_en Pi,s)/sqrt(2 pi Mi R T)', locator: {published_page: 8, pdf_page_index: 8, equation: '12'}}
+        - {number: 13, expression: 'dM/dR = 4 pi RP^2 rho_mantle', locator: {published_page: 11, pdf_page_index: 11, equation: '13'}}
+    - observation_id: jaggi_2021_figure1_digitized_cooling_points
+      type: figure_series
+      locator: {published_page: 9, pdf_page_index: 9, figure: '1', section: 3.1.1-3.1.2}
+      units: years and K as plotted; values approximate
+      values:
+        quantity: surface_temperature_cooling_curve
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Approximate values read from the plotted curves; the source does not tabulate these coordinates.
+        digitized: true
+        series:
+        - {time_years: '10^1', LV_surface_temperature_K: '~2400', SV_surface_temperature_K: '~2400', locator: {published_page: 9, pdf_page_index: 9, figure: '1', record: '10^1 years; LV and SV curves'}}
+        - {time_years: '10^2', LV_surface_temperature_K: '~2380', SV_surface_temperature_K: '~2350', locator: {published_page: 9, pdf_page_index: 9, figure: '1', record: '10^2 years; LV and SV curves'}}
+        - {time_years: '10^3', LV_surface_temperature_K: '~2150', SV_surface_temperature_K: '~1950', locator: {published_page: 9, pdf_page_index: 9, figure: '1', record: '10^3 years; LV and SV curves'}}
+        - {time_years: '10^4', LV_surface_temperature_K: '~1500', SV_surface_temperature_K: '—', locator: {published_page: 9, pdf_page_index: 9, figure: '1', record: '10^4 years; LV curve; SV curve not present'}}
+    - observation_id: jaggi_2021_figure2_vapor_pressure_plots
+      type: figure_plots
+      locator: {published_page: 10, pdf_page_index: 10, figure: '2', section: 3.1.1}
+      units: bar and K as plotted
+      values:
+        quantity: oxide_partial_vapor_pressure_curves
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Plotted curves retained as qualitative evidence; no coordinates digitized.
+        digitized: false
+        panels: [CB, EH4, NSP source, NSP melt]
+        species_plotted: [SiO, Na, Fe, Mg, K, O, AlO, Ca]
+        surface_temperature_range_K: '1500-2500'
+    - observation_id: jaggi_2021_figure3_homopause_plots
+      type: figure_plots
+      locator: {published_page: 11, pdf_page_index: 11, figure: '3', section: 3.1.1}
+      units: km and years as plotted
+      values:
+        quantity: sodium_homopause_altitude_curves
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Plotted curves retained as qualitative evidence; no coordinates digitized.
+        digitized: false
+        panels: [CB, NSP melt]
+        cases: [SN5, SN3, LN5, LN3]
+        caption_condition: Lines terminate when surface temperature reaches 1500 K.
+    - observation_id: jaggi_2021_figure4_atmosphere_composition
+      type: figure_gas_speciation
+      locator: {published_page: 12, pdf_page_index: 12, figure: '4', section: 3.1.2}
+      phase: gas
+      units: pressure ratio and mixing ratio as plotted; surface pressure bar in caption
+      values:
+        quantity: volatile_atmosphere_speciation
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Caption values are printed; plotted mixing-ratio curves were not digitized.
+        digitized: false
+        surface_temperature_K: '2000'
+        surface_pressure_SV_bar: '5.0'
+        surface_pressure_LV_bar: '12.1'
+        composition: NSP melt
+        panels: [SV, LV]
+        species_plotted: [H, H2, OH, H2O, O, CH4, CO, CO2, SiO, Na, NaOH, NaH, K, KOH, Fe(OH)2]
+    - observation_id: jaggi_2021_figure5_photoevaporation_integrated_loss
+      type: figure_mass_loss
+      locator: {published_page: 13, pdf_page_index: 13, figure: '5', section: 3.2 Atmospheric loss}
+      phase: gas
+      units: kg and km as plotted; values from caption are approximate
+      values:
+        quantity: integrated_photoevaporation_loss
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: >-
+          Caption conditions and endpoint range are printed; shaded curves and
+          uncertainty bands were not digitized.
+        digitized: false
+        surface_temperature_range_K: '2400-1500'
+        cases: [LV, LN3, LN5]
+        maximum_crust_loss_km: '2.3'
+        minimum_crust_loss: '16 cm'
+        mantle_density_g_cm3: '3.5'
+    - observation_id: jaggi_2021_figure6_nonvolatile_loss_fluxes
+      type: figure_rate_series
+      locator: {published_page: 14, pdf_page_index: 14, figure: '6', section: 3.2.1}
+      phase: gas
+      units: kg/s as printed in prose and plotted
+      values:
+        quantity: exobase_mass_loss_rate
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: >-
+          Exact endpoint values are retained from the printed results prose;
+          intermediate plotted points were not digitized.
+        digitized: false
+        figure_condition: small Mercury N3 cases; Tsurf 2400-1550 K; CB and NSPm
+        printed_prose_points:
+        - {species: SiO, case: CB, Tsurf_K: '2400', loss_kg_s: '9.6E5', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'SiO CB at 2400 K'}}
+        - {species: SiO, case: CB, Tsurf_K: '1500', loss_kg_s: '9.4E2', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'SiO CB at 1500 K'}}
+        - {species: Na, case: CB, Tsurf_K: '2400', loss_kg_s: '2.0E5', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'Na CB at 2400 K'}}
+        - {species: Na, case: CB, Tsurf_K: '1500', loss_kg_s: '3.2E5', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'Na CB at 1500 K'}}
+        - {species: K, case: CB, Tsurf_K: '2400', loss_kg_s: '3.1E3', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'K CB at 2400 K'}}
+        - {species: K, case: CB, Tsurf_K: '1500', loss_kg_s: '4.2E3', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'K CB at 1500 K'}}
+        - {species: Na, case: NSP melt, Tsurf_K: '2400', loss_kg_s: '5.9E5', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'Na NSP melt at 2400 K'}}
+        - {species: Na, case: NSP melt, Tsurf_K: '1500', loss_kg_s: '3.9E5', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'Na NSP melt at 1500 K'}}
+        - {species: K, case: NSP melt, Tsurf_K: '2400', loss_kg_s: '1.2E4', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'K NSP melt at 2400 K'}}
+        - {species: K, case: NSP melt, Tsurf_K: '1500', loss_kg_s: '4.3E3', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'K NSP melt at 1500 K'}}
+        - {name: Na_to_K_rate_ratio, value_as_printed: 'about 100', locator: {published_page: 13, pdf_page_index: 13, figure: '6', section: 3.2.1, record: 'Na/K diffusion-rate ratio'}}
+    - observation_id: jaggi_2021_figure7_integrated_photoionization_loss
+      type: figure_mass_loss
+      locator: {published_page: 15, pdf_page_index: 15, figure: '7', section: 3.2.1}
+      phase: gas
+      units: kg as printed in prose and plotted
+      values:
+        quantity: integrated_photoionization_loss
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Printed prose values and caption conditions retained; curves were not digitized.
+        digitized: false
+        surface_temperature_range_K: '2400-1500'
+        condensation_temperature_SiO_K: '1900'
+        printed_prose_points:
+        - {case: SV, total_photoionization_loss_kg: '4.1E16', locator: {published_page: 14, pdf_page_index: 14, figure: '7', section: 3.2.1, record: 'small volatile total'}}
+        - {case: LV, total_photoionization_loss_kg: '1.8E17', locator: {published_page: 14, pdf_page_index: 14, figure: '7', section: 3.2.1, record: 'large volatile total'}}
+        - {case: volatile_Na, total_photoionization_loss_kg: 'about 1E12', locator: {published_page: 14, pdf_page_index: 14, figure: '7', section: 3.2.1, record: 'volatile Na contribution'}}
+        - {case: nonvolatile_small, total_photoionization_loss_kg: '<=3.0E16', locator: {published_page: 15, pdf_page_index: 15, figure: '7', section: 4.1, record: 'small non-volatile total'}}
+    - observation_id: jaggi_2021_figure8_escape_layer_schematic
+      type: figure_escape_schematic
+      locator: {published_page: 16, pdf_page_index: 16, figure: '8', section: 4.1}
+      phase: gas
+      units: kg/s and RP multiples as printed in schematic
+      values:
+        quantity: atmospheric_escape_layer_rates_and_altitudes
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Printed schematic labels transcribed; arrows and unlabeled geometry not digitized.
+        digitized: false
+        labels:
+        - {name: Mdot_P, value_as_printed: '10^3 kg/s', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'plasma heating label'}}
+        - {name: Mdot_ion, value_as_printed: '10^5 kg/s', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'photo-ionization label'}}
+        - {name: Mdot_U, value_as_printed: '>10^6 kg/s', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'photo-evaporation label'}}
+        - {name: Mdot_diff, value_as_printed: '10^5 kg/s', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'homopause diffusion label'}}
+        - {name: z_exo, value_as_printed: '>1.80 RP', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'exobase altitude label'}}
+        - {name: z_hom, value_as_printed: '>1.66 RP', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'homopause altitude label'}}
+        - {name: z_abs, value_as_printed: '1.25 RP', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'absorption altitude label'}}
+        - {name: H_level, value_as_printed: '1.05 RP', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'H level label'}}
+    - observation_id: jaggi_2021_figure_e1_pressure_temperature_profile
+      type: figure_plots
+      locator: {published_page: 22, pdf_page_index: 22, figure: E1, appendix: E}
+      units: pressure/surface pressure and K as plotted
+      values:
+        quantity: atmospheric_pressure_temperature_profiles
+        method_class: figure_only
+        evidence_class: figure_only
+        derivation: Plotted P-T curves retained as qualitative evidence; no coordinates digitized.
+        digitized: false
+        surface_temperature_for_profiles_K: '2000'
+        profiles: [SV, LV, S/LN3, S/LN5]
+        omitted_profiles: [LN3, LN5]
+    - observation_id: jaggi_2021_reported_model_results
+      type: model_results
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+        section: 3 Results
+        note: Selected printed model-result statements outside tables; each item has its own page/section locator.
+      units: as printed per item
+      values:
+        quantity: printed_model_result_statements
+        method_class: model_derived
+        derivation: Selected numerical results transcribed from printed prose; no values inferred or back-calculated.
+        results:
+        - {name: surface_cooling_time_range_years, value_as_printed: '400-9000', locator: {published_page: 8, pdf_page_index: 8, section: 3.1}}
+        - {name: N5_minimum_cooling_time_years, value_as_printed: '470', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: N3_minimum_cooling_time_years, value_as_printed: 'about 1000', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: SV_cooling_time_years, value_as_printed: '3400', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.2}}
+        - {name: LV_cooling_time_years, value_as_printed: '8900', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.2}}
+        - {name: volatile_surface_pressure_at_2000K_bar, value_as_printed: 'about 5 and 12', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.2}}
+        - {name: nonvolatile_surface_pressure_at_2400K_bar, value_as_printed: '<0.1', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: nonvolatile_gaseous_fraction_at_2400K_pct, value_as_printed: '>99.8', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: NSP_melt_total_surface_pressure_at_2400K_bar, value_as_printed: '6.16E-2', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: NSP_melt_total_surface_pressure_at_1500K_bar, value_as_printed: '8.52E-6', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: CB_homopause_at_2400K_km, value_as_printed: '685', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: NSP_melt_homopause_at_2400K_km, value_as_printed: 'about 1258', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: CB_homopause_at_1500K_km, value_as_printed: '83', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: NSP_melt_homopause_at_1500K_km, value_as_printed: '439', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
+        - {name: volatile_case_surface_pressure_SV_bar, value_as_printed: 'about 5', locator: {published_page: 10, pdf_page_index: 10, section: 3.1.2, figure: '4'}}
+        - {name: volatile_case_surface_pressure_LV_bar, value_as_printed: 'about 12', locator: {published_page: 10, pdf_page_index: 10, section: 3.1.2, figure: '4'}}
+        - {name: exobase_level_small_max_km, value_as_printed: '2910', locator: {published_page: 11, pdf_page_index: 11, section: 3.1.2}}
+        - {name: exobase_level_large_max_km, value_as_printed: '2590', locator: {published_page: 11, pdf_page_index: 11, section: 3.1.2}}
+        - {name: homopause_level_small_min_km, value_as_printed: '2360', locator: {published_page: 11, pdf_page_index: 11, section: 3.1.2}}
+        - {name: homopause_level_large_min_km, value_as_printed: '2160', locator: {published_page: 11, pdf_page_index: 11, section: 3.1.2}}
+        - {name: photoevaporation_lower_limit_log10_kg_s, value_as_printed: '10^6.6', locator: {published_page: 11, pdf_page_index: 11, section: 3.2}}
+        - {name: photoevaporation_upper_limit_log10_kg_s, value_as_printed: '10^9.6', locator: {published_page: 11, pdf_page_index: 11, section: 3.2}}
+        - {name: high_efficiency_evaporation_limited_temperature_K, value_as_printed: '1600', locator: {published_page: 11, pdf_page_index: 11, section: 3.2}}
+        - {name: low_efficiency_surface_to_equilibrium_pressure_ratio, value_as_printed: '>0.93', locator: {published_page: 11, pdf_page_index: 11, section: 3.2}}
+        - {name: volatile_primary_species_diffusion_loss_range_kg_s, value_as_printed: '10^4-10^5', locator: {published_page: 13, pdf_page_index: 13, section: 3.2.2}}
+        - {name: early_Na_atmosphere_mass_kg, value_as_printed: 'about 10^11', locator: {published_page: 16, pdf_page_index: 16, section: 4.1.1}}
+        - {name: Na_layer_CB_thickness, value_as_printed: '<1 mm', locator: {published_page: 17, pdf_page_index: 17, section: 4.1.1}}
+        - {name: meteorite_impact_removed_crust_range_m, value_as_printed: '50 m-10 km', locator: {published_page: 17, pdf_page_index: 17, section: 4.1.1}}
+        - {name: Na_increase_50m_layer_small, value_as_printed: 'about 1 ppm', locator: {published_page: 17, pdf_page_index: 17, section: 4.1.1}}
+        - {name: Na_increase_50m_layer_large, value_as_printed: 'about 10 ppb', locator: {published_page: 17, pdf_page_index: 17, section: 4.1.1}}
+        - {name: CCS_sensitivity_loss_change_pct, value_as_printed: '<=2', locator: {published_page: 18, pdf_page_index: 18, section: 4.2}}
+        - {name: increased_skin_temperature_K, value_as_printed: '3800', locator: {published_page: 18, pdf_page_index: 18, section: 4.2}}
+        - {name: increased_skin_temperature_loss_factor, value_as_printed: 'about 2', locator: {published_page: 18, pdf_page_index: 18, section: 4.2}}
+        - {name: H_He_envelope_fraction, value_as_printed: '1%', locator: {published_page: 19, pdf_page_index: 19, section: 4.3}}
+        - {name: H_He_dissipation_time_years, value_as_printed: '10^4.4', locator: {published_page: 19, pdf_page_index: 19, section: 4.3}}
+        - {name: high_efficiency_crust_loss_km, value_as_printed: '2.3', locator: {published_page: 20, pdf_page_index: 20, section: 4.1}}
+        - {name: high_efficiency_crust_loss_fraction_pct, value_as_printed: '0.3', locator: {published_page: 20, pdf_page_index: 20, section: 4.1}}
+        - {name: integrated_Na_or_H2O_loss_fraction_pct, value_as_printed: '<=0.02', locator: {published_page: 20, pdf_page_index: 20, section: 4.1}}
+        - {name: integrated_Na_composition_difference_wt_pct, value_as_printed: '3E-4', locator: {published_page: 20, pdf_page_index: 20, section: 4.1}}
     - observation_id: jaggi_2021_messenger_na_quote
       type: quoted_comparator
       locator:
+        published_page: 2
         pdf_page_index: 2
         section: 1. Introduction
       units: wt% Na as printed
@@ -264,3 +940,39 @@ species:
         as_printed: element Na (3-5 wt%) is detected on Mercury's surface
         note: MESSENGER observation cited in introduction; not a measurement of this paper. Retained as
           unscored context.
+    - observation_id: jaggi_2021_refused_unmapped_or_undigitized_evidence
+      type: refusal
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        figure: '2, 3, 4, 5, 6, 7, E1'
+        note: Figure coordinate data not tabulated in the source.
+      units: as printed
+      values:
+        quantity: extraction_refusals
+        method_class: method_only
+        refused:
+        - item: Figure 2 plotted oxide vapor-pressure curves
+          reason: Intermediate curve coordinates are not printed; no exact digitization was retained.
+          locator: {published_page: 10, pdf_page_index: 10, figure: '2'}
+        - item: Figure 3 plotted homopause-altitude curves
+          reason: Intermediate curve coordinates are not printed; only caption/prose endpoints were retained.
+          locator: {published_page: 11, pdf_page_index: 11, figure: '3'}
+        - item: Figure 4 plotted atmospheric mixing-ratio curves
+          reason: Intermediate curve coordinates are not printed; caption conditions were retained.
+          locator: {published_page: 12, pdf_page_index: 12, figure: '4'}
+        - item: Figure 5 shaded integrated-loss curves
+          reason: Curve coordinates and uncertainty-band boundaries are not tabulated; caption endpoints were retained.
+          locator: {published_page: 13, pdf_page_index: 13, figure: '5'}
+        - item: Figure 6 intermediate loss-flux points
+          reason: Exact plotted coordinates are not printed; endpoint values in prose were retained.
+          locator: {published_page: 14, pdf_page_index: 14, figure: '6'}
+        - item: Figure 7 integrated photoionization curves
+          reason: Exact plotted coordinates are not printed; printed prose totals and caption conditions were retained.
+          locator: {published_page: 15, pdf_page_index: 15, figure: '7'}
+        - item: Figure E1 plotted atmospheric P-T curves
+          reason: Exact curve coordinates are not printed; profile names and surface temperature were retained.
+          locator: {published_page: 22, pdf_page_index: 22, figure: E1}
+        - item: bench and experiment registries
+          reason: This source reports computational models and no physical laboratory apparatus or run registry.
+          locator: {published_page: 2, pdf_page_index: 2, section: 2.1}
