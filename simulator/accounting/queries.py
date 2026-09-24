@@ -234,10 +234,10 @@ class AccountingQueries:
             return empty_thermal_train_report("no_run_history")
 
         hot_series: list[dict[str, float]] = []
-        oxygen_series: list[float] = []
+        oxygen_series: list[float | None] = []
         temperature_series: list[float] = []
         saturation_series: list[float] = []
-        vented_series: list[float] = []
+        vented_series: list[float | None] = []
         overhead_state_series: list[dict[str, Any]] = []
         unmeasured_hours: list[dict[str, Any]] = []
         for snapshot in snapshots:
@@ -257,6 +257,7 @@ class AccountingQueries:
                     "field": "melt_offgas_O2_mol_hr",
                     "reason": "missing-melt-offgas-o2-flow",
                 })
+                oxygen_series.append(None)
             else:
                 oxygen_series.append(float(raw_oxygen))
             temperature_series.append(float(getattr(snapshot, "temperature_C", 0.0)) + 273.15)
@@ -269,6 +270,7 @@ class AccountingQueries:
                     "field": "O2_vented_kg_hr",
                     "reason": "missing-o2-vented-flow",
                 })
+                vented_series.append(None)
             else:
                 vented_series.append(float(raw_vented))
             upstream_partials_mbar = dict(
@@ -300,8 +302,8 @@ class AccountingQueries:
         return _annotate_thermal_train_unmeasured_hours(
             report,
             unmeasured_hours,
-            oxygen_measured=bool(oxygen_series),
-            vented_measured=bool(vented_series),
+            oxygen_measured=any(value is not None for value in oxygen_series),
+            vented_measured=any(value is not None for value in vented_series),
         )
 
     def product_ledger(self) -> dict[str, float]:

@@ -607,6 +607,18 @@ def test_thermal_train_report_marks_absent_melt_offgas_o2_rate_unmeasured() -> N
     assert report["peaks"]["cold_o2_mol_hr"] is None
     assert report["peaks"]["cold_o2_kg_hr"] is None
     assert report["peaks"]["cold_o2_status"] == "unmeasured"
+    assert report["sections"]["o2_passive_radiator_night"]["status"] == "unmeasured"
+    assert report["sections"]["o2_passive_radiator_night"]["area_m2"] is None
+    assert report["sections"]["o2_passive_radiator_day"]["area_m2"] is None
+    assert report["capacity"]["captured_batch_kg"] is None
+    assert report["capacity"]["capture_shortfall_kg"] is None
+    assert report["capacity"]["thermal_train_overflow_kg_hr"] is None
+    assert report["capacity"]["capture_status"] == {
+        "status": "unmeasured",
+        "reason": "missing-melt-offgas-o2-flow",
+    }
+    assert report["sections"]["cavern_regeneration"]["status"] == "unmeasured"
+    assert report["display_costs"]["status"] == "unmeasured"
     assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.5
     assert report["observed_upstream_state"]["O2_vented_peak_status"] == "complete"
 
@@ -626,6 +638,20 @@ def test_thermal_train_report_does_not_publish_understated_o2_peak() -> None:
     }]
     assert report["peaks"]["cold_o2_mol_hr"] is None
     assert report["peaks"]["cold_o2_status"] == "partial_unmeasured_hours"
+    assert report["sections"]["o2_passive_radiator_night"]["status"] == (
+        "partial_unmeasured_hours"
+    )
+    assert report["sections"]["o2_passive_radiator_night"]["area_m2"] is None
+    assert report["capacity"]["captured_batch_kg"] is None
+    assert report["capacity"]["capture_shortfall_kg"] is None
+    assert report["capacity"]["thermal_train_overflow_kg_hr"] is None
+    assert report["capacity"]["capture_status"]["status"] == (
+        "partial_unmeasured_hours"
+    )
+    assert report["sections"]["cavern_regeneration"]["status"] == (
+        "partial_unmeasured_hours"
+    )
+    assert report["display_costs"]["status"] == "partial_unmeasured_hours"
 
 
 def test_thermal_train_report_explicit_zero_o2_rates_are_proven_zeros() -> None:
@@ -647,6 +673,9 @@ def test_thermal_train_report_explicit_zero_o2_rates_are_proven_zeros() -> None:
     assert report["peaks"]["cold_o2_status"] == "complete"
     assert report["observed_upstream_state"]["O2_vented_peak_kg_hr"] == 0.0
     assert report["observed_upstream_state"]["O2_vented_peak_status"] == "complete"
+    assert report["sections"]["o2_passive_radiator_night"]["status"] == "sized"
+    assert report["sections"]["o2_passive_radiator_night"]["area_m2"] == 0.0
+    assert report["capacity"]["captured_batch_kg"] == 0.0
 
 
 def test_thermal_train_report_explicit_positive_o2_rates_still_size() -> None:

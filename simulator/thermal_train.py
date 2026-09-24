@@ -1383,12 +1383,12 @@ def _knudsen_report(
 
 def report_from_recorded_series(
     hot_species_kg_hr_series: Sequence[Mapping[str, float]],
-    oxygen_mol_hr_series: Sequence[float],
+    oxygen_mol_hr_series: Sequence[float | None],
     temperature_K_series: Sequence[float],
     *,
     setpoints: Mapping[str, Any],
     observed_transport_saturation_pct: Sequence[float] = (),
-    observed_o2_vented_kg_hr: Sequence[float] = (),
+    observed_o2_vented_kg_hr: Sequence[float | None] = (),
     overhead_state_series: Sequence[Mapping[str, Any]] = (),
     parameters: ThermalTrainParameters | None = None,
     expected_refractory_trace_species: Sequence[str] = (),
@@ -1599,19 +1599,41 @@ def report_from_recorded_series(
         excluded[species]["heat_load_W"] = sensible + latent
 
     oxygen_molar_rates = [
-        _finite_nonnegative(value, "melt-offgas O2 mol/hr") / SECONDS_PER_HOUR
+        None
+        if value is None
+        else _finite_nonnegative(value, "melt-offgas O2 mol/hr") / SECONDS_PER_HOUR
         for value in oxygen_mol_hr_series
     ]
-    peak_o2_mol_s = max(oxygen_molar_rates, default=0.0)
-    peak_o2_mol_hr = peak_o2_mol_s * SECONDS_PER_HOUR
-    peak_o2_kg_hr = molar_rate_mol_s_to_mass_rate_kg_hr("O2", peak_o2_mol_s)
+    measured_oxygen_molar_rates = [
+        value for value in oxygen_molar_rates if value is not None
+    ]
+    oxygen_unmeasured = any(value is None for value in oxygen_molar_rates)
+    oxygen_status = (
+        "unmeasured"
+        if oxygen_unmeasured and not measured_oxygen_molar_rates
+        else "partial_unmeasured_hours"
+        if oxygen_unmeasured
+        else "complete"
+    )
+    if oxygen_unmeasured:
+        peak_o2_mol_s = None
+        peak_o2_mol_hr = None
+        peak_o2_kg_hr = None
+    else:
+        peak_o2_mol_s = max(measured_oxygen_molar_rates, default=0.0)
+        peak_o2_mol_hr = peak_o2_mol_s * SECONDS_PER_HOUR
+        peak_o2_kg_hr = molar_rate_mol_s_to_mass_rate_kg_hr("O2", peak_o2_mol_s)
     # Melt-offgas O2 is added to the S-A species vector only when the recorded
     # inlet exceeds HOT_RADIATOR_SPLIT_K.  That branch charges O2 as sensible
     # load on S-A and does not invent an O2 condensation crossing.  S-B inlet
     # is assigned separately below as max(HOT_RADIATOR_SPLIT_K, T_floor_K)
     # even when this S-A O2 term is skipped.
     hot_section_species = dict(hot_species)
-    if peak_o2_mol_s > 0.0 and inlet_temperature > HOT_RADIATOR_SPLIT_K:
+    if (
+        peak_o2_mol_s is not None
+        and peak_o2_mol_s > 0.0
+        and inlet_temperature > HOT_RADIATOR_SPLIT_K
+    ):
         hot_section_species["O2"] = hot_section_species.get("O2", 0.0) + peak_o2_mol_s
     hot_section = segmented_radiator_area_m2(
         hot_section_species,
@@ -1640,32 +1662,46 @@ def report_from_recorded_series(
     # not above the split, S-A did not take that O2 load; S-B still starts
     # at this split datum.
     o2_inlet_K = max(HOT_RADIATOR_SPLIT_K, params.T_floor_K)
-    o2_night = segmented_radiator_area_m2(
-        {"O2": peak_o2_mol_s},
-        temperature_in_K=o2_inlet_K,
-        temperature_out_K=params.T_floor_K,
-        sink_temperature_K=params.T_sink_night_K,
-        emissivity=params.emissivity,
-        segment_K=params.dT_segment_K,
-        sink_margin_K=params.dT_segment_K,
-    ) if peak_o2_mol_s > 0.0 and o2_inlet_K > params.T_floor_K else _zero_radiator_section()
-    o2_day = segmented_radiator_area_m2(
-        {"O2": peak_o2_mol_s},
-        temperature_in_K=o2_inlet_K,
-        temperature_out_K=params.T_floor_K,
-        sink_temperature_K=params.T_sink_day_K,
-        emissivity=params.emissivity,
-        segment_K=params.dT_segment_K,
-        sink_margin_K=params.dT_segment_K,
-    ) if peak_o2_mol_s > 0.0 and o2_inlet_K > params.T_floor_K else {
-        **_zero_radiator_section(),
-        "status": "passive_refused",
-        "reason": "target_not_above_effective_sink_margin",
-    }
-    o2_night["inlet_temperature_K"] = o2_inlet_K
-    o2_night["inlet_basis"] = "post_separator_S_B"
-    o2_day["inlet_temperature_K"] = o2_inlet_K
-    o2_day["inlet_basis"] = "post_separator_S_B"
+    if oxygen_unmeasured:
+        o2_night = _unmeasured_radiator_section(
+            oxygen_status,
+            reason="missing-melt-offgas-o2-flow",
+            inlet_temperature_K=o2_inlet_K,
+            inlet_basis="post_separator_S_B",
+        )
+        o2_day = _unmeasured_radiator_section(
+            oxygen_status,
+            reason="missing-melt-offgas-o2-flow",
+            inlet_temperature_K=o2_inlet_K,
+            inlet_basis="post_separator_S_B",
+        )
+    else:
+        o2_night = segmented_radiator_area_m2(
+            {"O2": peak_o2_mol_s},
+            temperature_in_K=o2_inlet_K,
+            temperature_out_K=params.T_floor_K,
+            sink_temperature_K=params.T_sink_night_K,
+            emissivity=params.emissivity,
+            segment_K=params.dT_segment_K,
+            sink_margin_K=params.dT_segment_K,
+        ) if peak_o2_mol_s > 0.0 and o2_inlet_K > params.T_floor_K else _zero_radiator_section()
+        o2_day = segmented_radiator_area_m2(
+            {"O2": peak_o2_mol_s},
+            temperature_in_K=o2_inlet_K,
+            temperature_out_K=params.T_floor_K,
+            sink_temperature_K=params.T_sink_day_K,
+            emissivity=params.emissivity,
+            segment_K=params.dT_segment_K,
+            sink_margin_K=params.dT_segment_K,
+        ) if peak_o2_mol_s > 0.0 and o2_inlet_K > params.T_floor_K else {
+            **_zero_radiator_section(),
+            "status": "passive_refused",
+            "reason": "target_not_above_effective_sink_margin",
+        }
+        o2_night["inlet_temperature_K"] = o2_inlet_K
+        o2_night["inlet_basis"] = "post_separator_S_B"
+        o2_day["inlet_temperature_K"] = o2_inlet_K
+        o2_day["inlet_basis"] = "post_separator_S_B"
     capacity_result = capacity_from_hardware(params.cold_train)
     if isinstance(capacity_result, FiniteCapacity) and params.cold_train is not None:
         capacity_kg_hr = capacity_result.value_kg_hr
@@ -1718,40 +1754,59 @@ def report_from_recorded_series(
     reject_radiator = _isothermal_radiator(
         cryo["reject_load_W"], params.T_reject_K, params.T_sink_night_K, params.emissivity
     )
-    # One HourSnapshot represents one elapsed hour, so summing mol/hr rows
-    # gives batch mol and snapshot_count is the report's run-hours basis.
-    batch_o2_mol = sum(oxygen_molar_rates) * SECONDS_PER_HOUR
     deposition_gate = oxygen_deposition_gate(params.P_discharge_Pa, params.T_frost_K)
-    if deposition_gate["frost_forms"]:
-        captured_batch_mol = min(
-            batch_o2_mol * params.frost_sticking_fraction,
-            params.cavern_capacity_kg / OXYGEN_MOLAR_MASS_KG_PER_MOL,
-        )
-        cavern = cavern_regeneration_energy_J(
-            captured_batch_mol,
-            storage_temperature_K=params.T_storage_K,
-            cavern_thermal_mass_J_per_K=params.cavern_thermal_mass_J_per_K,
-            segment_K=params.dT_segment_K,
-        )
-        capture_status = (
-            {"status": "captured", "reason": None}
-            if captured_batch_mol > 0.0
-            else {"status": "not_captured", "reason": "no_oxygen_captured"}
-        )
-    else:
-        captured_batch_mol = 0.0
+    if oxygen_unmeasured:
+        batch_o2_mol = None
+        captured_batch_mol = None
+        captured_batch_kg = None
         cavern = {
-            "status": "not_invoked",
-            "reason": "deposition_gate_not_met",
-            "oxygen_sensible_J": 0.0,
-            "oxygen_fusion_J": 0.0,
-            "cavern_walls_J": 0.0,
-            "total_J": 0.0,
+            "status": oxygen_status,
+            "reason": "missing-melt-offgas-o2-flow",
+            "oxygen_sensible_J": None,
+            "oxygen_fusion_J": None,
+            "cavern_walls_J": None,
+            "total_J": None,
             "integration_segment_K": params.dT_segment_K,
         }
-        capture_status = {"status": "refused", "reason": "deposition_gate_not_met"}
-    captured_batch_kg = captured_batch_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
-    overflow = thermal_train_overflow_kg_hr(peak_o2_kg_hr, capacity_kg_hr)
+        capture_status = {
+            "status": oxygen_status,
+            "reason": "missing-melt-offgas-o2-flow",
+        }
+        overflow = None
+    else:
+        # One HourSnapshot represents one elapsed hour, so summing mol/hr rows
+        # gives batch mol and snapshot_count is the report's run-hours basis.
+        batch_o2_mol = sum(measured_oxygen_molar_rates) * SECONDS_PER_HOUR
+        if deposition_gate["frost_forms"]:
+            captured_batch_mol = min(
+                batch_o2_mol * params.frost_sticking_fraction,
+                params.cavern_capacity_kg / OXYGEN_MOLAR_MASS_KG_PER_MOL,
+            )
+            cavern = cavern_regeneration_energy_J(
+                captured_batch_mol,
+                storage_temperature_K=params.T_storage_K,
+                cavern_thermal_mass_J_per_K=params.cavern_thermal_mass_J_per_K,
+                segment_K=params.dT_segment_K,
+            )
+            capture_status = (
+                {"status": "captured", "reason": None}
+                if captured_batch_mol > 0.0
+                else {"status": "not_captured", "reason": "no_oxygen_captured"}
+            )
+        else:
+            captured_batch_mol = 0.0
+            cavern = {
+                "status": "not_invoked",
+                "reason": "deposition_gate_not_met",
+                "oxygen_sensible_J": 0.0,
+                "oxygen_fusion_J": 0.0,
+                "cavern_walls_J": 0.0,
+                "total_J": 0.0,
+                "integration_segment_K": params.dT_segment_K,
+            }
+            capture_status = {"status": "refused", "reason": "deposition_gate_not_met"}
+        captured_batch_kg = captured_batch_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        overflow = thermal_train_overflow_kg_hr(peak_o2_kg_hr, capacity_kg_hr)
     # Midpoint of T_floor and T_reject is the wall temperature passed to
     # _isothermal_radiator.  Production compression["intercooler_reject_W"]
     # is 0.0 on this path (claude_cycle_cold_end, not intercooled_compression),
@@ -1765,17 +1820,24 @@ def report_from_recorded_series(
         params.emissivity,
     )
     intercooler_radiator["sizing_temperature_K"] = intercooler_radiator_temperature_K
-    display_costs = _display_cost_report(
-        params,
-        hot_section=hot_section,
-        mid_section=mid_section,
-        o2_radiator=o2_night,
-        intercooler_radiator=intercooler_radiator,
-        reject_radiator=reject_radiator,
-        compression=compression,
-        cryo=cryo,
-        captured_batch_kg=captured_batch_kg,
-        run_hours=snapshot_count,
+    display_costs = (
+        {
+            "status": oxygen_status,
+            "reason": "missing-melt-offgas-o2-flow",
+        }
+        if oxygen_unmeasured
+        else _display_cost_report(
+            params,
+            hot_section=hot_section,
+            mid_section=mid_section,
+            o2_radiator=o2_night,
+            intercooler_radiator=intercooler_radiator,
+            reject_radiator=reject_radiator,
+            compression=compression,
+            cryo=cryo,
+            captured_batch_kg=captured_batch_kg,
+            run_hours=snapshot_count,
+        )
     )
     partial_pressures = _peak_partial_pressures_pa(overhead_state_series)
     condensation_crossings: dict[str, dict[str, Any]] = {}
@@ -1787,7 +1849,7 @@ def report_from_recorded_series(
                 partial_pressures.get(species, 0.0),
             ),
         }
-    closes = not excluded
+    closes = not excluded and not oxygen_unmeasured
     known_trace = sorted(
         species
         for species, row in excluded.items()
@@ -1795,13 +1857,25 @@ def report_from_recorded_series(
     )
     major_excluded = sorted(set(excluded) - set(known_trace))
     closure_status = (
-        "closed"
+        "partial_unmeasured_hours"
+        if oxygen_unmeasured
+        else "closed"
         if closes
         else (
             "excluded_major_heat_carrier_report_incomplete"
             if major_excluded
             else "excluded_refractory_trace_expected"
         )
+    )
+    vented_rates = [
+        _finite_nonnegative(value, "observed_o2_vented_kg_hr")
+        for value in observed_o2_vented_kg_hr
+        if value is not None
+    ]
+    vented_peak = (
+        None
+        if any(value is None for value in observed_o2_vented_kg_hr)
+        else max(vented_rates, default=0.0)
     )
     return copy.deepcopy({
         "schema_version": THERMAL_TRAIN_REPORT_SCHEMA_VERSION,
@@ -1866,9 +1940,13 @@ def report_from_recorded_series(
             "thermal_train_overflow_kg_hr": overflow,
             "cavern_capacity_kg": params.cavern_capacity_kg,
             "captured_batch_kg": captured_batch_kg,
-            "capture_shortfall_kg": max(
-                0.0,
-                batch_o2_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL - captured_batch_kg,
+            "capture_shortfall_kg": (
+                max(
+                    0.0,
+                    batch_o2_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL - captured_batch_kg,
+                )
+                if batch_o2_mol is not None and captured_batch_kg is not None
+                else None
             ),
             "frost_sticking_fraction": params.frost_sticking_fraction,
             "deposition_gate": deposition_gate,
@@ -1884,13 +1962,7 @@ def report_from_recorded_series(
                 ),
                 default=0.0,
             ),
-            "O2_vented_peak_kg_hr": max(
-                (
-                    _finite_nonnegative(value, "observed_o2_vented_kg_hr")
-                    for value in observed_o2_vented_kg_hr
-                ),
-                default=0.0,
-            ),
+            "O2_vented_peak_kg_hr": vented_peak,
             "note": "observed legacy upstream diagnostics; not thermal-train overflow",
         },
         "display_costs": display_costs,
@@ -1930,6 +2002,28 @@ def _zero_radiator_section() -> dict[str, Any]:
         "latent_load_W": 0.0,
         "active_lift_W": 0.0,
         "latent_crossings": {},
+    }
+
+
+def _unmeasured_radiator_section(
+    status: str,
+    *,
+    reason: str,
+    inlet_temperature_K: float,
+    inlet_basis: str,
+) -> dict[str, Any]:
+    return {
+        "status": status,
+        "reason": reason,
+        "area_m2": None,
+        "sensible_area_m2": None,
+        "latent_area_m2": None,
+        "sensible_load_W": None,
+        "latent_load_W": None,
+        "active_lift_W": None,
+        "latent_crossings": {},
+        "inlet_temperature_K": inlet_temperature_K,
+        "inlet_basis": inlet_basis,
     }
 
 
