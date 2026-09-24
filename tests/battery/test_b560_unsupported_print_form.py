@@ -14,6 +14,7 @@ from simulator.battery.records import Located, Sample, Value
 from simulator.battery.waypoints import (
     GapReason,
     ReadinessStatus,
+    charge_moles_by_species,
     consumer_readiness,
     normalized_composition,
 )
@@ -49,6 +50,46 @@ def test_unsupported_print_form_omits_an_absent_sibling() -> None:
     gap = next(gap for gap in engine.gaps if gap.waypoint == "normalized_composition")
     assert gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
     assert gap.missing == (_PRINTED,)
+
+
+def test_typed_printed_composition_is_unwrapped_for_readiness() -> None:
+    typed = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "60"], ["MgO", "40"]],
+    }
+    experiment = replace(
+        factories.kems_experiment(),
+        sample=Sample(printed_composition=factories.located(typed)),
+    )
+
+    result = normalized_composition(experiment, _bench())
+
+    assert result.selected is not None
+    assert set(result.selected.value) == {"SiO2", "MgO"}
+    assert sum(result.selected.value.values()) == 1
+
+
+def test_ambiguous_mass_percent_withholds_engine_routes() -> None:
+    typed = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "60"], ["Cl", "40"]],
+    }
+    sample = Sample(
+        mass_kg=factories.located(Value.point_of("0.001")),
+        printed_composition=factories.located(typed),
+    )
+    experiment = replace(factories.kems_experiment(), sample=sample)
+
+    normalized = normalized_composition(experiment, _bench())
+    charge = charge_moles_by_species(experiment, _bench())
+
+    assert normalized.selected is None
+    assert normalized.absence is not None
+    assert normalized.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert not charge
+    assert charge.absence is not None
 
 
 def test_both_absent_compositions_stay_missing_evidence() -> None:

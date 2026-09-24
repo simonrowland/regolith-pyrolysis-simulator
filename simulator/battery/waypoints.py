@@ -9,6 +9,7 @@ from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, ValueKind
+from simulator.battery.migrate import _OXIDE_COMPONENT_KEYS
 from simulator.battery.records import (
     Bench,
     Experiment,
@@ -299,6 +300,39 @@ def _molar_mass_kg_mol(species: str) -> Decimal | None:
         return None
 
 
+def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
+    if not isinstance(raw, Mapping):
+        return None
+    basis = raw.get("amount_basis")
+    if isinstance(basis, AmountBasis):
+        basis = basis.value
+    if str(basis or "") != AmountBasis.MASS_PERCENT.value:
+        return raw
+    components = raw.get("components")
+    if isinstance(components, Mapping):
+        pairs = [(str(key), value) for key, value in components.items()]
+    elif isinstance(components, (list, tuple)):
+        pairs = [
+            (str(item[0]), item[1])
+            for item in components
+            if isinstance(item, (list, tuple)) and len(item) == 2
+        ]
+        if len(pairs) != len(components):
+            return None
+    else:
+        return None
+    if any(name not in _OXIDE_COMPONENT_KEYS for name, _value in pairs):
+        return None
+    return dict(pairs)
+
+
+def _ambiguous_mass_percent_initial(located: Located | None) -> bool:
+    if located is None or not located.state.is_unknown:
+        return False
+    reason = str(located.state.reason or "").lower()
+    return reason.startswith("mass-percent composition")
+
+
 def charge_moles_by_species(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> SpeciesWaypoints:
@@ -341,6 +375,7 @@ def charge_moles_by_species(
     dropped: list[str] = []
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
+    ambiguous_initial = _ambiguous_mass_percent_initial(composition)
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
@@ -386,8 +421,13 @@ def charge_moles_by_species(
                                 0,
                             )
     printed = experiment.sample.printed_composition
-    if mass is not None and printed is not None and printed.state.is_value:
-        raw = printed.state.value
+    if (
+        mass is not None
+        and printed is not None
+        and printed.state.is_value
+        and not ambiguous_initial
+    ):
+        raw = _printed_composition_map(printed.state.value)
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():
@@ -472,15 +512,27 @@ def normalized_composition(
     unsupported = False
     printed_species: set[str] | None = None
     printed_path = None
+    initial_located = (
+        point.get("composition")
+        if "composition" in point
+        else experiment.sample.initial_composition
+    )
+    ambiguous_initial = _ambiguous_mass_percent_initial(initial_located)
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
         path = (f"observation[{observation.observation_id}].point_conditions.{key}"
                 if key in point else f"experiment.sample.{field}")
+        if field == "printed_composition" and ambiguous_initial:
+            unsupported = True
+            missing.append(path)
+            continue
         if located is None or not located.state.is_value:
             absent.append(path)
             continue
         raw = located.state.value
+        if field == "printed_composition":
+            raw = _printed_composition_map(raw)
         if field == "printed_composition" and isinstance(raw, Mapping):
             printed_species = {str(species) for species in raw}
             printed_path = path

@@ -671,7 +671,9 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     )
 
 
-def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
+def _mass_percent_components(
+    payload: object, *, known_oxides_only: bool = True
+) -> dict[str, Decimal] | None:
     if not isinstance(payload, Mapping):
         return None
     body: object = payload
@@ -700,7 +702,7 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
             return None
         name = str(item[0])
         amount = _as_dec_or_none(item[1])
-        if name not in _OXIDE_COMPONENT_KEYS or amount is None:
+        if amount is None or (known_oxides_only and name not in _OXIDE_COMPONENT_KEYS):
             return None
         result[name] = amount
     return result or None
@@ -709,7 +711,7 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
-    wt = _mass_percent_components(payload)
+    wt = _mass_percent_components(payload, known_oxides_only=False)
     if wt is None:
         return None
     locator = (
@@ -728,10 +730,26 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
         else:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
+        try:
+            composition = wt_pct_to_mole_fraction(wt)
+        except (ArithmeticError, ValueError) as exc:
+            return Located(
+                State.unknown(f"mass-percent composition is not usable: {exc}"),
+                locator=locator,
+            )
         return Located(
-            State.of(wt_pct_to_mole_fraction(wt)),
+            State.of(composition),
             locator=locator,
             inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        )
+    printed = _mass_percent_components(payload, known_oxides_only=False)
+    if printed is not None:
+        source = _located_from_plain(payload, lambda value: value)
+        return Located(
+            State.unknown(
+                "mass-percent composition contains unsupported or ambiguous components"
+            ),
+            locator=source.locator,
         )
     if isinstance(payload, Mapping) and "state" not in payload:
         return located_value(
@@ -897,6 +915,9 @@ def _composition_from_plain(payload: object) -> Composition:
         wt = _mass_percent_components(payload)
         if wt is not None:
             return wt_pct_to_mole_fraction(wt)
+        raise ValueError(
+            "mass-percent composition contains unsupported or ambiguous components"
+        )
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
@@ -1185,13 +1206,17 @@ def _sample_from_plain(payload: object) -> Sample:
     printed_located = (
         None
         if printed is None
-        else _located_from_plain(printed, lambda value: value)
+        else _mass_percent_printed_from_plain(printed)
+        or _located_from_plain(printed, lambda value: value)
     )
     initial_located = (
         None if initial is None else _composition_located_from_plain(initial)
     )
     if printed_located is None and initial is not None:
         printed_located = _mass_percent_printed_from_plain(initial)
+    if initial_located is None and printed is not None:
+        if _mass_percent_components(printed, known_oxides_only=False) is not None:
+            initial_located = _composition_located_from_plain(printed)
     return Sample(
         mass_kg=None
         if mass is None
