@@ -86,6 +86,7 @@ experiments:
     form:
       state: {tag: value, value: 'Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies'}
       locator: {pdf_page_index: 4, published_page: 3, section: '2. Experimental procedure'}
+      supporting_locator: {pdf_page_index: 5, published_page: 4, figure: '1', section: '2.2 Oxygen fugacity'}
   apparatus:
     cell_material_and_liner:
       state: {tag: value, value: 'CaF2 pressure medium, graphite furnace, MgO spacers, alumina thermocouple sheath'}
@@ -186,6 +187,7 @@ species:
         first_experiment: AgI/Cl-007
         fCl2_derivation: 'The paper calculates f(Cl2) from the final molar Cl/(Cl+I), initial AgI/AgCl mixture, and molar Ag/(Ag+Pt), with ideal-mixture correction (Eq. 11); the resulting values are printed in Table 2.'
         table_footer: 'Cl% error in () is 2 stdev.'
+        table_footer_locator: {pdf_page_index: 8, published_page: 7, table: '2'}
         series:
         - experiment: AgI/Cl-007
           composition_label: CMAS
@@ -1101,6 +1103,7 @@ species:
         method_class: model_derived
         derivation: 'Author regressions to the tabulated experimental constants; equations are printed, not newly fitted here.'
         standard_state_note: 'f(O2) and f(Cl2) use pure-gas standard states at 0.1 MPa and the temperature of interest.'
+        standard_state_note_locator: {pdf_page_index: 2, published_page: 1, section: Abstract}
         fits:
         - {composition: CMAS, equation: 'log K_PT = 1.206(32) - 940(40) P/T', standard_error: 0.030, locator: {pdf_page_index: 10, published_page: 9, equation: '16'}}
         - {composition: Icelandic Basalt, equation: 'log K_PT = 0.984(64) - 930(70) P/T', standard_error: 0.053, locator: {pdf_page_index: 10, published_page: 9, equation: '17'}}
