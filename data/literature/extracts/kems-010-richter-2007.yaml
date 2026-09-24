@@ -59,6 +59,27 @@ experiments:
       locator:
         table: '1'
         row: R3-12
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1704457502611219554484777966']
+          - [SiO2, '0.4477905753386579030206826454']
+          - [Al2O3, '0.1141300456238582108526110147']
+          - [CaO, '0.2676336287763619306782285429']
+      locator:
+        table: '1'
+        row: R3-12
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -141,6 +162,27 @@ experiments:
       locator:
         table: '1'
         row: R3-10
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-10
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -219,6 +261,27 @@ experiments:
       locator:
         table: '1'
         row: R3-11
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-11
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -297,6 +360,27 @@ experiments:
       locator:
         table: '1'
         row: R-8
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-8
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -375,6 +459,27 @@ experiments:
       locator:
         table: '1'
         row: R-9
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-9
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -453,6 +558,27 @@ experiments:
       locator:
         table: '1'
         row: R-11
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-11
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -531,6 +657,27 @@ experiments:
       locator:
         table: '1'
         row: R2-4
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-4
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -613,6 +760,27 @@ experiments:
       locator:
         table: '1'
         row: R-16
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1767753295982317413803851829']
+          - [SiO2, '0.4477295761404451832685031722']
+          - [Al2O3, '0.11879831391861402001838447']
+          - [CaO, '0.2566967803427090553327271751']
+      locator:
+        table: '1'
+        row: R-16
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -691,6 +859,27 @@ experiments:
       locator:
         table: '1'
         row: R3-13
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-13
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -769,6 +958,27 @@ experiments:
       locator:
         table: '1'
         row: R3-15
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-15
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -847,6 +1057,27 @@ experiments:
       locator:
         table: '1'
         row: R3-9
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-9
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -929,6 +1160,27 @@ experiments:
       locator:
         table: '1'
         row: R-14
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1115151178475627665664395727']
+          - [SiO2, '0.3152873999105544336158752733']
+          - [Al2O3, '0.1820302031904954200826734888']
+          - [CaO, '0.3911672790513873797350116653']
+      locator:
+        table: '1'
+        row: R-14
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1011,6 +1263,27 @@ experiments:
       locator:
         table: '1'
         row: R-15
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.04782829250516168897295855714']
+          - [SiO2, '0.2800413387405848741663350284']
+          - [Al2O3, '0.2135549227944218276737305951']
+          - [CaO, '0.4585754459598316091869758192']
+      locator:
+        table: '1'
+        row: R-15
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1093,6 +1366,27 @@ experiments:
       locator:
         table: '1'
         row: R-17
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.001527529496029091498614015497']
+          - [SiO2, '0.2105137887883087200714891249']
+          - [Al2O3, '0.2508537260268920610729288682']
+          - [CaO, '0.5371049556887701273569679914']
+      locator:
+        table: '1'
+        row: R-17
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1175,6 +1469,27 @@ experiments:
       locator:
         table: '1'
         row: R-6
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1750033636925483327385129268']
+          - [SiO2, '0.4564843600940239918571501442']
+          - [Al2O3, '0.1165218374948420999471733412']
+          - [CaO, '0.2519904387185855754571635876']
+      locator:
+        table: '1'
+        row: R-6
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1253,6 +1568,27 @@ experiments:
       locator:
         table: '1'
         row: R-3
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-3
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1331,6 +1667,27 @@ experiments:
       locator:
         table: '1'
         row: R-2
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-2
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1409,6 +1766,27 @@ experiments:
       locator:
         table: '1'
         row: R-18
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-18
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1487,6 +1865,27 @@ experiments:
       locator:
         table: '1'
         row: R-4
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-4
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1565,6 +1964,27 @@ experiments:
       locator:
         table: '1'
         row: R3-14
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-14
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1643,6 +2063,27 @@ experiments:
       locator:
         table: '1'
         row: R2-1
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-1
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1721,6 +2162,27 @@ experiments:
       locator:
         table: '1'
         row: R-7
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R-7
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1803,6 +2265,27 @@ experiments:
       locator:
         table: '1'
         row: R-13
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1746658060956669381945260105']
+          - [SiO2, '0.457795910832871768792008654']
+          - [Al2O3, '0.1161410090829721019034411096']
+          - [CaO, '0.2513972739884891911100242261']
+      locator:
+        table: '1'
+        row: R-13
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1881,6 +2364,27 @@ experiments:
       locator:
         table: '1'
         row: R2-5
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-5
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -1963,6 +2467,27 @@ experiments:
       locator:
         table: '1'
         row: R2-21
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1715466750777195044392975608']
+          - [SiO2, '0.4615069227335697532263707115']
+          - [Al2O3, '0.1161456762262483229835188347']
+          - [CaO, '0.2508007259624624193508128933']
+      locator:
+        table: '1'
+        row: R2-21
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2045,6 +2570,27 @@ experiments:
       locator:
         table: '1'
         row: R2-20
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.05836890374878986585738705497']
+          - [SiO2, '0.2879621457959705616180774249']
+          - [Al2O3, '0.1930186497194624838951574436']
+          - [CaO, '0.4606503007357770886293780768']
+      locator:
+        table: '1'
+        row: R2-20
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2127,6 +2673,27 @@ experiments:
       locator:
         table: '1'
         row: R2-18
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0848552028498934284780734815']
+          - [SiO2, '0.3136591086443537391776126685']
+          - [Al2O3, '0.1886373858911297380828890351']
+          - [CaO, '0.4128483026146230942614248151']
+      locator:
+        table: '1'
+        row: R2-18
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2209,6 +2776,27 @@ experiments:
       locator:
         table: '1'
         row: R2-19
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.07473422319131383714565708859']
+          - [SiO2, '0.3056757152044701156784122806']
+          - [Al2O3, '0.1979047408188604331633512179']
+          - [CaO, '0.421685320785355614012579413']
+      locator:
+        table: '1'
+        row: R2-19
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2291,6 +2879,27 @@ experiments:
       locator:
         table: '1'
         row: R2-17
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.004411678934228001413650724154']
+          - [SiO2, '0.2589455741132844529297911855']
+          - [Al2O3, '0.2473656878307010757307234175']
+          - [CaO, '0.4892770591217864699258346728']
+      locator:
+        table: '1'
+        row: R2-17
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2373,6 +2982,27 @@ experiments:
       locator:
         table: '1'
         row: R2-7
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0003387906989474174555330623988']
+          - [SiO2, '0.2188539083959318732765637316']
+          - [Al2O3, '0.2468168523341178164718704555']
+          - [CaO, '0.5339904485710028927960327504']
+      locator:
+        table: '1'
+        row: R2-7
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2451,6 +3081,27 @@ experiments:
       locator:
         table: '1'
         row: R2-3
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-3
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2529,6 +3180,27 @@ experiments:
       locator:
         table: '1'
         row: R2-10
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-10
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2607,6 +3279,27 @@ experiments:
       locator:
         table: '1'
         row: R2-16
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-16
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2685,6 +3378,27 @@ experiments:
       locator:
         table: '1'
         row: R2-11
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-11
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2763,6 +3477,27 @@ experiments:
       locator:
         table: '1'
         row: R2-12
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-12
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2841,6 +3576,27 @@ experiments:
       locator:
         table: '1'
         row: R2-2
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R2-2
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -2923,6 +3679,27 @@ experiments:
       locator:
         table: '1'
         row: R2-13
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.07341955528863205133914734757']
+          - [SiO2, '0.3182322755235439700241992864']
+          - [Al2O3, '0.1926943911401260254472625643']
+          - [CaO, '0.4156537780476979531893908016']
+      locator:
+        table: '1'
+        row: R2-13
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3005,6 +3782,27 @@ experiments:
       locator:
         table: '1'
         row: R2-15
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0840027185436617640913320939']
+          - [SiO2, '0.3243320986643467350969244109']
+          - [Al2O3, '0.1871300340150602171556661767']
+          - [CaO, '0.4045351487769312836560773181']
+      locator:
+        table: '1'
+        row: R2-15
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3087,6 +3885,27 @@ experiments:
       locator:
         table: '1'
         row: R2-14
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0006755814117333554393494687452']
+          - [SiO2, '0.2363352732627923656069541368']
+          - [Al2O3, '0.241014347995218704658841538']
+          - [CaO, '0.5219747973302555742948548563']
+      locator:
+        table: '1'
+        row: R2-14
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3169,6 +3988,27 @@ experiments:
       locator:
         table: '1'
         row: R2-9
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0003425061518187127846741649965']
+          - [SiO2, '0.1871354241548056914580146836']
+          - [Al2O3, '0.265905827433401700396605432']
+          - [CaO, '0.5466162422599738953607057197']
+      locator:
+        table: '1'
+        row: R2-9
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3251,6 +4091,27 @@ experiments:
       locator:
         table: '1'
         row: R2-8
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.0005277105604998180038265415993']
+          - [SiO2, '0.1007694625298809078640996203']
+          - [Al2O3, '0.3143598211542120539308829029']
+          - [CaO, '0.5843430057554072202011909352']
+      locator:
+        table: '1'
+        row: R2-8
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3333,6 +4194,27 @@ experiments:
       locator:
         table: '1'
         row: R3-2
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1828173848433149249457362563']
+          - [SiO2, '0.4652498635720986474918105662']
+          - [Al2O3, '0.1141948597406284810240860223']
+          - [CaO, '0.2377378918439579465383671554']
+      locator:
+        table: '1'
+        row: R3-2
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3411,6 +4293,27 @@ experiments:
       locator:
         table: '1'
         row: R3-1
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-1
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3489,6 +4392,27 @@ experiments:
       locator:
         table: '1'
         row: R3-20
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-20
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3567,6 +4491,27 @@ experiments:
       locator:
         table: '1'
         row: R3-21
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-21
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3645,6 +4590,27 @@ experiments:
       locator:
         table: '1'
         row: R3-4
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-4
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3723,6 +4689,27 @@ experiments:
       locator:
         table: '1'
         row: R3-7
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-7
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3801,6 +4788,27 @@ experiments:
       locator:
         table: '1'
         row: R3-19
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-19
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3879,6 +4887,27 @@ experiments:
       locator:
         table: '1'
         row: R3-18
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-18
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -3957,6 +4986,27 @@ experiments:
       locator:
         table: '1'
         row: R3-8
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-8
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value
@@ -4035,6 +5085,27 @@ experiments:
       locator:
         table: '1'
         row: R3-5
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.1723239739392145251219793444']
+          - [SiO2, '0.463188945332534915178816448']
+          - [Al2O3, '0.115053442499515498138993548']
+          - [CaO, '0.2494336382287350615602106598']
+      locator:
+        table: '1'
+        row: R3-5
+        note: derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state:
         tag: value

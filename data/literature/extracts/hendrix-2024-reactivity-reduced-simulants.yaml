@@ -58,6 +58,35 @@ experiments:
         tag: value
         value: {SiO2: 46.2, TiO2: 1.85, Al2O3: 17.9, FeO: 11.2, MnO: 0.19, MgO: 6.87, CaO: 9.43, Na2O: 3.33, K2O: 0.85, P2O5: 0.62}
       locator: {published_page: 2489, pdf_page_index: 4, table: '1', note: 'JSC-1A bulk oxide wt% as printed; mineral-abundance rows not used; Cr2O3 and SO3 blank'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.5019273754959485256059605166']
+          - [TiO2, '0.0151204859576503122933284367']
+          - [Al2O3, '0.1145970381214175396205240754']
+          - [FeO, '0.1017602195393827206893823004']
+          - [MnO, '0.001748360679193541966579041272']
+          - [MgO, '0.1112651361493619955135143363']
+          - [CaO, '0.109768426249842835297065069']
+          - [Na2O, '0.03507142553401207213083266896']
+          - [K2O, '0.005890319140152531727887411837']
+          - [P2O5, '0.002851213133037925154926143533']
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: JSC-1A bulk oxide wt% as printed; mineral-abundance rows not used; Cr2O3 and
+          SO3 blank; derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
@@ -111,6 +140,37 @@ experiments:
         tag: value
         value: {SiO2: 42.81, TiO2: 4.62, Al2O3: 14.13, Cr2O3: 0.21, FeO: 7.87, MnO: 0.15, MgO: 18.89, CaO: 5.94, Na2O: 4.92, K2O: 0.57, P2O5: 0.44, SO3: 0.11}
       locator: {published_page: 2489, pdf_page_index: 4, table: '1', note: 'LMS-1 bulk oxide wt% as printed; mineral-abundance rows not used'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.4224796031900914959088866673']
+          - [TiO2, '0.03430027544084375013966780395']
+          - [Al2O3, '0.08217205252383718263265581725']
+          - [Cr2O3, '0.0008192542323231418791527865095']
+          - [FeO, '0.0649525724745881005936110711']
+          - [MnO, '0.001253805873350061734356251891']
+          - [MgO, '0.2779047281718872044413072741']
+          - [CaO, '0.06280783178931742513703609024']
+          - [Na2O, '0.04706910054146280647527514887']
+          - [K2O, '0.003588032489204471071689482924']
+          - [P2O5, '0.001838028668534934141292715136']
+          - [SO3, '0.0008147146045594258450688911424']
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: LMS-1 bulk oxide wt% as printed; mineral-abundance rows not used; derived wt%
+          to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
@@ -128,6 +188,36 @@ experiments:
         tag: value
         value: {SiO2: 44.18, TiO2: 0.79, Al2O3: 26.24, Cr2O3: 0.02, FeO: 3.04, MnO: 0.05, MgO: 11.22, CaO: 11.62, Na2O: 2.30, K2O: 0.46, SO3: 0.1}
       locator: {published_page: 2489, pdf_page_index: 4, table: '1', note: 'LHS-1 bulk oxide wt% as printed; mineral-abundance rows not used; P2O5 blank'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.4669992349950984169629596274']
+          - [TiO2, '0.006282213072100561041042790607']
+          - [Al2O3, '0.1634465442754120558150116059']
+          - [Cr2O3, '0.00008357171863732212777885587198']
+          - [FeO, '0.0268735565400503195554214637']
+          - [MnO, '0.0004476504073919290558530923613']
+          - [MgO, '0.1768018372199496758380341473']
+          - [CaO, '0.1316022829409398621610312201']
+          - [Na2O, '0.02356831702786512030017569884']
+          - [K2O, '0.003101482119559391409528144493']
+          - [SO3, '0.0007933096829953457331633528703']
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        note: LHS-1 bulk oxide wt% as printed; mineral-abundance rows not used; P2O5 blank;
+          derived wt% to mole fraction for initial_composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
       locator: *reduction_locator
@@ -221,6 +311,7 @@ species:
         temperature_measurement: monitoring Type K thermocouple
         temperature_control: furnace voltage controlled by a Variac voltage regulator
         target_temperature_C: 950
+        T_C: 950
         hold_duration_min: 15
         cooling: furnace turned off; silica glass tube immediately removed; pressurized air until sample no longer glowing (roughly 650 degrees C), then wet towels
         post_cooling_storage: Thermo Scientific Lab-Line vacuum desiccator at approximately 25 mmHg
