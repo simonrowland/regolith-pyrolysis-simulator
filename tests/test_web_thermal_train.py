@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import threading
 from pathlib import Path
 from types import SimpleNamespace
@@ -13,6 +14,9 @@ from simulator.accounting.ledger import AtomLedger
 from simulator.state import BatchRecord, EvaporationFlux, HourSnapshot, OverheadGas
 from web import routes as web_routes
 from web.events import _sim_locks, _simulations
+
+
+_ADVISORY_JS = Path(__file__).resolve().parents[1] / "web/static/js/simulator-advisory.js"
 
 
 @pytest.fixture
@@ -199,6 +203,76 @@ def test_passive_refusal_renders_reason_and_active_lift(client, monkeypatch) -> 
     assert b"target_not_above_effective_sink_margin" in response.data
     assert b"123.5 W active lift" in response.data
     assert response.data.count(b"Cold melt-offgas O2") == 1
+
+
+def test_unmeasured_thermal_train_values_render_as_not_measured(client, monkeypatch) -> None:
+    report = {
+        "schema_version": "thermal-train-report-v2",
+        "status": "incomplete",
+        "train_closes_for_run": False,
+        "snapshot_count": 1,
+        "peaks": {
+            "hot_total_vapor_kg_hr": 0.0,
+            "cold_o2_kg_hr": None,
+            "cold_o2_mol_hr": None,
+        },
+        "sections": {
+            "cavern_regeneration": {"status": "unmeasured", "total_J": None},
+        },
+        "excluded_species": {},
+        "excluded_species_nonzero": False,
+        "display_costs": {"status": "unmeasured"},
+    }
+    monkeypatch.setattr(
+        web_routes,
+        "_optimizer_result_row",
+        lambda *_args: (
+            Path("/root"),
+            Path("/root/run"),
+            {"result_blob": json.dumps({"thermal_train_report": report})},
+        ),
+    )
+    response = client.get("/thermal-train?run_id=r&cache_key=k")
+    assert response.status_code == 200
+    assert b"Cold melt-offgas O2</td><td>not measured</td>" in response.data
+    assert response.data.count(b"not measured") == 3
+
+
+def test_thermal_train_headline_null_is_not_rendered_as_zero() -> None:
+    harness = r"""
+const fs = require('fs');
+const vm = require('vm');
+const context = {
+  console,
+  document: {
+    readyState: 'loading',
+    getElementById: () => null,
+    addEventListener: () => {},
+  },
+  socket: { on: () => {} },
+  window: {},
+};
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(process.argv[2], 'utf8'), context);
+process.stdout.write(JSON.stringify([
+  context.thermalTrainHeadlineMetric(null, 'kg/hr'),
+  context.thermalTrainHeadlineMetric(undefined, 'kg/hr'),
+  context.thermalTrainHeadlineMetric(0, 'kg/hr'),
+]));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(_ADVISORY_JS)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert json.loads(completed.stdout) == [
+        "not measured",
+        "not measured",
+        "0 kg/hr",
+    ]
 
 
 def test_web_route_source_has_no_inline_simulation_or_worker_runtime_import() -> None:

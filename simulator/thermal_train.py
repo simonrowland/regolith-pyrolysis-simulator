@@ -1626,8 +1626,7 @@ def report_from_recorded_series(
     # Melt-offgas O2 is added to the S-A species vector only when the recorded
     # inlet exceeds HOT_RADIATOR_SPLIT_K.  That branch charges O2 as sensible
     # load on S-A and does not invent an O2 condensation crossing.  S-B inlet
-    # is assigned separately below as max(HOT_RADIATOR_SPLIT_K, T_floor_K)
-    # even when this S-A O2 term is skipped.
+    # is assigned separately below as max(HOT_RADIATOR_SPLIT_K, T_floor_K).
     hot_section_species = dict(hot_species)
     if (
         peak_o2_mol_s is not None
@@ -1635,15 +1634,23 @@ def report_from_recorded_series(
         and inlet_temperature > HOT_RADIATOR_SPLIT_K
     ):
         hot_section_species["O2"] = hot_section_species.get("O2", 0.0) + peak_o2_mol_s
-    hot_section = segmented_radiator_area_m2(
-        hot_section_species,
-        temperature_in_K=inlet_temperature,
-        temperature_out_K=HOT_RADIATOR_SPLIT_K,
-        sink_temperature_K=params.T_sink_night_K,
-        emissivity=params.emissivity,
-        segment_K=params.dT_segment_K,
-        latent_crossings_K=hot_crossings,
-    ) if hot_section_species and inlet_temperature >= HOT_RADIATOR_SPLIT_K else _zero_radiator_section()
+    if oxygen_unmeasured and inlet_temperature > HOT_RADIATOR_SPLIT_K:
+        hot_section = _unmeasured_radiator_section(
+            oxygen_status,
+            reason="missing-melt-offgas-o2-flow",
+            inlet_temperature_K=inlet_temperature,
+            inlet_basis="recorded_inlet_S_A",
+        )
+    else:
+        hot_section = segmented_radiator_area_m2(
+            hot_section_species,
+            temperature_in_K=inlet_temperature,
+            temperature_out_K=HOT_RADIATOR_SPLIT_K,
+            sink_temperature_K=params.T_sink_night_K,
+            emissivity=params.emissivity,
+            segment_K=params.dT_segment_K,
+            latent_crossings_K=hot_crossings,
+        ) if hot_section_species and inlet_temperature >= HOT_RADIATOR_SPLIT_K else _zero_radiator_section()
     mid_section = segmented_radiator_area_m2(
         mid_species,
         temperature_in_K=mid_inlet_temperature,
