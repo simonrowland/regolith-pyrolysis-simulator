@@ -114,6 +114,7 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     MeltBackend,
     MeltCompositionError,
+    MeltOxideProjection,
     RealBackendAuthority,
     RealBackendFamily,
     liquid_fraction_from_phase_masses,
@@ -255,6 +256,9 @@ class _MAGEMinBulkProjection:
     composition_wt_pct: Dict[str, float]
     warnings: Tuple[str, ...]
     dropped_components: Tuple[str, ...] = ()
+    # (component, mass fraction of the post-merge bulk). Empty unless the
+    # ig-order fold dropped something. Not a silent solve of that bulk.
+    dropped_component_mass_fractions: Tuple[Tuple[str, float], ...] = ()
     merged_components: Tuple[str, ...] = ()
     source_sum_wt_pct: float = 0.0
     projected_sum_wt_pct: float = 0.0
@@ -307,6 +311,119 @@ def _dropped_account_species(
 COMPOSITION_PROJECTED = 'composition_projected'
 
 
+def _as_mapping(value: Any) -> Mapping[str, Any] | None:
+    if isinstance(value, Mapping):
+        return value
+    return None
+
+
+def diagnostics_name_composition_projected(
+    diagnostics: Mapping[str, Any] | None,
+) -> bool:
+    """True when a payload is the ig-order drop refusal, at any nesting the
+    provider envelope uses. Does not invent a mass fraction."""
+    if not isinstance(diagnostics, Mapping):
+        return False
+    containers: list[Mapping[str, Any]] = [diagnostics]
+    nested = _as_mapping(diagnostics.get('backend_diagnostics'))
+    if nested is not None:
+        containers.append(nested)
+    for container in containers:
+        reason = container.get('backend_status_reason')
+        if reason == COMPOSITION_PROJECTED:
+            return True
+        projection = _as_mapping(container.get('input_composition_projection'))
+        if projection is None:
+            continue
+        if _as_mapping(projection.get(COMPOSITION_PROJECTED)) is not None:
+            return True
+        if projection.get('reason') == 'input_composition_projected' and (
+            projection.get('dropped_bulk_components')
+        ):
+            return True
+    notice = _as_mapping(diagnostics.get('composition_projected_notice'))
+    if notice is not None and notice.get('dropped_components'):
+        return True
+    return False
+
+
+def composition_projected_liquidus_notice(
+    diagnostics: Mapping[str, Any] | None,
+) -> Dict[str, Any] | None:
+    """Predict-and-flag notice for an ig-order drop, or None.
+
+    Each dropped component is named with its mass fraction of the bulk
+    MAGEMin folded. A missing fraction is not filled in: the caller must
+    not pretend the drop was measured as zero.
+    """
+    if not isinstance(diagnostics, Mapping):
+        return None
+    direct = _as_mapping(diagnostics.get('composition_projected_notice'))
+    if direct is not None and direct.get('dropped_components'):
+        rows = []
+        for row in direct.get('dropped_components') or ():
+            if not isinstance(row, Mapping):
+                return None
+            name = str(row.get('component') or '')
+            if not name or 'mass_fraction' not in row:
+                return None
+            rows.append({
+                'component': name,
+                'mass_fraction': float(row['mass_fraction']),
+            })
+        band = _as_mapping(direct.get('certified_band')) or {}
+        return {
+            'kind': COMPOSITION_PROJECTED,
+            'reason': COMPOSITION_PROJECTED,
+            'authority': str(direct.get('authority') or 'extrapolated'),
+            'certified_band': {
+                'engine': str(band.get('engine') or 'magemin'),
+                'database': str(band.get('database') or ''),
+                'bulk_components': [
+                    str(item) for item in (band.get('bulk_components') or ())
+                ],
+            },
+            'dropped_components': rows,
+        }
+
+    containers: list[Mapping[str, Any]] = [diagnostics]
+    nested = _as_mapping(diagnostics.get('backend_diagnostics'))
+    if nested is not None:
+        containers.append(nested)
+    for container in containers:
+        projection = _as_mapping(container.get('input_composition_projection'))
+        if projection is None:
+            continue
+        block = _as_mapping(projection.get(COMPOSITION_PROJECTED))
+        if block is None:
+            continue
+        components = [str(name) for name in (block.get('dropped_components') or ())]
+        fractions = dict(block.get('dropped_component_mass_fractions') or {})
+        if not components or any(name not in fractions for name in components):
+            continue
+        return {
+            'kind': COMPOSITION_PROJECTED,
+            'reason': COMPOSITION_PROJECTED,
+            'authority': 'extrapolated',
+            'certified_band': {
+                'engine': 'magemin',
+                'database': str(projection.get('magemin_database') or ''),
+                'bulk_components': [
+                    str(item)
+                    for item in (projection.get('magemin_bulk_order') or ())
+                ],
+            },
+            'dropped_components': [
+                {
+                    'component': name,
+                    'mass_fraction': float(fractions[name]),
+                }
+                for name in components
+            ],
+        }
+    return None
+
+
 def _magemin_dropped_mass_fraction(
     bulk_projection: _MAGEMinBulkProjection,
 ) -> float:
@@ -328,8 +445,13 @@ def _magemin_bulk_projection_details(
 
     bulk_dropped = tuple(bulk_projection.dropped_components)
     bulk_merged = tuple(bulk_projection.merged_components)
+    dropped_fractions = {
+        str(name): float(fraction)
+        for name, fraction in bulk_projection.dropped_component_mass_fractions
+    }
     details: Dict[str, Any] = {
         'magemin_database': bulk_projection.database,
+        'magemin_bulk_order': list(bulk_projection.order),
         'magemin_bulk_projected_components': sorted(
             str(k) for k in bulk_projection.composition_wt_pct
         ),
@@ -338,9 +460,15 @@ def _magemin_bulk_projection_details(
         dropped_mass_fraction = _magemin_dropped_mass_fraction(bulk_projection)
         details['dropped_bulk_components'] = list(bulk_dropped)
         details['dropped_mass_fraction'] = dropped_mass_fraction
+        details['dropped_component_mass_fractions'] = dict(dropped_fractions)
+        details['magemin_projected_composition_wt_pct'] = {
+            str(name): float(value)
+            for name, value in bulk_projection.composition_wt_pct.items()
+        }
         details[COMPOSITION_PROJECTED] = {
             'dropped_components': list(bulk_dropped),
             'dropped_mass_fraction': dropped_mass_fraction,
+            'dropped_component_mass_fractions': dict(dropped_fractions),
         }
     if bulk_merged:
         details['merged_bulk_components'] = list(bulk_merged)
@@ -948,6 +1076,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         call_timeout_s: Optional[float] = None,
+        projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
     ) -> EquilibriumResult:
         """
         Minimize Gibbs energy via MAGEMin.
@@ -987,39 +1116,63 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         prior_warnings: List[str] = []
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
-        if composition_mol_by_account is not None:
-            dropped_account_species = _dropped_account_species(
-                composition_mol_by_account
+        if projected_oxide_wt_pct is not None:
+            # Explicit solve of an already-folded ig bulk. These wt% values
+            # are the post-drop vector and are not rescaled to 100: that is
+            # the bulk the pre-refusal liquidus search sent to the binary.
+            # equilibrate() without this argument still refuses the original
+            # bulk and does not call MAGEMin.
+            comp_wt = {
+                str(name): float(value)
+                for name, value in projected_oxide_wt_pct.items()
+                if float(value) > 0.0
+            }
+            projection = MeltOxideProjection(
+                oxide_wt_pct=dict(comp_wt),
+                dropped_mass_kg_by_species={},
             )
-            melt_mol, dropped_accounts = split_cleaned_melt_account(
-                composition_mol_by_account)
-            for account in dropped_accounts:
-                prior_warnings.append(
-                    'MAGEMin is silicate-only; ignored non-melt ledger '
-                    f'account {account}'
+            projection_diagnostics = projection_diagnostics_for_melt_input(
+                backend='MAGEMin',
+                projection=projection,
+                composition_kg=comp_wt,
+                composition_mol=None,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+            )
+        else:
+            if composition_mol_by_account is not None:
+                dropped_account_species = _dropped_account_species(
+                    composition_mol_by_account
                 )
-            # The cleaned-melt account is the canonical input; it
-            # overrides any composition_mol passed alongside it.
-            composition_mol = melt_mol
+                melt_mol, dropped_accounts = split_cleaned_melt_account(
+                    composition_mol_by_account)
+                for account in dropped_accounts:
+                    prior_warnings.append(
+                        'MAGEMin is silicate-only; ignored non-melt ledger '
+                        f'account {account}'
+                    )
+                # The cleaned-melt account is the canonical input; it
+                # overrides any composition_mol passed alongside it.
+                composition_mol = melt_mol
 
-        projection = project_melt_to_oxide_projection(
-            composition_kg=composition_kg,
-            composition_mol=composition_mol,
-            oxide_basis=self._MAGEMIN_INPUT_BASIS,
-            species_formula_registry=species_formula_registry,
-        )
-        comp_wt = projection.oxide_wt_pct
-        prior_warnings.extend(projection.warnings)
-        projection_diagnostics = projection_diagnostics_for_melt_input(
-            backend='MAGEMin',
-            projection=projection,
-            composition_kg=composition_kg,
-            composition_mol=composition_mol,
-            oxide_basis=self._MAGEMIN_INPUT_BASIS,
-            species_formula_registry=species_formula_registry,
-            dropped_accounts=dropped_accounts,
-            dropped_account_species=dropped_account_species,
-        )
+            projection = project_melt_to_oxide_projection(
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+            )
+            comp_wt = projection.oxide_wt_pct
+            prior_warnings.extend(projection.warnings)
+            projection_diagnostics = projection_diagnostics_for_melt_input(
+                backend='MAGEMin',
+                projection=projection,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                oxide_basis=self._MAGEMIN_INPUT_BASIS,
+                species_formula_registry=species_formula_registry,
+                dropped_accounts=dropped_accounts,
+                dropped_account_species=dropped_account_species,
+            )
         if (
             projection.dropped_mass_kg_by_species
             or dropped_accounts
@@ -1223,6 +1376,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         max_T_C: float = 2200.0,
         scan_step_C: float = 50.0,
         tolerance_C: float = 2.0,
+        projected_retry: bool = False,
+        projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
     ) -> LiquidusSolidusResult:
         """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
         if not self._available or self._bridge is None:
@@ -1284,6 +1439,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_formula_registry,
                 call_timeout_s=remaining_budget_s,
+                projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
@@ -1324,6 +1480,73 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             budget_s=budget_s,
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
+        diagnostics = dict(result.diagnostics or {})
+        # An ig-order drop is a refusal of the requested bulk (status stays
+        # out_of_domain — not ok). The freeze gate is allowed to predict on
+        # the projected bulk, so the search for that different bulk is
+        # attached here, once, with the drop notice. A second drop does not
+        # recurse.
+        notice = (
+            None
+            if projected_retry
+            else composition_projected_liquidus_notice(diagnostics)
+        )
+        if (
+            notice is not None
+            and result.status == 'out_of_domain'
+        ):
+            projection_payload = (
+                diagnostics.get('input_composition_projection') or {}
+            )
+            folded_wt = projection_payload.get(
+                'magemin_projected_composition_wt_pct'
+            )
+            projected = self.find_liquidus_solidus(
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                species_formula_registry=species_formula_registry,
+                min_T_C=min_T_C,
+                max_T_C=max_T_C,
+                scan_step_C=scan_step_C,
+                tolerance_C=tolerance_C,
+                projected_retry=True,
+                projected_oxide_wt_pct=(
+                    dict(folded_wt) if isinstance(folded_wt, Mapping) else None
+                ),
+            )
+            diagnostics['projected_liquidus_status'] = projected.status
+            diagnostics['composition_projected_notice'] = notice
+            if (
+                projected.status == 'ok'
+                and projected.solidus_T_C is not None
+                and projected.liquidus_T_C is not None
+            ):
+                return LiquidusSolidusResult(
+                    liquidus_T_C=projected.liquidus_T_C,
+                    liquidus_T_K=projected.liquidus_T_K,
+                    solidus_T_C=projected.solidus_T_C,
+                    liquid_fraction=projected.liquid_fraction,
+                    status='out_of_domain',
+                    warnings=tuple([
+                        *warnings_out,
+                        *projected.warnings,
+                        (
+                            'MAGEMin liquidus is the projected bulk; '
+                            'dropped components stay a composition_projected '
+                            'refusal, not status=ok'
+                        ),
+                    ]),
+                    samples=projected.samples,
+                    iterations=projected.iterations,
+                    diagnostics=diagnostics,
+                )
+            warnings_out = [
+                *warnings_out,
+                (
+                    'composition_projected bulk has no projected liquidus; '
+                    f'status={projected.status}'
+                ),
+            ]
         return LiquidusSolidusResult(
             liquidus_T_C=result.liquidus_T_C,
             liquidus_T_K=result.liquidus_T_K,
@@ -1333,7 +1556,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             warnings=tuple(warnings_out),
             samples=result.samples,
             iterations=result.iterations,
-            diagnostics=dict(result.diagnostics or {}),
+            diagnostics=diagnostics,
         )
 
     # ------------------------------------------------------------------
@@ -2060,6 +2283,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'documented bulk order: {", ".join(dropped)}'
             )
 
+        source_sum_wt_pct = sum(float(value) for value in source.values())
+        dropped_fractions: List[Tuple[str, float]] = []
+        if source_sum_wt_pct > 0.0:
+            for component in dropped:
+                dropped_fractions.append((
+                    component,
+                    float(source[component]) / source_sum_wt_pct,
+                ))
         return _MAGEMinBulkProjection(
             database=db,
             order=order,
@@ -2071,8 +2302,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             },
             warnings=tuple(diagnostics),
             dropped_components=tuple(dropped),
+            dropped_component_mass_fractions=tuple(dropped_fractions),
             merged_components=tuple(merged),
-            source_sum_wt_pct=sum(float(value) for value in source.values()),
+            source_sum_wt_pct=source_sum_wt_pct,
             projected_sum_wt_pct=sum(float(value) for value in projected.values()),
         )
 

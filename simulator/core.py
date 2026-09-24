@@ -4621,6 +4621,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # default.
                 raise
             except Exception as exc:  # noqa: BLE001 - optional liquidus engines
+                # composition_projected is out-of-domain physics, not a missing
+                # liquidus. The floor (liquid_fraction = 1 above the Kress
+                # calibration) is only for a known absence. A refusal must
+                # not take that branch.
+                if 'composition_projected' in str(exc):
+                    raise
                 reason = str(exc)
                 liquidus_status = _liquidus_status_from_freeze_gate_exception(
                     exc
@@ -4685,12 +4691,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if isinstance(memo, dict):
             memo[key] = dict(normalized_curve)
-        self._last_melt_redox_liquidus_gate_diagnostic = {
+        gate_diagnostic = {
             'status': 'ok',
             'source': normalized_curve.get('source', 'liquidus_solidus'),
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
         }
+        projected_notice = normalized_curve.get('composition_projected_notice')
+        if isinstance(projected_notice, Mapping):
+            gate_diagnostic['composition_projected_notice'] = dict(
+                projected_notice
+            )
+        self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_curve
 
     def _melt_redox_liquid_fraction_factor(
@@ -4773,13 +4785,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else 0.0
             )
         liquid_fraction = max(0.0, min(1.0, liquid_fraction))
-        self._last_melt_redox_liquid_fraction_diagnostic = {
+        fraction_diagnostic = {
             'status': 'ok',
             'source': curve.get('source', 'liquidus_solidus'),
             'liquid_fraction': liquid_fraction,
             'solidus_T_C': curve.get('solidus_T_C'),
             'liquidus_T_C': curve.get('liquidus_T_C'),
         }
+        projected_notice = curve.get('composition_projected_notice')
+        if isinstance(projected_notice, Mapping):
+            fraction_diagnostic['composition_projected_notice'] = dict(
+                projected_notice
+            )
+        self._last_melt_redox_liquid_fraction_diagnostic = fraction_diagnostic
         return liquid_fraction
 
     def _melt_redox_source_capacity_mol_per_ln_fO2(
