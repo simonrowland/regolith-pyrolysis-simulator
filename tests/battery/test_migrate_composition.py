@@ -71,6 +71,54 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
+def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> None:
+    raw = {
+        "printed_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["MgO", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_value
+    assert sample.initial_composition.inference is not None
+    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+
+
+def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+    raw = {
+        "initial_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["Cl", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "60", "Cl": "40"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+
+
 def _iter_store_observations() -> list[dict]:
     rows: list[dict] = []
     for folder in _OBS_ROOTS:
