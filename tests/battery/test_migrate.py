@@ -2104,7 +2104,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
     assert census.get("activity_coefficient") == 128
-    assert census.get("p_partial") == 18
+    # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
+    # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
+    # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
+    assert census.get("p_partial") == 69
     assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 12
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
@@ -2115,7 +2118,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert census.get("evaporation_rate") == 25
     assert census.get("mass_loss_fraction") == 19
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 223, (n_numeric, census, n_unavailable)
+    assert n_numeric == 274, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
