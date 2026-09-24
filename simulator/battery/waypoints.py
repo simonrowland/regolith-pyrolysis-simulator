@@ -502,6 +502,7 @@ class _EnginePrintRefused(Exception):
 
 _TOTAL_IRON_AS_FEO = "total_iron_as_FeO"
 _FEOT_FLAG = "total iron reported as FeO; Fe3+/Fe2+ not printed"
+_TRACE_NON_OXIDE_LIMIT_WT_PCT = Decimal("1.0")
 
 
 def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
@@ -543,10 +544,12 @@ def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
 def _engine_printed_oxides(
     raw: object,
 ) -> tuple[dict[str, Decimal], set[str], str | None] | None:
-    """Engine oxide wt% when the print uses FeOT.
+    """Engine oxide wt% when the print uses FeOT or trace non-oxides.
 
-    Returns None for an ordinary oxide print. FeOT beside FeO or Fe2O3, and any
-    printed non-oxide, stay unsupported. Printed names are not rewritten.
+    Returns None for an ordinary oxide print. FeOT beside FeO or Fe2O3 stays
+    unsupported. Non-oxides totalling more than 1 wt% stay unsupported; at or
+    below that they are omitted and the oxide subset is what the engine sees.
+    Printed names are not rewritten.
     """
 
     pairs = _printed_component_pairs(raw)
@@ -577,10 +580,11 @@ def _engine_printed_oxides(
         if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS
     ]
     omitted_total = sum((amount for _name, amount in others), Decimal("0"))
-    if others:
+    if omitted_total > _TRACE_NON_OXIDE_LIMIT_WT_PCT:
         raise _EnginePrintRefused(omitted_total)
     if feot is not None and ("FeO" in oxides or "Fe2O3" in oxides):
         raise _EnginePrintRefused("ambiguous total iron")
+    raw_by_name = {name: value for name, value in pairs}
     exempt: set[str] = set()
     notes: list[str] = []
     if feot is not None:
@@ -592,9 +596,31 @@ def _engine_printed_oxides(
             "inputs=FeOT; "
             f"{_FEOT_FLAG}"
         )
+    if others:
+        exempt.update(name for name, _amount in others)
+        named = ", ".join(
+            f"{name} {_printed_wt_token(raw_by_name[name], amount)} wt%"
+            for name, amount in others
+        )
+        notes.append(
+            f"omitted non-oxide {named}; "
+            f"omitted total {_printed_wt_token(omitted_total, omitted_total)} wt% "
+            "<= 1.0 wt%"
+        )
     if not oxides or sum(oxides.values(), Decimal("0")) <= 0:
         return None
     return oxides, exempt, "; ".join(notes) if notes else None
+
+
+def _printed_wt_token(raw: object, amount: Decimal) -> str:
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip()
+    if isinstance(raw, int) and not isinstance(raw, bool):
+        return str(raw)
+    text = format(amount, "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text or "0"
 
 
 def normalized_composition(

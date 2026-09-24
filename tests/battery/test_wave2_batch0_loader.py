@@ -15,7 +15,7 @@ from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import ValueKind
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.identity import atm_to_pa
-from simulator.battery.migrate import migrate
+from simulator.battery.migrate import migrate, wt_pct_to_mole_fraction
 from simulator.battery.records import Sample, as_decimal
 from simulator.battery.waypoints import (
     GapReason,
@@ -209,6 +209,29 @@ def test_feot_beside_feo_stays_unsupported() -> None:
     assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
+def test_trace_non_oxides_are_omitted_and_named() -> None:
+    raw = {"SiO2": Decimal("50"), "MgO": Decimal("49.2"), "S": "0.5", "Cl": "0.3"}
+    experiment, bench, observation = _printed_experiment(raw)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert set(selected.value) == {"SiO2", "MgO"}
+    expected = wt_pct_to_mole_fraction({"SiO2": Decimal("50"), "MgO": Decimal("49.2")})
+    for name, amount in expected.components:
+        assert abs(selected.value[name] - amount) / amount < Decimal("1e-9")
+    assert selected.notice is not None
+    assert "S 0.5 wt%" in selected.notice
+    assert "Cl 0.3 wt%" in selected.notice
+    printed = str(experiment.sample.printed_composition.state.value)
+    assert "S" in printed and "Cl" in printed
+    requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert all(
+        item.payload is not None
+        and "S 0.5 wt%" in item.payload["composition_notice"]
+        and "Cl 0.3 wt%" in item.payload["composition_notice"]
+        for item in requests
+    )
+
+
 def test_non_oxide_above_one_weight_percent_stays_refused() -> None:
     raw = {"SiO2": Decimal("50"), "MgO": Decimal("39"), "Cl": Decimal("11")}
     experiment, bench, observation = _printed_experiment(raw)
@@ -223,3 +246,18 @@ def test_non_oxide_above_one_weight_percent_stays_refused() -> None:
         any(gap.reason is GapReason.UNSUPPORTED_PRINT_FORM for gap in item.readiness.gaps)
         for item in requests
     )
+
+
+def test_non_oxide_total_at_one_weight_percent_is_omitted() -> None:
+    raw = {"SiO2": "60", "MgO": "39", "F": "1.0"}
+    experiment, _bench_unused, _observation = _printed_experiment(raw)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert set(selected.value) == {"SiO2", "MgO"}
+    assert selected.notice is not None
+    assert "F 1.0 wt%" in selected.notice
+    over = {"SiO2": "60", "MgO": "38.99", "S": "0.6", "Cl": "0.41"}
+    refused = normalized_composition(_printed_experiment(over)[0], _bench())
+    assert refused.selected is None
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
