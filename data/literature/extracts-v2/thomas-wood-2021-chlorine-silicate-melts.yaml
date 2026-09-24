@@ -1,0 +1,86 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml
+observations:
+- observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table1_starting_compositions
+  experiment_id: 10.1016/j.gca.2020.11.018::experiment::cl-solubility-cmas-icb-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_material_composition'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_starting_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_material_composition'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  locator:
+    pdf_page_index: 4
+    table: '1'
+    section: 2. Experimental methods
+    note: Table 1. Silicate melt compositions used for measuring chlorine solubility.
+  read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+- observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_clglass
+  experiment_id: 10.1016/j.gca.2020.11.018::experiment::cl-solubility-cmas-icb-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chlorine_concentration_in_quench_glass'
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'experimentally_quenched_silicate_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chlorine_concentration_in_quench_glass'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical Clglass uncertainties retained verbatim per row; FeO wt% parentheticals likewise when present.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  locator:
+    pdf_page_index: 7
+    table: '2'
+    note: Table 2 Experimental conditions and compositions; Measured Clglass wt% is EPMA of quench glass. f(Cl2) column is
+      author-calculated from the Ag-AgCl-AgI buffer equilibrium, not a direct gas measurement.
+  read_from: unknown:thomas-wood-2021-chlorine-silicate-melts

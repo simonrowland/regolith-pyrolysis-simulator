@@ -1,0 +1,5512 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
+observations:
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '19950000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=2.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '199.5'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6310000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=1.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '63.1'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1995000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=1.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '19.95'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '631000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=0.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '6.31'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:4
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '199500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=0.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:5
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '63100'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.631'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:6
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '19950'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.1995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:7
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6310'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0631'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co2_partial_pressure::point:8
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1995'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=-2.0; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-2.0; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-2.0; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.02512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.07943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.2512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:4
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '79430'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.7943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:5
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '251200'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:6
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '794300'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:7
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '25.12'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:8
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.43'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_co_partial_pressure::point:9
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=CO open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '251.2'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=CO open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '19950000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=2.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '199.5'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6310000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=1.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '63.1'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1995000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=1.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '19.95'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '631000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=0.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '6.31'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:4
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '199500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=0.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:5
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '63100'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.631'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-0.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:6
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '19950'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.1995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-0.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:7
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6310'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0631'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-1.2; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2_partial_pressure::point:8
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1995'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2 marker at log10 P=-1.7; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.02512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-1.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.07943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-1.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.2512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-0.6; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '79430'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.7943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=-0.1; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:4
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '251200'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.512'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=0.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:5
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '794300'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:6
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '25.12'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:7
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.43'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h2o_partial_pressure::point:8
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H2O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '251.2'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H2O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '19950000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H marker at log10 P=2.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '199.5'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=2.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6310000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H marker at log10 P=1.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '63.1'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=1.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1995000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H marker at log10 P=1.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '19.95'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=1.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '631000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H marker at log10 P=0.8; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '6.31'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=0.8; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_h_partial_pressure::point:4
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '199500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=H marker at log10 P=0.3; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.995'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=H marker at log10 P=0.3; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o2_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=O2 open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.43'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O2 open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O2 open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o2_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=O2 open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '251.2'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O2 open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O2 open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '25.12'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.43'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_o_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '251.2'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=O open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure::point:0
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: OH
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '794300'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=OH open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.943'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=0.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure::point:1
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: OH
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2512000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=OH open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '25.12'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=1.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure::point:2
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: OH
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '7943000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=OH open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '79.43'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=1.9; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa
+- observation_id: pahlevan-2026-protolunar-volatile-outflows::pahlevan_2026_fig1a_oh_partial_pressure::point:3
+  experiment_id: 7a5c9c16910bb42a3ed78af0dd973cb95a6c1c2f332e0d415de6982bb5de8428::experiment::earth_volatile_atmosphere_5000K
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: OH
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '25120000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pahlevan-2026-protolunar-volatile-outflows
+  locator:
+    page: 28
+    figure: 1a
+    note: row=OH open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+  read_from: unknown:pahlevan-2026-protolunar-volatile-outflows
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:pahlevan-2026-protolunar-volatile-outflows
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '251.2'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 28
+          figure: 1a
+          note: row=OH open-circle marker at log10 P=2.4; column=P_bar, log mole fraction
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+    output_unit: Pa

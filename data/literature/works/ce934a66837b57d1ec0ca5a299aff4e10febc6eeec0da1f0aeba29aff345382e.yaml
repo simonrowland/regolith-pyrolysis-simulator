@@ -1,0 +1,62 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ce934a66837b57d1ec0ca5a299aff4e10febc6eeec0da1f0aeba29aff345382e
+  citation: Senior, C. L. (1991), "Solar heating of common lunar minerals for the production of oxygen", Journal of the British
+    Interplanetary Society 44 (December 1991), ISSN 0007-094X. NTRS accession 19920033574 / legacy 92A16198; contract NAS9-18102.
+    PSI Technology Co., Andover, MA.
+  source_ids:
+  - senior-1991-solar-heating-jbis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:senior-1991-solar-heating-jbis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: senior_1991_jbis_ntrs_citation_only
+  type: laboratory_conditions
+  locator:
+    section: ntrs_api_citation_record
+    note: Live NTRS API + citation page; no PDF bytes held
+  phase: acquisition_identity
+  regime: citation_only_no_pdf
+  units: as published
+  values:
+    quantity: ntrs_acquisition_identity_and_typed_absence_summary
+    method_class: method_only
+    evidence_class: ntrs_metadata_only_not_a_measurement_table
+    disseminated_as_api: METADATA_ONLY
+    downloads_available_as_api: false
+    downloads_count_as_api: 0
+    title_as_ntrs: Solar heating of common lunar minerals for the production of oxygen
+    author_as_ntrs: Senior, C. L.
+    affiliation_as_ntrs: PSI Technology Co., Andover, MA, United States
+    publication_as_ntrs: British Interplanetary Society, Journal
+    volume_as_ntrs: '44'
+    publication_date_as_ntrs: '1991-12-01'
+    issn_as_ntrs: 0007-094X
+    accession_as_ntrs: '19920033574'
+    legacy_accession_as_ntrs: 92A16198
+    contract_as_ntrs: NAS9-18102
+    sti_type_as_ntrs: REPRINT
+    copyright_determination_as_ntrs: OTHER
+    abstract_claim_temperature_K_range_as_ntrs: 2000 to 2500
+    abstract_claim_pressure_torr_range_as_ntrs: 0.01 to 1
+    abstract_claim_minerals_as_ntrs:
+    - ilmenite
+    - anorthite
+    n1_policy: Citation-only = typed absence; do not invent measurements from the NTRS abstract. Related Arizona abstract
+      extract is senior-1991-vacuum-pyrolysis.yaml.
+  uncertainty:
+    note: No measurement uncertainty applicable; no scored observations in this extract.
+  context_id: senior-1991-solar-heating-jbis::context::senior_1991_jbis_ntrs_citation_only
+  work_id: ce934a66837b57d1ec0ca5a299aff4e10febc6eeec0da1f0aeba29aff345382e
+  source_id: senior-1991-solar-heating-jbis
+  species: ntrs_record_identity

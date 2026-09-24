@@ -1,0 +1,44 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml
+observations:
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_compositions
+  experiment_id: 10.3847/psj/ac2dfb::experiment::mercury-magma-ocean-model-cases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'magma_ocean_surface_composition'
+    species:
+      formula: Mercury_magma_ocean
+      phase:
+        tag: unknown
+        reason: phase string 'model_magma_ocean_surface' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magma_ocean_surface_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Magma ocean surface composition. Literature compilations used as model inputs, not measurements by these
+      authors.
+  read_from: unknown:jaggi-2021-mercury-atmosphere

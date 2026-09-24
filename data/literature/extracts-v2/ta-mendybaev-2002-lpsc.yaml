@@ -1,0 +1,270 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-mendybaev-2002-lpsc.yaml
+observations:
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_apparent_Ea_1mm_multi_T
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activation_energy_of_vaporization'
+    species:
+      formula: B133_CAI_like_melt
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on Ea=580 kJ/mole. Authors compare to forsterite literature values (quoted_attributed
+        below).
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: 'Printed: corresponds to an apparent activation energy of evaporation Ea =580 kJ/mole'
+  read_from: unknown:ta-mendybaev-2002-lpsc
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'kinetic_isotope_fractionation_factor_Mg'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kinetic_isotope_fractionation_factor_Mg'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on alpha=0.987 in this abstract. Introduction also quotes prior vacuum alpha=0.989
+        and H2 alpha=0.987 from related work; those are attributed citations, not this campaign's new fit.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_direct_regression
+    original_method_class: measured_direct_regression
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Rayleigh fit; no apparent distinction as to sample size
+  read_from: unknown:ta-mendybaev-2002-lpsc
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: B133_CAI_like_melt
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Approximate tilde (~3x10^-7) as printed; no numeric uncertainty band printed for the 1600 C rate.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6
+      and ~3x10^-7 g/mm^2/min, respectively.'
+  read_from: unknown:ta-mendybaev-2002-lpsc
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: B133_CAI_like_melt
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1973.15, 1973.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Approximate tilde (~2x10^-6) as printed; no numeric uncertainty band printed for the 1700 C rate.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 2
+    section: Results and discussion
+    note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6
+      and ~3x10^-7 g/mm^2/min, respectively.'
+  read_from: unknown:ta-mendybaev-2002-lpsc
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: B133_CAI_like_melt
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on (1.1±0.2)x10^-5; authors also note possible systematic underestimation of 1.0 mm evaporating area
+        if melt wets the Ir wire.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+  read_from: unknown:ta-mendybaev-2002-lpsc
+- observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: B133_CAI_like_melt
+      phase:
+        tag: unknown
+        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.8 on (6.8±0.8)x10^-6; retained as stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2002-lpsc
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: prose average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C
+  read_from: unknown:ta-mendybaev-2002-lpsc

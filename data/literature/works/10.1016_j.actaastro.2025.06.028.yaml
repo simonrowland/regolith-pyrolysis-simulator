@@ -1,8 +1,11 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 10.1016/j.actaastro.2025.06.028
-  citation: Improving Molten Regolith Electrolysis with Zirconia-Based Hollow Anode Technology
+  citation: Yu, Kevin; West, William; Stokes, Jamesa; Harder, Bryan; Reidy, Lorlyn; Dominguez, Jesus; Faber, Katherine T.
+    (2025), "Improving molten regolith electrolysis with zirconia-based hollow anode technology", Acta Astronautica 235, 723–735.
+    DOI 10.1016/j.actaastro.2025.06.028. NASA NTRS 20250004626 (accepted manuscript / NTRS copy).
   source_ids:
+  - ntrs-20250004626
   - yu_2025_hollow_anode_measurements
   source_files:
     corpus_repo: regolith-corpus
@@ -10,6 +13,12 @@ work:
       tag: unknown
       reason: INDEX does not give corpus commit
     files:
+    - asset_id: unknown:ntrs-20250004626
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:yu_2025_hollow_anode_measurements
       role: pdftotext
       path: unknown
@@ -18,6 +27,38 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.actaastro.2025.06.028
 experiments:
+- experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_simulant_and_apollo_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.actaastro.2025.06.028
+  locator:
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 Major abundances of LHS-1 simulant and highlands lunar regolith (wt%) [26,27]
 - experiment_id: 10.1016/j.actaastro.2025.06.028::yu_2025_hollow_anode_measurements
   kind: literature
   method:
@@ -49,3 +90,38 @@ experiments:
   locator:
     section: 2.2.2
     note: derivation=0.5 A times 3600 s
+context:
+- observation_id: yu_2025_mre_method_conditions
+  type: method
+  locator:
+    pdf_page_index: 8
+    section: 2.2.2
+  phase: inverted_hollow_anode_MRE
+  regime: constant_current_Ar_carrier
+  units: as printed
+  values:
+    quantity: electrolysis_operating_conditions
+    method_class: method_only
+    T_C: 1600
+    durations_hr_as_printed:
+    - 1
+    - 3
+    - 12
+    pre_and_post_hold_hr_as_printed: 1
+    Ar_flow_sccm: 100
+    current_A: '0.5'
+    cathode_area_cm2_approx: 10
+    anode_pad_area_cm2_approx: 1
+    anodic_current_density_A_per_cm2_approx: '0.5'
+    LHS1_load_g_approx: 20
+    solid_electrolyte_as_printed: 10.5 wt% YSZ tube
+    cathode_as_printed: Mo
+    anode_current_collector_as_printed: Pt
+    carrier_gas_as_printed: Ar
+    RGA_as_printed: Hiden Analytical HPR-20
+  uncertainty:
+    note: tilde-approx printed on areas / current density / ~20 g load
+  context_id: ntrs-20250004626::context::yu_2025_mre_method_conditions
+  work_id: 10.1016/j.actaastro.2025.06.028
+  source_id: ntrs-20250004626
+  species: LHS-1_MRE_hollow_anode

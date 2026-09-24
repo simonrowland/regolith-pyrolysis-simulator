@@ -1,0 +1,1701 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/busemann-2000-phase-q-noble-gases.yaml
+observations:
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table1_ne
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 950
+    published_page: 950
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table1_ne_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 950
+    published_page: 950
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table1_ne_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992); Wieler et al. (1991); Schelhaas et al. (1990); Ott et al. (1985a); Alaerts et al. (1979a);
+      Huss et al. (1996); Wacker (1986); Eberhardt et al. (1965); Benkert et al. (1993); Pepin (1967); Huss and Lewis (1994a);
+      Amari et al. (1995); Lewis et al. (1994); typical chondritic value
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 950
+    published_page: 950
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table1_ne_quoted_wieler_1992
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 950
+    published_page: 950
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1; source-specific quoted cell fragments
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table3_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 954
+    published_page: 954
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table3_he_quoted_eugster_1998
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Eugster et al. (1998)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 954
+    published_page: 954
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3; source-specific quoted row fragments
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table3_he_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Eugster et al. (1998); Wieler et al. (1992); Scherer and Schultz (2000); Wieler et al. (1991); Benkert et
+      al. (1993); e.g., Black (1972); Eberhardt (1978); Reynolds et al. (1978); Huss and Lewis (1994a)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 954
+    published_page: 954
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table3_he_quoted_scherer_schultz_2000
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Scherer and Schultz (2000)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 954
+    published_page: 954
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3; source-specific quoted row fragments
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table4_ar
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ar
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 955
+    published_page: 955
+    pdf_page_index: 7
+    table: '4'
+    note: Table 4; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table4_ar_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ar
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 955
+    published_page: 955
+    pdf_page_index: 7
+    table: '4'
+    note: Table 4; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table4_ar_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ar
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992); Wieler et al. (1991); Nier (1950); Benkert et al. (1993); Reynolds et al. (1978); Huss
+      and Lewis (1994a); Alaerts et al. (1979a)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 955
+    published_page: 955
+    pdf_page_index: 7
+    table: '4'
+    note: Table 4; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table5_xe
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Xe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 956
+    published_page: 956
+    pdf_page_index: 8
+    table: '5'
+    note: Table 5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table5_xe_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Xe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 956
+    published_page: 956
+    pdf_page_index: 8
+    table: '5'
+    note: Table 5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table5_xe_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Xe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992); Wieler et al. (1991); Huss and Lewis (1994a); Ott et al. (1988); Pepin (1991); Basford
+      et al. (1973); Eugster et al. (1967)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 956
+    published_page: 956
+    pdf_page_index: 8
+    table: '5'
+    note: Table 5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table6_kr
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Kr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '6'
+    note: Table 6; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table6_kr_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Kr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '6'
+    note: Table 6; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table6_kr_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Kr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992); Wieler et al. (1991); Huss and Lewis (1994a); Ott et al. (1988); Basford et al. (1973);
+      Eugster et al. (1967)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '6'
+    note: Table 6; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table7_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '7'
+    note: Table 7; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table7_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '7'
+    note: Table 7; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table7_he_quoted_wieler_1991
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1991)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '7'
+    note: Table 7; source-specific quoted row fragment
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table7_he_quoted_wieler_1992
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Wieler et al. (1992)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 957
+    published_page: 957
+    pdf_page_index: 9
+    table: '7'
+    note: Table 7; source-specific quoted row fragment
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table8_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 959
+    published_page: 959
+    pdf_page_index: 11
+    table: '8'
+    note: Table 8; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table9_ne
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 965
+    published_page: 965
+    pdf_page_index: 17
+    table: '9'
+    note: Table 9; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_table9_ne_quoted_prior_work
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::busemann-2000-phase-q-noble-gases
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_prior_work
+    attribution: Huss and Lewis (1995); Wieler et al. (1992)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 965
+    published_page: 965
+    pdf_page_index: 17
+    table: '9'
+    note: Table 9; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea1_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::cold_bokkeveld_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 969
+    published_page: 969
+    pdf_page_index: 21
+    table: A1
+    note: Table A1; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea1_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::cold_bokkeveld_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 969
+    published_page: 969
+    pdf_page_index: 21
+    table: A1
+    note: Table A1; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea2_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::grosnaja_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 970
+    published_page: 970
+    pdf_page_index: 22
+    table: A2
+    note: Table A2; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea2_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::grosnaja_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 970
+    published_page: 970
+    pdf_page_index: 22
+    table: A2
+    note: Table A2; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea3_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::lance_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 970
+    published_page: 970
+    pdf_page_index: 22
+    table: A3
+    note: Table A3; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea3_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::lance_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 970
+    published_page: 970
+    pdf_page_index: 22
+    table: A3
+    note: Table A3; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea4_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::isna_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 971
+    published_page: 971
+    pdf_page_index: 23
+    table: A4
+    note: Table A4; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea4_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::isna_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 971
+    published_page: 971
+    pdf_page_index: 23
+    table: A4
+    note: Table A4; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea5_continued_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::chainpur_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 972
+    published_page: 972
+    pdf_page_index: 24
+    table: A5
+    note: Table A5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea5_continued_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::chainpur_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 972
+    published_page: 972
+    pdf_page_index: 24
+    table: A5
+    note: Table A5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea5_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::chainpur_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 971
+    published_page: 971
+    pdf_page_index: 23
+    table: A5
+    note: Table A5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea5_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::chainpur_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 971
+    published_page: 971
+    pdf_page_index: 23
+    table: A5
+    note: Table A5; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea6_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::dimmitt_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 972
+    published_page: 972
+    pdf_page_index: 24
+    table: A6
+    note: Table A6; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea6_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::dimmitt_csse
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 972
+    published_page: 972
+    pdf_page_index: 24
+    table: A6
+    note: Table A6; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea7_he
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::bulk_residue_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 973
+    published_page: 973
+    pdf_page_index: 25
+    table: A7
+    note: Table A7; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases
+- observation_id: busemann-2000-phase-q-noble-gases::busemann_2000_tablea7_he_derived
+  experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::bulk_residue_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'source_table_rows'
+    species:
+      formula: He
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'source_table_rows'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Parenthetical uncertainties and inequality/approximation markers are retained verbatim in each cell.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: busemann-2000-phase-q-noble-gases
+  locator:
+    page: 973
+    published_page: 973
+    pdf_page_index: 25
+    table: A7
+    note: Table A7; full table row matrix
+  read_from: unknown:busemann-2000-phase-q-noble-gases

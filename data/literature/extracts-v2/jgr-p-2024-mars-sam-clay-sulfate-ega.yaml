@@ -1,0 +1,4254 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml
+observations:
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_av
+  experiment_id: 10.1029/2024je008587::experiment::av
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '190'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=AV; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_bd
+  experiment_id: 10.1029/2024je008587::experiment::bd
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '80'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=BD; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ca1
+  experiment_id: 10.1029/2024je008587::experiment::ca1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '30'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=CA1; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ca2
+  experiment_id: 10.1029/2024je008587::experiment::ca2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '50'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=CA2; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_mg1
+  experiment_id: 10.1029/2024je008587::experiment::mg1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '180'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=MG1; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_mg2
+  experiment_id: 10.1029/2024je008587::experiment::mg2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '675'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=MG2; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_nt1
+  experiment_id: 10.1029/2024je008587::experiment::nt1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '90'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=NT1; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_nt2
+  experiment_id: 10.1029/2024je008587::experiment::nt2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '180'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=NT2; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_pt
+  experiment_id: 10.1029/2024je008587::experiment::pt
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '30'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=PT; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig10_co_ze
+  experiment_id: 10.1029/2024je008587::experiment::ze
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '130'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 18
+    figure: '10'
+    note: row=ZE; column=C from CO (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_av
+  experiment_id: 10.1029/2024je008587::experiment::av
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '2.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=AV; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_bd
+  experiment_id: 10.1029/2024je008587::experiment::bd
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '1.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=BD; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ca1
+  experiment_id: 10.1029/2024je008587::experiment::ca1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '3.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=CA1; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ca2
+  experiment_id: 10.1029/2024je008587::experiment::ca2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '2.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=CA2; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_mg1
+  experiment_id: 10.1029/2024je008587::experiment::mg1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '7.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=MG1; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_mg2
+  experiment_id: 10.1029/2024je008587::experiment::mg2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '7.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=MG2; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_nt1
+  experiment_id: 10.1029/2024je008587::experiment::nt1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '2.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=NT1; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_nt2
+  experiment_id: 10.1029/2024je008587::experiment::nt2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '1.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=NT2; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_pt
+  experiment_id: 10.1029/2024je008587::experiment::pt
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=PT; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig5_h2o_ze
+  experiment_id: 10.1029/2024je008587::experiment::ze
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '5.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 11
+    figure: '5'
+    note: row=ZE; column=SAM H2O abundance (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_av
+  experiment_id: 10.1029/2024je008587::experiment::av
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=AV; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_bd
+  experiment_id: 10.1029/2024je008587::experiment::bd
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=BD; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ca1
+  experiment_id: 10.1029/2024je008587::experiment::ca1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=CA1; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ca2
+  experiment_id: 10.1029/2024je008587::experiment::ca2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=CA2; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_mg1
+  experiment_id: 10.1029/2024je008587::experiment::mg1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '1.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=MG1; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_mg2
+  experiment_id: 10.1029/2024je008587::experiment::mg2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '2.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=MG2; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_nt1
+  experiment_id: 10.1029/2024je008587::experiment::nt1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=NT1; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_nt2
+  experiment_id: 10.1029/2024je008587::experiment::nt2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=NT2; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_pt
+  experiment_id: 10.1029/2024je008587::experiment::pt
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=PT; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig6_so3_ze
+  experiment_id: 10.1029/2024je008587::experiment::ze
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: SO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 12
+    figure: '6'
+    note: row=ZE; column=SAM SO3 / APXS SO3 (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_av
+  experiment_id: 10.1029/2024je008587::experiment::av
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=AV; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_bd
+  experiment_id: 10.1029/2024je008587::experiment::bd
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=BD; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ca1
+  experiment_id: 10.1029/2024je008587::experiment::ca1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=CA1; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ca2
+  experiment_id: 10.1029/2024je008587::experiment::ca2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=CA2; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_mg1
+  experiment_id: 10.1029/2024je008587::experiment::mg1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.35'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=MG1; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_mg2
+  experiment_id: 10.1029/2024je008587::experiment::mg2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.63'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=MG2; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_nt1
+  experiment_id: 10.1029/2024je008587::experiment::nt1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=NT1; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_nt2
+  experiment_id: 10.1029/2024je008587::experiment::nt2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=NT2; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_pt
+  experiment_id: 10.1029/2024je008587::experiment::pt
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=PT; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig8_cl_ze
+  experiment_id: 10.1029/2024je008587::experiment::ze
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 15
+    figure: '8'
+    note: row=ZE; column=SAM Cl / APXS Cl (wt.%)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_av
+  experiment_id: 10.1029/2024je008587::experiment::av
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '530'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=AV; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_bd
+  experiment_id: 10.1029/2024je008587::experiment::bd
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '630'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=BD; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ca1
+  experiment_id: 10.1029/2024je008587::experiment::ca1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '170'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=CA1; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ca2
+  experiment_id: 10.1029/2024je008587::experiment::ca2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '225'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=CA2; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_mg1
+  experiment_id: 10.1029/2024je008587::experiment::mg1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '900'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=MG1; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_mg2
+  experiment_id: 10.1029/2024je008587::experiment::mg2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '1640'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=MG2; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_nt1
+  experiment_id: 10.1029/2024je008587::experiment::nt1
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '320'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=NT1; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_nt2
+  experiment_id: 10.1029/2024je008587::experiment::nt2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '610'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=NT2; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_pt
+  experiment_id: 10.1029/2024je008587::experiment::pt
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '100'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=PT; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+- observation_id: jgr-p-2024-mars-sam-clay-sulfate-ega::jgr_2024_fig9_co2_ze
+  experiment_id: 10.1029/2024je008587::experiment::ze
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: point
+    point: '530'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  locator:
+    pdf_page_index: 16
+    figure: '9'
+    note: row=ZE; column=C from CO2 (µg/g)
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+  read_from: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega

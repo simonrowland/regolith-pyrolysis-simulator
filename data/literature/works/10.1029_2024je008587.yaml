@@ -1,0 +1,1984 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1029/2024je008587
+  citation: 'Clark, J. V., Sutter, B., McAdam, A. C., Lewis, J. M. T., Franz, H., Archer, P. D., Chou, L., Eigenbrode, J.,
+    Knudson, C., Stern, J., Glavin, D., Steele, A., House, C. H., Schroeder, J., Berger, J., Rampe, E. B., Simpson, S., Tutolo,
+    B., Milliken, R. E., Malespin, C., Mahaffy, P., Vasavada, A. (2024), Environmental Changes Recorded in Sedimentary Rocks
+    in the Clay-Sulfate Transition Region in Gale Crater, Mars: Results From the Sample Analysis at Mars-Evolved Gas Analysis
+    Instrument Onboard the Mars Science Laboratory Curiosity Rover, Journal of Geophysical Research: Planets'
+  source_ids:
+  - jgr-p-2024-mars-sam-clay-sulfate-ega
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1029/2024je008587
+experiments:
+- experiment_id: 10.1029/2024je008587::experiment::av
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: AV; Contigo member sample; goethite up to 4.1 wt.% reported in the sample characterization
+      locator:
+        pdf_page_index: 6
+        section: '2.1'
+        note: Sample mineralogy; AV row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=AV
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::bd
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: BD; Mercou member sample; phyllosilicates 12 wt.% reported in the sample characterization
+      locator:
+        pdf_page_index: 6
+        section: '2.1'
+        note: BD row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=BD
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::ca1
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: CA aliquot 1; Contigo member sample as labeled in the figures
+      locator:
+        pdf_page_index: 8
+        section: '2.3'
+        note: CA is the Contigo sample; aliquot label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: Figure row label identifies the first CA aliquot; row=CA1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::ca2
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: CA aliquot 2; Contigo member sample as labeled in the figures
+      locator:
+        pdf_page_index: 8
+        section: '2.3'
+        note: CA is the Contigo sample; aliquot label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition, not an inferred sample-cell
+          pressure'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: Figure row label identifies the second CA aliquot; row=CA2
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min; temperature increment °C = K'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::mg1
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: MG aliquot 1; Dunnideer member sample; amorphous material 54 ± 13 wt.% reported in the results
+      locator:
+        pdf_page_index: 11
+        section: '3.1'
+        note: Sample mineralogy; MG1 row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=MG1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::mg2
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: MG aliquot 2; Dunnideer member sample; amorphous material 54 ± 13 wt.% reported in the results
+      locator:
+        pdf_page_index: 11
+        section: '3.1'
+        note: Sample mineralogy; MG2 row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=MG2
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::nt1
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: NT aliquot 1; Glasgow member sample; phyllosilicates 18 wt.% reported in the sample characterization
+      locator:
+        pdf_page_index: 6
+        section: '2.1'
+        note: NT1 row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=NT1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::nt2
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: NT aliquot 2; Glasgow member sample; phyllosilicates 18 wt.% reported in the sample characterization
+      locator:
+        pdf_page_index: 6
+        section: '2.1'
+        note: NT2 row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=NT2
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::pt
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: PT; Pontours member sample; halite approximately 0.6 wt.% NaCl reported in the sample characterization
+      locator:
+        pdf_page_index: 6
+        section: '2.1'
+        note: PT row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=PT
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::sam_blank
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual blank mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: Post-ZE blank; triple-portion Windjana residue control, not a rock sample
+      locator:
+        pdf_page_index: 8
+        section: '2.3'
+    form:
+      state:
+        tag: value
+        value: preconditioned SAM cup / blank control
+      locator:
+        pdf_page_index: 8
+        section: '2.3'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 8
+        section: '2.3'
+        note: Blank is described as a control
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 8
+    section: '2.3'
+    note: Post-ZE blank run is the supplied source's blank/residue control
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+- experiment_id: 10.1029/2024je008587::experiment::ze
+  kind: literature
+  method:
+    tag: value
+    value: evolved_gas_ms
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 10
+        section: '2.5'
+        note: Individual aliquot mass is not printed
+    printed_composition:
+      state:
+        tag: value
+        value: ZE; Port Logan member sample; gypsum 18.2 wt.% reported in the results
+      locator:
+        pdf_page_index: 11
+        section: '3.1'
+        note: Sample mineralogy; ZE row label is printed in Figures 5-10
+    form:
+      state:
+        tag: value
+        value: drill fines loaded in a quartz cup
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Each result is from a temperature ramp
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2500'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: 'DERIVED: printed ~25 mbar carrier pressure × 100 Pa/mbar; QMS carrier condition'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: value
+            value: '0.8'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: Flow is printed; partial pressure is not inferred from flow
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1029/2024je008587
+  locator:
+    pdf_page_index: 13
+    figure: 5-10
+    note: row=ZE
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        note: No pO2/fO2 buffer or oxygen fugacity is printed
+  bench_id: 10.1029/2024je008587::bench::sam_msl_ega
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EGA ramp to approximately 900 °C
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.5833333333333333'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~35 °C/min ÷ 60 s/min'
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: '2.2'
+          note: 'DERIVED: printed ~900 °C + 273.15 K'
+benches:
+- id: 10.1029/2024je008587::bench::sam_msl_ega
+  work_id: 10.1029/2024je008587
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Sample Analysis at Mars (SAM) evolved gas analysis system
+    locator:
+      pdf_page_index: 7
+      section: 2.1-2.2
+      note: SAM has two ovens and QMS
+  pumping_type:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      pdf_page_index: 7
+      section: '2.2'
+      note: Carrier pressure is printed; a separate sample-cell pumping specification is not
+  detector:
+    state:
+      tag: value
+      value: Quadrupole mass spectrometer (QMS); six GC columns and TLS are also SAM gas-analysis instruments
+    locator:
+      pdf_page_index: 7
+      section: 2.1-2.2
+  heating_method:
+    state:
+      tag: value
+      value: Quartz-cup oven ramp for evolved gas analysis
+    locator:
+      pdf_page_index: 7
+      section: '2.2'
+  other_facts: []
+context:
+- observation_id: jgr_2024_cl_printed_range_and_profile
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 15
+    figure: '8'
+    section: '3.4'
+  units: wt.% and °C as printed
+  values:
+    quantity: printed_hcl_and_chlorine_release_facts
+    method_class: measured_direct
+    printed_points:
+    - field: sam_cl_range_wt_pct
+      value: 0.11-0.65
+      locator:
+        pdf_page_index: 15
+        figure: '8'
+        column: SAM-derived Cl
+    - field: hcl_peak_window_C
+      value: 550-600
+      locator:
+        pdf_page_index: 15
+        figure: '8'
+        column: HCl peak
+    - field: blank_low_temperature_window_C
+      value: <200
+      locator:
+        pdf_page_index: 15
+        figure: '8'
+        row: blank
+        column: HCl
+    - field: pt_halite_wt_pct_NaCl
+      value: '0.6'
+      locator:
+        pdf_page_index: 15
+        figure: '8'
+        row: PT
+        column: CheMin halite
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_cl_printed_range_and_profile
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: Cl
+- observation_id: jgr_2024_co2_printed_range_and_profile
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 16
+    figure: '9'
+    section: '3.5'
+  units: µg/g, µmol, and °C as printed
+  values:
+    quantity: printed_co2_carbon_release_facts
+    method_class: measured_direct
+    printed_points:
+    - field: carbon_from_co2_range_ug_per_g
+      value: 96-1668
+      locator:
+        pdf_page_index: 16
+        figure: '9'
+        column: C from CO2
+    - field: low_temperature_release_window_C
+      value: <250
+      locator:
+        pdf_page_index: 16
+        figure: '9'
+        column: release window
+    - field: mid_temperature_release_window_C
+      value: 295-375
+      locator:
+        pdf_page_index: 16
+        figure: '9'
+        column: release window
+    - field: carbonate_like_peak_window_C
+      value: 330-430
+      locator:
+        pdf_page_index: 16
+        figure: '9'
+        row: NT1, BD, ZE, AV
+        column: peak window
+    - field: blank_co2_umol
+      value: 0.2 ± 0.1
+      locator:
+        pdf_page_index: 17
+        figure: blank CO2
+        column: CO2 amount
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_co2_printed_range_and_profile
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: CO2
+- observation_id: jgr_2024_co_printed_range_and_profile
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 18
+    figure: '10'
+    section: '3.6'
+  units: µmol and °C as printed
+  values:
+    quantity: printed_co_release_facts
+    method_class: measured_direct
+    printed_points:
+    - field: total_co_range_umol
+      value: 0.25-1.5
+      locator:
+        pdf_page_index: 18
+        figure: '10'
+        column: total CO
+    - field: main_release_window_C
+      value: 230-525
+      locator:
+        pdf_page_index: 18
+        figure: '10'
+        column: CO release window
+    - field: high_temperature_release_C
+      value: ~800 and >850
+      locator:
+        pdf_page_index: 18
+        figure: '10'
+        column: CO release window
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_co_printed_range_and_profile
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: CO
+- observation_id: jgr_2024_fig6_ca_starkeyite_label
+  type: characterization
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 12
+    figure: '6'
+    row: CA
+    column: 2.3 wt.% starkeyite
+  units: wt.% as printed
+  values:
+    quantity: printed_starkeyite_abundance
+    method_class: figure_only
+    sample: CA
+    ca_starkeyite_wt_pct: '2.3'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig6_ca_starkeyite_label
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: SO3
+- observation_id: jgr_2024_fig7_mg_sulfate_av
+  experiment: av
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: AV
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: AV
+    evolved_so2_source_phase_apportionment_fraction: '0.32'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_av
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_bd
+  experiment: bd
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: BD
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: BD
+    evolved_so2_source_phase_apportionment_fraction: '0.02'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_bd
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_ca1
+  experiment: ca1
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: CA1
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: CA1
+    evolved_so2_source_phase_apportionment_fraction: '0.65'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_ca1
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_ca2
+  experiment: ca2
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: CA2
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: CA2
+    evolved_so2_source_phase_apportionment_fraction: '0.65'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_ca2
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_mg1
+  experiment: mg1
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: MG1
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: MG1
+    evolved_so2_source_phase_apportionment_fraction: '0.35'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_mg1
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_mg2
+  experiment: mg2
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: MG2
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: MG2
+    evolved_so2_source_phase_apportionment_fraction: '0.35'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_mg2
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_nt1
+  experiment: nt1
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: NT1
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: NT1
+    evolved_so2_source_phase_apportionment_fraction: '0.48'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_nt1
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_nt2
+  experiment: nt2
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: NT2
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: NT2
+    evolved_so2_source_phase_apportionment_fraction: '0.48'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_nt2
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_pt
+  experiment: pt
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: PT
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: PT
+    evolved_so2_source_phase_apportionment_fraction: '0.1'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_pt
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_fig7_mg_sulfate_ze
+  experiment: ze
+  type: apportionment
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    figure: '7'
+    row: ZE
+    column: Mg-sulfate fraction
+  units: dimensionless fraction as plotted
+  values:
+    method_class: figure_only
+    derivation: Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01
+    reason: authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield
+    sample: ZE
+    evolved_so2_source_phase_apportionment_fraction: '0.5'
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_fig7_mg_sulfate_ze
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_h2o_printed_abundance_and_profile
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 11
+    figure: '5'
+    section: '3.1'
+  units: wt.% and °C as printed
+  values:
+    quantity: printed_h2o_abundance_and_release_windows
+    method_class: measured_direct
+    printed_points:
+    - field: abundance_range_wt_pct
+      value: 0.87-7.74
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        column: H2O abundance
+        note: range printed in prose
+    - field: high_abundance_samples_wt_pct
+      value: 5.35-7.74
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        row: MG1, MG2, ZE
+        column: H2O abundance
+    - field: low_temperature_release_end_C
+      value: 250
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        column: release window
+        note: below 250 °C
+    - field: broad_release_window_C
+      value: 100-750
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        column: release window
+        note: approximately 100-750 °C
+    - field: mid_temperature_peak_window_C
+      value: 360-430
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        row: NT, BD, AV
+        column: peak window
+    - field: gypsum_ZE_wt_pct
+      value: '18.2'
+      locator:
+        pdf_page_index: 11
+        figure: '5'
+        row: ZE
+        column: CheMin gypsum
+    absence_statement: H2O was not detected in the post-ZE blank; this is retained as absence evidence, never as a zero.
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_h2o_printed_abundance_and_profile
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: H2O
+- observation_id: jgr_2024_method_and_h2o_printed_facts
+  type: method
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 7
+    section: 2.1-2.2
+  units: as printed in the PDF
+  values:
+    quantity: sam_ega_method_parameters
+    method_class: measured_direct
+    printed_facts:
+    - field: oven_end_temperature_C
+      value: 900
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        column: EGA oven
+        note: approximately 900 °C
+    - field: heating_rate_C_per_min
+      value: 35
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        column: heating rate
+        note: approximately 35 °C/min
+    - field: carrier_flow_sccm
+      value: '0.8'
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        column: He flow
+        note: approximately 0.8 standard cubic centimeters per minute
+    - field: carrier_pressure_mbar
+      value: 25
+      locator:
+        pdf_page_index: 7
+        section: '2.2'
+        column: He pressure
+        note: approximately 25 mbar
+    carrier_gas: He
+    instruments:
+    - QMS
+    - GC
+    - TLS
+    equations_as_printed: O2, formaldehyde, NO, and CO signals are corrected using m/z equations (1)-(4); coefficients are
+      printed in the cited equations and Table S1.
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_method_and_h2o_printed_facts
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: H2O
+- observation_id: jgr_2024_mgso4_printed_composition_facts
+  type: characterization
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 11
+    figure: '7'
+    section: 3.1-3.2
+  units: wt.% as printed
+  values:
+    quantity: printed_mg_sulfate_bearing_phase_facts
+    method_class: measured_direct
+    printed_points:
+    - field: mg_amorphous_fraction_wt_pct
+      value: 54 ± 13
+      locator:
+        pdf_page_index: 11
+        figure: '7'
+        row: MG
+        column: amorphous material
+    - field: gypsum_ZE_wt_pct
+      value: '18.2'
+      locator:
+        pdf_page_index: 11
+        figure: '7'
+        row: ZE
+        column: gypsum
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_mgso4_printed_composition_facts
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: MgSO4
+- observation_id: jgr_2024_o2_no_printed_status
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 13
+    section: 3.3 O2 and NO
+  units: wt.% and °C as printed
+  values:
+    quantity: printed_o2_no_status
+    method_class: measured_direct
+    printed_points:
+    - field: perchlorate_chlorate_detection_limit_wt_pct
+      value: <0.001
+      locator:
+        pdf_page_index: 13
+        section: '3.3'
+        column: ClO4 detection limit
+    - field: apxs_mno_range_wt_pct
+      value: 0.21-0.43
+      locator:
+        pdf_page_index: 13
+        section: '3.3'
+        column: APXS MnO
+    - field: bd_no_peak_C
+      value: 700
+      locator:
+        pdf_page_index: 13
+        section: '3.3'
+        row: BD
+        column: NO peak
+        note: approximately 700 °C
+    absence_statements:
+    - No evolved O2 detected in campaign samples or post-ZE blank
+    - NO undetectable or minor in other samples
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_o2_no_printed_status
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: H2O
+- observation_id: jgr_2024_refused_exact_figure_values
+  type: data_availability
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 11
+    figure: 5-10
+    note: Raster bar panels do not print numeric labels for every bar'
+  units: as plotted
+  values:
+    status: refused
+    reason: Exact unrounded bar values are not printed; retained values are explicitly approximate digitizations and must
+      not be treated as measured-printed.
+    method_class: measured_direct
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_refused_exact_figure_values
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: CO
+- observation_id: jgr_2024_refused_per_run_fugacity
+  type: data_availability
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 7
+    section: '2.2'
+    note: No per-aliquot pO2/fO2 or oxygen fugacity is printed'
+  units: as printed
+  values:
+    status: refused
+    reason: pO2/fO2 is absent from the article; no oxygen fugacity is inferred from He carrier gas or mineralogy.
+    method_class: measured_direct
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_refused_per_run_fugacity
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: CO
+- observation_id: jgr_2024_refused_supplementary_tables
+  type: data_availability
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 7
+    section: 2.1-2.5
+    note: Main PDF references Tables S1-S9
+    but the supplied corpus PDF does not contain those supplementary tables': null
+  units: as printed
+  values:
+    status: refused
+    reason: The cited supplementary tables are not present in the supplied source material; exact table-row values cannot
+      be transcribed without inventing them.
+    method_class: measured_direct
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_refused_supplementary_tables
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: CO
+- observation_id: jgr_2024_so3_printed_ranges_and_peaks
+  type: results_summary
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+    pdf_page_index: 12
+    figure: '6'
+    section: '3.2'
+  units: wt.% and °C as printed
+  values:
+    quantity: printed_so3_and_sulfate_release_facts
+    method_class: measured_direct
+    printed_points:
+    - field: sam_so3_range_wt_pct
+      value: 0.22 ± 0.13 to 2.19 ± 1.39
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        column: SAM-derived SO3
+    - field: apxs_so3_range_wt_pct
+      value: 4.77 ± 0.10 to 19.21 ± 0.22
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        column: APXS SO3
+    - field: av_so2_peak_C
+      value: 683
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        row: AV
+        column: SO2 peak
+    - field: nt1_peak_C
+      value: 545
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        row: NT1
+        column: SO2 peak
+    - field: nt2_peak_C
+      value: 452
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        row: NT2
+        column: SO2 peak
+    - field: nt2_high_temperature_peak_C
+      value: 790
+      locator:
+        pdf_page_index: 12
+        figure: '6'
+        row: NT2
+        column: high-temperature sulfate peak
+  context_id: jgr-p-2024-mars-sam-clay-sulfate-ega::context::jgr_2024_so3_printed_ranges_and_peaks
+  work_id: 10.1029/2024je008587
+  source_id: jgr-p-2024-mars-sam-clay-sulfate-ega
+  species: SO3

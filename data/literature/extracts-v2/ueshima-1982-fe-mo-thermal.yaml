@@ -1,0 +1,206 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ueshima-1982-fe-mo-thermal.yaml
+observations:
+- observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_synopsis_alpha_decomposition
+  experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'invariant_transformation_temperature'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alpha' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1727.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'invariant_transformation_temperature'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: +/- 2 C as printed in English Synopsis
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ueshima-1982-fe-mo-thermal
+  locator:
+    published_page: 2569
+    pdf_page_index: 1
+    section: Synopsis
+    note: 'English Synopsis invariant: alpha = L + delta'
+  read_from: unknown:ueshima-1982-fe-mo-thermal
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1727.15'
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        note: 'English Synopsis invariant: alpha = L + delta'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1454'
+            locator:
+              published_page: 2569
+              pdf_page_index: 1
+              section: Synopsis
+              note: 'English Synopsis invariant: alpha = L + delta'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2569
+              pdf_page_index: 1
+              section: Synopsis
+              note: 'English Synopsis invariant: alpha = L + delta'
+        output_unit: K
+- observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_synopsis_delta_decomposition
+  experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'invariant_transformation_temperature_range'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_delta' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'invariant_transformation_temperature_range'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed as a range 1503 ~ 1521 C rather than a single +/- interval
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ueshima-1982-fe-mo-thermal
+  locator:
+    published_page: 2569
+    pdf_page_index: 1
+    section: Synopsis
+    note: 'English Synopsis invariant: delta = L + sigma; range as printed'
+  read_from: unknown:ueshima-1982-fe-mo-thermal
+- observation_id: ueshima-1982-fe-mo-thermal::ueshima_1982_synopsis_sigma_decomposition
+  experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'invariant_transformation_temperature'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_sigma' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1883.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'invariant_transformation_temperature'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: +/- 1 C as printed in English Synopsis
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ueshima-1982-fe-mo-thermal
+  locator:
+    published_page: 2569
+    pdf_page_index: 1
+    section: Synopsis
+    note: 'English Synopsis invariant: sigma = L + (Mo); about 70 C higher than prior reports'
+  read_from: unknown:ueshima-1982-fe-mo-thermal
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883.15'
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        note: 'English Synopsis invariant: sigma = L + (Mo); about 70 C higher than prior reports'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1610'
+            locator:
+              published_page: 2569
+              pdf_page_index: 1
+              section: Synopsis
+              note: 'English Synopsis invariant: sigma = L + (Mo); about 70 C higher than prior reports'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2569
+              pdf_page_index: 1
+              section: Synopsis
+              note: 'English Synopsis invariant: sigma = L + (Mo); about 70 C higher than prior reports'
+        output_unit: K

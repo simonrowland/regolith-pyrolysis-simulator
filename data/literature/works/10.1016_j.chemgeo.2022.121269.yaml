@@ -19,11 +19,248 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.chemgeo.2022.121269
 experiments:
+- experiment_id: 10.1016/j.chemgeo.2022.121269::experiment::quench-glass-series
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+        note: Sample mass not printed
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121271
+        pdf_page_index: 3
+        table: '1'
+        note: 43 distinct EPMA glass compositions; no single series composition
+    form:
+      state:
+        tag: value
+        value: Silicate powder intimately mixed with Ag metal
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+    characterization:
+      state:
+        tag: value
+        value: Quenched glasses and Cl buffers analysed by EPMA; XAFS at Diamond Light Source I18
+      locator:
+        published_page: 121274
+        pdf_page_index: 6
+        section: 2.2 Analytical measurement
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121273
+        pdf_page_index: 5
+        table: '2'
+        note: Individual rows span 1300-1400 C; no single series setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 121273
+        pdf_page_index: 5
+        table: '2'
+        note: Individual rows span 0.5-2.0 GPa (methods prose 5-20 kbar); no single series pressure; sealed capsule has no
+          flowing atmosphere
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+        note: Sealed graphite/Pt capsule piston-cylinder runs; no sweep/carrier gas flow printed
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/j.chemgeo.2022.121269
+  locator:
+    published_page: 121270
+    pdf_page_index: 2
+    section: 2.1 Starting compositions and experimental conditions
+    note: 43 tabulated run IDs in Tables 1-2; series registry for shared piston-cylinder apparatus; per-run T/P/duration/log
+      fO2 remain in observation rows
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: graphite and Pt capsules
+      locator:
+        published_page: 121274
+        pdf_page_index: 6
+        section: 2.2 Analytical measurement
+        note: Printed encased within graphite and Pt capsules (total thickness <2 mm); run products >0.5 mm thick glass
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: 2.1 Starting compositions and experimental conditions
+          note: Sealed high-pressure capsule; no Knudsen orifice
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: 2.1 Starting compositions and experimental conditions
+          note: Sealed high-pressure capsule; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: value
+        value: controlled oxygen fugacity; exact buffer assembly not stated in this paper
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+        note: Per-run log fO2 printed in Table 2; assembly details absent here
+  bench_id: 10.1016/j.chemgeo.2022.121269::bench::oxford-piston-cylinder
+  equipment_context_id: thomas-2022-chlorine-bonding-silicate-melts::context::thomas_2022_apparatus_and_analytical_conditions
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated above the liquidus then quenched
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1573.15'
+            interval_high: '1673.15'
+            approximate: false
+        locator:
+          published_page: 121270
+          pdf_page_index: 2
+          section: 2.1 Starting compositions and experimental conditions
+          note: Printed 1300-1400 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1300'
+              locator:
+                published_page: 121270
+                pdf_page_index: 2
+                section: 2.1 Starting compositions and experimental conditions
+                note: Printed 1300-1400 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1400'
+              locator:
+                published_page: 121270
+                pdf_page_index: 2
+                section: 2.1 Starting compositions and experimental conditions
+                note: Printed 1300-1400 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 121270
+                pdf_page_index: 2
+                section: 2.1 Starting compositions and experimental conditions
+                note: Printed 1300-1400 C; unit conversion only
+          output_unit: K
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '3600'
+          interval_high: '10800'
+          approximate: false
+      locator:
+        published_page: 121273
+        pdf_page_index: 5
+        table: '2'
+        note: Printed durations 1-3 h across Table 2 rows; unit conversion only
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 121273
+              pdf_page_index: 5
+              table: '2'
+              note: Printed durations 1-3 h across Table 2 rows; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              published_page: 121273
+              pdf_page_index: 5
+              table: '2'
+              note: Printed durations 1-3 h across Table 2 rows; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              published_page: 121273
+              pdf_page_index: 5
+              table: '2'
+              note: Printed durations 1-3 h across Table 2 rows; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched to glass
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
 - experiment_id: 10.1016/j.chemgeo.2022.121269::thomas-2022-chlorine-bonding-silicate-melts
   kind: literature
   method:
-    tag: value
-    value: quench_equilibration
+    tag: unknown
+    reason: regime 'author_regression' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -48,49 +285,96 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.chemgeo.2022.121269
   locator:
-    published_page: 121271
-    pdf_page_index: 3
-    table: '1'
-    section: Starting compositions and experimental conditions
-    note: Table 1 continues on published page 121272 (PDF page 4); each row has one shared table locator.
+    published_page: 121270
+    pdf_page_index: 2
+    section: 1.1 Chlorine incorporation in silicate melts and glasses
+    equation: '3'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- experiment_id: 10.1016/j.chemgeo.2022.121269::2
-  kind: literature
-  method:
-    tag: value
-    value: quench_equilibration
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+benches:
+- id: 10.1016/j.chemgeo.2022.121269::bench::oxford-piston-cylinder
   work_id: 10.1016/j.chemgeo.2022.121269
-  locator:
-    published_page: 121273
-    pdf_page_index: 5
-    table: '2'
-    note: Table 2 continues on published page 121274 (PDF page 6); values shown are measured XAF parameters and tabulated
-      run conditions.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: End-loaded Boyd-and-England-type 1/2 inch piston-cylinder apparatus at the University of Oxford
+    locator:
+      published_page: 121270
+      pdf_page_index: 2
+      section: 2.1 Starting compositions and experimental conditions
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: graphite and Pt capsules
+    locator:
+      published_page: 121274
+      pdf_page_index: 6
+      section: 2.2 Analytical measurement
+      note: Printed encased within graphite and Pt capsules (total thickness <2 mm); run products >0.5 mm thick glass
+  detector:
+    state:
+      tag: value
+      value: CAMECA SX-Five-FE electron microprobe
+    locator:
+      published_page: 121274
+      pdf_page_index: 6
+      section: 2.2 Analytical measurement
+  heating_method:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 121270
+      pdf_page_index: 2
+      section: 2.1 Starting compositions and experimental conditions
+      note: Paper states samples were heated above the liquidus; furnace/heater type is not printed
+  other_facts:
+  - name: chlorine_fugacity_buffer
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Ag metal + AgCl + AgI immiscible phases; AgCl/AgI ratio controls fCl2
+          approximate: false
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+  - name: capsule_total_thickness
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '2'
+          approximate: false
+      locator:
+        published_page: 121274
+        pdf_page_index: 6
+        section: 2.2 Analytical measurement
+        note: Printed encased within graphite and Pt capsules (total thickness <2 mm); run products >0.5 mm thick glass
+    unit: mm
+  - name: pressure_range_as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '5'
+          interval_high: '20'
+          approximate: false
+      locator:
+        published_page: 121270
+        pdf_page_index: 2
+        section: 2.1 Starting compositions and experimental conditions
+        note: Printed 5 to 20 kbar
+    unit: kbar
 context:
 - observation_id: thomas_2022_apparatus_and_analytical_conditions
+  experiment: quench-glass-series
   type: apparatus
   locator:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf

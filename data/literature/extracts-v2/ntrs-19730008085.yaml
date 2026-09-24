@@ -1,0 +1,86 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ntrs-19730008085.yaml
+observations:
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085

@@ -1,0 +1,55 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: dbf547080a781f80f8c4a2f51eb58297c98a72debf5c49f210abe603eb4745b7
+  citation: 'Intended corpus target: Senior, Constance L. (1991), "Lunar oxygen production by pyrolysis of regolith", 10th
+    Princeton/AIAA/SSI Conference on Space Manufacturing, May 15–18, 1991, Princeton, NJ (NASA accession 19920035166 / NAS9-18102
+    / NAS9-19356). Held PDF is NOT that paper — see extraction.method and typed_absences.'
+  source_ids:
+  - senior-1992-vacuum-pyrolysis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:senior-1992-vacuum-pyrolysis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: senior_1992_held_pdf_is_nasa_bibliography
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 1
+    section: cover_title_page
+    note: pdftotext -f 1 -l 1; pdfinfo Title/Author/CreationDate; sha256 matches sidecar
+  phase: corpus_held_pdf_identity
+  regime: wrong_file_for_source_id
+  units: as published
+  values:
+    quantity: held_pdf_identity_and_typed_absence_summary
+    method_class: method_only
+    evidence_class: wrong_held_pdf_not_a_measurement_table
+    document_type: nasa_sti_special_bibliography_january_2004_not_senior
+    title_as_printed: Recovery and Utilization of Extraterrestrial Resources
+    subtitle_as_printed: A Special Bibliography From the NASA Scientific and Technical Information Program
+    month_year_as_printed: January 2004
+    pdfinfo_title_as_printed: Microsoft Word - bibcover.doc
+    pdfinfo_author_as_printed: debbie
+    page_count_as_printed: 208
+    sha256_as_sidecar: 526fc4262ccb23a9fdd156b67c93fd9f2c04f6be9bb03c4f439e99de14811cd3
+    vacuum_pyrolysis_string_count: 0
+    cites_senior_accession_as_printed: '19920035166'
+    cites_senior_title_as_printed: Lunar oxygen production by pyrolysis of regolith
+    cites_senior_author_as_printed: Senior, Constance L.
+    cites_senior_venue_as_printed: 10th Princeton/AIAA/SSI Conference, May 15-18, 1991, Princeton, NJ, USA
+    n1_policy: Wrong held PDF = typed absence; do not invent measurements. Real Senior abstract is senior-1991-vacuum-pyrolysis.yaml.
+  uncertainty:
+    note: No measurement uncertainty applicable; no scored observations in this extract.
+  context_id: senior-1992-vacuum-pyrolysis::context::senior_1992_held_pdf_is_nasa_bibliography
+  work_id: dbf547080a781f80f8c4a2f51eb58297c98a72debf5c49f210abe603eb4745b7
+  source_id: senior-1992-vacuum-pyrolysis
+  species: held_pdf_identity

@@ -1,0 +1,49 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
+observations:
+- observation_id: lpsc-2024-bennu-pyrolysis-vandam::mojarro_2024_ql_alanine_glycine_vs_murchison
+  experiment_id: 8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::wet-chemistry-pyrolysis-250C
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_amino_acid_quantitation_signal_vs_murchison'
+    species:
+      formula: Bennu_QL_fines
+      phase:
+        tag: unknown
+        reason: phase string 'Bennu_returned_QL_fines_OREX-500002-0' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [523.15, 523.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_amino_acid_quantitation_signal_vs_murchison';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed bound "more than 100x"; no absolute calibration uncertainty printed. Bound retained; not converted to
+        a point.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpsc-2024-bennu-pyrolysis-vandam
+  locator:
+    pdf_page_index: 1
+    section: Results & Discussion
+    note: Wet-chemistry pyrolysis quantitation signals for QL vs co-analyzed Murchison
+  read_from: unknown:lpsc-2024-bennu-pyrolysis-vandam

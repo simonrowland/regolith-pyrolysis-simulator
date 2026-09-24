@@ -1,0 +1,201 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
+  citation: Mendybaev, R. A., Davis, A. M. & Richter, F. M. (2002), "The Effect of Sample Size on Experimental Evaporation
+    of Type B CAIs", Lunar and Planetary Science XXXIII, abstract 2040.
+  source_ids:
+  - ta-mendybaev-2002-lpsc
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ta-mendybaev-2002-lpsc
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_free_evaporation_ir_wire_loop' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+    form:
+      state:
+        tag: value
+        value: Suspended on Ir-wire loops of 1.0
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+          approximate: false
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+        note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; rate averages reported at 1800 C'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source prints P≤10^-6 torr; no scalar total-pressure value in Pa
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+        note: P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: vacuum
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
+  locator:
+    pdf_page_index: 1
+    section: Experimental methods
+  bench_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
+- experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_free_evaporation_ir_wire_loop' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: B133-glass 12.0 wt% MgO, 46.1 wt% SiO2, 19.4 wt% Al2O3, 25.5 wt% CaO
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+    form:
+      state:
+        tag: value
+        value: Ir-wire loop suspended melt droplets
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source prints P≤10^-6 torr; no scalar total-pressure value in Pa
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+        note: P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: vacuum
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
+  locator:
+    pdf_page_index: 1
+    section: Experimental methods
+    note: campaigns at 1800/1700/1600 C; page-2 Results prints 1.0 mm multi-T rates and Ea=580 kJ/mole
+  bench_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
+benches:
+- id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::bench::chicago-high-vacuum-furnace-cai
+  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: High-vacuum evaporation furnace
+    locator:
+      pdf_page_index: 1
+      section: Experimental methods
+  pumping_type:
+    state:
+      tag: value
+      value: High vacuum; P less than or equal to 10^-6 torr as printed
+    locator:
+      pdf_page_index: 1
+      section: Experimental methods
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 1
+        section: Experimental methods
+  heating_method:
+    state:
+      tag: value
+      value: Not further specified in this abstract; furnace configuration deferred to Wang 1994 Ph.D. thesis [4]
+    locator:
+      pdf_page_index: 1
+      section: Experimental methods
+  other_facts: []
+context:
+- observation_id: mendybaev_2002_starting_composition_and_conditions
+  type: laboratory_conditions
+  experiment: b133-vacuum-multi-T-campaign
+  locator:
+    pdf_page_index: 1
+    section: Experimental methods
+  phase: B133-glass_Type_B_CAI_like
+  regime: vacuum_free_evaporation
+  units: as published
+  values:
+    quantity: starting_material_and_run_conditions
+    method_class: method_only
+    starting_material_as_printed: B133-glass
+    starting_MgO_wt_pct: '12'
+    starting_SiO2_wt_pct: '46.1'
+    starting_Al2O3_wt_pct: '19.4'
+    starting_CaO_wt_pct: '25.5'
+    composition_basis: oxide wt% as printed (not renormalised)
+    loop_diameters_mm:
+    - '1'
+    - '2.5'
+    - '3.3'
+    - '6'
+    initial_surface_area_mm2_as_printed: about 3.5 to 85
+    temperature_C_setpoints_as_printed:
+    - 1800
+    - 1700
+    - 1600
+    pressure_as_printed: P≤10^-6 torr
+    support: Ir-wire loops
+    furnace_detail_deferred_to: Wang J. (1994) Ph.D. thesis, University of Chicago [4]
+    analytical_SEM_as_printed: JEOL JSM-5800LV with Oxford/Link ISIS-300
+    analytical_ion_probe_as_printed: modified AEI IM-20 ion microprobe (Mg isotopes)
+  context_id: ta-mendybaev-2002-lpsc::context::mendybaev_2002_starting_composition_and_conditions
+  work_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d
+  source_id: ta-mendybaev-2002-lpsc
+  species: B133_CAI_like_melt

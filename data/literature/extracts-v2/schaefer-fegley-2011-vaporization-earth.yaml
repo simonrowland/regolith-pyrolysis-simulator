@@ -1,0 +1,888 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/schaefer-fegley-2011-vaporization-earth.yaml
+observations:
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_100bar_major_gas_summary
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_major_gases_at_100_bar'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500, 4000]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_major_gases_at_100_bar'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 10
+    figure: '2'
+    section: 3.1.2 Bulk Silicate Earth
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_exoplanet_atmospheric_profiles
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'hot_super_earth_bulk_silicate_earth_profile'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_and_condensate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'hot_super_earth_bulk_silicate_earth_profile';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 22
+    figure: '11'
+    section: 4.2.2 Hot Super-Earths
+    note: row=prose summaries; column=condensation pressures
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_variable_c_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_variable_carbon_at_100_bar'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_variable_carbon_at_100_bar';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 13
+    figure: '4'
+    section: 3.2.2 Carbon
+    note: row=BSE prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_variable_h_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_variable_hydrogen_at_100_bar'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_variable_hydrogen_at_100_bar';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 12
+    figure: '3'
+    section: 3.2.1 Hydrogen
+    note: row=BSE prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_variable_o_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_variable_oxygen_at_100_bar'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_variable_oxygen_at_100_bar';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 14
+    figure: '5'
+    section: 3.2.3 Oxygen
+    note: row=BSE prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_100bar_major_gas_summary
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'continental_crust_major_gases_at_100_bar'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500, 4000]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'continental_crust_major_gases_at_100_bar'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 7
+    figure: '1'
+    section: 3.1.1 Continental Crust
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_exoplanet_atmospheric_profiles
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'hot_super_earth_continental_crust_profile'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_and_condensate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'hot_super_earth_continental_crust_profile'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 22
+    figure: '11'
+    section: 4.2.2 Hot Super-Earths
+    note: row=prose summaries; column=condensation pressures
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_pressure_effects_printed
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'continental_crust_pressure_effects'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'continental_crust_pressure_effects'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 15
+    figure: '7'
+    section: 3.3 Effects of Total Pressure on Gas Composition
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_variable_c_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'variable_carbon_equilibrium_at_100_bar'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'variable_carbon_equilibrium_at_100_bar'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 13
+    figure: '4'
+    section: 3.2.2 Carbon
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_variable_h_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'continental_crust_variable_hydrogen_at_100_bar'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'continental_crust_variable_hydrogen_at_100_bar';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 11
+    figure: '3'
+    section: 3.2.1 Hydrogen
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_variable_o_model_outputs
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'variable_oxygen_equilibrium_at_100_bar'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'variable_oxygen_equilibrium_at_100_bar'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 14
+    figure: '5'
+    section: 3.2.3 Oxygen
+    note: row=prose summaries; column=printed model results
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_figure8_volatile_boundaries
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dominant_volatile_species_boundary_map'
+    species:
+      formula: volatile_boundary_map
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dominant_volatile_species_boundary_map'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 47
+    figure: '8'
+    note: row=all; column=equal-abundance boundary coordinates
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_figure9_temperature_pressure_profiles
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'test_case_temperature_pressure_profiles'
+    species:
+      formula: volatile_boundary_map
+      phase:
+        tag: unknown
+        reason: phase string 'planetary_atmosphere_profile' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'test_case_temperature_pressure_profiles'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 48
+    figure: '9'
+    note: row=all; column=digitized profile points
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_observable_gas_thresholds
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'spectroscopically_observable_gas_model_thresholds'
+    species:
+      formula: observable_gases
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'spectroscopically_observable_gas_model_thresholds';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 25
+    section: 4.4 Spectroscopically Observable Gases
+    note: row=prose summaries; column=threshold and peak abundances
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_cc_100bar_major_gas_summary
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_bse_100bar_major_gas_summary
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_bulk_elemental_composition'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_planetary_composition' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_bulk_elemental_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_prior_work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 32
+    table: '2'
+    note: row=all; column=Bulk Silicate Earth (wt%)
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'continental_crust_bulk_elemental_composition'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_planetary_composition' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'continental_crust_bulk_elemental_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_prior_work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 32
+    table: '2'
+    note: row=all; column=Continental Crust (wt%)
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table3_bse_extreme_atmospheres
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_earth_major_atmospheres_at_extreme_T_P'
+    species:
+      formula: bulk_silicate_earth
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_earth_major_atmospheres_at_extreme_T_P';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 33
+    table: '3'
+    note: row=all BSE cells; column=major atmospheric composition
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_bse_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table3_cc_extreme_atmospheres
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'continental_crust_major_atmospheres_at_extreme_T_P'
+    species:
+      formula: continental_crust
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'continental_crust_major_atmospheres_at_extreme_T_P';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 33
+    table: '3'
+    note: row=all CC cells; column=major atmospheric composition
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table4_j1_photolysis_rates
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime'
+    species:
+      formula: photochemical_gases
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_literature
+    attribution: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 34
+    table: '4'
+    note: row=all; column=J1 (s^-1), 1 AU
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table4_photochemical_lifetimes
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime'
+    species:
+      formula: photochemical_gases
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 34
+    table: '4'
+    note: row=all; column=tchem (s) at 1 AU, 0.25 AU, 0.017 AU
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth
+  derived_from:
+  - schaefer-fegley-2011-vaporization-earth::schaefer_2012_table2_continental_crust_bulk_composition
+- observation_id: schaefer-fegley-2011-vaporization-earth::schaefer_2012_table4_sio_j1_photolysis_rate
+  experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime'
+    species:
+      formula: photochemical_gases
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'photochemical_dissociation_rate_and_chemical_lifetime';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_literature
+    attribution: 'Table 4 footnote b: estimated based on data from Matveev (1986).'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schaefer-fegley-2011-vaporization-earth
+  locator:
+    pdf_page_index: 34
+    table: '4'
+    note: row=SiO; column=J1 (s^-1), 1 AU
+  read_from: unknown:schaefer-fegley-2011-vaporization-earth

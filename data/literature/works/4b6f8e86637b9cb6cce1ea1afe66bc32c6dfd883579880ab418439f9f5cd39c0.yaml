@@ -1,0 +1,78 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0
+  citation: Manuel, O. K.; Srinivasan, B.; Hennecke, E. W.; Sinclair, D. E. (1972), "Noble Gases in the Moon", Annual Report
+    to NASA, NASA-NGR-26-003-057, University of Missouri–Rolla, Department of Chemistry, September 1972. NASA NTRS 19730008085.
+  source_ids:
+  - ntrs-19730008085
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ntrs-19730008085
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'stepwise_heating_noble_gas_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+context:
+- observation_id: manuel_1972_15601_64_extraction_method
+  type: method
+  locator:
+    pdf_page_index: 8
+    section: Appendix I experimental
+    note: sample mass and stepwise schedule from Appendix I methods prose
+  phase: lunar_soil_fines
+  regime: quartz_sidearm_then_drop_into_hot_crucible
+  units: as printed
+  values:
+    quantity: stepwise_heating_extraction_method
+    method_class: method_only
+    sample_id_as_printed: '15601.64'
+    sample_mass_g: '0.9861'
+    T_start_C: 100
+    T_end_C: 1500
+    T_step_C: 100
+    hold_duration_min: 30
+    cleanup_as_printed: Ti getters (approx. 550°C and 850°C stages as printed)
+  uncertainty:
+    note: none printed beyond stated setpoints
+  context_id: ntrs-19730008085::context::manuel_1972_15601_64_extraction_method
+  work_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0
+  source_id: ntrs-19730008085
+  species: lunar_fines_15601_64

@@ -1,0 +1,4611 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-dacko-conradt-low-p-transpiration.yaml
+observations:
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_figure2_weight_loss_qualitative
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::ta-dacko-conradt-low-p-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 208
+    pdf_page_index: 4
+    figure: '2'
+    note: Weight loss per surface area versus time at 0.2
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_0p5h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_0p5h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_1h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_2h
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_2h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 207
+    pdf_page_index: 3
+    table: '1'
+    note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 207
+        pdf_page_index: 3
+        table: '1'
+        note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 207
+              pdf_page_index: 3
+              table: '1'
+              note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_b2o3_1400c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1400c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(B2O3), 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(B2O3), 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_b2o3_1500c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1500c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.039'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(B2O3), 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(B2O3), 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_b2o3_1600c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1600c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(B2O3), 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(B2O3), 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(B2O3), 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_na2o_1400c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1400c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000016'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(Na2O), 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(Na2O), 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_na2o_1500c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1500c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000053'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(Na2O), 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(Na2O), 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_na2o_1600c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1600c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000014'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: a(Na2O), 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: a(Na2O), 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: a(Na2O), 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1400c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '42'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.2 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.2 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1400c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '30'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.4 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.4 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1400c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '19'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 1.0 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 1.0 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.2 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.2 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '16'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.4 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.4 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '10'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 1.0 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 1.0 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.2 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.2 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.2 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 0.4 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 0.4 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 0.4 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class author_derived'
+    original_method_class: author_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_calc, 1.0 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_calc, 1.0 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_calc, 1.0 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.2 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.2 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.4 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.4 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '16'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 1.0 bar row, 1400 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 1.0 bar row, 1400 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1400 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1400 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '20'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.2 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.2 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.4 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.4 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 1.0 bar row, 1500 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 1.0 bar row, 1500 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1500 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1500 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_0p2bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p2bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.2 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.2 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.2 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_0p4bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p4bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 0.4 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 0.4 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 0.4 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_1bar
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_1bar
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: point
+    point: '4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 209
+    pdf_page_index: 5
+    table: '2'
+    note: r_exp, 1.0 bar row, 1600 C column
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 209
+        pdf_page_index: 5
+        table: '2'
+        note: r_exp, 1.0 bar row, 1600 C column
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1600 C column
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 209
+              pdf_page_index: 5
+              table: '2'
+              note: r_exp, 1.0 bar row, 1600 C column
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_200hpa_1400c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_200hpa_1400c_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 212
+    pdf_page_index: 8
+    table: '5'
+    note: Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 212
+        pdf_page_index: 8
+        table: '5'
+        note: Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_200hpa_1600c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_200hpa_1600c_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 212
+    pdf_page_index: 8
+    table: '5'
+    note: Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 212
+        pdf_page_index: 8
+        table: '5'
+        note: Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_400hpa_1400c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_400hpa_1400c_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 212
+    pdf_page_index: 8
+    table: '5'
+    note: Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 212
+        pdf_page_index: 8
+        table: '5'
+        note: Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
+        output_unit: K
+- observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_400hpa_1600c
+  experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_400hpa_1600c_1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: B
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-dacko-conradt-low-p-transpiration
+  locator:
+    published_page: 212
+    pdf_page_index: 8
+    table: '5'
+    note: Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+  read_from: unknown:ta-dacko-conradt-low-p-transpiration
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 212
+        pdf_page_index: 8
+        table: '5'
+        note: Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 212
+              pdf_page_index: 8
+              table: '5'
+              note: Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
+        output_unit: K

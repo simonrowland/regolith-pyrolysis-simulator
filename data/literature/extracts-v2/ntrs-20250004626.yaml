@@ -1,0 +1,210 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ntrs-20250004626.yaml
+observations:
+- observation_id: ntrs-20250004626::yu_2025_table1_lhs1_apollo16_oxide_wt_pct
+  experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'major_oxide_abundances_LHS1_vs_Apollo16_64501'
+    species:
+      formula: LHS-1_MRE_hollow_anode
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_oxide_composition' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'major_oxide_abundances_LHS1_vs_Apollo16_64501';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 1 oxide cells
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: source admission_status=authors_table_from_cited_LHS1_and_Apollo16_sources_not_this_work_instrument is not a closed
+      v2.1 token
+  notices: []
+  source_id: ntrs-20250004626
+  locator:
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 Major abundances of LHS-1 simulant and highlands lunar regolith (wt%) [26,27]
+  read_from: unknown:ntrs-20250004626
+- observation_id: ntrs-20250004626::yu_2025_table2_electrolysis_efficiencies
+  experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cathodic_products_Faradaic_and_extraction_efficiency'
+    species:
+      formula: LHS-1_MRE_hollow_anode
+      phase:
+        tag: unknown
+        reason: phase string 'MRE_cell_products' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'cathodic_products_Faradaic_and_extraction_efficiency';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 2 efficiency / O2-mass cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-20250004626
+  locator:
+    pdf_page_index: 15
+    table: '2'
+    note: Table 2 Summary of cathodic products and regolith electrolysis efficiencies
+  read_from: unknown:ntrs-20250004626
+- observation_id: ntrs-20250004626::yu_2025_table3_post_electrolysis_at_pct
+  experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'average_regolith_elemental_composition_after_electrolysis'
+    species:
+      formula: LHS-1_MRE_hollow_anode
+      phase:
+        tag: unknown
+        reason: phase string 'solidified_LHS1_electrolyte' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'average_regolith_elemental_composition_after_electrolysis';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3 at% cells; BOL cited from prior work [19]
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-20250004626
+  locator:
+    pdf_page_index: 21
+    table: '3'
+    note: Table 3 Average regolith composition after melting and electrolysis (at%)
+  read_from: unknown:ntrs-20250004626
+- observation_id: ntrs-20250004626::yu_2025_table4_ysz_wall_recession
+  experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'YSZ_wall_recession_vs_thermal_exposure'
+    species:
+      formula: LHS-1_MRE_hollow_anode
+      phase:
+        tag: unknown
+        reason: phase string 'YSZ_hollow_anode_wall' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'YSZ_wall_recession_vs_thermal_exposure'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: per-row ± as printed in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-20250004626
+  locator:
+    pdf_page_index: 24
+    table: '4'
+    note: Table 4 YSZ wall recession due to dissolution by molten LHS-1
+  read_from: unknown:ntrs-20250004626
+- observation_id: ntrs-20250004626::yu_2025_table5_cell_resistances
+  experiment_id: 10.1016/j.actaastro.2025.06.028::ntrs-20250004626
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cell_resistance_before_and_after_electrolysis'
+    species:
+      formula: LHS-1_MRE_hollow_anode
+      phase:
+        tag: unknown
+        reason: phase string 'MRE_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'cell_resistance_before_and_after_electrolysis';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 5 resistance cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-20250004626
+  locator:
+    pdf_page_index: 28
+    table: '5'
+    note: Table 5 Cell resistances at 1600°C before and after electrolysis
+  read_from: unknown:ntrs-20250004626

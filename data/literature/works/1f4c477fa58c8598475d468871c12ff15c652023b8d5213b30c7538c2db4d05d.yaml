@@ -1,0 +1,84 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d
+  citation: Shornikov, S. I. & Yakovlev, O. I. (2019), "Mass spectrometric study of perovskite evaporation from Knudsen cell",
+    82nd Annual Meeting of The Meteoritical Society, LPI Contrib. No. 2157, abstract 6005.
+  source_ids:
+  - metsoc-2019-6005
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:metsoc-2019-6005
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'knudsen_cell_mass_spectrometry_CaO_TiO2' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: formation enthalpy from oxide activities / partial pressures
+context:
+- observation_id: shornikov_yakovlev_2019_metsoc6005_method_T_ranges
+  type: method
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+  phase: perovskite_and_CaO_TiO2_melts
+  regime: Knudsen_molybdenum_effusion_cell_mass_spectrometry
+  units: K as printed
+  values:
+    quantity: evaporation_temperature_windows_and_cell
+    method_class: method_only
+    perovskite_T_range_K_as_printed: 1791–2241
+    CaO_TiO2_melt_T_range_K_as_printed: 2241–2441
+    cell_as_printed: Knudsen molybdenum effusion cell
+    pressure_method_as_printed: Hertz-Knudsen equation
+    vapor_species_as_printed:
+    - Ca
+    - CaO
+    - Ti
+    - TiO
+    - TiO2
+    - O
+    - O2
+    - CaTiO3
+    heterogeneous_reaction_as_printed: '[CaTiO3] = (CaTiO3)'
+  uncertainty:
+    note: none printed beyond stated T windows
+  context_id: metsoc-2019-6005::context::shornikov_yakovlev_2019_metsoc6005_method_T_ranges
+  work_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d
+  source_id: metsoc-2019-6005
+  species: CaTiO3

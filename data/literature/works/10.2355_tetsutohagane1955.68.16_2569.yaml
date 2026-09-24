@@ -1,0 +1,290 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1982), "Thermal Analysis of Fe-Mo Alloys by the Use of Knudsen Cell Mass Spectrometry",
+    Tetsu-to-Hagané 68(16):2569–2577, DOI 10.2355/tetsutohagane1955.68.16_2569
+  source_ids:
+  - ueshima-1982-fe-mo-thermal
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ueshima-1982-fe-mo-thermal
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/tetsutohagane1955.68.16_2569
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'knudsen_effusion_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002'
+          approximate: true
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed sample volume 0.25 cm3 (~2 g for Fe-Mo); SI conversion of ~2 g only
+    printed_composition:
+      state:
+        tag: value
+        value: Fe-Mo alloys, 25 to 67 at% Mo
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        note: English Synopsis composition range; section 2.2 also states 25-67 at% Mo
+    form:
+      state:
+        tag: value
+        value: Vacuum arc-melted or levitation-melted alloys from pure Fe and pure Mo
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.2 Samples
+    pretreatment:
+      state:
+        tag: value
+        value: Degas and melt-in under 10^-6 to 10^-7 Torr at >=1300 C before measurement
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.3 Measurement method
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1573.15'
+          interval_high: '1923.15'
+          approximate: false
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        note: Synopsis 1300-1650 C; T_K = T_C + 273.15 derived
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Degas vacuum 10^-6 to 10^-7 Torr printed; run chamber total pressure not a single scored value
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Vacuum Knudsen effusion; no sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen effusion is the method; gas-flow regime class is not published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '0.0000133'
+            interval_high: '0.000133'
+            approximate: true
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed 10^-6 to 10^-7 Torr degas vacuum; Pa = Torr * 133.322 so 1e-7 Torr ≈ 1.33e-5 Pa (low) and 1e-6 Torr
+            ≈ 1.33e-4 Pa (high)
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  locator:
+    published_page: 2569-2571
+    section: 2. Experimental method
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0005'
+            approximate: false
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed 0.5 mm orifice; SI conversion only
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Lid thickness 1 mm printed; orifice channel length not separately stated
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+  bench_id: 10.2355/tetsutohagane1955.68.16_2569::bench::hitachi-rm6k-knudsen
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Heating/cooling rates typically 3-5 C/min printed; total duration not a single series value
+benches:
+- id: 10.2355/tetsutohagane1955.68.16_2569::bench::hitachi-rm6k-knudsen
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hitachi RM-6K Knudsen cell mass spectrometer
+    locator:
+      published_page: 2569
+      pdf_page_index: 1
+      section: 2.1 Apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container
+    locator:
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2.1 Apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.009'
+            approximate: false
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed ID 9 mm; SI conversion only
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.012'
+            approximate: false
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          note: Printed height 12 mm; SI conversion only
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Two pairs of W/W-Re 26% thermocouples (cell-bottom centre and cell-side upper)
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2.1 Apparatus
+  heating_method:
+    state:
+      tag: value
+      value: Electron bombardment from upper and lower W ring filaments; applied voltage 0.5-1.8 kV
+    locator:
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2.1 Apparatus
+  other_facts:
+  - name: orifice_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed orifice diameter 0.5 mm
+    unit: mm
+  - name: crucible_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '11'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        note: Printed OD 11 mm
+    unit: mm
+  - name: lid_thickness
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+    unit: mm
+  - name: measured_ion
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 56Fe ion intensity I_Fe only (Mo vapour pressure too low)
+          approximate: false
+      locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: 2.1 Apparatus
+context:
+- observation_id: ueshima_1982_apparatus_and_protocol
+  type: apparatus
+  locator:
+    published_page: 2569-2571
+    section: 2. Experimental method
+  units: as printed
+  values:
+    quantity: kems_thermal_analysis_protocol
+    method_class: method_only
+    evidence_class: authors_methods_prose
+    instrument: Hitachi RM-6K Knudsen cell mass spectrometer
+    cell: Al2O3 SSA-S, OD 11 mm, ID 9 mm, height 12 mm, lid 1 mm, orifice 0.5 mm, in Ta container
+    heating_cooling_rate_C_per_min: typically 3-5
+    delta_t_control_C: 30 +/- 0.5
+    measured_ion: 56Fe (I_Fe)
+    mo_vapour_pressure_note: Mo vapour pressure approx 10^-11 atm at 1600 C; Mo ion intensity not measured
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_apparatus_and_protocol
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe

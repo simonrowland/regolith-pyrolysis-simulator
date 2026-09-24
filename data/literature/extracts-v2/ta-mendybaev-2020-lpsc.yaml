@@ -1,0 +1,135 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-mendybaev-2020-lpsc.yaml
+observations:
+- observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_gamma_si_from_tga
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evaporation_coefficient_gamma_Si'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'molten_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_gamma_Si'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed as gamma_Si ~0.04 (approximate); authors say close to crystalline SiO2 values in [13].
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2020-lpsc
+  locator:
+    pdf_page_index: 2
+    section: The proper way of determining true evaporation coefficients
+  read_from: unknown:ta-mendybaev-2020-lpsc
+- observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'molten_SiO2_or_SiO2_plus_Ir' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on the 6.8 mg/mm^2-hr rate.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2020-lpsc
+  locator:
+    pdf_page_index: 2
+    section: The proper way of determining true evaporation coefficients
+  read_from: unknown:ta-mendybaev-2020-lpsc
+- observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'surface_normalized_weight_loss_rate'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'molten_SiO2_with_1wtpct_Ir' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on the 0.3 mg/mm^2-hr rate.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-mendybaev-2020-lpsc
+  locator:
+    pdf_page_index: 2
+    figure: '3'
+    section: The proper way of determining true evaporation coefficients
+    note: prose value; Fig. 3 curve not digitized
+  read_from: unknown:ta-mendybaev-2020-lpsc

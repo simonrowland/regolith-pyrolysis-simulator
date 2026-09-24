@@ -1,0 +1,884 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1088/0004-637x/755/1/41
+  citation: 'Schaefer, L., Lodders, K. & Fegley, B. (2012), "Vaporization of the Earth: Application to Exoplanet Atmospheres",
+    The Astrophysical Journal, 755(1), 41.'
+  source_ids:
+  - schaefer-fegley-2011-vaporization-earth
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:schaefer-fegley-2011-vaporization-earth
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1088/0004-637x/755/1/41
+experiments:
+- experiment_id: 10.1088/0004-637x/755/1/41::schaefer-fegley-2011-vaporization-earth
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1088/0004-637x/755/1/41
+  locator:
+    pdf_page_index: 32
+    table: '2'
+    note: row=all; column=Continental Crust (wt%)
+context:
+- observation_id: schaefer_2012_bse_model_setup
+  type: method
+  locator:
+    pdf_page_index: 7
+    section: 2. Computational Methods
+    row: setup
+    column: model domain
+  units: as printed
+  values:
+    quantity: bulk_silicate_earth_equilibrium_model_setup
+    method_class: model_derived
+    evidence_class: model_derived
+    value_status: printed_method
+    facts:
+    - name: temperature_range
+      value_as_printed: 500-4000 K
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: temperature range
+        column: value
+    - name: total_pressure_range
+      value_as_printed: 10^-6 to 10^+2 bars
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: pressure range
+        column: value
+    - name: composition_source
+      value_as_printed: Kargel & Lewis (1993)
+      locator:
+        pdf_page_index: 5
+        section: 2. Computational Methods
+        paragraph: 1
+        row: composition
+        column: bulk silicate Earth
+    - name: mantle_fraction
+      value_as_printed: 99.4% by mass
+      locator:
+        pdf_page_index: 5
+        section: 2. Computational Methods
+        paragraph: 2
+        row: BSE
+        column: mantle mass fraction
+    - name: fO2_status
+      value:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        row: oxygen condition
+        column: fO2
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_bse_model_setup
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: bulk_silicate_earth
+- observation_id: schaefer_2012_cc_model_setup
+  type: method
+  locator:
+    pdf_page_index: 7
+    section: 2. Computational Methods
+    row: setup
+    column: model domain
+  units: as printed
+  values:
+    quantity: continental_crust_equilibrium_model_setup
+    method_class: model_derived
+    evidence_class: model_derived
+    value_status: printed_method
+    facts:
+    - name: temperature_range
+      value_as_printed: 500-4000 K
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: temperature range
+        column: value
+    - name: total_pressure_range
+      value_as_printed: 10^-6 to 10^+2 bars
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: pressure range
+        column: value
+    - name: gas_species_count
+      value_as_printed: ~750 gas species
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: species inventory
+        column: gas species
+    - name: condensed_species_count
+      value_as_printed: ~60 solid/liquid compounds
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: species inventory
+        column: condensed species
+    - name: element_count
+      value_as_printed: 18 elements
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: species inventory
+        column: elements
+    - name: nickel_treatment
+      value_as_printed: ~0.18% Ni omitted because it alloys with Fe
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        paragraph: 1
+        row: species inventory
+        column: Ni treatment
+    - name: composition_source
+      value_as_printed: Wedepohl (1995)
+      locator:
+        pdf_page_index: 5
+        section: 2. Computational Methods
+        paragraph: 1
+        row: composition
+        column: continental crust
+    - name: fO2_status
+      value:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: 2. Computational Methods
+        row: oxygen condition
+        column: fO2
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_cc_model_setup
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: continental_crust
+- observation_id: schaefer_2012_cool_gj1214_profile_context
+  type: planetary_application
+  locator:
+    pdf_page_index: 20
+    figure: '9'
+    section: 4.2.1 Cool Super-Earths
+    row: GJ 1214 b setup
+    column: model conditions
+  phase: atmosphere
+  regime: engine_evaluation
+  units: temperature K, pressure bars, scale height km, gravity m s^-2 as printed
+  values:
+    quantity: GJ_1214_b_atmospheric_profile_conditions
+    method_class: model_derived
+    evidence_class: model_derived
+    value_status: derived
+    derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+    rows:
+    - field: starting_composition
+      value_as_printed: 50% H2O + 50% CO2
+      locator:
+        pdf_page_index: 19
+        figure: '9'
+        section: 4.2 Application to Exoplanets
+        row: profile a
+        column: starting composition
+    - field: surface_temperature
+      value_as_printed: 1330 K
+      locator:
+        pdf_page_index: 20
+        figure: '10'
+        section: 4.2.1 Cool Super-Earths
+        row: GJ 1214 b
+        column: surface temperature
+    - field: surface_pressure
+      value_as_printed: 100 bars
+      locator:
+        pdf_page_index: 20
+        figure: '10'
+        section: 4.2.1 Cool Super-Earths
+        row: GJ 1214 b
+        column: surface pressure
+    - field: alkali_salt_condensation
+      value_as_printed: about 1-10 bar level
+      locator:
+        pdf_page_index: 20
+        figure: '10'
+        section: 4.2.1 Cool Super-Earths
+        row: alkali salts
+        column: condensation pressure
+    - field: gravity
+      value_as_printed: 8.89 m s^-2
+      locator:
+        pdf_page_index: 20
+        figure: '9'
+        section: 4.2.1 Cool Super-Earths
+        row: GJ 1214 b
+        column: gravity
+    - field: scale_height
+      value_as_printed: ~42 km continental crust; ~50 km BSE
+      locator:
+        pdf_page_index: 20
+        figure: '9'
+        section: 4.2.1 Cool Super-Earths
+        row: model atmospheres
+        column: scale height
+    - field: comparison_scale_height
+      value_as_printed: ~600 km pure H2; 69.1 km pure H2O
+      locator:
+        pdf_page_index: 20
+        figure: '9'
+        section: 4.2.1 Cool Super-Earths
+        row: comparison atmospheres
+        column: scale height
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_cool_gj1214_profile_context
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: observable_gases
+- observation_id: schaefer_2012_hot_corot7_profile_context
+  type: planetary_application
+  locator:
+    pdf_page_index: 19
+    figure: '9'
+    section: 4.2 Application to Exoplanets
+    row: profile b/c setup
+    column: model conditions
+  phase: atmosphere
+  regime: engine_evaluation
+  units: temperature K, pressure bars, gravity m s^-2 as printed
+  values:
+    quantity: CoRoT_7_b_atmospheric_profile_conditions
+    method_class: model_derived
+    evidence_class: model_derived
+    value_status: derived
+    derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+    rows:
+    - field: gravity
+      value_as_printed: 35.2 m s^-2
+      locator:
+        pdf_page_index: 19
+        figure: '9'
+        section: 4.2 Application to Exoplanets
+        row: CoRoT-7 b
+        column: gravity
+    - field: surface_temperature
+      value_as_printed: 2500 K
+      locator:
+        pdf_page_index: 19
+        figure: '9'
+        section: 4.2 Application to Exoplanets
+        row: CoRoT-7 b
+        column: surface temperature
+    - field: surface_pressure
+      value_as_printed: 10^-2 bars
+      locator:
+        pdf_page_index: 19
+        figure: '9'
+        section: 4.2 Application to Exoplanets
+        row: CoRoT-7 b
+        column: surface pressure
+    - field: gas_selection_threshold
+      value_as_printed: mole fraction >10^-3
+      locator:
+        pdf_page_index: 22
+        figure: '11'
+        section: 4.2.2 Hot Super-Earths
+        row: model selection
+        column: gas threshold
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_hot_corot7_profile_context
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: observable_gases
+- observation_id: schaefer_2012_photochemical_method_setup
+  type: method
+  locator:
+    pdf_page_index: 24
+    section: 4.3 Photochemistry
+    row: model setup
+    column: solar photodissociation
+  units: as printed
+  values:
+    quantity: photochemical_lifetime_model_setup
+    method_class: model_derived
+    evidence_class: model_derived
+    value_status: printed_method
+    facts:
+    - name: reference_flux
+      value_as_printed: top of Earth atmosphere at 1 AU
+      locator:
+        pdf_page_index: 24
+        section: 4.3 Photochemistry
+        paragraph: 2
+        row: photodissociation rates
+        column: reference flux
+    - name: evaluated_orbital_distances
+      value_as_printed: 1 AU, 0.25 AU, 0.017 AU
+      locator:
+        pdf_page_index: 24
+        section: 4.3 Photochemistry
+        paragraph: 2
+        row: model cases
+        column: orbital distances
+    - name: model_scope
+      value_as_printed: photochemical lifetimes, not equilibrium atmospheric composition
+      locator:
+        pdf_page_index: 24
+        section: 4.3 Photochemistry
+        paragraph: 1
+        row: model scope
+        column: quantity
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_photochemical_method_setup
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: photochemical_gases
+- observation_id: schaefer_2012_table1_transiting_low_mass_planets
+  type: planetary_context
+  locator:
+    pdf_page_index: 31
+    table: '1'
+    row: all
+    column: all
+  units: M⊕, R⊕, g cm^-3, AU, K as printed
+  values:
+    quantity: orbital_and_physical_properties_of_known_transiting_low_mass_planets
+    method_class: quoted_prior_work
+    evidence_class: quoted_prior_work
+    value_status: printed
+    source_attribution: Per-row footnote attribution below; planets without a footnote are unattributed.
+    rows:
+    - planet: Kepler-11 f
+      column: Mass (×M⊕)
+      value_as_printed: '2.30'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 f
+        column: Mass (×M⊕)
+    - planet: Kepler-11 f
+      column: Radius (×R⊕)
+      value_as_printed: '2.61'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 f
+        column: Radius (×R⊕)
+    - planet: Kepler-11 f
+      column: Density (g cm^-3)
+      value_as_printed: '0.71'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 f
+        column: Density (g cm^-3)
+    - planet: Kepler-11 f
+      column: Orbital Radius (AU)
+      value_as_printed: '0.25'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 f
+        column: Orbital Radius (AU)
+    - planet: Kepler-11 f
+      column: Teq (K)
+      value_as_printed: '544'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 f
+        column: Teq (K)
+    - planet: GJ 1214 b
+      column: Mass (×M⊕)
+      value_as_printed: '6.55'
+      source_attribution: Charbonneau et al. (2009)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: GJ 1214 b
+        column: Mass (×M⊕)
+    - planet: GJ 1214 b
+      column: Radius (×R⊕)
+      value_as_printed: '2.68'
+      source_attribution: Charbonneau et al. (2009)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: GJ 1214 b
+        column: Radius (×R⊕)
+    - planet: GJ 1214 b
+      column: Density (g cm^-3)
+      value_as_printed: '1.88'
+      source_attribution: Charbonneau et al. (2009)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: GJ 1214 b
+        column: Density (g cm^-3)
+    - planet: GJ 1214 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.014'
+      source_attribution: Charbonneau et al. (2009)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: GJ 1214 b
+        column: Orbital Radius (AU)
+    - planet: GJ 1214 b
+      column: Teq (K)
+      value_as_printed: '555'
+      source_attribution: Charbonneau et al. (2009)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: GJ 1214 b
+        column: Teq (K)
+    - planet: HD 97658 b
+      column: Mass (×M⊕)
+      value_as_printed: '6.40'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: HD 97658 b
+        column: Mass (×M⊕)
+    - planet: HD 97658 b
+      column: Radius (×R⊕)
+      value_as_printed: '2.93'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: HD 97658 b
+        column: Radius (×R⊕)
+    - planet: HD 97658 b
+      column: Density (g cm^-3)
+      value_as_printed: '1.40'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: HD 97658 b
+        column: Density (g cm^-3)
+    - planet: HD 97658 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.0797'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: HD 97658 b
+        column: Orbital Radius (AU)
+    - planet: HD 97658 b
+      column: Teq (K)
+      value_as_printed: 510-720
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: HD 97658 b
+        column: Teq (K)
+    - planet: Kepler-11 e
+      column: Mass (×M⊕)
+      value_as_printed: '8.40'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 e
+        column: Mass (×M⊕)
+    - planet: Kepler-11 e
+      column: Radius (×R⊕)
+      value_as_printed: '4.52'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 e
+        column: Radius (×R⊕)
+    - planet: Kepler-11 e
+      column: Density (g cm^-3)
+      value_as_printed: '0.5'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 e
+        column: Density (g cm^-3)
+    - planet: Kepler-11 e
+      column: Orbital Radius (AU)
+      value_as_printed: '0.194'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 e
+        column: Orbital Radius (AU)
+    - planet: Kepler-11 e
+      column: Teq (K)
+      value_as_printed: '617'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 e
+        column: Teq (K)
+    - planet: Kepler-11 d
+      column: Mass (×M⊕)
+      value_as_printed: '6.10'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 d
+        column: Mass (×M⊕)
+    - planet: Kepler-11 d
+      column: Radius (×R⊕)
+      value_as_printed: '3.43'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 d
+        column: Radius (×R⊕)
+    - planet: Kepler-11 d
+      column: Density (g cm^-3)
+      value_as_printed: '0.83'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 d
+        column: Density (g cm^-3)
+    - planet: Kepler-11 d
+      column: Orbital Radius (AU)
+      value_as_printed: '0.159'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 d
+        column: Orbital Radius (AU)
+    - planet: Kepler-11 d
+      column: Teq (K)
+      value_as_printed: '692'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 d
+        column: Teq (K)
+    - planet: Kepler-11 b
+      column: Mass (×M⊕)
+      value_as_printed: '4.30'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 b
+        column: Mass (×M⊕)
+    - planet: Kepler-11 b
+      column: Radius (×R⊕)
+      value_as_printed: '1.97'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 b
+        column: Radius (×R⊕)
+    - planet: Kepler-11 b
+      column: Density (g cm^-3)
+      value_as_printed: '3.10'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 b
+        column: Density (g cm^-3)
+    - planet: Kepler-11 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.091'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 b
+        column: Orbital Radius (AU)
+    - planet: Kepler-11 b
+      column: Teq (K)
+      value_as_printed: '900'
+      source_attribution: Lissauer et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-11 b
+        column: Teq (K)
+    - planet: Kepler-20 b
+      column: Mass (×M⊕)
+      value_as_printed: '8.70'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-20 b
+        column: Mass (×M⊕)
+    - planet: Kepler-20 b
+      column: Radius (×R⊕)
+      value_as_printed: '1.91'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-20 b
+        column: Radius (×R⊕)
+    - planet: Kepler-20 b
+      column: Density (g cm^-3)
+      value_as_printed: '6.5'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-20 b
+        column: Density (g cm^-3)
+    - planet: Kepler-20 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.04537'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-20 b
+        column: Orbital Radius (AU)
+    - planet: Kepler-20 b
+      column: Teq (K)
+      value_as_printed: '1014'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-20 b
+        column: Teq (K)
+    - planet: Kepler-18 b
+      column: Mass (×M⊕)
+      value_as_printed: '6.90'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-18 b
+        column: Mass (×M⊕)
+    - planet: Kepler-18 b
+      column: Radius (×R⊕)
+      value_as_printed: '2.00'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-18 b
+        column: Radius (×R⊕)
+    - planet: Kepler-18 b
+      column: Density (g cm^-3)
+      value_as_printed: '4.9'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-18 b
+        column: Density (g cm^-3)
+    - planet: Kepler-18 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.0447'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-18 b
+        column: Orbital Radius (AU)
+    - planet: Kepler-18 b
+      column: Teq (K)
+      value_as_printed: '1179'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-18 b
+        column: Teq (K)
+    - planet: CoRoT-7 b
+      column: Mass (×M⊕)
+      value_as_printed: '7.42'
+      source_attribution: Léger et al. (2009); Hatzes et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: CoRoT-7 b
+        column: Mass (×M⊕)
+    - planet: CoRoT-7 b
+      column: Radius (×R⊕)
+      value_as_printed: '1.58'
+      source_attribution: Léger et al. (2009); Hatzes et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: CoRoT-7 b
+        column: Radius (×R⊕)
+    - planet: CoRoT-7 b
+      column: Density (g cm^-3)
+      value_as_printed: '10.4'
+      source_attribution: Léger et al. (2009); Hatzes et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: CoRoT-7 b
+        column: Density (g cm^-3)
+    - planet: CoRoT-7 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.0172'
+      source_attribution: Léger et al. (2009); Hatzes et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: CoRoT-7 b
+        column: Orbital Radius (AU)
+    - planet: CoRoT-7 b
+      column: Teq (K)
+      value_as_printed: '1810'
+      source_attribution: Léger et al. (2009); Hatzes et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: CoRoT-7 b
+        column: Teq (K)
+    - planet: Kepler-10 b
+      column: Mass (×M⊕)
+      value_as_printed: '4.54'
+      source_attribution: Batalha et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-10 b
+        column: Mass (×M⊕)
+    - planet: Kepler-10 b
+      column: Radius (×R⊕)
+      value_as_printed: '1.42'
+      source_attribution: Batalha et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-10 b
+        column: Radius (×R⊕)
+    - planet: Kepler-10 b
+      column: Density (g cm^-3)
+      value_as_printed: '8.74'
+      source_attribution: Batalha et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-10 b
+        column: Density (g cm^-3)
+    - planet: Kepler-10 b
+      column: Orbital Radius (AU)
+      value_as_printed: '0.01684'
+      source_attribution: Batalha et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-10 b
+        column: Orbital Radius (AU)
+    - planet: Kepler-10 b
+      column: Teq (K)
+      value_as_printed: '1833'
+      source_attribution: Batalha et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: Kepler-10 b
+        column: Teq (K)
+    - planet: 55 Cnc e
+      column: Mass (×M⊕)
+      value_as_printed: 7.98^5/8.63^6
+      source_attribution: Demory et al. (2011); Winn et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: 55 Cnc e
+        column: Mass (×M⊕)
+    - planet: 55 Cnc e
+      column: Radius (×R⊕)
+      value_as_printed: 2.13^5/2.00^6
+      source_attribution: Demory et al. (2011); Winn et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: 55 Cnc e
+        column: Radius (×R⊕)
+    - planet: 55 Cnc e
+      column: Density (g cm^-3)
+      value_as_printed: 4.97^5/5.9^6
+      source_attribution: Demory et al. (2011); Winn et al. (2011)
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: 55 Cnc e
+        column: Density (g cm^-3)
+    - planet: 55 Cnc e
+      column: Orbital Radius (AU)
+      value_as_printed: '0.01564'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: 55 Cnc e
+        column: Orbital Radius (AU)
+    - planet: 55 Cnc e
+      column: Teq (K)
+      value_as_printed: '1967'
+      source_attribution: unattributed
+      locator:
+        pdf_page_index: 31
+        table: '1'
+        row: 55 Cnc e
+        column: Teq (K)
+  context_id: schaefer-fegley-2011-vaporization-earth::context::schaefer_2012_table1_transiting_low_mass_planets
+  work_id: 10.1088/0004-637x/755/1/41
+  source_id: schaefer-fegley-2011-vaporization-earth
+  species: planetary_context

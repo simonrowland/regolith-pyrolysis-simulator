@@ -1,0 +1,141 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/metsoc-2019-6005.yaml
+observations:
+- observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_of_formation'
+    species:
+      formula: CaTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'solid_perovskite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_fH_kJ_mol: '0.54'
+      as_printed: −39.88±0.54 kJ/mol
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2019-6005
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: formation enthalpy from oxide activities / partial pressures
+  read_from: unknown:metsoc-2019-6005
+- observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'entropy_of_formation'
+    species:
+      formula: CaTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'solid_perovskite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'entropy_of_formation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_fS_J_mol_K: '0.28'
+      as_printed: 3.15±0.28 J/(mol×K)
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2019-6005
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: formation entropy from oxide activities / partial pressures
+  read_from: unknown:metsoc-2019-6005
+- observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_melting
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melting_enthalpy_and_temperature'
+    species:
+      formula: CaTiO3
+      phase:
+        tag: unknown
+        reason: phase string 'solid_to_liquid_perovskite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2241'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'melting_enthalpy_and_temperature'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      melting_T_K: 10
+      melting_enthalpy_kJ_mol: '1.84'
+      as_printed: 2241±10 K; 47.61±1.84 kJ/mol
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2019-6005
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: melting enthalpy at printed melting temperature
+  read_from: unknown:metsoc-2019-6005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2241'
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: melting enthalpy at printed melting temperature

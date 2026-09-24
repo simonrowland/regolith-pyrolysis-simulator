@@ -1,0 +1,97 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  citation: Shirai, T., Tachibana, S. and Tsuchiyama, A. (2000), Evaporation rates of Na from Na2O-SiO2 melt at 1 atm, Lunar
+    and Planetary Science XXXI, abstract 1610.
+  source_ids:
+  - ta-shirai-2000-lpsc
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ta-shirai-2000-lpsc
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime '1atm_HBD_apparent_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+context:
+- observation_id: shirai_2000_experiments
+  type: apparatus
+  locator:
+    page: 1
+    section: Experiments
+  phase: Na2O-SiO2_melt
+  regime: 1atm_H2_CO2_wire_loop
+  units: as published
+  values:
+    quantity: experimental_conditions
+    method_class: method_only
+    starting_material: synthesized Na2O-SiO2 glass
+    starting_Na2O_wt_pct_range:
+    - 22
+    - 23
+    method: Pt wire loop 2 mm diameter in 1 atm furnace with alumina muffle tube (4 cm ID)
+    atmosphere: H2-CO2 mixed gas streams
+    temperatures_C:
+    - 1300
+    - 1400
+    pO2_bar_setpoints:
+    - '0.00000001'
+    - '0.000000001'
+    - '0.0000000001'
+    flow_rates_tested_ml_per_min:
+    - 500
+    - 678
+    - 1000
+    - 1500
+    flow_rate_selected_ml_per_min: 1000
+    flow_rate_selection_conditions: 1400 C, pO2=1e-9 bar, 30 min; Na2O concentration independent of flow 500-1500 ml/min
+    quench: diffusion pump oil
+    analysis: EPMA broad beam 50 um, 15 kV, 12 nA; ZAF; albite and quartz standards
+    reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
+  equipment:
+    cell_material:
+      value: Pt wire loop; alumina muffle tube furnace
+      locator:
+        page: 1
+        section: Experiments
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_experiments
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na

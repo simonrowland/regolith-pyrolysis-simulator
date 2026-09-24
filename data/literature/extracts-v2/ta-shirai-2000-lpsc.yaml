@@ -1,0 +1,588 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-shirai-2000-lpsc.yaml
+observations:
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=1f73f652b5d8
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=49a9270c6c31
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=57bed505b965
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=047813e93e6f
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=77f05f932d35
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=87ef40786c1e
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
+    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a-1b
+    section: Estimation of alpha*
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1a-1b
+        section: Estimation of alpha*
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: 1a-1b
+              section: Estimation of alpha*
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jNa_pO2_slopes::T=1573.15:h=4c0c9191d070
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_jNa_vs_log_pO2_slope'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_from_alpha_star_and_activity_model
+    original_method_class: author_derived_from_alpha_star_and_activity_model
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    section: The dependence of jNa on p(O2)
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: '2'
+        section: The dependence of jNa on p(O2)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              figure: '2'
+              section: The dependence of jNa on p(O2)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: '2'
+              section: The dependence of jNa on p(O2)
+        output_unit: K
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jNa_pO2_slopes::T=1673.15:h=d39f3009792b
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_jNa_vs_log_pO2_slope'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_derived_from_alpha_star_and_activity_model
+    original_method_class: author_derived_from_alpha_star_and_activity_model
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    section: The dependence of jNa on p(O2)
+  read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: '2'
+        section: The dependence of jNa on p(O2)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 2
+              figure: '2'
+              section: The dependence of jNa on p(O2)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              figure: '2'
+              section: The dependence of jNa on p(O2)
+        output_unit: K

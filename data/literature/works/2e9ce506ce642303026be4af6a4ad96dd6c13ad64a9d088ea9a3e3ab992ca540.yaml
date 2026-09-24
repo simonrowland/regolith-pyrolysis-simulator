@@ -1,0 +1,70 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 2e9ce506ce642303026be4af6a4ad96dd6c13ad64a9d088ea9a3e3ab992ca540
+  citation: 'Senior, Constance L. (1991), "Oxygen Production by Pyrolysis of Lunar Regolith", Resources of Near-Earth Space:
+    Abstracts, Second Annual Symposium of the University of Arizona/NASA Space Engineering Research Center for Utilization
+    of Local Planetary Resources, Tucson, AZ, 7–10 January 1991. NTRS N91-26033 / NASA accession abstract; NTRS citation 19910016719.'
+  source_ids:
+  - senior-1991-vacuum-pyrolysis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:senior-1991-vacuum-pyrolysis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: senior_1991_pyrolysis_process_claims
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 21
+    published_page: 12
+    section: Oxygen Production by Pyrolysis of Lunar Regolith
+    note: Constance L Senior abstract; PSI Technology Company, Andover MA
+  phase: lunar_regolith_pyrolysis_process_description
+  regime: vapor_phase_reduction_pyrolysis_abstract
+  units: as published
+  values:
+    quantity: vacuum_pyrolysis_process_claims_abstract_only
+    method_class: method_only
+    evidence_class: authors_abstract_prose_not_a_measurement_table
+    title_as_printed: Oxygen Production by Pyrolysis of Lunar Regolith
+    author_as_printed: Constance L Senior
+    affiliation_as_printed: PSI Technology Company, 20 New England Business Center, Andover, MA 01810
+    process_names_as_printed:
+    - pyrolysis
+    - vapor-phase reduction
+    feedstock_claim_as_printed: unbeneficiated regolith is a suitable feedstock for pyrolysis
+    process_temperature_K_as_printed: circa 2000
+    process_temperature_note: Printed phrase is "circa 2000 K"; approximation retained; not converted or treated as a measured
+      run temperature.
+    energy_source_claim_as_printed: could be supplied by direct solar or electrical energy
+    reagents_claim_as_printed: the pyrolysis process requires no chemicals or reagents
+    demonstration_claim_as_printed: The feasibility of obtaining oxygen from common lunar minerals was demonstrated using
+      solar furnace experiments. These results will be discussed together with chemical equilibrium models which were extended
+      to include the multicomponent oxides used in experiments.
+    example_reduced_vapour_species_as_printed:
+    - SiO
+    - AlO
+    - Fe
+    - Ca
+    oxygen_release_mechanism_as_printed: vaporization of metal oxides as reduced suboxides or atomic species; reduced species
+      must then be condensed without re-oxidizing, yielding oxygen in the gas phase
+    nasa_stamp_as_printed: N91-26033
+    booklet_handwritten_note: ABS. ONLY
+    related_full_papers_ntrs_aq_2026_09_23: Princeton/AIAA/SSI accession 19920035166 and JBIS accession 19920033574 are both
+      NTRS METADATA_ONLY (no downloads). See senior-1992-vacuum-pyrolysis.yaml and senior-1991-solar-heating-jbis.yaml; this
+      abstract extract is unchanged and remains the only held Senior full-text abstract.
+  uncertainty:
+    note: No numeric uncertainty printed. "circa 2000 K" is an approximate process temperature claim, not a measured series
+      point.
+  context_id: senior-1991-vacuum-pyrolysis::context::senior_1991_pyrolysis_process_claims
+  work_id: 2e9ce506ce642303026be4af6a4ad96dd6c13ad64a9d088ea9a3e3ab992ca540
+  source_id: senior-1991-vacuum-pyrolysis
+  species: lunar_regolith_feedstock

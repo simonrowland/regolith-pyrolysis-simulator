@@ -1,0 +1,206 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3847/psj/ac2dfb
+  citation: Jäggi, N., Gamborino, D., Bower, D. J., Sossi, P. A., Wolf, A. S., Oza, A. V., Vorburger, A., Galli, A. & Wurz,
+    P. (2021), "Evolution of Mercury's Earliest Atmosphere", The Planetary Science Journal 2:230, DOI 10.3847/PSJ/ac2dfb
+  source_ids:
+  - jaggi-2021-mercury-atmosphere
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:jaggi-2021-mercury-atmosphere
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.3847/psj/ac2dfb
+experiments:
+- experiment_id: 10.3847/psj/ac2dfb::experiment::mercury-magma-ocean-model-cases
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'coupled_interior_atmosphere_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: EH4, CB, NSP source, and NSP lava compositions as printed in Table 2
+      locator:
+        pdf_page_index: 5
+        table: '2'
+    form:
+      state:
+        tag: value
+        value: Model magma-ocean surface compositions (literature compilations)
+      locator:
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        table: '1'
+        note: Case parameters quote pressures at 2000 K; no single laboratory setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 lists species partial pressures at 2000 K per model case; not a lab total pressure
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        pdf_page_index: 3
+        note: Model atmosphere; no laboratory sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.3847/psj/ac2dfb
+  locator:
+    pdf_page_index: 3
+    section: 2. Methods
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 3
+          note: Numerical model; no Knudsen orifice
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          pdf_page_index: 3
+          note: Numerical model; no effusion channel
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fO2 set to IW-1 in the evaporation model (O'Neill & Eggins 2002)
+      locator:
+        pdf_page_index: 4
+        section: 2.3 Evaporation from the magma ocean
+  bench_id: 10.3847/psj/ac2dfb::bench::spider-vaporock-vulcan-model-stack
+benches:
+- id: 10.3847/psj/ac2dfb::bench::spider-vaporock-vulcan-model-stack
+  work_id: 10.3847/psj/ac2dfb
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Coupled SPIDER (interior) + VapoRock (evaporation) + VULCAN/FactSage (atmospheric chemistry) model stack — not
+        a laboratory instrument
+    locator:
+      pdf_page_index: 3
+      section: 2. Methods
+  other_facts: []
+context:
+- observation_id: jaggi_2021_messenger_na_quote
+  type: quoted_comparator
+  locator:
+    pdf_page_index: 2
+    section: 1. Introduction
+  units: wt% Na as printed
+  values:
+    quantity: messenger_surface_sodium_abundance_quote
+    method_class: quoted_from_prior_work
+    evidence_class: quoted_comparator_not_this_works_measurement
+    as_printed: element Na (3-5 wt%) is detected on Mercury's surface
+    note: MESSENGER observation cited in introduction; not a measurement of this paper. Retained as unscored context.
+  context_id: jaggi-2021-mercury-atmosphere::context::jaggi_2021_messenger_na_quote
+  work_id: 10.3847/psj/ac2dfb
+  source_id: jaggi-2021-mercury-atmosphere
+  species: Mercury_magma_ocean
+- observation_id: jaggi_2021_model_outputs_typed_absence
+  type: scope_note
+  locator:
+    pdf_page_index: 5
+    note: Tables 3-5 and figures of escape/mass-loss
+  units: not applicable
+  values:
+    quantity: model_derived_outputs_not_extracted
+    method_class: typed_absence
+    evidence_class: model_derived_cohort_blocked
+    absent_tables:
+    - Table 3 surface element ratios at 2000 K (SPIDER/VapoRock)
+    - Table 4 escape parameters
+    - Table 5 time-averaged mass loss rates
+    absent_observables:
+    - photoevaporation and plasma-heating mass-loss rates
+    - homopause/exobase altitudes
+    - atmospheric mixing-ratio profiles
+    - integrated cumulative atmospheric loss
+    ruling: 'BACKLOG 3 N7 model-paper rule applied: model outputs are the model-derived cohort the owner BLOCKED — typed absence,
+      not observations.'
+  context_id: jaggi-2021-mercury-atmosphere::context::jaggi_2021_model_outputs_typed_absence
+  work_id: 10.3847/psj/ac2dfb
+  source_id: jaggi-2021-mercury-atmosphere
+  species: Mercury_magma_ocean
+- observation_id: jaggi_2021_table1_case_parameters
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 4
+    table: '1'
+  units: R_P in km; g in m/s^2; species pressures in bar at 2000 K
+  values:
+    quantity: magma_ocean_model_case_parameters
+    method_class: model_input
+    evidence_class: author_model_setup_not_scored
+    caption_as_printed: Table 1. Parameters for the magma ocean cases.
+    rows_as_printed:
+    - case: SN5
+      R_P_km: 2440
+      g_m_s2: '3.7'
+      SiO_bar_at_2000K: '1.4E-4'
+    - case: SN3
+      R_P_km: 2440
+      g_m_s2: '3.7'
+      SiO_bar_at_2000K: '1.4E-4'
+    - case: SV
+      R_P_km: 2440
+      g_m_s2: '3.7'
+      H2O_bar: '0.7'
+      H2_bar: '3.2'
+      CO2_bar: '0.05'
+      CO_bar: '1.1'
+    - case: LN5
+      R_P_km: 3290
+      g_m_s2: '4'
+      SiO_bar_at_2000K: '1.4E-4'
+    - case: LN3
+      R_P_km: 3290
+      g_m_s2: '4'
+      SiO_bar_at_2000K: '1.4E-4'
+    - case: LV
+      R_P_km: 3290
+      g_m_s2: '4'
+      H2O_bar: '1.2'
+      H2_bar: '5.8'
+      CO2_bar: '0.2'
+      CO_bar: '4.9'
+    naming_note: S/L = small/large Mercury; V/N = with/without volatiles; 5/3 = SiO opacity 1e-5 / 1e-3 m2 kg^-1 for non-volatile
+      cases
+  context_id: jaggi-2021-mercury-atmosphere::context::jaggi_2021_table1_case_parameters
+  work_id: 10.3847/psj/ac2dfb
+  source_id: jaggi-2021-mercury-atmosphere
+  species: Mercury_magma_ocean
