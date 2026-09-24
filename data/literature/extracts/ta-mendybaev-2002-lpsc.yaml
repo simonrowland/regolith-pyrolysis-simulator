@@ -88,10 +88,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '2073.15'}}
       locator: {pdf_page_index: 1, section: Experimental methods, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; rate averages reported at 1800 C'}
   pressure_environment:
-    total_pressure_as_printed:
-      state: {tag: value, value: 'P≤10^-6 torr'}
-      locator: {pdf_page_index: 1, section: Experimental methods}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints P≤10^-6 torr; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 1, section: Experimental methods, note: 'P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa'}
     sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *methods_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 - experiment_id: b133-vacuum-multi-T-campaign
   bench_id: chicago-high-vacuum-furnace-cai
   method: vacuum_free_evaporation_ir_wire_loop
@@ -105,14 +107,13 @@ experiments:
     form:
       state: {tag: value, value: Ir-wire loop suspended melt droplets}
       locator: {pdf_page_index: 1, section: Experimental methods}
-  conditions:
-    temperature_C_setpoints_as_printed:
-      state: {tag: value, value: [1800, 1700, 1600]}
-      locator: {pdf_page_index: 1, section: Experimental methods}
   pressure_environment:
-    total_pressure_as_printed:
-      state: {tag: value, value: 'P≤10^-6 torr'}
-      locator: {pdf_page_index: 1, section: Experimental methods}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints P≤10^-6 torr; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 1, section: Experimental methods, note: 'P≤10^-6 torr as printed; retained as typed absence rather than inferred Pa'}
+    sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *methods_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 fidelity_samples:
 - species: B133_CAI_like_melt
   observable: rate_series

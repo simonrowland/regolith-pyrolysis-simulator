@@ -698,14 +698,43 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
     return _located_from_plain(payload, as_decimal)
 
 
+def _condition_value_from_plain(payload: object) -> object:
+    if isinstance(payload, Mapping) and payload.get("kind") is not None:
+        return _value_from_plain(payload)
+    return as_decimal(payload)
+
+
+def _inferred_derivation_from_plain(payload: Mapping[str, Any]) -> Derivation:
+    raw_locator = payload.get("locator")
+    locator_note = (
+        raw_locator.get("note")
+        if isinstance(raw_locator, Mapping)
+        else None
+    )
+    detail = str(
+        payload.get("inference")
+        or locator_note
+        or "extract marks inferred; derivation not supplied"
+    )
+    return Derivation(
+        relation="extract_inference",
+        inputs=("inferred=true", detail),
+        parameters=(),
+        output_unit="as_published",
+    )
+
+
 def _located_from_plain(payload: object, cast) -> Located:
     if isinstance(payload, Located):
         return payload
     if not isinstance(payload, Mapping) or "state" not in payload:
         return Located(_state_from_plain(payload, cast))
     inference = None
-    if payload.get("inference"):
-        inference = _derivation_from_plain(payload.get("inference"))
+    raw_inference = payload.get("inference")
+    if isinstance(raw_inference, Mapping):
+        inference = _derivation_from_plain(raw_inference)
+    elif payload.get("inferred") is True:
+        inference = _inferred_derivation_from_plain(payload)
     else:
         inference = _inference_for_printed_conversion(payload)
     return Located(
@@ -1408,7 +1437,22 @@ def experiment_from_plain(payload: object) -> Experiment:
     assert isinstance(payload, Mapping)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
-        conditions[str(key)] = _located_from_plain(value, as_decimal)
+        try:
+            conditions[str(key)] = _located_from_plain(
+                value, _condition_value_from_plain
+            )
+        except (ArithmeticError, TypeError, ValueError):
+            locator = (
+                _locator_from_plain(value.get("locator"))
+                if isinstance(value, Mapping)
+                else None
+            )
+            conditions[str(key)] = Located(
+                State.unknown(
+                    f"condition {key} is not a scalar numeric value"
+                ),
+                locator=locator,
+            )
     fo2 = payload.get("fO2_control")
     fo2_control = None
     if isinstance(fo2, Mapping):
@@ -1926,6 +1970,24 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "min_to_s": (Decimal("60"), "t_s = t_min × 60", "s", "min"),
     "h_to_s": (Decimal("3600"), "t_s = t_h × 3600", "s", "h"),
     "ks_to_s": (Decimal("1000"), "t_s = t_ks × 1000", "s", "ks"),
+    "thermochemical_calorie_to_J_exact": (
+        Decimal("4.184"),
+        "Q_J_per_declared_mol_basis_per_K = Q_cal_per_mol_K × 4.184",
+        "J_per_declared_mol_basis_per_K",
+        "cal/mol/K",
+    ),
+    "thermochemical_kcal_to_kJ_exact": (
+        Decimal("4.184"),
+        "H_kJ_per_declared_mol_basis = H_kcal_per_mol × 4.184",
+        "kJ_per_declared_mol_basis",
+        "kcal/mol",
+    ),
+    "J_to_kJ_exact": (
+        Decimal("1000"),
+        "H_kJ_per_declared_mol_basis = H_J_per_mol / 1000",
+        "kJ_per_declared_mol_basis",
+        "J/mol",
+    ),
     "C_per_min_to_K_per_s": (
         Decimal("60"),
         "rate_K_s = rate_C_per_min / 60",
@@ -2205,6 +2267,23 @@ def conversion_derivation(
         parameters=tuple(params),
         output_unit=output_unit,
     )
+
+
+def _compilation_conversion_derivation(
+    trail: str | None,
+    original_value: object,
+    locator: Locator | None,
+    read_from: str,
+) -> Derivation | None:
+    """Attach a compilation unit conversion to its registered source asset."""
+
+    derivation = conversion_derivation(trail, original_value, locator)
+    if derivation is None:
+        return None
+    # Observation derivation inputs are referential links, not free-form
+    # arithmetic text. The relation/output/parameters retain the conversion
+    # trail while the source asset supplies the resolvable input.
+    return replace(derivation, inputs=(read_from,))
 
 
 def _converted_temperature(
@@ -3530,6 +3609,7 @@ class CompilationColumnSeries:
     series_key: str
     value: Value
     temperature_K: State[Decimal]
+    unit_trail: str | None = None
 
 
 def _normalize_compilation_column_label(label: str) -> str:
@@ -3592,6 +3672,15 @@ def _series_temperature_state(label: str) -> State[Decimal]:
     )
 
 
+def _consistent_series_trail(trails: Iterable[str]) -> str | None:
+    values = tuple(str(trail) for trail in trails)
+    if not values or any(
+        trail == "as_published" or trail.startswith("identity") for trail in values
+    ):
+        return None
+    return values[0] if len(set(values)) == 1 else None
+
+
 def _cell_numeric_amount(cell: object) -> Decimal | None:
     if isinstance(cell, Mapping):
         return _as_dec_or_none(cell.get("value"))
@@ -3638,6 +3727,7 @@ def _emit_series_or_point(
     points: list[tuple[Decimal, Decimal]],
     *,
     point_temperature: Decimal | None = None,
+    unit_trail: str | None = None,
 ) -> CompilationColumnSeries | None:
     if not points:
         return None
@@ -3647,12 +3737,14 @@ def _emit_series_or_point(
             series_key=series_key,
             value=Value.point_of(points[0][1]),
             temperature_K=State.of(point_temperature),
+            unit_trail=unit_trail,
         )
     return CompilationColumnSeries(
         quantity=quantity,
         series_key=series_key,
         value=Value(ValueKind.SERIES, series=tuple(points)),
         temperature_K=_series_temperature_state(series_key),
+        unit_trail=unit_trail,
     )
 
 
@@ -3685,6 +3777,7 @@ def _column_series_from_list_cells(
         index, heading = cols[0]
         unit = next(item[3] for item in headings if item[0] == index)
         points: list[tuple[Decimal, Decimal]] = []
+        trails: list[str] = []
         for row in rows:
             cells = row.get("cells")
             if not isinstance(cells, list):
@@ -3699,9 +3792,15 @@ def _column_series_from_list_cells(
             if converted is None:
                 points = []
                 break
-            v_amt, _trail = converted
+            v_amt, trail = converted
             points.append((t_amt, v_amt))
-        series = _emit_series_or_point(quantity, heading, points)
+            trails.append(trail)
+        series = _emit_series_or_point(
+            quantity,
+            heading,
+            points,
+            unit_trail=_consistent_series_trail(trails),
+        )
         if series is not None:
             emitted.append(series)
     return tuple(emitted)
@@ -3730,9 +3829,11 @@ def _column_series_from_named_cells(
 
     # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
     cp_points: list[tuple[Decimal, Decimal]] = []
+    cp_trails: list[str] = []
     entropy_series: list[CompilationColumnSeries] = []
     grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
     grid_keys: dict[Quantity, str] = {}
+    grid_trails: dict[Quantity, list[str]] = {}
 
     for row in rows:
         cells = row_cells(row)
@@ -3760,6 +3861,7 @@ def _column_series_from_named_cells(
                 )
                 if converted is not None:
                     cp_points.append((cp_t, converted[0]))
+                    cp_trails.append(converted[1])
                 continue
             if key in _KELLEY_ENTROPY_COLUMNS:
                 converted = _convert_compilation_amount(
@@ -3772,6 +3874,10 @@ def _column_series_from_named_cells(
                     key,
                     [(_KELLEY_ENTROPY_T_K, converted[0])],
                     point_temperature=_KELLEY_ENTROPY_T_K,
+                    unit_trail=converted[1]
+                    if not converted[1].startswith("identity")
+                    and converted[1] != "as_published"
+                    else None,
                 )
                 if series is not None:
                     entropy_series.append(series)
@@ -3786,19 +3892,28 @@ def _column_series_from_named_cells(
             )
             if converted is not None:
                 grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
+                grid_trails.setdefault(quantity, []).append(converted[1])
             grid_keys.setdefault(quantity, key)
 
     emitted: list[CompilationColumnSeries] = []
     if cp_points:
         # Stable order by printed temperature.
         cp_points.sort(key=lambda item: item[0])
-        series = _emit_series_or_point(Quantity.CP, "cp_temperature_grid", cp_points)
+        series = _emit_series_or_point(
+            Quantity.CP,
+            "cp_temperature_grid",
+            cp_points,
+            unit_trail=_consistent_series_trail(cp_trails),
+        )
         if series is not None:
             emitted.append(series)
     emitted.extend(entropy_series)
     for quantity, points in grid_points.items():
         series = _emit_series_or_point(
-            quantity, grid_keys.get(quantity, quantity.value), points
+            quantity,
+            grid_keys.get(quantity, quantity.value),
+            points,
+            unit_trail=_consistent_series_trail(grid_trails.get(quantity, ())),
         )
         if series is not None:
             emitted.append(series)
@@ -4386,6 +4501,8 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "delta_fH",
         "deltafH",
         "formation_enthalpy",
+        "delta_f_H_298_15",
+        "formation_enthalpy_298_15_K_as_published",
         "value",
     ),
     Quantity.DELTA_FG: (
@@ -4398,15 +4515,6 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "table_kJ_mol",
         "Gf",
         "formation_gibbs_energy",
-        "value",
-    ),
-    Quantity.DELTA_FH: (
-        "delta_f_H_298_15",
-        "delta_f_H",
-        "delta_fH",
-        "deltafH",
-        "formation_enthalpy_298_15_K_as_published",
-        "formation_enthalpy",
         "value",
     ),
     Quantity.LOG10_KF: (
@@ -4571,6 +4679,8 @@ def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
             unit = units.get(key)
             if unit not in (None, ""):
                 return str(unit)
+        elif isinstance(units, str) and units not in (None, ""):
+            return str(units)
     return None
 
 
@@ -9745,6 +9855,7 @@ class Migrator:
         column_series = compilation_column_series_from_record(doc)
         if column_series:
             # One observation per declared mapped series; never first-numeric-cell.
+            read_from = choose_read_from(work, locator)
             for series in column_series:
                 suffix = _compilation_series_obs_suffix(series)
                 self._generic_obs(
@@ -9760,7 +9871,27 @@ class Migrator:
                     temperature_K=series.temperature_K,
                     standard_pressure_Pa=p_std,
                     method=State.of(MethodToken.TABULATION),
+                    derivation=_compilation_conversion_derivation(
+                        series.unit_trail,
+                        None,
+                        locator,
+                        read_from,
+                    ),
                 )
+            for column, numeric_count in _printed_column_counts(doc).items():
+                if (
+                    numeric_count
+                    and not _is_temperature_column_label(column)
+                    and _quantity_for_compilation_column_label(column) is None
+                ):
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        ["value"],
+                        f"printed compilation column {column} is not mapped to a closed Quantity",
+                        source=rel,
+                        observation_id=f"{source_id}:{record_id}",
+                    )
             return
         rows = doc.get("rows")
         series_items: list[dict[str, Any]] = []
@@ -9805,6 +9936,15 @@ class Migrator:
         # Quantity.DELTA_FH is a closed v2.1 token; formation-enthalpy fields are
         # projected above via compilation_quantity_from_record / QUANTITY_SOURCE_FIELDS.
         # Do not re-queue a "not a v2.1 Quantity token" refusal here.
+        read_from = choose_read_from(work, locator)
+        original_value = None
+        if sel.field_name:
+            raw_original = doc.get(sel.field_name)
+            original_value = (
+                raw_original.get("value")
+                if isinstance(raw_original, Mapping)
+                else raw_original
+            )
         self._generic_obs(
             work=work,
             source_id=source_id,
@@ -9818,6 +9958,12 @@ class Migrator:
             temperature_K=t,
             standard_pressure_Pa=p_std,
             method=State.of(MethodToken.TABULATION),
+            derivation=_compilation_conversion_derivation(
+                sel.unit_trail,
+                original_value,
+                locator,
+                read_from,
+            ),
         )
 
     def _lift_janaf_from_generator(

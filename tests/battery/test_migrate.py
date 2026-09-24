@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     AssetRole,
     EvidenceClass,
+    FO2Channel,
     IdentityEqualKind,
     MethodToken,
     NoticeKind,
@@ -3236,6 +3237,14 @@ def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
     assert sel.amount == as_decimal("0")
     assert sel.value.kind is ValueKind.POINT
     assert sel.field_name == "formation_enthalpy_298_15_K_as_published"
+    named = select_declared_source(
+        Quantity.DELTA_FH,
+        None,
+        {"delta_h": "94", "units": {"delta_h": "kcal/mol"}},
+    )
+    assert named.value.kind is ValueKind.POINT
+    assert named.amount == as_decimal("393.296")
+    assert named.unit_trail == "thermochemical_kcal_to_kJ_exact"
 
     nasa = {
         "record_id": "NG-fixture",
@@ -3256,7 +3265,9 @@ def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
     assert sel.field_name == "delta_f_H_298_15"
 
 
-def test_g1_delta_fh_migrate_admits_point_without_token_queue(tmp_path: Path) -> None:
+def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
+    tmp_path: Path,
+) -> None:
     root = _write_min_tree(tmp_path)
     _copy_compilation_record(root, "atct", "atct-1.222-0001.json")
     _copy_compilation_record(root, "nasa-glenn", "NG-0467.json")
@@ -3269,8 +3280,12 @@ def test_g1_delta_fh_migrate_admits_point_without_token_queue(tmp_path: Path) ->
     ]
     assert atct_obs
     assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in atct_obs)
-    assert all(obs.value.kind is ValueKind.POINT for obs in atct_obs)
-    assert all(obs.value.point == as_decimal("0") for obs in atct_obs)
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in atct_obs)
+    assert any(
+        "missing printed unit" in (entry.why or "")
+        for entry in result.queue
+        if "atct-1.222-0001" in (entry.observation_id or "")
+    )
 
     ng_obs = [
         obs
@@ -3281,9 +3296,51 @@ def test_g1_delta_fh_migrate_admits_point_without_token_queue(tmp_path: Path) ->
     assert all(quantity_token(obs.identity) is Quantity.DELTA_FH for obs in ng_obs)
     assert all(obs.value.kind is ValueKind.POINT for obs in ng_obs)
     assert all(obs.value.point == as_decimal("-103.772885") for obs in ng_obs)
+    assert all(
+        obs.derivation is not None
+        and obs.derivation.relation == "J_to_kJ_exact"
+        for obs in ng_obs
+    )
 
     for entry in result.queue:
         assert "not a v2.1 Quantity token" not in (entry.why or "")
+
+
+def test_g1_scalar_units_guard_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    payload = {
+        "formation_enthalpy_298_15_K_as_published": "12.5",
+        "units_as_published": "kJ/mol",
+    }
+    live = select_declared_source(Quantity.DELTA_FH, None, payload)
+    assert live.value.kind is ValueKind.POINT
+    monkeypatch.setattr(
+        migrate_mod,
+        "_printed_unit_for_field",
+        lambda _payload, _key: None,
+    )
+    mutant = select_declared_source(Quantity.DELTA_FH, None, payload)
+    assert mutant.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_g1_delta_h_named_field_mutation_proof() -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    payload = {"delta_h": "94", "units": {"delta_h": "kcal/mol"}}
+    live = select_declared_source(Quantity.DELTA_FH, None, payload)
+    assert live.amount == as_decimal("393.296")
+
+    saved = migrate_mod.QUANTITY_SOURCE_FIELDS[Quantity.DELTA_FH]
+    migrate_mod.QUANTITY_SOURCE_FIELDS[Quantity.DELTA_FH] = tuple(
+        key for key in saved if key != "delta_h"
+    )
+    try:
+        mutant = select_declared_source(Quantity.DELTA_FH, None, payload)
+    finally:
+        migrate_mod.QUANTITY_SOURCE_FIELDS[Quantity.DELTA_FH] = saved
+    assert mutant.value.kind is ValueKind.UNAVAILABLE
+    assert "no mapped delta_fH field" in (mutant.value.unavailable_reason or "")
 
 
 def test_g1_delta_fh_mapping_mutation_proof() -> None:
@@ -3317,6 +3374,124 @@ def test_g1_delta_fh_mapping_mutation_proof() -> None:
 
     restored, restored_reason = compilation_quantity_from_record(doc)
     assert restored.is_value and restored.value is Quantity.DELTA_FH and restored_reason is None
+
+
+def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -> None:
+    names = (
+        "jaggi-2021-mercury-atmosphere.yaml",
+        "thomas-wood-2021-chlorine-silicate-melts.yaml",
+        "ueshima-1982-fe-mo-thermal.yaml",
+        "ta-mendybaev-2002-lpsc.yaml",
+        "ta-mendybaev-2020-lpsc.yaml",
+        "lpsc-2024-bennu-pyrolysis-vandam.yaml",
+    )
+    root = _write_min_tree(tmp_path)
+    for name in names:
+        _copy_extract(root, name)
+
+    result = migrate(root, write=True)
+    assert not result.registry_issues
+    for name in names:
+        source_id = name.removesuffix(".yaml")
+        assert any(obs.source_id == source_id for obs in result.observations.values())
+
+    experiments = result.experiments
+    assert any(eid.endswith("::experiment::mercury-magma-ocean-model-cases") for eid in experiments)
+    assert any(eid.endswith("::experiment::cl-solubility-cmas-icb-series") for eid in experiments)
+    assert any(eid.endswith("::experiment::femo-thermal-analysis-series") for eid in experiments)
+    assert any(eid.endswith("::experiment::b133-vacuum-1800C-loop-series") for eid in experiments)
+    assert any(eid.endswith("::experiment::sio2-langmuir-ir-loop-1800C") for eid in experiments)
+    assert any(eid.endswith("::experiment::standard-pyrolysis-600C") for eid in experiments)
+
+    jaggi = next(
+        exp for eid, exp in experiments.items()
+        if eid.endswith("::experiment::mercury-magma-ocean-model-cases")
+    )
+    assert jaggi.fO2_control is not None
+    assert jaggi.fO2_control.channel.is_value
+    assert jaggi.fO2_control.channel.value is FO2Channel.BUFFER
+
+    ueshima = next(
+        exp for eid, exp in experiments.items()
+        if eid.endswith("::experiment::femo-thermal-analysis-series")
+    )
+    temperature = ueshima.conditions["temperature_K"]
+    assert temperature.state.is_value
+    assert temperature.state.value.kind is ValueKind.INTERVAL
+
+    works, loaded_experiments, loaded_observations = load_migrated_store(root)
+    assert works and loaded_experiments and loaded_observations
+    assert any(
+        obs.source_id == "ueshima-1982-fe-mo-thermal"
+        for obs in loaded_observations.values()
+    )
+    assert any(
+        eid.endswith("::experiment::femo-thermal-analysis-series")
+        for eid in loaded_experiments
+    )
+
+
+def test_registry_tagged_condition_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
+    from simulator.battery import migrate as migrate_mod
+    from simulator.battery.migrate import experiment_from_plain
+
+    raw = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/extracts/ueshima-1982-fe-mo-thermal.yaml"
+        ).read_text(encoding="utf-8")
+    )["experiments"][0]
+    raw = dict(raw)
+    raw["method"] = "knudsen_effusion"
+    live = experiment_from_plain(raw)
+    assert live.conditions["temperature_K"].state.value.kind is ValueKind.INTERVAL
+
+    monkeypatch.setattr(migrate_mod, "_condition_value_from_plain", as_decimal)
+    mutant = experiment_from_plain(raw)
+    assert mutant.conditions["temperature_K"].state.is_unknown
+
+
+def test_heck_inferred_pressure_survives_registry_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-140-heck-2025.yaml")
+    result = migrate(root, write=True)
+    experiment = next(
+        exp
+        for eid, exp in result.experiments.items()
+        if eid.endswith("::experiment::open-furnace-mvce-degassing-series")
+    )
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    assert pressure.inference is not None
+    assert pressure.inference.relation == "extract_inference"
+    assert "inferred=true" in pressure.inference.inputs
+    assert any("not printed" in item for item in pressure.inference.inputs)
+
+    saved = migrate_mod._inferred_derivation_from_plain
+    monkeypatch.setattr(
+        migrate_mod,
+        "_inferred_derivation_from_plain",
+        lambda _payload: None,
+    )
+    mutated = migrate_mod._pressure_env_from_plain(
+        yaml.safe_load(
+            """
+            total_pressure_Pa:
+              state: {tag: value, value: {kind: point, point: '101325'}}
+              inferred: true
+            sweep_gas: {state: {tag: not_applicable, reason: not_published}}
+            regime:
+              regime_class: {tag: unknown, reason: not_published}
+            """
+        )
+    )
+    monkeypatch.setattr(migrate_mod, "_inferred_derivation_from_plain", saved)
+    assert mutated.total_pressure_Pa.inference is None
+
+
 def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
     """Multi-column Cp/S/H/ΔHf/ΔGf censuses explode to one series per Quantity."""
     pankratz = json.loads(
@@ -3372,6 +3547,12 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     }
     assert by_quantity[Quantity.CP] == as_decimal("35.9824")
     assert by_quantity[Quantity.DELTA_FH] == as_decimal("393.296")
+    trails = {
+        item.quantity: item.unit_trail
+        for item in compilation_column_series_from_record(page)
+    }
+    assert trails[Quantity.CP] == "thermochemical_calorie_to_J_exact"
+    assert trails[Quantity.DELTA_FH] == "thermochemical_kcal_to_kJ_exact"
 
     for record in ("table-0001.json", "table-0002.json"):
         doc = json.loads(
@@ -3392,6 +3573,40 @@ def test_pankratz_source_units_convert_and_missing_units_refuse() -> None:
     )
 
 
+def test_g5_compilation_conversion_trail_mutation_proof(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery import migrate as migrate_mod
+
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "pankratz-1987-usbm-b689", "page-0003.json")
+    live = migrate(root, write=False)
+    live_cp = next(
+        obs for oid, obs in live.observations.items() if oid.endswith(":page-0003:cp")
+    )
+    assert live_cp.derivation is not None
+    assert live_cp.derivation.relation == "thermochemical_calorie_to_J_exact"
+
+    saved = dict(migrate_mod._CONVERSION_META)
+    try:
+        for trail in (
+            "thermochemical_calorie_to_J_exact",
+            "thermochemical_kcal_to_kJ_exact",
+            "J_to_kJ_exact",
+        ):
+            migrate_mod._CONVERSION_META.pop(trail, None)
+        mutant = migrate(root, write=False)
+    finally:
+        migrate_mod._CONVERSION_META.clear()
+        migrate_mod._CONVERSION_META.update(saved)
+    mutant_cp = next(
+        obs
+        for oid, obs in mutant.observations.items()
+        if oid.endswith(":page-0003:cp")
+    )
+    assert mutant_cp.derivation is None
+
+
 def test_joule_heat_capacity_unit_is_identity() -> None:
     selection = select_declared_source(Quantity.CP, "J/mol/K", {"cp": 25})
     assert selection.value.kind is ValueKind.POINT
@@ -3401,6 +3616,7 @@ def test_joule_heat_capacity_unit_is_identity() -> None:
 def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-1447.json")
+    _copy_compilation_record(root, "pankratz-1987-usbm-b689", "page-0003.json")
     _copy_compilation_record(root, "kelley-king-1961-usbm-b592", "table-006-0007.json")
     _copy_compilation_record(root, "kelley-king-1961-usbm-b592", "table-006-0923.json")
     result = migrate(root, write=False)
@@ -3457,6 +3673,11 @@ def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
         ):
             assert "source column census" not in why
             assert "printed compilation columns are not mapped" not in why
+    assert any(
+        "gibbs_function" in (entry.why or "")
+        for entry in result.queue
+        if "page-0003" in (entry.observation_id or "")
+    )
 
 
 def test_g5_compilation_column_mapping_mutation_proof() -> None:

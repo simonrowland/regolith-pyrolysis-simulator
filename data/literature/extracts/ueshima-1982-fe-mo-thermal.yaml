@@ -119,7 +119,9 @@ benches:
     value:
       state:
         tag: value
-        value: 56Fe ion intensity I_Fe only (Mo vapour pressure too low)
+        value:
+          kind: categorical
+          categorical: 56Fe ion intensity I_Fe only (Mo vapour pressure too low)
       locator:
         published_page: 2569
         pdf_page_index: 1
@@ -228,8 +230,8 @@ experiments:
         note: Vacuum Knudsen effusion; no sweep gas
     regime:
       regime_class:
-        tag: value
-        value: knudsen_effusion
+        tag: unknown
+        reason: 'Knudsen effusion is the method; gas-flow regime class is not published'
     pumping:
       base_pressure_Pa:
         state:

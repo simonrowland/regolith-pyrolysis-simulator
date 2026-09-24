@@ -77,10 +77,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '2073.15'}}
       locator: {pdf_page_index: 2, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K'}
   pressure_environment:
-    total_pressure_as_printed:
-      state: {tag: value, value: '5x10^-6 torr or less'}
-      locator: {pdf_page_index: 2}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 2, note: '5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa'}
     sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *tga_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 - experiment_id: sio2-knudsen-ir-cell-1800C
   bench_id: nasa-glenn-vacuum-tga
   method: vacuum_tga_knudsen_equilibrium_cell
@@ -97,10 +99,12 @@ experiments:
       state: {tag: value, value: {kind: point, point: '2073.15'}}
       locator: {pdf_page_index: 2, note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; same conditions as loop arm'}
   pressure_environment:
-    total_pressure_as_printed:
-      state: {tag: value, value: '5x10^-6 torr or less'}
-      locator: {pdf_page_index: 2}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: 'source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa'}
+      locator: {pdf_page_index: 2, note: '5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa'}
     sweep_gas: {state: {tag: not_applicable, reason: vacuum}, locator: *tga_loc}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 fidelity_samples:
 - species: SiO2
   observable: rate_series
