@@ -572,9 +572,8 @@ fidelity_samples:
   value: 2.1
   locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG2, column: 'SAM-derived SO3 (wt.%)'}
 - species: MgSO4
-  observable: composition_series
   observation_id: jgr_2024_fig7_mg_sulfate_ca2
-  field: yield_fraction
+  field: evolved_so2_source_phase_apportionment_fraction
   value: 0.65
   locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
 - species: Cl
@@ -794,67 +793,117 @@ species:
         printed_points:
         - {field: mg_amorphous_fraction_wt_pct, value: '54 ± 13', locator: {pdf_page_index: 11, figure: '7', row: MG, column: 'amorphous material'} }
         - {field: gypsum_ZE_wt_pct, value: 18.2, locator: {pdf_page_index: 11, figure: '7', row: ZE, column: gypsum} }
-    observations:
     - observation_id: jgr_2024_fig7_mg_sulfate_ca2
       experiment: ca2
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA2, yield_fraction: 0.65}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: CA2
+        evolved_so2_source_phase_apportionment_fraction: 0.65
     - observation_id: jgr_2024_fig7_mg_sulfate_ca1
       experiment: ca1
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: CA1, yield_fraction: 0.65}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: CA1
+        evolved_so2_source_phase_apportionment_fraction: 0.65
     - observation_id: jgr_2024_fig7_mg_sulfate_av
       experiment: av
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: AV, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: AV, yield_fraction: 0.32}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: AV
+        evolved_so2_source_phase_apportionment_fraction: 0.32
     - observation_id: jgr_2024_fig7_mg_sulfate_ze
       experiment: ze
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: ZE, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: ZE, yield_fraction: 0.50}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: ZE
+        evolved_so2_source_phase_apportionment_fraction: 0.50
     - observation_id: jgr_2024_fig7_mg_sulfate_mg2
       experiment: mg2
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG2, yield_fraction: 0.35}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: MG2
+        evolved_so2_source_phase_apportionment_fraction: 0.35
     - observation_id: jgr_2024_fig7_mg_sulfate_mg1
       experiment: mg1
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: MG1, yield_fraction: 0.35}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: MG1
+        evolved_so2_source_phase_apportionment_fraction: 0.35
     - observation_id: jgr_2024_fig7_mg_sulfate_pt
       experiment: pt
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: PT, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: PT, yield_fraction: 0.10}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: PT
+        evolved_so2_source_phase_apportionment_fraction: 0.10
     - observation_id: jgr_2024_fig7_mg_sulfate_bd
       experiment: bd
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: BD, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: BD, yield_fraction: 0.02}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: BD
+        evolved_so2_source_phase_apportionment_fraction: 0.02
     - observation_id: jgr_2024_fig7_mg_sulfate_nt2
       experiment: nt2
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT2, yield_fraction: 0.48}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: NT2
+        evolved_so2_source_phase_apportionment_fraction: 0.48
     - observation_id: jgr_2024_fig7_mg_sulfate_nt1
       experiment: nt1
-      type: composition_series
+      type: apportionment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
-      values: {quantity: yield_fraction, method_class: figure_only, derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01', sample: NT1, yield_fraction: 0.48}
+      values:
+        method_class: figure_only
+        derivation: 'Digitized from the Figure 7 bar height against the printed 0-1 fraction axis; approximate to about 0.01'
+        reason: "authors' SO2 source-phase apportionment; no closed Quantity for an apportionment fraction; not a yield"
+        sample: NT1
+        evolved_so2_source_phase_apportionment_fraction: 0.48
+    observations: []
   Cl:
     context:
     - observation_id: jgr_2024_cl_printed_range_and_profile
