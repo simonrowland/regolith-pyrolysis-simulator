@@ -137,6 +137,8 @@ from collections.abc import Mapping
 import math
 from typing import Any
 
+import yaml
+
 from engines.builtin._common import (
     build_atom_balance_proof,
     diagnostic_control_audit,
@@ -156,7 +158,8 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
-from simulator.yaml_cache import load_cached_safe_yaml
+
+from engines.yaml_loader import YAML12SafeLoader
 
 
 # Reaction-family discriminators (string-literal contract with the
@@ -1232,7 +1235,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         repo_root = Path(__file__).resolve().parents[2]
         vapor_path = repo_root / "data" / "vapor_pressures.yaml"
         with vapor_path.open(encoding="utf-8") as handle:
-            payload = load_cached_safe_yaml(handle.read()) or {}
+            payload = yaml.load(handle.read(), Loader=YAML12SafeLoader) or {}
         from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
         payload = vapor_pressure_legacy_view(payload)
