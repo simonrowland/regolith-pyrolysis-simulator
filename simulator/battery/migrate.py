@@ -1966,6 +1966,35 @@ def convert_area_to_m2(
     return None, f"unmapped area unit {units!r}"
 
 
+def convert_areal_mass_to_kg_per_m2(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Convert printed mass-per-area values to kg/m²."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal mass value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal mass unit"
+    lowered = (
+        str(units).strip().lower().split(";", 1)[0].strip()
+        .replace(" ", "")
+        .replace("²", "2")
+        .replace("^", "")
+    )
+    if lowered in {"kg/m2", "kgperm2", "kg_per_m2", "kgm-2"}:
+        return amount, "identity:kg_per_m2"
+    if lowered in {"g/m2", "gperm2", "g_per_m2", "gm-2"}:
+        return amount / Decimal("1000"), "g_per_m2_to_kg_per_m2"
+    if lowered in {"mg/m2", "mgperm2", "mg_per_m2", "mgm-2"}:
+        return amount / Decimal("1000000"), "mg_per_m2_to_kg_per_m2"
+    if lowered in {"g/cm2", "gpercm2", "g_per_cm2", "gcm-2"}:
+        return amount * Decimal("10"), "g_per_cm2_to_kg_per_m2"
+    if lowered in {"mg/cm2", "mgpercm2", "mg_per_cm2", "mgcm-2"}:
+        return amount / Decimal("100"), "mg_per_cm2_to_kg_per_m2"
+    return None, f"unmapped areal mass unit {units!r}"
+
+
 def convert_mass_to_kg(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -2056,6 +2085,30 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     ),
     "cm2_to_m2": (Decimal("10000"), "A_m2 = A_cm2 / 10000", "m2", "cm2"),
     "mm2_to_m2": (Decimal("1000000"), "A_m2 = A_mm2 / 1e6", "m2", "mm2"),
+    "g_per_m2_to_kg_per_m2": (
+        Decimal("1000"),
+        "m_kg_per_m2 = m_g_per_m2 / 1000",
+        "kg_per_m2",
+        "g_per_m2",
+    ),
+    "mg_per_m2_to_kg_per_m2": (
+        Decimal("1000000"),
+        "m_kg_per_m2 = m_mg_per_m2 / 1e6",
+        "kg_per_m2",
+        "mg_per_m2",
+    ),
+    "g_per_cm2_to_kg_per_m2": (
+        Decimal("10"),
+        "m_kg_per_m2 = m_g_per_cm2 × 10",
+        "kg_per_m2",
+        "g_per_cm2",
+    ),
+    "mg_per_cm2_to_kg_per_m2": (
+        Decimal("100"),
+        "m_kg_per_m2 = m_mg_per_cm2 / 100",
+        "kg_per_m2",
+        "mg_per_cm2",
+    ),
     "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
     "cm_to_m": (Decimal("100"), "L_m = L_cm / 100", "m", "cm"),
@@ -3216,6 +3269,11 @@ def _quantity_contradiction(
         if "partial pressure" in units_l or "lg p" in units_l or "lg p" in blob:
             return "source units name partial pressure, not mass_loss_rate"
 
+    if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
+        if not any(token in units_l for token in ("/cm", "per_cm", "cm-2")):
+            if "kg/m" not in units_l and "kg_per_m" not in units_l:
+                return f"source units {units!r} do not denote areal mass loss"
+
     if semantics in {"bound_not_point_ordering", "bound_not_point"} and candidate not in {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.ACTIVITY_COEFFICIENT,
@@ -3281,6 +3339,10 @@ def _quantity_corroborated(
         return "gamma" in values or "activity_coefficient" in values
     if candidate is Quantity.MASS_LOSS_RATE:
         return "mass_loss_rate" in values
+    if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
+        return values.get("quantity_as_printed") == "delta_q" or any(
+            key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
+        )
     return False
 
 
@@ -3550,6 +3612,17 @@ def map_quantity(
                     return State.unknown(contradiction), contradiction
                 return State.of(qualified), None
     quantity_absent = raw is None or raw == ""
+    if (
+        quantity_absent
+        and obs_type == "mass_loss"
+        and isinstance(values, Mapping)
+        and values.get("quantity_as_printed") == "delta_q"
+    ):
+        inferred = Quantity.MASS_LOSS_AREAL_DENSITY
+        contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+        if contradiction:
+            return State.unknown(contradiction), contradiction
+        return State.of(inferred), None
     if quantity_absent and units is not None and str(units).strip():
         unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
         if unit_mapped is not None:
@@ -4704,6 +4777,12 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     + ("P", "p")
     + _PARTIAL_PRESSURE_FIELDS,
     Quantity.MASS_LOSS_RATE: ("mass_loss_rate",),
+    Quantity.MASS_LOSS_AREAL_DENSITY: (
+        "mass_loss_areal_density",
+        "delta_q",
+        "delta_q_replicate_1",
+        "delta_q_replicate_2",
+    ),
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
@@ -5249,6 +5328,19 @@ def _selection_from_named_field(
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
+        if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
+            amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass loss",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -5287,6 +5379,19 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
+        if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
+            amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass loss",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -8642,6 +8747,16 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        value_derivation = source_derivation
+        if (
+            q_token is Quantity.MASS_LOSS_AREAL_DENSITY
+            and value_sel.available
+            and value_sel.field_name
+        ):
+            original_raw = values.get(value_sel.field_name)
+            value_derivation = conversion_derivation(
+                value_sel.unit_trail, original_raw, locator
+            )
         if initial_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
@@ -8950,7 +9065,7 @@ class Migrator:
             read_from=read_from,
             point_conditions=point_conditions,
             derived_from=derived_from,
-            derivation=source_derivation,
+            derivation=value_derivation,
         )
         self._queue_unstated_derived_lineage(
             work.work_id,
@@ -8959,7 +9074,7 @@ class Migrator:
             obs_id,
             evidence,
             derived_from,
-            source_derivation,
+            value_derivation,
         )
         self._add_observation(observation, source_key)
 

@@ -65,6 +65,7 @@ class Quantity(StrEnum):
     EVAPORATION_COEFFICIENT_ALPHA = "evaporation_coefficient_alpha"
     MASS_LOSS_FRACTION = "mass_loss_fraction"
     MASS_LOSS_FRACTION_VS_T = "mass_loss_fraction_vs_T"
+    MASS_LOSS_AREAL_DENSITY = "mass_loss_areal_density"
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
@@ -402,6 +403,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: "dimensionless",
     Quantity.MASS_LOSS_FRACTION: "dimensionless",
     Quantity.MASS_LOSS_FRACTION_VS_T: "dimensionless",
+    Quantity.MASS_LOSS_AREAL_DENSITY: "kg_per_m2",
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",

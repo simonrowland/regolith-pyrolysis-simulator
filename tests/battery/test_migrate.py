@@ -5152,6 +5152,28 @@ def test_pyrolysis_yield_quantities_are_not_collapsed() -> None:
     assert not model.is_value
 
 
+def test_areal_mass_loss_routes_delta_q_to_kg_per_m2(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units="mg/cm2; T C; P hPa",
+        values={
+            "quantity_as_printed": "delta_q",
+            "method_class": "measured_direct",
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = result.observations["fixture-source::na_psat"]
+    assert quantity_token(obs.identity) is Quantity.MASS_LOSS_AREAL_DENSITY
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("0.0555184")
+    assert obs.derivation is not None
+    assert obs.derivation.relation == "mg_per_cm2_to_kg_per_m2"
+    assert obs.derivation.output_unit == "kg_per_m2"
+
+
 def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="bulk_mass_loss_wt_pct",
