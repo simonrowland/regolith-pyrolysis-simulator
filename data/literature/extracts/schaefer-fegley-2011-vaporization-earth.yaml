@@ -1,0 +1,903 @@
+schema_version: literature_extract.v1
+source_id: schaefer-fegley-2011-vaporization-earth
+source:
+  citation: 'Schaefer, L., Lodders, K. & Fegley, B. (2012), "Vaporization of the Earth: Application to Exoplanet Atmospheres", The Astrophysical Journal, 755(1), 41.'
+  doi: 10.1088/0004-637x/755/1/41
+  url: https://doi.org/10.1088/0004-637X/755/1/41
+  year: 2012
+extraction:
+  method: >-
+    Manual transcription from the corpus PDF. Tables 1-4 were read from
+    rendered PDF pages 31-34 and every numeric table cell was checked against
+    its page image. Printed model-result prose was transcribed from PDF pages
+    2 and 7-26. Figures 8-9 have conservative approximate digitized points
+    checked against PDF pages 47-48; other plotted curve coordinates are
+    explicitly refused rather than promoted to printed values. OCR/MinerU was
+    used only to inventory figures and locate candidate rows.
+  date: '2026-09-24'
+  worker: extract-schaefer-fegley-2011-vaporization-earth
+  provenance_path: raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf
+  source_sha256: 9b1e48b4275d28af171e82fa3f7a55c5dd17fadefc484831a5c80074026d3d2d
+  figure_heavy: true
+  figure_policy: >-
+    Approximate values digitized from Figures 8-9 retain figure-only status.
+    Figures 1-7 and 10-11 retain qualitative captions/prose only; their curve
+    coordinates are refused because no tabulation is printed.
+review_status: draft
+corrections: []
+fidelity_samples:
+  - path: species.continental_crust.observations[schaefer_2012_table2_continental_crust_bulk_composition].values.rows[0].value_as_printed
+    value: '47.20'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: O, column: 'Continental Crust (wt%)'}
+  - path: species.bulk_silicate_earth.observations[schaefer_2012_table2_bse_bulk_composition].values.rows[14].value_as_printed
+    value: '0.88×10^-4'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: N, column: 'Bulk Silicate Earth (wt%)'}
+  - path: species.continental_crust.observations[schaefer_2012_table3_cc_extreme_atmospheres].values.rows[0].abundance_as_printed
+    value: '49%'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}
+  - path: species.photochemical_gases.observations[schaefer_2012_table4_photochemical_lifetimes].values.rows[0].value_as_printed
+    value: '1.18×10^-5'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}
+  - path: species.continental_crust.observations[schaefer_2012_cc_100bar_major_gas_summary].values.rows[0].result_as_printed
+    value: '~55%'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 7, section: '3.1.1 Continental Crust', paragraph: 'Figure 1 discussion', row: 'broad temperature range', column: steam abundance}
+  - path: species.volatile_boundary_map.observations[schaefer_2012_figure8_volatile_boundaries].values.rows[0].temperature_K_as_plotted
+    value: '~1800'
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 47, figure: '8', row: H, column: 'log P = -6 bars; boundary temperature (K)'}
+
+species:
+  planetary_context:
+    observations: []
+    context:
+      - observation_id: schaefer_2012_table1_transiting_low_mass_planets
+        type: planetary_context
+        locator: {pdf_page_index: 31, table: '1', row: all, column: all}
+        units: 'M⊕, R⊕, g cm^-3, AU, K as printed'
+        values:
+          quantity: orbital_and_physical_properties_of_known_transiting_low_mass_planets
+          method_class: quoted_prior_work
+          evidence_class: quoted_prior_work
+          value_status: printed
+          source_attribution: 'References in Table 1 footnotes 1-7; compiled planet properties'
+          rows:
+            - {planet: 'Kepler-11 f', column: 'Mass (×M⊕)', value_as_printed: '2.30', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 f', column: 'Radius (×R⊕)', value_as_printed: '2.61', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 f', column: 'Density (g cm^-3)', value_as_printed: '0.71', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 f', column: 'Orbital Radius (AU)', value_as_printed: '0.25', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 f', column: 'Teq (K)', value_as_printed: '544', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 f', column: 'Teq (K)'}}
+            - {planet: 'GJ 1214 b', column: 'Mass (×M⊕)', value_as_printed: '6.55', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'GJ 1214 b', column: 'Radius (×R⊕)', value_as_printed: '2.68', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'GJ 1214 b', column: 'Density (g cm^-3)', value_as_printed: '1.88', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'GJ 1214 b', column: 'Orbital Radius (AU)', value_as_printed: '0.014', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'GJ 1214 b', column: 'Teq (K)', value_as_printed: '555', locator: {pdf_page_index: 31, table: '1', row: 'GJ 1214 b', column: 'Teq (K)'}}
+            - {planet: 'HD 97658 b', column: 'Mass (×M⊕)', value_as_printed: '6.40', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'HD 97658 b', column: 'Radius (×R⊕)', value_as_printed: '2.93', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'HD 97658 b', column: 'Density (g cm^-3)', value_as_printed: '1.40', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'HD 97658 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0797', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'HD 97658 b', column: 'Teq (K)', value_as_printed: '510-720', locator: {pdf_page_index: 31, table: '1', row: 'HD 97658 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 e', column: 'Mass (×M⊕)', value_as_printed: '8.40', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 e', column: 'Radius (×R⊕)', value_as_printed: '4.52', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 e', column: 'Density (g cm^-3)', value_as_printed: '0.5', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 e', column: 'Orbital Radius (AU)', value_as_printed: '0.194', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 e', column: 'Teq (K)', value_as_printed: '617', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 e', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 d', column: 'Mass (×M⊕)', value_as_printed: '6.10', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 d', column: 'Radius (×R⊕)', value_as_printed: '3.43', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 d', column: 'Density (g cm^-3)', value_as_printed: '0.83', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 d', column: 'Orbital Radius (AU)', value_as_printed: '0.159', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 d', column: 'Teq (K)', value_as_printed: '692', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 d', column: 'Teq (K)'}}
+            - {planet: 'Kepler-11 b', column: 'Mass (×M⊕)', value_as_printed: '4.30', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-11 b', column: 'Radius (×R⊕)', value_as_printed: '1.97', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-11 b', column: 'Density (g cm^-3)', value_as_printed: '3.10', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-11 b', column: 'Orbital Radius (AU)', value_as_printed: '0.091', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-11 b', column: 'Teq (K)', value_as_printed: '900', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-11 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-20 b', column: 'Mass (×M⊕)', value_as_printed: '8.70', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-20 b', column: 'Radius (×R⊕)', value_as_printed: '1.91', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-20 b', column: 'Density (g cm^-3)', value_as_printed: '6.5', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-20 b', column: 'Orbital Radius (AU)', value_as_printed: '0.04537', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-20 b', column: 'Teq (K)', value_as_printed: '1014', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-20 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-18 b', column: 'Mass (×M⊕)', value_as_printed: '6.90', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-18 b', column: 'Radius (×R⊕)', value_as_printed: '2.00', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-18 b', column: 'Density (g cm^-3)', value_as_printed: '4.9', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-18 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0447', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-18 b', column: 'Teq (K)', value_as_printed: '1179', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-18 b', column: 'Teq (K)'}}
+            - {planet: 'CoRoT-7 b', column: 'Mass (×M⊕)', value_as_printed: '7.42', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'CoRoT-7 b', column: 'Radius (×R⊕)', value_as_printed: '1.58', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'CoRoT-7 b', column: 'Density (g cm^-3)', value_as_printed: '10.4', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'CoRoT-7 b', column: 'Orbital Radius (AU)', value_as_printed: '0.0172', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'CoRoT-7 b', column: 'Teq (K)', value_as_printed: '1810', locator: {pdf_page_index: 31, table: '1', row: 'CoRoT-7 b', column: 'Teq (K)'}}
+            - {planet: 'Kepler-10 b', column: 'Mass (×M⊕)', value_as_printed: '4.54', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Mass (×M⊕)'}}
+            - {planet: 'Kepler-10 b', column: 'Radius (×R⊕)', value_as_printed: '1.42', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Radius (×R⊕)'}}
+            - {planet: 'Kepler-10 b', column: 'Density (g cm^-3)', value_as_printed: '8.74', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Density (g cm^-3)'}}
+            - {planet: 'Kepler-10 b', column: 'Orbital Radius (AU)', value_as_printed: '0.01684', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Orbital Radius (AU)'}}
+            - {planet: 'Kepler-10 b', column: 'Teq (K)', value_as_printed: '1833', locator: {pdf_page_index: 31, table: '1', row: 'Kepler-10 b', column: 'Teq (K)'}}
+            - {planet: '55 Cnc e', column: 'Mass (×M⊕)', value_as_printed: '7.98^5/8.63^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Mass (×M⊕)'}}
+            - {planet: '55 Cnc e', column: 'Radius (×R⊕)', value_as_printed: '2.13^5/2.00^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Radius (×R⊕)'}}
+            - {planet: '55 Cnc e', column: 'Density (g cm^-3)', value_as_printed: '4.97^5/5.9^6', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Density (g cm^-3)'}}
+            - {planet: '55 Cnc e', column: 'Orbital Radius (AU)', value_as_printed: '0.01564', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Orbital Radius (AU)'}}
+            - {planet: '55 Cnc e', column: 'Teq (K)', value_as_printed: '1967', locator: {pdf_page_index: 31, table: '1', row: '55 Cnc e', column: 'Teq (K)'}}
+
+  continental_crust:
+    context:
+      - observation_id: schaefer_2012_cc_model_setup
+        type: method
+        locator: {pdf_page_index: 7, section: '2. Computational Methods', row: setup, column: model domain}
+        units: as printed
+        values:
+          quantity: continental_crust_equilibrium_model_setup
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: printed_method
+          facts:
+            - {name: temperature_range, value_as_printed: '500-4000 K', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: temperature range, column: value}}
+            - {name: total_pressure_range, value_as_printed: '10^-6 to 10^+2 bars', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: pressure range, column: value}}
+            - {name: gas_species_count, value_as_printed: '~750 gas species', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: species inventory, column: gas species}}
+            - {name: condensed_species_count, value_as_printed: '~60 solid/liquid compounds', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: species inventory, column: condensed species}}
+            - {name: element_count, value_as_printed: '18 elements', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: species inventory, column: elements}}
+            - {name: nickel_treatment, value_as_printed: '~0.18% Ni omitted because it alloys with Fe', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: species inventory, column: Ni treatment}}
+            - {name: composition_source, value_as_printed: 'Wedepohl (1995)', locator: {pdf_page_index: 5, section: '2. Computational Methods', paragraph: 1, row: composition, column: continental crust}}
+            - {name: fO2_status, value: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 7, section: '2. Computational Methods', row: oxygen condition, column: fO2}}
+    observations:
+      - observation_id: schaefer_2012_table2_continental_crust_bulk_composition
+        type: composition_series
+        locator: {pdf_page_index: 32, table: '2', row: all, column: 'Continental Crust (wt%)'}
+        phase: bulk_planetary_composition
+        regime: tabulation
+        units: 'wt% as printed'
+        values:
+          quantity: continental_crust_bulk_elemental_composition
+          method_class: quoted_prior_work
+          evidence_class: quoted_prior_work
+          value_status: printed
+          source_attribution: Wedepohl_1995
+          conditions:
+            temperature: {tag: unknown, reason: not_applicable}
+            total_pressure: {tag: unknown, reason: not_applicable}
+            fO2: {tag: unknown, reason: not_published}
+            composition: continental_crust
+          rows:
+            - {element: O, value_as_printed: '47.20', locator: {pdf_page_index: 32, table: '2', row: O, column: 'Continental Crust (wt%)'}}
+            - {element: Si, value_as_printed: '28.80', locator: {pdf_page_index: 32, table: '2', row: Si, column: 'Continental Crust (wt%)'}}
+            - {element: Al, value_as_printed: '7.96', locator: {pdf_page_index: 32, table: '2', row: Al, column: 'Continental Crust (wt%)'}}
+            - {element: Fe, value_as_printed: '4.32', locator: {pdf_page_index: 32, table: '2', row: Fe, column: 'Continental Crust (wt%)'}}
+            - {element: Ca, value_as_printed: '3.85', locator: {pdf_page_index: 32, table: '2', row: Ca, column: 'Continental Crust (wt%)'}}
+            - {element: Na, value_as_printed: '2.36', locator: {pdf_page_index: 32, table: '2', row: Na, column: 'Continental Crust (wt%)'}}
+            - {element: Mg, value_as_printed: '2.20', locator: {pdf_page_index: 32, table: '2', row: Mg, column: 'Continental Crust (wt%)'}}
+            - {element: K, value_as_printed: '2.14', locator: {pdf_page_index: 32, table: '2', row: K, column: 'Continental Crust (wt%)'}}
+            - {element: Ti, value_as_printed: '0.401', locator: {pdf_page_index: 32, table: '2', row: Ti, column: 'Continental Crust (wt%)'}}
+            - {element: P, value_as_printed: '0.076', locator: {pdf_page_index: 32, table: '2', row: P, column: 'Continental Crust (wt%)'}}
+            - {element: Cr, value_as_printed: '0.013', locator: {pdf_page_index: 32, table: '2', row: Cr, column: 'Continental Crust (wt%)'}}
+            - {element: Mn, value_as_printed: '0.072', locator: {pdf_page_index: 32, table: '2', row: Mn, column: 'Continental Crust (wt%)'}}
+            - {element: H, value_as_printed: '0.045', locator: {pdf_page_index: 32, table: '2', row: H, column: 'Continental Crust (wt%)'}}
+            - {element: C, value_as_printed: '0.199', locator: {pdf_page_index: 32, table: '2', row: C, column: 'Continental Crust (wt%)'}}
+            - {element: N, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: N, column: 'Continental Crust (wt%)'}}
+            - {element: S, value_as_printed: '0.070', locator: {pdf_page_index: 32, table: '2', row: S, column: 'Continental Crust (wt%)'}}
+            - {element: F, value_as_printed: '0.053', locator: {pdf_page_index: 32, table: '2', row: F, column: 'Continental Crust (wt%)'}}
+            - {element: Cl, value_as_printed: '0.047', locator: {pdf_page_index: 32, table: '2', row: Cl, column: 'Continental Crust (wt%)'}}
+            - {element: TOTAL, value_as_printed: '99.822', locator: {pdf_page_index: 32, table: '2', row: TOTAL, column: 'Continental Crust (wt%)'}}
+      - observation_id: schaefer_2012_cc_100bar_major_gas_summary
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: prose summaries, column: printed model results}
+        T_range_K: [500, 4000]
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: continental_crust_major_gases_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions:
+            total_pressure_bar_as_printed: '100 bars'
+            composition: continental_crust
+            fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {species: H2O, temperature_as_printed: broad range, result_as_printed: '~55%', locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: 'broad temperature range', column: steam abundance}}
+            - {species: CO2, temperature_as_printed: broad range, result_as_printed: '~42%', locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: 'broad temperature range', column: CO2 abundance}}
+            - {species: C_gas, temperature_as_printed: 'down to ~700 K', result_as_printed: '100%', locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: carbon phase boundary, column: gas-phase fraction}}
+            - {species: CO2, temperature_as_printed: '700-3000 K', result_as_printed: bulk of carbon, locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: carbon-bearing gas, column: dominant species}}
+            - {species: CO, temperature_as_printed: '3750 K', result_as_printed: '~7%', locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: carbon-bearing gas, column: peak abundance}}
+            - {species: O2, temperature_as_printed: '3450-3900 K', result_as_printed: dominant atmospheric species, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: oxygen-bearing gas, column: dominant species}}
+            - {species: O2, temperature_as_printed: '>~1600 K', result_as_printed: '>0.1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: oxygen-bearing gas, column: abundance threshold}}
+            - {species: O, temperature_as_printed: '>~2500 K; peak at 4000 K', result_as_printed: '6.6%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: oxygen-bearing gas, column: peak abundance}}
+            - {species: OH, temperature_as_printed: '>~2000 K; peak at 3750 K', result_as_printed: '6.9%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: hydroxyl, column: peak abundance}}
+            - {species: H, temperature_as_printed: '3900 K', result_as_printed: '1.1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: atomic hydrogen, column: peak abundance}}
+            - {species: N2, temperature_as_printed: '<600 K', result_as_printed: dominantly N2, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: dominant species}}
+            - {species: N2, temperature_as_printed: 'up to ~3200 K', result_as_printed: major N-bearing species, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: major species}}
+            - {species: NO, temperature_as_printed: '4000 K', result_as_printed: '~1%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: nitrogen, column: atmospheric abundance}}
+            - {species: SO2, temperature_as_printed: '~1000 K', result_as_printed: enters gas in significant amount, locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: onset}}
+            - {species: SO2, temperature_as_printed: '1000-4000 K; peak at 2250 K', result_as_printed: '~5%', locator: {pdf_page_index: 8, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: peak abundance}}
+            - {species: SO, temperature_as_printed: '4000 K', result_as_printed: '~10% of total sulfur', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: sulfur, column: total-sulfur fraction}}
+            - {species: HCl, temperature_as_printed: lower temperatures, result_as_printed: dominant Cl-bearing gas, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: Cl-bearing gas}}
+            - {species: KCl, temperature_as_printed: higher temperatures, result_as_printed: major Cl-bearing gas, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: Cl-bearing gas}}
+            - {species: HF, temperature_as_printed: lower temperatures, result_as_printed: dominant F-bearing gas, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: F-bearing gas}}
+            - {species: KF, temperature_as_printed: higher temperatures, result_as_printed: major F-bearing gas, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: F-bearing gas}}
+            - {species: HCl/KCl, temperature_as_printed: '~2095 K', result_as_printed: unity ratio, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: ratio}}
+            - {species: HF/KF, temperature_as_printed: '~3530 K', result_as_printed: unity ratio, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: halides, column: ratio}}
+            - {species: Si_gas, temperature_as_printed: '4000 K', result_as_printed: '~10% of Si in gas phase', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: silicon, column: gas-phase fraction}}
+            - {species: SiO, temperature_as_printed: '4000 K', result_as_printed: '~29% of whole atmosphere', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: silicon, column: maximum atmospheric abundance}}
+            - {species: Na, temperature_as_printed: high temperature, result_as_printed: maximum 4%, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: alkalis, column: maximum abundance}}
+            - {species: K, temperature_as_printed: high temperature, result_as_printed: maximum 3.5%, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: alkalis, column: maximum abundance}}
+            - {species: Fe(OH)2, temperature_as_printed: '<3500 K', result_as_printed: '~0.2%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: iron, column: peak abundance}}
+            - {species: Fe, temperature_as_printed: '4000 K', result_as_printed: '0.4%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: iron, column: abundance}}
+            - {species: FeO, temperature_as_printed: '4000 K', result_as_printed: '0.6%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: iron, column: abundance}}
+            - {species: MgO, temperature_as_printed: '4000 K', result_as_printed: '~0.3%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: magnesium, column: abundance}}
+            - {species: TiO2, temperature_as_printed: '4000 K', result_as_printed: '1.1%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: titanium, column: gas abundance}}
+            - {species: Ti_condensed, temperature_as_printed: '4000 K', result_as_printed: '61%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: titanium, column: condensed fraction}}
+            - {species: Ti_gas, temperature_as_printed: '4000 K', result_as_printed: '39%', locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: titanium, column: gas fraction}}
+            - {species: P_gases, temperature_as_printed: '~2500 K onward', result_as_printed: important; P2O5 -> PO2 -> PO with increasing T, locator: {pdf_page_index: 9, figure: '1', section: '3.1.1 Continental Crust', row: phosphorus, column: sequence}}
+            - {species: Ca(OH)2, temperature_as_printed: studied range, result_as_printed: maximum 2 ppmv, locator: {pdf_page_index: 10, figure: '1', section: '3.1.1 Continental Crust', row: calcium, column: maximum abundance}}
+            - {species: AlO, temperature_as_printed: studied range, result_as_printed: maximum 800 ppmv, locator: {pdf_page_index: 10, figure: '1', section: '3.1.1 Continental Crust', row: aluminum, column: maximum abundance}}
+      - observation_id: schaefer_2012_cc_variable_h_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 11, figure: '3', section: '3.2.1 Hydrogen', row: prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, vol%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: continental_crust_variable_hydrogen_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', composition: continental_crust, fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {variation: '0.1× nominal H', species: CO2, temperature_as_printed: '500-2600 K', result_as_printed: first major gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H continental crust, column: first major gas}}
+            - {variation: '0.1× nominal H', species: O2, temperature_as_printed: '2600-4000 K', result_as_printed: second major gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H continental crust, column: second major gas}}
+            - {variation: '10× nominal H', species: H2, temperature_as_printed: studied range, result_as_printed: '~45 vol%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H continental crust, column: abundance}}
+            - {variation: '10× nominal H', species: H2O, temperature_as_printed: studied range, result_as_printed: '~33 vol%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H continental crust, column: abundance}}
+            - {variation: '10× nominal H', species: H2+H2O, temperature_as_printed: studied range, result_as_printed: nearly 80% of gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H continental crust, column: combined abundance}}
+            - {variation: '0.1× nominal H', composition: bulk_silicate_earth, species: CH4, temperature_as_printed: '500-700 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', composition: bulk_silicate_earth, species: CO2, temperature_as_printed: '700-1800 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', composition: bulk_silicate_earth, species: SO2, temperature_as_printed: '1800-2900 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', composition: bulk_silicate_earth, species: O2, temperature_as_printed: '2900-4000 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '10× nominal H', composition: bulk_silicate_earth, species: H2, temperature_as_printed: studied range, result_as_printed: '~28%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H BSE, column: abundance}}
+            - {variation: '10× nominal H', composition: bulk_silicate_earth, species: H2O, temperature_as_printed: studied range, result_as_printed: '~52%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H BSE, column: abundance}}
+            - {variation: '10× nominal H', species: CH4, temperature_as_printed: '500-1200 K', result_as_printed: third most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H both compositions, column: third gas}}
+            - {variation: '10× nominal H', species: CO, temperature_as_printed: '>1200 K', result_as_printed: third most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H both compositions, column: third gas}}
+            - {variation: '10× nominal H', composition: continental_crust, species: SiO, temperature_as_printed: '>~2800 K', result_as_printed: greater abundance than KOH, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H continental crust, column: SiO/KOH comparison}}
+            - {variation: nominal H, composition: continental_crust, species: SiO, temperature_as_printed: '>~3700 K', result_as_printed: greater abundance than KOH, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: nominal continental crust, column: SiO/KOH comparison}}
+      - observation_id: schaefer_2012_cc_variable_c_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, vol%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: variable_carbon_equilibrium_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {composition: continental_crust, variation: '0.1× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: drops from ~30% to 3%, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: low-C continental crust, column: CO2 abundance}}
+            - {composition: bulk_silicate_earth, variation: '0.1× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: drops from ~9% to 1%, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: low-C BSE, column: CO2 abundance}}
+            - {composition: continental_crust, variation: '10× nominal C', species: CO2+H2O, temperature_as_printed: '600-1100 K', result_as_printed: two most abundant gases, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C continental crust, column: major gases}}
+            - {composition: continental_crust, variation: '10× nominal C', species: CO+H2, temperature_as_printed: '1100-4000 K', result_as_printed: two most abundant gases, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C continental crust, column: major gases}}
+            - {composition: continental_crust, variation: '10× nominal C', species: SO2+O2, temperature_as_printed: 'below ~3500 K', result_as_printed: '<0.1%', locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C continental crust, column: abundance threshold}}
+            - {composition: continental_crust, variation: '10× nominal C', species: CH4, temperature_as_printed: '500-1600 K', result_as_printed: '>0.1%', locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C continental crust, column: abundance threshold}}
+            - {composition: continental_crust, variation: '10× nominal C', species: SiO, temperature_as_printed: '>~3700 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C continental crust, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: '10× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: increases to ~44%, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: CO2 abundance}}
+            - {composition: bulk_silicate_earth, variation: '10× nominal C', species: CH4, temperature_as_printed: '500-700 K', result_as_printed: major gas, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: '10× nominal C', species: CO2, temperature_as_printed: '700-3700 K', result_as_printed: major gas, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: '10× nominal C', species: CO, temperature_as_printed: studied range, result_as_printed: increases by about 10×, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: relative change}}
+            - {composition: bulk_silicate_earth, variation: '10× nominal C', species: O2, temperature_as_printed: studied range, result_as_printed: peak ~10% versus 40% nominal, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: peak abundance}}
+      - observation_id: schaefer_2012_cc_variable_o_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: variable_oxygen_equilibrium_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {composition: continental_crust, variation: 'O = 43 wt%', species: H2, temperature_as_printed: '500-2800 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O continental crust, column: major gas}}
+            - {composition: continental_crust, variation: 'O = 43 wt%', species: SiO, temperature_as_printed: '>2800 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O continental crust, column: major gas}}
+            - {composition: continental_crust, variation: 'O = 43 wt%', species: CH4, temperature_as_printed: '500-1800 K', result_as_printed: second most abundant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O continental crust, column: second gas}}
+            - {composition: continental_crust, variation: 'O = 43 wt%', species: CO, temperature_as_printed: '2000-2800 K', result_as_printed: second most abundant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O continental crust, column: second gas}}
+            - {composition: continental_crust, variation: 'O = 51.2 wt%', species: O2, temperature_as_printed: studied range, result_as_printed: most abundant gas at all temperatures, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: high-O continental crust, column: major gas}}
+            - {composition: continental_crust, variation: 'O = 51.2 wt%', species: H2O, temperature_as_printed: studied range, result_as_printed: '~14%', locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: high-O continental crust, column: abundance}}
+            - {composition: continental_crust, variation: 'O = 51.2 wt%', species: CO2, temperature_as_printed: studied range, result_as_printed: '10%', locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: high-O continental crust, column: abundance}}
+            - {composition: bulk_silicate_earth, variation: 'O = 39-42 wt%', species: H2, temperature_as_printed: '500-2000 K', result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 39-42 wt%', species: Na, temperature_as_printed: '2000-3000 K', result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 39-42 wt%', species: SiO, temperature_as_printed: highest temperatures, result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 39-42 wt%', species: H2O+O2+SO2, temperature_as_printed: studied range, result_as_printed: never above 10^-3, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: abundance bound}}
+            - {composition: bulk_silicate_earth, variation: 'O >42.5 wt%', species: H2, temperature_as_printed: wide T/P range, result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: intermediate-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O >42.5 wt%', species: H2O+CO+CH4, temperature_as_printed: wide T/P range, result_as_printed: percent-level abundances, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: intermediate-O BSE, column: abundance}}
+            - {composition: bulk_silicate_earth, variation: 'O >46 wt%', species: O2, temperature_as_printed: 'up to 3500 K', result_as_printed: '~100% atmosphere', locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: high-O BSE, column: atmosphere composition}}
+            - {composition: bulk_silicate_earth, variation: 'O = 45 wt%', species: N2, temperature_as_printed: '500-700 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 45 wt%', species: CO2, temperature_as_printed: '700-1000 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 45 wt%', species: H2O, temperature_as_printed: '1000-2000 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {composition: bulk_silicate_earth, variation: 'O = 45 wt%', species: O2, temperature_as_printed: '2000 K onward', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+      - observation_id: schaefer_2012_table3_cc_extreme_atmospheres
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        locator: {pdf_page_index: 33, table: '3', row: all CC cells, column: major atmospheric composition}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'temperature K, total pressure bars, gas mole percent as printed'
+        values:
+          quantity: continental_crust_major_atmospheres_at_extreme_T_P
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Table values are transcribed model output; no arithmetic was performed.
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: H2O, abundance_as_printed: '49%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}}
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: CO2, abundance_as_printed: '39%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: CO2}}
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: HF, abundance_as_printed: '4.5%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: HF}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: SiO, abundance_as_printed: '52%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / continental crust', column: SiO}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: O, abundance_as_printed: '25%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / continental crust', column: O}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: O2, abundance_as_printed: '15%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / continental crust', column: O2}}
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: H2O, abundance_as_printed: '55%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / continental crust', column: H2O}}
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: CO2, abundance_as_printed: '42%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / continental crust', column: CO2}}
+            - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: HCl, abundance_as_printed: '1.4%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / continental crust', column: HCl}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: H2O, abundance_as_printed: '48%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / continental crust', column: H2O}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: CO2, abundance_as_printed: '38%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / continental crust', column: CO2}}
+            - {composition: continental_crust, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: HF, abundance_as_printed: '4%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / continental crust', column: HF}}
+      - observation_id: schaefer_2012_cc_pressure_effects_printed
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors pressure-sweep Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'temperature K, total pressure bars, mole percent as printed'
+        values:
+          quantity: continental_crust_pressure_effects
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          composition: continental_crust
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {species: gas_phase, total_pressure_bar_as_printed: '10^-6', temperature_as_printed: '>~1800 K', result_as_printed: nearly all material vaporized, locator: {pdf_page_index: 15, figure: '6', section: '3.3 Effects of Total Pressure on Gas Composition', row: low pressure, column: gas/solid state}}
+            - {species: condensed_phase, total_pressure_bar_as_printed: '100', temperature_as_printed: 'up to 4000 K', result_as_printed: nearly all mass remains condensed, locator: {pdf_page_index: 15, figure: '6', section: '3.3 Effects of Total Pressure on Gas Composition', row: high pressure, column: gas/solid state}}
+            - {species: CO2, total_pressure_bar_as_printed: '10^-6', temperature_as_printed: 'up to 1150 K', result_as_printed: '~30 mol%', locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: CO2, column: pressure plateau}}
+            - {species: CO2, total_pressure_bar_as_printed: '10^-4', temperature_as_printed: 'up to 1300 K', result_as_printed: '~30 mol%', locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: CO2, column: pressure plateau}}
+            - {species: CO2, total_pressure_bar_as_printed: '10^-2', temperature_as_printed: 'up to 1550 K', result_as_printed: '~30 mol%', locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: CO2, column: pressure plateau}}
+            - {species: CO2, total_pressure_bar_as_printed: '10^0', temperature_as_printed: 'up to 1950 K', result_as_printed: '~30 mol%', locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: CO2, column: pressure plateau}}
+            - {species: CO2, total_pressure_bar_as_printed: '10^2', temperature_as_printed: 'up to 2300 K', result_as_printed: '~30 mol%', locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: CO2, column: pressure plateau}}
+            - {species: SO2, total_pressure_bar_as_printed: pressure sweep, temperature_as_printed: pressure-temperature grid, result_as_printed: far more abundant in BSE than CC, locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: SO2, column: composition comparison}}
+      - observation_id: schaefer_2012_cc_exoplanet_atmospheric_profiles
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
+        phase: gas_phase_and_condensate
+        regime: engine_evaluation
+        units: 'temperature K, pressure bars, mole fraction threshold as printed'
+        values:
+          quantity: hot_super_earth_continental_crust_profile
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors equilibrium calculation along dry-adiabatic CoRoT-7b profile
+          derivation: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
+          composition: continental_crust
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {species: Na, total_pressure_bar_as_printed: '1-2×10^-4', result_as_printed: condenses primarily as Na2CO3, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: Na condensation, column: pressure and condensate}}
+            - {species: K, total_pressure_bar_as_printed: '~(4-5)×10^-5', result_as_printed: condenses primarily as KOH, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: K condensation, column: pressure and condensate}}
+            - {species: C, total_pressure_bar_as_printed: '~5×10^-4', result_as_printed: condenses as Na2CO3, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: carbon condensation, column: pressure and condensate}}
+            - {species: S, total_pressure_bar_as_printed: '~5×10^-4', result_as_printed: condenses as Na2SO4, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: sulfur condensation, column: pressure and condensate}}
+            - {species: H, total_pressure_bar_as_printed: '~4×10^-5', result_as_printed: completely removed from atmosphere, locator: {pdf_page_index: 23, figure: '11', section: '4.2.2 Hot Super-Earths', row: hydrogen condensation, column: pressure and removal}}
+            - {species: atmosphere, total_pressure_bar_as_printed: upper atmosphere, result_as_printed: only O2 remains, locator: {pdf_page_index: 23, figure: '11', section: '4.2.2 Hot Super-Earths', row: continental crust upper atmosphere, column: surviving gases}}
+            - {species: atmosphere, result_as_printed: volatile-free Na2O condenses below ~28 km; this model gives ~44 km, locator: {pdf_page_index: 23, figure: '11', section: '4.2.2 Hot Super-Earths', row: Na altitude comparison, column: altitude}}
+
+  bulk_silicate_earth:
+    context:
+      - observation_id: schaefer_2012_bse_model_setup
+        type: method
+        locator: {pdf_page_index: 7, section: '2. Computational Methods', row: setup, column: model domain}
+        units: as printed
+        values:
+          quantity: bulk_silicate_earth_equilibrium_model_setup
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: printed_method
+          facts:
+            - {name: temperature_range, value_as_printed: '500-4000 K', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: temperature range, column: value}}
+            - {name: total_pressure_range, value_as_printed: '10^-6 to 10^+2 bars', locator: {pdf_page_index: 7, section: '2. Computational Methods', paragraph: 1, row: pressure range, column: value}}
+            - {name: composition_source, value_as_printed: 'Kargel & Lewis (1993)', locator: {pdf_page_index: 5, section: '2. Computational Methods', paragraph: 1, row: composition, column: bulk silicate Earth}}
+            - {name: mantle_fraction, value_as_printed: '99.4% by mass', locator: {pdf_page_index: 5, section: '2. Computational Methods', paragraph: 2, row: BSE, column: mantle mass fraction}}
+            - {name: fO2_status, value: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 7, section: '2. Computational Methods', row: oxygen condition, column: fO2}}
+    observations:
+      - observation_id: schaefer_2012_table2_bse_bulk_composition
+        type: composition_series
+        locator: {pdf_page_index: 32, table: '2', row: all, column: 'Bulk Silicate Earth (wt%)'}
+        phase: bulk_planetary_composition
+        regime: tabulation
+        units: 'wt% as printed'
+        values:
+          quantity: bulk_silicate_earth_bulk_elemental_composition
+          method_class: quoted_prior_work
+          evidence_class: quoted_prior_work
+          value_status: printed
+          source_attribution: 'Kargel_and_Lewis_1993'
+          conditions:
+            temperature: {tag: unknown, reason: not_applicable}
+            total_pressure: {tag: unknown, reason: not_applicable}
+            fO2: {tag: unknown, reason: not_published}
+            composition: bulk_silicate_earth
+          rows:
+            - {element: O, value_as_printed: '44.42', locator: {pdf_page_index: 32, table: '2', row: O, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Si, value_as_printed: '21.61', locator: {pdf_page_index: 32, table: '2', row: Si, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Al, value_as_printed: '2.12', locator: {pdf_page_index: 32, table: '2', row: Al, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Fe, value_as_printed: '6.27', locator: {pdf_page_index: 32, table: '2', row: Fe, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Ca, value_as_printed: '2.46', locator: {pdf_page_index: 32, table: '2', row: Ca, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Na, value_as_printed: '0.29', locator: {pdf_page_index: 32, table: '2', row: Na, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Mg, value_as_printed: '22.01', locator: {pdf_page_index: 32, table: '2', row: Mg, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: K, value_as_printed: '0.02', locator: {pdf_page_index: 32, table: '2', row: K, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Ti, value_as_printed: '0.12', locator: {pdf_page_index: 32, table: '2', row: Ti, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: P, value_as_printed: '0.008', locator: {pdf_page_index: 32, table: '2', row: P, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Cr, value_as_printed: '0.29', locator: {pdf_page_index: 32, table: '2', row: Cr, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Mn, value_as_printed: '0.11', locator: {pdf_page_index: 32, table: '2', row: Mn, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: H, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: H, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: C, value_as_printed: '0.006', locator: {pdf_page_index: 32, table: '2', row: C, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: N, value_as_printed: '0.88×10^-4', locator: {pdf_page_index: 32, table: '2', row: N, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: S, value_as_printed: '0.027', locator: {pdf_page_index: 32, table: '2', row: S, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: F, value_as_printed: '0.002', locator: {pdf_page_index: 32, table: '2', row: F, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: Cl, value_as_printed: '0.004', locator: {pdf_page_index: 32, table: '2', row: Cl, column: 'Bulk Silicate Earth (wt%)'}}
+            - {element: TOTAL, value_as_printed: '99.776', locator: {pdf_page_index: 32, table: '2', row: TOTAL, column: 'Bulk Silicate Earth (wt%)'}}
+      - observation_id: schaefer_2012_bse_100bar_major_gas_summary
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: prose summaries, column: printed model results}
+        T_range_K: [500, 4000]
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: bulk_silicate_earth_major_gases_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {species: CO2, temperature_as_printed: broad range, result_as_printed: '~16%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: CO2, column: relative abundance}}
+            - {species: CH4, temperature_as_printed: '<~750 K', result_as_printed: more abundant than CO2 and most abundant gas, locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: methane, column: dominance}}
+            - {species: NH3, temperature_as_printed: '<650 K', result_as_printed: more abundant than N2, locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: ammonia, column: relative abundance}}
+            - {species: SO2, temperature_as_printed: '1800 K', result_as_printed: '~20%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: sulfur dioxide, column: abundance}}
+            - {species: H2, temperature_as_printed: '700 K', result_as_printed: '~4%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: hydrogen, column: abundance}}
+            - {species: O2, temperature_as_printed: '~2900 K', result_as_printed: dominant gas, locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: oxygen, column: dominant temperature}}
+            - {species: SiO, temperature_as_printed: high temperature, result_as_printed: '~2.2%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: silicon, column: abundance}}
+            - {species: SiO2, temperature_as_printed: high temperature, result_as_printed: '~0.6%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: silicon, column: abundance}}
+            - {species: Na, temperature_as_printed: '3850 K', result_as_printed: '~23%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: sodium, column: maximum abundance}}
+            - {species: KOH, temperature_as_printed: '2900 K', result_as_printed: '~7%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: alkali hydroxides, column: peak abundance}}
+            - {species: NaOH, temperature_as_printed: '3450 K', result_as_printed: '~7%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: alkali hydroxides, column: peak abundance}}
+            - {species: Mg(OH)2, temperature_as_printed: '3400 K', result_as_printed: '0.3%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: magnesium, column: peak abundance}}
+            - {species: MgO, temperature_as_printed: '4000 K', result_as_printed: '4%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: magnesium, column: maximum abundance}}
+            - {species: TiO2, temperature_as_printed: '4000 K', result_as_printed: '~1%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: titanium and iron, column: abundance}}
+            - {species: FeO, temperature_as_printed: '4000 K', result_as_printed: '~1%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: titanium and iron, column: abundance}}
+            - {species: CaO, temperature_as_printed: studied range, result_as_printed: maximum 20 ppmv, locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: calcium, column: maximum abundance}}
+            - {species: AlO, temperature_as_printed: studied range, result_as_printed: maximum 600 ppmv, locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: aluminum, column: maximum abundance}}
+      - observation_id: schaefer_2012_table3_bse_extreme_atmospheres
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        locator: {pdf_page_index: 33, table: '3', row: all BSE cells, column: major atmospheric composition}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'temperature K, total pressure bars, gas mole percent as printed'
+        values:
+          quantity: bulk_silicate_earth_major_atmospheres_at_extreme_T_P
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Table values are transcribed model output; no arithmetic was performed.
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: H2O, abundance_as_printed: '61%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / BSE', column: H2O}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: SO2, abundance_as_printed: '20%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / BSE', column: SO2}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: CO2, abundance_as_printed: '12%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / BSE', column: CO2}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: Mg, abundance_as_printed: '28%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / BSE', column: Mg}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: O, abundance_as_printed: '26%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / BSE', column: O}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^-6', gas: SiO, abundance_as_printed: '24%', locator: {pdf_page_index: 33, table: '3', row: 'low P / high T / BSE', column: SiO}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: H2O, abundance_as_printed: '80%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / BSE', column: H2O}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: CO2, abundance_as_printed: '16%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / BSE', column: CO2}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^+2', gas: H2, abundance_as_printed: '2.3%', locator: {pdf_page_index: 33, table: '3', row: 'high P / low T / BSE', column: H2}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: H2O, abundance_as_printed: '62%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / BSE', column: H2O}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: SO2, abundance_as_printed: '20%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / BSE', column: SO2}}
+            - {composition: bulk_silicate_earth, temperature_K_as_printed: 2000, total_pressure_bar_as_printed: '10^+2', gas: CO2, abundance_as_printed: '12%', locator: {pdf_page_index: 33, table: '3', row: 'high P / high T / BSE', column: CO2}}
+      - observation_id: schaefer_2012_bse_variable_h_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: BSE prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, vol%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: bulk_silicate_earth_variable_hydrogen_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {variation: '10× nominal H', species: H2, temperature_as_printed: studied range, result_as_printed: '~28%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H BSE, column: H2 abundance}}
+            - {variation: '10× nominal H', species: H2O, temperature_as_printed: studied range, result_as_printed: '~52%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H BSE, column: H2O abundance}}
+            - {variation: '0.1× nominal H', species: CH4, temperature_as_printed: '500-700 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', species: CO2, temperature_as_printed: '700-1800 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', species: SO2, temperature_as_printed: '1800-2900 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+            - {variation: '0.1× nominal H', species: O2, temperature_as_printed: '2900-4000 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H BSE, column: major gas}}
+      - observation_id: schaefer_2012_bse_variable_c_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: BSE prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, vol%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: bulk_silicate_earth_variable_carbon_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {variation: '10× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: '~44%', locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: CO2 abundance}}
+            - {variation: '10× nominal C', species: CH4, temperature_as_printed: '500-700 K', result_as_printed: major gas, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: major gas}}
+            - {variation: '10× nominal C', species: CO2, temperature_as_printed: '700-3700 K', result_as_printed: major gas, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: major gas}}
+            - {variation: '10× nominal C', species: CO, temperature_as_printed: studied range, result_as_printed: increases by about 10×, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: relative change}}
+            - {variation: '10× nominal C', species: O2, temperature_as_printed: studied range, result_as_printed: peak ~10% versus 40% nominal, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: peak abundance}}
+      - observation_id: schaefer_2012_bse_variable_o_model_outputs
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: BSE prose summaries, column: printed model results}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'wt%, mole fraction, temperature K, pressure bar as printed'
+        values:
+          quantity: bulk_silicate_earth_variable_oxygen_at_100_bar
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Authors report the model output in prose; no value was recomputed.
+          conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
+          rows:
+            - {variation: 'O = 39-42 wt%', species: H2, temperature_as_printed: '500-2000 K', result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {variation: 'O = 39-42 wt%', species: Na, temperature_as_printed: '2000-3000 K', result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {variation: 'O = 39-42 wt%', species: SiO, temperature_as_printed: highest temperatures, result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
+            - {variation: 'O = 39-42 wt%', species: H2O+O2+SO2, temperature_as_printed: studied range, result_as_printed: never above 10^-3, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: abundance bound}}
+            - {variation: 'O >46 wt%', species: O2, temperature_as_printed: 'up to 3500 K', result_as_printed: '~100% atmosphere', locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: high-O BSE, column: atmosphere composition}}
+            - {variation: 'O = 45 wt%', species: N2, temperature_as_printed: '500-700 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {variation: 'O = 45 wt%', species: CO2, temperature_as_printed: '700-1000 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {variation: 'O = 45 wt%', species: H2O, temperature_as_printed: '1000-2000 K', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+            - {variation: 'O = 45 wt%', species: O2, temperature_as_printed: '2000 K onward', result_as_printed: major gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: nominal-plus-O BSE, column: major gas}}
+      - observation_id: schaefer_2012_bse_exoplanet_atmospheric_profiles
+        type: gas_speciation
+        derived_from: [schaefer_2012_table2_bse_bulk_composition]
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
+        phase: gas_phase_and_condensate
+        regime: engine_evaluation
+        units: 'pressure bars, mole fraction threshold as printed'
+        values:
+          quantity: hot_super_earth_bulk_silicate_earth_profile
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors equilibrium calculation along dry-adiabatic CoRoT-7b profile
+          derivation: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
+          composition: bulk_silicate_earth
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {species: Na, total_pressure_bar_as_printed: '1-2×10^-4', result_as_printed: condenses primarily as Na2O + NaOH, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: Na condensation, column: pressure and condensate}}
+            - {species: K, total_pressure_bar_as_printed: '~(4-5)×10^-5', result_as_printed: condenses primarily as KOH + KCl, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: K condensation, column: pressure and condensate}}
+            - {species: C, total_pressure_bar_as_printed: '~5×10^-4', result_as_printed: condenses as Na2CO3, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: carbon condensation, column: pressure and condensate}}
+            - {species: S, total_pressure_bar_as_printed: '~5×10^-4', result_as_printed: condenses as Na2SO4 + K2SO4, locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: sulfur condensation, column: pressure and condensate}}
+            - {species: H2O+KCl, total_pressure_bar_as_printed: '~6×10^-4', result_as_printed: sharp abundance decrease, locator: {pdf_page_index: 23, figure: '11', section: '4.2.2 Hot Super-Earths', row: BSE depletion, column: pressure and species}}
+
+  photochemical_gases:
+    context:
+      - observation_id: schaefer_2012_photochemical_method_setup
+        type: method
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', row: model setup, column: solar photodissociation}
+        units: as printed
+        values:
+          quantity: photochemical_lifetime_model_setup
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: printed_method
+          facts:
+            - {name: reference_flux, value_as_printed: 'top of Earth atmosphere at 1 AU', locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photodissociation rates, column: reference flux}}
+            - {name: evaluated_orbital_distances, value_as_printed: '1 AU, 0.25 AU, 0.017 AU', locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: model cases, column: orbital distances}}
+            - {name: model_scope, value_as_printed: 'photochemical lifetimes, not equilibrium atmospheric composition', locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 1, row: model scope, column: quantity}}
+    observations:
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes
+        type: rate_series
+        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
+        derivation: {relation: authors photochemical lifetime calculation from printed photodissociation rates, output_unit: as_printed}
+        locator: {pdf_page_index: 34, table: '4', row: all, column: all}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'J1 s^-1 at 1 AU; tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors photochemical calculation from photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Table values are transcribed model output; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: H2O, column: 'tchem (s), 1 AU', value_as_printed: '8.47×10^4', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 1 AU'}}
+            - {gas: H2O, column: 'tchem (s), 0.25 AU', value_as_printed: '5.29×10^3', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.25 AU'}}
+            - {gas: H2O, column: 'tchem (s), 0.017 AU', value_as_printed: '2.45×10^1', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.017 AU'}}
+            - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO2, column: 'tchem (s), 1 AU', value_as_printed: '4.95×10^5', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 1 AU'}}
+            - {gas: CO2, column: 'tchem (s), 0.25 AU', value_as_printed: '3.09×10^4', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.25 AU'}}
+            - {gas: CO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.43×10^2', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.017 AU'}}
+            - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CO, column: 'tchem (s), 1 AU', value_as_printed: '1.55×10^6', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 1 AU'}}
+            - {gas: CO, column: 'tchem (s), 0.25 AU', value_as_printed: '9.68×10^4', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.25 AU'}}
+            - {gas: CO, column: 'tchem (s), 0.017 AU', value_as_printed: '4.47×10^2', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.017 AU'}}
+            - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: SO2, column: 'tchem (s), 1 AU', value_as_printed: '4.01×10^3', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 1 AU'}}
+            - {gas: SO2, column: 'tchem (s), 0.25 AU', value_as_printed: '2.51×10^2', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.25 AU'}}
+            - {gas: SO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.16×10^0', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.017 AU'}}
+            - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: O2, column: 'tchem (s), 1 AU', value_as_printed: '2.06×10^5', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 1 AU'}}
+            - {gas: O2, column: 'tchem (s), 0.25 AU', value_as_printed: '1.29×10^4', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.25 AU'}}
+            - {gas: O2, column: 'tchem (s), 0.017 AU', value_as_printed: '5.94×10^1', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.017 AU'}}
+            - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: CH4, column: 'tchem (s), 1 AU', value_as_printed: '1.28×10^5', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 1 AU'}}
+            - {gas: CH4, column: 'tchem (s), 0.25 AU', value_as_printed: '8.02×10^3', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.25 AU'}}
+            - {gas: CH4, column: 'tchem (s), 0.017 AU', value_as_printed: '3.71×10^1', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.017 AU'}}
+            - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: NH3, column: 'tchem (s), 1 AU', value_as_printed: '5.73×10^3', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 1 AU'}}
+            - {gas: NH3, column: 'tchem (s), 0.25 AU', value_as_printed: '3.58×10^2', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.25 AU'}}
+            - {gas: NH3, column: 'tchem (s), 0.017 AU', value_as_printed: '1.66×10^0', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.017 AU'}}
+            - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: H2S, column: 'tchem (s), 1 AU', value_as_printed: '3.03×10^2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 1 AU'}}
+            - {gas: H2S, column: 'tchem (s), 0.25 AU', value_as_printed: '1.89×10^1', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.25 AU'}}
+            - {gas: H2S, column: 'tchem (s), 0.017 AU', value_as_printed: '8.76×10^-2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.017 AU'}}
+            - {gas: NO, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: NO, column: 'tchem (s), 1 AU', value_as_printed: '2.83×10^5', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 1 AU'}}
+            - {gas: NO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.77×10^4', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 0.25 AU'}}
+            - {gas: NO, column: 'tchem (s), 0.017 AU', value_as_printed: '8.19×10^1', locator: {pdf_page_index: 34, table: '4', row: NO, column: 'tchem (s), 0.017 AU'}}
+            - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: N2, column: 'tchem (s), 1 AU', value_as_printed: '9.76×10^5', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 1 AU'}}
+            - {gas: N2, column: 'tchem (s), 0.25 AU', value_as_printed: '6.10×10^4', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.25 AU'}}
+            - {gas: N2, column: 'tchem (s), 0.017 AU', value_as_printed: '2.82×10^2', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.017 AU'}}
+            - {gas: SiO, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.03×10^-3', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'J1 (s^-1), 1 AU'}}
+            - {gas: SiO, column: 'tchem (s), 1 AU', value_as_printed: '2.48×10^2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 1 AU'}}
+            - {gas: SiO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.55×10^1', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.25 AU'}}
+            - {gas: SiO, column: 'tchem (s), 0.017 AU', value_as_printed: '7.17×10^-2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.017 AU'}}
+
+  volatile_boundary_map:
+    observations:
+      - observation_id: schaefer_2012_figure8_volatile_boundaries
+        type: transition_point
+        locator: {pdf_page_index: 47, figure: '8', row: all, column: 'equal-abundance boundary coordinates'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'log10(total pressure in bars), temperature K as plotted; approximate digitization'
+        values:
+          quantity: dominant_volatile_species_boundary_map
+          method_class: figure_only
+          evidence_class: figure-only / digitized
+          value_status: figure
+          digitization_method: 'Approximate read-off of the labeled log-pressure ticks and boundary curves from the PDF figure; all values retain ~.'
+          generator: authors Gibbs-energy-minimization equilibrium calculation
+          derivation: Digitized from plotted boundaries; no interpolation or curve fitting.
+          conditions:
+            composition: 'continental crust solid / BSE dashed; curves nearly identical'
+            fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {species: H, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: H, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8a', row: H, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: OH, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8a', row: OH, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: CO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8b', row: CO, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: CO2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8b', row: CO2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: CH4, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8b', row: CH4, column: 'log P=2 bars low-temperature boundary (K)'}}
+            - {species: CH4, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~600', locator: {pdf_page_index: 47, figure: '8b', row: CH4, column: 'log P=2 bars upper boundary (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: S, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: S, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: SO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: N, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2900', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: N, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~3200', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: N, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: N, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3800', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: N, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8d', row: N, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: NO, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: NO, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: NO, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2800', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: NO, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: NO, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~3200', locator: {pdf_page_index: 47, figure: '8d', row: NO, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~2100', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2500', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~3000', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~3500', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: SO2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~4000', locator: {pdf_page_index: 47, figure: '8c', row: SO2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~1800', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~2000', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~2200', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~2400', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: N2, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~2600', locator: {pdf_page_index: 47, figure: '8d', row: N2, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: -6, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-6 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: -4, temperature_K_as_plotted: '~600', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-4 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: -2, temperature_K_as_plotted: '~700', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=-2 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: 0, temperature_K_as_plotted: '~800', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=0 bars boundary temperature (K)'}}
+            - {species: H2S, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~1000', locator: {pdf_page_index: 47, figure: '8c', row: H2S, column: 'log P=2 bars boundary temperature (K)'}}
+            - {species: NH3, log_pressure_bar_as_plotted: 2, temperature_K_as_plotted: '~500', locator: {pdf_page_index: 47, figure: '8d', row: NH3, column: 'log P=2 bars boundary temperature (K)'}}
+      - observation_id: schaefer_2012_figure9_temperature_pressure_profiles
+        type: composition_series
+        locator: {pdf_page_index: 48, figure: '9', row: all, column: 'digitized profile points'}
+        phase: planetary_atmosphere_profile
+        regime: tabulation
+        units: 'temperature K and total pressure bars as plotted; approximate digitization'
+        values:
+          quantity: test_case_temperature_pressure_profiles
+          method_class: figure_only
+          evidence_class: figure-only / digitized
+          value_status: figure
+          digitization_method: 'Approximate read-off of profile bends and labeled pressure ticks from PDF Figure 9; no interpolation.'
+          derivation: Digitized from plotted profiles; values are not printed table entries.
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~500', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈500 K / P≈10^-2 bar'}}
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1000', total_pressure_bar_as_plotted: '10^0', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1000 K / P≈10^0 bar'}}
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1050', total_pressure_bar_as_plotted: '10^-1', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1050 K / P≈10^-1 bar'}}
+            - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~1350', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈1350 K / P≈10^-2 bar'}}
+            - {profile: b/c, composition: 'continental crust / BSE', temperature_K_as_plotted: '2500', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: b and c, column: 'surface start T=2500 K / P=10^-2 bar'}}
+
+  observable_gases:
+    observations:
+      - observation_id: schaefer_2012_observable_gas_thresholds
+        type: gas_speciation
+        derived_from: [schaefer_2012_cc_100bar_major_gas_summary, schaefer_2012_bse_100bar_major_gas_summary]
+        derivation: {relation: authors equilibrium and atmospheric-chemistry calculations, output_unit: as_printed}
+        locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: prose summaries, column: threshold and peak abundances}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'ppb, ppm, mole fraction, temperature K, total pressure bar as printed'
+        values:
+          quantity: spectroscopically_observable_gas_model_thresholds
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors equilibrium and atmospheric chemistry calculations
+          derivation: Authors report thresholds and peaks in prose; no abundance was recomputed.
+          fO2: {tag: unknown, reason: not_published}
+          rows:
+            - {composition: continental_crust, species: CH4, condition_as_printed: 'T >600 K, P >10 bar', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: CH4 continental crust threshold, column: abundance}}
+            - {composition: bulk_silicate_earth, species: CH4, condition_as_printed: 'T <1500 K at 100 bars', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: CH4 BSE threshold, column: abundance}}
+            - {composition: continental_crust, species: CH4, condition_as_printed: '500 K and 100 bars', result_as_printed: '0.68 ppm', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: CH4 continental crust peak, column: peak abundance}}
+            - {composition: bulk_silicate_earth, species: CH4, condition_as_printed: 'low temperature', result_as_printed: '~95%', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: CH4 BSE peak, column: peak abundance}}
+            - {composition: continental_crust, species: NH3, condition_as_printed: '<900 K at 100 bars', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: NH3 threshold, column: abundance}}
+            - {composition: continental_crust, species: NH3, condition_as_printed: '600 K and 100 bars', result_as_printed: '2.8 ppm', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: NH3 peak, column: peak abundance}}
+            - {composition: bulk_silicate_earth, species: NH3, condition_as_printed: low temperature, result_as_printed: '0.6%', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: NH3 BSE, column: abundance}}
+            - {composition: continental_crust, species: O3, condition_as_printed: 'T >1800 K, P >~0.1 bar', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: O3 continental crust threshold, column: abundance}}
+            - {composition: continental_crust, species: O3, condition_as_printed: '100 bars', result_as_printed: '8.7 ppm', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: O3 continental crust peak, column: peak abundance}}
+            - {composition: bulk_silicate_earth, species: O3, condition_as_printed: 'T >2000 K, P >10^-2 bar', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: O3 BSE threshold, column: abundance}}
+            - {composition: bulk_silicate_earth, species: O3, condition_as_printed: '100 bars', result_as_printed: '6.5 ppm', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: O3 BSE peak, column: peak abundance}}
+            - {composition: continental_crust, species: N2O, condition_as_printed: 'P >1 bar, T >1700 K', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: N2O continental crust threshold, column: abundance}}
+            - {composition: continental_crust, species: N2O, condition_as_printed: threshold range, result_as_printed: '79 ppb peak', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: N2O continental crust peak, column: peak abundance}}
+            - {composition: bulk_silicate_earth, species: N2O, condition_as_printed: '2400-3500 K at 100 bars', result_as_printed: '>1 ppb', locator: {pdf_page_index: 26, section: '4.4 Spectroscopically Observable Gases', row: N2O BSE threshold, column: abundance}}
+            - {composition: bulk_silicate_earth, species: N2O, condition_as_printed: '2400-3500 K at 100 bars', result_as_printed: '4.8 ppb peak', locator: {pdf_page_index: 26, section: '4.4 Spectroscopically Observable Gases', row: N2O BSE peak, column: peak abundance}}
+            - {composition: continental_crust, species: SO2, condition_as_printed: '>1300 K', result_as_printed: '~3%', locator: {pdf_page_index: 26, section: '4.4 Spectroscopically Observable Gases', row: SO2 continental crust, column: abundance}}
+            - {composition: continental_crust, species: SO2, condition_as_printed: '1700-3500 K', result_as_printed: '5-20%', locator: {pdf_page_index: 26, section: '4.4 Spectroscopically Observable Gases', row: SO2 continental crust, column: abundance}}
+    context:
+      - observation_id: schaefer_2012_cool_gj1214_profile_context
+        type: planetary_application
+        locator: {pdf_page_index: 20, figure: '9', section: '4.2.1 Cool Super-Earths', row: GJ 1214 b setup, column: model conditions}
+        phase: atmosphere
+        regime: engine_evaluation
+        units: 'temperature K, pressure bars, scale height km, gravity m s^-2 as printed'
+        values:
+          quantity: GJ_1214_b_atmospheric_profile_conditions
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+          rows:
+            - {field: starting_composition, value_as_printed: '50% H2O + 50% CO2', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: profile a, column: starting composition}}
+            - {field: surface_temperature, value_as_printed: '1330 K', locator: {pdf_page_index: 20, figure: '10', section: '4.2.1 Cool Super-Earths', row: GJ 1214 b, column: surface temperature}}
+            - {field: surface_pressure, value_as_printed: '100 bars', locator: {pdf_page_index: 20, figure: '10', section: '4.2.1 Cool Super-Earths', row: GJ 1214 b, column: surface pressure}}
+            - {field: alkali_salt_condensation, value_as_printed: 'about 1-10 bar level', locator: {pdf_page_index: 20, figure: '10', section: '4.2.1 Cool Super-Earths', row: alkali salts, column: condensation pressure}}
+            - {field: gravity, value_as_printed: '8.89 m s^-2', locator: {pdf_page_index: 20, figure: '9', section: '4.2.1 Cool Super-Earths', row: GJ 1214 b, column: gravity}}
+            - {field: scale_height, value_as_printed: '~42 km continental crust; ~50 km BSE', locator: {pdf_page_index: 20, figure: '9', section: '4.2.1 Cool Super-Earths', row: model atmospheres, column: scale height}}
+            - {field: comparison_scale_height, value_as_printed: '~600 km pure H2; 69.1 km pure H2O', locator: {pdf_page_index: 20, figure: '9', section: '4.2.1 Cool Super-Earths', row: comparison atmospheres, column: scale height}}
+      - observation_id: schaefer_2012_hot_corot7_profile_context
+        type: planetary_application
+        locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: profile b/c setup, column: model conditions}
+        phase: atmosphere
+        regime: engine_evaluation
+        units: 'temperature K, pressure bars, gravity m s^-2 as printed'
+        values:
+          quantity: CoRoT_7_b_atmospheric_profile_conditions
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+          rows:
+            - {field: gravity, value_as_printed: '35.2 m s^-2', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: CoRoT-7 b, column: gravity}}
+            - {field: surface_temperature, value_as_printed: '2500 K', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: CoRoT-7 b, column: surface temperature}}
+            - {field: surface_pressure, value_as_printed: '10^-2 bars', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: CoRoT-7 b, column: surface pressure}}
+            - {field: gas_selection_threshold, value_as_printed: 'mole fraction >10^-3', locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: model selection, column: gas threshold}}
+
+figures_not_digitized:
+  - {figure: '1', pdf_page_index: 37, admission_status: figure_only, note: plotted gas-composition curves not digitized; printed prose summaries are retained}
+  - {figure: '2', pdf_page_index: 38, admission_status: figure_only, note: plotted gas-composition curves not digitized; printed prose summaries are retained}
+  - {figure: '3', pdf_page_index: 39, admission_status: figure_only, note: variable-H curves not digitized; printed prose summaries are retained}
+  - {figure: '4', pdf_page_index: 40, admission_status: figure_only, note: variable-C curves not digitized; printed prose summaries are retained}
+  - {figure: '5', pdf_page_index: 41, admission_status: figure_only, note: variable-O curves not digitized; printed prose summaries are retained}
+  - {figure: '6', pdf_page_index: 45, admission_status: figure_only, note: gas/solid curves not digitized; prose thresholds are retained}
+  - {figure: '7', pdf_page_index: 46, admission_status: figure_only, note: gas-abundance curves not digitized; prose CO2 plateaus are retained}
+  - {figure: '10', pdf_page_index: 49, admission_status: figure_only, note: atmospheric composition curves not digitized; setup and printed thresholds are retained}
+  - {figure: '11', pdf_page_index: 50, admission_status: figure_only, note: atmospheric composition curves not digitized; printed condensation thresholds are retained}
+apparatus_not_stated:
+  status: true
+  reason: This source is a thermochemical-equilibrium calculation; it does not report a laboratory bench or per-run experimental apparatus.
+  locator: {pdf_page_index: 7, section: '2. Computational Methods', row: calculation method, column: apparatus}
+refused:
+  - what: numeric curve coordinates for Figures 1-7, 10 and 11 beyond the conservative Figure 8-9 points
+    why: the PDF provides plotted curves and qualitative prose, not tabulated coordinates; promoting visual read-offs to printed values would violate the evidence rule
+    locator: {pdf_page_index: 37, figure: '1', row: all, column: curve coordinates}
+  - what: fO2 values for all model runs
+    why: the source specifies total pressure and bulk composition but does not print oxygen fugacity or oxygen partial pressure; no fO2 was inferred from composition
+    locator: {pdf_page_index: 7, section: '2. Computational Methods', row: model conditions, column: fO2}
+  - what: laboratory bench and experiment registry
+    why: no physical experiment or apparatus is reported; this is an equilibrium-model paper
+    locator: {pdf_page_index: 7, section: '2. Computational Methods', row: model method, column: apparatus}
