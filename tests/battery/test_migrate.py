@@ -5174,6 +5174,57 @@ def test_areal_mass_loss_routes_delta_q_to_kg_per_m2(tmp_path: Path) -> None:
     assert obs.derivation.output_unit == "kg_per_m2"
 
 
+def test_fugacity_series_routes_bar_to_pa_without_partial_pressure(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    measured = yaml.safe_load(yaml.safe_dump(base))
+    measured["observation_id"] = "measured_parent"
+    measured["values"] = {
+        "quantity": "pure_Psat",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "pressure_atm": 1.0,
+    }
+    fugacity = yaml.safe_load(yaml.safe_dump(base))
+    fugacity.update(
+        {
+            "observation_id": "agI_cl_007_fugacity",
+            "type": "fugacity_series",
+            "units": "bar",
+            "values": {
+                "method_class": "calculated",
+                "admission_status": "admitted",
+                "derived_from": ["measured_parent"],
+                "derivation": {
+                    "relation": "agcl_agi_mass_balance",
+                    "inputs": ["fixture-source::measured_parent"],
+                    "output_unit": "Pa",
+                },
+                "series": [{"T_K": 1200.0, "fCl2_bar": "3.37E-04"}],
+            },
+        }
+    )
+    extract["species"]["Na"]["observations"] = [measured, fugacity]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(
+        item
+        for item in result.observations.values()
+        if "agI_cl_007_fugacity" in item.observation_id
+    )
+    assert quantity_token(obs.identity) is Quantity.FUGACITY
+    assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("33.7")
+    assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert obs.derivation is not None
+    assert obs.derivation.relation == "agcl_agi_mass_balance"
+    assert obs.derivation.output_unit == "Pa"
+    original = dict(obs.derivation.parameters)["original"]
+    assert original.state.value == as_decimal("3.37E-04")
+    assert original.locator == obs.locator
+
+
 def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="bulk_mass_loss_wt_pct",
