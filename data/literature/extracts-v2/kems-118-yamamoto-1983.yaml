@@ -88,9 +88,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -100,7 +99,9 @@ observations:
     published_page: 58
     pdf_page_index: 3
     figure: '3'
-    note: also Figs 5, 7, 9, 10, 11, 12, 13, 14, 15
+    note: 'Mixed undigitised plates, also Figs 5, 7, 9-15: Fig 7 measured 1600 C markers (N_Al 0, 0.005, 0.010) plus fit;
+      Fig 9 six 1560-1610 C series; Figs 11-12 present work 1600 C, Onillon 1547 C, Wagner 1537 C; Fig 13 five named literature/this-work
+      series; Fig 14 decreasing-temperature open circles and increasing-temperature filled triangles'
   read_from: pdf:kems-118-yamamoto-1983
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_figs_ion_ratios_figure_only
   experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series

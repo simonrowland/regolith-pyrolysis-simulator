@@ -499,7 +499,8 @@ observations:
     published_page: 304
     pdf_page_index: 10
     figure: '7'
-    note: Relation between heat of reaction absorbed and composition. q in arbitrary unit
+    note: 'Three printed series on the shared axes: Reaction A, Reaction B, Reaction C; q x 10^-2 versus atomic fraction of
+      Mn'
   read_from: pdf:kems-198-ichise-ueshima-1989
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
@@ -622,7 +623,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: quoted literature values have no sigma in Table V; present-study column is this work's Table II means
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
   evidence:
     class:
       tag: value

@@ -88,8 +88,8 @@ observations:
   source_id: itoh-hino-banya-1998-spinel
   locator:
     published_page: 86
-    figure: '1'
     section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
+    note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_equilibrium_time
@@ -143,7 +143,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'dissolved_element_concentration_plots'
+      reason: unsupported quantity 'dissolved_Mg_O_vs_dolomite_MgO_CaO'
     species:
       formula: O
       phase:
@@ -157,7 +157,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_element_concentration_plots'; refusing
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_Mg_O_vs_dolomite_MgO_CaO'; refusing
       to pick a number
     approximate: false
   uncertainty:
@@ -176,7 +176,52 @@ observations:
   source_id: itoh-hino-banya-1998-spinel
   locator:
     published_page: 86
-    note: Dissolved Mg/O versus dolomite MgO/CaO and concentration versus time are plotted; points were not digitised.; figures=1-2
+    figure: '1'
+    note: 'Four printed series: filled circles Present work [Mg], filled squares Present work [O], open circles Degawa [Mg],
+      open squares Degawa [O]; x-axis dolomite MgO/CaO; points not digitised'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+  read_from: unknown:itoh-hino-banya-1998-spinel
+- observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig2_measured_concentration_time_plots
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_element_concentration_vs_time'
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_element_concentration_vs_time'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure error bars or point uncertainties were not transcribed.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: itoh-hino-banya-1998-spinel
+  locator:
+    published_page: 86
+    figure: '2'
+    note: 'Four printed series versus time: [Al] circles, [Mg] squares, [O] triangles, [Ca] diamonds; [Al]init = 0.5 mass%;
+      crucible (%MgO)0.4(%CaO)0.6; points not digitised'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_quoted_prior_interaction_parameters
@@ -360,8 +405,8 @@ observations:
   locator:
     published_page: 88
     figure: '4'
-    note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; symbols
-      retain the paper's interaction-coefficient notation.; equations=7-20
+    note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure 4
+      and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
   derived_from:

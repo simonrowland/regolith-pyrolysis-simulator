@@ -306,7 +306,8 @@ observations:
     published_page: 931
     pdf_page_index: 2
     figure: '4'
-    note: CaO-MgO-Al2O3-SiO2 at 1600 C, AlO1.5/CaO=1, 10% and 20% MgO, Rein and Chipman
+    note: CaO-MgO-Al2O3-SiO2 at 1600 C, AlO1.5/CaO=1, 10% and 20% MgO; caption cites Morita et al. (ref 5) and Rein and Chipman
+      (ref 6), while body section 5 attributes the values to Rein and Chipman
   read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig5_cao_feo_sio2_figure_only
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
@@ -403,6 +404,118 @@ observations:
     figure: '6'
     note: Computed oxide activities in MnO-Al2O3-SiO2 at 1550 and 1650 C after Fujisawa and Sakao
   read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig7_cs_curve_1600C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2 melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only model curve; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '7'
+        note: Dashed C-S curve for CaO-SiO2 melts at 1600 C; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '7'
+    note: Dashed C-S curve for CaO-SiO2 melts at 1600 C; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig7_mno_sio2_gamma_1650C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-SiO2 and MnO-Al2O3-SiO2 melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1923.15, 1923.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; scatter not digitised; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '7'
+        note: Filled-circle 1650 C model series read from computed Fig. 6; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '7'
+    note: Filled-circle 1650 C model series read from computed Fig. 6; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig7_mno_sio2_gamma_figure_only
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
@@ -422,7 +535,7 @@ observations:
         value: 0
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+      reason: source T_range_K [1823.15, 1823.15]; no midpoint invented
     reference_state:
       tag: unknown
       reason: qualifier gamma_SiO2 does not name a reference_state
@@ -437,20 +550,29 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
-    original_method_class: quoted_measurement
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '7'
+        note: Open-circle 1550 C model series read from computed Fig. 6; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
   notices: []
   source_id: kems-048-turkdogan-2001-sio2-gamma
   locator:
     published_page: 932
     pdf_page_index: 3
     figure: '7'
-    note: gamma_SiO2 in MnO-SiO2 and MnO-Al2O3-SiO2 from Ref 13 vs C-S curve at 1600 C
+    note: Open-circle 1550 C model series read from computed Fig. 6; x-axis x_MnO and x_CaO; y-axis log10(gamma_SiO2)
   read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
-- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_mno_ox_gamma_figure_only
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_left_mno_sio2_1550C_model
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
     quantity:
@@ -460,7 +582,7 @@ observations:
       formula: SiO2
       phase:
         tag: unknown
-        reason: phase string 'MnO-SiO2 and MnO-Al2O3-SiO2 melts' is not in the closed automatic map
+        reason: phase string 'MnO-SiO2 melts' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -469,7 +591,7 @@ observations:
         value: 0
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+      reason: source T_range_K [1823.15, 1823.15]; no midpoint invented
     reference_state:
       tag: unknown
       reason: qualifier gamma_SiO2 does not name a reference_state
@@ -484,18 +606,251 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
-    original_method_class: quoted_measurement
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '8'
+        note: Left panel, open-circle 1550 C model series; x-axis OX = 0.8 x_MnO; y-axis log10(gamma_SiO2)
   notices: []
   source_id: kems-048-turkdogan-2001-sio2-gamma
   locator:
     published_page: 932
     pdf_page_index: 3
     figure: '8'
-    note: gamma_SiO2 vs OX = 0.8(x_MnO + x_Al2O3) for MnO-SiO2 and MnO-Al2O3-SiO2
+    note: Left panel, open-circle 1550 C model series; x-axis OX = 0.8 x_MnO; y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_left_mno_sio2_1650C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-SiO2 melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1923.15, 1923.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; scatter not digitised; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '8'
+        note: Left panel, filled-circle 1650 C model series; x-axis OX = 0.8 x_MnO; y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '8'
+    note: Left panel, filled-circle 1650 C model series; x-axis OX = 0.8 x_MnO; y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_right_cs_curve_1600C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2 comparison curve' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only model curve; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '8'
+        note: Right panel, dashed C-S curve for 1600 C; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '8'
+    note: Right panel, dashed C-S curve for 1600 C; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_right_mno_al2o3_sio2_1550C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-Al2O3-SiO2 melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1823.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; scatter not digitised; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '8'
+        note: Right panel, open-circle 1550 C model series; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '8'
+    note: Right panel, open-circle 1550 C model series; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
+  read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
+- observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_right_mno_al2o3_sio2_1650C_model
+  experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_gamma_SiO2'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-Al2O3-SiO2 melts' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1923.15, 1923.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_SiO2 does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; scatter not digitised; no numeric uncertainty printed on the figure
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-kems-048
+      date: '2026-09-12'
+      evidence:
+        published_page: 932
+        pdf_page_index: 3
+        figure: '8'
+        note: Right panel, filled-circle 1650 C model series; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
+  notices: []
+  source_id: kems-048-turkdogan-2001-sio2-gamma
+  locator:
+    published_page: 932
+    pdf_page_index: 3
+    figure: '8'
+    note: Right panel, filled-circle 1650 C model series; x-axis OX = 0.8(x_MnO + x_Al2O3); y-axis log10(gamma_SiO2)
   read_from: pdf:kems-048-turkdogan-2001-sio2-gamma
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_liquid_sio2_about_minus_2p5_quoted
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma

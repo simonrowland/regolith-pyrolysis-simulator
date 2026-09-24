@@ -82,6 +82,48 @@ observations:
   locator:
     pdf_page_index: 2
     figure: 4-5
+    note: Figures 4-5 only; Figures 6-8 are on PDF page 3
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_figures_6_8_figure_only_characterisation
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'figure_only_characterisation'
+    species:
+      formula: '12023'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'figure_only_characterisation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure values were not read off axes.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=typed_refusal is not a closed v2.1 token
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 3
+    figure: 6-8
+    note: Figure 6 REE series, Figure 7 grain-size histogram, and Figure 8 gas-release panel
   read_from: unknown:jsc-lunar-catalog-12023
 - observation_id: jsc-lunar-catalog-12023::jsc_12023_glass_bead_ages
   experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
@@ -288,7 +330,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'figure_only_sample_subdivision'
+      reason: unsupported quantity 'figure_only_sample_characterisation'
     species:
       formula: '12024'
       phase:
@@ -302,13 +344,13 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'figure_only_sample_subdivision'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'figure_only_sample_characterisation'; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Figure allocation values not systematically transcribed.
+      note: Photograph carries no plotted numeric series.
   evidence:
     class:
       tag: value
@@ -322,6 +364,48 @@ observations:
   locator:
     pdf_page_index: 6
     figure: '13'
+    note: Photograph of 12024,15; caption says large dark rock and Cube is 1 cm
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12024_maturity_index
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_characterisation'
+    species:
+      formula: '12024'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_characterisation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 2
+    paragraph: maturity index
+    section: Petrography
+    note: 'Printed prose: 12024 has Is/FeO = 30 (submature), attributed to Morris (1978)'
   read_from: unknown:jsc-lunar-catalog-12023
 - observation_id: jsc-lunar-catalog-12023::jsc_12024_sample_mass_and_characterisation
   experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
@@ -361,4 +445,44 @@ observations:
   locator:
     pdf_page_index: 1
     note: header=12024 - 56.5 grams
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12024_unnumbered_allocation_tree_figure_only
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'figure_only_sample_subdivision'
+    species:
+      formula: '12024'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'figure_only_sample_subdivision'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Allocation values not systematically transcribed.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=typed_refusal is not a closed v2.1 token
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 6
+    note: Unnumbered 12024 allocation tree printed below Figure 13; it is not Figure 13
   read_from: unknown:jsc-lunar-catalog-12023

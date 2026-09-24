@@ -599,8 +599,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -610,7 +610,8 @@ observations:
     published_page: 55
     pdf_page_index: 5
     figure: 5(a)
-    note: Variation of epsilon_P^i with atomic number of 4th and 5th period elements at 1600 C
+    note: 'Variation of epsilon_P^i with atomic number at 1600 C: open circles 4th period, open triangles 5th period; Mn?
+      and Cu? are printed labels but section 10 says Fe-P-Mn and Fe-P-Cu could not be measured'
   read_from: pdf:kems-105-yamada-1983
   point_conditions:
     temperature_K:
@@ -621,7 +622,8 @@ observations:
         published_page: 55
         pdf_page_index: 5
         figure: 5(a)
-        note: Variation of epsilon_P^i with atomic number of 4th and 5th period elements at 1600 C
+        note: 'Variation of epsilon_P^i with atomic number at 1600 C: open circles 4th period, open triangles 5th period;
+          Mn? and Cu? are printed labels but section 10 says Fe-P-Mn and Fe-P-Cu could not be measured'
 - observation_id: kems-105-yamada-1983::yamada_1983_fig5b_epsilon_S_quoted_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
