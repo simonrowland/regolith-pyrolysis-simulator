@@ -5264,7 +5264,15 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
             or bool(re.search(r"\b(?:about|approximately)\b|[~≈]", str(mapping.get("as_printed") or ""), re.I))
         )
     )
-    state = State.of(Value(ValueKind.POINT, point=si, approximate=True)) if approximate else State.of(si)
+    state = (
+        State.of(
+            _value_from_plain(
+                {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
+            )
+        )
+        if approximate
+        else State.of(si)
+    )
     if non_point:
         state = State.unknown(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
