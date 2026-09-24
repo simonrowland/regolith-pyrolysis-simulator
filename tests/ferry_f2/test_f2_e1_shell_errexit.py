@@ -257,12 +257,24 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
         check=False,
         env={**env, "SULFLIQ_CHECKOUT": str(fallback)},
     )
-    assert overridden.returncode == 0, overridden.stdout + overridden.stderr
+    assert overridden.returncode != 0
     assert (
-        f"sulfliq: MATCH RESOLVED={fallback} "
-        "(explicit SULFLIQ_CHECKOUT override; interpreter loads engine here)"
+        f"sulfliq: ASSERTED PATCH=MATCH RESOLVED={fallback} "
+        "(explicit SULFLIQ_CHECKOUT override; not import-verified)"
         in overridden.stdout
     )
+
+    asserted_allowed = subprocess.run(
+        ["bash", str(script), "--allow-asserted", *verify[2:]],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**env, "SULFLIQ_CHECKOUT": str(fallback)},
+    )
+    assert asserted_allowed.returncode == 0, (
+        asserted_allowed.stdout + asserted_allowed.stderr
+    )
+    assert "sulfliq: ASSERTED PATCH=MATCH" in asserted_allowed.stdout
 
 
 def test_scripts_enable_errexit() -> None:

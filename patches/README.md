@@ -46,6 +46,15 @@ Git tree at its pinned `UPSTREAM.pin` `base_sha`; they do not fall back to a sib
 `apply` and `refresh` act on the resolved tree and refuse an override path the selected
 interpreter does not load unless `--force-path` is supplied.
 
+`verify` reports the resolution and patch state separately:
+
+| status | meaning | exit 0 |
+|---|---|---|
+| `MATCH` | Interpreter import, pinned base, and patch set all match. | yes |
+| `ASSERTED` | Tree came from an explicit `*_CHECKOUT` override; `PATCH=MATCH` or `PATCH=DRIFT` is printed, but import was not verified. | only with `--allow-asserted` and `PATCH=MATCH` |
+| `NOT-LOADED` | Engine is not importable; the fallback patch state is printed as `FALLBACK=...`. | only with `--allow-not-loaded` and `FALLBACK=MATCH` |
+| `DRIFT` / `MISSING` / `FAILED` | Patch contents, checkout, or validation failed. | no |
+
 ## Inventory
 
 ### vaporock — package `vaporock` @ `0159678`

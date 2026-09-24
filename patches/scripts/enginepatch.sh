@@ -2,7 +2,7 @@
 # Engine patch manager. Engine checkouts are outside this repo and are NOT
 # version-controlled by us, so local edits are invisible drift unless captured here.
 #
-#   enginepatch.sh [--python PATH] [--allow-not-loaded] verify [engine] # tree == patch set?
+#   enginepatch.sh [--python PATH] [--allow-not-loaded] [--allow-asserted] verify [engine] # tree == patch set?
 #   enginepatch.sh [--python PATH] apply   <engine>   # apply patches onto a clean checkout
 #   enginepatch.sh [--python PATH] refresh <engine>   # re-capture patches from a dirty tree
 #   enginepatch.sh [--python PATH] status  [engine]   # base SHA, drift, patch list
@@ -29,6 +29,7 @@ PYTHON_ARG=""
 PYTHON=""
 FORCE_PATH=0
 ALLOW_NOT_LOADED=0
+ALLOW_ASSERTED=0
 
 engine_package() {
   case "$1" in
@@ -339,12 +340,13 @@ cmd_verify() {
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
         rc=1
       fi
-    elif [ "$PATCH_STATE" = "MATCH" ]; then
-      if [ "$RESOLUTION_KIND" = "override" ]; then
-        echo "$e: MATCH RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; interpreter loads engine here)"
-      else
-        echo "$e: MATCH RESOLVED=$RESOLVED_PATH"
+    elif [ "$RESOLUTION_KIND" = "override" ]; then
+      echo "$e: ASSERTED PATCH=$PATCH_STATE RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; not import-verified)"
+      if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_ASSERTED" -ne 1 ]; then
+        rc=1
       fi
+    elif [ "$PATCH_STATE" = "MATCH" ]; then
+      echo "$e: MATCH RESOLVED=$RESOLVED_PATH"
     else
       echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$RESOLVED_PATH"
       rc=1
@@ -431,6 +433,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --allow-not-loaded)
       ALLOW_NOT_LOADED=1
+      shift
+      ;;
+    --allow-asserted)
+      ALLOW_ASSERTED=1
       shift
       ;;
     --help|-h)
