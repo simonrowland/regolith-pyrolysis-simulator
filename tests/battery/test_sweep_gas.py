@@ -47,7 +47,7 @@ def _extract_with_gas(gas: object) -> dict:
     return doc
 
 
-def test_existing_single_species_preserves_printed_composition_and_round_trips(tmp_path) -> None:
+def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
     doc = yaml.safe_load((EXTRACTS / "kems-027-plante-hastie-1983.yaml").read_text())
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     experiment = next(e for e in result.experiments.values()
