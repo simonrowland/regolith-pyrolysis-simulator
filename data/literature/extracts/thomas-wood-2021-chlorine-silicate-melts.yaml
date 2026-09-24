@@ -189,7 +189,8 @@ species:
         table_footer: 'Cl% error in () is 2 stdev.'
         table_footer_locator: {pdf_page_index: 8, published_page: 7, table: '2'}
         series:
-        - experiment: AgI/Cl-007
+        - series: time
+          experiment: AgI/Cl-007
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 5
@@ -207,7 +208,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.924
           fCl2_bar: {value: 3.37e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-007, column: all}
-        - experiment: AgI/Cl-002
+        - series: time
+          experiment: AgI/Cl-002
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 30
@@ -225,7 +227,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.837
           fCl2_bar: {value: 2.82e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-002, column: all}
-        - experiment: AgI/Cl-005
+        - series: time
+          experiment: AgI/Cl-005
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -243,7 +246,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.844
           fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
-        - experiment: AgI/Cl-006
+        - series: time
+          experiment: AgI/Cl-006
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 120
@@ -261,7 +265,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.861
           fCl2_bar: {value: 3.11e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-006, column: all}
-        - experiment: AgI/Cl-018
+        - series: f_Cl2
+          experiment: AgI/Cl-018
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -279,7 +284,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.856
           fCl2_bar: {value: 1.66e-06, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-018, column: all}
-        - experiment: AgI/Cl-010
+        - series: f_Cl2
+          experiment: AgI/Cl-010
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -297,7 +303,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.864
           fCl2_bar: {value: 2.29e-06, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-010, column: all}
-        - experiment: AgI/Cl-009
+        - series: f_Cl2
+          experiment: AgI/Cl-009
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -315,7 +322,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.869
           fCl2_bar: {value: 1.59e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-009, column: all}
-        - experiment: AgI/Cl-008
+        - series: f_Cl2
+          experiment: AgI/Cl-008
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -333,7 +341,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.851
           fCl2_bar: {value: 5.43e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: all}
-        - experiment: AgI/Cl-005
+        - series: f_Cl2
+          experiment: AgI/Cl-005
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -351,7 +360,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.844
           fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
-        - experiment: AgI/Cl-013
+        - series: f_Cl2
+          experiment: AgI/Cl-013
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -369,7 +379,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.843
           fCl2_bar: {value: 1.38e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-013, column: all}
-        - experiment: AgI/Cl-027
+        - series: f_Cl2
+          experiment: AgI/Cl-027
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -388,7 +399,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.778
           fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
-        - experiment: AgI/Cl-023
+        - series: f_Cl2
+          experiment: AgI/Cl-023
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -407,7 +419,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.799
           fCl2_bar: {value: 9.32e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-023, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-023, column: all}
-        - experiment: AgI/Cl-037
+        - series: f_Cl2
+          experiment: AgI/Cl-037
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -426,7 +439,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.823
           fCl2_bar: {value: 2.31e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-037, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-037, column: all}
-        - experiment: AgI/Cl-039
+        - series: f_Cl2
+          experiment: AgI/Cl-039
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -445,7 +459,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.793
           fCl2_bar: {value: 1.36e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-039, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-039, column: all}
-        - experiment: AgI/Cl-029
+        - series: f_O2
+          experiment: AgI/Cl-029
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -463,7 +478,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.742
           fCl2_bar: {value: 1.08e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-029, column: all}
-        - experiment: AgI/Cl-031
+        - series: f_O2
+          experiment: AgI/Cl-031
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -482,7 +498,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.823
           fCl2_bar: {value: 9.45e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-031, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-031, column: all}
-        - experiment: AgI/Cl-028
+        - series: temperature
+          experiment: AgI/Cl-028
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -500,7 +517,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.786
           fCl2_bar: {value: 6.72e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-028, column: all}
-        - experiment: AgI/Cl-005
+        - series: temperature
+          experiment: AgI/Cl-005
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -518,7 +536,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.844
           fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
-        - experiment: AgI/Cl-020
+        - series: temperature
+          experiment: AgI/Cl-020
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 420
@@ -536,7 +555,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.931
           fCl2_bar: {value: 1.38e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-020, column: all}
-        - experiment: AgI/Cl-043
+        - series: temperature
+          experiment: AgI/Cl-043
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -555,7 +575,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.702
           fCl2_bar: {value: 8.44e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-043, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-043, column: all}
-        - experiment: AgI/Cl-027
+        - series: temperature
+          experiment: AgI/Cl-027
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -574,7 +595,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.778
           fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
-        - experiment: AgI/Cl-044
+        - series: temperature
+          experiment: AgI/Cl-044
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 3
@@ -593,7 +615,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.814
           fCl2_bar: {value: 1.97e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-044, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-044, column: all}
-        - experiment: AgI/Cl-045
+        - series: temperature
+          experiment: AgI/Cl-045
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 31
@@ -612,7 +635,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.832
           fCl2_bar: {value: 8.30e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-045, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-045, column: all}
-        - experiment: AgI/Cl-032
+        - series: pressure
+          experiment: AgI/Cl-032
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -630,7 +654,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.909
           fCl2_bar: {value: 1.09e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-032, column: all}
-        - experiment: AgI/Cl-019
+        - series: pressure
+          experiment: AgI/Cl-019
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -648,7 +673,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.858
           fCl2_bar: {value: 7.46e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-019, column: all}
-        - experiment: AgI/Cl-005
+        - series: pressure
+          experiment: AgI/Cl-005
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -666,7 +692,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.844
           fCl2_bar: {value: 3.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-005, column: all}
-        - experiment: AgI/Cl-021
+        - series: pressure
+          experiment: AgI/Cl-021
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -684,7 +711,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.830
           fCl2_bar: {value: 1.20e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-021, column: all}
-        - experiment: AgI/Cl-051
+        - series: pressure
+          experiment: AgI/Cl-051
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -702,7 +730,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.865
           fCl2_bar: {value: 1.07e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-051, column: all}
-        - experiment: AgI/Cl-008
+        - series: pressure
+          experiment: AgI/Cl-008
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 60
@@ -720,7 +749,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.851
           fCl2_bar: {value: 5.43e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-008, column: all}
-        - experiment: AgI/Cl-052
+        - series: pressure
+          experiment: AgI/Cl-052
           composition_label: CMAS
           composition_wt_pct: *cmas_oxides
           time_min: 120
@@ -738,7 +768,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.852
           fCl2_bar: {value: 2.05e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-052, column: all}
-        - experiment: AgI/Cl-050
+        - series: pressure
+          experiment: AgI/Cl-050
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -757,7 +788,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.879
           fCl2_bar: {value: 1.37e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-050, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-050, column: all}
-        - experiment: AgI/Cl-048
+        - series: pressure
+          experiment: AgI/Cl-048
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -776,7 +808,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.821
           fCl2_bar: {value: 6.95e-05, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-048, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-048, column: all}
-        - experiment: AgI/Cl-027
+        - series: pressure
+          experiment: AgI/Cl-027
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 60
@@ -795,7 +828,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.778
           fCl2_bar: {value: 4.24e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-027, column: all}
-        - experiment: AgI/Cl-049
+        - series: pressure
+          experiment: AgI/Cl-049
           composition_label: ICB
           composition_wt_pct: *icb_oxides
           time_min: 150
@@ -814,7 +848,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.657
           fCl2_bar: {value: 1.55e-03, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-049, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 7, published_page: 6, table: '2', row: AgI/Cl-049, column: all}
-        - experiment: AgI/Cl-024
+        - series: pressure
+          experiment: AgI/Cl-024
           composition_label: CMAS + FeO
           composition_status: partial_printed_composition
           composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
@@ -834,7 +869,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.887
           fCl2_bar: {value: 2.96e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-024, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-024, column: all}
-        - experiment: AgI/Cl-025
+        - series: pressure
+          experiment: AgI/Cl-025
           composition_label: CMAS + FeO
           composition_status: partial_printed_composition
           composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
@@ -854,7 +890,8 @@ species:
           molar_Ag_over_Ag_Pt: 0.864
           fCl2_bar: {value: 2.46e-04, units: bar, method_class: calculated, evidence_class: model_derived, derivation: 'Eq. 11 mass-balance/ideal-mixture correction from printed ratios', locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-025, column: 'f(Cl2)'}}
           locator: {pdf_page_index: 8, published_page: 7, table: '2', row: AgI/Cl-025, column: all}
-        - experiment: AgI/Cl-026
+        - series: pressure
+          experiment: AgI/Cl-026
           composition_label: CMAS + FeO
           composition_status: partial_printed_composition
           composition_refusal: 'Complete Fe-bearing melt composition is not printed; only CMAS label and FeO wt% are retained.'
