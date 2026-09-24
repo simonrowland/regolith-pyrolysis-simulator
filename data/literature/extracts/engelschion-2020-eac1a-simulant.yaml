@@ -62,53 +62,6 @@ experiments:
 species:
   EAC-1A:
     observations:
-    - observation_id: engelschion_2020_eac1a_water_release
-      type: mass_loss
-      locator:
-        page: 2
-        section: Density
-        standard: ASTM D4442
-      phase: granular_lunar_regolith_simulant
-      regime: air_drying_before_density_measurement
-      units: wt percent, as printed
-      values:
-        quantity: water_released_during_drying
-        method_class: measured
-        evidence_class: authors_own_measurement
-        water_released_wt_pct_as_printed: '~0.8'
-        drying_atmosphere: air
-        procedure: heating and drying before density measurement
-      uncertainty:
-        note: approximate value; no numeric uncertainty printed.
-    - observation_id: engelschion_2020_eac1_dsc
-      experiment: dsc-simulant-series
-      type: phase_transition
-      locator:
-        page: 5
-        section: DSC
-        figure: '6'
-      phase: EAC-1A_and_comparison_simulants
-      regime: argon_dsc
-      units: degrees Celsius, K/minute, mm, as printed
-      values:
-        quantity: dsc_thermal_characterization
-        method_class: measured
-        evidence_class: authors_own_measurement
-        simulants_tested: 6, including EAC-1
-        instrument: Pegasus DSC 404 C
-        atmosphere: argon
-        crucible_diameter_mm: 5
-        crucible_height_mm: 5
-        heating_rate_K_per_min: 10
-        temperature_start: room temperature
-        temperature_end_C: 1200
-        EAC1A_phase_description: fully crystallised
-        EAC1A_endothermic_peak_C: 1080-1250
-        EAC1A_major_exothermic_transformations: none
-        comparison_materials_fully_crystallised: EAC-1, NU-LHT-3M, FJS-1, DNA
-      uncertainty:
-        note: peak is printed as a range; no numeric uncertainty printed.
-    context:
     - observation_id: engelschion_2020_eac1a_grain_size_distribution
       type: characterization
       locator:
@@ -136,6 +89,24 @@ species:
         note: >-
           The median grain size is printed as approximately 11 micrometres;
           the source does not print a numeric uncertainty.
+    - observation_id: engelschion_2020_eac1a_water_release
+      type: mass_loss
+      locator:
+        page: 2
+        section: Density
+        standard: ASTM D4442
+      phase: granular_lunar_regolith_simulant
+      regime: air_drying_before_density_measurement
+      units: wt percent, as printed
+      values:
+        quantity: water_released_during_drying
+        method_class: measured
+        evidence_class: authors_own_measurement
+        water_released_wt_pct_as_printed: '~0.8'
+        drying_atmosphere: air
+        procedure: heating and drying before density measurement
+      uncertainty:
+        note: approximate value; no numeric uncertainty printed.
     - observation_id: engelschion_2020_eac1a_density
       type: characterization
       locator:
@@ -331,9 +302,36 @@ species:
         pyroxenes: mainly Mg-rich augite; no enstatite in EAC-1
       uncertainty:
         note: comparative plagioclase ranges and the EDX dead-time bound retained as printed.
+    - observation_id: engelschion_2020_eac1_dsc
+      experiment: dsc-simulant-series
+      type: thermal_transition
+      locator:
+        page: 5
+        section: DSC
+        figure: '6'
+      phase: EAC-1A_and_comparison_simulants
+      regime: argon_dsc
+      units: degrees Celsius, K/minute, mm, as printed
+      values:
+        quantity: dsc_thermal_characterization
+        method_class: measured
+        evidence_class: authors_own_measurement
+        simulants_tested: 6, including EAC-1
+        instrument: Pegasus DSC 404 C
+        atmosphere: argon
+        crucible_diameter_mm: 5
+        crucible_height_mm: 5
+        heating_rate_K_per_min: 10
+        temperature_start: room temperature
+        temperature_end_C: 1200
+        EAC1A_phase_description: fully crystallised
+        EAC1A_endothermic_peak_C: 1080-1250
+        EAC1A_major_exothermic_transformations: none
+        comparison_materials_fully_crystallised: EAC-1, NU-LHT-3M, FJS-1, DNA
+      uncertainty:
+        note: peak is printed as a range; no numeric uncertainty printed.
   EAC-1:
-    observations: []
-    context:
+    observations:
     - observation_id: engelschion_2020_eac1_provenance
       type: characterization
       locator:
