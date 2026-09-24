@@ -209,6 +209,10 @@ experiments:
 - <<: *t1_1600_1000_05
   experiment_id: t1_1400c_400hpa_0p5h
   locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 400 hPa, 0.5 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '40000'}}
@@ -231,6 +235,10 @@ experiments:
 - <<: *t1_1600_1000_05
   experiment_id: t1_1400c_200hpa_0p5h
   locator: {published_page: 207, pdf_page_index: 3, table: '1', note: '1400 C, 200 hPa, 0.5 h row'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1400 C; unit conversion only'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '20000'}}
@@ -948,7 +956,7 @@ species:
         equations:
         - {equation: '1', formula: 'log r = -A/T - log P + B', locator: {published_page: 208, pdf_page_index: 4, equation: '1'}}
         - {equation: '2', formula: 'log r = 3.239 - 10770/T - 0.311 log P; EA = 206.2 kJ/mol; standard deviation of r = +/- 5.79%', locator: {published_page: 208, pdf_page_index: 4, equation: '2'}}
-        - {equation: '3', formula: 'log r = 2.843 - 10528/T - 0.458 log P; EA = 201.6 kJ/mol; standard deviation of r = +/- 6.18%', locator: {published_page: 209, pdf_page_index: 5, equation: '3'}}
+        - {equation: '3', formula: 'log r = 2.843 - 10528/T - 0.458 log; EA = 201.6 kJ/mol; standard deviation of r = +/- 6.18%', locator: {published_page: 209, pdf_page_index: 5, equation: '3'}}
         - {equation: '4', formula: 'log r = 1.961 - 9003/T - 0.089 log P; EA = 172.4 kJ/mol; standard deviation of r = +/- 9.65%', locator: {published_page: 209, pdf_page_index: 5, equation: '4'}}
         - {equation: '5', formula: 'r_i = beta_i * P_i * M_i / (R * T)', definitions: 'beta_i mass-transfer coefficient; M_i molar mass; P_i partial vapour pressure; T absolute temperature; R gas constant', locator: {published_page: 209, pdf_page_index: 5, equation: '5'}}
     - observation_id: dacko_2004_table3_mass_transfer_relations
