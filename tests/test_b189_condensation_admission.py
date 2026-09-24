@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import copy
 from copy import deepcopy
 from itertools import product
+import pickle
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,6 +18,8 @@ from simulator.condensation import (
     CONDENSATION_FLUX_DORMANT_REFUSAL,
     CondensationModel,
     WallSaturationPressureRefusal,
+    _FrozenCatalogDict,
+    _FrozenCatalogList,
     _freeze_catalog_value,
     _antoine_psat_pa,
     _condensation_admission_refusal,
@@ -31,6 +35,7 @@ from simulator.condensation import (
 from simulator.diagnostic_helpers.extract_reproduction import _engine_pure_psat_pa
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.vapour_rail.catalog import (
+    CatalogCompileError,
     HotTrainInapplicable,
     compiled_catalog_for,
     vapor_pressure_legacy_view,
@@ -116,10 +121,7 @@ def test_route_catalog_payload_refuses_mutation_between_batches(payload, monkeyp
         ]["code_metadata"]["hot_train_applicability"] = "not_applicable"
 
 
-def test_route_catalog_reuses_by_identity_without_content_snapshot(
-    payload, monkeypatch
-):
-    import simulator.condensation as condensation_module
+def test_route_catalog_compiles_once_per_route(payload, monkeypatch):
     import simulator.vapour_rail.catalog as catalog_module
 
     model = _configured_model(payload, "Na")
@@ -131,17 +133,93 @@ def test_route_catalog_reuses_by_identity_without_content_snapshot(
         return original(*args, **kwargs)
 
     monkeypatch.setattr(catalog_module, "compiled_catalog_for", counted)
-    monkeypatch.setattr(
-        condensation_module,
-        "_catalog_content_snapshot",
-        lambda value: pytest.fail("route lookup performed a content snapshot"),
-        raising=False,
-    )
     model.route(
         EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
         MeltState(),
     )
     assert len(calls) == 1
+
+
+def test_frozen_catalog_survives_deepcopy_and_refusal_snapshot(payload):
+    import simulator.core as core_module
+
+    model = _configured_model(payload, "Na")
+    copied_model = copy.deepcopy(model)
+    refusal_state = core_module._deepcopy_refusal_state(
+        {"_condensation_model": model}, {}
+    )
+    restored_model = refusal_state["_condensation_model"]
+    family_id = compiled_catalog_for(payload).species["Na"].family_id
+
+    for candidate in (copied_model, restored_model):
+        copied_payload = candidate.vapor_pressure_data.catalog_payload
+        assert isinstance(copied_payload, _FrozenCatalogDict)
+        assert isinstance(copied_payload["families"], _FrozenCatalogDict)
+        assert isinstance(
+            copied_payload["families"][family_id]["physical_properties"][
+                "species"
+            ]["Na"]["pressure_models"],
+            _FrozenCatalogList,
+        )
+
+    flux = EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0)
+    expected = model.route(flux, MeltState())
+    assert copied_model.route(
+        EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
+        MeltState(),
+    ) == expected
+    assert restored_model.route(
+        EvaporationFlux(species_kg_hr={"Na": 1.0}, total_kg_hr=1.0),
+        MeltState(),
+    ) == expected
+
+
+def test_frozen_catalog_supports_pickle_copy_and_yaml_dump(payload):
+    frozen = _freeze_catalog_value(payload)
+    family_id = compiled_catalog_for(payload).species["Na"].family_id
+
+    pickled = pickle.loads(pickle.dumps(frozen))
+    shallow = copy.copy(frozen)
+    dumped = yaml.safe_dump(frozen)
+    round_tripped = yaml.safe_load(dumped)
+
+    for candidate in (pickled, shallow):
+        assert isinstance(candidate, _FrozenCatalogDict)
+        assert isinstance(candidate["families"], _FrozenCatalogDict)
+        assert isinstance(
+            candidate["families"][family_id]["physical_properties"][
+                "species"
+            ]["Na"]["pressure_models"],
+            _FrozenCatalogList,
+        )
+        assert candidate == frozen
+    assert round_tripped == frozen
+
+
+def test_catalog_compile_rejects_boolean_activity_exponent(payload):
+    mutated = deepcopy(payload)
+    family_id = compiled_catalog_for(mutated).species["Na"].family_id
+    pressure_model = mutated["families"][family_id]["physical_properties"][
+        "species"
+    ]["Na"]["pressure_models"][0]
+    pressure_model["activity_exponent"] = True
+
+    with pytest.raises(CatalogCompileError, match="activity_exponent"):
+        compiled_catalog_for(mutated, emit_u0_request_rules=False)
+
+
+def test_replacing_frozen_catalog_payload_refuses_hot_train(payload):
+    model = _configured_model(payload, "Na")
+    replacement = deepcopy(payload)
+    _set_applicability(replacement, "Na", "not_applicable")
+    model.vapor_pressure_data.catalog_payload = _freeze_catalog_value(replacement)
+
+    with pytest.raises(HotTrainInapplicable):
+        _antoine_psat_pa(
+            "Na",
+            1200.0,
+            vapor_pressure_data=model.vapor_pressure_data,
+        )
 
 
 def test_route_catalog_payload_refuses_mid_batch_mutation(payload, monkeypatch):
@@ -165,7 +243,7 @@ def test_route_catalog_payload_refuses_mid_batch_mutation(payload, monkeypatch):
 
 def test_route_distinguishes_catalog_payloads(payload, monkeypatch):
     model = _configured_model(payload, "Na")
-    other = deepcopy(model.vapor_pressure_data.catalog_payload)
+    other = deepcopy(payload)
     _set_applicability(other, "Na", "not_applicable")
     other = _freeze_catalog_value(other)
 

@@ -4825,11 +4825,22 @@ class _FrozenCatalogDict(dict):
         raise TypeError("condensation catalog payload is immutable")
 
     def __deepcopy__(self, memo):
-        clone = {}
+        clone = _FrozenCatalogDict()
         memo[id(self)] = clone
-        for key, value in self.items():
-            clone[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        dict.__init__(
+            clone,
+            (
+                (
+                    copy.deepcopy(key, memo),
+                    copy.deepcopy(value, memo),
+                )
+                for key, value in self.items()
+            ),
+        )
         return clone
+
+    def __reduce__(self):
+        return (_rebuild_frozen_catalog_dict, (tuple(self.items()),))
 
 
 class _FrozenCatalogList(list):
@@ -4872,10 +4883,41 @@ class _FrozenCatalogList(list):
         raise TypeError("condensation catalog payload is immutable")
 
     def __deepcopy__(self, memo):
-        clone = []
+        clone = _FrozenCatalogList()
         memo[id(self)] = clone
-        clone.extend(copy.deepcopy(value, memo) for value in self)
+        list.__init__(
+            clone,
+            (copy.deepcopy(value, memo) for value in self),
+        )
         return clone
+
+    def __reduce__(self):
+        return (_rebuild_frozen_catalog_list, (tuple(self),))
+
+
+def _rebuild_frozen_catalog_dict(items):
+    clone = _FrozenCatalogDict()
+    dict.__init__(clone, items)
+    return clone
+
+
+def _rebuild_frozen_catalog_list(items):
+    clone = _FrozenCatalogList()
+    list.__init__(clone, items)
+    return clone
+
+
+# PyYAML's safe representer dispatches by exact runtime type. Register the
+# schema-compatible subclasses as their immutable built-in counterparts so
+# serializing a frozen payload never invokes a mutation-based constructor.
+yaml.SafeDumper.add_representer(
+    _FrozenCatalogDict,
+    yaml.representer.SafeRepresenter.represent_dict,
+)
+yaml.SafeDumper.add_representer(
+    _FrozenCatalogList,
+    yaml.representer.SafeRepresenter.represent_list,
+)
 
 
 def _freeze_catalog_value(value):
@@ -4903,6 +4945,9 @@ def _condensation_catalog(vapor_pressure_data, catalog_payload):
     # sufficient: mutation cannot make a cached catalog stale. This remaining
     # check rejects a different payload, while route() clears the slot in its
     # finally block so a later route starts from a fresh catalog identity.
+    # Production callers never invoke the unbound dict.__setitem__ escape hatch;
+    # that base-slot write is out of scope. Whole-payload replacement misses the
+    # identity check and is recompiled against its own declaration.
     if hasattr(vapor_pressure_data, '_route_catalog') and not isinstance(
         catalog_payload, _FrozenCatalogDict
     ):
