@@ -718,7 +718,7 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
                 assert volume.locator is not None
                 assert volume.inference.relation == "cm3_to_m3"
         else:
-            assert len(result.observations) == 46
+            assert len(result.observations) == 88
             assert not any(quantity_token(o.identity) is Quantity.FUGACITY for o in result.observations.values())
             rows = [o for o in result.observations.values() if "table2_experimental_conditions_and_xaf" in o.observation_id]
             assert len(rows) == 43

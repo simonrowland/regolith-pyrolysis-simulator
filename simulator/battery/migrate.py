@@ -8384,6 +8384,15 @@ class Migrator:
                 )
             if self._count(source_key).observations_out > before:
                 return
+        row_point_containers: list[list[Any]] = []
+        if isinstance(values, Mapping):
+            row_items = values.get("rows")
+            if isinstance(row_items, list) and row_items:
+                row_point_containers.append(row_items)
+            if yield_items is None:
+                point_items = values.get("points")
+                if isinstance(point_items, list) and point_items:
+                    row_point_containers.append(point_items)
         if exploded and isinstance(values.get("series"), list):
             before = self._count(source_key).observations_out
             for item in exploded:
@@ -8417,6 +8426,33 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        elif row_point_containers:
+            # Same _emit_exploded_point path as series. Yield tables already
+            # returned. Explicit row point_conditions overwrite inferred ones.
+            before = self._count(source_key).observations_out
+            for container in row_point_containers:
+                for index, raw in enumerate(container):
+                    self._emit_exploded_point(
+                        parent_id=obs_id,
+                        item={"index": index, "item": raw, "units": obs.get("units")},
+                        work=work,
+                        source_id=source_id,
+                        source_key=source_key,
+                        experiment_id=experiment_id,
+                        locator=locator,
+                        identity_base=(quantity, species, ident_kwargs),
+                        evidence=evidence,
+                        admission=admission,
+                        uncertainty=uncertainty_for(obs.get("uncertainty")),
+                        units=str(obs.get("units") or ""),
+                        read_from=read_from,
+                        derived_from=derived_from,
+                        source_derivation=source_derivation,
+                        equipment=obs.get("equipment"),
+                        parent_values=values,
+                    )
+            if self._count(source_key).observations_out > before:
+                return
         elif not value_sel.available:
             self.result.add_queue(
                 work.work_id,
