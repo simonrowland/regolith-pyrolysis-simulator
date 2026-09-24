@@ -457,6 +457,38 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
+def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"]["series"][0][
+        "point_conditions"
+    ] = {
+        "total_pressure_Pa": {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "interval",
+                    "interval_low": "10",
+                    "interval_high": "20",
+                },
+            }
+        }
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == as_decimal("1200")
+    )
+    pressure = point.point_conditions["total_pressure_Pa"]
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.INTERVAL
+    assert pressure.state.value.interval_low == as_decimal("10")
+    assert pressure.state.value.interval_high == as_decimal("20")
+
+
 def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["values"].pop("admission_status")
