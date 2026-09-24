@@ -13,15 +13,15 @@ def test_wall_advisory_parses_one_material_revision_for_repeated_ticks(
     monkeypatch,
 ) -> None:
     wall_advisor._load_wall_materials_cached.cache_clear()
-    original_safe_load = wall_advisor.yaml.safe_load
+    original_load = wall_advisor.load_cached_safe_yaml
     parse_calls = 0
 
-    def counted_safe_load(stream):
+    def counted_load(payload, **kwargs):
         nonlocal parse_calls
         parse_calls += 1
-        return original_safe_load(stream)
+        return original_load(payload, **kwargs)
 
-    monkeypatch.setattr(wall_advisor.yaml, "safe_load", counted_safe_load)
+    monkeypatch.setattr(wall_advisor, "load_cached_safe_yaml", counted_load)
     first = wall_advisory_payload(["SiO", "Na"], pO2_mbar=0.1)
     second = wall_advisory_payload(["SiO", "Na"], pO2_mbar=0.1)
 

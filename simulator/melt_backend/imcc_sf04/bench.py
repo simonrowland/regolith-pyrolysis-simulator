@@ -40,7 +40,7 @@ from pathlib import Path
 from typing import Any, TextIO
 
 import numpy as np
-from simulator.yaml_cache import load_cached_safe_yaml
+import yaml
 
 from simulator.melt_backend.imcc_sf04 import (
     ImccCompositionOutsideValidatedEnvelopeError,
@@ -252,7 +252,7 @@ def composition_wt_pct_for_point(
 
 
 def load_bench_set(path: Path) -> dict[str, Any]:
-    data = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("schema_version") != "melt-activity-bench.v1":
         raise ValueError(f"unsupported melt activity bench set: {path}")
     if not data.get("compositions") or not data.get("points"):
