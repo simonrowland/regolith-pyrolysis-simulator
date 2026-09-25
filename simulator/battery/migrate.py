@@ -4057,6 +4057,10 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
+        elif item.startswith("tables:"):
+            # A reduced literature value may cite the registered table asset
+            # that carries the source's calibration/measurement lineage.
+            parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it
             # dangles, the store validator flags the extract, not us.
@@ -6660,6 +6664,7 @@ def _pressure_located(
     printed_key: str,
     published: str,
     quote: str | None,
+    source_derivation: str | None,
 ) -> Located[Value] | None:
     si, trail = convert_pressure_to_pa(amount_in_printed_unit, units)
     if si is None or si <= 0 or trail is None:
@@ -6673,7 +6678,7 @@ def _pressure_located(
         if quote:
             extras.append(f"quote={quote}")
         inference = Derivation(
-            relation=base.relation,
+            relation=source_derivation.strip() if source_derivation else base.relation,
             inputs=base.inputs + tuple(extras),
             parameters=base.parameters,
             output_unit=base.output_unit,
@@ -6803,6 +6808,11 @@ def _walk_printed_oxygen(
                 located = _pressure_located(
                     amount, units, locator,
                     printed_key=name, published=published, quote=quote_text,
+                    source_derivation=(
+                        str(node.get("derivation")).strip()
+                        if isinstance(node.get("derivation"), str)
+                        else None
+                    ),
                 )
                 if located is None or not located.state.is_value:
                     continue
@@ -8333,6 +8343,18 @@ class Migrator:
             )
         elif q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
+        if raw_adm == AdmissionStatus.ADMITTED.value:
+            oxygen = collect_printed_oxygen(
+                (values,), locator, skip_tables=True
+            ).oxygen_partial_pressure_Pa
+            if oxygen is not None and oxygen.state.is_value:
+                oxygen_value = oxygen.state.value
+                if (
+                    isinstance(oxygen_value, Value)
+                    and oxygen_value.kind is ValueKind.POINT
+                    and oxygen_value.point is not None
+                ):
+                    ident_kwargs["fO2_Pa"] = State.of(oxygen_value.point)
         if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         elif t_known is None and t_sel.condition_ranges:
@@ -8483,6 +8505,23 @@ class Migrator:
             obs, values, source_id, local_ids
         )
         derived_from = derived_parents or None
+        raw_derivation = values.get("derivation")
+        if raw_derivation is None:
+            raw_derivation = obs.get("derivation")
+        # Legacy extracts also use ``derivation`` for page/quote prose. Only
+        # promote the structured table-asset form; it has resolvable lineage.
+        derivation = (
+            _derivation_from_plain(raw_derivation)
+            if (
+                isinstance(raw_derivation, Mapping)
+                and isinstance(raw_derivation.get("inputs"), (list, tuple))
+                and any(
+                    str(item).startswith("tables:")
+                    for item in raw_derivation["inputs"]
+                )
+            )
+            else None
+        )
         for prose_item in derived_prose:
             self.result.add_queue(
                 work.work_id,
@@ -8637,6 +8676,7 @@ class Migrator:
             read_from=read_from,
             point_conditions=point_conditions,
             derived_from=derived_from,
+            derivation=derivation,
         )
         self._queue_unstated_derived_lineage(
             work.work_id,
@@ -8645,7 +8685,7 @@ class Migrator:
             obs_id,
             evidence,
             derived_from,
-            None,
+            derivation,
         )
         self._add_observation(observation, source_key)
 

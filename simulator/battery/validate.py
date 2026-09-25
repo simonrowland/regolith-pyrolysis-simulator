@@ -1032,7 +1032,7 @@ def validate_observation(
             )
     if observation.derived_from:
         for parent in observation.derived_from:
-            if parent not in observations:
+            if parent not in observations and parent not in asset_ids:
                 issues.append(
                     _issue(
                         f"{path}.derived_from",

@@ -176,14 +176,61 @@ def test_g1_unmapped_series_does_not_deny_numbers():
 
 
 def test_g2_plante_source_points_and_comparison_fence(tmp_path):
+    """Plante fence is the admission split, not a single p_partial count.
+
+    162 superseded parents, 162 admitted homogeneous successors, and 59
+    superscript-a rows stay pending. Changing the total from 221 to 383
+    does not by itself keep the 59 pending.
+    """
+
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-042-plante-1979.yaml")
     result = migrate(root, write=False)
     measured = [o for o in result.observations.values()
                 if o.source_id == "kems-042-plante-1979" and quantity_token(o.identity) is Quantity.P_PARTIAL]
-    assert len(measured) == 221
-    assert all(o.value.kind is ValueKind.POINT for o in measured)
+    buckets: dict[str, list] = {}
+    for obs in measured:
+        buckets.setdefault(obs.admission.status.value, []).append(obs)
+    assert set(buckets) == {"admitted", "pending", "superseded"}
+    assert len(buckets["superseded"]) == 162
+    assert len(buckets["admitted"]) == 162
+    assert len(buckets["pending"]) == 59
+    assert len(measured) == 383
+    assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
     assert sum(bool(o.notices) for o in measured) == 59
+    factor = Decimal("0.226")
+    tolerance = Decimal("1e-12")
+    for obs in buckets["admitted"]:
+        composition = obs.identity.composition
+        assert composition is not None and composition.is_value and composition.value is not None
+        assert {oxide for oxide, _amount in composition.value.components} == {"K2O", "SiO2"}
+        assert "s1214" not in obs.observation_id
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is not None and fo2.is_value and fo2.value is not None
+        assert abs(fo2.value - factor * obs.value.point) <= tolerance
+        assert obs.derivation is not None
+        assert "P_K = k_K I_K+ T" in obs.derivation.relation
+        assert "sqrt(T)" not in obs.derivation.relation
+    assert len([obs for obs in buckets["pending"] if "s1214" in obs.observation_id]) == 37
+    for obs in buckets["pending"]:
+        assert obs.admission.status.value == "pending"
+        composition = obs.identity.composition
+        assert composition is None or not composition.is_value
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is None or not fo2.is_value
+    for obs in buckets["superseded"]:
+        assert obs.admission.superseded_by
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is None or not fo2.is_value
+    parent = result.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1115_003_1404K"
+    ]
+    successor = result.observations[
+        "kems-042-plante-1979::plante1979_table2_s1115_r004_quoted"
+    ]
+    parent_k2o = dict(parent.identity.composition.value.components)["K2O"]
+    successor_k2o = dict(successor.identity.composition.value.components)["K2O"]
+    assert parent_k2o == successor_k2o
     for oid, temperature, pressure in [
         ("plante1979_table2_s1104_r001_quoted", "1302", "6.91e-7"),
         ("plante1979_table2_s1123_r030_quoted", "1356", "2.51e-7"),
@@ -192,6 +239,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         source = _extract_observation("kems-042-plante-1979.yaml", oid)
         assert Decimal(str(source["values"]["P_K_atm_as_published"])) == Decimal(pressure)
         assert Decimal(str(source["values"]["T_K_as_published"])) == Decimal(temperature)
+        assert "activity" not in source["values"]
         obs = result.observations[f"kems-042-plante-1979::{oid}"]
         assert quantity_token(obs.identity) is Quantity.P_PARTIAL
         assert obs.value.kind is ValueKind.POINT
@@ -201,7 +249,10 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             if "s1123" in oid:
                 assert source["values"]["composition_K2O_wt_percent_as_published"] == 21.14
             assert any(source["values"]["reason"] in n.reason for n in obs.notices)
-            assert obs.admission.status.value != "admitted"
+            assert obs.admission.status.value == "pending"
+        else:
+            assert obs.admission.status.value == "admitted"
+            assert obs.identity.fO2_Pa.is_value
 
 
 def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
