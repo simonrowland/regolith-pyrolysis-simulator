@@ -4057,6 +4057,10 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
+        elif item.startswith("tables:"):
+            # A reduced literature value may cite the registered table asset
+            # that carries the source's calibration/measurement lineage.
+            parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it
             # dangles, the store validator flags the extract, not us.
@@ -8483,6 +8487,23 @@ class Migrator:
             obs, values, source_id, local_ids
         )
         derived_from = derived_parents or None
+        raw_derivation = values.get("derivation")
+        if raw_derivation is None:
+            raw_derivation = obs.get("derivation")
+        # Legacy extracts also use ``derivation`` for page/quote prose. Only
+        # promote the structured table-asset form; it has resolvable lineage.
+        derivation = (
+            _derivation_from_plain(raw_derivation)
+            if (
+                isinstance(raw_derivation, Mapping)
+                and isinstance(raw_derivation.get("inputs"), (list, tuple))
+                and any(
+                    str(item).startswith("tables:")
+                    for item in raw_derivation["inputs"]
+                )
+            )
+            else None
+        )
         for prose_item in derived_prose:
             self.result.add_queue(
                 work.work_id,
@@ -8637,6 +8658,7 @@ class Migrator:
             read_from=read_from,
             point_conditions=point_conditions,
             derived_from=derived_from,
+            derivation=derivation,
         )
         self._queue_unstated_derived_lineage(
             work.work_id,
@@ -8645,7 +8667,7 @@ class Migrator:
             obs_id,
             evidence,
             derived_from,
-            None,
+            derivation,
         )
         self._add_observation(observation, source_key)
 
