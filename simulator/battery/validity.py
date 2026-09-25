@@ -127,7 +127,13 @@ def _calibration_grounded(calibration: object) -> bool:
     for located in calibration.values():
         if not isinstance(located, Located):
             return False
-        if not located.state.is_value or located.state.value is None:
+        if (
+            not located.state.is_value
+            or located.state.value is None
+            or located.locator is None
+            or not located.locator.has_location()
+            or located.inference is not None
+        ):
             return False
     return True
 

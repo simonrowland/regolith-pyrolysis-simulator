@@ -39,6 +39,7 @@ from simulator.battery.pins import (
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
+    Derivation,
     Execution,
     Located,
     Notice,
@@ -644,6 +645,43 @@ def test_knudsen_absolute_flux_requires_orifice_area() -> None:
         c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
     )
     assert "orifice_area_m2" in missing
+
+
+@pytest.mark.parametrize(
+    "calibration",
+    (
+        {"standard": Located(State.of("Ag"))},
+        {
+            "standard": Located(
+                State.of("Ag"),
+                locator=F.loc(page=271),
+                inference=Derivation(
+                    "extract_inference", ("inferred=true",), (), "as_published"
+                ),
+            )
+        },
+    ),
+)
+def test_kems_calibration_requires_located_recorded_provenance(calibration) -> None:
+    experiment = F.kems_experiment(
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    assert experiment.apparatus is not None
+    experiment = replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, calibration=calibration),
+    )
+
+    gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "kems_calibration"
+    check = next(item for item in gate.checks if item.name == "kems_calibration")
+    assert check.detail["missing"] == ["calibration"]
 
 
 def test_battery_score_script_runs_status_diff() -> None:

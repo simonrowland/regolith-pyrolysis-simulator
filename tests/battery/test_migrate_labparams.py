@@ -55,6 +55,35 @@ _YAM_OBSERVATION_IDS = {
     "yam1983::yam1983_sio2_table2_minus_log10_a_AT_B",
 }
 
+_WETZEL_EXTRACT = (
+    REPO_ROOT / "data" / "literature" / "extracts" / "kems-011-wetzel-gail-2013.yaml"
+)
+
+
+def test_wetzel_sio_film_source_is_not_mapped_to_kems(tmp_path: Path) -> None:
+    doc = yaml.load(_WETZEL_EXTRACT.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+    assert doc["experiments"][0]["method"] == "solid_SiO_growth_coefficient"
+    row = next(
+        item
+        for item in doc["species"]["SiO"]["observations"]
+        if item["observation_id"] == "wetzel_gail_2013_sio_ta_knudsen_geometry_partial"
+    )
+
+    assert row["regime"] == "solid_SiO_growth_coefficient"
+    assert map_method(row["regime"]).is_unknown
+
+    root = _write_min_tree(tmp_path)
+    extract = root / "data" / "literature" / "extracts" / _WETZEL_EXTRACT.name
+    extract.write_text(_WETZEL_EXTRACT.read_text(encoding="utf-8"), encoding="utf-8")
+    migrator = Migrator(root, index={}, aliases={})
+    migrator.migrate_extracts()
+    experiment = next(
+        item
+        for item in migrator.result.experiments.values()
+        if item.experiment_id.endswith("::experiment::sio-film-measurement-series")
+    )
+    assert experiment.method.is_unknown
+
 
 def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> None:
     text = _YAM_EXTRACT.read_text(encoding="utf-8")
