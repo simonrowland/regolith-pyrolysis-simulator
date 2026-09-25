@@ -9,10 +9,13 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import MethodToken
 from simulator.battery.migrate import (
     REPO_ROOT,
+    Migrator,
     apparatus_from_equipment,
     experiment_from_plain,
+    map_method,
     migrate,
     pressure_from_equipment,
     sample_from_equipment,
@@ -20,6 +23,104 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+@pytest.mark.parametrize(
+    ("printed_method", "expected"),
+    [
+        ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
+        ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
+    ],
+)
+def test_printed_method_aliases_map_to_closed_tokens(
+    printed_method: str, expected: MethodToken
+) -> None:
+    mapped = map_method(printed_method)
+    assert mapped.is_value
+    assert mapped.value is expected
+
+
+# Printed 「3. 起電力測定」 under 「II. 実験方法」. The heading is on published
+# page 737; the temperature-stabilization paragraph continues on page 738
+# above 「III. 実験結果および考察」. Roman III on that page is results.
+_YAM_EMF_PROCEDURE_SECTION = "II.3. EMF measurement"
+_YAM_EXTRACT = REPO_ROOT / "data" / "literature" / "extracts" / "yam1983.yaml"
+_YAM_OBSERVATION_IDS = {
+    "yam1983::yam1983_na2o_table1_minus_log10_a_AT_B",
+    "yam1983::yam1983_na2o_prose_activity_range",
+    "yam1983::yam1983_sio2_table2_minus_log10_a_AT_B",
+}
+
+
+def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> None:
+    text = _YAM_EXTRACT.read_text(encoding="utf-8")
+    assert "III. EMF measurement" not in text
+    assert text.count(f"'{_YAM_EMF_PROCEDURE_SECTION}'") == 6
+
+    doc = yaml.safe_load(text)
+    experiment = doc["experiments"][0]
+    assert experiment["experiment_id"] == "na2o-sio2-emf-series"
+    assert experiment["method"] == "emf_cell"
+    assert experiment["locator"]["page"] == 738
+    assert experiment["locator"]["section"] == _YAM_EMF_PROCEDURE_SECTION
+    assert "sample preparation" in experiment["locator"]["note"]
+
+    bench = doc["benches"][0]
+    anchor = bench["apparatus_family"]["locator"]
+    assert anchor["page"] == 738
+    assert anchor["section"] == _YAM_EMF_PROCEDURE_SECTION
+    assert bench["heating_method"]["locator"] is anchor
+    assert bench["detector"]["locator"] is anchor
+    stability_src = next(
+        fact for fact in bench["other_facts"] if fact["name"] == "furnace_temperature_stability"
+    )
+    assert stability_src["value"]["locator"]["section"] == _YAM_EMF_PROCEDURE_SECTION
+    assert experiment["conditions"]["temperature_K"]["locator"]["section"] == (
+        _YAM_EMF_PROCEDURE_SECTION
+    )
+
+    extracts = tmp_path / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (extracts / "yam1983.yaml").write_text(text, encoding="utf-8")
+    migrator = Migrator(tmp_path, index={}, aliases={})
+    migrator.migrate_extracts()
+
+    lifted = next(
+        item
+        for item in migrator.result.experiments.values()
+        if item.experiment_id.endswith("::experiment::na2o-sio2-emf-series")
+    )
+    assert lifted.method.is_value
+    assert lifted.method.value is MethodToken.EMF_CELL
+    assert not lifted.method.reason
+    assert lifted.locator is not None
+    assert lifted.locator.page == 738
+    assert lifted.locator.section == _YAM_EMF_PROCEDURE_SECTION
+    assert "sample preparation" in (lifted.locator.note or "")
+
+    lifted_bench = next(
+        item
+        for item in migrator.result.benches.values()
+        if item.id.endswith("::bench::beta-alumina-emf-cell")
+    )
+    assert lifted_bench.apparatus_family is not None
+    assert lifted_bench.apparatus_family.locator is not None
+    assert lifted_bench.apparatus_family.locator.section == _YAM_EMF_PROCEDURE_SECTION
+    assert lifted_bench.heating_method is not None
+    assert lifted_bench.heating_method.locator is not None
+    assert lifted_bench.heating_method.locator.section == _YAM_EMF_PROCEDURE_SECTION
+    stability = next(
+        fact for fact in lifted_bench.other_facts if fact.name == "furnace_temperature_stability"
+    )
+    assert stability.value.locator is not None
+    assert stability.value.locator.section == _YAM_EMF_PROCEDURE_SECTION
+
+    linked = {
+        observation.observation_id
+        for observation in migrator.result.observations.values()
+        if observation.experiment_id == lifted.experiment_id
+    }
+    assert linked == _YAM_OBSERVATION_IDS
 
 
 def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> None:
