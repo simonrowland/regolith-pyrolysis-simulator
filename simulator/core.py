@@ -371,7 +371,10 @@ from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
-from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.melt_backend.base import (
+    InternalAnalyticalBackend,
+    MeltCompositionError,
+)
 from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
@@ -4591,6 +4594,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if curve is None:
             try:
                 curve = self._freeze_gate_curve()
+            except MeltCompositionError:
+                raise
             except IntentResultStatusError:
                 # An engine that answered with a status we do not recognise is
                 # NOT an unavailable engine, and must not be routed to the

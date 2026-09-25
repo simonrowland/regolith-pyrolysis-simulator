@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from copy import deepcopy
 import math
 from types import SimpleNamespace
 
@@ -1455,6 +1456,62 @@ def test_composition_projected_invalid_fraction_is_typed_refusal(
 
     with pytest.raises(MeltCompositionError, match='composition_projected'):
         sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize('mass_fraction', [None, float('nan'), -0.01])
+def test_composition_projected_invalid_fraction_refuses_through_provider_kernel(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    mass_fraction,
+):
+    """The registered MAGEMin fallback must preserve typed refusal."""
+    from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    _diagnostic, notice = _lunar_composition_projected_diagnostic(sim)
+    malformed_notice = deepcopy(notice)
+    malformed_notice['dropped_components'][0]['mass_fraction'] = mass_fraction
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'synthetic-equilibrate'
+    calls = []
+
+    def equilibrate(*_args, **_kwargs):
+        calls.append(True)
+        return EquilibriumResult(
+            status='out_of_domain',
+            diagnostics={
+                'composition_projected_notice': deepcopy(malformed_notice),
+            },
+        )
+
+    backend.equilibrate = equilibrate
+    monkeypatch.setattr(
+        MAGEMinShadowProvider,
+        '_ensure_backend',
+        lambda _provider: backend,
+    )
+    sim.melt.temperature_C = 1400.0
+    before = sim._melt_redox_liquidus_gate_fallback_count
+
+    with pytest.raises(
+        MeltCompositionError,
+        match='composition_projected_invalid_mass_fraction',
+    ):
+        sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+
+    assert calls
+    assert sim._melt_redox_liquidus_gate_fallback_count == before
     assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
 
