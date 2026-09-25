@@ -79,6 +79,8 @@ QUANTITY_PRESSURE = "gas_partial_pressure_Pa"
 
 PO2_ENGINE_DEFAULT = "engine_default"
 PO2_COMMANDED = "commanded"
+# Caller stated oxygen is not an input. Never rewritten to log fO2 = -9.
+PO2_NOT_AN_INPUT = "not_an_input"
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
 REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
@@ -1757,6 +1759,11 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         temperature_K=float(payload["temperature_K"]),
         po2=po2,
         timeout_s=_finite_float(payload.get("timeout_s")),
+        physical_pressure_bar=(
+            None
+            if payload.get("physical_pressure_bar") is None
+            else float(payload["physical_pressure_bar"])
+        ),
         qualification=bool(payload.get("qualification")),
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
@@ -1853,6 +1860,7 @@ def _run_cell_in_subprocess(
     authority: str | None,
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
+    physical_pressure_bar: float | None = None,
 ) -> EquilibrateCell:
     hostname = _hostname()
     wall0 = time.perf_counter()
@@ -1870,6 +1878,8 @@ def _run_cell_in_subprocess(
         "arm": arm,
         "simulate_crash": simulate_crash,
     }
+    if physical_pressure_bar is not None:
+        payload["physical_pressure_bar"] = float(physical_pressure_bar)
     env = dict(os.environ)
     env.setdefault("PYTHONPATH", str(REPO_ROOT))
     pythonpath = env.get("PYTHONPATH") or ""
@@ -2109,6 +2119,8 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     if request.mode == PO2_COMMANDED:
         assert request.po2_bar is not None
         return math.log10(float(request.po2_bar))
+    if request.mode == PO2_NOT_AN_INPUT:
+        return None
     if handle.supports_intrinsic_fo2:
         return None
     return _DEFAULT_FO2_LOG
@@ -2144,6 +2156,7 @@ def equilibrate_cell(
     isolated: bool | None = None,
     arm: str | None = None,
     simulate_crash: str | None = None,
+    physical_pressure_bar: float | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
@@ -2198,6 +2211,7 @@ def equilibrate_cell(
             authority=authority,
             certified_band=certified_band,
             simulate_crash=simulate_crash,
+            physical_pressure_bar=physical_pressure_bar,
         )
 
     if not handle.available or handle.backend is None:
@@ -2217,7 +2231,10 @@ def equilibrate_cell(
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
-    physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+    if physical_pressure_bar is None:
+        physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+    else:
+        physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
     if handle.name == "alphamelts":
         from simulator.alphamelts_reference_pressure import (
