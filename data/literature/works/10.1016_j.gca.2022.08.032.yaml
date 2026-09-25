@@ -56,8 +56,8 @@ experiments:
 - experiment_id: 10.1016/j.gca.2022.08.032::experiment::sulfate-solubility-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'melt_equilibration_quench' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: quench_equilibration
   sample:
     mass_kg:
       state:

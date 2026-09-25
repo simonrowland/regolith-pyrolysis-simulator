@@ -2761,3 +2761,46 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     # class, so it is asserted as a whitelist member rather than helper-driven.
     assert "reduced_real_cache_state" in PER_HOUR_OPTIONAL_KEYS
     assert "reduced_real_cache_state" not in PER_HOUR_KEYS
+
+
+@pytest.mark.parametrize(
+    ("backend_name", "expected_notice"),
+    (("alphamelts", True), ("thermoengine", True), ("internal-analytical", False)),
+)
+def test_runner_provenance_flags_diagnostic_freeze_gate_authority(
+    backend_name: str,
+    expected_notice: bool,
+) -> None:
+    """Capability provenance works without starting an optional engine."""
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.backend = SimpleNamespace(backend_name=backend_name)
+    sim._register_freeze_gate_liquid_fraction_providers()
+
+    payload = run._run_session(session)
+    run_metadata = payload["run_metadata"]
+    engines_used = run_metadata["engines_used"]
+    assert "notices" not in engines_used
+
+    notice = run_metadata.get("diagnostic_gate_authority_notice")
+    if expected_notice:
+        assert notice is not None
+        assert notice["intent"] == "gate_liquid_fraction"
+        assert notice["provider_id"] == "alphamelts-diagnostic"
+        assert notice["authority_scope"] == "dispatch_only"
+        assert notice["ledger_transition_authority"] is False
+        report = payload["product_classification"]
+        assert report["diagnostic_gate_authority_notice"] == notice
+        assert "Diagnostic freeze-gate authority" in report["markdown"]
+        assert "Reported numbers are unchanged." in report["markdown"]
+    else:
+        assert notice is None
+        assert "diagnostic_gate_authority_notice" not in payload[
+            "product_classification"
+        ]

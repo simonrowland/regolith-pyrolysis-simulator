@@ -24,7 +24,7 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Galvanic EMF cell using beta-alumina solid electrolyte}
-    locator: &yam_emf {page: 738, section: 'III. EMF measurement'}
+    locator: &yam_emf {page: 738, section: 'II.3. EMF measurement'}
   cell_material_and_liner:
     state: {tag: value, value: 'Platinum crucible, mullite tube, beta-alumina closed-end tube, alumina and zirconia-magnesia components'}
     locator: *yam_emf
@@ -46,7 +46,7 @@ benches:
   temperature_calibration:
     uncertainty:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 738, section: 'III. EMF measurement', note: 'Printed +/-1 K is furnace control stability, not calibration uncertainty.'}
+      locator: {page: 738, section: 'II.3. EMF measurement', note: 'Printed +/-1 K is furnace control stability, not calibration uncertainty.'}
   detector:
     state: {tag: value, value: Yokokawa 2727 potentiometer}
     locator: *yam_emf
@@ -60,7 +60,7 @@ benches:
     unit: K
     value:
       state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
-      locator: {page: 738, section: 'III. EMF measurement', note: Controlled within +/-1 K.}
+      locator: {page: 738, section: 'II.3. EMF measurement', note: Controlled within +/-1 K.}
 experiments:
 - &yam_emf_common
   experiment_id: na2o-sio2-xna2o-0p205
@@ -103,7 +103,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 738, section: 'III. EMF measurement', note: Multiple measurement temperatures; no single series setpoint.}
+      locator: {page: 738, section: 'II.3. EMF measurement', note: Multiple measurement temperatures; no single series setpoint.}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
@@ -124,7 +124,7 @@ experiments:
       locator: *yam_emf
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 738, section: 'III. EMF measurement', note: 'Stability criterion is a lower bound after temperature stabilization, not a universal total duration.'}
+      locator: {page: 738, section: 'II.3. EMF measurement', note: 'Stability criterion is a lower bound after temperature stabilization, not a universal total duration.'}
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1173', interval_high: '1673'}}
@@ -350,7 +350,14 @@ experiments:
       locator: {page: 737, section: 'II. Samples and electrolyte'}
 - <<: *yam_emf_common
   experiment_id: na2o-sio2-emf-series
-  locator: {page: 736, section: Abstract, note: 'Mixed X_Na2O observation bags; numeric maps live on na2o-sio2-xna2o-* experiments'}
+  method: emf_cell
+  locator:
+    page: 738
+    section: 'II.3. EMF measurement'
+    note: >-
+      EMF was measured in the beta-alumina galvanic cell after temperature
+      stabilization; the water-cooled copper-plate quench in p. 737 §II is
+      sample preparation for the vitrified charge.
   sample:
     printed_composition:
       state: {tag: value, value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions}
