@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import replace
 import math
 from pathlib import Path
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from typing import Any
 
 import pytest
@@ -812,6 +812,10 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
         return None
 
     model._resolve_evaporation_vapour_batch = fail_resolution
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
+    )
     equilibrium = SimpleNamespace(vapor_pressures_Pa={"Na": 1.0})
 
     with pytest.raises(EvaporationFluxRefusal) as exc_info:
@@ -836,6 +840,10 @@ def test_evaporation_healthy_empty_batch_at_900c_keeps_cheap_zero() -> None:
                 set()
             )
         ),
+    )
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
     )
     equilibrium = SimpleNamespace(vapor_pressures_Pa={})
 
@@ -999,6 +1007,10 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
                 effective_pressure_source=effective_pressure_source,
             )
         )
+    )
+    host._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        host,
     )
     equilibrium = SimpleNamespace(
         vapor_pressures_Pa=compatibility,

@@ -4496,6 +4496,10 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         PyrolysisSimulator._evaporation_bulk_partial_pressure_pa,
         sim,
     )
+    sim._resolve_evaporation_batch_flux_state = types.MethodType(
+        PyrolysisSimulator._resolve_evaporation_batch_flux_state,
+        sim,
+    )
 
     PyrolysisSimulator._calculate_evaporation(sim, result)
 

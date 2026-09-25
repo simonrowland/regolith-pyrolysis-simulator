@@ -651,6 +651,69 @@ class EvaporationMixin:
             self, '_melt_headspace_composition_mbar', {}) or {}
         return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
+    def _resolve_evaporation_batch_flux_state(
+        self,
+        equilibrium: Any,
+        *,
+        temperature_K: float,
+    ) -> tuple[
+        dict[str, float],
+        dict[str, Any],
+        Any,
+        dict[str, Any],
+        dict[str, Any],
+        Any,
+    ]:
+        """Batch-gated flux pressures shared by live evaporation and capacity.
+
+        ``vapour_batch_flux_pressures_Pa`` is the only flux pressure input.
+        An omitted or explicit empty map prices no species; it does not fall
+        through to ``equilibrium.vapor_pressures_Pa``. Callers that solve
+        flux at another partial-pressure vector (the finite cold-train
+        shadow) must pass this map so a flagged transitional species is
+        priced with its flag instead of dropped from the solved set.
+        """
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        effective_pressure_source = _pre_rg_effective_pressure_source(
+            self.vapor_pressures,
+            equilibrium,
+        )
+        live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
+            self.vapor_pressures,
+            vapor_pressure_diagnostic,
+        )
+        vapour_batch = self._resolve_evaporation_vapour_batch(
+            equilibrium,
+            temperature_K=temperature_K,
+            effective_pressure_source=effective_pressure_source,
+        )
+        resolve_error = dict(
+            getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
+        )
+        vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
+            vapour_batch,
+            effective_pressure_source=effective_pressure_source,
+            resolution_error=resolve_error or None,
+        )
+        flux_overlay_report.update(
+            compare_live_shadow_to_batch_flux(
+                batch=vapour_batch,
+                live_pressures_Pa=live_vapor_pressures,
+                batch_flux_pressures_Pa=vapor_pressures,
+                resolution_error=resolve_error or None,
+            )
+        )
+        return (
+            vapor_pressures,
+            flux_overlay_report,
+            vapour_batch,
+            resolve_error,
+            vapor_pressure_diagnostic,
+            effective_pressure_source,
+        )
+
     def _calculate_evaporation(
         self,
         equilibrium,
@@ -748,37 +811,16 @@ class EvaporationMixin:
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
         # Pre-RG effective values cross only the named typed seam below.
-        vapor_pressure_diagnostic = dict(
-            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
-        )
-        effective_pressure_source = _pre_rg_effective_pressure_source(
-            self.vapor_pressures,
-            equilibrium,
-        )
-        live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
-            self.vapor_pressures,
+        (
+            vapor_pressures,
+            flux_overlay_report,
+            vapour_batch,
+            resolve_error,
             vapor_pressure_diagnostic,
-        )
-        vapour_batch = self._resolve_evaporation_vapour_batch(
+            effective_pressure_source,
+        ) = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
-            effective_pressure_source=effective_pressure_source,
-        )
-        resolve_error = dict(
-            getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
-        )
-        vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
-            vapour_batch,
-            effective_pressure_source=effective_pressure_source,
-            resolution_error=resolve_error or None,
-        )
-        flux_overlay_report.update(
-            compare_live_shadow_to_batch_flux(
-                batch=vapour_batch,
-                live_pressures_Pa=live_vapor_pressures,
-                batch_flux_pressures_Pa=vapor_pressures,
-                resolution_error=resolve_error or None,
-            )
         )
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
