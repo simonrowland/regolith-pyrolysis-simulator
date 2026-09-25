@@ -363,14 +363,26 @@ def test_g1_unmapped_composition_and_nested_admission_are_not_absent(tmp_path):
     for name in ("kems-105-yamada-1983.yaml", "schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml"):
         _copy_extract(root, name)
     result = migrate(root, write=False)
-    yamada = result.observations["kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C"]
-    assert yamada.identity.composition.is_unknown
-    assert yamada.identity.composition.reason == "no composition mapped from source"
-    schaefer = result.observations[
+
+    def rows_for(observation_id: str):
+        found = [
+            obs
+            for oid, obs in result.observations.items()
+            if oid == observation_id or oid.startswith(observation_id + "::")
+        ]
+        assert found, observation_id
+        return found
+
+    for yamada in rows_for(
+        "kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C"
+    ):
+        assert yamada.identity.composition.is_unknown
+        assert yamada.identity.composition.reason == "no composition mapped from source"
+    for schaefer in rows_for(
         "schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_h_solid_solutions"
-    ]
-    assert schaefer.admission.status.value == "pending"
-    assert schaefer.admission.reason == "no observation admission_status mapped from source"
+    ):
+        assert schaefer.admission.status.value == "pending"
+        assert schaefer.admission.reason == "no observation admission_status mapped from source"
 
 
 def _leaves(value, prefix=""):
