@@ -200,9 +200,16 @@ def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
 
     from engines.alphamelts.domain import (
         MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
+        MELTS_LIQUID_OXIDE_ENDMEMBERS,
+        MELTS_OXIDE_BASIS,
         melts_endmember_to_parent_oxide_activity,
     )
 
+    # H2O is a liquid endmember label, but it is not admitted by the
+    # composition adapter's 14-oxide basis. Do not advertise a request the
+    # adapter will reject before it can report that label.
+    if formula in MELTS_LIQUID_OXIDE_ENDMEMBERS and formula not in MELTS_OXIDE_BASIS:
+        return False, f"typed-refusal:melts_composition_basis:{formula}"
     _value, reason = melts_endmember_to_parent_oxide_activity({}, formula)
     if reason.startswith(MELTS_PARENT_OXIDE_NOT_ENDMEMBER):
         return False, reason
@@ -438,6 +445,17 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
         if status is not ReadinessStatus.READY:
             results.append(GeneratedInput(readiness, None, provenance))
+            continue
+        if inputs.measured_species != state.endmember.formula:
+            gap = ReadinessGap(
+                "reference_state",
+                GapReason.REFERENCE_STATE_MISMATCH,
+                (
+                    f"species:{inputs.measured_species}",
+                    f"endmember:{state.endmember.formula}",
+                ),
+            )
+            results.append(_not_applicable(provenance, engine, (gap,)))
             continue
         try:
             moles = {}

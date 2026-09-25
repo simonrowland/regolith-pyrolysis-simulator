@@ -1081,23 +1081,6 @@ def _activity_contract_refusal(
     )
 
 
-def _admitted_endmember_formula(identity: Identity) -> str | None:
-    """Endmember formula the melt-activity gate matched.
-
-    The gate admits ``reference_state.endmember.formula``. Scoring the
-    measured species instead reports a(Na2O) or a(Na2SiO3) on a row
-    admitted as SiO2.
-    """
-
-    from simulator.battery.records import StandardState
-
-    state = identity.reference_state
-    if state is None or not state.is_value or not isinstance(state.value, StandardState):
-        return None
-    text = state.value.endmember.formula.strip()
-    return text or None
-
-
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -1441,14 +1424,10 @@ def predict_with_engine(
 
     magnitude: float | None = None
     converter_reason = ""
-    # The gate admitted the endmember. A different oxide species is not
-    # that activity. A raw element stays on its own formula: the oxide
-    # matcher refuses it, and the endmember is not substituted for Na.
+    # The melt-activity gate already required the measured species to equal
+    # the admitted endmember. Compare that exact identity; never substitute a
+    # different species into the residual.
     compared = formula
-    if quantity in MELT_ACTIVITY_QUANTITIES and not _is_raw_element_label(formula):
-        admitted = _admitted_endmember_formula(identity)
-        if admitted:
-            compared = admitted
     if quantity is Quantity.ACTIVITY and engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
         # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
         # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)

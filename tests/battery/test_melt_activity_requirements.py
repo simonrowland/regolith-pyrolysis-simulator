@@ -929,12 +929,8 @@ def _fake_engine(monkeypatch, activities, gammas=None):
     return opened
 
 
-def test_h2o_endmember_activity_is_the_reported_label(monkeypatch):
-    """H2O is admitted for MELTS, and the reported H2O label is the activity.
-
-    IMCC does not report a(H2O). The activity coefficient of that same
-    label stays the coefficient. The 14-oxide diagnostic map is untouched.
-    """
+def test_h2o_endmember_is_refused_when_melts_adapter_rejects_composition(monkeypatch):
+    """H2O's label is understood, but the MELTS composition adapter rejects it."""
 
     from engines.alphamelts.domain import (
         MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
@@ -958,9 +954,11 @@ def test_h2o_endmember_activity_is_the_reported_label(monkeypatch):
     results = _by_engine(_melt(experiment, bench, observation))
     for engine in _MELTS_ACTIVITY:
         item = results[engine]
-        assert item.readiness.status is ReadinessStatus.READY
-        assert item.payload is not None
-        assert "fO2_log" not in item.payload
+        assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+        assert item.payload is None
+        gap = item.readiness.gaps[0]
+        assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+        assert "H2O" in gap.missing[1]
     for engine in _IMCC_ACTIVITY:
         item = results[engine]
         assert item.payload is None
@@ -979,9 +977,8 @@ def test_h2o_endmember_activity_is_the_reported_label(monkeypatch):
         prediction = predict_with_engine(
             engine, observation, experiment=experiment, isolated=False,
         )
-        assert prediction.value == Decimal("0.3")
-        assert prediction.value != Decimal("0.42")
-        assert "no positive activity" not in str(prediction.refusal_detail)
+        assert prediction.value is None
+        assert prediction.refusal_detail["reason"] == "reference_state_mismatch"
     imcc_before = len(opened)
     imcc = predict_with_engine(
         Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
@@ -997,15 +994,13 @@ def test_h2o_endmember_activity_is_the_reported_label(monkeypatch):
     coefficient = predict_with_engine(
         Engine.ALPHAMELTS, coefficient_observation, experiment=experiment, isolated=False,
     )
-    assert coefficient.value == Decimal("1.7")
+    assert coefficient.value is None
+    assert coefficient.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
 
 def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypatch):
-    """Endmember SiO2 is the compared formula. Species Na2O and Na2SiO3 are not.
-
-    A raw element species stays unmatched: the admitted oxide is not
-    substituted for Na.
-    """
+    """Only the measured species named by the admitted endmember is scoreable."""
 
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
@@ -1013,67 +1008,74 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     composition = _composition(("Na2O", "0.4"), ("SiO2", "0.6"))
 
     def _score(engine, species, activities, gammas=None, quantity=Quantity.ACTIVITY):
-        _fake_engine(monkeypatch, activities, gammas)
+        opened = _fake_engine(monkeypatch, activities, gammas)
         experiment, _bench, observation = _case(
             composition=composition,
             formula="SiO2",
             species_formula=species,
             quantity=quantity,
         )
-        return predict_with_engine(
+        prediction = predict_with_engine(
             engine, observation, experiment=experiment, isolated=False,
         )
+        return prediction, opened
 
-    imcc_compound_only = _score(Engine.IMCC_SF04, "Na2SiO3", {"Na2SiO3": 0.2})
+    imcc_compound_only, opened = _score(Engine.IMCC_SF04, "Na2SiO3", {"Na2SiO3": 0.2})
     assert imcc_compound_only.value is None
     assert imcc_compound_only.value != Decimal("0.2")
-    assert imcc_compound_only.refusal_detail["formula"] == "SiO2"
+    assert imcc_compound_only.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    melts_both = _score(
+    melts_both, opened = _score(
         Engine.ALPHAMELTS,
         "Na2O",
         {"Na2O": 0.2, "SiO2_Liq": 0.42, "Na": 0.08},
     )
-    assert melts_both.value == Decimal("0.42")
-    assert melts_both.value != Decimal("0.2")
-    assert melts_both.value != Decimal("0.08")
+    assert melts_both.value is None
+    assert melts_both.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    melts_only_parent = _score(Engine.ALPHAMELTS, "Na2O", {"Na2O": 0.2})
+    melts_only_parent, opened = _score(Engine.ALPHAMELTS, "Na2O", {"Na2O": 0.2})
     assert melts_only_parent.value is None
     assert melts_only_parent.value != Decimal("0.2")
-    assert melts_only_parent.refusal_detail["formula"] == "SiO2"
+    assert melts_only_parent.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    imcc_both = _score(
+    imcc_both, opened = _score(
         Engine.IMCC_SF04,
         "Na2O",
         {"Na2O": 0.2, "SiO2": 0.55},
     )
-    assert imcc_both.value == Decimal("0.55")
-    assert imcc_both.value != Decimal("0.2")
+    assert imcc_both.value is None
+    assert imcc_both.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    imcc_compound = _score(
+    imcc_compound, opened = _score(
         Engine.IMCC_SF04,
         "Na2SiO3",
         {"Na2SiO3": 0.2, "SiO2": 0.55},
     )
-    assert imcc_compound.value == Decimal("0.55")
-    assert imcc_compound.value != Decimal("0.2")
+    assert imcc_compound.value is None
+    assert imcc_compound.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    melts_compound = _score(
+    melts_compound, opened = _score(
         Engine.ALPHAMELTS,
         "Na2SiO3",
         {"Na2SiO3": 0.2, "SiO2_Liq": 0.42},
     )
-    assert melts_compound.value == Decimal("0.42")
-    assert melts_compound.value != Decimal("0.2")
+    assert melts_compound.value is None
+    assert melts_compound.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
 
-    coefficient = _score(
+    coefficient, opened = _score(
         Engine.IMCC_SF04,
         "Na2SiO3",
         {"Na2SiO3": 0.2, "SiO2": 0.55},
         {"Na2SiO3": 9.9, "SiO2": 1.5},
         Quantity.ACTIVITY_COEFFICIENT,
     )
-    assert coefficient.value == Decimal("1.5")
-    assert coefficient.value != Decimal("9.9")
+    assert coefficient.value is None
     assert coefficient.value != Decimal("0.2")
+    assert coefficient.refusal_detail["reason"] == "reference_state_mismatch"
+    assert opened == []
