@@ -31,9 +31,11 @@ from simulator.environment import (
 )
 from simulator.mre_ladder import mre_decomposition_voltage_reference
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
+from simulator import condensation
 
 
 PA_PER_ATM = 101_325.0
+JANAF_GAS_CONSTANT_KJ_MOL_K = 8.314462618e-3
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
@@ -273,8 +275,59 @@ def _janaf_liquid_vapour_pa(species: str, temperature_K: float) -> float:
     # JANAF p° = 0.1 MPa. K = P_sat/p° for M(l) -> M(g), so this is an
     # external-table computation independent of the runtime Antoine row.
     return 100_000.0 * 10.0 ** (
-        -delta_g_kj_mol / (GAS_CONSTANT / 1000.0 * temperature_K * math.log(10.0))
+        -delta_g_kj_mol
+        / (JANAF_GAS_CONSTANT_KJ_MOL_K * temperature_K * math.log(10.0))
     )
+
+
+@lru_cache(maxsize=None)
+def _janaf_liquid_vapour_grid(species: str) -> tuple[tuple[float, float], ...]:
+    """Return every exact liquid/gas JANAF intersection plus the NBP anchor."""
+
+    table_ids = {
+        "Al": ("Al-003", "Al-005"),
+        "Si": ("Si-003", "Si-005"),
+    }
+    liquid_table, gas_table = table_ids[species]
+    points_by_table = []
+    for table_id in (liquid_table, gas_table):
+        table_path = (
+            DATA_DIR
+            / "literature"
+            / "compilations"
+            / "janaf"
+            / "tables"
+            / f"{table_id}.yaml"
+        )
+        payload = yaml.safe_load(table_path.read_text())
+        points_by_table.append(
+            {
+                float(point["temperature"]["value"])
+                for point in payload["table"]["values"]
+                if point["formation_gibbs_energy"]["value"] is not None
+            }
+        )
+
+    row = _vapor_pressure_data()["metals"][species]["pure_component_antoine"]
+    low_K, high_K = map(float, row["valid_range_K"])
+    grid_temperatures = sorted(
+        temperature_K
+        for temperature_K in points_by_table[0] & points_by_table[1]
+        if low_K <= temperature_K <= high_K
+    )
+    cases = [
+        (temperature_K, _janaf_liquid_vapour_pa(species, temperature_K))
+        for temperature_K in grid_temperatures
+    ]
+    cases.append((high_K, PA_PER_ATM))
+    return tuple(cases)
+
+
+_JANAF_LIQUID_VAPOUR_GRID_CASES = tuple(
+    (species, temperature_K, expected_pa)
+    for species in ("Al", "Si")
+    for temperature_K, expected_pa in _janaf_liquid_vapour_grid(species)
+)
 
 
 def _shomate_h_increment_kj_mol(coeff: dict, temperature_K: float) -> float:
@@ -463,27 +516,136 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
 
 
 @pytest.mark.parametrize(
-    ("species", "temperature_K"),
-    [
-        pytest.param("Al", 2200.0, id="Al-JANAF-003-005-2200K"),
-        pytest.param("Si", 2200.0, id="Si-JANAF-003-005-2200K"),
+    ("species", "temperature_K", "expected_pa"),
+    _JANAF_LIQUID_VAPOUR_GRID_CASES,
+    ids=[
+        f"{species}-JANAF-{temperature_K:g}K"
+        for species, temperature_K, _ in _JANAF_LIQUID_VAPOUR_GRID_CASES
     ],
 )
 def test_pure_component_janaf_fit_matches_independent_liquid_vapour_point(
     species: str,
     temperature_K: float,
+    expected_pa: float,
 ) -> None:
-    """d-021: the active sidecars are grounded against JANAF, not self-parity."""
+    """d-021: every in-range JANAF point and NBP anchor ground the fit."""
 
-    expected_pa = _janaf_liquid_vapour_pa(species, temperature_K)
     actual_pa = _pure_component_antoine_pa(
         _vapor_pressure_data()["metals"][species], temperature_K
     )
+    declared_max_dex = float(
+        _vapor_pressure_data()["metals"][species]["pure_component_antoine"][
+            "fit_residual_dex"
+        ]["max_abs"]
+    )
+    expected_max_dex = {"Al": 0.004385281, "Si": 0.023313638}[species]
 
-    # The YAML derivation records the full-grid max residual: 0.0044 dex for
-    # Al and 0.0234 dex for Si. Six percent leaves that declared Si fit error
-    # visible while making a restored Stull row fail by 1.16/1.77 dex.
-    assert actual_pa == pytest.approx(expected_pa, rel=0.06)
+    assert declared_max_dex == pytest.approx(expected_max_dex, abs=1e-12)
+    assert abs(math.log10(actual_pa / expected_pa)) <= declared_max_dex + 1e-8
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_label"),
+    [
+        pytest.param(
+            "Al",
+            950.0,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Al-below-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            1690.0,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Si-below-JANAF-fit",
+        ),
+        pytest.param(
+            "Al",
+            2200.0,
+            "builtin_authoritative:pure_component_derived_from_evaluation",
+            id="Al-inside-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            2200.0,
+            "builtin_authoritative:pure_component_derived_from_evaluation",
+            id="Si-inside-JANAF-fit",
+        ),
+        pytest.param(
+            "Al",
+            2792.15,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Al-NBP-above-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            3538.15,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Si-NBP-above-JANAF-fit",
+        ),
+    ],
+)
+def test_janaf_source_range_label_marks_fit_continuations(
+    species: str,
+    temperature_K: float,
+    expected_label: str,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"][species]
+    _, block = vapor_pressure_antoine_coefficients(
+        row,
+        temperature_K=temperature_K,
+    )
+
+    assert vapor_pressure_source_label(
+        "builtin_authoritative",
+        row,
+        coefficient_block=block,
+        temperature_K=temperature_K,
+    ) == expected_label
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_range_K", "extrapolated"),
+    [
+        pytest.param("Al", 950.0, [1000.0, 2700.0], True, id="Al-below-fit"),
+        pytest.param("Si", 1690.0, [1700.0, 3500.0], True, id="Si-below-fit"),
+        pytest.param("Al", 2200.0, [1000.0, 2700.0], False, id="Al-inside-fit"),
+        pytest.param("Si", 2200.0, [1700.0, 3500.0], False, id="Si-inside-fit"),
+    ],
+)
+def test_janaf_wall_telemetry_marks_fit_continuations(
+    species: str,
+    temperature_K: float,
+    expected_range_K: list[float],
+    extrapolated: bool,
+) -> None:
+    records: dict[str, dict] = {}
+    diagnostic: dict[str, object] = {}
+    driving_pressure_pa = condensation._wall_deposition_driving_pressure_pa(
+        species,
+        1000.0,
+        temperature_K,
+        vapor_pressure_data=_vapor_pressure_data(),
+        reactive_product_backstop=False,
+        antoine_extrapolations=records,
+        diagnostic_out=diagnostic,
+    )
+
+    assert driving_pressure_pa >= 0.0
+    if extrapolated:
+        notice = diagnostic["wall_saturation_pressure_notice"]
+        assert notice["valid_range_K"] == expected_range_K
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["status"] == "extrapolated"
+        assert notice["output_status"] == "status_bearing"
+    else:
+        assert records == {}
+        assert "wall_saturation_pressure_notice" not in diagnostic
 
 
 def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() -> None:

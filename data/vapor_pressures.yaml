@@ -1865,7 +1865,7 @@ families:
               (-0.004005 dex). At T_b=2792.15 K the fit gives 102219.23 Pa (+0.003817 dex from
               101325 Pa). Fit residual over 17 JANAF points plus the boiling-point check is max 0.004385
               dex, RMS 0.003274 dex. Valid range covers the liquid phase and the normal-boiling check.
-            fit_source_range_K:
+            source_certified_range_K:
             - 1000
             - 2700
             fit_residual_dex:
@@ -2055,8 +2055,12 @@ families:
               Si-005 delta-fG=144.382 kJ/mol gives P_tab=37.3252 Pa; the fit gives 39.2047 Pa
               (+0.021336 dex). At T_b=3538.15 K the fit gives 106912.93 Pa (+0.023314 dex from
               101325 Pa). Fit residual over 18 JANAF points plus the boiling-point check is max 0.023314
-              dex, RMS 0.016850 dex. Valid range covers the liquid phase and the normal-boiling check.
-            fit_source_range_K:
+              dex, RMS 0.016850 dex. The Si residual is accepted as smooth Antoine curvature,
+              not unstructured table noise: it changes sign across the JANAF grid (negative at
+              1800 K, positive at 2200-2400 K, and negative again by 3100-3500 K) while remaining
+              within the declared 0.023314 dex bound. Valid range covers the liquid phase and the
+              normal-boiling check.
+            source_certified_range_K:
             - 1700
             - 3500
             fit_residual_dex:
