@@ -24,6 +24,7 @@ from simulator.battery.enums import (
     FO2Channel,
     IdentityEqualKind,
     MethodToken,
+    MEASURED_EVIDENCE,
     NoticeKind,
     Phase,
     Polymorph,
@@ -67,6 +68,9 @@ from simulator.battery.migrate import (
     group_queue_entries,
     migrate,
     migration_queue_document,
+    reference_state_from_extract,
+    _mole_fraction_composition_from_values,
+    _standard_state_from_plain,
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
@@ -159,6 +163,50 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
         yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     return root
+
+
+def _migrate_real_extract(tmp_path: Path, name: str):
+    src = REPO_ROOT / "data" / "literature" / "extracts" / name
+    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    assert isinstance(doc, dict)
+    root = tmp_path / "tree"
+    extracts = root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir(parents=True)
+    source = doc.get("source") if isinstance(doc.get("source"), dict) else {}
+    index = {
+        "schema_version": "literature_index.v1",
+        "sources": [
+            {
+                "source_id": doc.get("source_id") or src.stem,
+                "citation": source.get("citation") or src.stem,
+                "doi": source.get("doi"),
+            }
+        ],
+    }
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(index, sort_keys=False),
+        encoding="utf-8",
+    )
+    (extracts / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+    return migrate(root, write=False)
+
+
+def _extract_observations(name: str) -> list[dict]:
+    src = REPO_ROOT / "data" / "literature" / "extracts" / name
+    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    found: list[dict] = []
+    species = doc.get("species") if isinstance(doc, dict) else None
+    if not isinstance(species, dict):
+        return found
+    for block in species.values():
+        rows = block.get("observations") if isinstance(block, dict) else None
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if isinstance(row, dict):
+                found.append(row)
+    return found
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -2222,7 +2270,7 @@ def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
         ({"X_Na2O_as_published": 0.4}, {"Na2O": as_decimal("0.4"), "SiO2": as_decimal("0.6")}),
         (
             {"composition_mol": {"SiO2": 0.79, "Na2O": 0.07, "B2O3": 0.10, "Al2O3": 0.03, "minor constituents": 0.01}},
-            {"SiO2": as_decimal("0.79"), "Na2O": as_decimal("0.07"), "B2O3": as_decimal("0.10"), "Al2O3": as_decimal("0.03"), "minor constituents": as_decimal("0.01")},
+            {"SiO2": as_decimal("0.79"), "Na2O": as_decimal("0.07"), "B2O3": as_decimal("0.10"), "Al2O3": as_decimal("0.03")},
         ),
     ],
 )
@@ -2249,6 +2297,13 @@ def test_printed_mole_fraction_composition_maps_without_wt_conversion(
     assert obs.identity.composition is not None
     assert obs.identity.composition.is_value
     assert obs.identity.composition.value.as_map() == expected
+    if "minor constituents" in extra.get("composition_mol", {}):
+        assert any(
+            "minor constituents" in (entry.why or "")
+            and "composition" in (entry.axes or [])
+            for entry in result.queue
+        )
+        assert "minor constituents" not in obs.identity.composition.value.as_map()
 
 
 def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
@@ -3207,6 +3262,202 @@ def test_activity_standard_state_source_prose_lifts_typed_reference(tmp_path: Pa
     assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
     assert reference_state.value.endmember.formula == "Na2O"
     assert reference_state.value.endmember.phase.value is Phase.L
+    assert reference_state.value.reference_pressure_bar is None
+
+
+def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:
+    feo = reference_state_from_extract(
+        "raoultian_pure_endmember; pure liquid FeO endmember=FeO. "
+        "The pure condensed solid/liquid activity is unity.",
+        species_formula="Fe",
+        values={},
+    )
+    assert feo is not None and feo.is_value
+    assert feo.value.endmember.formula == "FeO"
+    assert feo.value.endmember.phase.is_value
+    assert feo.value.endmember.phase.value is Phase.L
+    assert feo.value.reference_pressure_bar is None
+
+    ichise = reference_state_from_extract(
+        "Fe(l)=Fe (in alloy), Raoultian liquid Fe; "
+        "Mo(s)=Mo (in alloy), Raoultian solid Mo",
+        species_formula="Fe",
+        values={},
+    )
+    assert ichise is not None and ichise.is_value
+    assert ichise.value.endmember.formula == "Fe"
+    assert ichise.value.endmember.phase.value is Phase.L
+
+    ueshima = reference_state_from_extract(
+        "a_Fe liquid Fe; a_W solid W",
+        species_formula="Fe",
+        values={},
+    )
+    assert ueshima is not None and ueshima.is_value
+    assert ueshima.value.endmember.formula == "Fe"
+    assert ueshima.value.endmember.phase.value is Phase.L
+
+    ambiguous = reference_state_from_extract(
+        "Fe(l)=Fe (in alloy), Raoultian liquid Fe; "
+        "Mo(s)=Mo (in alloy), Raoultian solid Mo",
+        species_formula="not-either",
+        values={},
+    )
+    assert ambiguous is not None and ambiguous.is_unknown
+
+    sossi = reference_state_from_extract(
+        "raoultian_pure_endmember; pure liquid oxide at the temperature and "
+        "pressure of interest; endmember=NaO0.5; the coefficient is the "
+        "Henry/infinite-dilution limit",
+        species_formula="Na",
+        values={},
+    )
+    assert sossi is not None and sossi.is_value
+    assert sossi.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert sossi.value.endmember.formula == "NaO0.5"
+    assert sossi.value.endmember.phase.value is Phase.L
+    assert sossi.value.reference_pressure_bar is None
+    plain = to_plain(sossi.value)
+    assert isinstance(plain, dict)
+    assert "reference_pressure_bar" not in plain
+    assert _standard_state_from_plain(plain).reference_pressure_bar is None
+
+    printed_bar = reference_state_from_extract(
+        "pure liquid Na2O at 1 bar endmember=Na2O",
+        species_formula="Na2O",
+        values={},
+    )
+    assert printed_bar is not None and printed_bar.is_value
+    assert printed_bar.value.reference_pressure_bar == as_decimal("1")
+
+    sodium = reference_state_from_extract(
+        "γ°_Na is the infinite-dilution (Henry) coefficient in Pb such that "
+        "Raoultian a_Na = γ°_Na · X_Na. "
+        "「a_Na: ラウール基準のナトリウムの活量」.",
+        species_formula="Na",
+        values={},
+    )
+    assert sodium is not None and sodium.is_value
+    assert sodium.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert sodium.value.endmember.formula == "Na"
+
+    henry = reference_state_from_extract(
+        "infinite-dilution activity coefficient of Al in liquid Fe",
+        species_formula="Al",
+        values={},
+    )
+    assert henry is not None and henry.is_value
+    assert henry.value.convention is ReferenceStateConvention.HENRIAN_LIQUID
+    assert henry.value.endmember.phase.value is Phase.L
+
+
+def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    result = _migrate_real_extract(tmp_path, "kems-ms2000-044.yaml")
+    r2 = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("_class_quote_r2")
+        and "sio2_activity" in obs.observation_id
+    ]
+    assert len(r2) == 24
+    r2_ids = {obs.observation_id for obs in r2}
+    for obs in r2:
+        evidence = obs.evidence.class_
+        assert obs.evidence.original_method_class == "derived"
+        assert not (evidence.is_value and evidence.value in MEASURED_EVIDENCE)
+        reference = obs.identity.reference_state
+        assert reference is not None and reference.is_value
+        assert reference.value.endmember.formula == "SiO2"
+        assert reference.value.endmember.phase.value is Phase.L
+        assert reference.value.reference_pressure_bar is None
+    superseded = [
+        obs
+        for obs in result.observations.values()
+        if obs.admission.superseded_by in r2_ids
+    ]
+    assert len(superseded) == 24
+    for obs in superseded:
+        assert obs.admission.status is AdmissionStatus.SUPERSEDED
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    candidate_ids = {obs.observation_id for obs in candidates}
+    assert r2_ids.isdisjoint(candidate_ids)
+    assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
+
+
+def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
+    arxiv_rows = _extract_observations("arxiv-1902-05005.yaml")
+    table2 = next(
+        row
+        for row in arxiv_rows
+        if row.get("observation_id") == "sossi_fegley_2018_table2_activity_coefficients"
+    )
+    assert "T_range_K" not in table2
+    assert "standard_state" not in table2
+    arxiv = _migrate_real_extract(tmp_path, "arxiv-1902-05005.yaml")
+    loaded = next(
+        obs
+        for obs in arxiv.observations.values()
+        if obs.observation_id.endswith("sossi_fegley_2018_table2_activity_coefficients")
+    )
+    reference = loaded.identity.reference_state
+    assert reference is None or not reference.is_value or (
+        reference.value.endmember.formula not in {"FeO", "FeO."}
+    )
+    temperature = loaded.identity.temperature_K
+    if temperature is not None and temperature.is_unknown:
+        assert "1573" not in (temperature.reason or "")
+        assert "1923" not in (temperature.reason or "")
+
+    demaria_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    rotating = next(
+        row
+        for row in demaria_rows
+        if row.get("observation_id") == "demaria_1971_fe_activity_multi_rotating_cell"
+    )
+    assert "T_range_K" not in rotating
+
+
+def test_ts1985_printed_binary_complement_is_not_a_float_residue() -> None:
+    rows = [
+        row
+        for row in _extract_observations("ts1985.yaml")
+        if isinstance(row.get("values"), dict)
+        and row["values"].get("X_Na2O_as_published") == 0.55
+    ]
+    assert len(rows) == 3
+    for row in rows:
+        composition, _omitted = _mole_fraction_composition_from_values(row["values"])
+        assert composition is not None
+        assert composition.as_map() == {
+            "Na2O": as_decimal("0.55"),
+            "SiO2": as_decimal("0.45"),
+        }
+
+
+def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> None:
+    rows = [
+        row
+        for row in _extract_observations("ta-dacko-conradt-low-p-transpiration.yaml")
+        if str(row.get("observation_id") or "").startswith("dacko_2004_table2_activity_")
+    ]
+    assert len(rows) == 6
+    for row in rows:
+        composition, omitted = _mole_fraction_composition_from_values(row["values"])
+        assert composition is not None
+        assert "minor constituents" in omitted
+        assert "minor constituents" not in composition.as_map()
+        assert composition.as_map()["SiO2"] == as_decimal("0.79")
+        assert composition.as_map()["B2O3"] == as_decimal("0.10")
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
