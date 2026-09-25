@@ -2308,6 +2308,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if len(candidates) != 1:
             return None
         return _num(candidates[0][1])
+    if q_token == "transition_temperature":
+        if "T_K" in item:
+            return _num(item.get("T_K"))
+        if "T_C" in item:
+            amount = _num(item.get("T_C"))
+            return None if amount is None else amount + as_decimal("273.15")
+        return None
     if q_token in _CENSUS_PERCENT_FRACTION_QUANTITIES:
         candidates = [
             (key, value)
@@ -2388,10 +2395,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
-def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], list[str], int, int]:
+def _series_census(
+    extracts: Path, extracts_v2: Path
+) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal
 
     census: dict[str, int] = {}
+    per_source: dict[str, dict[str, int]] = {}
     mismatches: list[str] = []
     n_numeric = 0
     n_unavailable = 0
@@ -2476,6 +2486,8 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
                     n_numeric += 1
                     label = q_token if q_token is not None else "unknown"
                     census[label] = census.get(label, 0) + 1
+                    source_census = per_source.setdefault(source_id, {})
+                    source_census[label] = source_census.get(label, 0) + 1
                     if stored_q.get("value") != label:
                         mismatches.append(
                             f"{oid} stored quantity {stored_q.get('value')!r} != declared {label}"
@@ -2488,7 +2500,7 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
                     got = Decimal(str(stored_val.get("point")))
                     if got != expected:
                         mismatches.append(f"{oid} stored {got} != source {expected} for {label}")
-    return census, mismatches, n_numeric, n_unavailable
+    return census, mismatches, n_numeric, n_unavailable, per_source
 
 
 def test_j01_store_census_series_numeric_matches_declared_field() -> None:
@@ -2496,7 +2508,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
-    census, mismatches, n_numeric, n_unavailable = _series_census(extracts, extracts_v2)
+    census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
+        extracts, extracts_v2
+    )
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
     assert census.get("activity_coefficient") == 128
@@ -2520,7 +2534,15 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert census.get("evaporation_rate") == 25
     assert census.get("mass_loss_fraction") == 19
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 298, (n_numeric, census, n_unavailable)
+    # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
+    # adds 58 printed T_C points, routed as transition_temperature. The
+    # Ueshima per-source delta is numeric 0->58 and model_derived 0->58;
+    # mismatches remains 0.
+    assert census.get("transition_temperature") == 58
+    assert per_source.get("ueshima-1982-fe-mo-thermal") == {
+        "transition_temperature": 58
+    }
+    assert n_numeric == 356, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
@@ -2565,7 +2587,9 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         n_mutated += 1
     assert n_mutated == 9, n_mutated
     fedkin.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
-    _census, mismatches, _n_numeric, _n_unavailable = _series_census(extracts, dest)
+    _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
+        extracts, dest
+    )
     assert mismatches, "census must go red when stored alpha points are corrupted"
 
 
@@ -3803,6 +3827,11 @@ def test_registry_tagged_condition_mutation_proof(monkeypatch: pytest.MonkeyPatc
         ).read_text(encoding="utf-8")
     )["experiments"][0]
     raw = dict(raw)
+    raw["conditions"] = {
+        "temperature_K": raw["thermal_schedule"]["setpoints_and_holds"][0][
+            "temperature_K"
+        ]
+    }
     raw["method"] = "knudsen_effusion"
     live = experiment_from_plain(raw)
     assert live.conditions["temperature_K"].state.value.kind is ValueKind.INTERVAL
