@@ -1525,6 +1525,44 @@ def test_invalid_projected_bounds_use_kress_floor_and_name_drops(
     )
 
 
+def test_same_drop_set_replaces_projected_notice_with_kress_authority(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """The run notice follows the latest authority for one dropped bulk."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _diagnostic, projected_notice = _lunar_composition_projected_diagnostic(sim)
+    floor_notice = sim._invalid_projection_bounds_notice(
+        projected_notice,
+        bounds_source=_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    )
+
+    sim._record_composition_projected_liquidus_notice(projected_notice)
+    sim._record_composition_projected_liquidus_notice(floor_notice)
+
+    notices = sim.composition_projected_liquidus_run_notice()['notices']
+    assert len(notices) == 1
+    assert notices[0]['bounds_source'] == (
+        _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    )
+    assert notices[0]['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert notices[0]['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
+    assert notices[0]['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert notices[0]['projection_certified_band'] == (
+        projected_notice['certified_band']
+    )
+
+
 def test_invalid_projected_bounds_prefer_later_ladder_authority(
     monkeypatch,
     vapor_pressure_data,

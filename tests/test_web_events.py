@@ -4257,6 +4257,77 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert "residual_inventory_kg" in payload
 
 
+def test_live_completion_payload_propagates_composition_projected_notice(
+    monkeypatch,
+):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    notice = {
+        "kind": "composition_projected",
+        "reason": "composition_projected",
+        "authority": "extrapolated",
+        "notices": [{
+            "bounds_source": "kress91_liquid_calibration_floor",
+            "certified_band": {
+                "min_T_C": 1200.0,
+                "max_T_C": 1630.0,
+            },
+            "floor_T_C": 1200.0,
+            "temperature_band_case": "below_1200C_extrapolation",
+            "temperature_band_status": (
+                "extrapolation_below_calibration_floor"
+            ),
+        }],
+    }
+    monkeypatch.setattr(
+        sim,
+        "composition_projected_liquidus_run_notice",
+        lambda: copy.deepcopy(notice),
+    )
+    payload = _completion_payload(sim)
+    assert payload["composition_projected_liquidus_notice"] == notice
+
+    sid = "test-live-completion-projected-notice"
+    session = SimpleNamespace(
+        simulator=sim,
+        is_complete=lambda: True,
+        result_document=lambda: _terminal_runner_document("ok"),
+    )
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    emitted = []
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, payload, room=None):
+            if event == "simulation_complete":
+                emitted.append(payload)
+
+    monkeypatch.setattr(
+        web_events,
+        "_persist_terminal",
+        lambda *_args, status, **_kwargs: {
+            "execution_status": status,
+        },
+    )
+    socket = Socket()
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "ok",
+            True,
+        )
+        socket.target()
+        assert emitted[0]["composition_projected_liquidus_notice"] == notice
+    finally:
+        _clear_simulation_state(sid)
+
+
 def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
     monkeypatch,
 ):

@@ -1703,10 +1703,6 @@ class EvaporationMixin:
         stored = getattr(self, '_composition_projected_liquidus_notices', None)
         if not isinstance(stored, list):
             stored = []
-        key = _composition_projected_notice_key(notice)
-        for existing in stored:
-            if _composition_projected_notice_key(existing) == key:
-                return
         stored_notice = {
             'kind': notice.get('kind'),
             'reason': notice.get('reason'),
@@ -1746,6 +1742,14 @@ class EvaporationMixin:
         ):
             if key in notice:
                 stored_notice[key] = notice.get(key)
+        notice_key = _composition_projected_notice_key(stored_notice)
+        for index, existing in enumerate(stored):
+            if _composition_projected_notice_key(existing) == notice_key:
+                # A later curve can resolve the same dropped bulk through a
+                # more informative authority, such as the Kress floor.
+                stored[index] = stored_notice
+                self._composition_projected_liquidus_notices = stored
+                return
         stored.append(stored_notice)
         self._composition_projected_liquidus_notices = stored
 
