@@ -422,14 +422,46 @@ def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
     return formula_composition(formula)
 
 
+def _is_raw_element_label(formula: str) -> bool:
+    """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
+
+    parsed = parse_species_formula(formula)
+    if parsed is None or len(parsed) != 1:
+        return False
+    element, count = parsed[0]
+    return element != "O" and count == 1
+
+
 def match_reported_species(
-    formula: str, reported: Mapping[str, float]
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
 ) -> tuple[str, float] | None:
+    """Closed-formula match. Oxide activity never accepts a raw element label.
+
+    ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
+    map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
+    ``Na`` when this flag is false.
+    """
+
     target = parse_species_formula(formula)
     if target is None:
         return None
+    if oxide_activity and _is_raw_element_label(formula):
+        return None
     for name, value in reported.items():
+        if oxide_activity and _is_raw_element_label(str(name)):
+            continue
         parsed = parse_species_formula(str(name))
+        if parsed == target:
+            return str(name), float(value)
+    if not oxide_activity:
+        return None
+    from engines.alphamelts.domain import canonical_oxide_activity_map
+
+    for name, value in canonical_oxide_activity_map(reported).items():
+        parsed = parse_species_formula(name)
         if parsed == target:
             return str(name), float(value)
     return None
@@ -1076,23 +1108,8 @@ def cell_notices(
 
 
 # More than one oxidation state in silicate melts over the fO2 range these
-# engines are asked to run. Oxygen is an input for a melt activity only when
-# the composition or the measured species holds one of these at a positive
-# amount. Iron aliases, including total-iron prints, resolve through
-# MELTS_OXIDE_ALIASES inside _elements_of_component. Same table as the
-# melt-activity contract.
-_MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
-    "Fe": "Fe2+/Fe3+",
-    "Ti": "Ti4+/Ti3+",
-    "Cr": "Cr3+/Cr2+",
-    "Mn": "Mn2+/Mn3+",
-    "V": "V3+/V4+/V5+",
-    "Eu": "Eu3+/Eu2+",
-    "Ce": "Ce4+/Ce3+",
-    "S": "S2-/S6+",
-    "Ga": "Ga3+/Ga+",
-}
-_MULTIVALENT_ELEMENT_LIST = "Fe, Ti, Cr, Mn, V, Eu, Ce, S, Ga"
+# engines are asked to run. The generator owns the table; scorer and contract
+# use that same mapping so redox admission cannot drift between consumers.
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -1117,8 +1134,10 @@ def _elements_of_component(name: str) -> frozenset[str]:
 
 
 def _is_multivalent_name(name: str) -> bool:
+    from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
+
     return any(
-        element in _MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
+        element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
     )
 
 
@@ -1178,10 +1197,12 @@ def oxygen_is_scorer_input(
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox
+        from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
+
         return (
             False,
             "melt has no multivalent element "
-            f"({_MULTIVALENT_ELEMENT_LIST}) in the composition or measured species; "
+            f"({', '.join(MULTIVALENT_MELT_ELEMENTS)}) in the composition or measured species; "
             "oxygen is not an input and was omitted",
             (),
         )
@@ -1228,6 +1249,69 @@ def _input_refusal(
         coefficient_sources=sources,
         lineage_complete=False,
         refusal_reason=reason,
+        refusal_detail=detail,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
+def melt_quantity_report(
+    quantity: Quantity,
+    activities: Mapping[str, float],
+    coefficients: Mapping[str, float],
+) -> dict[str, float] | None:
+    """Select the engine map that matches the activity quantity."""
+
+    if quantity is Quantity.ACTIVITY:
+        return dict(activities)
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        if not coefficients:
+            return None
+        return dict(coefficients)
+    return None
+
+
+def _activity_contract_refusal(
+    engine: Engine,
+    *,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    generated,
+) -> EnginePrediction:
+    from simulator.battery.waypoints import GapReason
+
+    gaps = () if generated is None else generated.readiness.gaps
+    first = gaps[0] if gaps else None
+    reason_token = first.reason.value if first is not None else "engine_does_not_report_melt_activity"
+    detail: dict[str, object] = {
+        "reason": reason_token,
+        "consumer": "melt_activity",
+        "gaps": [
+            {
+                "waypoint": gap.waypoint,
+                "reason": gap.reason.value,
+                "missing": list(gap.missing),
+            }
+            for gap in gaps
+        ],
+    }
+    if first is not None and first.reason is GapReason.REFERENCE_STATE_MISMATCH and len(first.missing) >= 2:
+        detail["row_convention"] = first.missing[0]
+        detail["engine_convention"] = first.missing[1]
+    refusal = (
+        RefusalReason.UNSUPPORTED
+        if first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH
+        else RefusalReason.IDENTITY_INCOMPLETE
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=refusal,
         refusal_detail=detail,
         identity=identity,
         requested_composition=requested,
@@ -1286,6 +1370,7 @@ def predict_with_engine(
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
+    experiment: Experiment | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -1395,7 +1480,61 @@ def predict_with_engine(
     requested: State[Composition] | None = None
     input_notices: list[Notice] = []
     composition_value: Composition | None = None
-    if identity.composition is not None and identity.composition.is_value:
+    activity_payload: Mapping | None = None
+    if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
+        # Activity rows use the melt-activity contract. A gap is a typed
+        # refusal. No engine fO2 default is an input on this path.
+        from simulator.battery.enums import AmountBasis
+        from simulator.battery.generators.bench import activity_request_for_engine
+        from simulator.battery.records import Composition as OxideComposition
+
+        if experiment is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "melt_activity_contract_requires_experiment",
+                    "consumer": "melt_activity",
+                },
+                identity=identity,
+            )
+        generated = activity_request_for_engine(experiment, observation, engine.value)
+        if generated is None or generated.payload is None:
+            return _activity_contract_refusal(
+                engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
+                generated=generated,
+            )
+        activity_payload = generated.payload
+        moles = dict(activity_payload.get("composition_mol") or {})
+        built = OxideComposition(
+            "oxides",
+            tuple((str(name), Decimal(str(amount))) for name, amount in moles.items()),
+            AmountBasis.MOLE_FRACTION,
+        )
+        requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
+        composition_value = built
+        wt = composition_wt_pct(built)
+        if wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "composition_unparsed"},
+                identity=identity,
+                requested_composition=requested,
+            )
+    elif identity.composition is not None and identity.composition.is_value:
         requested = identity.composition
         assert identity.composition.value is not None
         composition_value = identity.composition.value
@@ -1442,48 +1581,60 @@ def predict_with_engine(
             identity=identity,
         )
 
-    pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
-        identity, quantity
-    )
-    if pressure_invalid is not None:
-        return _input_refusal(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=requested,
-            reason=RefusalReason.INVALID_IDENTITY,
-            detail={"reason": pressure_invalid, "quantity": quantity.value},
-            notices=tuple(input_notices),
+    pressure_bar: float | None = None
+    if activity_payload is None:
+        pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
+            identity, quantity
         )
-    if pressure_notice is not None:
-        input_notices.append(pressure_notice)
+        if pressure_invalid is not None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.INVALID_IDENTITY,
+                detail={"reason": pressure_invalid, "quantity": quantity.value},
+                notices=tuple(input_notices),
+            )
+        if pressure_notice is not None:
+            input_notices.append(pressure_notice)
 
-    oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
     fo2_state = identity.fO2_Pa
-    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-        # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
-        # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
-        po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-    elif oxygen_required:
-        return _input_refusal(
-            engine=engine,
-            channel=channel,
-            sources=sources,
-            identity=identity,
-            requested=requested,
-            reason=RefusalReason.IDENTITY_INCOMPLETE,
-            detail={
-                "reason": "missing_fO2",
-                "quantity": quantity.value,
-                "why": oxygen_why,
-                "multivalent": list(redox),
-            },
-            notices=tuple(input_notices),
-        )
+    if activity_payload is not None:
+        # The contract's oxygen point, or none. Never an engine default.
+        if "fO2_log" in activity_payload:
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=10.0 ** float(activity_payload["fO2_log"]),
+            )
+        else:
+            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     else:
-        po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-        input_notices.append(_omission_notice(quantity, oxygen_why))
+        oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
+        if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+            # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
+            # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
+            po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
+        elif oxygen_required:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={
+                    "reason": "missing_fO2",
+                    "quantity": quantity.value,
+                    "why": oxygen_why,
+                    "multivalent": list(redox),
+                },
+                notices=tuple(input_notices),
+            )
+        else:
+            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+            input_notices.append(_omission_notice(quantity, oxygen_why))
 
     if composition_value is not None:
         wt = composition_wt_pct(composition_value)
@@ -1617,7 +1768,26 @@ def predict_with_engine(
     reported: Mapping[str, float]
     unit = QUANTITY_UNITS[quantity]
     if quantity in MELT_ACTIVITY_QUANTITIES:
-        reported = activities
+        coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
+        selected = melt_quantity_report(quantity, activities, coefficients)
+        if selected is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.PRODUCED, call_evidence=call_evidence),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_reported_activity_not_coefficient",
+                    "quantity": quantity.value,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+        reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
         reported = pressures
@@ -1625,8 +1795,38 @@ def predict_with_engine(
     else:
         reported = {**activities, **pressures}
 
-    matched = match_reported_species(formula, reported)
-    if matched is None:
+    magnitude: float | None = None
+    converter_reason = ""
+    # The melt-activity gate already required the measured species to equal
+    # the admitted endmember. Compare that exact identity; never substitute a
+    # different species into the residual.
+    compared = formula
+    if quantity is Quantity.ACTIVITY and engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
+        # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
+        # from H2O or H2O_Liq. Element labels are not oxide activities.
+        from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+
+        value, converter_reason = melts_endmember_to_parent_oxide_activity(
+            reported, compared,
+        )
+        magnitude = value
+    else:
+        matched = match_reported_species(
+            compared,
+            reported,
+            oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
+        )
+        if matched is not None:
+            _name, magnitude = matched
+    if magnitude is None:
+        detail: dict[str, object] = {
+            "reason": "species_unmatched_in_engine_output",
+            "formula": compared,
+            "reported": sorted(str(name) for name in reported),
+        }
+        if converter_reason:
+            detail["converter"] = converter_reason
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1637,15 +1837,10 @@ def predict_with_engine(
             lineage_complete=False,
             certified_band=certified_band,
             refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "species_unmatched_in_engine_output",
-                "formula": formula,
-                "reported": sorted(reported),
-            },
+            refusal_detail=detail,
             identity=identity,
             requested_composition=requested,
         )
-    _name, magnitude = matched
     if not math.isfinite(magnitude):
         return EnginePrediction(
             engine=engine,
@@ -1853,7 +2048,7 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
-        prediction = predictor(engine, reference, handles=handles)
+        prediction = predictor(engine, reference, handles=handles, experiment=experiment)
 
     notices = union_notices(notices, prediction.notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)

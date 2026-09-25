@@ -14,6 +14,8 @@ from engines.alphamelts.domain import (
     MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
     AlphaMELTSDomainGate,
     DomainGateAssessment,
+    canonical_melt_oxide_activity_name,
+    canonical_oxide_activity_map,
     melts_endmember_to_parent_oxide_activity,
     _SIO2_CRASH_FLOOR_WT_PCT,
 )
@@ -228,3 +230,55 @@ def test_melts_cao_mgo_are_typed_refusals_not_fabricated_conversions() -> None:
     assert "Mg2SiO4" in mgo_reason
     assert "standard state the model does not define" in cao_reason
     assert "standard state the model does not define" in mgo_reason
+
+
+def test_h2o_label_is_the_endmember_activity_and_not_a_basis_oxide() -> None:
+    """H2O is a liquid endmember. The 14-oxide basis map still omits it."""
+
+    present, present_reason = melts_endmember_to_parent_oxide_activity(
+        {"H2O": 0.3}, "H2O"
+    )
+    liquid, liquid_reason = melts_endmember_to_parent_oxide_activity(
+        {"H2O_Liq": 0.31}, "H2O"
+    )
+    wrapped, wrapped_reason = melts_endmember_to_parent_oxide_activity(
+        {"a(H2O)": 0.29}, "H2O"
+    )
+    empty, empty_reason = melts_endmember_to_parent_oxide_activity({}, "H2O")
+    skipped, skipped_reason = melts_endmember_to_parent_oxide_activity(
+        {"H2O": 0.0, "H2O_Liq": 0.31}, "H2O"
+    )
+
+    assert present == pytest.approx(0.3)
+    assert present_reason == ""
+    assert "no positive activity" not in present_reason
+    assert liquid == pytest.approx(0.31)
+    assert liquid_reason == ""
+    assert wrapped == pytest.approx(0.29)
+    assert wrapped_reason == ""
+    assert empty is None
+    assert empty_reason == "engine returned no positive activity for H2O"
+    assert not empty_reason.startswith(MELTS_PARENT_OXIDE_NOT_ENDMEMBER)
+    assert skipped == pytest.approx(0.31)
+    assert skipped_reason == ""
+    assert canonical_melt_oxide_activity_name("H2O") is None
+    assert canonical_melt_oxide_activity_name("H2O_Liq") is None
+    assert canonical_oxide_activity_map(
+        {"H2O": 0.3, "SiO2_Liq": 0.42, "Na": 0.08}
+    ) == {"SiO2": 0.42}
+
+
+@pytest.mark.parametrize("oxide", ["Na2O", "CaO", "MgO", "FeO", "K2O"])
+def test_same_named_parent_oxide_is_not_an_endmember_activity(oxide: str) -> None:
+    """A literal Na2O key is not a(Na2O). The endmember refusal comes first."""
+
+    activities = {oxide: 0.7, "SiO2_Liq": 0.42, "Na2SiO3": 0.2}
+    value, reason = melts_endmember_to_parent_oxide_activity(activities, oxide)
+    sio2, sio2_reason = melts_endmember_to_parent_oxide_activity(activities, "SiO2")
+
+    assert value is None
+    assert value != pytest.approx(0.7)
+    assert MELTS_PARENT_OXIDE_NOT_ENDMEMBER in reason
+    assert oxide in reason
+    assert sio2 == pytest.approx(0.42)
+    assert sio2_reason == ""
