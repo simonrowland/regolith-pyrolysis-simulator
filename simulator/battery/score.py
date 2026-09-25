@@ -49,6 +49,7 @@ from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
     identity_equal,
+    profile_for,
     quantity_token,
 )
 from simulator.battery.migrate import (
@@ -77,6 +78,7 @@ from simulator.battery.records import (
     Value,
     Work,
     as_decimal,
+    phase_token,
     union_notices,
 )
 from simulator.battery.validate import (
@@ -981,6 +983,211 @@ def cell_notices(
     return tuple(notices)
 
 
+# More than one oxidation state in silicate melts over the fO2 range these
+# engines are asked to run. Oxygen is an input for a melt activity only when
+# the composition or the measured species holds one of these at a positive
+# amount. Iron aliases, including total-iron prints, resolve through
+# MELTS_OXIDE_ALIASES inside _elements_of_component. Same table as the
+# melt-activity contract.
+_MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
+    "Fe": "Fe2+/Fe3+",
+    "Ti": "Ti4+/Ti3+",
+    "Cr": "Cr3+/Cr2+",
+    "Mn": "Mn2+/Mn3+",
+    "V": "V3+/V4+/V5+",
+    "Eu": "Eu3+/Eu2+",
+    "Ce": "Ce4+/Ce3+",
+    "S": "S2-/S6+",
+    "Ga": "Ga3+/Ga+",
+}
+_MULTIVALENT_ELEMENT_LIST = "Fe, Ti, Cr, Mn, V, Eu, Ce, S, Ga"
+
+
+def _oxide_lookup_key(name: str) -> str:
+    key = str(name).strip()
+    if key.endswith("_Liq"):
+        key = key[:-4]
+    if key.endswith("*"):
+        key = key[:-1]
+    return key
+
+
+def _elements_of_component(name: str) -> frozenset[str]:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    key = _oxide_lookup_key(name)
+    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
+    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
+    parsed = formula_composition(formula)
+    if not parsed:
+        return frozenset()
+    return frozenset(element for element, _count in parsed)
+
+
+def _is_multivalent_name(name: str) -> bool:
+    return any(
+        element in _MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
+    )
+
+
+def multivalent_components(
+    composition: Composition | None,
+    species: str | None,
+) -> tuple[str, ...]:
+    """Names that hold a multivalent element at a positive amount, plus the species.
+
+    A printed zero does not count, so FeO = 0 cannot hide TiO2.
+    """
+
+    present: list[str] = []
+    if composition is not None:
+        for name, amount in composition.components:
+            if amount > 0 and _is_multivalent_name(str(name)):
+                present.append(str(name))
+    if species and _is_multivalent_name(species) and species not in present:
+        present.append(species)
+    return tuple(sorted(set(present)))
+
+
+def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
+    """Pot formula and phase when the row states a pure condensed reservoir.
+
+    Absent reservoir, an unknown phase, or a gas reservoir is not that
+    statement. p_sat also requires the reservoir formula to be the gas species.
+    """
+
+    reservoir = identity.reservoir
+    if reservoir is None or not reservoir.is_value or reservoir.value is None:
+        return None
+    src = reservoir.value
+    token = phase_token(src)
+    if token not in CONDENSED_PHASES:
+        return None
+    if parse_species_formula(src.formula) is None:
+        return None
+    if quantity_token(identity) is Quantity.P_SAT and src.formula != identity.species.formula:
+        return None
+    return src.formula, token.value
+
+
+def oxygen_is_scorer_input(
+    identity: Identity,
+    composition: Composition | None,
+) -> tuple[bool, str, tuple[str, ...]]:
+    """Whether a missing fO2 must be refused, and the record of why.
+
+    Melt activity takes oxygen only when a multivalent element is present.
+    Every other quantity follows its identity profile: a required fO2 is an
+    input, and a not-applicable fO2 is omitted rather than filled.
+    """
+
+    quantity = quantity_token(identity)
+    redox = multivalent_components(composition, identity.species.formula)
+    if quantity in MELT_ACTIVITY_QUANTITIES:
+        if redox:
+            return True, "melt contains multivalent " + ", ".join(redox), redox
+        return (
+            False,
+            "melt has no multivalent element "
+            f"({_MULTIVALENT_ELEMENT_LIST}) in the composition or measured species; "
+            "oxygen is not an input and was omitted",
+            (),
+        )
+    if "fO2_Pa" in profile_for(identity).required:
+        qname = quantity.value if quantity is not None else "quantity"
+        return True, f"{qname} requires oxygen", redox
+    qname = quantity.value if quantity is not None else "quantity"
+    return False, f"{qname} does not take oxygen as an input; oxygen was omitted", redox
+
+
+def _unfilled_inputs(identity: Identity) -> dict[str, str]:
+    """Which of the scorer's former fills this identity does not carry."""
+
+    fo2 = identity.fO2_Pa
+    pressure = identity.total_pressure_Pa
+    fo2_missing = not (fo2 is not None and fo2.is_value and fo2.value is not None)
+    pressure_missing = not (
+        pressure is not None and pressure.is_value and pressure.value is not None
+    )
+    out: dict[str, str] = {}
+    if fo2_missing:
+        out["fO2_Pa"] = "missing"
+    if pressure_missing:
+        out["total_pressure_Pa"] = "missing"
+    return out
+
+
+def _input_refusal(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    reason: RefusalReason,
+    detail: dict[str, object],
+    notices: tuple[Notice, ...] = (),
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=reason,
+        refusal_detail=detail,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
+def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
+    return Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score:predict_with_engine",
+    )
+
+
+def _omission_notice(quantity: Quantity, reason: str) -> Notice:
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score:predict_with_engine",
+    )
+
+
+def total_pressure_bar_for_score(
+    identity: Identity,
+    quantity: Quantity,
+) -> tuple[float, Notice | None, str | None]:
+    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+
+    A present but non-finite or negative pressure is invalid. It is not
+    replaced by the assumption.
+    """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
+
+    state = identity.total_pressure_Pa
+    if state is not None and state.is_value and state.value is not None:
+        pa = state.value if isinstance(state.value, Decimal) else as_decimal(state.value)
+        if not pa.is_finite() or pa < 0:
+            return 0.0, None, "total_pressure_invalid"
+        return float(pa) / 1.0e5, None, None
+    detail = "observation does not carry total_pressure_Pa"
+    if state is not None and state.reason:
+        detail = f"{detail} ({state.tag.value}: {state.reason})"
+    notice = _assumption_notice(
+        quantity,
+        f"{detail}; residual assumes {_DEFAULT_PRESSURE_BAR:g} bar",
+    )
+    return float(_DEFAULT_PRESSURE_BAR), notice, None
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -995,7 +1202,7 @@ def predict_with_engine(
         ARM_QUALIFICATION,
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
-        PO2_ENGINE_DEFAULT,
+        PO2_NOT_AN_INPUT,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -1062,42 +1269,44 @@ def predict_with_engine(
 
     wt: dict[str, float] | None = None
     requested: State[Composition] | None = None
+    input_notices: list[Notice] = []
+    composition_value: Composition | None = None
     if identity.composition is not None and identity.composition.is_value:
         requested = identity.composition
         assert identity.composition.value is not None
-        wt = composition_wt_pct(identity.composition.value)
-        if wt is None:
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
-                refusal_detail={"reason": "composition_unparsed"},
-                identity=identity,
-                requested_composition=requested,
-            )
+        composition_value = identity.composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM or quantity in FORMATION_QUANTITIES:
-        # Pure-species identity: 100 wt% of the reservoir/species formula.
-        reservoir = identity.reservoir
-        formula_pot = formula
-        if reservoir is not None and reservoir.is_value and reservoir.value is not None:
-            formula_pot = reservoir.value.formula
-        if parse_species_formula(formula_pot) is None:
-            return EnginePrediction(
+        # 100 wt% of a species is the pure substance only when the row says so.
+        stated = stated_pure_substance_reservoir(identity)
+        if stated is None:
+            detail: dict[str, object] = {
+                "reason": "composition_not_stated_pure_reservoir",
+                "quantity": quantity.value,
+                "formula": formula,
+            }
+            unfilled = _unfilled_inputs(identity)
+            if unfilled:
+                detail["also_unfilled"] = unfilled
+            return _input_refusal(
                 engine=engine,
                 channel=channel,
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
-                refusal_detail={"reason": "species_formula_unparsed", "formula": formula_pot},
+                sources=sources,
                 identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail=detail,
             )
+        formula_pot, phase_name = stated
         wt = {formula_pot: 100.0}
+        input_notices.append(
+            _omission_notice(
+                quantity,
+                "composition omitted; reservoir states the pure condensed "
+                f"substance {formula_pot} ({phase_name})",
+            )
+        )
 
-    if wt is None:
+    if composition_value is None and wt is None:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1108,6 +1317,65 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_has_no_engine_pot", "quantity": quantity.value},
             identity=identity,
         )
+
+    pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
+        identity, quantity
+    )
+    if pressure_invalid is not None:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.INVALID_IDENTITY,
+            detail={"reason": pressure_invalid, "quantity": quantity.value},
+            notices=tuple(input_notices),
+        )
+    if pressure_notice is not None:
+        input_notices.append(pressure_notice)
+
+    oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
+    fo2_state = identity.fO2_Pa
+    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+        # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
+        # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
+        po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
+    elif oxygen_required:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+                "multivalent": list(redox),
+            },
+            notices=tuple(input_notices),
+        )
+    else:
+        po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+        input_notices.append(_omission_notice(quantity, oxygen_why))
+
+    if composition_value is not None:
+        wt = composition_wt_pct(composition_value)
+        if wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "composition_unparsed"},
+                identity=identity,
+                requested_composition=requested,
+            )
 
     handle_map = handles or {}
     handle = handle_map.get(engine.value)
@@ -1123,6 +1391,7 @@ def predict_with_engine(
                 state=ExecutionState.ATTEMPTED_UNAVAILABLE,
                 call_evidence=f"open_battery_engine:{name}",
             ),
+            notices=tuple(input_notices),
             coefficient_sources=sources,
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -1134,16 +1403,8 @@ def predict_with_engine(
             requested_composition=requested,
         )
 
-    fo2_state = identity.fO2_Pa
-    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-        # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
-        # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
-        po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-    else:
-        po2 = Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None)
-
     qualification = False
-    extra_notices: list[Notice] = []
+    extra_notices: list[Notice] = list(input_notices)
     authority = Authority.BRIDGE
     certified_band = None
     if name in MELTS_FAMILY_ENGINES:
@@ -1166,6 +1427,7 @@ def predict_with_engine(
         qualification=qualification,
         isolated=use_isolated,
         arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+        physical_pressure_bar=pressure_bar,
     )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
