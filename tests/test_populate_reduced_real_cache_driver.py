@@ -11,6 +11,7 @@ import pytest
 
 import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
+from simulator.evaporation import EvaporationFluxRefusal
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -661,6 +662,101 @@ def test_gate_liquidus_unavailable_is_isolated_per_case(
         "status=ok hours=1"
     ) in out
     assert "CASE-GAP: mars_sulfate_rich/C2A_staged gate_liquidus_unavailable" in out
+
+
+def test_freeze_gate_no_authority_refusal_is_isolated_per_case(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    target_db = tmp_path / "target.db"
+
+    def fake_load_yaml(path):
+        path = Path(path)
+        if path.name == "dummy-profile.yaml":
+            return {"feedstock": "fake_feedstock"}
+        return {"feedstock": path.stem}
+
+    monkeypatch.setattr(driver, "_load_yaml", fake_load_yaml)
+
+    def fake_run_case(*, db_path, feedstock, campaign, mode, **kwargs):
+        assert mode == "capture"
+        if feedstock == "mars_sulfate_rich":
+            raise EvaporationFluxRefusal(
+                "composition_projected; freeze gate has no liquidus bound "
+                "of any authority. kress91 liquid calibration floor "
+                "unavailable: no cleaned melt",
+                {
+                    "reason_refused": "freeze_gate_no_liquidus_authority",
+                    "bounds_source": "refused",
+                },
+            )
+        _write_magemin_row(db_path, f"{feedstock}-{campaign}")
+        return _result(marker=f"{feedstock}-{campaign}", mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "unused",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--feedstock",
+            "mars_sulfate_rich",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C2A_staged",
+        ]
+    )
+
+    assert rc == 0
+    assert emitted[-1]["domain_gap_count"] == 1
+    assert emitted[-1]["domain_gaps"][0]["reason"] == (
+        "freeze_gate_no_liquidus_authority"
+    )
+    assert emitted[-1]["domain_gaps"][0]["feedstock"] == "mars_sulfate_rich"
+    out = capsys.readouterr().out
+    assert (
+        "CASE-GAP: mars_sulfate_rich/C2A_staged "
+        "freeze_gate_no_liquidus_authority"
+    ) in out
+    assert (
+        "[case] feedstock=lunar_mare_low_ti campaign=C2A_staged "
+        "status=ok hours=1"
+    ) in out
+
+
+def test_other_evaporation_flux_refusal_still_aborts(tmp_path, monkeypatch):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+
+    def fake_run_case(**kwargs):
+        raise EvaporationFluxRefusal(
+            "uncertified_melt_resistance_model",
+            {"reason_refused": "uncertified_melt_resistance_model"},
+        )
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    with pytest.raises(EvaporationFluxRefusal, match="uncertified_melt_resistance"):
+        driver.main(
+            [
+                "--profile",
+                "unused",
+                "--db",
+                str(tmp_path / "target.db"),
+                "--hours",
+                "1",
+            ]
+        )
+
+    assert emitted == []
 
 
 def test_non_prefix_gate_liquidus_runtime_error_still_aborts(tmp_path, monkeypatch):

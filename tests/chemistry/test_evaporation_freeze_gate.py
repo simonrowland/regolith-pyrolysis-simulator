@@ -22,7 +22,11 @@ from simulator.evaporation import (
     EvaporationFluxRefusal,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
-from simulator.fe_redox import kress91_ln_fO2_temperature_delta
+from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    kress91_ln_fO2_temperature_delta,
+)
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
@@ -1444,6 +1448,32 @@ def test_invalid_projected_bounds_use_kress_floor_and_name_drops(
     assert fraction['composition_projected_notice']['projected_bounds'] == (
         'invalid'
     )
+    floor_notice = fraction['composition_projected_notice']
+    assert floor_notice['certified_band'] == {
+        'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+        'source': 'REF-001 Kress91 1200-1630 C calibration band',
+    }
+    assert floor_notice['projection_certified_band'] == notice['certified_band']
+    assert floor_notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert floor_notice['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert floor_notice['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert floor_notice['temperature_band_source'] == (
+        'REF-001 Kress91 liquid relation; below 1200 C calibration floor'
+    )
+    assert 'engine' not in floor_notice['certified_band']
+    assert fraction['status'] == 'extrapolation_below_calibration_floor'
+    assert fraction['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert fraction['temperature_band_case'] == 'below_1200C_extrapolation'
+    gate = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert gate['status'] == 'extrapolation_below_calibration_floor'
+    assert gate['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert gate['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert gate['composition_projected_notice']['certified_band'] == (
+        floor_notice['certified_band']
+    )
 
     gate_factor = sim._freeze_gate_liquid_fraction_factor()
     assert gate_factor == 1.0
@@ -1454,12 +1484,45 @@ def test_invalid_projected_bounds_use_kress_floor_and_name_drops(
     assert run_notice['notices'][0]['bounds_source'] == (
         _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
     )
+    assert run_notice['notices'][0]['certified_band'] == (
+        floor_notice['certified_band']
+    )
+    assert run_notice['notices'][0]['floor_T_C'] == (
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    )
+    assert run_notice['notices'][0]['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
+    assert run_notice['notices'][0]['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert run_notice['notices'][0]['projection_certified_band'] == (
+        notice['certified_band']
+    )
     run_names = {
         row['component']
         for item in run_notice['notices']
         for row in item['dropped_components']
     }
     assert {'MnO', 'P2O5'} <= run_names
+    metadata = {}
+    _attach_composition_projected_liquidus_notice(metadata, sim)
+    rendered = metadata['composition_projected_liquidus_notice']['notices'][0]
+    assert rendered['certified_band'] == floor_notice['certified_band']
+    assert rendered['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert rendered['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert rendered['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert rendered['projection_certified_band']['engine'] == 'magemin'
+    freeze_notice = sim._last_freeze_gate_diagnostic[
+        'composition_projected_notice'
+    ]
+    assert freeze_notice['certified_band'] == floor_notice['certified_band']
+    assert freeze_notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert freeze_notice['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
 
 
 def test_invalid_projected_bounds_prefer_later_ladder_authority(
@@ -1510,6 +1573,9 @@ def test_invalid_projected_bounds_prefer_later_ladder_authority(
     attached = sim._last_freeze_gate_diagnostic['composition_projected_notice']
     assert attached['bounds_source'] == 'liquidus_solidus:backend'
     assert attached['projected_bounds'] == 'invalid'
+    assert attached['certified_band']['engine'] == 'magemin'
+    assert 'floor_T_C' not in attached
+    assert 'temperature_band_case' not in attached
     assert dropped <= {
         row['component'] for row in attached['dropped_components']
     }
@@ -1554,6 +1620,48 @@ def test_invalid_projected_bounds_without_any_authority_is_typed_refusal(
     run_notice = sim.composition_projected_liquidus_run_notice()
     assert run_notice['notices'][0]['bounds_source'] == 'refused'
     assert run_notice['notices'][0]['projected_bounds'] == 'invalid'
+
+
+def test_invalid_projected_notice_missing_is_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A projection name with no drop rows is a typed refusal, not a failed run.
+
+    FALSIFIABILITY: raise RuntimeError from the empty-ladder branch in
+    ``_freeze_gate_curve`` and this raises RuntimeError. Route the same
+    branch through ``_melt_redox_liquidus_floor_fallback`` and the empty
+    fallback summary fails.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+    }
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        _dispatch_projected_without_bounds(diagnostic),
+    )
+    sim.backend.find_liquidus_solidus = None
+    sim.melt.temperature_C = 1500.0
+
+    with pytest.raises(EvaporationFluxRefusal, match='composition_projected') as exc:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert not isinstance(exc.value, RuntimeError)
+    assert exc.value.diagnostic['reason_refused'] == (
+        'freeze_gate_no_liquidus_authority'
+    )
+    assert exc.value.diagnostic['bounds_source'] == 'refused'
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
 
 
 @pytest.mark.parametrize('mass_fraction', [None, float('nan'), float('inf')])

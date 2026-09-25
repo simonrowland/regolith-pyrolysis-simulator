@@ -39,6 +39,7 @@ from simulator.backend_names import (
 from simulator.backends import BackendSelectionPolicy
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import (
     ControlQuantization,
@@ -72,10 +73,10 @@ FIRST_FLIP_CAMPAIGNS = ("C2A_continuous", "C2B", "C4")
 CAL_FEEDSTOCKS = ("lunar_mare_low_ti", "mars_perchlorate_rich", "ci_carbonaceous_chondrite")
 KREEP_FEEDSTOCK = "lunar_pkt_kreep_average"
 MAGEMIN_PROVIDER_ID = "magemin-shadow"
-# TODO: replace message-prefix match with a typed exception once the in-flight
-# evaporation.py work lands. Pinned by
-# tests/test_populate_reduced_real_cache_driver.py against the upstream literal
-# in simulator/evaporation.py.
+# Prefix remains for a missing liquidus that is not a composition projection
+# (still RuntimeError). Pinned by tests/test_populate_reduced_real_cache_driver.py
+# against the upstream literal in simulator/evaporation.py. The empty-melt
+# projection refusal is EvaporationFluxRefusal, classified separately.
 GATE_LIQUIDUS_UNAVAILABLE_PREFIX = (
     "freeze_gate.enabled requires a liquid_fraction(T) source"
 )
@@ -445,8 +446,22 @@ def _diagnostic_keys_from_vapor_pressure_refusal(
     return tuple(keys)
 
 
-def _known_chemistry_case_gap(exc: RuntimeError | ValueError) -> dict[str, Any] | None:
+def _known_chemistry_case_gap(
+    exc: RuntimeError | ValueError | EvaporationFluxRefusal,
+) -> dict[str, Any] | None:
     detail = str(exc)
+    if isinstance(exc, EvaporationFluxRefusal):
+        diagnostic = getattr(exc, "diagnostic", None) or {}
+        if (
+            isinstance(diagnostic, Mapping)
+            and diagnostic.get("reason_refused")
+            == "freeze_gate_no_liquidus_authority"
+        ):
+            return {
+                "reason": "freeze_gate_no_liquidus_authority",
+                "detail": detail,
+            }
+        return None
     if isinstance(exc, RuntimeError):
         if detail.startswith(GATE_LIQUIDUS_UNAVAILABLE_PREFIX):
             return {
@@ -1165,7 +1180,7 @@ def main(argv: list[str]) -> int:
                         allow_internal_analytical_equilibrium=args.allow_internal_analytical_equilibrium,
                         control_quantization=args.control_quantization,
                     )
-                except (RuntimeError, ValueError) as exc:
+                except (RuntimeError, ValueError, EvaporationFluxRefusal) as exc:
                     gap = _known_chemistry_case_gap(exc)
                     if gap is None:
                         raise

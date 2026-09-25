@@ -4712,6 +4712,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_diagnostic['composition_projected_notice'] = dict(
                 projected_notice
             )
+        self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_curve
 
@@ -4807,6 +4808,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fraction_diagnostic['composition_projected_notice'] = dict(
                 projected_notice
             )
+        self._stamp_kress_floor_diagnostic(fraction_diagnostic)
         self._last_melt_redox_liquid_fraction_diagnostic = fraction_diagnostic
         return liquid_fraction
 

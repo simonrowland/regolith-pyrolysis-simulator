@@ -20,8 +20,10 @@ from simulator.chemistry.kernel import (
 from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_referenced_log_fO2,
+    kress91_temperature_band_case,
 )
 from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
@@ -1663,6 +1665,29 @@ class EvaporationMixin:
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 
+    def _stamp_kress_floor_diagnostic(
+        self,
+        diagnostic: dict[str, Any],
+    ) -> None:
+        """Mark a Kress-floor fraction as extrapolated, not a measured liquidus.
+
+        Reads the curve notice. A measured curve, and the generic
+        liquidus-unavailable floor, are left unchanged.
+        """
+        if diagnostic.get('source') != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE:
+            return
+        notice = diagnostic.get('composition_projected_notice')
+        if not isinstance(notice, Mapping):
+            return
+        status = notice.get('temperature_band_status')
+        if status:
+            diagnostic['status'] = str(status)
+        if 'floor_T_C' in notice:
+            diagnostic['floor_T_C'] = float(notice['floor_T_C'])
+        case = notice.get('temperature_band_case')
+        if case:
+            diagnostic['temperature_band_case'] = str(case)
+
     def _record_composition_projected_liquidus_notice_from_curve(
         self,
         curve: Mapping[str, Any],
@@ -1702,6 +1727,25 @@ class EvaporationMixin:
             stored_notice['bounds_source'] = notice.get('bounds_source')
         if 'projected_bounds' in notice:
             stored_notice['projected_bounds'] = notice.get('projected_bounds')
+        # Present only on the Kress-floor curve. A usable projection and a
+        # later real liquidus keep the historical notice shape.
+        projection_band = notice.get('projection_certified_band')
+        if isinstance(projection_band, Mapping):
+            stored_notice['projection_certified_band'] = dict(projection_band)
+            components = projection_band.get('bulk_components')
+            if isinstance(components, (list, tuple)):
+                stored_notice['projection_certified_band'][
+                    'bulk_components'
+                ] = [str(item) for item in components]
+        if 'floor_T_C' in notice:
+            stored_notice['floor_T_C'] = float(notice['floor_T_C'])
+        for key in (
+            'temperature_band_case',
+            'temperature_band_status',
+            'temperature_band_source',
+        ):
+            if key in notice:
+                stored_notice[key] = notice.get(key)
         stored.append(stored_notice)
         self._composition_projected_liquidus_notices = stored
 
@@ -1808,7 +1852,7 @@ class EvaporationMixin:
         *,
         bounds_source: str,
     ) -> dict[str, Any]:
-        return {
+        annotated = {
             'kind': notice.get('kind'),
             'reason': notice.get('reason'),
             'authority': notice.get('authority'),
@@ -1824,6 +1868,34 @@ class EvaporationMixin:
             'bounds_source': bounds_source,
             'projected_bounds': 'invalid',
         }
+        if bounds_source != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE:
+            return annotated
+        # Frozen at and below 1200 C. That limb is the below-1200 C
+        # extrapolation: Kress91's liquid relation is certified on
+        # 1200–1630 C. The MAGEMin oxide list stays the projection's band.
+        below = kress91_temperature_band_case(
+            float(KRESS91_LIQUID_CALIBRATION_MIN_T_C) - 1.0
+        )
+        certified = kress91_temperature_band_case(
+            float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        )
+        projection_band = dict(annotated['certified_band'])
+        components = projection_band.get('bulk_components')
+        if isinstance(components, (list, tuple)):
+            projection_band['bulk_components'] = [
+                str(item) for item in components
+            ]
+        annotated['projection_certified_band'] = projection_band
+        annotated['certified_band'] = {
+            'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+            'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+            'source': certified['source'],
+        }
+        annotated['floor_T_C'] = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        annotated['temperature_band_case'] = below['case']
+        annotated['temperature_band_status'] = below['status']
+        annotated['temperature_band_source'] = below['source']
+        return annotated
 
     def _freeze_gate_kress_floor_curve(
         self,
@@ -2028,7 +2100,23 @@ class EvaporationMixin:
                 # Keep the token even when the joined tail is long. The redox
                 # gate must not read this refusal as a missing liquidus.
                 if any('composition_projected' in reason for reason in reasons):
+                    # Named projection, no parseable drop notice, and no
+                    # ladder bound. Typed refusal. A RuntimeError here is
+                    # re-raised and the runner records status=failed.
                     detail = f'composition_projected; {detail}'
+                    raise EvaporationFluxRefusal(
+                        detail,
+                        {
+                            'reason_refused': (
+                                'freeze_gate_no_liquidus_authority'
+                            ),
+                            'kind': 'composition_projected',
+                            'reason': 'composition_projected',
+                            'bounds_source': 'refused',
+                            'projected_bounds': 'invalid',
+                            'detail': detail,
+                        },
+                    )
                 raise RuntimeError(
                     'freeze_gate.enabled requires a liquid_fraction(T) source; '
                     'no liquidus engine produced usable solidus/liquidus bounds. '
