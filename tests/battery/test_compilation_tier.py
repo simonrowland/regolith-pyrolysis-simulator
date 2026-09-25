@@ -183,6 +183,37 @@ def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
     assert decision_band_for(Quantity.DELTA_FG, SourceRelation.INDEPENDENT) is not None
 
 
+def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
+    experiment = F.tabulation_experiment()
+    series = F.observation(
+        "na2o-series",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("0"), Decimal("0")), (_T, _PRINTED_DFG)),
+        ),
+    )
+    out = compilation_tier_census(
+        _context(series),
+        engines=(Engine.VAPOROCK,),
+        audit_compile_residual=False,
+    )
+    row = out["rows"][0]
+    assert row["reachable"] == 2
+    assert row["refused"]["identity_unknown:temperature-not-positive"] == 1
+    assert row["refused"]["unsupported:engine-thermo-does-not-emit"] == 1
+
+
 def test_non_positive_temperature_is_a_refusal_not_an_exception() -> None:
     identity = replace(_na2o_liquid(), temperature_K=State.of(Decimal("0")))
     attempt = predict_thermo_attempt(

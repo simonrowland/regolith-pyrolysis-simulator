@@ -1079,16 +1079,34 @@ def compilation_tier_census(
                         quantity=token or Quantity.DELTA_FG,
                         origin=point.observation_id,
                     )
-                elif engine is not Engine.INTERNAL_ANALYTICAL and engine in reused:
-                    attempt = reused[engine]
                 else:
-                    attempt = predict_thermo_attempt(
-                        engine,
-                        point,
-                        invoke_pure_phase=invoke_pure_phase,
+                    # A 0 K row is a real printed point. Do not reuse its
+                    # refusal for later temperatures in the same series.
+                    temperature_state = (
+                        point.identity.temperature_K
+                        if isinstance(point.identity, Identity)
+                        else None
                     )
-                    if engine is not Engine.INTERNAL_ANALYTICAL:
-                        reused[engine] = attempt
+                    nonpositive = (
+                        isinstance(temperature_state, State)
+                        and temperature_state.is_value
+                        and temperature_state.value is not None
+                        and as_decimal(temperature_state.value) <= 0
+                    )
+                    if (
+                        not nonpositive
+                        and engine is not Engine.INTERNAL_ANALYTICAL
+                        and engine in reused
+                    ):
+                        attempt = reused[engine]
+                    else:
+                        attempt = predict_thermo_attempt(
+                            engine,
+                            point,
+                            invoke_pure_phase=invoke_pure_phase,
+                        )
+                        if not nonpositive and engine is not Engine.INTERNAL_ANALYTICAL:
+                            reused[engine] = attempt
                 relation = relation_for(obs, engine)
                 account(
                     row,
