@@ -562,10 +562,11 @@ def test_terminal_evaporation_refusal_rolls_back_full_hour(monkeypatch):
 @pytest.mark.serial
 def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     # DEFAULT_MASS_TOLERANCE_KG (20 g) bounds a single transition only.
-    # The no-MRE campaign now ends at the first unsupported transitional-Kn
-    # flux point. If each committed prefix transition closed a little short or
-    # long with a consistent sign, cumulative drift could still grow while
-    # every individual transition passed. Guard that prefix directly.
+    # The no-MRE campaign now runs to completion: transitional-Kn hours commit
+    # as flagged extrapolations (continuum_extrapolation_notice), not refusals.
+    # If each committed transition closed a little short or long with a
+    # consistent sign, cumulative drift could still grow while every
+    # individual transition passed. Guard the whole ledger directly.
     feedstocks = _load_data_yaml("feedstocks.yaml")
     setpoints = _load_data_yaml("setpoints.yaml")
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
