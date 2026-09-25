@@ -4481,9 +4481,9 @@ def _named_reference_endmembers(text: str) -> list[tuple[str, str]]:
 def _names_raoultian_standard(text: str, lowered: str) -> bool:
     if "ラウール" in text:
         return True
-    if re.search(r"\bnot\s+raoult", lowered):
+    if re.search(r"\bnot\s+(?:a\s+)?raoult(?:ian)?(?:\b|_)", lowered):
         return False
-    return re.search(r"\braoult", lowered) is not None
+    return re.search(r"\braoult(?:ian)?(?:\b|_)", lowered) is not None
 
 
 def _reference_endmember_formula(
@@ -4590,6 +4590,18 @@ def reference_state_from_extract(
         )
     if "not printed" in lowered or "not stated" in lowered:
         return State.unknown(f"source reference state not printed: {text}")
+    if re.search(r"\bnot\s+(?:a\s+)?raoult(?:ian)?(?:\b|_)", lowered):
+        return State.unknown(
+            f"source explicitly excludes a Raoultian reference state: {text}"
+        )
+    if re.search(
+        r"(?:\braoult(?:ian)?\b\s*(?:/|and)\s*\bhenr(?:ian|y)\b|"
+        r"\bhenr(?:ian|y)\b\s*(?:/|and)\s*\braoult(?:ian)?\b)",
+        lowered,
+    ):
+        return State.unknown(
+            f"source names both Raoultian and Henrian conventions: {text}"
+        )
 
     if _names_raoultian_standard(text, lowered):
         convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER

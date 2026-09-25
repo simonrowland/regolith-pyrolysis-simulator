@@ -3351,6 +3351,49 @@ def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() ->
     assert henry.value.endmember.phase.value is Phase.L
 
 
+def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
+    furukawa = next(
+        row
+        for row in _extract_observations("kems-119-furukawa-1975.yaml")
+        if row.get("observation_id") == "furukawa_1975_quoted_fruehan_gamma_v"
+    )
+    mixed = reference_state_from_extract(
+        furukawa["standard_state"],
+        species_formula="V",
+        values=furukawa["values"],
+    )
+    assert mixed is not None and mixed.is_unknown
+
+    plante = next(
+        row
+        for row in _extract_observations("kems-027-plante-hastie-1983.yaml")
+        if row.get("observation_id") == "plante_hastie_1983_nabo2_activity_approx"
+    )
+    negated = reference_state_from_extract(
+        plante["standard_state"],
+        species_formula="NaBO2",
+        values=plante["values"],
+    )
+    assert negated is not None and negated.is_unknown
+
+
+def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    expected = {
+        "demaria_1971_fe_lunar_basalt_kems_main_cell",
+        "demaria_1971_fe_activity_multi_rotating_cell",
+    }
+    loaded = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.observation_id.split("::", 1)[-1] in expected
+    }
+    assert set(loaded) == expected
+    for obs in loaded.values():
+        reference = obs.identity.reference_state
+        assert reference is not None and reference.is_unknown
+
+
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
     from simulator.battery.score import ScoreContext, comparison_candidates
 
