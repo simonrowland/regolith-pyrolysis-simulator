@@ -1112,12 +1112,29 @@ def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
     return None
 
 
+# First resolution of a work walks every observation. Series scoring calls
+# it once per printed cell; the set depends only on the maps' identity and
+# size. Callers must not mutate the returned set. A map that grows changes
+# len() and misses the cache.
+_WORK_INPUT_CACHE: dict[tuple[int, int, str, int, int], set[str]] = {}
+
+
 def _inputs_registered_under_work(
     work: Work,
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
 ) -> set[str]:
+    key = (
+        id(observations),
+        id(experiments),
+        work.work_id,
+        len(observations),
+        -1 if experiments is None else len(experiments),
+    )
+    cached = _WORK_INPUT_CACHE.get(key)
+    if cached is not None:
+        return cached
     ids: set[str] = set()
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
@@ -1129,6 +1146,7 @@ def _inputs_registered_under_work(
                 nested = _observation_lineage(obs.observation_id, observations, table_ids)
                 if nested:
                     ids |= nested
+    _WORK_INPUT_CACHE[key] = ids
     return ids
 
 
