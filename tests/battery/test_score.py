@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     MetricOperation,
     NoticeKind,
     Quantity,
+    Rail,
     RefusalReason,
     ResidualStatus,
     SourceRelation,
@@ -782,6 +783,211 @@ def test_pyrolysis_yield_does_not_use_robinot_eleven_percent_floor() -> None:
         assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
         assert "0.11" not in str(detail)
         assert "11" not in str(detail.get("reason") or "")
+
+
+def test_vapour_rail_is_only_vapour_pressures() -> None:
+    """Isotope and ion ratios, and Zn/Cu/Mg alphas, do not borrow a rail."""
+
+    from simulator.battery.score import no_headline_rail_reason, rail_for_quantity
+
+    for quantity in (Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE):
+        assert rail_for_quantity(quantity, species_formula="Na") is Rail.VAPOUR
+        assert rail_for_quantity(quantity, species_formula="SiO") is Rail.SIO_EVOLUTION
+        assert rail_for_quantity(quantity, species_formula="SiO2") is Rail.SIO_EVOLUTION
+    assert rail_for_quantity(None) is None
+    assert no_headline_rail_reason(None) == "quantity_unknown"
+    for quantity in (
+        Quantity.ISOTOPE_DELTA,
+        Quantity.ION_INTENSITY_RATIO,
+        Quantity.ION_INTENSITY,
+    ):
+        assert rail_for_quantity(quantity, species_formula="Si") is None
+        assert no_headline_rail_reason(quantity) == "not_a_vapour_quantity"
+    for formula in ("Zn", "Cu", "Mg"):
+        rail = rail_for_quantity(
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA, species_formula=formula
+        )
+        assert rail is None
+        assert rail is not Rail.SIO_EVOLUTION
+        assert rail is not Rail.VAPOUR
+    assert (
+        no_headline_rail_reason(Quantity.EVAPORATION_COEFFICIENT_ALPHA)
+        == "non_alkali_kinetic"
+    )
+    assert (
+        rail_for_quantity(
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA, species_formula="SiO"
+        )
+        is Rail.SIO_EVOLUTION
+    )
+    assert (
+        rail_for_quantity(Quantity.MASS_LOSS_RATE, species_formula="Na")
+        is Rail.ALKALI_SHUTTLE
+    )
+    assert rail_for_quantity(Quantity.MASS_LOSS_RATE, species_formula="Zn") is None
+    assert rail_for_quantity(Quantity.VISCOSITY) is None
+    assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
+
+
+def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
+    ident = replace(
+        F.psat_identity("Zn"), quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    )
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "zn-alpha",
+        exp.experiment_id,
+        ident,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.2"), ident))
+    assert residual.rail is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail.get("reason") == "non_alkali_kinetic"
+    assert "::none::" in residual.key
+    assert "SiO_evolution" not in residual.key
+    assert "::vapour::" not in residual.key
+
+
+def test_gibbs_band_applies_only_to_formation_energies() -> None:
+    """cp, S, H-H298, and log10_Kf do not borrow the 1.0 kJ/mol Gibbs band."""
+
+    from simulator.battery.score import decision_band_for, populate_numeric
+
+    for quantity in (
+        Quantity.CP,
+        Quantity.S,
+        Quantity.H_MINUS_H298,
+        Quantity.LOG10_KF,
+    ):
+        assert decision_band_for(quantity, SourceRelation.INDEPENDENT) is None
+        numeric, reason, detail = populate_numeric(
+            quantity=quantity,
+            candidate=Decimal("10"),
+            reference=Decimal("9"),
+            source_relation=SourceRelation.INDEPENDENT,
+        )
+        assert numeric is None
+        assert reason is RefusalReason.DECISION_RULE_MISSING
+        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
+    for quantity in (Quantity.DELTA_FG, Quantity.DELTA_FH):
+        band = decision_band_for(quantity, SourceRelation.INDEPENDENT)
+        assert band is not None
+        assert band.value == Decimal("1.0")
+        assert band.unit == "kJ_per_declared_mol_basis"
+    numeric, reason, _detail = populate_numeric(
+        quantity=Quantity.DELTA_FG,
+        candidate=Decimal("1"),
+        reference=Decimal("1"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.decision_band.unit == "kJ_per_declared_mol_basis"
+
+
+def test_applying_kj_band_to_cp_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Forcing the Gibbs kJ band onto cp is a dimension refusal, not a match."""
+
+    from simulator.battery import score as score_mod
+
+    band = score_mod.THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
+    assert score_mod.band_dimension_matches(Quantity.CP, band) is False
+    assert score_mod.band_dimension_matches(Quantity.S, band) is False
+    assert score_mod.band_dimension_matches(Quantity.LOG10_KF, band) is False
+    assert score_mod.band_dimension_matches(Quantity.DELTA_FG, band) is True
+    assert score_mod.band_dimension_matches(Quantity.DELTA_FH, band) is True
+    # H-H298 shares the kJ/mol dimension and is still not a sourced band.
+    assert score_mod.band_dimension_matches(Quantity.H_MINUS_H298, band) is True
+    assert (
+        score_mod.decision_band_for(Quantity.H_MINUS_H298, SourceRelation.INDEPENDENT)
+        is None
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "decision_band_for",
+        lambda quantity, source_relation: band,
+    )
+    numeric, reason, detail = score_mod.populate_numeric(
+        quantity=Quantity.CP,
+        candidate=Decimal("50"),
+        reference=Decimal("40"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert numeric is None
+    assert reason is RefusalReason.DECISION_RULE_MISSING
+    assert detail.get("reason") == "band_dimension_mismatch:cp"
+    assert detail.get("quantity_unit") == "J_per_declared_mol_basis_per_K"
+    assert detail.get("band_unit") == "kJ_per_declared_mol_basis"
+
+
+def test_candidate_census_splits_admitted_from_pending() -> None:
+    from simulator.battery.score import candidate_rail_census, render_score_report
+
+    exp = F.tabulation_experiment()
+    sio = replace(F.psat_identity("SiO"), quantity=Quantity.P_PARTIAL)
+    potassium = F.psat_identity("K")
+    zinc = replace(
+        F.psat_identity("Zn"), quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    )
+    admitted = F.observation(
+        "sio-p",
+        exp.experiment_id,
+        sio,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    pending = F.observation(
+        "k-psat",
+        exp.experiment_id,
+        potassium,
+        Decimal("2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.PENDING,
+        source_id="work-1",
+    )
+    alpha = F.observation(
+        "zn-alpha",
+        exp.experiment_id,
+        zinc,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.PENDING,
+        source_id="work-1",
+    )
+    ctx = _context(F.work(), exp, admitted, pending, alpha)
+    rails, off = candidate_rail_census(ctx)
+    by_rail = {row["rail"]: row for row in rails}
+    assert by_rail["SiO_evolution"]["candidates"] == 1
+    assert by_rail["SiO_evolution"]["admitted"] == 1
+    assert by_rail["SiO_evolution"]["pending"] == 0
+    assert by_rail["SiO_evolution"]["points"] == 1
+    assert by_rail["vapour"]["candidates"] == 1
+    assert by_rail["vapour"]["admitted"] == 0
+    assert by_rail["vapour"]["pending"] == 1
+    assert by_rail["vapour"]["points"] == 1
+    assert len(off) == 1
+    assert off[0]["reason"] == "non_alkali_kinetic"
+    assert off[0]["candidates"] == 1
+    assert off[0]["pending"] == 1
+    report = render_score_report(
+        (),
+        context=ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert "## Live candidate census" in report
+    assert "| SiO_evolution | 1 | 1 | 0 | 1 |" in report
+    assert "| vapour | 1 | 0 | 1 | 1 |" in report
+    assert "| `non_alkali_kinetic` | 1 | 0 | 1 | 1 |" in report
+    assert "Admitted is split from pending" in report
+    assert "score_eligible is 0" in report
+    assert "Pins were not compared" in report
 
 
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:

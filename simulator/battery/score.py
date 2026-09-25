@@ -202,7 +202,12 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 }
 
 # Sourced decision bands (not pins). Gibbs agreement_bands_kJ_mol from the
-# residual ledger headers. Missing band → decision_rule_missing refusal.
+# residual ledger headers, in kJ/mol. Applied only to formation energies
+# whose stored unit has that dimension (delta_fG, delta_fH). cp and S are
+# J/mol/K, H-H298 is not a formation energy, and log10_Kf is dimensionless:
+# they stay unbanded until a sourced band exists. Missing band, or a band
+# whose dimension differs from the quantity, → decision_rule_missing.
+# A borrowed number is never attached.
 # Searched and not used as decision bands (do not invent a tolerance):
 # - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
 #   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
@@ -236,6 +241,28 @@ THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
         "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
     ),
 }
+
+# Formation energies stored in kJ/mol. Not log10_Kf (dimensionless), not
+# cp/S (J/mol/K), not H-H298 (kJ/mol, but not a formation energy).
+GIBBS_BAND_QUANTITIES: frozenset[Quantity] = frozenset(
+    {Quantity.DELTA_FG, Quantity.DELTA_FH}
+)
+_UNIT_DIMENSION: dict[str, str] = {
+    "kJ_per_declared_mol_basis": "energy_per_mol",
+    "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
+    "dimensionless": "dimensionless",
+}
+_SIO_FORMULAS: frozenset[str] = frozenset({"SiO", "SiO2"})
+_ALKALI_FORMULAS: frozenset[str] = frozenset(
+    {"Na", "K", "NaO0.5", "KO0.5", "Na2O", "K2O"}
+)
+_NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
+    {
+        Quantity.ISOTOPE_DELTA,
+        Quantity.ION_INTENSITY_RATIO,
+        Quantity.ION_INTENSITY,
+    }
+)
 
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
@@ -401,9 +428,18 @@ def match_reported_species(
     return None
 
 
-def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail:
+def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
+    """Headline rail, or None when the quantity is not on one.
+
+    Vapour is only p_sat, p_partial, or p_reference (SiO/SiO2 partial
+    pressures stay on SiO_evolution). Isotope ratios, ion ratios, and an
+    unknown quantity do not fall through onto vapour. A non-alkali kinetic
+    quantity (Zn, Cu, Mg evaporation coefficients, and the same else-branch)
+    does not fall through onto SiO_evolution.
+    """
+
     if quantity in _VAPOUR_EQUILIBRIUM:
-        if species_formula in {"SiO", "SiO2"}:
+        if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
@@ -423,14 +459,29 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     }:
         return Rail.PYROLYSIS_YIELD
     if quantity in KINETIC_YIELD_QUANTITIES:
-        if species_formula in {"SiO", "SiO2"}:
+        if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
-        if species_formula in {"Na", "K", "NaO0.5", "KO0.5", "Na2O", "K2O"}:
+        if species_formula in _ALKALI_FORMULAS:
             return Rail.ALKALI_SHUTTLE
-        return Rail.SIO_EVOLUTION
+        return None
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         return Rail.THERMOCHEMISTRY
-    return Rail.VAPOUR
+    return None
+
+
+def no_headline_rail_reason(
+    quantity: Quantity | None, *, species_formula: str = ""
+) -> str:
+    """Why rail_for_quantity returned None. Not a rail token."""
+
+    del species_formula
+    if quantity is None:
+        return "quantity_unknown"
+    if quantity in _NOT_VAPOUR_QUANTITIES:
+        return "not_a_vapour_quantity"
+    if quantity in KINETIC_YIELD_QUANTITIES:
+        return "non_alkali_kinetic"
+    return f"no_headline_rail:{quantity.value}"
 
 
 def residual_key(
@@ -438,17 +489,19 @@ def residual_key(
     reference_id: str,
     quantity: Quantity | None,
     engine: Engine,
-    rail: Rail,
+    rail: Rail | None,
     temperature_K: Decimal | None = None,
 ) -> str:
     """Stable comparison slot: lineage + quantity + identity T + rail + engine.
 
-    Run/version are excluded (v2.1 pin_key_map).
+    Run/version are excluded (v2.1 pin_key_map). No headline rail is the
+    token ``none``, never a borrowed vapour or SiO label.
     """
 
     q = "quantity_unknown" if quantity is None else quantity.value
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
-    return f"{reference_id}{t}::{q}::{rail.value}::{engine.value}"
+    rail_token = "none" if rail is None else rail.value
+    return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
 
 
 def _dec_token(value: Decimal) -> str:
@@ -765,13 +818,36 @@ def build_conjuncts(
     )
 
 
+def unit_dimension(unit: str) -> str | None:
+    """Physical dimension of a stored unit. Unknown units match nothing."""
+
+    return _UNIT_DIMENSION.get(unit)
+
+
+def band_dimension_matches(quantity: Quantity, band: DecisionBand) -> bool:
+    """True only when the band and the quantity share one dimension.
+
+    kJ/mol does not match J/mol/K or a dimensionless quantity. Scale
+    aliases that are not in ``_UNIT_DIMENSION`` fail closed.
+    """
+
+    quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
+    band_dim = unit_dimension(band.unit)
+    return quantity_dim is not None and quantity_dim == band_dim
+
+
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
 ) -> DecisionBand | None:
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
-        return THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
-    return None
+    if quantity not in GIBBS_BAND_QUANTITIES:
+        return None
+    band = THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
+    if band is None:
+        return None
+    if not band_dimension_matches(quantity, band):
+        return None
+    return band
 
 
 def populate_numeric(
@@ -799,6 +875,17 @@ def populate_numeric(
         return None, RefusalReason.DECISION_RULE_MISSING, {
             "reason": f"no_sourced_decision_band:{quantity.value}",
             "quantity": quantity.value,
+            "operation": operation.value,
+        }
+    # Dimension guard. decision_band_for already refuses a mismatched
+    # sourced band; this still fires when a caller forces the kJ band
+    # onto a quantity of another dimension.
+    if not band_dimension_matches(quantity, band):
+        return None, RefusalReason.DECISION_RULE_MISSING, {
+            "reason": f"band_dimension_mismatch:{quantity.value}",
+            "quantity": quantity.value,
+            "quantity_unit": QUANTITY_UNITS[quantity],
+            "band_unit": band.unit,
             "operation": operation.value,
         }
     numeric = ResidualNumeric(
@@ -1425,6 +1512,17 @@ def compile_residual(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
+    if rail is None:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": no_headline_rail_reason(quantity, species_formula=formula),
+                "quantity": quantity.value,
+                "species_formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("status_match_or_mismatch",),
+        )
     if point_magnitude(reference.value) is None:
         reason_token = "value_unknown"
         if reference.value.kind is ValueKind.UNAVAILABLE:
@@ -1751,7 +1849,13 @@ def score_store(
                     flush=True,
                 )
                 last_progress = now
-    residuals.sort(key=lambda r: (r.rail.value, r.reference, r.key))
+    residuals.sort(
+        key=lambda r: (
+            "" if r.rail is None else r.rail.value,
+            r.reference,
+            r.key,
+        )
+    )
     return tuple(residuals), candidates
 
 
@@ -1973,6 +2077,8 @@ def headline_rows(
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     for residual in residuals:
+        if residual.rail is None:
+            continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
         groups.setdefault((residual.rail.value, engine), []).append(residual)
@@ -2117,6 +2223,64 @@ def _engine_of(residual: Residual) -> str:
     return "unknown"
 
 
+def candidate_rail_census(
+    context: ScoreContext,
+) -> tuple[tuple[dict[str, object], ...], tuple[dict[str, object], ...]]:
+    """Per-rail comparison candidates, admitted split from pending.
+
+    One row per observation. Not multiplied by engines. Quantities with no
+    headline rail are returned in the second tuple, keyed by reason.
+    """
+
+    rail_rows: dict[str, dict[str, object]] = {
+        rail.value: {
+            "rail": rail.value,
+            "candidates": 0,
+            "admitted": 0,
+            "pending": 0,
+            "points": 0,
+        }
+        for rail in Rail
+    }
+    unassigned: dict[str, dict[str, object]] = {}
+    for obs in comparison_candidates(context):
+        identity = obs.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        formula = identity.species.formula if isinstance(identity, Identity) else ""
+        rail = rail_for_quantity(quantity, species_formula=formula)
+        if rail is None:
+            reason = no_headline_rail_reason(quantity, species_formula=formula)
+            bucket = unassigned.get(reason)
+            if bucket is None:
+                bucket = {
+                    "reason": reason,
+                    "candidates": 0,
+                    "admitted": 0,
+                    "pending": 0,
+                    "points": 0,
+                }
+                unassigned[reason] = bucket
+        else:
+            bucket = rail_rows[rail.value]
+        bucket["candidates"] = int(bucket["candidates"]) + 1
+        if obs.admission.status is AdmissionStatus.ADMITTED:
+            bucket["admitted"] = int(bucket["admitted"]) + 1
+        elif obs.admission.status is AdmissionStatus.PENDING:
+            bucket["pending"] = int(bucket["pending"]) + 1
+        if obs.value.kind is ValueKind.POINT:
+            bucket["points"] = int(bucket["points"]) + 1
+    rails = tuple(rail_rows[rail.value] for rail in Rail)
+    off = tuple(unassigned[key] for key in sorted(unassigned))
+    return rails, off
+
+
+def _census_count_line(row: Mapping[str, object], label: str) -> str:
+    return (
+        f"| {label} | {row['candidates']} | {row['admitted']} | "
+        f"{row['pending']} | {row['points']} |"
+    )
+
+
 def render_score_report(
     residuals: Sequence[Residual],
     *,
@@ -2142,32 +2306,84 @@ def render_score_report(
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
     lines.extend(["", *format_store_stamp_report_lines(stamp)])
+    lines.extend(["", f"Engines: {', '.join(e.value for e in engines)}."])
+    if not residuals:
+        lines.extend(
+            [
+                "",
+                "No engine residuals were regenerated for this store revision.",
+                "Match rate is blank. score_eligible is 0.",
+                "The live candidate census is the published candidate count.",
+            ]
+        )
+    rail_census, unassigned_census = candidate_rail_census(context)
     lines.extend(
         [
             "",
-            f"Engines: {', '.join(e.value for e in engines)}.",
+            "## Live candidate census",
             "",
-            "## Per rail × engine headline",
+            "Comparison candidates are measured rows admitted or pending.",
+            "Admitted is split from pending. Counts are observations, not",
+            "residuals, so they are not multiplied by the engine set.",
+            "A vapour candidate is only `p_sat`, `p_partial`, or `p_reference`.",
             "",
-            "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
-            "|---|---|---:|---:|---:|---:|---:|",
+            "| rail | candidates | admitted | pending | points |",
+            "|---|---:|---:|---:|---:|",
         ]
     )
-    for row in headline_rows(residuals, context=context):
-        rate = row["match_rate"]
-        rate_s = "—" if rate is None else f"{rate:.3f}"
-        med = row["median_abs_dex"] or "—"
-        lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
-        )
-    lines.extend(["", "## Refusal census", "", "| reason | n |", "|---|---:|"])
-    census = refusal_census(residuals)
-    if not census:
-        lines.append("| (none) | 0 |")
+    for row in rail_census:
+        lines.append(_census_count_line(row, str(row["rail"])))
+    lines.extend(
+        [
+            "",
+            "### No headline rail",
+            "",
+            "These quantities are not vapour candidates and not SiO_evolution",
+            "candidates. The reason is the refusal, not a borrowed rail.",
+            "",
+            "| reason | candidates | admitted | pending | points |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+    if not unassigned_census:
+        lines.append("| (none) | 0 | 0 | 0 | 0 |")
     else:
-        for reason, n in census.items():
-            lines.append(f"| `{reason}` | {n} |")
+        for row in unassigned_census:
+            lines.append(_census_count_line(row, f"`{row['reason']}`"))
+    lines.extend(["", "## Per rail × engine headline", ""])
+    if not residuals:
+        lines.append(
+            "Not regenerated. Match rate is blank. score_eligible is 0."
+        )
+    else:
+        lines.extend(
+            [
+                "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
+                "|---|---|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for row in headline_rows(residuals, context=context):
+            rate = row["match_rate"]
+            rate_s = "—" if rate is None else f"{rate:.3f}"
+            med = row["median_abs_dex"] or "—"
+            lines.append(
+                f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+                f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
+            )
+    lines.extend(["", "## Refusal census", ""])
+    if not residuals:
+        lines.append(
+            "Engine refusals were not regenerated with this census. "
+            "Rows with no headline rail are counted above and are not hidden."
+        )
+    else:
+        lines.extend(["| reason | n |", "|---|---:|"])
+        census = refusal_census(residuals)
+        if not census:
+            lines.append("| (none) | 0 |")
+        else:
+            for reason, n in census.items():
+                lines.append(f"| `{reason}` | {n} |")
     admit = admission_census(residuals, context=context)
     lines.extend(
         [
@@ -2228,7 +2444,11 @@ def render_score_report(
     )
     lines.append(f"Diagnostic residuals in this file: {n_diag}.")
     lines.extend(["", "## Pin failures", ""])
-    if not pin_failures:
+    if not residuals and not pin_failures:
+        lines.append(
+            "Pins were not compared; no residuals ledger was regenerated for this store revision."
+        )
+    elif not pin_failures:
         lines.append("None.")
     else:
         lines.append(f"{len(pin_failures)} pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.")
@@ -2243,7 +2463,11 @@ def render_score_report(
         if len(pin_failures) > 50:
             lines.append(f"| … | {len(pin_failures) - 50} more | | | |")
     lines.extend(["", "## status_diff vs old scorers", ""])
-    if not status_diff:
+    if not residuals and not status_diff:
+        lines.append(
+            "status_diff was not run; no residuals ledger was regenerated for this store revision."
+        )
+    elif not status_diff:
         lines.append("No mapped outcome changes.")
     else:
         lines.append("| old key | old | new | axis |")
@@ -2260,7 +2484,7 @@ def render_score_report(
                 f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained.",
             ]
         )
-    else:
+    elif residuals:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
     return "\n".join(lines)

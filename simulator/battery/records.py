@@ -1121,7 +1121,7 @@ class Residual:
     key: str
     reference: str
     execution: Execution
-    rail: Rail
+    rail: Rail | None
     status: ResidualStatus
     source_relation: SourceRelation
     score_eligible: bool
