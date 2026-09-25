@@ -4691,6 +4691,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if isinstance(memo, dict):
             memo[key] = dict(normalized_curve)
+        self._record_composition_projected_liquidus_notice_from_curve(
+            normalized_curve
+        )
         gate_diagnostic = {
             'status': 'ok',
             'source': normalized_curve.get('source', 'liquidus_solidus'),

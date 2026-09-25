@@ -22,6 +22,7 @@ from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
 )
+from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -1651,6 +1652,14 @@ class EvaporationMixin:
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 
+    def _record_composition_projected_liquidus_notice_from_curve(
+        self,
+        curve: Mapping[str, Any],
+    ) -> None:
+        notice = curve.get('composition_projected_notice')
+        if isinstance(notice, Mapping):
+            self._record_composition_projected_liquidus_notice(notice)
+
     def _record_composition_projected_liquidus_notice(
         self,
         notice: Mapping[str, Any],
@@ -1753,7 +1762,6 @@ class EvaporationMixin:
             return None
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
-        self._record_composition_projected_liquidus_notice(notice)
         return curve
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
@@ -1771,7 +1779,9 @@ class EvaporationMixin:
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            curve = store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
+            return curve
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         if (
@@ -1780,6 +1790,7 @@ class EvaporationMixin:
             and isinstance(cached_curve, Mapping)
         ):
             curve = dict(cached_curve)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
@@ -1800,6 +1811,7 @@ class EvaporationMixin:
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
                 curve = dict(process_cached)
+                self._record_composition_projected_liquidus_notice_from_curve(curve)
                 self._freeze_gate_liquid_fraction_cache = {
                     'key': key,
                     'curve': dict(curve),
@@ -1853,6 +1865,7 @@ class EvaporationMixin:
                     f'{detail}'
                 )
 
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             self._freeze_gate_liquid_fraction_cache = {
                 'key': key,
                 'curve': dict(curve),
@@ -2175,6 +2188,8 @@ class EvaporationMixin:
                     getattr(self, 'species_formula_registry', {}) or {}
                 ),
             )
+        except MeltCompositionError:
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None

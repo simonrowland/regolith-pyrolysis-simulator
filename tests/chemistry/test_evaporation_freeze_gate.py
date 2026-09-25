@@ -19,7 +19,8 @@ from simulator.chemistry.kernel import (
 from simulator.core import PoisonedHourError
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import kress91_ln_fO2_temperature_delta
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
+from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
@@ -1404,6 +1405,115 @@ def test_composition_projected_without_liquidus_does_not_floor_fallback(
     with pytest.raises(RuntimeError, match='composition_projected'):
         sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
     assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize('mass_fraction', [None, float('nan'), float('inf')])
+def test_composition_projected_invalid_fraction_is_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    mass_fraction,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'solidus_T_C': 1100.0,
+        'liquidus_T_C': 1600.0,
+        'composition_projected_notice': {
+            'kind': 'composition_projected',
+            'reason': 'composition_projected',
+            'authority': 'extrapolated',
+            'certified_band': {
+                'engine': 'magemin',
+                'database': 'ig',
+                'bulk_components': ['SiO2', 'MgO'],
+            },
+            'dropped_components': [{
+                'component': 'P2O5',
+                'mass_fraction': mass_fraction,
+            }],
+        },
+    }
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(status='out_of_domain', diagnostic=diagnostic)
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    sim.backend.find_liquidus_solidus = None
+    sim.melt.temperature_C = 1400.0
+
+    with pytest.raises(MeltCompositionError, match='composition_projected'):
+        sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    shared_cache = {}
+    notice = {
+        'kind': 'composition_projected',
+        'reason': 'composition_projected',
+        'authority': 'extrapolated',
+        'certified_band': {
+            'engine': 'magemin',
+            'database': 'ig',
+            'bulk_components': ['SiO2', 'MgO'],
+        },
+        'dropped_components': [{
+            'component': 'P2O5',
+            'mass_fraction': 0.01,
+        }],
+    }
+    curve = {
+        'source': 'gate_liquid_fraction:composition_projected',
+        'solidus_T_C': 1100.0,
+        'liquidus_T_C': 1600.0,
+        'composition_projected_notice': notice,
+    }
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    calls = []
+    for index, sim in enumerate(sims):
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or dict(curve)
+            )
+        )
+
+    first_curve = sims[0]._freeze_gate_curve()
+    second_curve = sims[1]._freeze_gate_curve()
+    first_metadata = {}
+    second_metadata = {}
+    _attach_composition_projected_liquidus_notice(first_metadata, sims[0])
+    _attach_composition_projected_liquidus_notice(second_metadata, sims[1])
+
+    assert calls == [0]
+    assert second_curve == first_curve
+    assert first_metadata['composition_projected_liquidus_notice'] == (
+        second_metadata['composition_projected_liquidus_notice']
+    )
 
 
 def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(

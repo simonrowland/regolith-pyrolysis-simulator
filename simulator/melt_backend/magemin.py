@@ -347,6 +347,25 @@ def diagnostics_name_composition_projected(
     return False
 
 
+def _validated_projected_mass_fraction(
+    component: str,
+    value: Any,
+) -> float:
+    try:
+        fraction = float(value)
+    except (TypeError, ValueError) as exc:
+        raise MeltCompositionError(
+            'composition_projected_invalid_mass_fraction: '
+            f'{component}={value!r}'
+        ) from exc
+    if not math.isfinite(fraction) or fraction < 0.0 or fraction > 1.0:
+        raise MeltCompositionError(
+            'composition_projected_invalid_mass_fraction: '
+            f'{component}={value!r}'
+        )
+    return fraction
+
+
 def composition_projected_liquidus_notice(
     diagnostics: Mapping[str, Any] | None,
 ) -> Dict[str, Any] | None:
@@ -365,11 +384,21 @@ def composition_projected_liquidus_notice(
             if not isinstance(row, Mapping):
                 return None
             name = str(row.get('component') or '')
-            if not name or 'mass_fraction' not in row:
-                return None
+            if not name:
+                raise MeltCompositionError(
+                    'composition_projected_missing_component'
+                )
+            if 'mass_fraction' not in row:
+                raise MeltCompositionError(
+                    'composition_projected_missing_mass_fraction: '
+                    f'{name}'
+                )
             rows.append({
                 'component': name,
-                'mass_fraction': float(row['mass_fraction']),
+                'mass_fraction': _validated_projected_mass_fraction(
+                    name,
+                    row['mass_fraction'],
+                ),
             })
         band = _as_mapping(direct.get('certified_band')) or {}
         return {
@@ -399,8 +428,14 @@ def composition_projected_liquidus_notice(
             continue
         components = [str(name) for name in (block.get('dropped_components') or ())]
         fractions = dict(block.get('dropped_component_mass_fractions') or {})
-        if not components or any(name not in fractions for name in components):
+        if not components:
             continue
+        if any(name not in fractions for name in components):
+            missing = next(name for name in components if name not in fractions)
+            raise MeltCompositionError(
+                'composition_projected_missing_mass_fraction: '
+                f'{missing}'
+            )
         return {
             'kind': COMPOSITION_PROJECTED,
             'reason': COMPOSITION_PROJECTED,
@@ -416,7 +451,10 @@ def composition_projected_liquidus_notice(
             'dropped_components': [
                 {
                     'component': name,
-                    'mass_fraction': float(fractions[name]),
+                    'mass_fraction': _validated_projected_mass_fraction(
+                        name,
+                        fractions[name],
+                    ),
                 }
                 for name in components
             ],
