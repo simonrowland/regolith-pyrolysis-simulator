@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from copy import deepcopy
 import math
 from types import SimpleNamespace
 
@@ -17,9 +18,17 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PoisonedHourError
-from simulator.evaporation import EvaporationFluxRefusal
-from simulator.fe_redox import kress91_ln_fO2_temperature_delta
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.evaporation import (
+    EvaporationFluxRefusal,
+    _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+)
+from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    kress91_ln_fO2_temperature_delta,
+)
+from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
+from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
@@ -1243,6 +1252,619 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
     assert diagnostic['floor_T_C'] == 1200.0
     assert diagnostic['reason']
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+
+
+def _lunar_composition_projected_diagnostic(sim):
+    """Ig-order drop notice for the lunar cleaned melt, without a binary."""
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+        composition_projected_liquidus_notice,
+    )
+
+    kg = sim.atom_ledger.kg_by_account('process.cleaned_melt')
+    inert = set(getattr(sim.inventory, 'inert_melt_components_kg', {}) or {})
+    basis = set(MAGEMinBackend._MAGEMIN_INPUT_BASIS)
+    oxide_kg = {
+        str(name): float(mass)
+        for name, mass in kg.items()
+        if str(name) not in inert
+        and str(name) in basis
+        and float(mass) > 0.0
+    }
+    total = sum(oxide_kg.values())
+    wt_pct = {
+        name: mass / total * 100.0
+        for name, mass in oxide_kg.items()
+    }
+    projection = MAGEMinBackend()._build_db_bulk_projection(wt_pct)
+    details = _magemin_bulk_projection_details(projection)
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'backend_diagnostics': {
+            'backend_status': 'out_of_domain',
+            'backend_status_reason': 'composition_projected',
+            'input_composition_projection': details,
+        },
+    }
+    notice = composition_projected_liquidus_notice(diagnostic)
+    assert notice is not None
+    return diagnostic, notice
+
+
+def test_lunar_composition_projected_does_not_arm_floor_fallback(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A MAGEMin composition_projected refusal is not "no liquidus".
+
+    Lunar mare drops MnO and P2O5 on the ig bulk order. The redox gate must
+    use the projected liquidus, name those components and their mass
+    fractions, and leave the Kress floor fallback disarmed. Mass balance
+    on the lunar batch stays closed.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    diagnostic, notice = _lunar_composition_projected_diagnostic(sim)
+    dropped = {
+        row['component']: row['mass_fraction']
+        for row in notice['dropped_components']
+    }
+    assert {'MnO', 'P2O5'} <= set(dropped)
+    assert all(fraction > 0.0 for fraction in dropped.values())
+
+    original_dispatch = sim._dispatch_only
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(
+                status='out_of_domain',
+                diagnostic={
+                    **diagnostic,
+                    'solidus_T_C': 1100.0,
+                    'liquidus_T_C': 1600.0,
+                },
+                warnings=('MAGEMin refused projected composition',),
+            )
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
+            )
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    sim.melt.temperature_C = 1400.0
+
+    # 1400 C is above the Kress floor, so the old fallback would return 1.
+    # The projected curve (1100-1600) returns 0.6.
+    factor = sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+    assert factor == pytest.approx(0.6)
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    fraction_notice = sim._last_melt_redox_liquid_fraction_diagnostic[
+        'composition_projected_notice'
+    ]
+    flagged = {
+        row['component']: row['mass_fraction']
+        for row in fraction_notice['dropped_components']
+    }
+    assert flagged.keys() == dropped.keys()
+    for name, fraction in dropped.items():
+        assert flagged[name] == pytest.approx(fraction)
+    assert 'composition_projected' in (
+        sim._last_melt_redox_liquid_fraction_diagnostic['source']
+    )
+
+    sim.start_campaign(CampaignPhase.C0)
+    snapshot = sim.step()
+    assert snapshot.mass_balance_error_pct is not None
+    assert abs(snapshot.mass_balance_error_pct) <= 5.0e-12
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    run_notice = sim.composition_projected_liquidus_run_notice()
+    assert run_notice['reason'] == 'composition_projected'
+    assert run_notice['authority'] == 'extrapolated'
+    run_names = {
+        row['component']
+        for item in run_notice['notices']
+        for row in item['dropped_components']
+    }
+    assert {'MnO', 'P2O5'} <= run_names
+
+
+def _dispatch_projected_without_bounds(diagnostic):
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(
+                status='out_of_domain',
+                diagnostic=diagnostic,
+            )
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    return fake_dispatch
+
+
+def test_invalid_projected_bounds_use_kress_floor_and_name_drops(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Invalid projected bounds predict on the Kress floor and name the drops.
+
+    The projection is not the curve source and does not arm the generic
+    liquidus-unavailable floor. FALSIFIABILITY: label that curve
+    ``composition_projected`` or route it through
+    ``_melt_redox_liquidus_floor_fallback`` and the source / empty-summary
+    assertions go red. Restore the RuntimeError in ``_freeze_gate_curve``
+    and the factor calls go red.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    diagnostic, notice = _lunar_composition_projected_diagnostic(sim)
+    dropped = {
+        row['component']: row['mass_fraction']
+        for row in notice['dropped_components']
+    }
+
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        _dispatch_projected_without_bounds(diagnostic),
+    )
+    sim.backend.find_liquidus_solidus = None
+    sim.melt.temperature_C = 1500.0
+
+    factor = sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+    assert factor == 1.0
+    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    fraction = sim._last_melt_redox_liquid_fraction_diagnostic
+    assert fraction['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert 'composition_projected' not in fraction['source']
+    flagged = {
+        row['component']: row['mass_fraction']
+        for row in fraction['composition_projected_notice']['dropped_components']
+    }
+    assert flagged.keys() == dropped.keys()
+    assert fraction['composition_projected_notice']['bounds_source'] == (
+        _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    )
+    assert fraction['composition_projected_notice']['projected_bounds'] == (
+        'invalid'
+    )
+    floor_notice = fraction['composition_projected_notice']
+    assert floor_notice['certified_band'] == {
+        'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+        'source': 'REF-001 Kress91 1200-1630 C calibration band',
+    }
+    assert floor_notice['projection_certified_band'] == notice['certified_band']
+    assert floor_notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert floor_notice['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert floor_notice['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert floor_notice['temperature_band_source'] == (
+        'REF-001 Kress91 liquid relation; below 1200 C calibration floor'
+    )
+    assert 'engine' not in floor_notice['certified_band']
+    assert fraction['status'] == 'extrapolation_below_calibration_floor'
+    assert fraction['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert fraction['temperature_band_case'] == 'below_1200C_extrapolation'
+    gate = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert gate['status'] == 'extrapolation_below_calibration_floor'
+    assert gate['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert gate['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert gate['composition_projected_notice']['certified_band'] == (
+        floor_notice['certified_band']
+    )
+
+    gate_factor = sim._freeze_gate_liquid_fraction_factor()
+    assert gate_factor == 1.0
+    assert sim._last_freeze_gate_diagnostic['source'] == (
+        _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    )
+    run_notice = sim.composition_projected_liquidus_run_notice()
+    assert run_notice['notices'][0]['bounds_source'] == (
+        _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    )
+    assert run_notice['notices'][0]['certified_band'] == (
+        floor_notice['certified_band']
+    )
+    assert run_notice['notices'][0]['floor_T_C'] == (
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    )
+    assert run_notice['notices'][0]['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
+    assert run_notice['notices'][0]['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert run_notice['notices'][0]['projection_certified_band'] == (
+        notice['certified_band']
+    )
+    run_names = {
+        row['component']
+        for item in run_notice['notices']
+        for row in item['dropped_components']
+    }
+    assert {'MnO', 'P2O5'} <= run_names
+    metadata = {}
+    _attach_composition_projected_liquidus_notice(metadata, sim)
+    rendered = metadata['composition_projected_liquidus_notice']['notices'][0]
+    assert rendered['certified_band'] == floor_notice['certified_band']
+    assert rendered['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert rendered['temperature_band_case'] == 'below_1200C_extrapolation'
+    assert rendered['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert rendered['projection_certified_band']['engine'] == 'magemin'
+    freeze_notice = sim._last_freeze_gate_diagnostic[
+        'composition_projected_notice'
+    ]
+    assert freeze_notice['certified_band'] == floor_notice['certified_band']
+    assert freeze_notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert freeze_notice['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
+
+
+def test_same_drop_set_replaces_projected_notice_with_kress_authority(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """The run notice follows the latest authority for one dropped bulk."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _diagnostic, projected_notice = _lunar_composition_projected_diagnostic(sim)
+    floor_notice = sim._invalid_projection_bounds_notice(
+        projected_notice,
+        bounds_source=_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+    )
+
+    sim._record_composition_projected_liquidus_notice(projected_notice)
+    sim._record_composition_projected_liquidus_notice(floor_notice)
+
+    notices = sim.composition_projected_liquidus_run_notice()['notices']
+    assert len(notices) == 1
+    assert notices[0]['bounds_source'] == (
+        _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    )
+    assert notices[0]['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert notices[0]['temperature_band_case'] == (
+        'below_1200C_extrapolation'
+    )
+    assert notices[0]['temperature_band_status'] == (
+        'extrapolation_below_calibration_floor'
+    )
+    assert notices[0]['projection_certified_band'] == (
+        projected_notice['certified_band']
+    )
+
+
+def test_invalid_projected_bounds_prefer_later_ladder_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A real later liquidus wins; the invalid projection is only the notice."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    diagnostic, notice = _lunar_composition_projected_diagnostic(sim)
+    dropped = {
+        row['component'] for row in notice['dropped_components']
+    }
+
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        _dispatch_projected_without_bounds(diagnostic),
+    )
+
+    def fake_liquidus_finder(**_kwargs):
+        return SimpleNamespace(
+            status='ok',
+            solidus_T_C=1000.0,
+            liquidus_T_C=1400.0,
+            samples=(),
+            warnings=(),
+            diagnostics={},
+        )
+
+    sim.backend.find_liquidus_solidus = fake_liquidus_finder
+    sim.melt.temperature_C = 1200.0
+
+    factor = sim._freeze_gate_liquid_fraction_factor()
+    assert factor == pytest.approx(0.5)
+    assert sim._last_freeze_gate_diagnostic['source'] == (
+        'liquidus_solidus:backend'
+    )
+    assert 'composition_projected' not in (
+        sim._last_freeze_gate_diagnostic['source']
+    )
+    attached = sim._last_freeze_gate_diagnostic['composition_projected_notice']
+    assert attached['bounds_source'] == 'liquidus_solidus:backend'
+    assert attached['projected_bounds'] == 'invalid'
+    assert attached['certified_band']['engine'] == 'magemin'
+    assert 'floor_T_C' not in attached
+    assert 'temperature_band_case' not in attached
+    assert dropped <= {
+        row['component'] for row in attached['dropped_components']
+    }
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+def test_invalid_projected_bounds_without_any_authority_is_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """No cleaned melt and no ladder bound: refuse, do not abort or arm the floor."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    diagnostic, _notice = _lunar_composition_projected_diagnostic(sim)
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        _dispatch_projected_without_bounds(diagnostic),
+    )
+    sim.backend.find_liquidus_solidus = None
+    monkeypatch.setattr(
+        sim.atom_ledger,
+        'mol_by_account',
+        lambda *_args, **_kwargs: {},
+    )
+    sim.melt.temperature_C = 1500.0
+
+    with pytest.raises(EvaporationFluxRefusal, match='composition_projected') as exc:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert exc.value.diagnostic['reason_refused'] == (
+        'freeze_gate_no_liquidus_authority'
+    )
+    assert exc.value.diagnostic['bounds_source'] == 'refused'
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    run_notice = sim.composition_projected_liquidus_run_notice()
+    assert run_notice['notices'][0]['bounds_source'] == 'refused'
+    assert run_notice['notices'][0]['projected_bounds'] == 'invalid'
+
+
+def test_invalid_projected_notice_missing_is_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A projection name with no drop rows is a typed refusal, not a failed run.
+
+    FALSIFIABILITY: raise RuntimeError from the empty-ladder branch in
+    ``_freeze_gate_curve`` and this raises RuntimeError. Route the same
+    branch through ``_melt_redox_liquidus_floor_fallback`` and the empty
+    fallback summary fails.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+    }
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        _dispatch_projected_without_bounds(diagnostic),
+    )
+    sim.backend.find_liquidus_solidus = None
+    sim.melt.temperature_C = 1500.0
+
+    with pytest.raises(EvaporationFluxRefusal, match='composition_projected') as exc:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert not isinstance(exc.value, RuntimeError)
+    assert exc.value.diagnostic['reason_refused'] == (
+        'freeze_gate_no_liquidus_authority'
+    )
+    assert exc.value.diagnostic['bounds_source'] == 'refused'
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize('mass_fraction', [None, float('nan'), float('inf')])
+def test_composition_projected_invalid_fraction_is_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    mass_fraction,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    diagnostic = {
+        'backend_status': 'out_of_domain',
+        'backend_status_reason': 'composition_projected',
+        'solidus_T_C': 1100.0,
+        'liquidus_T_C': 1600.0,
+        'composition_projected_notice': {
+            'kind': 'composition_projected',
+            'reason': 'composition_projected',
+            'authority': 'extrapolated',
+            'certified_band': {
+                'engine': 'magemin',
+                'database': 'ig',
+                'bulk_components': ['SiO2', 'MgO'],
+            },
+            'dropped_components': [{
+                'component': 'P2O5',
+                'mass_fraction': mass_fraction,
+            }],
+        },
+    }
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(status='out_of_domain', diagnostic=diagnostic)
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    sim.backend.find_liquidus_solidus = None
+    sim.melt.temperature_C = 1400.0
+
+    with pytest.raises(MeltCompositionError, match='composition_projected'):
+        sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize('mass_fraction', [None, float('nan'), -0.01])
+def test_composition_projected_invalid_fraction_refuses_through_provider_kernel(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    mass_fraction,
+):
+    """The registered MAGEMin fallback must preserve typed refusal."""
+    from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    _diagnostic, notice = _lunar_composition_projected_diagnostic(sim)
+    malformed_notice = deepcopy(notice)
+    malformed_notice['dropped_components'][0]['mass_fraction'] = mass_fraction
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'synthetic-equilibrate'
+    calls = []
+
+    def equilibrate(*_args, **_kwargs):
+        calls.append(True)
+        return EquilibriumResult(
+            status='out_of_domain',
+            diagnostics={
+                'composition_projected_notice': deepcopy(malformed_notice),
+            },
+        )
+
+    backend.equilibrate = equilibrate
+    monkeypatch.setattr(
+        MAGEMinShadowProvider,
+        '_ensure_backend',
+        lambda _provider: backend,
+    )
+    sim.melt.temperature_C = 1400.0
+    before = sim._melt_redox_liquidus_gate_fallback_count
+
+    with pytest.raises(
+        MeltCompositionError,
+        match='composition_projected_invalid_mass_fraction',
+    ):
+        sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+
+    assert calls
+    assert sim._melt_redox_liquidus_gate_fallback_count == before
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    shared_cache = {}
+    notice = {
+        'kind': 'composition_projected',
+        'reason': 'composition_projected',
+        'authority': 'extrapolated',
+        'certified_band': {
+            'engine': 'magemin',
+            'database': 'ig',
+            'bulk_components': ['SiO2', 'MgO'],
+        },
+        'dropped_components': [{
+            'component': 'P2O5',
+            'mass_fraction': 0.01,
+        }],
+    }
+    curve = {
+        'source': 'gate_liquid_fraction:composition_projected',
+        'solidus_T_C': 1100.0,
+        'liquidus_T_C': 1600.0,
+        'composition_projected_notice': notice,
+    }
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    calls = []
+    for index, sim in enumerate(sims):
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or dict(curve)
+            )
+        )
+
+    first_curve = sims[0]._freeze_gate_curve()
+    second_curve = sims[1]._freeze_gate_curve()
+    first_metadata = {}
+    second_metadata = {}
+    _attach_composition_projected_liquidus_notice(first_metadata, sims[0])
+    _attach_composition_projected_liquidus_notice(second_metadata, sims[1])
+
+    assert calls == [0]
+    assert second_curve == first_curve
+    assert first_metadata['composition_projected_liquidus_notice'] == (
+        second_metadata['composition_projected_liquidus_notice']
+    )
 
 
 def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(

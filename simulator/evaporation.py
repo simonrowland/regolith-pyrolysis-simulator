@@ -20,8 +20,12 @@ from simulator.chemistry.kernel import (
 from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_referenced_log_fO2,
+    kress91_temperature_band_case,
 )
+from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -358,6 +362,29 @@ def refuse_viscous_p_bulk_out_of_domain(
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+def _diagnostic_names_composition_projected(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    from simulator.melt_backend.magemin import (
+        diagnostics_name_composition_projected,
+    )
+
+    return diagnostics_name_composition_projected(diagnostic)
+
+
+def _composition_projected_notice_key(notice: Mapping[str, Any]) -> tuple:
+    rows = []
+    for row in notice.get('dropped_components') or ():
+        if not isinstance(row, Mapping):
+            continue
+        try:
+            fraction = round(float(row.get('mass_fraction')), 8)
+        except (TypeError, ValueError):
+            fraction = None
+        rows.append((str(row.get('component')), fraction))
+    return tuple(rows)
+
+
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
 # The validation map's smallest adjacent Na-dose step changes the FeO mole
@@ -397,6 +424,16 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'MnO',
     'P2O5',
 ))
+# Lower authority when a projected bulk has no usable solidus/liquidus.
+# The projection is not this source: the calibration floor is.
+_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE = (
+    'kress91_liquid_calibration_floor'
+)
+# Curve schema requires solidus < liquidus. The floor is a step at the
+# calibration minimum (liquid strictly above it). This gap is below any
+# recipe temperature quantum, so interpolation matches
+# temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C.
+_KRESS91_FLOOR_OPEN_SIDE_C = 1.0e-6
 
 
 def _assert_runtime_alpha_source_not_vaporock(
@@ -1620,8 +1657,313 @@ class EvaporationMixin:
             'liquidus_T_C': curve['liquidus_T_C'],
             'liquid_fraction': factor,
         }
+        notice = curve.get('composition_projected_notice')
+        if isinstance(notice, Mapping):
+            self._last_freeze_gate_diagnostic[
+                'composition_projected_notice'
+            ] = dict(notice)
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
+
+    def _stamp_kress_floor_diagnostic(
+        self,
+        diagnostic: dict[str, Any],
+    ) -> None:
+        """Mark a Kress-floor fraction as extrapolated, not a measured liquidus.
+
+        Reads the curve notice. A measured curve, and the generic
+        liquidus-unavailable floor, are left unchanged.
+        """
+        if diagnostic.get('source') != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE:
+            return
+        notice = diagnostic.get('composition_projected_notice')
+        if not isinstance(notice, Mapping):
+            return
+        status = notice.get('temperature_band_status')
+        if status:
+            diagnostic['status'] = str(status)
+        if 'floor_T_C' in notice:
+            diagnostic['floor_T_C'] = float(notice['floor_T_C'])
+        case = notice.get('temperature_band_case')
+        if case:
+            diagnostic['temperature_band_case'] = str(case)
+
+    def _record_composition_projected_liquidus_notice_from_curve(
+        self,
+        curve: Mapping[str, Any],
+    ) -> None:
+        notice = curve.get('composition_projected_notice')
+        if isinstance(notice, Mapping):
+            self._record_composition_projected_liquidus_notice(notice)
+
+    def _record_composition_projected_liquidus_notice(
+        self,
+        notice: Mapping[str, Any],
+    ) -> None:
+        stored = getattr(self, '_composition_projected_liquidus_notices', None)
+        if not isinstance(stored, list):
+            stored = []
+        stored_notice = {
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+        }
+        # Present only when the projected bounds were not the curve. A
+        # usable projection keeps the historical notice shape.
+        if 'bounds_source' in notice:
+            stored_notice['bounds_source'] = notice.get('bounds_source')
+        if 'projected_bounds' in notice:
+            stored_notice['projected_bounds'] = notice.get('projected_bounds')
+        # Present only on the Kress-floor curve. A usable projection and a
+        # later real liquidus keep the historical notice shape.
+        projection_band = notice.get('projection_certified_band')
+        if isinstance(projection_band, Mapping):
+            stored_notice['projection_certified_band'] = dict(projection_band)
+            components = projection_band.get('bulk_components')
+            if isinstance(components, (list, tuple)):
+                stored_notice['projection_certified_band'][
+                    'bulk_components'
+                ] = [str(item) for item in components]
+        if 'floor_T_C' in notice:
+            stored_notice['floor_T_C'] = float(notice['floor_T_C'])
+        for key in (
+            'temperature_band_case',
+            'temperature_band_status',
+            'temperature_band_source',
+        ):
+            if key in notice:
+                stored_notice[key] = notice.get(key)
+        notice_key = _composition_projected_notice_key(stored_notice)
+        for index, existing in enumerate(stored):
+            if _composition_projected_notice_key(existing) == notice_key:
+                # A later curve can resolve the same dropped bulk through a
+                # more informative authority, such as the Kress floor.
+                stored[index] = stored_notice
+                self._composition_projected_liquidus_notices = stored
+                return
+        stored.append(stored_notice)
+        self._composition_projected_liquidus_notices = stored
+
+    def composition_projected_liquidus_run_notice(self) -> dict[str, Any] | None:
+        """Run-level flag for liquidus solved on a projected bulk.
+
+        MAGEMin's equilibrate result stays ``out_of_domain``. This notice is
+        the category-3 flag: each dropped component and its mass fraction.
+        """
+        stored = getattr(self, '_composition_projected_liquidus_notices', None)
+        if not stored:
+            return None
+        return {
+            'kind': 'composition_projected',
+            'reason': 'composition_projected',
+            'authority': 'extrapolated',
+            'notices': [dict(item) for item in stored],
+        }
+
+    def _composition_projected_freeze_gate_curve(
+        self,
+        diagnostic: Mapping[str, Any],
+        *,
+        source: str,
+        reasons: list[str],
+        path: tuple = (),
+    ) -> dict[str, Any] | None:
+        """Use the projected bulk's liquidus only when its bounds are usable.
+
+        Invalid or missing projected bounds are not a curve and do not arm
+        the Kress floor by themselves. The caller keeps the drop notice and
+        continues the ladder. A missing per-component fraction stays a typed
+        refusal from ``composition_projected_liquidus_notice``.
+        """
+        from simulator.melt_backend.magemin import (
+            composition_projected_liquidus_notice,
+        )
+
+        if not _diagnostic_names_composition_projected(diagnostic):
+            return None
+        notice = composition_projected_liquidus_notice(diagnostic)
+        if notice is None:
+            reasons.append(
+                f'{source} composition_projected refusal has no '
+                'per-component mass fraction'
+            )
+            return None
+        projected_source = f'{source}:composition_projected'
+        curve = None
+        if path:
+            curve = self._freeze_gate_curve_from_path(
+                path,
+                solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+                liquidus_T_C=self._optional_float(
+                    diagnostic.get('liquidus_T_C')
+                ),
+                source=projected_source,
+            )
+        if curve is None:
+            curve = self._freeze_gate_curve_from_bounds(
+                solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+                liquidus_T_C=self._optional_float(
+                    diagnostic.get('liquidus_T_C')
+                ),
+                source=projected_source,
+                reasons=reasons,
+            )
+        if curve is None:
+            self._stash_invalid_projected_liquidus_notice(notice)
+            if not any('composition_projected' in reason for reason in reasons):
+                reasons.append(
+                    f'{source} composition_projected refusal has no '
+                    'projected liquidus'
+                )
+            return None
+        curve = dict(curve)
+        curve['composition_projected_notice'] = notice
+        return curve
+
+    def _stash_invalid_projected_liquidus_notice(
+        self,
+        notice: Mapping[str, Any],
+    ) -> None:
+        if getattr(self, '_invalid_projected_liquidus_notice', None) is not None:
+            return
+        self._invalid_projected_liquidus_notice = {
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+        }
+
+    def _invalid_projection_bounds_notice(
+        self,
+        notice: Mapping[str, Any],
+        *,
+        bounds_source: str,
+    ) -> dict[str, Any]:
+        annotated = {
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+            'bounds_source': bounds_source,
+            'projected_bounds': 'invalid',
+        }
+        if bounds_source != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE:
+            return annotated
+        # Frozen at and below 1200 C. That limb is the below-1200 C
+        # extrapolation: Kress91's liquid relation is certified on
+        # 1200–1630 C. The MAGEMin oxide list stays the projection's band.
+        below = kress91_temperature_band_case(
+            float(KRESS91_LIQUID_CALIBRATION_MIN_T_C) - 1.0
+        )
+        certified = kress91_temperature_band_case(
+            float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        )
+        projection_band = dict(annotated['certified_band'])
+        components = projection_band.get('bulk_components')
+        if isinstance(components, (list, tuple)):
+            projection_band['bulk_components'] = [
+                str(item) for item in components
+            ]
+        annotated['projection_certified_band'] = projection_band
+        annotated['certified_band'] = {
+            'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+            'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+            'source': certified['source'],
+        }
+        annotated['floor_T_C'] = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        annotated['temperature_band_case'] = below['case']
+        annotated['temperature_band_status'] = below['status']
+        annotated['temperature_band_source'] = below['source']
+        return annotated
+
+    def _freeze_gate_kress_floor_curve(
+        self,
+        notice: Mapping[str, Any],
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        """Kress91 calibration step, named as its own authority.
+
+        Applies only when the cleaned melt still has a silicate species the
+        floor was calibrated on. The invalid projection is not the source.
+        """
+        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        if not any(
+            species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
+            for species, mol in cleaned_mol.items()
+        ):
+            reasons.append(
+                'kress91 liquid calibration floor unavailable: no cleaned melt'
+            )
+            return None
+        solidus_T_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        liquidus_T_C = solidus_T_C + _KRESS91_FLOOR_OPEN_SIDE_C
+        source = _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        return {
+            'source': source,
+            'solidus_T_C': solidus_T_C,
+            'liquidus_T_C': liquidus_T_C,
+            'path': (
+                (solidus_T_C, 0.0),
+                (liquidus_T_C, 1.0),
+            ),
+            'composition_projected_notice': (
+                self._invalid_projection_bounds_notice(
+                    notice,
+                    bounds_source=source,
+                )
+            ),
+        }
+
+    def _refuse_freeze_gate_without_liquidus_authority(
+        self,
+        notice: Mapping[str, Any],
+        reasons: list[str],
+    ) -> None:
+        """No projected, ladder, or Kress bound. Typed run refusal, not abort."""
+        annotated = self._invalid_projection_bounds_notice(
+            notice,
+            bounds_source='refused',
+        )
+        self._record_composition_projected_liquidus_notice(annotated)
+        detail = '; '.join(reasons[-6:]) or 'no liquidus bound of any authority'
+        raise EvaporationFluxRefusal(
+            'composition_projected; freeze gate has no liquidus bound of '
+            f'any authority. {detail}',
+            {
+                'reason_refused': 'freeze_gate_no_liquidus_authority',
+                'kind': 'composition_projected',
+                'reason': 'composition_projected',
+                'bounds_source': 'refused',
+                'projected_bounds': 'invalid',
+                'composition_projected_notice': annotated,
+                'detail': detail,
+            },
+        )
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -1638,7 +1980,9 @@ class EvaporationMixin:
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            curve = store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
+            return curve
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         if (
@@ -1647,6 +1991,7 @@ class EvaporationMixin:
             and isinstance(cached_curve, Mapping)
         ):
             curve = dict(cached_curve)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
@@ -1667,6 +2012,7 @@ class EvaporationMixin:
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
                 curve = dict(process_cached)
+                self._record_composition_projected_liquidus_notice_from_curve(curve)
                 self._freeze_gate_liquid_fraction_cache = {
                     'key': key,
                     'curve': dict(curve),
@@ -1691,6 +2037,12 @@ class EvaporationMixin:
         self._freeze_gate_liquid_fraction_cache = computing_cache
         self._freeze_gate_curve_in_progress = True
         cache_committed = False
+        previous_invalid_notice = getattr(
+            self,
+            '_invalid_projected_liquidus_notice',
+            None,
+        )
+        self._invalid_projected_liquidus_notice = None
         try:
             reasons: list[str] = []
             curve = self._freeze_gate_curve_from_gate_dispatch(
@@ -1708,14 +2060,74 @@ class EvaporationMixin:
                     reasons,
                     fO2_log=fO2_log,
                 )
+            # Invalid projected bounds are not a liquidus. A later ladder
+            # bound wins; otherwise the Kress floor is the prediction and
+            # the notice names that source plus the dropped components.
+            # The projection itself is never the curve source. No bound at
+            # all is a typed refusal, not a run-killing RuntimeError.
+            invalid_notice = getattr(
+                self,
+                '_invalid_projected_liquidus_notice',
+                None,
+            )
+            if isinstance(invalid_notice, Mapping):
+                existing_notice = (
+                    curve.get('composition_projected_notice')
+                    if isinstance(curve, Mapping)
+                    else None
+                )
+                if isinstance(curve, Mapping) and isinstance(
+                    existing_notice,
+                    Mapping,
+                ):
+                    pass
+                elif isinstance(curve, Mapping):
+                    curve = dict(curve)
+                    curve['composition_projected_notice'] = (
+                        self._invalid_projection_bounds_notice(
+                            invalid_notice,
+                            bounds_source=str(curve.get('source') or ''),
+                        )
+                    )
+                else:
+                    curve = self._freeze_gate_kress_floor_curve(
+                        invalid_notice,
+                        reasons,
+                    )
+                    if curve is None:
+                        self._refuse_freeze_gate_without_liquidus_authority(
+                            invalid_notice,
+                            reasons,
+                        )
             if curve is None:
                 detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
+                # Keep the token even when the joined tail is long. The redox
+                # gate must not read this refusal as a missing liquidus.
+                if any('composition_projected' in reason for reason in reasons):
+                    # Named projection, no parseable drop notice, and no
+                    # ladder bound. Typed refusal. A RuntimeError here is
+                    # re-raised and the runner records status=failed.
+                    detail = f'composition_projected; {detail}'
+                    raise EvaporationFluxRefusal(
+                        detail,
+                        {
+                            'reason_refused': (
+                                'freeze_gate_no_liquidus_authority'
+                            ),
+                            'kind': 'composition_projected',
+                            'reason': 'composition_projected',
+                            'bounds_source': 'refused',
+                            'projected_bounds': 'invalid',
+                            'detail': detail,
+                        },
+                    )
                 raise RuntimeError(
                     'freeze_gate.enabled requires a liquid_fraction(T) source; '
                     'no liquidus engine produced usable solidus/liquidus bounds. '
                     f'{detail}'
                 )
 
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             self._freeze_gate_liquid_fraction_cache = {
                 'key': key,
                 'curve': dict(curve),
@@ -1729,6 +2141,7 @@ class EvaporationMixin:
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
             )
         finally:
+            self._invalid_projected_liquidus_notice = previous_invalid_notice
             if (
                 not cache_committed
                 and getattr(self, '_freeze_gate_liquid_fraction_cache', None)
@@ -1976,6 +2389,21 @@ class EvaporationMixin:
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
         if status != 'ok':
+            projected = self._composition_projected_freeze_gate_curve(
+                diagnostic,
+                source=source,
+                reasons=reasons,
+            )
+            if projected is not None:
+                return projected
+            if _diagnostic_names_composition_projected(diagnostic):
+                if not any(
+                    'composition_projected' in reason for reason in reasons
+                ):
+                    reasons.append(
+                        f'{source} composition_projected status={status}'
+                    )
+                return None
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'
@@ -2023,6 +2451,8 @@ class EvaporationMixin:
                     getattr(self, 'species_formula_registry', {}) or {}
                 ),
             )
+        except MeltCompositionError:
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None
@@ -2144,6 +2574,39 @@ class EvaporationMixin:
                 )
                 if callable(note):
                     note()
+            sample_points = []
+            for sample in tuple(getattr(result, 'samples', ()) or ()):
+                sample_points.append({
+                    'temperature_C': getattr(sample, 'temperature_C', None),
+                    'liquid_fraction': getattr(sample, 'frac_M', None),
+                })
+            projected_diagnostic = (
+                dict(diagnostics) if isinstance(diagnostics, Mapping) else {}
+            )
+            projected_diagnostic.setdefault(
+                'solidus_T_C',
+                getattr(result, 'solidus_T_C', None),
+            )
+            projected_diagnostic.setdefault(
+                'liquidus_T_C',
+                getattr(result, 'liquidus_T_C', None),
+            )
+            projected = self._composition_projected_freeze_gate_curve(
+                projected_diagnostic,
+                source=source,
+                reasons=reasons,
+                path=tuple(sample_points),
+            )
+            if projected is not None:
+                return projected
+            if _diagnostic_names_composition_projected(projected_diagnostic):
+                if not any(
+                    'composition_projected' in reason for reason in reasons
+                ):
+                    reasons.append(
+                        f'{source} composition_projected status={status}'
+                    )
+                return None
             warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
             reasons.append(
                 f'{source} unavailable: status={status}'

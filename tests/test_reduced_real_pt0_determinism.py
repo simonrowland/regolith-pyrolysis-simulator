@@ -43,6 +43,7 @@ from simulator.reduced_real_determinism import (
     canonical_json_bytes,
     canonical_replay_key,
 )
+from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 
@@ -1940,6 +1941,52 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.summary()["hits"] == 1
     assert replay.summary()["misses"] == 0
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
+
+
+def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> None:
+    db_path = tmp_path / "pt1-projected-notice.db"
+    notice = {
+        "kind": "composition_projected",
+        "reason": "composition_projected",
+        "authority": "extrapolated",
+        "certified_band": {
+            "engine": "magemin",
+            "database": "ig",
+            "bulk_components": ["SiO2", "MgO"],
+        },
+        "dropped_components": [
+            {"component": "P2O5", "mass_fraction": 0.01},
+        ],
+    }
+    curve = {
+        "source": "unit-test:composition_projected",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1600.0,
+        "path": (),
+        "composition_projected_notice": notice,
+    }
+
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    capture_fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=capture_fO2_log,
+        curve=curve,
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replayed_curve = replay_sim._freeze_gate_curve()
+    metadata = {}
+    _attach_composition_projected_liquidus_notice(metadata, replay_sim)
+
+    assert replayed_curve == curve
+    assert metadata["composition_projected_liquidus_notice"]["notices"] == [
+        notice
+    ]
 
 
 def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(
