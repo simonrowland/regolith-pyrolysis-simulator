@@ -1109,6 +1109,74 @@ def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
     ]
     assert notice["dropped_components"] == ["P2O5"]
     assert notice["dropped_mass_fraction"] == pytest.approx(0.10)
+    assert notice["dropped_component_mass_fractions"]["P2O5"] == pytest.approx(
+        0.10
+    )
+
+
+def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
+    """The ig-order drop stays a refusal. The projected bulk's liquidus is
+    attached for the freeze gate; it is not reported as status=ok.
+    """
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._config = {}
+    backend._subprocess_pool = None
+    calls = []
+
+    def fake_call(*, bulk_projection, temperature_C, **_kwargs):
+        composition = dict(bulk_projection.composition_wt_pct)
+        calls.append(composition)
+        assert "P2O5" not in composition
+        assert "MnO" not in composition
+        frac = max(0.0, min(1.0, (float(temperature_C) - 1000.0) / 200.0))
+        phases = {}
+        if frac > 0.0:
+            phases["liq"] = {"mass_kg": frac}
+        if frac < 1.0:
+            phases["ol"] = {"mass_kg": 1.0 - frac}
+        return {"phases": phases, "converged": True}
+
+    backend._call_magemin = fake_call
+    bulk = {"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0}
+    result = backend.find_liquidus_solidus(
+        composition_kg=bulk,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=2.0,
+    )
+
+    assert calls
+    assert result.status == "out_of_domain"
+    assert result.status != "ok"
+    assert result.solidus_T_C == pytest.approx(1000.0, abs=2.0)
+    assert result.liquidus_T_C == pytest.approx(1200.0, abs=2.0)
+    assert result.solidus_T_C < result.liquidus_T_C
+    notice = result.diagnostics["composition_projected_notice"]
+    fractions = {
+        row["component"]: row["mass_fraction"]
+        for row in notice["dropped_components"]
+    }
+    assert fractions["P2O5"] == pytest.approx(0.10)
+    assert fractions["MnO"] == pytest.approx(0.01)
+    assert notice["authority"] == "extrapolated"
+    assert notice["reason"] == "composition_projected"
+
+    calls_before = len(calls)
+    refused = backend.equilibrate(
+        1400.0,
+        composition_kg=bulk,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert refused.status == "out_of_domain"
+    assert refused.diagnostics["backend_status_reason"] == COMPOSITION_PROJECTED
+    assert len(calls) == calls_before
 
 
 def test_magemin_pressure_conversion_helpers_are_exact():

@@ -22,6 +22,7 @@ from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
 )
+from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -358,6 +359,29 @@ def refuse_viscous_p_bulk_out_of_domain(
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+def _diagnostic_names_composition_projected(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    from simulator.melt_backend.magemin import (
+        diagnostics_name_composition_projected,
+    )
+
+    return diagnostics_name_composition_projected(diagnostic)
+
+
+def _composition_projected_notice_key(notice: Mapping[str, Any]) -> tuple:
+    rows = []
+    for row in notice.get('dropped_components') or ():
+        if not isinstance(row, Mapping):
+            continue
+        try:
+            fraction = round(float(row.get('mass_fraction')), 8)
+        except (TypeError, ValueError):
+            fraction = None
+        rows.append((str(row.get('component')), fraction))
+    return tuple(rows)
+
+
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
 # The validation map's smallest adjacent Na-dose step changes the FeO mole
@@ -1620,8 +1644,125 @@ class EvaporationMixin:
             'liquidus_T_C': curve['liquidus_T_C'],
             'liquid_fraction': factor,
         }
+        notice = curve.get('composition_projected_notice')
+        if isinstance(notice, Mapping):
+            self._last_freeze_gate_diagnostic[
+                'composition_projected_notice'
+            ] = dict(notice)
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
+
+    def _record_composition_projected_liquidus_notice_from_curve(
+        self,
+        curve: Mapping[str, Any],
+    ) -> None:
+        notice = curve.get('composition_projected_notice')
+        if isinstance(notice, Mapping):
+            self._record_composition_projected_liquidus_notice(notice)
+
+    def _record_composition_projected_liquidus_notice(
+        self,
+        notice: Mapping[str, Any],
+    ) -> None:
+        stored = getattr(self, '_composition_projected_liquidus_notices', None)
+        if not isinstance(stored, list):
+            stored = []
+        key = _composition_projected_notice_key(notice)
+        for existing in stored:
+            if _composition_projected_notice_key(existing) == key:
+                return
+        stored.append({
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+        })
+        self._composition_projected_liquidus_notices = stored
+
+    def composition_projected_liquidus_run_notice(self) -> dict[str, Any] | None:
+        """Run-level flag for liquidus solved on a projected bulk.
+
+        MAGEMin's equilibrate result stays ``out_of_domain``. This notice is
+        the category-3 flag: each dropped component and its mass fraction.
+        """
+        stored = getattr(self, '_composition_projected_liquidus_notices', None)
+        if not stored:
+            return None
+        return {
+            'kind': 'composition_projected',
+            'reason': 'composition_projected',
+            'authority': 'extrapolated',
+            'notices': [dict(item) for item in stored],
+        }
+
+    def _composition_projected_freeze_gate_curve(
+        self,
+        diagnostic: Mapping[str, Any],
+        *,
+        source: str,
+        reasons: list[str],
+        path: tuple = (),
+    ) -> dict[str, Any] | None:
+        """Use the projected bulk's liquidus when that is what the ladder has.
+
+        The freeze-gate runtime engine is MAGEMin (fallback for
+        GATE_LIQUID_FRACTION unless a MELTS backend was selected, in which
+        case MELTS already answered). Nothing else registered on this ladder
+        covers the ig-order drops, so category 3 predicts on the projected
+        bulk and names the drops. A refusal without those bounds is not a
+        curve and must not be reported as a missing liquidus.
+        """
+        from simulator.melt_backend.magemin import (
+            composition_projected_liquidus_notice,
+        )
+
+        if not _diagnostic_names_composition_projected(diagnostic):
+            return None
+        notice = composition_projected_liquidus_notice(diagnostic)
+        if notice is None:
+            reasons.append(
+                f'{source} composition_projected refusal has no '
+                'per-component mass fraction'
+            )
+            return None
+        projected_source = f'{source}:composition_projected'
+        curve = None
+        if path:
+            curve = self._freeze_gate_curve_from_path(
+                path,
+                solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+                liquidus_T_C=self._optional_float(
+                    diagnostic.get('liquidus_T_C')
+                ),
+                source=projected_source,
+            )
+        if curve is None:
+            curve = self._freeze_gate_curve_from_bounds(
+                solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+                liquidus_T_C=self._optional_float(
+                    diagnostic.get('liquidus_T_C')
+                ),
+                source=projected_source,
+                reasons=reasons,
+            )
+        if curve is None:
+            if not any('composition_projected' in reason for reason in reasons):
+                reasons.append(
+                    f'{source} composition_projected refusal has no '
+                    'projected liquidus'
+                )
+            return None
+        curve = dict(curve)
+        curve['composition_projected_notice'] = notice
+        return curve
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -1638,7 +1779,9 @@ class EvaporationMixin:
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            curve = store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
+            return curve
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         if (
@@ -1647,6 +1790,7 @@ class EvaporationMixin:
             and isinstance(cached_curve, Mapping)
         ):
             curve = dict(cached_curve)
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
@@ -1667,6 +1811,7 @@ class EvaporationMixin:
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
                 curve = dict(process_cached)
+                self._record_composition_projected_liquidus_notice_from_curve(curve)
                 self._freeze_gate_liquid_fraction_cache = {
                     'key': key,
                     'curve': dict(curve),
@@ -1710,12 +1855,17 @@ class EvaporationMixin:
                 )
             if curve is None:
                 detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
+                # Keep the token even when the joined tail is long. The redox
+                # gate must not read this refusal as a missing liquidus.
+                if any('composition_projected' in reason for reason in reasons):
+                    detail = f'composition_projected; {detail}'
                 raise RuntimeError(
                     'freeze_gate.enabled requires a liquid_fraction(T) source; '
                     'no liquidus engine produced usable solidus/liquidus bounds. '
                     f'{detail}'
                 )
 
+            self._record_composition_projected_liquidus_notice_from_curve(curve)
             self._freeze_gate_liquid_fraction_cache = {
                 'key': key,
                 'curve': dict(curve),
@@ -1976,6 +2126,21 @@ class EvaporationMixin:
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
         if status != 'ok':
+            projected = self._composition_projected_freeze_gate_curve(
+                diagnostic,
+                source=source,
+                reasons=reasons,
+            )
+            if projected is not None:
+                return projected
+            if _diagnostic_names_composition_projected(diagnostic):
+                if not any(
+                    'composition_projected' in reason for reason in reasons
+                ):
+                    reasons.append(
+                        f'{source} composition_projected status={status}'
+                    )
+                return None
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'
@@ -2023,6 +2188,8 @@ class EvaporationMixin:
                     getattr(self, 'species_formula_registry', {}) or {}
                 ),
             )
+        except MeltCompositionError:
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None
@@ -2144,6 +2311,39 @@ class EvaporationMixin:
                 )
                 if callable(note):
                     note()
+            sample_points = []
+            for sample in tuple(getattr(result, 'samples', ()) or ()):
+                sample_points.append({
+                    'temperature_C': getattr(sample, 'temperature_C', None),
+                    'liquid_fraction': getattr(sample, 'frac_M', None),
+                })
+            projected_diagnostic = (
+                dict(diagnostics) if isinstance(diagnostics, Mapping) else {}
+            )
+            projected_diagnostic.setdefault(
+                'solidus_T_C',
+                getattr(result, 'solidus_T_C', None),
+            )
+            projected_diagnostic.setdefault(
+                'liquidus_T_C',
+                getattr(result, 'liquidus_T_C', None),
+            )
+            projected = self._composition_projected_freeze_gate_curve(
+                projected_diagnostic,
+                source=source,
+                reasons=reasons,
+                path=tuple(sample_points),
+            )
+            if projected is not None:
+                return projected
+            if _diagnostic_names_composition_projected(projected_diagnostic):
+                if not any(
+                    'composition_projected' in reason for reason in reasons
+                ):
+                    reasons.append(
+                        f'{source} composition_projected status={status}'
+                    )
+                return None
             warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
             reasons.append(
                 f'{source} unavailable: status={status}'

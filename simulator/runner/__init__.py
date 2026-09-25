@@ -1418,6 +1418,7 @@ class PyrolysisRun:
         _attach_engine_commissioning_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
+        _attach_composition_projected_liquidus_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3351,6 +3352,29 @@ def _attach_rump_expectation_notice(
         run_metadata["rump_expectation_notice"] = _json_safe(notice)
 
 
+def _composition_projected_liquidus_notice(sim: Any) -> dict[str, Any] | None:
+    if sim is None:
+        return None
+    reader = getattr(sim, "composition_projected_liquidus_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_composition_projected_liquidus_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    notice = _composition_projected_liquidus_notice(sim)
+    if notice:
+        run_metadata["composition_projected_liquidus_notice"] = _json_safe(
+            notice
+        )
+
+
 def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
     authority = str(notice.get("authority") or "unspecified")
     pieces: list[str] = []
@@ -5030,6 +5054,7 @@ def _runner_failure_result(
     _attach_engine_commissioning_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
+    _attach_composition_projected_liquidus_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
         if sim is not None
