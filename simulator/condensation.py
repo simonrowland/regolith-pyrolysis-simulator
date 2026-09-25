@@ -4733,18 +4733,21 @@ class CondensationModel:
                 or molar_mass_kg_mol <= 0.0
             ):
                 return 0.0
-            available_mol = available_kg / molar_mass_kg_mol
-            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
-            # baffle area and residence time gives capturable mol:
-            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
-            # makes eta dimensionless and lets configured Stage-3 area affect
-            # capture without inventing an area-normalized rate constant.
-            capturable_mol = (
-                max(0.0, band_flux_mol_m2_s)
-                * stage_area_m2
-                * residence_s
+            # Premise: ``available_kg`` is the route's available vapor rate in
+            # kg h^-1, not the inventory occupying one residence interval.
+            # Algebra: n_dot_s = available_kg / (M * 3600), and
+            # eta = (flux * area * residence_s) / (n_dot_s * residence_s)
+            # = flux * area / n_dot_s. Units: both numerator and denominator
+            # are mol s^-1, so eta is dimensionless. Sanity: with M in kg
+            # mol^-1, a 1 s residence still gives the 3600 factor in
+            # eta = flux * area * 3600 * M / available_kg. The no-area branch
+            # below remains an explicit pass-through; it does not invent a
+            # band-flux fraction or a capture rate without m^2.
+            available_mol_s = available_kg / molar_mass_kg_mol / 3600.0
+            capture_rate_mol_s = (
+                max(0.0, band_flux_mol_m2_s) * stage_area_m2
             )
-            eta = capturable_mol / available_mol
+            eta = capture_rate_mol_s / available_mol_s
         else:
             # Premise: ``band_flux_fraction = flux / reference_flux`` is
             # dimensionless. Algebra requires capturable mol =
@@ -6189,9 +6192,9 @@ def _antoine_psat_pa(
                 # (T_e+C)**2, and ln(P/P_e)=-(dH/R)*(1/T-1/T_e). Units —
                 # B, T, and dH/R are kelvin, so the exponent is dimensionless
                 # and P is pascal. Sanity — the Na sidecar at T_e=924 K gives
-                # P(298.15 K)=4.637e-11 Pa; with P_local=100 Pa this changes
-                # deposition by zero at the displayed precision while the
-                # extrapolation notice carries authority. Known limitation —
+                # P(298.15 K)=4.637e-11 Pa; while P_sat << P_local, the
+                # deposition consequence is nil and the extrapolation notice
+                # carries authority. Known limitation —
                 # the slope is the source equation's slope, not measured
                 # sublimation enthalpy; Na implies dH~119 kJ/mol versus
                 # ~107 kJ/mol for Na(s), so cold P_sat is understated by

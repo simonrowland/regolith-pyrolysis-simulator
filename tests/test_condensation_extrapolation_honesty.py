@@ -666,6 +666,48 @@ def test_condensation_efficiency_stage7_na_band_is_positive():
     assert not any(item["status"] == "refused" for item in outcomes)
 
 
+def test_condensation_efficiency_uses_hourly_vapour_rate_units(monkeypatch):
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    area_m2 = 2.0
+    rate_kg_hr = 1.0e-3
+    flux_mol_m2_s = 2.0e-6
+    residence_s = 3.0
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+        stage_area_m2_by_stage={"7": area_m2},
+    )
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 7)
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        lambda *args, **kwargs: flux_mol_m2_s,
+    )
+    molar_mass_kg_mol = (
+        condensation._molecular_mass_kg_per_molecule("Na")
+        * condensation.AVOGADRO_MOL
+    )
+    expected_eta = (
+        flux_mol_m2_s * area_m2 * 3600.0 * molar_mass_kg_mol
+        / rate_kg_hr
+    )
+    assert 0.0 < expected_eta < 1.0
+
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=model.condensation_temperatures_C["Na"],
+        residence_s=residence_s,
+        available_kg=rate_kg_hr,
+        alpha_s_value=1.0,
+    )
+
+    assert eta == pytest.approx(expected_eta)
+
+
 def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeypatch):
     model = condensation.CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
@@ -702,6 +744,7 @@ def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeyp
     available_kg = (
         condensation._molecular_mass_kg_per_molecule("Na")
         * condensation.AVOGADRO_MOL
+        * 4000.0
     )
     outcomes = []
     eta = model._condensation_efficiency(
@@ -713,7 +756,7 @@ def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeyp
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(1.0)
+    assert eta == pytest.approx(0.9)
     assert calls == condensation.HKL_BAND_SAMPLES
     refused = [item for item in outcomes if item["status"] == "refused"]
     assert len(refused) == 1

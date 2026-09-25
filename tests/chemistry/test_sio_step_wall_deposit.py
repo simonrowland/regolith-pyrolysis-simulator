@@ -216,8 +216,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # overstated D_AB by 1.216%. SiO/N2 at 1973.15 K and 1000 Pa moves
     # 0.0496927555 -> 0.0490955656 m^2/s. The 1050 C cold-liner Si+SiO2
     # deposit follows: 8.452523682217e-06 -> 8.191796266986e-06 (−3.085%).
+    # 2026-09-25 b-324: stage capture now compares flux*area (mol/s) with
+    # the hourly vapor supply converted to mol/s, so more SiO is captured
+    # upstream and the reachable cold-wall load decreases.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.191796266986e-06, rel=1e-9
+        4.39057870014e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
@@ -232,11 +235,12 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     p_local_pa = 1.0
     alpha_s = 0.04
 
-    sio_psat_pa = _antoine_psat_pa("SiO", wall_T_K)
+    with pytest.raises(WallSaturationPressureRefusal) as refusal:
+        _antoine_psat_pa("SiO", wall_T_K)
     # SiO now carries the melt standard-reaction term, which must not be
     # consumed as a pure-vapor wall saturation pressure. The authorized
     # disproportionation-product backstop supplies the P_sat ~= 0 limit.
-    assert sio_psat_pa is None
+    assert refusal.value.valid_range_K == [1400.0, 2273.15]
 
     expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
         "SiO",

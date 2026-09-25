@@ -408,17 +408,12 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps, refusal = _run_c2a_staged_to_completion(sim)
 
-    # The run now stops at the first unsupported transitional-Kn flux point.
-    # The refused hour is rolled back exactly by the helper above; the ledger
-    # prefix still has to close on both freeze-gate paths.
-    # Both configurations complete 13 ledger-authorized hours, then refuse
-    # before committing the first unsupported transitional-Kn hour.
-    assert steps == 13
-    assert refusal is not None
-    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= refusal.diagnostic["knudsen_number"] < 10.0
+    # b-324 increases the condenser capture-rate budget by converting the
+    # hourly vapor supply to mol/s. The campaign now completes instead of
+    # reaching the prior transitional-Kn refusal.
+    assert refusal is None
+    assert steps == 130
+    assert sim.is_complete()
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
@@ -510,10 +505,8 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
             break
         steps += 1
 
-    assert refusal is not None
-    assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
-    assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
+    assert refusal is None
+    assert sim.is_complete()
     transitions = sim.atom_ledger.transitions
     assert transitions
 
