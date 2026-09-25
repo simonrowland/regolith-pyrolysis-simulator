@@ -1444,6 +1444,11 @@ def validate_residual(
                     or primary_check is None
                     or refusal.check_refs[0] != primary_check
                 )
+                if (
+                    refusal is not None
+                    and refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+                ):
+                    wrong_evidence = False
                 if wrong_shape or wrong_evidence:
                     issues.append(
                         _issue(

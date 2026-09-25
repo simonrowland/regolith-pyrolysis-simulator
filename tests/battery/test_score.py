@@ -8,6 +8,7 @@ from __future__ import annotations
 import ast
 import inspect
 import warnings
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -45,6 +46,7 @@ from simulator.battery.records import (
     Notice,
     ResidualNumeric,
     DecisionBand,
+    Species,
     State,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
@@ -54,6 +56,7 @@ from simulator.battery.score import (
     EligibleConjuncts,
     EnginePrediction,
     ScoreContext,
+    SINGLE_LIQUID_ENGINES,
     compile_residual,
     compute_metric,
     dumps_residual_line,
@@ -61,8 +64,9 @@ from simulator.battery.score import (
     parse_species_formula,
     resolve_source_relation,
     score_eligible_from_conjuncts,
+    score_store,
 )
-from simulator.battery.validate import validate_corpus
+from simulator.battery.validate import validate_corpus, validate_residual
 from tests.battery import factories as F
 
 
@@ -170,6 +174,183 @@ def _compile(reference, experiment, predict, review=None, extra_obs=()):
         comparison_ids={reference.observation_id, *(o.observation_id for o in extra_obs)},
         predict=lambda engine, obs, **kw: predict,
     )
+
+
+def _partial_identity(*, phase_reason: str | None = None):
+    identity = replace(
+        F.pref_identity(),
+        quantity=Quantity.P_PARTIAL,
+        composition=F.activity_identity().composition,
+    )
+    if phase_reason is not None:
+        identity = replace(
+            identity,
+            species=Species("Na", State.unknown(phase_reason)),
+        )
+    return identity
+
+
+def _partial_prediction(engine, observation, **_kwargs):
+    return EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:predict"),
+        value=Decimal("1"),
+        unit="Pa",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=observation.identity,
+    )
+
+
+def _two_phase_notice():
+    return Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            "Printed pressure retained; no equilibrium comparator claimed for bulk "
+            "composition in the two-phase region."
+        ),
+        origin="plante1979",
+        band="two_phase_bulk_composition_not_liquid_composition",
+    )
+
+
+@pytest.mark.parametrize("engine", tuple(SINGLE_LIQUID_ENGINES))
+def test_two_phase_bulk_rows_are_refused_before_single_liquid_prediction(engine):
+    exp = F.kems_experiment()
+    ident = _partial_identity(
+        phase_reason=(
+            "phase string 'K2O-SiO2_bulk_composition_in_two_phase_region' "
+            "is not in the closed automatic map"
+        )
+    )
+    ref = F.observation(
+        "plante-two-phase",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.PENDING,
+        source_id="work-1",
+        notices=(_two_phase_notice(),),
+    )
+    calls = []
+    ctx = _context(F.work(), exp, ref)
+
+    def predict(*args, **kwargs):
+        calls.append((args, kwargs))
+        return _partial_prediction(*args, **kwargs)
+
+    residual, candidate = compile_residual(
+        ref,
+        engine,
+        context=ctx,
+        comparison_ids={ref.observation_id},
+        predict=predict,
+    )
+
+    assert candidate is None
+    assert calls == []
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+    assert residual.refusal.detail["reason"] == "bulk_not_liquid_composition"
+    assert residual.execution.state is ExecutionState.NOT_PROBED
+    assert ref.admission.status is AdmissionStatus.PENDING
+    assert residual.notices == ref.notices
+
+
+def test_two_phase_bulk_marker_refusal_preserves_homogeneous_row_count():
+    exp = F.kems_experiment()
+    work = F.work()
+    observations = {}
+    for index in range(162):
+        ref = F.observation(
+            f"plante-homogeneous-{index}",
+            exp.experiment_id,
+            _partial_identity(),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        )
+        observations[ref.observation_id] = ref
+    for index in range(59):
+        ref = F.observation(
+            f"plante-bulk-{index}",
+            exp.experiment_id,
+            _partial_identity(),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            admission=AdmissionStatus.PENDING,
+            source_id="work-1",
+            notices=(_two_phase_notice(),),
+        )
+        observations[ref.observation_id] = ref
+    ctx = ScoreContext(
+        works={work.work_id: work},
+        experiments={exp.experiment_id: exp},
+        observations=observations,
+        extract_review={"work-1": None},
+        hostname="test",
+    )
+
+    for engine in tuple(SINGLE_LIQUID_ENGINES):
+        residuals, _ = score_store(
+            ctx,
+            engines=(engine,),
+            rail=Rail.VAPOUR,
+            predict=_partial_prediction,
+        )
+        reasons = Counter(
+            residual.refusal.reason.value
+            for residual in residuals
+            if residual.refusal is not None
+        )
+        assert len(residuals) == 221
+        assert reasons["bulk_not_liquid_composition"] == 59
+        assert sum(
+            residual.refusal is None
+            or residual.refusal.reason is not RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+            for residual in residuals
+        ) == 162
+
+
+def test_bulk_refusal_survives_validity_gate_validation():
+    exp = F.kems_experiment(
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    work = F.work()
+    ref = F.observation(
+        "plante-two-phase-validation",
+        exp.experiment_id,
+        _partial_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.PENDING,
+        source_id="work-1",
+        notices=(_two_phase_notice(),),
+    )
+    residual, _ = compile_residual(
+        ref,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, exp, ref),
+        comparison_ids={ref.observation_id},
+        predict=_partial_prediction,
+    )
+
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+    assert validate_residual(
+        residual,
+        {ref.observation_id: ref},
+        {exp.experiment_id: exp},
+        {work.work_id: work},
+    ) == []
 
 
 def test_green_thermo_residual_is_score_eligible() -> None:

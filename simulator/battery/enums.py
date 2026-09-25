@@ -129,6 +129,7 @@ class RefusalReason(StrEnum):
     RESERVOIR_RULE = "reservoir_rule"
     IDENTITY_INCOMPLETE = "identity_incomplete"
     CONDITIONAL_FIELD = "conditional_field"
+    BULK_NOT_LIQUID_COMPOSITION = "bulk_not_liquid_composition"
 
 
 class BenchAbsenceReason(StrEnum):
