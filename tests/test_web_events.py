@@ -25,7 +25,7 @@ from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
-from simulator.runner import build_per_hour_summary
+from simulator.runner import PyrolysisRun, build_per_hour_summary
 from simulator.session import drive_auto_apply
 from simulator.state import CampaignPhase, DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
@@ -4150,6 +4150,62 @@ def test_reduced_terminal_payload_preserves_available_submission_provenance():
         "pins": [],
         "recipe_schema_version": "recipe-schema-v1",
     }
+
+
+def test_reduced_terminal_payload_preserves_run_notices_after_projection_failure(
+    monkeypatch,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.backend = SimpleNamespace(backend_name="alphamelts")
+    sim._register_freeze_gate_liquid_fraction_providers()
+    sibling_notice = {"authority": "extrapolated", "count": 1}
+    monkeypatch.setattr(
+        sim,
+        "engine_commissioning_run_notice",
+        lambda: sibling_notice,
+    )
+
+    def fail_projection(*_args, **_kwargs):
+        raise RuntimeError("forced canonical projection failure")
+
+    monkeypatch.setattr(run, "_build_output", fail_projection)
+    captured = {}
+
+    def capture_artifact(payload, _run_id, **_kwargs):
+        captured["payload"] = copy.deepcopy(payload)
+        return {"execution_status": payload["status"]}
+
+    monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
+    sid = "test-reduced-terminal-run-notices"
+    state, _lock = _replace_simulation_state(
+        sid,
+        session,
+        speed=0.0,
+        run_store=object(),
+        runner_projector=run,
+    )
+    try:
+        artifact = web_events._persist_terminal(
+            None,
+            sid,
+            state["run_id"],
+            session,
+            status="ok",
+        )
+        assert artifact == {"execution_status": "failed"}
+        metadata = captured["payload"]["run_metadata"]
+        assert metadata["diagnostic_gate_authority_notice"]["provider_id"] == (
+            "alphamelts-diagnostic"
+        )
+        assert metadata["engine_commissioning_notice"] == sibling_notice
+    finally:
+        _clear_simulation_state(sid)
 
 
 @pytest.mark.parametrize("failure_site", ["completion", "tick", "emit"])

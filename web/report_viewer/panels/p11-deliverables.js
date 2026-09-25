@@ -74,6 +74,9 @@
       markdown: own(block, "markdown") ? block.markdown : undefined,
       commissioningNotice: own(block, "engine_commissioning_notice")
         ? block.engine_commissioning_notice
+        : undefined,
+      diagnosticGateAuthorityNotice: own(block, "diagnostic_gate_authority_notice")
+        ? block.diagnostic_gate_authority_notice
         : undefined
     };
   }
@@ -101,6 +104,20 @@
       `hours ${notice.first_hour}-${notice.last_hour}; ` +
       `${notice.count} step(s). Reported numbers are unchanged.`;
     return `<p class="sec-p11-flag" data-engine-commissioning-notice="true">${esc(text)}</p>`;
+  }
+
+  function diagnosticGateAuthorityBanner(notice) {
+    if (!isRecord(notice)) return "";
+    const provider = typeof notice.provider_id === "string" && notice.provider_id
+      ? notice.provider_id
+      : "unspecified";
+    const intent = typeof notice.intent === "string" && notice.intent
+      ? notice.intent
+      : "gate_liquid_fraction";
+    const text = typeof notice.message === "string" && notice.message
+      ? notice.message
+      : `Diagnostic provider ${provider} is authoritative for ${intent} dispatch but has no ledger-transition authority.`;
+    return `<p class="sec-p11-flag" data-diagnostic-gate-authority-notice="true">${esc(text)}</p>`;
   }
 
   function quantityClaim(record, key) {
@@ -658,6 +675,7 @@
       ) + renderMarkdown(envelope);
     }
     return commissioningBanner(envelope.commissioningNotice) +
+      diagnosticGateAuthorityBanner(envelope.diagnosticGateAuthorityNotice) +
       `<div class="sec-p11-grid">` +
       `${renderMetals(classification)}${renderSilica(classification, envelope.markdown)}` +
       `${renderMixedGlass(classification)}${renderRump(classification)}` +

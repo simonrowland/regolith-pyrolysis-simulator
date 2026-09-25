@@ -224,6 +224,7 @@ def test_p11_shows_engine_commissioning_next_to_unchanged_class_totals() -> None
     block, classification = _lunar()
     bare = _render(_wrapped(block))
     assert "data-engine-commissioning-notice" not in bare
+    assert "data-diagnostic-gate-authority-notice" not in bare
 
     flagged = copy.deepcopy(block)
     flagged["engine_commissioning_notice"] = {
@@ -243,10 +244,25 @@ def test_p11_shows_engine_commissioning_next_to_unchanged_class_totals() -> None
         "last_hour": 1,
         "count": 1,
     }
+    flagged["diagnostic_gate_authority_notice"] = {
+        "kind": "diagnostic_provider_gate_authority",
+        "intent": "gate_liquid_fraction",
+        "provider_id": "alphamelts-diagnostic",
+        "authority_scope": "dispatch_only",
+        "ledger_transition_authority": False,
+        "message": (
+            "The authoritative freeze-gate liquid-fraction provider "
+            "`alphamelts-diagnostic` is "
+            "diagnostic-only for ledger transitions."
+        ),
+    }
     html = _render(_wrapped(flagged))
     assert 'data-engine-commissioning-notice="true"' in html
+    assert 'data-diagnostic-gate-authority-notice="true"' in html
     assert "temperature_range" in html
     assert "extrapolated" in html
+    assert "alphamelts-diagnostic" in html
+    assert "diagnostic-only for ledger transitions" in html
     assert "Reported numbers are unchanged." in html
     _assert_traced_kg(
         _card(html, "metals"),
