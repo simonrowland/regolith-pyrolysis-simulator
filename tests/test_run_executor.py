@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from dataclasses import replace
 from types import SimpleNamespace
@@ -89,29 +90,27 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
         execution.simulator.condensation_model
         .last_condensation_refusals_by_species["SiO"]
     )
+    assert "pending_decision" not in species_record
     assert species_record["status"] == "status_bearing"
-    assert species_record["reason"] == (
-        "wall_saturation_pressure_refused_band_sample"
-    )
+    assert species_record["reason"] in {
+        "reactive_uptake",
+        "reactive_equilibrium_undersaturated",
+    }
     assert species_record["output_status"] == "status_bearing"
-    assert species_record["authority_level"] == "unavailable"
-    assert species_record["pending_decision"] == "d-025"
-    assert species_record["refused_fraction"] == pytest.approx(1.0)
-    assert species_record["eta_basis"] == (
-        "lower_bound_refused_samples_uncaptured"
-    )
-    assert species_record["original_reason"]
+    assert species_record["authority_level"] == "bridge"
+    assert species_record["saturation_pressure_policy"] == "reactive_equilibrium"
     outcomes = species_record["stage_outcomes"]
-    lower_bound = next(
+    reactive = next(
         outcome
         for outcome in outcomes
-        if outcome.get("eta_basis") == "lower_bound_refused_samples_uncaptured"
+        if outcome.get("reason") == species_record["reason"]
+        and outcome.get("saturation_pressure_policy") == "reactive_equilibrium"
     )
-    assert lower_bound["status"] == "status_bearing"
-    assert lower_bound["authority_level"] == "unavailable"
-    assert lower_bound["pending_decision"] == "d-025"
-    assert lower_bound["refused_fraction"] == pytest.approx(1.0)
-    assert lower_bound["eta"] == pytest.approx(0.0)
+    assert reactive["status"] == "status_bearing"
+    assert reactive["authority_level"] == "bridge"
+    assert "pending_decision" not in reactive
+    assert "eta_basis" not in reactive
+    assert math.isfinite(float(reactive["eta"]))
     assert any(outcome.get("status") == "extrapolated" for outcome in outcomes)
 
     published = run._build_output(execution)["condensation_refusals_by_species"][
@@ -121,10 +120,8 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
         "status",
         "reason",
         "authority_level",
-        "pending_decision",
-        "refused_fraction",
-        "eta_basis",
-        "original_reason",
+        "saturation_pressure_policy",
+        "output_status",
     ):
         assert published[field] == species_record[field]
 

@@ -24,12 +24,10 @@ reactivity_class_values:
   - reactive
   - physisorbing
 
-# C4b re-evaporation default (2026-06-29): SiO disproportionates on the
-# wall to non-volatile products, so its deposit uses an effective product
-# P_sat ~= 0. The listed metals keep reversible pure-species condensation.
-# Fe/Mg physisorbing-with-reactive-tail is a known approximation recorded in
-# docs/model-limitations.md; CrO2 remains reversible here to avoid widening
-# this SiO-only chunk into the unresolved Cr oxide wall-product decision.
+# Species class is not the deposit branch. The pair table below is.
+# SiO disproportionation is p_eq(T) from 2 SiO(g) = Si + SiO2, on every
+# liner. Na/K silicate is only the silica class. Fe/Mg stay metal films.
+# CrO2 remains the separate stable-product backstop.
 reactivity_class_by_species:
   SiO: reactive
   Na: physisorbing
@@ -52,6 +50,34 @@ wall_product_class_values:
 
 wall_product_class_by_species:
   CrO2: stable_condensation_product
+
+# Explicit liner allowlist. Class is never inferred from a name substring.
+# Q1: silica is fused_silica_baffles only, and that row must also declare
+# wall_material_class: silica in data/materials.yaml.
+silica_wall_liner_allowlist:
+  - fused_silica_baffles
+
+# Branch key is (species, wall_material_class). "any" matches every class,
+# including an absent class. A listed class wins over "any".
+reactive_sink_values:
+  - disproportionation
+  - alkali_silicate
+
+reactive_sink_by_species_and_material:
+  SiO:
+    any: disproportionation
+  Na:
+    silica: alkali_silicate
+  K:
+    silica: alkali_silicate
+
+# Coating-conservative gate is the low-activity end. The notice must name
+# the whole band and whether the two ends disagree. Do not average them.
+silicate_activity_band:
+  log10_a_oxide: [-8.0, -7.0]
+  gate_log10_a_oxide: -8.0
+  original_reason: silicate_activity_anchor_not_this_wall
+  potassium_activity_status: K_TBAND_PROXY_FROM_NA_GAP
 
 species:
   Fe:

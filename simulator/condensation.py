@@ -452,6 +452,7 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
         raise ValueError(f'{path}: regularizer time must be CITED or UNCERTIFIED')
     if not time_constant.get('source') or not time_constant.get('source_class'):
         raise ValueError(f'{path}: regularizer time needs source/source_class')
+    _validate_reactive_sink_table(path, raw)
     return dict(raw)
 
 
@@ -471,6 +472,97 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
     for key in ('source', 'source_class', 'temperature_range_K', 'uncertainty_flag'):
         if entry.get(key) in (None, ''):
             raise ValueError(f'{path}: {name}.{key} is required')
+
+
+REACTIVE_SINK_VALUES = frozenset(('disproportionation', 'alkali_silicate'))
+
+
+def _validate_reactive_sink_table(path: Path, raw: Mapping[str, Any]) -> None:
+    allowlist = raw.get('silica_wall_liner_allowlist')
+    if (
+        not isinstance(allowlist, list)
+        or not allowlist
+        or any(not isinstance(item, str) or not item for item in allowlist)
+    ):
+        raise ValueError(
+            f'{path}: silica_wall_liner_allowlist must be a non-empty '
+            'list of liner names'
+        )
+    sinks = raw.get('reactive_sink_by_species_and_material')
+    if not isinstance(sinks, Mapping) or not sinks:
+        raise ValueError(
+            f'{path}: missing reactive_sink_by_species_and_material'
+        )
+    declared = raw.get('reactive_sink_values')
+    if not isinstance(declared, list) or set(declared) != set(REACTIVE_SINK_VALUES):
+        raise ValueError(
+            f'{path}: reactive_sink_values must be '
+            f'{sorted(REACTIVE_SINK_VALUES)}'
+        )
+    for species_name, row in sinks.items():
+        if not isinstance(species_name, str) or not species_name:
+            raise ValueError(f'{path}: reactive sink species names must be strings')
+        if not isinstance(row, Mapping) or not row:
+            raise ValueError(
+                f'{path}: reactive_sink_by_species_and_material.{species_name} '
+                'must be a mapping'
+            )
+        for material_class, sink in row.items():
+            if material_class != 'any' and (
+                not isinstance(material_class, str) or not material_class
+            ):
+                raise ValueError(
+                    f'{path}: reactive sink class for {species_name} must be '
+                    'a string or "any"'
+                )
+            if sink not in REACTIVE_SINK_VALUES:
+                allowed = ', '.join(sorted(REACTIVE_SINK_VALUES))
+                raise ValueError(
+                    f'{path}: reactive sink {species_name}.{material_class} '
+                    f'must be one of {allowed}'
+                )
+    sio = sinks.get('SiO')
+    if not isinstance(sio, Mapping) or sio.get('any') != 'disproportionation':
+        raise ValueError(
+            f'{path}: SiO reactive sink must be any: disproportionation'
+        )
+    for species_name in ('Na', 'K'):
+        row = sinks.get(species_name)
+        if not isinstance(row, Mapping) or row.get('silica') != 'alkali_silicate':
+            raise ValueError(
+                f'{path}: {species_name} reactive sink must be '
+                'silica: alkali_silicate'
+            )
+    band = raw.get('silicate_activity_band')
+    if not isinstance(band, Mapping):
+        raise ValueError(f'{path}: missing silicate_activity_band')
+    logs = band.get('log10_a_oxide')
+    try:
+        log_values = [float(item) for item in logs]
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f'{path}: silicate_activity_band.log10_a_oxide must be numeric'
+        ) from exc
+    if log_values != [-8.0, -7.0]:
+        raise ValueError(
+            f'{path}: silicate activity band must be log10 a = [-8, -7]'
+        )
+    try:
+        gate = float(band.get('gate_log10_a_oxide'))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f'{path}: silicate gate_log10_a_oxide must be numeric'
+        ) from exc
+    if gate != -8.0:
+        raise ValueError(
+            f'{path}: silicate gate must be the coating-conservative '
+            'end log10 a = -8'
+        )
+    if not band.get('original_reason') or not band.get('potassium_activity_status'):
+        raise ValueError(
+            f'{path}: silicate activity band needs original_reason and '
+            'potassium_activity_status'
+        )
 
 
 def _validate_sticking_reactivity_class(path: Path, name: str, value: Any) -> None:
@@ -845,6 +937,506 @@ def _reactive_product_backstop_authorized(species: str) -> bool:
 
 def _stable_condensation_product_backstop_authorized(species: str) -> bool:
     return _sticking_wall_product_class(species) == 'stable_condensation_product'
+
+
+def _silicate_activity_band() -> Mapping[str, Any]:
+    band = STICKING_DATA.get('silicate_activity_band')
+    if not isinstance(band, Mapping):
+        raise ValueError(
+            f'{STICKING_DATA_PATH}: missing silicate_activity_band'
+        )
+    return band
+
+
+def _declared_reactive_sink(
+    species: str,
+    wall_material_class: str | None,
+) -> str | None:
+    """Pair-table sink, or None when this pair stays on the metal dew point."""
+
+    table = STICKING_DATA.get('reactive_sink_by_species_and_material')
+    if not isinstance(table, Mapping):
+        raise ValueError(
+            f'{STICKING_DATA_PATH}: missing reactive_sink_by_species_and_material'
+        )
+    row = table.get(str(species))
+    if not isinstance(row, Mapping):
+        return None
+    if wall_material_class:
+        specific = row.get(str(wall_material_class))
+        if specific:
+            return str(specific)
+    generic = row.get('any')
+    if generic:
+        return str(generic)
+    return None
+
+
+def wall_material_class_for_liner(
+    liner_material: str,
+    materials: Mapping[str, Any] | None = None,
+) -> str | None:
+    """Return silica only for an allowlisted liner that declares the class.
+
+    The liner name is not parsed. A name that merely contains "silica" stays
+    physisorbing until it is on silica_wall_liner_allowlist and its materials
+    row sets wall_material_class.
+    """
+
+    name = str(liner_material or '')
+    if not name:
+        return None
+    allowlist = STICKING_DATA.get('silica_wall_liner_allowlist') or []
+    if name not in allowlist:
+        return None
+    label = _liner_material_config(name, materials).get('wall_material_class')
+    if str(label or '') != 'silica':
+        return None
+    return 'silica'
+
+
+def _fail_closed_zero_alpha(entry: Any) -> bool:
+    if not isinstance(entry, Mapping):
+        return False
+    if str(entry.get('source_class') or '') != (
+        'fail_closed_no_direct_sticking_coefficient'
+    ):
+        return False
+    try:
+        return float(entry.get('value')) == 0.0
+    except (TypeError, ValueError):
+        return False
+
+
+def _annotate_reactive_uptake_alpha(
+    record: dict[str, Any],
+    species: str,
+    *,
+    wall_material_class: str | None,
+) -> dict[str, Any]:
+    """Mark the coefficient the reactive branch actually uses.
+
+    The fused-silica SiO zero is not this coefficient. SiO keeps the species
+    sticking bridge (Wetzel), authority bridge. Na/K on silica keep the
+    physical ceiling, authority extrapolated. Citation status is left as the
+    sticking row recorded it.
+    """
+
+    sink = _declared_reactive_sink(species, wall_material_class)
+    if (
+        sink == 'disproportionation'
+        and _sticking_reactivity_class(species) == 'reactive'
+    ):
+        envelope = record.get('alpha_s_uncertainty_envelope') or record.get(
+            'envelope'
+        )
+        record['authority_level'] = 'bridge'
+        record['reactive_uptake_reason'] = (
+            'evaporation_alpha_proxy_not_reactive_uptake'
+        )
+        record['alpha_reactive_ladder'] = 'species_bridge'
+        if isinstance(envelope, (list, tuple)) and len(envelope) == 2:
+            record['reactive_uptake_envelope'] = [
+                float(envelope[0]),
+                float(envelope[1]),
+            ]
+        if str(record.get('citation_status') or '') != 'CITED':
+            record['output_status'] = 'status_bearing'
+        return record
+    if sink == 'alkali_silicate':
+        record['authority_level'] = 'extrapolated'
+        record['reactive_uptake_reason'] = (
+            'physical_bound_only_no_reactive_uptake_measurement'
+        )
+        record['reactive_uptake_envelope'] = [0.0, 1.0]
+        record['alpha_reactive_ladder'] = 'physical_ceiling'
+        record['output_status'] = 'status_bearing'
+    return record
+
+
+def _sio_liquid_ellingham_leg():
+    from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
+
+    for segment in ELLINGHAM_FIT_SEGMENTS['Si']:
+        if float(segment.range_K[0]) == 1696.0:
+            return segment
+    raise ValueError('Si Ellingham table has no 1696 K liquid leg')
+
+
+def _sio_reference_equilibrium_inputs(
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> tuple[float, float, float, float, float, tuple[float, float] | None]:
+    data = _species_vapor_data('SiO', vapor_pressure_data=vapor_pressure_data)
+    antoine = data.get('antoine') or {}
+    reaction = data.get('reaction') if isinstance(data.get('reaction'), Mapping) else {}
+    if not isinstance(antoine, Mapping) or 'A' not in antoine or 'B' not in antoine:
+        raise ValueError('SiO standard-reaction Antoine coefficients are missing')
+    p_std = float(reaction.get('standard_pressure_Pa') or 1.0e5)
+    pO2_ref = float(
+        data.get('pO2_reference_bar')
+        or reaction.get('pO2_reference_bar')
+        or 1.0e-9
+    )
+    bounds = _valid_temperature_range_K(data.get('valid_range_K'))
+    return (
+        float(antoine['A']),
+        float(antoine['B']),
+        float(antoine.get('C') or 0.0),
+        p_std,
+        pO2_ref,
+        bounds,
+    )
+
+
+def _sio_p_eq_pa_for_leg(
+    temperature_K: float,
+    segment: Any,
+    *,
+    antoine_A: float,
+    antoine_B: float,
+    antoine_C: float,
+    p_std_pa: float,
+    pO2_reference_bar: float,
+) -> tuple[float, float]:
+    """Return (p_eq_Pa, dG_disp_J) for one Si/SiO2 standard-state leg.
+
+    Premise: 2 SiO(g) = Si + SiO2, pure-phase activities 1.
+    dG_disp = -2 dG_B - dG_A.
+    (B) SiO2(l) -> SiO(g) + 0.5 O2 is the SiO standard-reaction term
+    from data/vapor_pressures.yaml:4617-4623, with its Antoine coefficients
+    at data/vapor_pressures.yaml:4722-4730. (A) Si + O2 -> SiO2 is the
+    JANAF O-039 segmented source in simulator/chemistry/ellingham_thermo.py:
+    616-655; the 1696 K liquid leg and the 1100-1685 K solid leg are both
+    evaluated below the liquid standard-state floor.
+    log10(P_ref/Pa) = A - B/(T+C) at pO2 = pO2_reference_bar
+    (data/vapor_pressures.yaml reference_pressure_model, the SiO family
+    antoine block). K_B = (P_ref/p_std) * sqrt(pO2_reference_bar) because
+    p_std = 1e5 Pa = 1 bar, so pO2/p_std = pO2_reference_bar.
+    dG_B = -RT ln K_B, joules per mol SiO.
+    (A) Si + O2 -> SiO2 is the JANAF O-039 segment passed in, joules per
+    mol O2 (ellingham_thermo.py liquid leg at 1696 K, the solid leg below
+    that). Reverse (B) twice and reverse (A) once: O2 and one SiO2 cancel.
+    p_eq = p_std * exp(dG_disp / (2 R T)). dG/(2RT) is dimensionless and
+    p_eq is pascals.
+    Sanity, liquid leg: 1500 C -> 30.8 mbar; the 1 mbar crossing is
+    ~1253 C; 1100 C -> ~6 Pa. Schick self-volatilization of the silica wall
+    is the other reaction and is not subtracted here.
+    """
+
+    temperature_K = float(temperature_K)
+    p_ref_pa = 10.0 ** (
+        antoine_A - antoine_B / (temperature_K + antoine_C)
+    )
+    k_b = (p_ref_pa / p_std_pa) * math.sqrt(pO2_reference_bar)
+    if k_b <= 0.0 or not math.isfinite(k_b):
+        raise ValueError('SiO disproportionation K_B is not a positive finite number')
+    dG_B_J = -GAS_CONSTANT_J_MOL_K * temperature_K * math.log(k_b)
+    dG_A_J = float(segment.delta_g_kJ_per_mol_O2(temperature_K)) * 1000.0
+    dG_disp_J = -2.0 * dG_B_J - dG_A_J
+    p_eq_pa = p_std_pa * math.exp(
+        dG_disp_J / (2.0 * GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
+    if not math.isfinite(p_eq_pa) or p_eq_pa < 0.0:
+        raise ValueError('SiO disproportionation p_eq is not a finite pressure')
+    return p_eq_pa, dG_disp_J
+
+
+def _sio_1mbar_crossing_C(segment: Any, inputs: tuple) -> float:
+    antoine_A, antoine_B, antoine_C, p_std_pa, pO2_ref, _bounds = inputs
+    target_pa = 100.0
+    low_K = 900.0
+    high_K = 2500.0
+    for _step in range(60):
+        mid_K = 0.5 * (low_K + high_K)
+        p_eq_pa, _dG = _sio_p_eq_pa_for_leg(
+            mid_K,
+            segment,
+            antoine_A=antoine_A,
+            antoine_B=antoine_B,
+            antoine_C=antoine_C,
+            p_std_pa=p_std_pa,
+            pO2_reference_bar=pO2_ref,
+        )
+        if p_eq_pa < target_pa:
+            low_K = mid_K
+        else:
+            high_K = mid_K
+    return 0.5 * (low_K + high_K) - CELSIUS_TO_KELVIN_OFFSET
+
+
+def _sio_disproportionation_equilibrium(
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Liquid-consistent p_eq, plus the other standard-state leg as a band.
+
+    Below 1696 K the Antoine K_B is still the liquid-SiO2 standard state
+    while the in-range Ellingham leg is Si(s)+SiO2(II). Both are evaluated.
+    The driving pressure uses the liquid leg. The 1 mbar crossings differ
+    by about 6 C; that is phase_standard_state_mismatch, not a refusal.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_segment_for_temperature,
+    )
+
+    temperature_K = float(temperature_K)
+    inputs = _sio_reference_equilibrium_inputs(vapor_pressure_data)
+    liquid = _sio_liquid_ellingham_leg()
+    liquid_floor_K = float(liquid.range_K[0])
+    if temperature_K >= liquid_floor_K:
+        primary = ellingham_segment_for_temperature('Si', temperature_K)
+        comparison = None
+        mismatch = False
+    else:
+        primary = liquid
+        comparison = ellingham_segment_for_temperature('Si', temperature_K)
+        mismatch = True
+    p_eq_pa, dG_disp_J = _sio_p_eq_pa_for_leg(
+        temperature_K,
+        primary,
+        antoine_A=inputs[0],
+        antoine_B=inputs[1],
+        antoine_C=inputs[2],
+        p_std_pa=inputs[3],
+        pO2_reference_bar=inputs[4],
+    )
+    comparison_pa = None
+    if comparison is not None:
+        comparison_pa, _comparison_dG = _sio_p_eq_pa_for_leg(
+            temperature_K,
+            comparison,
+            antoine_A=inputs[0],
+            antoine_B=inputs[1],
+            antoine_C=inputs[2],
+            p_std_pa=inputs[3],
+            pO2_reference_bar=inputs[4],
+        )
+    cache = getattr(_sio_disproportionation_equilibrium, '_crossing_cache', None)
+    if not isinstance(cache, dict):
+        liquid_crossing_C = _sio_1mbar_crossing_C(liquid, inputs)
+        # The solid leg is Si(s)+SiO2(II), range start 1100 K. The 1685 K
+        # sliver is Si(l)+SiO2(II) and is not the comparison the 6 C band
+        # is measured against.
+        solid = ellingham_segment_for_temperature('Si', 1100.0)
+        solid_crossing_C = _sio_1mbar_crossing_C(solid, inputs)
+        cache = {
+            'liquid_C': liquid_crossing_C,
+            'comparison_C': solid_crossing_C,
+            'band_C': abs(liquid_crossing_C - solid_crossing_C),
+        }
+        _sio_disproportionation_equilibrium._crossing_cache = cache
+    antoine_bounds = inputs[5]
+    antoine_extrapolated = (
+        antoine_bounds is None
+        or temperature_K < antoine_bounds[0]
+        or temperature_K > antoine_bounds[1]
+    )
+    return {
+        'p_eq_pa': p_eq_pa,
+        'dG_disp_J': dG_disp_J,
+        'p_eq_comparison_pa': comparison_pa,
+        'phase_standard_state_mismatch': mismatch,
+        'liquid_standard_state_min_K': liquid_floor_K,
+        'standard_state_1mbar_crossing_liquid_C': cache['liquid_C'],
+        'standard_state_1mbar_crossing_comparison_C': cache['comparison_C'],
+        'standard_state_crossing_band_C': cache['band_C'],
+        'antoine_standard_state_extrapolated': antoine_extrapolated,
+        'primary_phase_basis': str(primary.phase_basis),
+        'comparison_phase_basis': (
+            None if comparison is None else str(comparison.phase_basis)
+        ),
+        'authority_level': 'bridge',
+    }
+
+
+def _alkali_silicate_gate(
+    species: str,
+    temperature_K: float,
+    p_metal_pa: float,
+    headspace_pO2_bar: float | None,
+) -> dict[str, Any]:
+    """Oxygen-balanced silicate gate. Metal dew point is the other branch.
+
+    Premise: 4 M(g) + O2 = 2 M2O(in silicate), M = Na or K.
+    K = exp(-dG_M / RT) = a_M2O^2 / ((p_M/p_std)^4 * (p_O2/p_std)).
+    dG_M is the JANAF Ellingham row, joules per mol O2
+    (simulator/chemistry/ellingham_thermo.py:135-255, Na-014 / K-012).
+    p_std = 1e5 Pa = 1 bar, so
+    p_O2,eq / bar = a^2 / (K * (p_M/p_std)^4).
+    The gate uses the coating-conservative end log10 a = -8. The other
+    end, -7, is reported and not averaged.
+    Sanity at 1500 C, p_M = 1 mbar, Na: K ~ 1.06e6;
+    log10 a = 0 -> pO2,eq ~ 9.5e5 bar (sink off);
+    -7 -> ~9.5e-9 bar; -8 -> ~9.5e-11 bar.
+    At the 1e-9 bar floor the ends disagree and -8 is on.
+    K uses the same algebra. Its activity anchor is the Na band
+    (K_TBAND_PROXY_FROM_NA_GAP), so the notice is the same shape with
+    worse provenance. Favoured iff the supplied headspace pO2 is above
+    pO2,eq at log10 a = -8. A missing pO2 is not a measured zero and does
+    not turn the sink on.
+    """
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_delta_g_kj_per_mol_o2,
+        ellingham_segment_for_temperature,
+    )
+
+    band = _silicate_activity_band()
+    temperature_K = float(temperature_K)
+    p_std_pa = 1.0e5
+    segment = ellingham_segment_for_temperature(str(species), temperature_K)
+    dG_J = float(ellingham_delta_g_kj_per_mol_o2(str(species), temperature_K)) * 1000.0
+    k_eq = math.exp(-dG_J / (GAS_CONSTANT_J_MOL_K * temperature_K))
+    reduced_p = float(p_metal_pa) / p_std_pa
+    p_power = reduced_p ** 4
+    pO2_eq_by_log: dict[str, float] = {}
+    for log_a in band.get('log10_a_oxide') or ():
+        activity = 10.0 ** float(log_a)
+        if p_power <= 0.0 or not math.isfinite(k_eq):
+            pO2_eq_by_log[str(log_a)] = math.inf
+        else:
+            pO2_eq_by_log[str(float(log_a))] = (
+                activity ** 2 / (k_eq * p_power)
+            )
+    gate_log = float(band['gate_log10_a_oxide'])
+    gate_key = str(gate_log)
+    if gate_key not in pO2_eq_by_log:
+        gate_key = str(float(gate_log))
+    pO2_eq_gate = pO2_eq_by_log[gate_key]
+    ends = [pO2_eq_by_log[key] for key in pO2_eq_by_log]
+    try:
+        pO2_bar = (
+            None if headspace_pO2_bar is None else float(headspace_pO2_bar)
+        )
+    except (TypeError, ValueError):
+        pO2_bar = None
+    if pO2_bar is None or not math.isfinite(pO2_bar):
+        favoured = False
+        pO2_missing = True
+        ends_disagree = False
+    else:
+        pO2_missing = False
+        favoured = pO2_bar > pO2_eq_gate
+        end_on = [pO2_bar > value for value in ends]
+        ends_disagree = any(end_on) and not all(end_on)
+    if ends_disagree:
+        band_notice = (
+            'silicate activity band log10 a_oxide [-8, -7] disagrees at '
+            'this headspace pO2; the coating-conservative end log10 a = -8 '
+            'decides'
+        )
+    elif pO2_missing:
+        band_notice = (
+            'silicate activity band log10 a_oxide [-8, -7] was not evaluated; '
+            'headspace pO2 is missing, so the sink stays off and the metal '
+            'dew point is used'
+        )
+    else:
+        band_notice = (
+            'silicate activity band log10 a_oxide [-8, -7] agrees at this '
+            'headspace pO2'
+        )
+    low_K, high_K = segment.range_K
+    in_segment = low_K <= temperature_K < high_K or (
+        temperature_K >= low_K and temperature_K <= high_K
+    )
+    notice = {
+        'status': 'status_bearing',
+        'output_status': 'status_bearing',
+        'authority_level': 'bridge',
+        'original_reason': str(band.get('original_reason')),
+        'silicate_activity_band_log10_a': [
+            float(item) for item in band.get('log10_a_oxide') or ()
+        ],
+        'gate_log10_a_oxide': gate_log,
+        'headspace_pO2_bar': pO2_bar,
+        'pO2_eq_bar_by_log10_a': pO2_eq_by_log,
+        'activity_band_ends_disagree': ends_disagree,
+        'activity_band_notice': band_notice,
+        'equilibrium_constant': k_eq,
+        'dG_J_per_mol_O2': dG_J,
+        'ellingham_phase_basis': str(segment.phase_basis),
+        'ellingham_segment_range_K': [float(low_K), float(high_K)],
+        'ellingham_segment_extrapolated': not in_segment,
+        'headspace_pO2_missing': pO2_missing,
+        'favoured': favoured,
+    }
+    if str(species) == 'K':
+        notice['potassium_activity_status'] = str(
+            band.get('potassium_activity_status')
+        )
+        notice['authority_level'] = 'extrapolated'
+    return {'favoured': favoured and not pO2_missing, 'notice': notice}
+
+
+def _apply_sio_disproportionation_driving_pressure(
+    local_pressure_pa: float,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    diagnostic_out: MutableMapping[str, Any] | None,
+) -> float:
+    equilibrium = _sio_disproportionation_equilibrium(
+        temperature_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    p_eq_pa = float(equilibrium['p_eq_pa'])
+    driving_pressure_pa = max(0.0, local_pressure_pa - p_eq_pa)
+    reason = (
+        'reactive_uptake'
+        if driving_pressure_pa > 0.0
+        else 'reactive_equilibrium_undersaturated'
+    )
+    if diagnostic_out is not None:
+        notice = {
+            'status': 'status_bearing',
+            'output_status': 'status_bearing',
+            'authority_level': equilibrium['authority_level'],
+            'reason': reason,
+            'saturation_pressure_policy': 'reactive_equilibrium',
+            'temperature_K': float(temperature_K),
+            'wall_saturation_pressure_pa': p_eq_pa,
+            'driving_pressure_pa': driving_pressure_pa,
+            'phase_standard_state_mismatch': bool(
+                equilibrium['phase_standard_state_mismatch']
+            ),
+            'liquid_standard_state_min_K': equilibrium[
+                'liquid_standard_state_min_K'
+            ],
+            'p_eq_comparison_pa': equilibrium['p_eq_comparison_pa'],
+            'standard_state_1mbar_crossing_liquid_C': equilibrium[
+                'standard_state_1mbar_crossing_liquid_C'
+            ],
+            'standard_state_1mbar_crossing_comparison_C': equilibrium[
+                'standard_state_1mbar_crossing_comparison_C'
+            ],
+            'standard_state_crossing_band_C': equilibrium[
+                'standard_state_crossing_band_C'
+            ],
+            'antoine_standard_state_extrapolated': equilibrium[
+                'antoine_standard_state_extrapolated'
+            ],
+            'primary_phase_basis': equilibrium['primary_phase_basis'],
+            'comparison_phase_basis': equilibrium['comparison_phase_basis'],
+            'certified_band_K': [
+                equilibrium['liquid_standard_state_min_K'],
+                2500.0,
+            ],
+        }
+        diagnostic_out['wall_saturation_pressure_pa'] = p_eq_pa
+        diagnostic_out['wall_saturation_pressure_refused'] = False
+        diagnostic_out['wall_saturation_pressure_status'] = 'reactive_equilibrium'
+        diagnostic_out['saturation_pressure_policy'] = 'reactive_equilibrium'
+        diagnostic_out['authority_level'] = equilibrium['authority_level']
+        diagnostic_out['reason'] = reason
+        diagnostic_out['phase_standard_state_mismatch'] = bool(
+            equilibrium['phase_standard_state_mismatch']
+        )
+        diagnostic_out['driving_pressure_pa'] = driving_pressure_pa
+        diagnostic_out['wall_saturation_pressure_notice'] = notice
+    return driving_pressure_pa
 
 
 def _sticking_ref_record(species: str, ref: Any) -> Mapping[str, Any] | None:
@@ -2136,6 +2728,7 @@ class CondensationModel:
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
+        self._headspace_transport_pO2_bar: float | None = None
         self.last_cold_spot_diagnostic: dict[str, Any] = {
             'has_cold_spot': False,
             'warnings': [],
@@ -2964,6 +3557,25 @@ class CondensationModel:
             if self._species_partial_pressures_configured
             else {}
         )
+        oxygen_reservoir = getattr(melt, 'oxygen_reservoir', None)
+        raw_headspace_pO2 = getattr(
+            oxygen_reservoir,
+            'headspace_transport_pO2_bar',
+            None,
+        )
+        # Small direct-model fixtures may still expose the scalar on the melt
+        # object. Production state owns it on OxygenReservoirState.
+        if raw_headspace_pO2 is None:
+            raw_headspace_pO2 = getattr(melt, 'headspace_transport_pO2_bar', None)
+        try:
+            headspace_pO2_bar = (
+                None if raw_headspace_pO2 is None else float(raw_headspace_pO2)
+            )
+        except (TypeError, ValueError):
+            headspace_pO2_bar = None
+        if headspace_pO2_bar is not None and not math.isfinite(headspace_pO2_bar):
+            headspace_pO2_bar = None
+        self._headspace_transport_pO2_bar = headspace_pO2_bar
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             [segment for segment in self.pipe_segments
@@ -2975,6 +3587,7 @@ class CondensationModel:
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            headspace_pO2_bar=headspace_pO2_bar,
         )
         for species in evap_flux.species_kg_hr:
             for segment in self._mixed_temperature_wall_candidate_segments(species):
@@ -3625,9 +4238,6 @@ class CondensationModel:
                         'refused_fraction'
                     ],
                     'eta_basis': lower_bound_outcome['eta_basis'],
-                    'pending_decision': lower_bound_outcome[
-                        'pending_decision'
-                    ],
                     'authority_level': lower_bound_outcome[
                         'authority_level'
                     ],
@@ -3635,6 +4245,38 @@ class CondensationModel:
                         'original_reason'
                     ],
                 }
+            reactive_outcome = next(
+                (
+                    item for item in outcomes
+                    if item.get('saturation_pressure_policy')
+                    == 'reactive_equilibrium'
+                    and item.get('reason') in {
+                        'reactive_uptake',
+                        'reactive_equilibrium_undersaturated',
+                    }
+                ),
+                None,
+            )
+            reactive_record = {}
+            if reactive_outcome is not None:
+                reactive_record = {
+                    'status': reactive_outcome['status'],
+                    'reason': reactive_outcome['reason'],
+                    'output_status': 'status_bearing',
+                    'authority_level': reactive_outcome['authority_level'],
+                    'saturation_pressure_policy': 'reactive_equilibrium',
+                    'phase_standard_state_mismatch': reactive_outcome.get(
+                        'phase_standard_state_mismatch'
+                    ),
+                }
+                for key in (
+                    'standard_state_crossing_band_C',
+                    'activity_band_notice',
+                    'activity_band_ends_disagree',
+                    'original_reason',
+                ):
+                    if key in reactive_outcome:
+                        reactive_record[key] = reactive_outcome[key]
             if domain_outcome is not None:
                 authority = condensation_authority_by_species.get(species)
                 if authority is not None:
@@ -3650,12 +4292,23 @@ class CondensationModel:
                         'valid_range_K': domain_outcome['valid_range_K'],
                         'stage_outcomes': list(outcomes),
                     })
+            if reactive_outcome is not None:
+                authority = condensation_authority_by_species.get(species)
+                if authority is not None:
+                    authority.update({
+                        'authoritative_for_condensation': False,
+                        'authority_level': reactive_outcome['authority_level'],
+                        'reason': reactive_outcome['reason'],
+                        'saturation_pressure_policy': 'reactive_equilibrium',
+                    })
             if species in condensation_refusals_by_species:
                 existing = condensation_refusals_by_species[species]
                 if isinstance(existing, dict):
                     existing = dict(existing)
                     if lower_bound_record:
                         existing.update(lower_bound_record)
+                    if reactive_record:
+                        existing.update(reactive_record)
                     stage_list = list(existing.get('stage_outcomes') or [])
                     stage_list.extend(outcomes)
                     existing['stage_outcomes'] = stage_list
@@ -3677,6 +4330,10 @@ class CondensationModel:
             if lower_bound_record:
                 condensation_refusals_by_species[species].update(
                     lower_bound_record
+                )
+            if reactive_record:
+                condensation_refusals_by_species[species].update(
+                    reactive_record
                 )
 
         for species, authority in condensation_authority_by_species.items():
@@ -4590,9 +5247,10 @@ class CondensationModel:
                 )
             if P_local_pa == 0.0:
                 return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
-            # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
-            # below the declared routing temperature. Flow supplies pressure;
-            # the 1 mbar routing reference never substitutes for measured flow.
+            # Antoine is unavailable at the routing temperature. SiO capture
+            # is the disproportionation equilibrium on each band sample, not
+            # a product pressure of 0 and not the T_cond switch. T_cond stays
+            # the routing setpoint.
             domain_outcome = {
                 **notice,
                 'status': 'extrapolated',
@@ -4607,7 +5265,7 @@ class CondensationModel:
                 'flowing_pressure_pa': P_local_pa,
                 'routing_reference_temperature_C': declared_temperature,
                 'routing_reference_source': 'condensation_train.condensation_temperatures_C',
-                'saturation_pressure_policy': 'reactive_product_backstop',
+                'saturation_pressure_policy': 'reactive_equilibrium',
                 'eta': 0.0,
             }
             if efficiency_outcomes is not None:
@@ -4676,6 +5334,21 @@ class CondensationModel:
         band_samples_used = 0
         band_samples_total = 0
         refused_sample_reason: str | None = None
+        reactive_sample_count = 0
+        reactive_uptake_count = 0
+        reactive_authority: str | None = None
+        reactive_mismatch = False
+        reactive_notice: Mapping[str, Any] | None = None
+        stage_wall_class = wall_material_class_for_liner(
+            str(
+                _stage_material_config(stage, self.materials).get(
+                    'liner_material'
+                )
+                or ''
+            ),
+            self.materials,
+        )
+        headspace_pO2_bar = getattr(self, '_headspace_transport_pO2_bar', None)
         width_C = hi_C - lo_C
         spec = (
             alpha_record.get('alpha_s_coefficient_spec')
@@ -4735,17 +5408,14 @@ class CondensationModel:
                     overhead_pressure_pa=overhead_pressure_pa,
                     carrier_gas=self.carrier_gas,
                     vapor_pressure_data=self.vapor_pressure_data,
-                    # Standard-reaction SiO rows intentionally have no pure-SiO
-                    # wall P_sat.  At and below the declared condensation
-                    # temperature, baffles materialize the disproportionation
-                    # product instead of silently disabling capture when the melt
-                    # reaction term is rejected as a wall pressure.  The
-                    # temperature gate preserves colder downstream carryover
-                    # without admitting hotter upstream stages.
+                    # T_cond is the routing setpoint. It is not the capture
+                    # switch. SiO uses p_eq(T); Na/K on a silica class use
+                    # the silicate gate.
                     reactive_product_backstop=(
                         _reactive_product_backstop_authorized(species)
-                        and T_surface_C <= T_cond_C
                     ),
+                    wall_material_class=stage_wall_class,
+                    headspace_pO2_bar=headspace_pO2_bar,
                     # Stable product class (CrO2 today) materializes the declared
                     # irreversible oxide route instead of reversible pure-species Psat.
                     stable_condensation_product_backstop=(
@@ -4769,6 +5439,20 @@ class CondensationModel:
                 continue
             band_flux_mol_m2_s += flux
             band_samples_used += 1
+            if rate_diagnostic.get('wall_saturation_pressure_status') == (
+                'reactive_equilibrium'
+            ):
+                reactive_sample_count += 1
+                if rate_diagnostic.get('reason') == 'reactive_uptake':
+                    reactive_uptake_count += 1
+                level = rate_diagnostic.get('authority_level')
+                if level:
+                    reactive_authority = str(level)
+                if rate_diagnostic.get('phase_standard_state_mismatch'):
+                    reactive_mismatch = True
+                notice = rate_diagnostic.get('wall_saturation_pressure_notice')
+                if isinstance(notice, Mapping):
+                    reactive_notice = notice
         if band_samples_total == 0:
             raise RuntimeError('condensation efficiency sampled no wall temperatures')
         band_flux_mol_m2_s /= band_samples_total
@@ -4782,11 +5466,10 @@ class CondensationModel:
         refused_count = band_samples_total - band_samples_used
         refused_band_outcome = None
         if refused_count:
-            # d-025 leaves two candidate policies for owner adjudication:
-            # mean over authorized samples only, or a lower-bound mean over
-            # every sample with refused fractions uncaptured. Use the latter
-            # pending decision: it is coating-conservative and keeps vapor in
-            # the downstream route instead of aborting the hour.
+            # A physisorber that still has no wall curve keeps the refused
+            # samples in the denominator as uncaptured. That is a typed
+            # refusal, not a reactive equilibrium. The d-025 decision is
+            # closed and is not named on this record.
             refused_band_outcome = {
                 'status': 'status_bearing',
                 'output_status': 'status_bearing',
@@ -4800,12 +5483,47 @@ class CondensationModel:
                 'refused_count': refused_count,
                 'total_samples': band_samples_total,
                 'eta_basis': 'lower_bound_refused_samples_uncaptured',
-                'pending_decision': 'd-025',
                 'species': species,
                 'stage_number': int(getattr(stage, 'stage_number', -1)),
                 'T_cond_C': float(T_cond_C),
                 'eta': 0.0,
             }
+        reactive_band_outcome = None
+        if reactive_sample_count:
+            reactive_reason = (
+                'reactive_uptake'
+                if reactive_uptake_count
+                else 'reactive_equilibrium_undersaturated'
+            )
+            reactive_band_outcome = {
+                'status': 'status_bearing',
+                'output_status': 'status_bearing',
+                'authority_level': reactive_authority or 'bridge',
+                'reason': reactive_reason,
+                'saturation_pressure_policy': 'reactive_equilibrium',
+                'phase_standard_state_mismatch': reactive_mismatch,
+                'species': species,
+                'stage_number': int(getattr(stage, 'stage_number', -1)),
+                'T_cond_C': float(T_cond_C),
+                'reactive_sample_count': reactive_sample_count,
+                'reactive_uptake_count': reactive_uptake_count,
+                'eta': 0.0,
+            }
+            if isinstance(reactive_notice, Mapping):
+                for key in (
+                    'standard_state_1mbar_crossing_liquid_C',
+                    'standard_state_1mbar_crossing_comparison_C',
+                    'standard_state_crossing_band_C',
+                    'liquid_standard_state_min_K',
+                    'silicate_activity_band_log10_a',
+                    'activity_band_ends_disagree',
+                    'activity_band_notice',
+                    'gate_log10_a_oxide',
+                    'headspace_pO2_bar',
+                    'original_reason',
+                ):
+                    if key in reactive_notice:
+                        reactive_band_outcome[key] = reactive_notice[key]
 
         stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
         if stage_area_m2 is not None:
@@ -4821,11 +5539,11 @@ class CondensationModel:
                 or available_kg <= 0.0
                 or molar_mass_kg_mol <= 0.0
             ):
-                if (
-                    refused_band_outcome is not None
-                    and efficiency_outcomes is not None
-                ):
-                    efficiency_outcomes.append(refused_band_outcome)
+                if efficiency_outcomes is not None:
+                    if refused_band_outcome is not None:
+                        efficiency_outcomes.append(refused_band_outcome)
+                    if reactive_band_outcome is not None:
+                        efficiency_outcomes.append(reactive_band_outcome)
                 return 0.0
             # Premise: ``available_kg`` is the route's available vapor rate in
             # kg h^-1, not the inventory occupying one residence interval.
@@ -4864,6 +5582,10 @@ class CondensationModel:
             refused_band_outcome['eta'] = eta
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append(refused_band_outcome)
+        if reactive_band_outcome is not None:
+            reactive_band_outcome['eta'] = eta
+            if efficiency_outcomes is not None:
+                efficiency_outcomes.append(reactive_band_outcome)
         supply_limited = eta_uncapped > 1.0
         if domain_outcome is not None:
             domain_outcome['eta'] = eta
@@ -5878,6 +6600,10 @@ def _stage_alpha_record(
     # An explicit null / absent stage entry falls back to the grounded sidecar
     # record (matching the pre-record _stage_alpha_s behaviour); only a present
     # non-None material entry overrides it.
+    wall_class = wall_material_class_for_liner(
+        str(config.get('liner_material') or ''),
+        materials,
+    )
     if entry is not None:
         record = _alpha_record(
             species=species,
@@ -5890,10 +6616,18 @@ def _stage_alpha_record(
             source_class='material_stage_alpha',
         )
         record['stage_number'] = int(stage.stage_number)
-        return record
+        return _annotate_reactive_uptake_alpha(
+            record,
+            species,
+            wall_material_class=wall_class,
+        )
     record = _sidecar_alpha_record(species, T_K=T_K)
     record['stage_number'] = int(stage.stage_number)
-    return record
+    return _annotate_reactive_uptake_alpha(
+        record,
+        species,
+        wall_material_class=wall_class,
+    )
 
 
 def _wall_alpha_record(
@@ -5910,17 +6644,27 @@ def _wall_alpha_record(
         )
     config = _wall_material_config(materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
+    disproportionation = (
+        _declared_reactive_sink(species, None) == 'disproportionation'
+        and _sticking_reactivity_class(species) == 'reactive'
+    )
+    selected_liner = ''
+    record: dict[str, Any] | None = None
     if segment is not None and getattr(segment, 'liner_material', ''):
         liner_material = str(segment.liner_material)
         material_config = _liner_material_config(liner_material, materials)
         material_alpha = material_config.get('alpha_s_by_species', {}) or {}
-        if (
-            isinstance(material_alpha, Mapping)
-            and material_alpha.get(species) is not None
+        entry = (
+            material_alpha.get(species)
+            if isinstance(material_alpha, Mapping)
+            else None
+        )
+        if entry is not None and not (
+            disproportionation and _fail_closed_zero_alpha(entry)
         ):
-            return _alpha_record(
+            record = _alpha_record(
                 species=species,
-                entry=material_alpha.get(species),
+                entry=entry,
                 source=(
                     'data/materials.yaml::liner_materials.'
                     f'{liner_material}.alpha_s_by_species.{species}'
@@ -5930,11 +6674,13 @@ def _wall_alpha_record(
                 segment=segment,
                 source_class='material_liner_alpha',
             )
-    if (
+            selected_liner = liner_material
+    if record is None and (
         isinstance(alpha_by_species, Mapping)
         and alpha_by_species.get(species) is not None
     ):
-        return _alpha_record(
+        selected_liner = str(config.get('liner_material') or '')
+        record = _alpha_record(
             species=species,
             entry=alpha_by_species.get(species),
             source=(
@@ -5942,30 +6688,45 @@ def _wall_alpha_record(
                 f'alpha_s_by_species.{species}'
             ),
             T_K=T_K,
-            liner_material=str(config.get('liner_material') or ''),
+            liner_material=selected_liner,
             segment=segment,
         )
-    liner_material = str(config.get('liner_material') or '')
-    if liner_material:
-        material_config = _liner_material_config(liner_material, materials)
-        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
-        if (
-            isinstance(material_alpha, Mapping)
-            and material_alpha.get(species) is not None
-        ):
-            return _alpha_record(
-                species=species,
-                entry=material_alpha.get(species),
-                source=(
-                    'data/materials.yaml::liner_materials.'
-                    f'{liner_material}.alpha_s_by_species.{species}'
-                ),
-                T_K=T_K,
-                liner_material=liner_material,
-                segment=segment,
-                source_class='material_liner_alpha',
+    if record is None:
+        liner_material = str(config.get('liner_material') or '')
+        if liner_material:
+            material_config = _liner_material_config(liner_material, materials)
+            material_alpha = material_config.get('alpha_s_by_species', {}) or {}
+            entry = (
+                material_alpha.get(species)
+                if isinstance(material_alpha, Mapping)
+                else None
             )
-    return _sidecar_alpha_record(species, T_K=T_K)
+            if entry is not None and not (
+                disproportionation and _fail_closed_zero_alpha(entry)
+            ):
+                record = _alpha_record(
+                    species=species,
+                    entry=entry,
+                    source=(
+                        'data/materials.yaml::liner_materials.'
+                        f'{liner_material}.alpha_s_by_species.{species}'
+                    ),
+                    T_K=T_K,
+                    liner_material=liner_material,
+                    segment=segment,
+                    source_class='material_liner_alpha',
+                )
+                selected_liner = liner_material
+    if record is None:
+        record = _sidecar_alpha_record(species, T_K=T_K)
+    return _annotate_reactive_uptake_alpha(
+        record,
+        species,
+        wall_material_class=wall_material_class_for_liner(
+            selected_liner,
+            materials,
+        ),
+    )
 
 
 def _capture_budget_alpha_record(
@@ -6931,6 +7692,8 @@ def _wall_deposition_driving_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    wall_material_class: str | None = None,
+    headspace_pO2_bar: float | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -6982,13 +7745,6 @@ def _wall_deposition_driving_pressure_pa(
             T_surface_K,
             refusal_reason,
         )
-    P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
-        species,
-        T_surface_K,
-        vapor_pressure_data=vapor_pressure_data,
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-    )
     if stable_condensation_product_backstop:
         if not _stable_condensation_product_backstop_authorized(species):
             raise ValueError(
@@ -7002,13 +7758,85 @@ def _wall_deposition_driving_pressure_pa(
                 "stable_condensation_product_backstop"
             )
         return max(0.0, local_pressure_pa)
+    sink_kind = _declared_reactive_sink(species, wall_material_class)
+    if (
+        reactive_product_backstop
+        and declared_reactivity_class == 'reactive'
+        and sink_kind is None
+    ):
+        refusal_reason = 'reactive_sink_not_declared'
+        if diagnostic_out is not None:
+            diagnostic_out['wall_saturation_pressure_pa'] = None
+            diagnostic_out['wall_saturation_pressure_refused'] = True
+            diagnostic_out['wall_saturation_pressure_refusal_reason'] = (
+                refusal_reason
+            )
+            diagnostic_out['wall_saturation_pressure_refusal_type'] = (
+                'MissingReactiveSinkRefusal'
+            )
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            refusal_reason,
+        )
+    if (
+        sink_kind == 'disproportionation'
+        and reactive_product_backstop
+        and declared_reactivity_class == 'reactive'
+    ):
+        return _apply_sio_disproportionation_driving_pressure(
+            local_pressure_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            diagnostic_out=diagnostic_out,
+        )
+    if sink_kind == 'alkali_silicate':
+        gate = _alkali_silicate_gate(
+            species,
+            T_surface_K,
+            local_pressure_pa,
+            headspace_pO2_bar,
+        )
+        if diagnostic_out is not None:
+            diagnostic_out['silicate_equilibrium_notice'] = gate['notice']
+        if gate['favoured']:
+            notice = dict(gate['notice'])
+            notice.update({
+                'reason': 'reactive_uptake',
+                'saturation_pressure_policy': 'reactive_equilibrium',
+                'temperature_K': float(T_surface_K),
+                'wall_saturation_pressure_pa': 0.0,
+                'driving_pressure_pa': local_pressure_pa,
+                'metal_psat_subtracted': False,
+            })
+            if diagnostic_out is not None:
+                diagnostic_out['wall_saturation_pressure_pa'] = 0.0
+                diagnostic_out['wall_saturation_pressure_refused'] = False
+                diagnostic_out['wall_saturation_pressure_status'] = (
+                    'reactive_equilibrium'
+                )
+                diagnostic_out['saturation_pressure_policy'] = (
+                    'reactive_equilibrium'
+                )
+                diagnostic_out['authority_level'] = notice['authority_level']
+                diagnostic_out['reason'] = 'reactive_uptake'
+                diagnostic_out['driving_pressure_pa'] = local_pressure_pa
+                diagnostic_out['wall_saturation_pressure_notice'] = notice
+            return max(0.0, local_pressure_pa)
+    P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
+        species,
+        T_surface_K,
+        vapor_pressure_data=vapor_pressure_data,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
     reactivity_class = declared_reactivity_class
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
-            # SiO has a melt standard-reaction pressure, not a stable pure-SiO
-            # wall P_sat. Its authorized wall product is disproportionated
-            # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
-            # full local SiO pressure remains the deposition driving pressure.
+            # Disproportionation (SiO) returns before this Antoine gap.
+            # A class stamped reactive with no pair-table sink still has no
+            # pure-species wall curve; the declared-class hook keeps the full
+            # local pressure rather than raising on the species name.
             if diagnostic_out is not None:
                 record = dict(
                     (antoine_extrapolations or {}).get(
@@ -7023,14 +7851,14 @@ def _wall_deposition_driving_pressure_pa(
                         "reason": "antoine_psat_unavailable_at_T",
                         "original_reason": original_reason,
                         "output_status": "status_bearing",
-                        "saturation_pressure_policy": "reactive_product_backstop",
+                        "saturation_pressure_policy": "reactive_equilibrium",
                         "wall_saturation_pressure_pa": 0.0,
                     })
                     diagnostic_out["wall_saturation_pressure_notice"] = record
                 diagnostic_out["wall_saturation_pressure_pa"] = 0.0
                 diagnostic_out["wall_saturation_pressure_refused"] = False
                 diagnostic_out["wall_saturation_pressure_status"] = (
-                    "reactive_product_backstop"
+                    "reactive_equilibrium"
                 )
             return max(0.0, local_pressure_pa)
         admission_refusal = _condensation_admission_refusal(
@@ -7087,14 +7915,6 @@ def _wall_deposition_driving_pressure_pa(
                 and value.get('authority_level') == 'extrapolated'), None)
         if record is not None:
             diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
-    if reactivity_class == 'reactive':
-        if P_sat_pa < local_pressure_pa:
-            return max(0.0, local_pressure_pa - P_sat_pa)
-        # Reactive deposits are less-volatile wall products, not the vapor
-        # species. Today SiO uses the disproportionation-product limit
-        # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
-        effective_product_psat_pa = 0.0
-        return max(0.0, local_pressure_pa - effective_product_psat_pa)
     return max(0.0, local_pressure_pa - P_sat_pa)
 
 
@@ -7109,6 +7929,8 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     reactive_product_backstop: bool = True,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    wall_material_class: str | None = None,
+    headspace_pO2_bar: float | None = None,
 ) -> float:
     # b-304: same category-1 gate as the series-resistance helper below.
     # Pre-fix this helper had NO input gate: alpha_s multiplies the flux
@@ -7132,6 +7954,8 @@ def _hkl_surface_deposition_flux_mol_m2_s(
         reactive_product_backstop=reactive_product_backstop,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        wall_material_class=wall_material_class,
+        headspace_pO2_bar=headspace_pO2_bar,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
@@ -7180,6 +8004,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    wall_material_class: str | None = None,
+    headspace_pO2_bar: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -7227,9 +8053,10 @@ def _series_resistance_deposition_flux_mol_m2_s(
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
     Returns 0 only for category-3 real limits: no driving force
-    (physisorber ``P_local <= P_sat`` at ``T_surface``; reactive species
-    use the product-P_sat floor) or ``alpha_s == 0.0`` exactly (a
-    perfectly non-sticking surface — see the gate comment below).
+    (physisorber ``P_local <= P_sat`` at ``T_surface``; SiO
+    ``P_local <= p_eq``; a silicate gate that is off and below the metal
+    dew point) or ``alpha_s == 0.0`` exactly (a perfectly non-sticking
+    surface — see the gate comment below).
     Category-1 degenerate inputs — non-positive pipe diameter or
     absolute temperatures, sticking coefficient outside [0, 1], any
     non-finite input — raise ``DepositionInputRefusal`` instead of
@@ -7309,6 +8136,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         diagnostic_out=diagnostic_out,
+        wall_material_class=wall_material_class,
+        headspace_pO2_bar=headspace_pO2_bar,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
@@ -8035,15 +8864,17 @@ def cold_spot_diagnostic(
     species_partial_pressures_pa: Mapping[str, float] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    headspace_pO2_bar: float | None = None,
 ) -> dict[str, Any]:
     """Flag pipe segments that would condense flowing vapor too early.
 
     Landing-temperature cold spots stay a fixed engineering-threshold
-    check. Upstream hot-wall fouling uses local partial pressure versus
-    the existing wall Antoine P_sat when that pressure is supplied.
+    check. Upstream hot-wall fouling uses the same branch as the flux:
+    metal dew point for a physisorbing pair, p > p_eq for SiO, and the
+    silicate gate for Na/K on a silica class. A refused Antoine P_sat
+    is not itself a finding.
 
-    ``upstream_hot_wall_min_C`` remains an ignored compatibility keyword;
-    upstream hot-wall findings are dew-point findings only.
+    ``upstream_hot_wall_min_C`` remains an ignored compatibility keyword.
     """
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
@@ -8083,44 +8914,100 @@ def cold_spot_diagnostic(
                 continue
             wall_T_C = float(segment.wall_temperature_C)
             if p_local_pa is not None:
-                # Premise: fouling requires p_i > P_sat(T_wall) (mandate
-                # hot-wall invariant). Algebra: supersaturation iff
-                # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
-                # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
-                # (1 mbar) Fe stream is ~88-fold supersaturated; Na
-                # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
-                # undersaturated. SiO wall Antoine is not a P_sat
-                # curve; a refused P_sat does not invent a flag here
-                # (reactive P_sat ~= 0 is M30 deposition policy).
-                P_sat_pa, saturation_refused = _try_antoine_psat_pa(
-                    str(species),
-                    wall_T_C + CELSIUS_TO_KELVIN_OFFSET,
-                    vapor_pressure_data=vapor_pressure_data,
-                    antoine_extrapolations=antoine_extrapolations,
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings
-                    ),
+                # Premise: fouling requires the same driving pressure as
+                # the flux. Physisorbing pairs: p_i > P_sat(T_wall).
+                # SiO: p_i > p_eq(T) from 2 SiO(g) = Si + SiO2. Na/K on
+                # silica: the silicate gate, including when p_i < P_sat.
+                # Units: pressures are pascals. Sanity: Fe P_sat(1673.15 K)
+                # ≈ 1.14 Pa, so 100 Pa Fe is supersaturated; 100 Pa SiO at
+                # 1500 C is under p_eq ≈ 3081 Pa and must not flag; the
+                # same 100 Pa at 1100 C is over p_eq ≈ 6 Pa and must flag.
+                # A refused SiO Antoine is not a finding by itself.
+                wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
+                wall_class = wall_material_class_for_liner(
+                    str(getattr(segment, 'liner_material', '') or '')
                 )
+                sink = _declared_reactive_sink(str(species), wall_class)
+                reactive_finding = False
                 if (
-                    not saturation_refused
-                    and P_sat_pa is not None
-                    and math.isfinite(P_sat_pa)
-                    and p_local_pa > P_sat_pa
+                    sink == 'disproportionation'
+                    and _reactive_product_backstop_authorized(str(species))
                 ):
-                    upstream_hot_wall_findings.append({
-                        'segment': segment.name,
-                        'account': segment.wall_deposit_account,
-                        'species': str(species),
-                        'kg_hr': kg_hr,
-                        'wall_temperature_C': wall_T_C,
-                        'target_stage_number': target_stage_number,
-                        'warning': (
-                            f'upstream hot-wall violation {segment.name}: '
-                            f'{species} local pressure exceeds wall '
-                            f'saturation at {wall_T_C:.1f} C before stage '
-                            f'{target_stage_number}'
+                    equilibrium = _sio_disproportionation_equilibrium(
+                        wall_T_K,
+                        vapor_pressure_data=vapor_pressure_data,
+                    )
+                    reactive_finding = p_local_pa > float(
+                        equilibrium['p_eq_pa']
+                    )
+                    if reactive_finding:
+                        upstream_hot_wall_findings.append({
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': str(species),
+                            'kg_hr': kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'target_stage_number': target_stage_number,
+                            'warning': (
+                                f'upstream hot-wall violation {segment.name}: '
+                                f'{species} local pressure exceeds reactive '
+                                f'equilibrium at {wall_T_C:.1f} C before '
+                                f'stage {target_stage_number}'
+                            ),
+                        })
+                elif sink == 'alkali_silicate':
+                    gate = _alkali_silicate_gate(
+                        str(species),
+                        wall_T_K,
+                        p_local_pa,
+                        headspace_pO2_bar,
+                    )
+                    if gate['favoured']:
+                        reactive_finding = True
+                        upstream_hot_wall_findings.append({
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': str(species),
+                            'kg_hr': kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'target_stage_number': target_stage_number,
+                            'warning': (
+                                f'upstream hot-wall violation {segment.name}: '
+                                f'{species} silicate equilibrium is favoured '
+                                f'at {wall_T_C:.1f} C before stage '
+                                f'{target_stage_number}'
+                            ),
+                        })
+                if not reactive_finding and sink != 'disproportionation':
+                    P_sat_pa, saturation_refused = _try_antoine_psat_pa(
+                        str(species),
+                        wall_T_K,
+                        vapor_pressure_data=vapor_pressure_data,
+                        antoine_extrapolations=antoine_extrapolations,
+                        antoine_extrapolation_warnings=(
+                            antoine_extrapolation_warnings
                         ),
-                    })
+                    )
+                    if (
+                        not saturation_refused
+                        and P_sat_pa is not None
+                        and math.isfinite(P_sat_pa)
+                        and p_local_pa > P_sat_pa
+                    ):
+                        upstream_hot_wall_findings.append({
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': str(species),
+                            'kg_hr': kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'target_stage_number': target_stage_number,
+                            'warning': (
+                                f'upstream hot-wall violation {segment.name}: '
+                                f'{species} local pressure exceeds wall '
+                                f'saturation at {wall_T_C:.1f} C before stage '
+                                f'{target_stage_number}'
+                            ),
+                        })
             if wall_T_C >= threshold_C:
                 continue
             findings.append({

@@ -380,12 +380,10 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
 # 07fa3fe baffle fix (double-run byte-stable CLI). Nonzero is load-bearing:
 # a zero here means the designated-condenser capture failed open again.
-# 2026-07-21 B1 wall-gate fix (same gate as the stage site, queries.py): hot
-# walls above T_cond no longer engage the SiO disproportionation backstop, so
-# the mass that phantom-deposited on the >1050 C hot train now reaches the
-# designated stage-3 baffle — stage-3 capture DOUBLES and wall deposit goes
-# to zero for this recipe. North-Star-coherent: designated-condenser capture,
-# no hot-wall coating.
+# 2026-09-25 d-025 supersedes the B1 T_cond gate: hot walls now evaluate the
+# SiO disproportionation p_eq, so stage-3 capture and wall kilograms move
+# according to the equilibrium curve. The studio must regenerate these pins;
+# the old "no hot-wall coating" expectation is not the ruling's behavior.
 # 2026-07-24 re-pin (SC-92 churn-era correction, f1fb933; same class as
 # BASELINE_SIO_EVOLVED_KG above): honest-MAGEMin CLI values, fresh
 # double-run byte-stable on compose-0.6.3 @ cd88e34.
@@ -639,8 +637,9 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
+    assert authority["authority_level"] == "bridge"
+    assert authority["reason"] == "reactive_uptake"
+    assert authority["saturation_pressure_policy"] == "reactive_equilibrium"
     assert authority["valid_range_K"]
     assert (route.condensed_for_species("SiO") + route.wall_deposit_by_species.get("SiO", 0.0)
             + route.remaining_by_species["SiO"]) == pytest.approx(1.0)
@@ -751,7 +750,7 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_flags_outside_envelope():
     ] is True
 
 
-def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
+def test_wall_deposit_uses_reactive_equilibrium_not_sio_reaction_term():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
     # Bug A source-range contract; B1 vapor package extends the SiO band to
     # the declared gas-rail certified edge (data/vapor_pressures.yaml:
@@ -772,8 +771,9 @@ def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
     )
 
     authority = route.condensation_authority_by_species["SiO"]
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
+    assert authority["authority_level"] == "bridge"
+    assert authority["reason"] == "reactive_uptake"
+    assert authority["saturation_pressure_policy"] == "reactive_equilibrium"
     assert authority["valid_range_K"] == certified_range_K
     assert route.wall_deposit_by_species["SiO"] > 0.0
 
@@ -838,18 +838,18 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["source_class"] == "status_bearing_material_alpha"
     assert notice["source_classes"] == [
         "cited_high_supersaturation_condensation_limit",
-        "fail_closed_no_direct_sticking_coefficient",
         "solid_film_growth_proxy_not_evaporation_evidence",
     ]
     assert notice["species"] == ["SiO"]
     assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
         0.022481955557451427
     )
-    assert (
-        notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
-            "alpha_s"
-        ]
-        == pytest.approx(0.0)
+    reactive_wall_alpha = notice["alpha_s_provenance_by_species"]["SiO"][
+        "stage_2_to_stage_3"
+    ]
+    assert reactive_wall_alpha["alpha_s"] > 0.0
+    assert reactive_wall_alpha["source_class"] != (
+        "fail_closed_no_direct_sticking_coefficient"
     )
     # Reported alphas are the wall-path values; the capture-budget path reads
     # the same literature sidecar defaults and must not be conflated with

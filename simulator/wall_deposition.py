@@ -206,6 +206,7 @@ def wall_deposit_candidate_for_surface_kg(
         _reactive_product_backstop_authorized,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
+        wall_material_class_for_liner,
         _species_vapor_data,
         _transport_parameter_notice,
         _wall_alpha_record,
@@ -369,15 +370,18 @@ def wall_deposit_candidate_for_surface_kg(
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
                 vapor_pressure_data=vapor_pressure_data,
-                # Same eligibility gate as the stage band-sampling site in
-                # condensation.py: the SiO disproportionation backstop may
-                # materialize product only at/below the declared condensation
-                # temperature. Without this the helper's True default let a HOT
-                # wall (above T_cond) mass-deposit reactive products — the inverse
-                # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
+                # T_cond remains the routing setpoint. Capture follows the
+                # deposit branch: SiO p_eq, Na/K silicate on a silica class,
+                # metal dew point otherwise.
                 reactive_product_backstop=(
                     _reactive_product_backstop_authorized(species)
-                    and float(wall_temperature_C) <= float(T_cond_C)
+                ),
+                wall_material_class=wall_material_class_for_liner(
+                    segment_liner or wall_liner,
+                    materials,
+                ),
+                headspace_pO2_bar=getattr(
+                    model, "_headspace_transport_pO2_bar", None
                 ),
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,
@@ -451,7 +455,7 @@ def wall_deposit_candidate_for_surface_kg(
     if (
         pressure_notice is not None
         or rate_diagnostic.get("wall_saturation_pressure_status")
-        == "reactive_product_backstop"
+        in {"reactive_product_backstop", "reactive_equilibrium"}
     ):
         if pressure_notice is None:
             pressure_notice = {

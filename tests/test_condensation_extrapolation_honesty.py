@@ -617,10 +617,10 @@ def test_predict_flag_sio_cold_backstop_records_extrapolation_and_hot_wall_refus
         "wall_saturation_pressure_extrapolations_by_species"
     ]["SiO"]["default_pipe"]
     assert cold_notice["output_status"] == "status_bearing"
-    assert cold_notice["authority_level"] == "extrapolated"
-    assert cold_notice["saturation_pressure_policy"] == "reactive_product_backstop"
-    assert cold_notice["wall_saturation_pressure_pa"] == 0.0
-    assert cold_notice["original_reason"]
+    assert cold_notice["authority_level"] == "bridge"
+    assert cold_notice["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert cold_notice["reason"] == "reactive_uptake"
+    assert cold_notice["wall_saturation_pressure_pa"] > 0.0
 
     hot_model = condensation.CondensationModel(
         CondensationTrain.create_default(), wall_temperature_C=1500.0,
@@ -640,10 +640,13 @@ def test_predict_flag_sio_cold_backstop_records_extrapolation_and_hot_wall_refus
         wall_temperature_C=1500.0,
         surface_area_m2=1.0,
     )
-    assert hot_candidate["status"] == "unavailable"
-    assert hot_model.last_sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+    assert isinstance(hot_candidate, float)
+    assert hot_candidate == 0.0
+    hot_notice = hot_model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
     ]["SiO"]["default_pipe"]
+    assert hot_notice["reason"] == "reactive_equilibrium_undersaturated"
+    assert hot_notice["saturation_pressure_policy"] == "reactive_equilibrium"
 
 
 def test_condensation_efficiency_stage7_na_band_is_positive():
@@ -780,7 +783,7 @@ def test_condensation_efficiency_lower_bound_keeps_refused_sample_in_denominator
     assert lower_bound["eta_basis"] == (
         "lower_bound_refused_samples_uncaptured"
     )
-    assert lower_bound["pending_decision"] == "d-025"
+    assert "pending_decision" not in lower_bound
 
 
 def test_condensation_efficiency_records_lower_bound_before_zero_available_return(monkeypatch):
@@ -828,7 +831,7 @@ def test_condensation_efficiency_records_lower_bound_before_zero_available_retur
     )
     assert lower_bound["refused_fraction"] == pytest.approx(1.0)
     assert lower_bound["eta"] == pytest.approx(0.0)
-    assert lower_bound["pending_decision"] == "d-025"
+    assert "pending_decision" not in lower_bound
 
 
 def test_predict_flag_pareto_unavailable_keeps_extrapolation():

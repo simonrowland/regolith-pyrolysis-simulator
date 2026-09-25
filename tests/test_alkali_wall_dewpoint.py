@@ -209,6 +209,81 @@ def test_wall_driving_force_is_zero_via_dewpoint_relation(
     assert p_sat_pa > p_i_pa
 
 
+def test_silica_class_na_driving_pressure_is_the_partial_pressure() -> None:
+    """Na, 100 Pa, 1500 C, silica, pO2 = 1e-9 bar, log a = -8: driving = p.
+
+    Alumina is not the silica class, so the same point stays on the metal
+    dew point. The notice names [-8, -7] and that the ends disagree.
+    """
+
+    vapor_data = _vapor_pressure_data()
+    wall_temperature_K = 1500.0 + CELSIUS_TO_KELVIN
+    diagnostic: dict = {}
+    driving_pa = _wall_deposition_driving_pressure_pa(
+        "Na",
+        100.0,
+        wall_temperature_K,
+        vapor_pressure_data=vapor_data,
+        wall_material_class="silica",
+        headspace_pO2_bar=1.0e-9,
+        diagnostic_out=diagnostic,
+    )
+    assert driving_pa == pytest.approx(100.0)
+    assert diagnostic["reason"] == "reactive_uptake"
+    notice = diagnostic["silicate_equilibrium_notice"]
+    assert notice["silicate_activity_band_log10_a"] == pytest.approx([-8.0, -7.0])
+    assert notice["gate_log10_a_oxide"] == pytest.approx(-8.0)
+    assert notice["activity_band_ends_disagree"] is True
+    assert "disagrees" in notice["activity_band_notice"]
+    assert notice["headspace_pO2_bar"] == pytest.approx(1.0e-9)
+    assert notice["original_reason"] == "silicate_activity_anchor_not_this_wall"
+
+    bare = _wall_deposition_driving_pressure_pa(
+        "Na",
+        100.0,
+        wall_temperature_K,
+        vapor_pressure_data=vapor_data,
+        wall_material_class="alumina",
+        headspace_pO2_bar=1.0e-9,
+    )
+    assert bare == 0.0
+
+
+def test_silica_class_k_uses_the_same_gate_with_its_own_ellingham_row() -> None:
+    """K is the same equilibrium shape. Its dG does not copy the Na number."""
+
+    vapor_data = _vapor_pressure_data()
+    wall_temperature_K = 1500.0 + CELSIUS_TO_KELVIN
+    floor: dict = {}
+    floor_driving = _wall_deposition_driving_pressure_pa(
+        "K",
+        100.0,
+        wall_temperature_K,
+        vapor_pressure_data=vapor_data,
+        wall_material_class="silica",
+        headspace_pO2_bar=1.0e-9,
+        diagnostic_out=floor,
+    )
+    notice = floor["silicate_equilibrium_notice"]
+    assert notice["potassium_activity_status"] == "K_TBAND_PROXY_FROM_NA_GAP"
+    assert notice["silicate_activity_band_log10_a"] == pytest.approx([-8.0, -7.0])
+    pO2_eq = float(notice["pO2_eq_bar_by_log10_a"]["-8.0"])
+    assert pO2_eq > 1.0e-9
+    assert floor_driving == 0.0
+    above: dict = {}
+    driving_pa = _wall_deposition_driving_pressure_pa(
+        "K",
+        100.0,
+        wall_temperature_K,
+        vapor_pressure_data=vapor_data,
+        wall_material_class="silica",
+        headspace_pO2_bar=pO2_eq * 10.0,
+        diagnostic_out=above,
+    )
+    assert driving_pa == pytest.approx(100.0)
+    assert above["reason"] == "reactive_uptake"
+
+
 @pytest.mark.parametrize("species", ["Na", "K"])
 def test_wall_driving_force_turns_positive_below_the_dew_point(
     species: str,
@@ -240,9 +315,10 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
     wall_temperature_C: float,
 ) -> None:
     # Integration mirror of tests/test_coating_rate.py:342-370 on the claim's
-    # own wall band: the shadow rate model must report identically zero
-    # alkali wall flux, with the record's own fields showing the reason is
-    # the dew-point relation at the wall temperature.
+    # own wall band: non-silica surfaces must report identically zero alkali
+    # wall flux, with the record's own fields showing the reason is the
+    # dew-point relation at the wall temperature. The explicit fused-silica
+    # baffle is the reactive Na exception.
     #
     # Hold at 1300 C (1573 K) so both Na and K stay inside their catalog
     # fit domains (Na [1400,1900] K, K [1190,1600] K). This isolates the
@@ -278,10 +354,29 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
             p_total_pa = float(record["total_pressure_pa"])
             p_sat_pa = float(record["wall_saturation_pressure_pa"])
             wall_K = float(record["surface"]["wall_temperature_K"])
+            is_fused_silica = (
+                record["surface"]["material"] == "fused_silica_baffles"
+            )
+
+            if is_fused_silica and species == "Na":
+                # The silica-class silicate gate is intentionally the one
+                # positive branch in this integration. Its pO2 floor is
+                # above the coating-conservative -8 activity threshold.
+                assert float(record["mol_s"]) > 0.0
+                assert record["wall_saturation_pressure_status"] == (
+                    "reactive_equilibrium"
+                )
+                assert record["saturation_pressure_policy"] == (
+                    "reactive_equilibrium"
+                )
+                assert record["reason"] == "reactive_uptake"
+                assert record["wall_saturation_pressure_pa"] == 0.0
+                assert record["supersaturated"] is True
+                continue
 
             # Mirrored mechanism assertion (test_coating_rate.py:364-370):
-            # zero flux AND admissible nonzero partial pressure AND not
-            # supersaturated at the wall.
+            # zero flux on every non-silica class (and for K when its silica
+            # gate is off), plus admissible pressure and no supersaturation.
             assert float(record["mol_s"]) == 0.0
             assert 0.0 < p_i_pa <= p_total_pa
             assert record["supersaturated"] is False
