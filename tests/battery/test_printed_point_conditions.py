@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import ValueKind
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.battery.migrate import REPO_ROOT, migrate
@@ -46,29 +47,6 @@ _TEMPERATURE_ROUTES = (
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig4_figure_only", "1823.0", "figure", "4"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig6_figure_only", "1923.0", "figure", "6"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig10_figure_only", "1873.0", "figure", "10"),
-    # Table 1 FactSage prediction "at 2500 K"; every printed species row carries
-    # the same table temperature into its child observation.
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=74d5773621a8", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=3572ac165c05", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=724db990a5f0", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8e91d02ef91b", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=9068cb979358", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0d961a132e64", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e0c484f68fb4", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0e35afbec232", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4de3eec4d492", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=f9397cac3476", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8a4250e30775", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c19469749fc3", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=22a6308ffb70", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c048d1e20a62", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=69c8c69b6bb4", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8909c73dbda3", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4c03a6797e19", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=dc8fb3e575aa", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=87bebe4f0dc4", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=30ff34758a56", "2500.0", "table", "1"),
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=42696be8be5a", "2500.0", "table", "1"),
     ("kems-139-jacobson-2024", "jacobson_2024_t2_hfo_second_law_narrative", "1976.0", None, None),
     # "each experiment run at a temperature of 2650 K" (Experiments section).
     ("steurer-1985-vapor-phase-pyrolysis", "steurer_1985_sio2_induction_experiment", "2650.0", None, None),
@@ -111,6 +89,21 @@ def test_printed_point_temperature_routes(
     assert locator is not None, "routed point condition must carry its locator"
     if locator_key is not None:
         assert getattr(locator, locator_key) == locator_value
+
+
+def test_jacobson_table1_bound_parent_keeps_printed_temperature(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")
+    obs = result.observations[
+        "kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat"
+    ]
+    assert obs.value.kind is ValueKind.CATEGORICAL
+    assert obs.value.categorical == "bound_not_point_ordering"
+    temperature = (obs.point_conditions or {}).get("temperature_K")
+    assert temperature is not None
+    assert temperature.state.is_value
+    assert temperature.state.value == Decimal("2500.0")
+    assert temperature.locator is not None
+    assert temperature.locator.table == "1"
 
 
 def test_kato_table1_routes_every_printed_1873k_row(tmp_path: Path) -> None:

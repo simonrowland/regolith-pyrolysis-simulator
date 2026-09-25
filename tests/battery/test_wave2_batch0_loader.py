@@ -152,6 +152,34 @@ def test_nonyield_points_explode_once_and_yield_points_stay_single(tmp_path: Pat
     assert len(yield_children) == 2
 
 
+def test_bound_categorical_rows_do_not_explode_but_numeric_rows_do(
+    tmp_path: Path,
+) -> None:
+    for index, semantics in enumerate(("bound_not_point_ordering", None)):
+        values = {
+            "rows": [
+                {"T_K": 1200, "pressure_atm": 1},
+                {"T_K": 1300, "pressure_atm": 2},
+            ]
+        }
+        if semantics is not None:
+            values["semantics"] = semantics
+        _, result = _migrate_obs(tmp_path / str(index), values)
+        parent_id = "fixture-source::na_psat"
+        children = [
+            obs for obs in result.observations.values()
+            if obs.observation_id.startswith(f"{parent_id}::")
+        ]
+        if semantics is None:
+            assert parent_id not in result.observations
+            assert len(children) == 2
+        else:
+            parent = result.observations[parent_id]
+            assert parent.value.kind is ValueKind.CATEGORICAL
+            assert parent.value.categorical == semantics
+            assert not children
+
+
 def test_explicit_row_point_conditions_win_over_inferred(tmp_path: Path) -> None:
     _, result = _migrate_obs(
         tmp_path,
