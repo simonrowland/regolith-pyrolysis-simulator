@@ -837,6 +837,93 @@ def _standard_state_from_plain(payload: object) -> StandardState:
     )
 
 
+_EXTRACT_STANDARD_ENDMEMBER_RE = re.compile(
+    r"\b([A-Z][a-z]?(?:O(?:1\.5|2|3)?)?)\s*\(\s*([ls])\s*\)"
+)
+_EXTRACT_STANDARD_PURE_RE = re.compile(
+    r"\bpure\s+(liquid|solid)\s+([A-Z][a-z]?(?:O(?:1\.5|2|3)?)?)\b",
+    re.IGNORECASE,
+)
+
+
+def _standard_state_from_extract_text(
+    raw: object,
+    species_formula: str,
+    *,
+    phase_raw: object = None,
+) -> StandardState | None:
+    """Map only an explicit, single-convention extract standard state.
+
+    Extracts predate the v2 ``StandardState`` record and store this field as
+    source prose.  The mapper accepts the closed Raoultian convention only
+    when the prose (or the same row's printed phase field) names one liquid or
+    solid endmember.  Vapor-pressure ratios, mixed Raoultian/Henrian claims,
+    and rows with both solid and liquid alternatives stay unresolved.
+    """
+
+    if not isinstance(raw, str):
+        return None
+    text = " ".join(raw.split())
+    lowered = text.lower()
+    if "raoultian" not in lowered:
+        return None
+    if any(
+        marker in lowered
+        for marker in (
+            "not a raoultian",
+            "henrian",
+            "henry's law",
+            "p/p°",
+            "p/p0",
+            "janaf",
+            "gurvich",
+            "vapor",
+            "vapour",
+        )
+    ):
+        return None
+
+    explicit: list[tuple[str, Phase]] = []
+    for match in _EXTRACT_STANDARD_ENDMEMBER_RE.finditer(text):
+        explicit.append(
+            (match.group(1), Phase.L if match.group(2).lower() == "l" else Phase.CR)
+        )
+    for match in _EXTRACT_STANDARD_PURE_RE.finditer(text):
+        explicit.append(
+            (
+                match.group(2),
+                Phase.L if match.group(1).lower() == "liquid" else Phase.CR,
+            )
+        )
+
+    species_formula = str(species_formula)
+    unique_explicit = list(dict.fromkeys(explicit))
+    matching = [item for item in unique_explicit if item[0] == species_formula]
+    if len(matching) > 1:
+        return None
+    if matching:
+        endmember, phase = matching[0]
+    elif len(unique_explicit) == 1:
+        endmember, phase = unique_explicit[0]
+    elif unique_explicit:
+        return None
+    else:
+        phase_text = str(phase_raw or "").lower()
+        has_liquid = "liquid" in phase_text
+        has_solid = "solid" in phase_text
+        if has_liquid == has_solid:
+            return None
+        endmember = species_formula
+        phase = Phase.L if has_liquid else Phase.CR
+
+    return StandardState(
+        convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+        endmember=make_species(endmember, phase),
+        component_basis="raoultian_pure_endmember",
+        reference_pressure_bar=Decimal("1"),
+    )
+
+
 def _identity_from_plain(payload: object) -> Identity:
     assert isinstance(payload, Mapping)
     kwargs: dict[str, Any] = {
@@ -8361,6 +8448,14 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+            reference_state = _standard_state_from_extract_text(
+                obs.get("standard_state"),
+                species.formula,
+                phase_raw=phase_raw,
+            )
+            if reference_state is not None:
+                ident_kwargs["reference_state"] = State.of(reference_state)
         if q_token is Quantity.TRANSITION_TEMPERATURE:
             kind = values.get("property_kind") or values.get("quantity")
             if isinstance(kind, str) and kind:
