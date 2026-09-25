@@ -793,8 +793,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      tag: value
+      value: '2073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_molecular_oxygen_yield'; refusing
@@ -822,6 +822,41 @@ observations:
     paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
     section: '4.3'
   read_from: pdf:kems-044-robinot-2026
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
+        section: '4.3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 11
+              pdf_page_index: 12
+              paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
+              section: '4.3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 11
+              pdf_page_index: 12
+              paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
+              section: '4.3'
+        output_unit: K
 - observation_id: kems-044-robinot-2026::robinot_2026_o2_prose_rate_points
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:

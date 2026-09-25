@@ -142,8 +142,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-114-nichols-1995::nichols_1995_fig1_mg_IT_figure_only_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
       evidence:
         page: 2
         published_page: 1048
@@ -195,8 +195,17 @@ observations:
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T;
       a similar plot is obtained for Fe. Each data point is an average of up to five measurements at a given temperature.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Mg I+T points exist only as Figure 1 filled circles. Coordinates are not tabulated. Not digitised (no printed
+      quote for any point).
+    decided_by:
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -347,8 +356,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio2_IT_figure_only_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
       evidence:
         page: 2
         published_page: 1048
@@ -397,8 +406,16 @@ observations:
     original_method_class: measured_direct
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: SiO2 I+T points exist only as Figure 1 open squares with error bars. Not tabulated. Not digitised.
+    decided_by:
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -549,8 +566,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio_IT_figure_only_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
       evidence:
         page: 2
         published_page: 1048
@@ -599,8 +616,16 @@ observations:
     original_method_class: measured_direct
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: SiO I+T points exist only as Figure 1 filled squares. Not tabulated. Not digitised.
+    decided_by:
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -754,8 +779,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-114-nichols-1995::nichols_1995_fig2_mg_fe_ratio_figure_only_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
       evidence:
         page: 2
         published_page: 1048
@@ -811,8 +836,18 @@ observations:
       same trend as the Mg/(Mg+Fe) ratio in the gas phase, but the plotted ordinate values are probably slightly different
       due to unknown relative ionization cross sections of Mg and Fe.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: 'Figure 2 points are not tabulated. Not digitised (no printed coordinate quotes). Axis ticks transcribed. Caption:
+      plotted ordinate values are probably slightly different from Mg/(Mg+Fe) due to unknown relative ionization cross sections
+      of Mg and Fe.'
+    decided_by:
+      worker: wave-W2-kems-114-nichols-1995
+      date: '2026-09-06'
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '2'
   notices: []
   source_id: kems-114-nichols-1995
   locator:

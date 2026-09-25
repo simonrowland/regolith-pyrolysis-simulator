@@ -723,8 +723,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
@@ -753,6 +753,44 @@ observations:
     note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for numerals
       and English captions only.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 488
+        pdf_page_index: 1
+        section: '2'
+        note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for
+          numerals and English captions only.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 488
+              pdf_page_index: 1
+              section: '2'
+              note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed
+                for numerals and English captions only.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 488
+              pdf_page_index: 1
+              section: '2'
+              note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed
+                for numerals and English captions only.
+        output_unit: K
 - observation_id: kems-067-yamada-1980::yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:

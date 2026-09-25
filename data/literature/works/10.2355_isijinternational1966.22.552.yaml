@@ -63,8 +63,13 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Printed 1823 K Fe-Mo measurement temperature; Ag-standard temperatures are separate calibration readings
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -157,8 +162,13 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed 1823 K activity measurement temperature; no conversion
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -231,8 +241,13 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 556
+        pdf_page_index: 5
+        table: '3'
+        note: Printed 1823 K phase-boundary measurement temperature; no conversion
   pressure_environment:
     total_pressure_Pa:
       state:

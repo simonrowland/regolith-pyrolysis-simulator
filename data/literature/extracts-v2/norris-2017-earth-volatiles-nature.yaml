@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/norris-2017-earth-volatiles-nature.yaml
 observations:
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_author_volatility_factor_definition
-  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
+  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
   identity:
     quantity:
       tag: unknown
@@ -44,7 +44,7 @@ observations:
     note: Author-defined ratio used to compare measured volatile loss.
   read_from: unknown:norris-2017-earth-volatiles-nature
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure2_time_series
-  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
   identity:
     quantity:
       tag: unknown
@@ -63,6 +63,30 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5226508780512647327686871688'
+        - - TiO2
+          - '0.007450970521666675864658847771'
+        - - Al2O3
+          - '0.09186126415983606031527388527'
+        - - FeO
+          - '0.08360483248003905551512051168'
+        - - MnO
+          - '0.001747652234872601342381195539'
+        - - MgO
+          - '0.1368799899499452779858934599'
+        - - CaO
+          - '0.1357412059451461588276430933'
+        - - Na2O
+          - '0.01960256253777322478085063111'
+        - - K2O
+          - '0.0004606441194562125994912063457'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'normalized_trace_element_concentration_time_series';
@@ -125,8 +149,8 @@ observations:
         pdf_page_index: 15
         figure: '2'
         note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors
-  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg11
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
     quantity:
       tag: unknown
@@ -199,8 +223,262 @@ observations:
               figure: '3'
               note: Volatility-factor plot; values retained as figure-only and not read off the graph.
         output_unit: K
-- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility
-  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
+    fO2_log:
+      state:
+        tag: value
+        value: '-11'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg13
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatility_factor_vs_oxygen_fugacity'
+    species:
+      formula: trace_elements
+      phase:
+        tag: unknown
+        reason: phase string 'trace_element_doped_basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: norris-2017-earth-volatiles-nature
+  locator:
+    pdf_page_index: 16
+    figure: '3'
+    note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  read_from: unknown:norris-2017-earth-volatiles-nature
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg7
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatility_factor_vs_oxygen_fugacity'
+    species:
+      formula: trace_elements
+      phase:
+        tag: unknown
+        reason: phase string 'trace_element_doped_basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: norris-2017-earth-volatiles-nature
+  locator:
+    pdf_page_index: 16
+    figure: '3'
+    note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  read_from: unknown:norris-2017-earth-volatiles-nature
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-7'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg9
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatility_factor_vs_oxygen_fugacity'
+    species:
+      formula: trace_elements
+      phase:
+        tag: unknown
+        reason: phase string 'trace_element_doped_basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: norris-2017-earth-volatiles-nature
+  locator:
+    pdf_page_index: 16
+    figure: '3'
+    note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  read_from: unknown:norris-2017-earth-volatiles-nature
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 16
+              figure: '3'
+              note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-9'
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg11
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
     quantity:
       tag: unknown
@@ -273,8 +551,98 @@ observations:
               figure: 4a,b
               note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
         output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11'
+      locator:
+        pdf_page_index: 17
+        figure: 4a,b
+        note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+- observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg13
+  experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'BSE_CI_abundance_vs_measured_volatility_factor'
+    species:
+      formula: trace_elements
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_Earth_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'BSE_CI_abundance_vs_measured_volatility_factor';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: norris-2017-earth-volatiles-nature
+  locator:
+    pdf_page_index: 17
+    figure: 4a,b
+    note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+  read_from: unknown:norris-2017-earth-volatiles-nature
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 17
+        figure: 4a,b
+        note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 17
+              figure: 4a,b
+              note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 17
+              figure: 4a,b
+              note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13'
+      locator:
+        pdf_page_index: 17
+        figure: 4a,b
+        note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions
-  experiment_id: 10.1038/nature23645::experiment::volatile-loss-series
+  experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
   identity:
     quantity:
       tag: unknown

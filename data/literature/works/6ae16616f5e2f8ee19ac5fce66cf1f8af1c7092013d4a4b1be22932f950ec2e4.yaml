@@ -36,7 +36,7 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-vacuum-evaporation-series
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c0h2
   kind: literature
   method:
     tag: unknown
@@ -81,18 +81,192 @@ experiments:
               section: 2.1 Sample preparation
               note: Printed 25-70 mg; unit conversion only
         output_unit: kg
-    printed_composition:
+    initial_composition:
       state:
         tag: value
-        value: synthetic basaltic oxide and carbonate mixture
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
       locator:
-        section: 2.1 Sample preparation
+        page: 71
+        table: '1'
+        note: row=Bas1200C0h2
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
     form:
       state:
         tag: value
         value: pre-molten glass on a 2.5 mm iridium wire loop
       locator:
-        section: 2.1 Sample preparation
+        page: 71
+        table: '1'
     pretreatment:
       state:
         tag: value
@@ -102,11 +276,11 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value: '1473.15'
       locator:
-        section: 2.2 Vacuum evaporation experiments
-        note: 1200 and 1400 C are distinct run setpoints; no single series setpoint
+        page: 71
+        table: '1'
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -141,7 +315,9 @@ experiments:
           note: Printed about 10^-6 mbar; unit conversion only
   work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
   locator:
-    section: 2.2 Vacuum evaporation experiments
+    page: 71
+    table: '1'
+    note: Printed run Bas1200C0h2
   apparatus:
     cell_material_and_liner:
       state:
@@ -159,23 +335,66 @@ experiments:
         section: 2.2 Vacuum evaporation experiments
     total_duration_s:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
       locator:
+        page: 71
         table: '1'
-        note: Per-run durations vary from zero-time to 2400 min
+        note: Minutes converted to seconds
     cooling_or_quench:
       state:
         tag: value
         value: power cut; cooled to about 25 C before venting
       locator:
         section: 2.2 Vacuum evaporation experiments
-- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
   kind: literature
   method:
-    tag: value
-    value: langmuir_free_evaporation
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
   sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
     initial_composition:
       state:
         tag: value
@@ -202,6 +421,7 @@ experiments:
       locator:
         page: 71
         table: '1'
+        note: row=Bas1200C10h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
       inference:
         relation: wt_pct_to_mole_fraction
@@ -216,6 +436,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_Al2O3_g_mol
           - state:
@@ -224,6 +445,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_CaO_wt_pct
           - state:
@@ -232,6 +454,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_CaO_g_mol
           - state:
@@ -240,6 +463,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_FeO_wt_pct
           - state:
@@ -248,6 +472,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_FeO_g_mol
           - state:
@@ -256,6 +481,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_K2O_wt_pct
           - state:
@@ -264,6 +490,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_K2O_g_mol
           - state:
@@ -272,6 +499,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_MgO_wt_pct
           - state:
@@ -280,6 +508,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_MgO_g_mol
           - state:
@@ -288,6 +517,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_Na2O_wt_pct
           - state:
@@ -296,6 +526,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_Na2O_g_mol
           - state:
@@ -304,6 +535,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_SiO2_wt_pct
           - state:
@@ -312,6 +544,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_SiO2_g_mol
           - state:
@@ -320,6 +553,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - original_TiO2_wt_pct
           - state:
@@ -328,6 +562,7 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         - - M_TiO2_g_mol
           - state:
@@ -336,25 +571,2617 @@ experiments:
             locator:
               page: 71
               table: '1'
+              note: row=Bas1200C10h
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
         output_unit: mole_fraction
-    printed_composition:
+    form:
       state:
         tag: value
-        value:
-          Al2O3: '16'
-          CaO: '11.21'
-          FeO: '10.67'
-          K2O: '2.49'
-          MgO: '7.09'
-          Na2O: '2.27'
-          Rb2O: '1.86'
-          SiO2: '45.94'
-          TiO2: '1.79'
+        value: pre-molten glass on a 2.5 mm iridium wire loop
       locator:
         page: 71
         table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1200C10h
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '35700'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C1h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1200C1h
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3300'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C40h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1200C40h
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '143700'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C4h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1200C4h
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14100'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1400C0m1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C15m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1400C15m
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '900'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C30m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1400C30m
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C60m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1400C60m
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c90m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        section: 2.1 Sample preparation
+        note: Printed 25-70 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              section: 2.1 Sample preparation
+              note: Printed 25-70 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1024751398848478785295547634'
+          - - CaO
+            - '0.1305417807745096914068286727'
+          - - FeO
+            - '0.09698456164147551033877893278'
+          - - K2O
+            - '0.01726225080549124870357434797'
+          - - MgO
+            - '0.1148753313202567723917830081'
+          - - Na2O
+            - '0.02391735874316515239764588901'
+          - - SiO2
+            - '0.499307481588041653260565299'
+          - - TiO2
+            - '0.01463609524221209297126908714'
+          amount_basis: mole_fraction
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C90m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.67'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '2.49'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.09'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.27'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.94'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: mole_fraction
+    form:
+      state:
+        tag: value
+        value: pre-molten glass on a 2.5 mm iridium wire loop
+      locator:
+        page: 71
+        table: '1'
+    pretreatment:
+      state:
+        tag: value
+        value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2
+      locator:
+        section: 2.1 Sample preparation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1'
+            approximate: true
+        locator:
+          section: 2.2 Vacuum evaporation experiments
+          note: Printed about 10^-6 mbar; unit conversion only
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    note: Printed run Bas1400C90m
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loop
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+  bench_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        page: 71
+        table: '1'
+        note: Minutes converted to seconds
+    cooling_or_quench:
+      state:
+        tag: value
+        value: power cut; cooled to about 25 C before venting
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
   conditions:
     temperature_K:
       state:
@@ -378,8 +3205,8 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
   locator:
-    page: 71
-    table: '1'
+    page: 74
+    table: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
 benches:
 - id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::bench::chicago-vacuum-furnace
@@ -406,7 +3233,7 @@ benches:
         reason: not_published
       locator:
         section: 2.2 Vacuum evaporation experiments
-        note: Within 5 C is agreement among measured temperatures
+        note: Within 5 C is agreement among measured temperatures, not calibration uncertainty
   heating_method:
     state:
       tag: value

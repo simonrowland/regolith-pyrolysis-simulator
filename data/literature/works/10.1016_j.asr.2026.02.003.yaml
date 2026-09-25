@@ -49,42 +49,10 @@ experiments:
         value:
           kind: point
           point: '0.00338'
-          approximate: false
+          approximate: true
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        figure: 4b
-        section: '4.1'
-        note: Oxygen production and mass yield from the reported EAC-1 run
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=3.38 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '3.38'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4b
-              section: '4.1'
-              note: Oxygen production and mass yield from the reported EAC-1 run
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4b
-              section: '4.1'
-              note: Oxygen production and mass yield from the reported EAC-1 run
-        output_unit: kg
+        section: 4.1 Experimental results
+        note: Approximately 3.38 g initial pellet mass
     printed_composition:
       state:
         tag: value
@@ -94,7 +62,7 @@ experiments:
     form:
       state:
         tag: value
-        value: Hydraulically pressed pellet
+        value: Hydraulically pressed pellet, 13 mm diameter and 10 mm height
       locator:
         section: 3.2 Solar pyrolysis procedure
     pretreatment:
@@ -110,7 +78,8 @@ experiments:
         reason: not_published
       locator:
         section: 4.1 Experimental results
-        note: Around 1800 C is a punctual peak measurement
+        note: Around 1800 C is a punctual peak measurement, not a series-wide condition; retained in existing observation
+          evidence
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -217,7 +186,7 @@ experiments:
           reason: not_published
         locator:
           section: 4.1 Experimental results
-          note: Peak temperature reported around 1800 C
+          note: Peak temperature reported around 1800 C, but no hold temperature assigned
       hold_duration_s:
         state:
           tag: value
@@ -519,7 +488,7 @@ benches:
     sensor:
       state:
         tag: value
-        value: Omicron IN 140/5 pyrometer
+        value: Omicron IN 140/5 pyrometer, 4.8-5.2 um, emissivity 1
       locator:
         section: 3.1 Experimental setup
   heating_method:

@@ -150,6 +150,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1623.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'time_to_boron_loss'; refusing to pick a number
@@ -175,6 +178,41 @@ observations:
     table: '4'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
   read_from: unknown:ta-flemetakis-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        published_page: 180
+        pdf_page_index: 8
+        table: '4'
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              published_page: 180
+              pdf_page_index: 8
+              table: '4'
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 180
+              pdf_page_index: 8
+              table: '4'
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        output_unit: K
 - observation_id: ta-flemetakis-2024::flemetakis_2024_sample_and_furnace_apparatus
   experiment_id: 10.5194/ejm-36-173-2024::ta-flemetakis-2024
   identity:

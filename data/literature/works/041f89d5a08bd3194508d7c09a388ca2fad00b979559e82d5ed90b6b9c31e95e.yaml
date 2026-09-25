@@ -137,7 +137,7 @@ experiments:
     method:
       state:
         tag: value
-        value: Heated at 4 or 6 C/min to 950
+        value: Heated at 4 or 6 C/min to 950, 1050, 1200, or 1400 C; run assignments are not printed
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -1219,7 +1219,7 @@ benches:
   detector:
     state:
       tag: value
-      value: continuously recorded sample weight
+      value: continuously recorded sample weight, temperature, and in some experiments evolved-gas composition
     locator:
       published_page: 2004
       section: Experimental procedures

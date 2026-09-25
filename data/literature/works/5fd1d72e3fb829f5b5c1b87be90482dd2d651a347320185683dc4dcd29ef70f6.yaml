@@ -36,19 +36,35 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::alkali-silicate-kems-series
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p500
   kind: literature
   method:
     tag: value
     value: knudsen_effusion
   sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5'
+          - - K2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
     printed_composition:
       state:
         tag: value
-        value: Na2O-SiO2 and K2O-SiO2 samples
+        value: K2O-SiO2 melt; x(SiO2)=0.500
       locator:
-        page: 2
-        section: 2. Experimental
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
     pretreatment:
       state:
         tag: value
@@ -84,9 +100,9 @@ experiments:
         reason: not_published
   work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
   locator:
-    page: 2
-    section: 2. Experimental
-    note: Own Na2O-SiO2 and K2O-SiO2 measurements.
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.500; activities chosen at random
   apparatus:
     geometry:
       orifice_diameter_m:
@@ -123,6 +139,2201 @@ experiments:
         page: 2
         section: 2. Experimental
         note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p543
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.543'
+          - - K2O
+            - '0.457'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.543
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.543; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p591
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.591'
+          - - K2O
+            - '0.409'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.591
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.591; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p630
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.63'
+          - - K2O
+            - '0.37'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.630
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.630; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p674
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.674'
+          - - K2O
+            - '0.326'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.674
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.674; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p722
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.722'
+          - - K2O
+            - '0.278'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.722
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.722; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p770
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.77'
+          - - K2O
+            - '0.23'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.770
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.770; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p811
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.811'
+          - - K2O
+            - '0.189'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.811
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.811; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p848
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.848'
+          - - K2O
+            - '0.152'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.848
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.848; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::k2o-sio2-xsio2-0p892
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.892'
+          - - K2O
+            - '0.108'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: K2O-SiO2 melt; x(SiO2)=0.892
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 K2O-SiO2 row x(SiO2)=0.892; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p349
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.349'
+          - - Na2O
+            - '0.651'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.349
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.349; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p382
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.382'
+          - - Na2O
+            - '0.618'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.382
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.382; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p405
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.405'
+          - - Na2O
+            - '0.595'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.405
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.405; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p430
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.43'
+          - - Na2O
+            - '0.57'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.430
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.430; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p477
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.477'
+          - - Na2O
+            - '0.523'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.477
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.477; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p524
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.524'
+          - - Na2O
+            - '0.476'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.524
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.524; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p573
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.573'
+          - - Na2O
+            - '0.427'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.573
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.573; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p625
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.625'
+          - - Na2O
+            - '0.375'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.625
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.625; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p671
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.671'
+          - - Na2O
+            - '0.329'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.671
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.671; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p709
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.709'
+          - - Na2O
+            - '0.291'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.709
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.709; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p753
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.753'
+          - - Na2O
+            - '0.247'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.753
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.753; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::experiment::na2o-sio2-xsio2-0p805
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.805'
+          - - Na2O
+            - '0.195'
+          amount_basis: mole_fraction
+      locator:
+        page: 22
+        table: '1'
+        note: x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 melt; x(SiO2)=0.805
+      locator:
+        page: 22
+        table: '1'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa
+      locator:
+        page: 2
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: The <10^-4 Pa value is preparation pressure, not measurement pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: Dry nitrogen was used for manipulation, not measurement gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: 22
+    table: '1'
+    note: Table 1 Na2O-SiO2 row x(SiO2)=0.805; activities chosen at random
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          section: '3.2'
+          note: Various orifice areas without printed diameters or run assignment.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          section: 2. Experimental
+          note: Not published.
+  bench_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No heating schedule is printed.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: 2. Experimental
+        note: No run duration is printed.
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_silicate_formation_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
 benches:
 - id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::bench::alkali-silicate-kems
   work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6

@@ -182,8 +182,15 @@ observations:
     attribution: 'the prevailing species in the gas mixture can be clearly identified by their fragmentation pattern (major
       mass fragments underlined): H2O (m/z 16, 17, 18, 19, 20), H2 (m/z 1, 2), and CO2 (m/z 12, 16, 28, 44, 45, 46).'
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: H2 partial-pressure vs T exists only as the m/z 2 curve on Figs 6–8; not digitised
+    decided_by:
+      worker: extract-pyro-outgas
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 12
+        figure: 6-7
+        paragraph: 206-207
   notices: []
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
@@ -380,8 +387,15 @@ observations:
       initial peak (A) between -100 °C and -50 °C (phase 1), a broader feature (B) between -50 °C and 300 °C (phase 2), and
       two separately identifiable peaks (C-D) at temperatures above 300 °C (phase 3).'
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Partial-pressure and total-pressure release curves exist only as Figs 6–11. No printed numeric table of p(T).
+      Curves were not read off axes.
+    decided_by:
+      worker: extract-pyro-outgas
+      date: '2026-09-12'
+      evidence:
+        figure: 6-11
+        note: RGA partial-pressure and total-pressure vs set-point T; not digitised; pdf_page_index=12-20
   notices: []
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:

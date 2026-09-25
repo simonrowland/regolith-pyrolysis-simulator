@@ -58,8 +58,8 @@ experiments:
       locator:
         published_page: 276
         table: '2'
-        note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in
-          this extract. Loaded mass is not stated.
+        note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+          remain on observations.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
@@ -73,8 +73,8 @@ experiments:
             locator:
               published_page: 276
               table: '2'
-              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
-                in this extract. Loaded mass is not stated.
+              note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+                remain on observations.
         - - M_K2O_g_mol
           - state:
               tag: value
@@ -82,8 +82,8 @@ experiments:
             locator:
               published_page: 276
               table: '2'
-              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
-                in this extract. Loaded mass is not stated.
+              note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+                remain on observations.
         - - original_SiO2_wt_pct
           - state:
               tag: value
@@ -91,8 +91,8 @@ experiments:
             locator:
               published_page: 276
               table: '2'
-              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
-                in this extract. Loaded mass is not stated.
+              note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+                remain on observations.
         - - M_SiO2_g_mol
           - state:
               tag: value
@@ -100,8 +100,8 @@ experiments:
             locator:
               published_page: 276
               table: '2'
-              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
-                in this extract. Loaded mass is not stated.
+              note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+                remain on observations.
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -112,14 +112,14 @@ experiments:
       locator:
         published_page: 276
         table: '2'
-        note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in
-          this extract. Loaded mass is not stated.
+        note: Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions
+          remain on observations.
     form:
       state:
         tag: value
         value: crystalline K2Si2O5
       locator:
-        published_page: 271
+        page: 271
         section: 3. Procedure
     pretreatment:
       state:
@@ -135,7 +135,7 @@ experiments:
         reason: not_published
       locator:
         section: Abstract
-        note: The 1300-1800 K range is series-wide
+        note: The 1300-1800 K range is series-wide, not a single experiment condition; row temperatures remain in observations
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -222,6 +222,20 @@ experiments:
         locator:
           page: 271
           section: 3. Procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 279
+        equation: P_O2 = 0.226 P_K
+        note: Author oxygen is stoichiometric from dissociative vaporization, P_O2 = 0.226 P_K (printed). No commanded buffer
+          or gas mix. Per-row P_O2 is derived from printed P_K × printed ratio and lands on observation point_conditions.fO2_Pa
+          as DERIVED; no single experiment oxygen_partial_pressure_Pa is asserted.
   bench_id: 10.6028/nbs.sp.561v1::bench::kems-system
 benches:
 - id: 10.6028/nbs.sp.561v1::bench::kems-system

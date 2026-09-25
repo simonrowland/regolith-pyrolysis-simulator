@@ -37,6 +37,2506 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/isijinternational.29.843
 experiments:
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p048
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.048'
+          - - Fe
+            - '0.952'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.048 as Table 5 molar fraction column (heat 8); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.048 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 8; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 8; X_Nb=0.048
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p091
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.091'
+          - - Fe
+            - '0.909'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.091 as Table 5 molar fraction column (heat 4); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.091 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 4; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 4; X_Nb=0.091
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p094
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.094'
+          - - Fe
+            - '0.906'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.094 as Table 5 molar fraction column (heat 31); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.094 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 31; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 31; X_Nb=0.094
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p139
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.139'
+          - - Fe
+            - '0.861'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.139 as Table 5 molar fraction column (heat 59); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.139 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 59; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 59; X_Nb=0.139
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p144
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.144'
+          - - Fe
+            - '0.856'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.144 as Table 5 molar fraction column (heat 58); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.144 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 58; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 58; X_Nb=0.144
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p192
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.192'
+          - - Fe
+            - '0.808'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.192 as Table 5 molar fraction column (heat 11); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.192 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 11; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 11; X_Nb=0.192
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p234
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.234'
+          - - Fe
+            - '0.766'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.234 as Table 5 molar fraction column (heat 14); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.234 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 14; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 14; X_Nb=0.234
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p242
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.242'
+          - - Fe
+            - '0.758'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.242 as Table 5 molar fraction column (heat 12); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.242 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 12; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 12; X_Nb=0.242
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p298
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.298'
+          - - Fe
+            - '0.702'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.298 as Table 5 molar fraction column (heat 32); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.298 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 32; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 32; X_Nb=0.298
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p320
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.32'
+          - - Fe
+            - '0.68'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.320 as Table 5 molar fraction column (heat 15); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.320 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 15; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 15; X_Nb=0.320
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p370
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.37'
+          - - Fe
+            - '0.63'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.370 as Table 5 molar fraction column (heat 30); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.370 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 30; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 30; X_Nb=0.370
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p384
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.384'
+          - - Fe
+            - '0.616'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.384 as Table 5 molar fraction column (heat 29); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.384 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 29; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 29; X_Nb=0.384
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p388
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.388'
+          - - Fe
+            - '0.612'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.388 as Table 5 molar fraction column (heat 20); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.388 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 20; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 20; X_Nb=0.388
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p394
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.394'
+          - - Fe
+            - '0.606'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.394 as Table 5 molar fraction column (heat 19); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.394 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 19; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 19; X_Nb=0.394
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p502
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.502'
+          - - Fe
+            - '0.498'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.502 as Table 5 molar fraction column (heat 16); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.502 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 16; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 16; X_Nb=0.502
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p548
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.548'
+          - - Fe
+            - '0.452'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.548 as Table 5 molar fraction column (heat 26); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.548 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 26; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 26; X_Nb=0.548
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p596
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.596'
+          - - Fe
+            - '0.404'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.596 as Table 5 molar fraction column (heat 23); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.596 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 23; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 23; X_Nb=0.596
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p671
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.671'
+          - - Fe
+            - '0.329'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.671 as Table 5 molar fraction column (heat 24); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.671 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 24; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 24; X_Nb=0.671
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p760
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.76'
+          - - Fe
+            - '0.24'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.760 as Table 5 molar fraction column (heat 25); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.760 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 25; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 25; X_Nb=0.760
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p856
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Nb
+            - '0.856'
+          - - Fe
+            - '0.144'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: X_Nb=0.856 as Table 5 molar fraction column (heat 27); Fe=1-X_Nb complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Nb 0.856 Fe-Nb alloy
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Heat 27; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 27; X_Nb=0.856
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
 - experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   kind: literature
   method:
@@ -50,6 +2550,8 @@ experiments:
       locator:
         published_page: 844
         section: 2.1 Apparatus
+        note: Series label only. Per-heat Fe-Ta (Table 1) and Fe-Nb (Table 5) molar fractions land on fe-ta-xta-* / fe-nb-xnb-*
+          experiments.
     form:
       state:
         tag: value
@@ -109,7 +2611,2507 @@ experiments:
     method:
       state:
         tag: value
-        value: foil ion intensity measured below melting points
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p048
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.048'
+          - - Fe
+            - '0.952'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.048 as Table 1 molar fraction column (heat 9); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.048 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 9; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 9; X_Ta=0.048
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p054
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.054'
+          - - Fe
+            - '0.946'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.054 as Table 1 molar fraction column (heat 34); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.054 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 34; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 34; X_Ta=0.054
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p094
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.094'
+          - - Fe
+            - '0.906'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.094 as Table 1 molar fraction column (heat 12); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.094 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 12; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 12; X_Ta=0.094
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p152
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.152'
+          - - Fe
+            - '0.848'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.152 as Table 1 molar fraction column (heat 32); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.152 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 32; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 32; X_Ta=0.152
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p153
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.153'
+          - - Fe
+            - '0.847'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.153 as Table 1 molar fraction column (heat 21); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.153 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 21; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 21; X_Ta=0.153
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p156
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.156'
+          - - Fe
+            - '0.844'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.156 as Table 1 molar fraction column (heat 31); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.156 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 31; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 31; X_Ta=0.156
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p239
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.239'
+          - - Fe
+            - '0.761'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.239 as Table 1 molar fraction column (heat 25); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.239 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 25; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 25; X_Ta=0.239
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p244
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.244'
+          - - Fe
+            - '0.756'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.244 as Table 1 molar fraction column (heat 22); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.244 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 22; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 22; X_Ta=0.244
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p255
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.255'
+          - - Fe
+            - '0.745'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.255 as Table 1 molar fraction column (heat 27); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.255 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 27; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 27; X_Ta=0.255
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p297
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.297'
+          - - Fe
+            - '0.703'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.297 as Table 1 molar fraction column (heat 33); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.297 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 33; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 33; X_Ta=0.297
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p319
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.319'
+          - - Fe
+            - '0.681'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.319 as Table 1 molar fraction column (heat 17); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.319 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 17; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 17; X_Ta=0.319
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p404
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.404'
+          - - Fe
+            - '0.596'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.404 as Table 1 molar fraction column (heat 50); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.404 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 50; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 50; X_Ta=0.404
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p406
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.406'
+          - - Fe
+            - '0.594'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.406 as Table 1 molar fraction column (heat 49); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.406 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 49; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 49; X_Ta=0.406
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p436
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.436'
+          - - Fe
+            - '0.564'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.436 as Table 1 molar fraction column (heat 47); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.436 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 47; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 47; X_Ta=0.436
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p444
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.444'
+          - - Fe
+            - '0.556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.444 as Table 1 molar fraction column (heat 51); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.444 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 51; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 51; X_Ta=0.444
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p606
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.606'
+          - - Fe
+            - '0.394'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.606 as Table 1 molar fraction column (heat 48); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.606 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 48; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 48; X_Ta=0.606
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p727
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.727'
+          - - Fe
+            - '0.273'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.727 as Table 1 molar fraction column (heat 53); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.727 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 53; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 53; X_Ta=0.727
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p775
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.775'
+          - - Fe
+            - '0.225'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.775 as Table 1 molar fraction column (heat 55); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.775 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 55; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 55; X_Ta=0.775
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p810
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.81'
+          - - Fe
+            - '0.19'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.810 as Table 1 molar fraction column (heat 54); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.810 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 54; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 54; X_Ta=0.810
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: No universal run duration is printed.
+- experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p828
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - Ta
+            - '0.828'
+          - - Fe
+            - '0.172'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: X_Ta=0.828 as Table 1 molar fraction column (heat 56); Fe=1-X_Ta complement for the binary alloy; not renormalised
+    printed_composition:
+      state:
+        tag: value
+        value: X_Ta 0.828 Fe-Ta alloy
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Heat 56; label retained; numeric mole fractions in initial_composition
+    form:
+      state:
+        tag: value
+        value: iron foil covering the alloy sample surface
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        table: '1'
+        note: Activity of iron reported at 1873 K (Table 1 / Table 5).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 844
+        section: 2.1 Apparatus
+        note: Vacuum measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.29.843
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 56; X_Ta=0.828
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum Knudsen-cell holder heated
+          by electron bombardment from two ring filaments. W/W-26%Re thermocouples at upper side and bottom center of the
+          cell holder. Modified internal standard: a piece of pure iron foil on the sample surface.'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with an orifice of 0.4 mm
+          in diameter were used as a Knudsen cell.
+        section: '2.1'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: false
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 844
+          section: 2.1 Apparatus
+  bench_id: 10.2355/isijinternational.29.843::bench::ichise-kems
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy
       locator:
         published_page: 844
         section: 2.1 Apparatus

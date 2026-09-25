@@ -82,7 +82,7 @@ experiments:
     pretreatment:
       state:
         tag: value
-        value: Cd acid
+        value: Cd acid, water, and ethanol cleaned; alloy prepared under Ar; cell baked at about 450 K overnight after loading
       locator:
         page: 528
         published_page: 528
@@ -115,7 +115,7 @@ experiments:
       locator:
         page: 528
         published_page: 528
-        note: Ar was used for alloy preparation
+        note: Ar was used for alloy preparation, not as measurement sweep gas
     regime:
       regime_class:
         tag: value
@@ -160,6 +160,17 @@ experiments:
         figure: '1'
         note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
     geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00018'
+            approximate: true
+        locator:
+          page: 528
+          published_page: 528
+          note: Printed about 0.18 mm diameter; Fig. 5 example separately labels 0.19 mm
       orifice_channel_length_m:
         state:
           tag: value
@@ -267,7 +278,7 @@ benches:
   cell_material_and_liner:
     state:
       tag: value
-      value: Molybdenum lid
+      value: Molybdenum lid, container, and orifice plate; alumina inner crucible
     locator:
       page: 528
       published_page: 528

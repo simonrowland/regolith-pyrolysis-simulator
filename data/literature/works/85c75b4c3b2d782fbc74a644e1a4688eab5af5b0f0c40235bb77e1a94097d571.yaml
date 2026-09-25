@@ -18,12 +18,31 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-1
   kind: literature
   method:
     tag: unknown
     reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
   sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_species
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+      inference:
+        relation: printed_single_component_to_mole_fraction
+        inputs:
+        - 'printed single-component sample: Sodium'
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -43,7 +62,7 @@ experiments:
     pretreatment:
       state:
         tag: value
-        value: Filtered
+        value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point
       locator:
         published_page: 3
         pdf_page_index: 5
@@ -52,7 +71,12 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: experiment temperature not published
+        reason: multiple_table_points_per_static_run
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -115,18 +139,12 @@ experiments:
           output_unit: Pa
   work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
   locator:
-    published_page: 2
-    pdf_page_index: 4
-    section: Experiment - Apparatus and Procedure
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 1
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 90 percent tantalum and 10 percent tungsten alloy capsule
-      locator:
-        published_page: 2
-        pdf_page_index: 4
-        section: Experiment - Apparatus
     geometry:
       orifice_diameter_m:
         state:
@@ -144,6 +162,679 @@ experiments:
           published_page: 2
           pdf_page_index: 4
           section: Experiment - Apparatus
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_species
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+      inference:
+        relation: printed_single_component_to_mole_fraction
+        inputs:
+        - 'printed single-component sample: Sodium'
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: multiple_table_points_per_static_run
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          output_unit: Pa
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 2
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_species
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+      inference:
+        relation: printed_single_component_to_mole_fraction
+        inputs:
+        - 'printed single-component sample: Sodium'
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: multiple_table_points_per_static_run
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          output_unit: Pa
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 3
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_species
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+      inference:
+        relation: printed_single_component_to_mole_fraction
+        inputs:
+        - 'printed single-component sample: Sodium'
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: multiple_table_points_per_static_run
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          output_unit: Pa
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 4
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_species
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+      inference:
+        relation: printed_single_component_to_mole_fraction
+        inputs:
+        - 'printed single-component sample: Sodium'
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value: Sodium
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment
+    form:
+      state:
+        tag: value
+        value: Liquid sodium
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure; Sodium purification
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: multiple_table_points_per_static_run
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 5
+        section: Procedure
+        note: Argon transfers sodium before measurement; it is not sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01333223684210526315789473684'
+        locator:
+          published_page: 3
+          pdf_page_index: 5
+          section: Procedure
+          note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 3
+                pdf_page_index: 5
+                section: Procedure
+                note: Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only
+          output_unit: Pa
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 5
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 8
+        table: I
+        note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 2
+    pdf_page_index: 4
+    section: Experiment - Apparatus and Procedure
+    note: Series-level sodium vapor-pressure context; per-run experiments remain declared below
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 90 percent tantalum and 10 percent tungsten alloy capsule
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment - Apparatus
     calibration:
       calibration:
         state:
@@ -164,15 +855,6 @@ experiments:
           pdf_page_index: 6
           section: Temperature measurements
   bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
-  thermal_schedule:
-    method:
-      state:
-        tag: value
-        value: Heated through series of test temperatures; sufficient time allowed between changes for equilibrium
-      locator:
-        published_page: 3
-        pdf_page_index: 5
-        section: Procedure
 - experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
   kind: literature
   method:

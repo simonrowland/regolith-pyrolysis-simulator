@@ -91,7 +91,7 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: Crushed whole Murchison meteorite
+        value: Crushed whole Murchison meteorite, solvent-extracted and catalyst-impregnated
       locator:
         published_page: 1386
         section: 2.1 H2-Pyrolysis
@@ -103,7 +103,7 @@ experiments:
       locator:
         published_page: 1386
         section: 2.1 H2-Pyrolysis
-        note: Program has 220 C and 520 C endpoints
+        note: Program has 220 C and 520 C endpoints, not one run temperature
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -204,6 +204,49 @@ experiments:
     pdf_page_index: 6
     table: '2'
     note: Four C/N-bearing components in Murchison HF/HCl residues; Sephton et al. 2003
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
 benches:
 - id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
   work_id: 10.1016/j.gca.2003.08.019

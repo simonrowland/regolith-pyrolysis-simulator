@@ -39,14 +39,15 @@ observations:
     published_page: 208
     pdf_page_index: 4
     figure: '2'
-    note: Weight loss per surface area versus time at 0.2
+    note: Weight loss per surface area versus time at 0.2, 0.4, and 1 bar; qualitative figure retained without coordinate
+      digitization
   read_from: unknown:ta-dacko-conradt-low-p-transpiration
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -62,8 +63,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0123896'
     approximate: false
   uncertainty:
     kind: none
@@ -118,12 +119,61 @@ observations:
               table: '1'
               note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.23896'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.23896'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -139,8 +189,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0127237'
     approximate: false
   uncertainty:
     kind: none
@@ -195,12 +245,61 @@ observations:
               table: '1'
               note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.27237'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.27237'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_1000hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_1000hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -216,8 +315,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.033041'
     approximate: false
   uncertainty:
     kind: none
@@ -272,12 +371,61 @@ observations:
               table: '1'
               note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.3041'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.3041'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -293,8 +441,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0209631'
     approximate: false
   uncertainty:
     kind: none
@@ -349,12 +497,61 @@ observations:
               table: '1'
               note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.09631'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.09631'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -370,8 +567,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0254943'
     approximate: false
   uncertainty:
     kind: none
@@ -426,12 +623,61 @@ observations:
               table: '1'
               note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.54943'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.54943'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_200hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_200hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -447,8 +693,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0352111'
     approximate: false
   uncertainty:
     kind: none
@@ -503,12 +749,61 @@ observations:
               table: '1'
               note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.52111'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.52111'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 200 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -524,8 +819,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0125809'
     approximate: false
   uncertainty:
     kind: none
@@ -580,12 +875,61 @@ observations:
               table: '1'
               note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.25809'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.25809'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -601,8 +945,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0166497'
     approximate: false
   uncertainty:
     kind: none
@@ -657,12 +1001,61 @@ observations:
               table: '1'
               note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.66497'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.66497'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1400c_400hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1400c_400hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -678,8 +1071,8 @@ observations:
       tag: value
       value: '1673.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0221093'
     approximate: false
   uncertainty:
     kind: none
@@ -734,12 +1127,61 @@ observations:
               table: '1'
               note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.21093'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.21093'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1400 C, 400 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -755,8 +1197,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0555184'
     approximate: false
   uncertainty:
     kind: none
@@ -811,12 +1253,61 @@ observations:
               table: '1'
               note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.55184'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5.55184'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -832,8 +1323,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0575562'
     approximate: false
   uncertainty:
     kind: none
@@ -888,12 +1379,61 @@ observations:
               table: '1'
               note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.75562'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5.75562'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_1000hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_1000hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -909,8 +1449,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0992987'
     approximate: false
   uncertainty:
     kind: none
@@ -965,12 +1505,61 @@ observations:
               table: '1'
               note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '9.92987'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '9.92987'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 1000 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -986,8 +1575,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0915847'
     approximate: false
   uncertainty:
     kind: none
@@ -1042,12 +1631,61 @@ observations:
               table: '1'
               note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '9.15847'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '9.15847'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -1063,8 +1701,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.1130269'
     approximate: false
   uncertainty:
     kind: none
@@ -1119,12 +1757,61 @@ observations:
               table: '1'
               note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '11.30269'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '11.30269'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_200hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_200hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -1140,8 +1827,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.1303781'
     approximate: false
   uncertainty:
     kind: none
@@ -1196,12 +1883,61 @@ observations:
               table: '1'
               note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '13.03781'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '13.03781'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 200 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_0p5h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_0p5h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -1217,8 +1953,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.0741033'
     approximate: false
   uncertainty:
     kind: none
@@ -1273,12 +2009,61 @@ observations:
               table: '1'
               note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '7.41033'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7.41033'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 0.5 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_1h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_1h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -1294,8 +2079,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.083917'
     approximate: false
   uncertainty:
     kind: none
@@ -1350,12 +2135,61 @@ observations:
               table: '1'
               note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '8.3917'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '8.3917'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 1 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_t1_1600c_400hpa_2h
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t1_1600c_400hpa_2h
   identity:
     quantity:
-      tag: unknown
-      reason: source does not state a closed quantity
+      tag: value
+      value: mass_loss_areal_density
     species:
       formula: Na
       phase:
@@ -1371,8 +2205,8 @@ observations:
       tag: value
       value: '1873.15'
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    kind: point
+    point: '0.105117'
     approximate: false
   uncertainty:
     kind: none
@@ -1427,6 +2261,55 @@ observations:
               table: '1'
               note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
         output_unit: K
+  derivation:
+    relation: mg_per_cm2_to_kg_per_m2
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '10.5117'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+        inference:
+          relation: mg_per_cm2_to_kg_per_m2
+          inputs:
+          - m_kg_per_m2 = m_mg_per_cm2 / 100
+          - original_unit=mg_per_cm2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10.5117'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                published_page: 207
+                pdf_page_index: 3
+                table: '1'
+                note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+          output_unit: kg_per_m2
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 207
+          pdf_page_index: 3
+          table: '1'
+          note: 1600 C, 400 hPa, 2 h row; columns T, P, t, Δq
+    output_unit: kg_per_m2
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_activity_b2o3_1400c
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_activity_1400c
   identity:
@@ -1498,7 +2381,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1617,7 +2500,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1736,7 +2619,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1855,7 +2738,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1974,7 +2857,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2093,7 +2976,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2213,7 +3096,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2333,7 +3216,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2453,7 +3336,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2573,7 +3456,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2693,7 +3576,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2813,7 +3696,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -2933,7 +3816,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -3053,7 +3936,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -3173,7 +4056,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending

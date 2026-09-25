@@ -34,7 +34,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: Figs 1 and 2 are σ(E) curves for Ag. Figure digitization is forbidden. Not melt p(T).
     decided_by:
       worker: hunt-RH-46
       date: '2026-09-06'
@@ -82,8 +82,16 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: IUPAC HTMS methods/cross-section compilation. Tables 1–5 are ionization-cross-section compilations or fits. No
+      silicate-melt p(T), γ, α, residue, or time/mass-loss series are tabulated.
+    decided_by:
+      worker: hunt-RH-46
+      date: '2026-09-06'
+      evidence:
+        page: 683
+        note: full paper 683–737; Tables 1–5 and Figs 1–2 from official PDF text
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/completeness-ledger.md
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -122,8 +130,17 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: This paper is a methodology standard, not a melt p(T) or α data set. No silicate-melt measurement rows exist to
+      admit.
+    decided_by:
+      worker: hunt-RH-46
+      date: '2026-09-06'
+      evidence:
+        page: 685
+        section: 2. PRINCIPLES OF THE METHOD
+        note: also §4.3a p. 687–688 and §9 p. 728
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -328,8 +345,17 @@ observations:
       value: compilation_assessed
     original_method_class: secondary_compilation
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: Table 5 body was not retrieved from the official PDF (WAF-blocked bytes). Caption confirms compiled polyatomic
+      ionization cross-section ratios, not melt p(T). Not a true absence of the table.
+    decided_by:
+      worker: hunt-RH-46
+      date: '2026-09-06'
+      evidence:
+        page: 715
+        table: '5'
+        note: caption and header only from official PDF URL text
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
   notices: []
   source_id: kems-014-drowart-2005
   locator:

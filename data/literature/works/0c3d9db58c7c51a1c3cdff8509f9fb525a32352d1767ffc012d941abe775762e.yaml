@@ -37,7 +37,7 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::cai-evaporation-series
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::b-113-evaporation
   kind: literature
   method:
     tag: value
@@ -86,13 +86,45 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.189830084551'
+          - - SiO2
+            - '0.481315451853'
+          - - CaO
+            - '0.211707048832'
+          - - Al2O3
+            - '0.117147414764'
+          amount_basis: mole_fraction
+      locator:
+        page: 525
+        table: '1'
+        note: B-113-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
-        value: Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2 composition
+        value:
+          MgO: '12.67'
+          SiO2: '47.89'
+          CaO: '19.66'
+          Al2O3: '19.78'
       locator:
         page: 525
-        section: 5.1 Starting Materials
+        table: '1'
+        note: B-113-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue
+          rows not landed as start
     form:
       state:
         tag: value
@@ -120,7 +152,11 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: conflicting printed pressures; not collapsed into one number
+        reason: not_published
+      locator:
+        page: 525
+        table: '1'
+        note: Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned
     sweep_gas:
       state:
         tag: unknown
@@ -137,7 +173,7 @@ experiments:
   locator:
     page: 525
     section: 5.1 Starting Materials
-    note: Type B CAI-like evaporation series; Table 1 retains per-run temperature
+    note: B-113 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration
   bench_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   thermal_schedule:
     total_duration_s:
@@ -183,6 +219,456 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::b-133-evaporation
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+        note: 5-70 mg; converted to kg
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.17894349817'
+          - - SiO2
+            - '0.462853393482'
+          - - CaO
+            - '0.243866079966'
+          - - Al2O3
+            - '0.114337028381'
+          amount_basis: mole_fraction
+      locator:
+        page: 525
+        table: '1'
+        note: B-133-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '11.94'
+          SiO2: '46.04'
+          CaO: '22.64'
+          Al2O3: '19.30'
+      locator:
+        page: 525
+        table: '1'
+        note: B-133-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue
+          rows not landed as start
+    form:
+      state:
+        tag: value
+        value: Quenched synthetic glass powder on platinum loops
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+    pretreatment:
+      state:
+        tag: value
+        value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 525
+        table: '1'
+        note: The 1400-1800 C range spans distinct runs; per-run temperatures remain in Table 1 observations
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 525
+        table: '1'
+        note: Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 525
+        section: 5.2 Experimental Procedure
+        note: Multiple pressure-regime furnaces; no common sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  locator:
+    page: 525
+    section: 5.1 Starting Materials
+    note: B-133 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration
+  bench_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '900'
+          interval_high: '18000'
+          approximate: false
+      locator:
+        page: 525
+        table: '1'
+        note: 15-300 min per run; converted to s
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - original_high
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        output_unit: s
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::bcai-evaporation
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00007'
+          approximate: false
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+        note: 5-70 mg; converted to kg
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - original_high
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 525
+              section: 5.1 Starting Materials
+              note: 5-70 mg; converted to kg
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.260506723746'
+          - - SiO2
+            - '0.362820323228'
+          - - CaO
+            - '0.258284936966'
+          - - Al2O3
+            - '0.11838801606'
+          amount_basis: mole_fraction
+      locator:
+        page: 525
+        table: '1'
+        note: BCAI-0 starting-glass oxide wt% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '17.84'
+          SiO2: '37.04'
+          CaO: '24.61'
+          Al2O3: '20.51'
+      locator:
+        page: 525
+        table: '1'
+        note: BCAI-0 starting-glass row only; oxide wt% as printed; label Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2; residue
+          rows not landed as start
+    form:
+      state:
+        tag: value
+        value: Quenched synthetic glass powder on platinum loops
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+    pretreatment:
+      state:
+        tag: value
+        value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity
+      locator:
+        page: 525
+        section: 5.1 Starting Materials
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 525
+        table: '1'
+        note: The 1400-1800 C range spans distinct runs; per-run temperatures remain in Table 1 observations
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
+        line_range: 194-196
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        - as_published=1e-09 bar
+        - printed=vacuum_bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000001'
+            locator:
+              paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
+              line_range: 194-196
+              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
+              line_range: 194-196
+              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 525
+        section: 5.2 Experimental Procedure
+        note: Multiple pressure-regime furnaces; no common sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  locator:
+    page: 525
+    section: 5.1 Starting Materials
+    note: BCAI starting-glass series; Table 1 retains per-run temperature, pressure, area and duration
+  bench_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '900'
+          interval_high: '18000'
+          approximate: false
+      locator:
+        page: 525
+        table: '1'
+        note: 15-300 min per run; converted to s
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - original_high
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 525
+              table: '1'
+              note: 15-300 min per run; converted to s
+        output_unit: s
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::kems-037-richter-2002
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.7'
+          approximate: false
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        - as_published=0.000187 bar
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000187'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  locator:
+    table: '1'
+    paragraph: Avg.area (cm2) and γ_Mg per run
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
 benches:
 - id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
@@ -205,7 +691,7 @@ benches:
   heating_method:
     state:
       tag: value
-      value: Three furnaces for vacuum
+      value: Three furnaces for vacuum, hydrogen, and gas-mixing pressure regimes
     locator:
       page: 525
       section: 5.2 Experimental Procedure

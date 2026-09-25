@@ -37,7 +37,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: Fig. 1 is an unlabeled Arrhenius-style plot. MinerU ~ dump rejected. Digitizing forbidden.
     decided_by:
       worker: orphans-close
       date: '2026-08-27'
@@ -85,7 +85,8 @@ observations:
     original_method_class: mixed
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: Fig. 4 is a plotted overlay (A this-work; B Taylor & Chipman; C Kojima estimate; D Sakawa; E Raoult). MinerU dumped
+      approximate ~ values. Figure digitization is forbidden. This-work numeric f is Table 2.
     decided_by:
       worker: orphans-close
       date: '2026-08-27'
@@ -100,8 +101,8 @@ observations:
     figure: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_ion_intensity_ratios_1973k
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p15
   identity:
     quantity:
       tag: unknown
@@ -143,6 +144,7 @@ observations:
     page: 1278
     pdf_page_index: 3
     table: '1'
+    note: Table 1 row x(FeO)=0.15
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
   point_conditions:
@@ -154,6 +156,349 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '1'
+        note: Table 1 row x(FeO)=0.15
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.30
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.30
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p40
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.40
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.40
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p54
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.54
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.54
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p70
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.70
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.70
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p80
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.80
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.80
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p90
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1973'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.90
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.90
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series

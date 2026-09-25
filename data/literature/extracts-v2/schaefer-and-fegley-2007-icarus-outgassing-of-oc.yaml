@@ -89,8 +89,16 @@ observations:
       during ordinary chondrite metamorphism.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist only as Figs 2–17. No printed
+      numeric table of mole fractions vs T. Curves were not read off axes.
+    decided_by:
+      worker: extract-pyro-outgas
+      date: '2026-09-12'
+      evidence:
+        published_page: 466–479
+        figure: 2–17
+        note: All calculated gas-chemistry / mineralogy / fO2 plots; not digitised; pdf_page_index=5–18
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:

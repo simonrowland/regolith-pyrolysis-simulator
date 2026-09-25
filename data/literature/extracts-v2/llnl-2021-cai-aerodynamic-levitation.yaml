@@ -19,6 +19,23 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.179376771290376463947779236'
+        - - SiO2
+          - '0.4612531330881410134532778808'
+        - - Al2O3
+          - '0.1122681465573851739507109502'
+        - - CaO
+          - '0.2471019490640973486482319335'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_composition_and_elemental_loss_series';
@@ -42,6 +59,23 @@ observations:
     table: '1'
     section: Elemental and isotopic composition of the evaporated samples
   read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        pdf_page_index: 5
+        table: '1'
+        section: Elemental and isotopic composition of the evaporated samples
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.1'
+      locator:
+        pdf_page_index: 6
+        section: 3. Experiments and analyses
+        note: quote=oxygen_fugacity_log10_atm = -9.1 as printed
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_aerodynamic_transport_conditions
   experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
   identity:

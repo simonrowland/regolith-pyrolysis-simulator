@@ -37,7 +37,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2320/jinstmet1952.30.6_515
 experiments:
-- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::alloy-vacuum-evaporation-series
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-c-mn-6501-11
   kind: literature
   method:
     tag: value
@@ -81,11 +81,12 @@ experiments:
       state:
         tag: value
         value:
-          kind: categorical
-          categorical: Fe-Mn, Fe-C-Mn, Fe-Cu, or Fe-Sn master alloy
+          C: '4.85'
       locator:
-        page: 516
-        section: II. Experimental method
+        page: 517
+        figure: '1'
+        note: Fig. 1 caption carbon wt% for alloys 6501-11 and 6501-12; elemental wt%; Mn mother-alloy % not printed for these
+          melts; Fe balance not printed; label Fe-C-Mn Melt 6501-11
     form:
       state:
         tag: value
@@ -101,40 +102,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '1.333223684210526315789473684'
-          approximate: false
+        tag: unknown
+        reason: not_published
       locator:
-        paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-        line_range: '29'
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.01 mmHg
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.01'
-            locator:
-              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              line_range: '29'
-              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              line_range: '29'
-              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        output_unit: Pa
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
     sweep_gas:
       state:
         tag: not_applicable
@@ -150,15 +123,1658 @@ experiments:
   locator:
     page: 516
     section: II. Experimental method
-  apparatus:
-    cell_material_and_liner:
+    note: Fe-C-Mn Melt 6501-11; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
       state:
         tag: value
-        value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
       locator:
-        paragraph: 市販アルミナるつぼ (CP-2)
-        line_range: '27'
-        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-c-mn-6501-12
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          C: '4.69'
+      locator:
+        page: 517
+        figure: '1'
+        note: Fig. 1 caption carbon wt% for alloys 6501-11 and 6501-12; elemental wt%; Mn mother-alloy % not printed for these
+          melts; Fe balance not printed; label Fe-C-Mn Melt 6501-12
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-C-Mn Melt 6501-12; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-cu-6503-11
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: '1.74'
+      locator:
+        page: 517
+        table: '2'
+        note: Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-11
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Cu Melt 6503-11; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-cu-6503-12
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: '1.04'
+      locator:
+        page: 517
+        table: '2'
+        note: Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-12
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Cu Melt 6503-12; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-cu-6503-16
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: '2.65'
+      locator:
+        page: 518
+        table: '2'
+        note: Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-16
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Cu Melt 6503-16; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-cu-6503-28
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: '4.57'
+      locator:
+        page: 518
+        table: '2'
+        note: Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-28
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Cu Melt 6503-28; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-mn-6412-14
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Mn: '2.89'
+      locator:
+        page: 517
+        table: '1'
+        note: Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6412-14
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Mn Melt 6412-14; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-mn-6502-1
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Mn: '1.05'
+      locator:
+        page: 517
+        table: '1'
+        note: Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6502-1
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Mn Melt 6502-1; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-mn-6502-2
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Mn: '1.74'
+      locator:
+        page: 517
+        table: '1'
+        note: Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6502-2
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Mn Melt 6502-2; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-sn-6503-14
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: '1.84'
+      locator:
+        page: 518
+        table: '3'
+        note: Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6503-14
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Sn Melt 6503-14; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-sn-6503-15
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: '0.98'
+      locator:
+        page: 518
+        table: '3'
+        note: Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6503-15
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Sn Melt 6503-15; common vacuum-induction protocol
+  bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: categorical
+            categorical: 1600 C +/-20 C
+            approximate: false
+        locator:
+          page: 516
+          section: II. Experimental method
+          note: Printed setpoint and envelope; not collapsed to a point
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1200'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 5 to 20 min; unit conversion only
+      inference:
+        relation: min_to_s
+        inputs:
+        - t_s = t_min × 60
+        - original_unit=min
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 5 to 20 min; unit conversion only
+        output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: cooled in crucible or cast in 100-mm-diameter mold
+      locator:
+        page: 516
+        section: II. Experimental method
+- experiment_id: 10.2320/jinstmet1952.30.6_515::experiment::fe-sn-6504-1
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.15'
+          approximate: false
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Printed 150 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 516
+              section: II. Experimental method
+              note: Printed 150 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: '3.13'
+      locator:
+        page: 518
+        table: '3'
+        note: Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6504-1
+    form:
+      state:
+        tag: value
+        value: master alloy
+      locator:
+        page: 516
+        section: II. Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 516
+        section: II. Experimental method
+        note: Evacuated after argon at one atmosphere; no vacuum pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 516
+        section: II. Experimental method
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: 516
+    section: II. Experimental method
+    note: Fe-Sn Melt 6504-1; common vacuum-induction protocol
   bench_id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
   thermal_schedule:
     setpoints_and_holds:
@@ -227,7 +1843,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'olette_relative_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -237,11 +1853,40 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value:
+          kind: point
+          point: '1.333223684210526315789473684'
+          approximate: false
+      locator:
+        paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+        line_range: '29'
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.01 mmHg
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -252,8 +1897,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2320/jinstmet1952.30.6_515
   locator:
-    table: '1'
-    line_range: 162-164
+    table: '4'
+    paragraph: English abstract specific evaporation constants
+    line_range: 5-7
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   apparatus:
     cell_material_and_liner:
@@ -261,7 +1907,8 @@ experiments:
         tag: value
         value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
       locator:
-        paragraph: crucible CP-2
+        paragraph: 市販アルミナるつぼ (CP-2)
+        line_range: '27'
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
     geometry:
       exposed_area_m2:
