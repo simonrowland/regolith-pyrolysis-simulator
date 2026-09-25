@@ -1416,6 +1416,7 @@ class PyrolysisRun:
             }
         )
         _attach_engine_commissioning_notice(run_metadata, sim)
+        _attach_diagnostic_gate_authority_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
         run_metadata.update(
@@ -3313,6 +3314,25 @@ def _attach_engine_commissioning_notice(
         run_metadata["engine_commissioning_notice"] = _json_safe(notice)
 
 
+def _diagnostic_gate_authority_notice(sim: Any) -> dict[str, Any] | None:
+    reader = getattr(sim, "diagnostic_gate_authority_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_diagnostic_gate_authority_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    notice = _diagnostic_gate_authority_notice(sim)
+    if notice:
+        run_metadata["diagnostic_gate_authority_notice"] = _json_safe(notice)
+
+
 def _sulfur_saturation_notice(sim: Any) -> dict[str, Any] | None:
     reader = getattr(sim, "sulfur_saturation_run_notice", None)
     if not callable(reader):
@@ -3378,24 +3398,37 @@ def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
     )
 
 
-def _markdown_with_engine_commissioning(
+def _diagnostic_gate_authority_sentence(notice: Mapping[str, Any]) -> str:
+    provider_id = str(notice.get("provider_id") or "unspecified")
+    intent = str(notice.get("intent") or "gate_liquid_fraction")
+    return (
+        f"**Diagnostic freeze-gate authority**: provider `{provider_id}` is "
+        f"authoritative for `{intent}` dispatch but has no ledger-transition "
+        "authority. Reported numbers are unchanged."
+    )
+
+
+def _markdown_with_notice_sentences(
     markdown: str,
-    notice: Mapping[str, Any],
+    sentences: list[str],
 ) -> str:
-    sentence = _engine_commissioning_sentence(notice)
+    if not sentences:
+        return markdown
     lines = markdown.split("\n")
     out: list[str] = []
     inserted = False
     for line in lines:
         out.append(line)
         if not inserted and line.startswith("**Class totals**:"):
-            out.append("")
-            out.append(sentence)
+            for sentence in sentences:
+                out.append("")
+                out.append(sentence)
             inserted = True
     if not inserted:
-        if out and out[-1] != "":
-            out.append("")
-        out.append(sentence)
+        for sentence in sentences:
+            if out and out[-1] != "":
+                out.append("")
+            out.append(sentence)
     return "\n".join(out)
 
 
@@ -3416,13 +3449,19 @@ def _product_classification_report(
         "classification": _json_safe(classification),
         "markdown": markdown,
     }
+    sentences: list[str] = []
     notice = _engine_commissioning_notice(sim)
     if notice:
         report["engine_commissioning_notice"] = _json_safe(notice)
-        report["markdown"] = _markdown_with_engine_commissioning(
-            markdown,
-            notice,
+        sentences.append(_engine_commissioning_sentence(notice))
+    diagnostic_notice = _diagnostic_gate_authority_notice(sim)
+    if diagnostic_notice:
+        report["diagnostic_gate_authority_notice"] = _json_safe(
+            diagnostic_notice
         )
+        sentences.append(_diagnostic_gate_authority_sentence(diagnostic_notice))
+    if sentences:
+        report["markdown"] = _markdown_with_notice_sentences(markdown, sentences)
     return report
 
 
@@ -5028,6 +5067,7 @@ def _runner_failure_result(
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
     _attach_engine_commissioning_notice(run_metadata, sim)
+    _attach_diagnostic_gate_authority_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
     final_state = (

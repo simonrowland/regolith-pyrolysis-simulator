@@ -77,7 +77,15 @@ from simulator.recipe import recipe_schema_version
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
 from simulator.run_executor import RunExecutor
-from simulator.runner import PyrolysisRun, RunnerError, _deep_merge_setpoints
+from simulator.runner import (
+    PyrolysisRun,
+    RunnerError,
+    _attach_diagnostic_gate_authority_notice,
+    _attach_engine_commissioning_notice,
+    _attach_rump_expectation_notice,
+    _attach_sulfur_saturation_notice,
+    _deep_merge_setpoints,
+)
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -2809,6 +2817,16 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
+    for attach_notice in (
+        _attach_engine_commissioning_notice,
+        _attach_diagnostic_gate_authority_notice,
+        _attach_sulfur_saturation_notice,
+        _attach_rump_expectation_notice,
+    ):
+        try:
+            attach_notice(metadata, sim)
+        except Exception as exc:  # noqa: BLE001 - fallback must survive
+            _safe_log(f'Reduced runner notice unavailable: {exc}')
     summaries_builder = getattr(session, 'per_hour_summaries', None)
     summaries = summaries_builder() if callable(summaries_builder) else []
     payload = {

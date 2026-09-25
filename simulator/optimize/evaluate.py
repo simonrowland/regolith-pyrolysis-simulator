@@ -5806,6 +5806,20 @@ def _cache_trace_payload(
             payload["engine_commissioning_notice"] = _compact_jsonable(
                 dict(commissioning_notice)
             )
+    diagnostic_gate_reader = getattr(
+        simulator,
+        "diagnostic_gate_authority_run_notice",
+        None,
+    )
+    if callable(diagnostic_gate_reader):
+        diagnostic_gate_notice = diagnostic_gate_reader()
+        if (
+            isinstance(diagnostic_gate_notice, MappingABC)
+            and diagnostic_gate_notice
+        ):
+            payload["diagnostic_gate_authority_notice"] = _compact_jsonable(
+                dict(diagnostic_gate_notice)
+            )
     sulfsat_reader = getattr(simulator, "sulfur_saturation_run_notice", None)
     if callable(sulfsat_reader):
         sulfsat_notice = sulfsat_reader()
