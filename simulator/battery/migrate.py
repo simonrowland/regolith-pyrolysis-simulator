@@ -2204,6 +2204,8 @@ def _mole_fraction_composition_from_values(
             break
     if len(components) < 2:
         return None, tuple(omitted)
+    if omitted:
+        return None, tuple(omitted)
     return (
         Composition(
             basis="printed_mole_fraction",
@@ -2246,6 +2248,13 @@ def wt_pct_to_mole_fraction_derivation(
 
 def composition_unknown_reason() -> str:
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
+
+
+def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
+    return (
+        "partial_composition: omitted non-formula component(s): "
+        + ", ".join(omitted_components)
+    )
 
 
 def bulk_property_species_formula(
@@ -8619,7 +8628,11 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
-        if initial_composition is not None:
+        if omitted_components:
+            ident_kwargs["composition"] = State.unknown(
+                partial_composition_unknown_reason(omitted_components)
+            )
+        elif initial_composition is not None:
             ident_kwargs["composition"] = State.of(initial_composition)
         elif initial_oxide_map:
             ident_kwargs["composition"] = State.of(

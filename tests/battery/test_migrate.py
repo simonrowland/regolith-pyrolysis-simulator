@@ -21,6 +21,8 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     AssetRole,
     EvidenceClass,
+    Engine,
+    ExecutionState,
     FO2Channel,
     IdentityEqualKind,
     MethodToken,
@@ -36,6 +38,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
+from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
     DuplicateContextIdError,
@@ -2295,15 +2298,37 @@ def test_printed_mole_fraction_composition_maps_without_wt_conversion(
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.identity.composition is not None
-    assert obs.identity.composition.is_value
-    assert obs.identity.composition.value.as_map() == expected
     if "minor constituents" in extra.get("composition_mol", {}):
+        assert obs.identity.composition.is_unknown
+        assert "partial_composition" in (obs.identity.composition.reason or "")
         assert any(
             "minor constituents" in (entry.why or "")
             and "composition" in (entry.axes or [])
             for entry in result.queue
         )
-        assert "minor constituents" not in obs.identity.composition.value.as_map()
+    else:
+        assert obs.identity.composition.is_value
+        assert obs.identity.composition.value.as_map() == expected
+
+
+def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "ta-dacko-conradt-low-p-transpiration.yaml"
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if "table2_activity_" in obs.observation_id
+    ]
+    assert len(rows) == 6
+    for obs in rows:
+        composition = obs.identity.composition
+        assert composition is not None and composition.is_unknown
+        assert "partial_composition" in (composition.reason or "")
+        prediction = predict_with_engine(Engine.IMCC_SF04, obs)
+        assert prediction.execution.state is ExecutionState.NOT_PROBED
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert prediction.requested_composition == composition
 
 
 def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
@@ -3496,11 +3521,8 @@ def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> Non
     assert len(rows) == 6
     for row in rows:
         composition, omitted = _mole_fraction_composition_from_values(row["values"])
-        assert composition is not None
+        assert composition is None
         assert "minor constituents" in omitted
-        assert "minor constituents" not in composition.as_map()
-        assert composition.as_map()["SiO2"] == as_decimal("0.79")
-        assert composition.as_map()["B2O3"] == as_decimal("0.10")
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
