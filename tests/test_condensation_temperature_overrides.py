@@ -617,7 +617,7 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         CondensationTrain.create_default(),
         wall_temperature_C=1000.0,
     )
-    overridden_model.condensation_temperatures_C['SiO'] = 1000.0
+    overridden_model.condensation_temperatures_C['SiO'] = 900.0
     _configure_knudsen_policy(overridden_model)
     overridden_result = overridden_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -628,10 +628,11 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
         assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
     else:
-        # T-dependent alpha_s(T) narrows the cold-stage contrast versus the old
-        # fixed 0.04 pin, but the instance override still reaches the budget path.
+        # The all-hot SiO stage now completes with a flagged lower-bound band
+        # outcome; the independently retained stage-weight contrast remains
+        # above the original 0.03 separation.
         assert overridden_result.remaining_by_species["SiO"] > (
-            default_result.remaining_by_species["SiO"] + 0.015
+            default_result.remaining_by_species["SiO"] + 0.03
         )
 
 

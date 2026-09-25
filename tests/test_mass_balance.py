@@ -408,9 +408,9 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps, refusal = _run_c2a_staged_to_completion(sim)
 
-    # b-324 increases the condenser capture-rate budget by converting the
-    # hourly vapor supply to mol/s. The campaign now completes instead of
-    # reaching the prior transitional-Kn refusal.
+    # The staged allocator authorizes the configured 130 ledger hours; this
+    # observed pin is the completed campaign length, not a capture-budget
+    # consequence of b-324 (which only changes HKL stage weights).
     assert refusal is None
     assert steps == 130
     assert sim.is_complete()
@@ -446,6 +446,57 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         assert liquid_fractions == []
 
 
+def test_terminal_evaporation_refusal_rolls_back_full_hour(monkeypatch):
+    feedstocks = _load_data_yaml("feedstocks.yaml")
+    setpoints = _load_data_yaml("setpoints.yaml")
+    vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
+    setpoints = dict(setpoints)
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel_config["allow_fallback_vapor"] = True
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints["chemistry_kernel"] = kernel_config
+
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C0)
+    # Force a hot C0 hour so the wrapped update follows real ledger mutations
+    # before the terminal refusal; a cold zero-flux hour cannot prove rollback.
+    sim.melt.temperature_C = 1200.0
+
+    original_update = sim._update_melt_composition
+    forced = False
+
+    def update_then_refuse(evap_flux):
+        nonlocal forced
+        original_update(evap_flux)
+        forced = True
+        raise EvaporationFluxRefusal(
+            "forced_terminal_evaporation_refusal",
+            {"evaporation_flux_status": "forced_for_test"},
+        )
+
+    monkeypatch.setattr(sim, "_update_melt_composition", update_then_refuse)
+    ledger_before = sim.atom_ledger.mol_by_account()
+    transitions_before = tuple(sim.atom_ledger.transitions)
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    hour_before = sim.melt.hour
+
+    with pytest.raises(
+        EvaporationFluxRefusal,
+        match="forced_terminal_evaporation_refusal",
+    ):
+        sim.step()
+
+    assert forced
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+    assert tuple(sim.atom_ledger.transitions) == transitions_before
+    assert sim.atom_ledger.element_atom_drift_report() == drift_before
+    assert sim.melt.hour == hour_before
+    assert sim._poisoned_hour is None
+
+
 # xdist 3.8 UNIONS group marks: keep exactly ONE xdist_group here — the
 # magemin_fullrun_b scope replaces the old per-test "serial" group (the
 # pytest.mark.serial selector mark stays for the two-pass helper).
@@ -475,7 +526,11 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    # Drive the no-MRE path until the transitional-Kn refusal.
+    # Drive the no-MRE path through the allocator. If a transitional-Kn
+    # refusal occurs, the loop checks that no hour was committed before the
+    # completion assertion rejects the run. A separate forced-refusal test
+    # protects the full rollback surfaces; this run protects cumulative
+    # closure for the completed path.
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -521,8 +576,8 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     # single per-transition tolerance -- yet leaves ample headroom.
     assert cumulative_imbalance_kg < 1e-6
 
-    # The committed prefix at refusal must still close to ~zero. The
-    # absolute floor is 5e-12 % (the legacy kg-native path holds
+    # The completed ledger must still close to ~zero. The absolute floor is
+    # 5e-12 % (the legacy kg-native path holds
     # ~7e-13 %; the kernel-routed EVAPORATION_TRANSITION provider
     # introduces an additional ULP per species per transition through
     # the mol -> kg materialization in

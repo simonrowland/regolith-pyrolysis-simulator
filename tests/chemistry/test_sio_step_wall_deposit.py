@@ -216,9 +216,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # overstated D_AB by 1.216%. SiO/N2 at 1973.15 K and 1000 Pa moves
     # 0.0496927555 -> 0.0490955656 m^2/s. The 1050 C cold-liner Si+SiO2
     # deposit follows: 8.452523682217e-06 -> 8.191796266986e-06 (−3.085%).
-    # 2026-09-25 b-324: stage capture now compares flux*area (mol/s) with
-    # the hourly vapor supply converted to mol/s, so more SiO is captured
-    # upstream and the reachable cold-wall load decreases.
+    # 2026-09-25 b-324: stage weights now compare flux*area (mol/s) with the
+    # hourly vapor supply converted to mol/s. The executable stage split moves
+    # the cold-wall value from 8.192e-6 kg to 4.391e-6 kg because more SiO is
+    # captured upstream.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
         4.39057870014e-06, rel=1e-9
     )
@@ -684,15 +685,17 @@ def test_missing_wall_reactivity_class_refuses_only_that_route(monkeypatch):
 
     diagnostic = {}
     telemetry = {}
-    assert _wall_deposition_driving_pressure_pa(
-        "Unobtanium",
-        P_local_pa=100.0,
-        T_surface_K=1000.0,
-        vapor_pressure_data={},
-        reactive_product_backstop=True,
-        antoine_extrapolations=telemetry,
-        diagnostic_out=diagnostic,
-    ) == 0.0
+    with pytest.raises(WallSaturationPressureRefusal) as diagnostic_refusal:
+        _wall_deposition_driving_pressure_pa(
+            "Unobtanium",
+            P_local_pa=100.0,
+            T_surface_K=1000.0,
+            vapor_pressure_data={},
+            reactive_product_backstop=True,
+            antoine_extrapolations=telemetry,
+            diagnostic_out=diagnostic,
+        )
+    assert diagnostic_refusal.value.reason == "missing_reactivity_class"
     assert diagnostic["wall_saturation_pressure_refused"] is True
     assert diagnostic["wall_saturation_pressure_refusal_reason"] == (
         "missing_reactivity_class"

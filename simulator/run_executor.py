@@ -16,7 +16,11 @@ from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
 )
-from simulator.condensation import KnudsenRegimeRefusal
+from simulator.condensation import (
+    DepositionInputRefusal,
+    KnudsenRegimeRefusal,
+    WallSaturationPressureRefusal,
+)
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import (
     BACKEND_FALLBACK_EXCEPTIONS,
@@ -48,6 +52,8 @@ _TYPED_PHYSICS_REFUSALS = (
     VaporPressureRangeError,
     CertifiedPointRefusedError,
     TransportRegimeRefusal,
+    WallSaturationPressureRefusal,
+    DepositionInputRefusal,
 )
 _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,

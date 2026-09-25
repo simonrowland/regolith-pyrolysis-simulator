@@ -11,7 +11,12 @@ from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
 )
-from simulator.condensation import KnudsenRegimeRefusal
+from simulator.condensation import (
+    DepositionInputRefusal,
+    KnudsenRegimeRefusal,
+    WallSaturationPressureRefusal,
+)
+from simulator.evaporation import EvaporationFlux
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.run_executor import (
     RunExecution,
@@ -60,6 +65,62 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.trace, PhysicsTrace)
     assert execution.trace.snapshots == execution.snapshots
     assert isinstance(execution.operator_decisions, tuple)
+
+
+def test_run_executor_completes_all_hot_sio_stage_with_flag():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    simulator = session.simulator
+    simulator.condensation_model.condensation_temperatures_C["SiO"] = 900.0
+    simulator._calculate_evaporation = lambda *_args, **_kwargs: EvaporationFlux(
+        species_kg_hr={"SiO": 1.0},
+        total_kg_hr=1.0,
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert execution.error_message == ""
+    outcomes = (
+        execution.simulator.condensation_model
+        .last_condensation_refusals_by_species["SiO"]["stage_outcomes"]
+    )
+    lower_bound = next(
+        outcome
+        for outcome in outcomes
+        if outcome.get("eta_basis") == "lower_bound_refused_samples_uncaptured"
+    )
+    assert lower_bound["status"] == "status_bearing"
+    assert lower_bound["authority_level"] == "unavailable"
+    assert lower_bound["pending_decision"] == "d-025"
+    assert lower_bound["refused_fraction"] == pytest.approx(1.0)
+    assert lower_bound["eta"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    "refusal",
+    [
+        WallSaturationPressureRefusal("SiO", 1173.15, "wall curve absent"),
+        DepositionInputRefusal("alpha_s", float("nan"), "must be finite"),
+    ],
+    ids=("wall_saturation", "deposition_input"),
+)
+def test_run_executor_classifies_wall_refusals_as_typed(refusal, monkeypatch):
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(refusal),
+    )
+
+    execution = RunExecutor().execute_session(_envelope_session(), hours=1)
+
+    assert execution.status == "refused"
+    assert execution.failure_exception is refusal
+    assert execution.backend_status != "failed"
+    assert not execution.error_message.startswith("backend failure:")
 
 
 def test_run_executor_uses_campaigns_elapsed_override_without_history():

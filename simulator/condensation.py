@@ -49,12 +49,12 @@ by a gate valve after devolatilisation.
 Key physics:
     Live stage efficiency averages 33 series-resistance deposition-flux
     samples over the stage temperature band, then computes:             [COND-1]
-        n_capture = J_band * A_stage * t_res
-        η_stage = clip(n_capture / n_available, 0, 1)
-    Premise: J_band is mol m^-2 s^-1. Unit check:
-    (mol m^-2 s^-1)(m^2)(s) = mol, and mol/mol makes η dimensionless.
+        n_dot = available_kg_hr / (M * 3600)                 [mol s^-1]
+        η_stage = clip(J_band * A_stage / n_dot, 0, 1)
+    Premise: the route supply is kg h^-1 and J_band * A_stage is mol s^-1.
+    The residence time cancels between captured and available parcel moles.
     Sanity: no configured stage area means no physical capture area, so
-    η_stage = 0; enough area or residence time saturates at η_stage = 1.
+    η_stage = 0; sufficient capture rate saturates at η_stage = 1.
 
     A separate total-capture regularizer uses
     ``1 - exp(-t_res / tau_s)``. It allocates a capture budget and is not
@@ -3572,6 +3572,13 @@ class CondensationModel:
                 (item for item in outcomes if item.get('status') == 'extrapolated'),
                 None,
             )
+            status_bearing_outcome = next(
+                (
+                    item for item in outcomes
+                    if item.get('status') == 'status_bearing'
+                ),
+                None,
+            )
             if domain_outcome is not None:
                 authority = condensation_authority_by_species.get(species)
                 if authority is not None:
@@ -3596,9 +3603,15 @@ class CondensationModel:
                     existing['stage_outcomes'] = stage_list
                     condensation_refusals_by_species[species] = existing
                 continue
-            primary = domain_outcome or outcomes[0]
+            primary = domain_outcome or status_bearing_outcome or outcomes[0]
             condensation_refusals_by_species[species] = {
-                'status': 'extrapolated' if domain_outcome else 'pass_through',
+                'status': (
+                    'extrapolated'
+                    if domain_outcome
+                    else 'status_bearing'
+                    if status_bearing_outcome
+                    else 'pass_through'
+                ),
                 'reason': str(primary.get('reason') or 'condensation_efficiency_zero'),
                 'output_status': 'status_bearing',
                 'stage_outcomes': list(outcomes),
@@ -4599,7 +4612,8 @@ class CondensationModel:
 
         band_flux_mol_m2_s = 0.0
         band_samples_used = 0
-        refused_sample: WallSaturationPressureRefusal | None = None
+        band_samples_total = 0
+        refused_sample_reason: str | None = None
         width_C = hi_C - lo_C
         spec = (
             alpha_record.get('alpha_s_coefficient_spec')
@@ -4615,6 +4629,7 @@ class CondensationModel:
                     lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
                 )
             T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+            band_samples_total += 1
             sample_alpha_s = alpha_s_value
             if isinstance(spec, Mapping):
                 alpha_context: dict[str, Any] = {'coefficient_spec': spec}
@@ -4679,38 +4694,22 @@ class CondensationModel:
                     diagnostic_out=rate_diagnostic,
                 )
             except WallSaturationPressureRefusal as exc:
-                _record_refused_sample(T_surface_C, rate_diagnostic, exc)
-                if rate_diagnostic.get(
-                    'wall_saturation_pressure_refusal_type'
-                ) == 'MissingReactivityClassRefusal':
-                    raise
-                if refused_sample is None:
-                    refused_sample = exc
+                reason = _record_refused_sample(
+                    T_surface_C, rate_diagnostic, exc
+                )
+                if refused_sample_reason is None:
+                    refused_sample_reason = reason
                 continue
             if bool(rate_diagnostic.get('wall_saturation_pressure_refused')):
                 reason = _record_refused_sample(T_surface_C, rate_diagnostic)
-                if rate_diagnostic.get(
-                    'wall_saturation_pressure_refusal_type'
-                ) == 'MissingReactivityClassRefusal':
-                    raise WallSaturationPressureRefusal(
-                        species,
-                        T_surface_K,
-                        reason,
-                    )
-                if refused_sample is None:
-                    refused_sample = WallSaturationPressureRefusal(
-                        species,
-                        T_surface_K,
-                        reason,
-                    )
+                if refused_sample_reason is None:
+                    refused_sample_reason = reason
                 continue
             band_flux_mol_m2_s += flux
             band_samples_used += 1
-        if band_samples_used == 0:
-            if refused_sample is not None:
-                raise refused_sample
+        if band_samples_total == 0:
             raise RuntimeError('condensation efficiency sampled no wall temperatures')
-        band_flux_mol_m2_s /= band_samples_used
+        band_flux_mol_m2_s /= band_samples_total
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
                 max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
@@ -4766,6 +4765,34 @@ class CondensationModel:
         # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
         eta_uncapped = float(eta)
         eta = max(0.0, min(1.0, eta))
+        refused_count = band_samples_total - band_samples_used
+        if refused_count:
+            # d-025 leaves two candidate policies for owner adjudication:
+            # mean over authorized samples only, or a lower-bound mean over
+            # every sample with refused fractions uncaptured. Use the latter
+            # pending decision: it is coating-conservative and keeps vapor in
+            # the downstream route instead of aborting the hour.
+            refused_band_outcome = {
+                'status': 'status_bearing',
+                'output_status': 'status_bearing',
+                'authority_level': 'unavailable',
+                'reason': 'wall_saturation_pressure_refused_band_sample',
+                'original_reason': (
+                    refused_sample_reason
+                    or 'wall_saturation_pressure_refused'
+                ),
+                'refused_fraction': refused_count / band_samples_total,
+                'refused_count': refused_count,
+                'total_samples': band_samples_total,
+                'eta_basis': 'lower_bound_refused_samples_uncaptured',
+                'pending_decision': 'd-025',
+                'species': species,
+                'stage_number': int(getattr(stage, 'stage_number', -1)),
+                'T_cond_C': float(T_cond_C),
+                'eta': eta,
+            }
+            if efficiency_outcomes is not None:
+                efficiency_outcomes.append(refused_band_outcome)
         supply_limited = eta_uncapped > 1.0
         if domain_outcome is not None:
             domain_outcome['eta'] = eta
@@ -6857,7 +6884,7 @@ def _wall_deposition_driving_pressure_pa(
     )
     if reactive_product_backstop and declared_reactivity_class is None:
         refusal_reason = "missing_reactivity_class"
-        antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = {
+        refusal_record = {
             "temperature_K": T_surface_K,
             "status": "refused",
             "reason": refusal_reason,
@@ -6866,19 +6893,24 @@ def _wall_deposition_driving_pressure_pa(
             "band_scope": "wall_saturation_pressure",
             "refusal_type": "MissingReactivityClassRefusal",
         }
-        if diagnostic_out is None:
-            raise WallSaturationPressureRefusal(
-                species,
-                T_surface_K,
-                refusal_reason,
+        antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = refusal_record
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = None
+            diagnostic_out["wall_saturation_pressure_refused"] = True
+            diagnostic_out["wall_saturation_pressure_refusal_reason"] = (
+                refusal_reason
             )
-        diagnostic_out["wall_saturation_pressure_pa"] = None
-        diagnostic_out["wall_saturation_pressure_refused"] = True
-        diagnostic_out["wall_saturation_pressure_refusal_reason"] = refusal_reason
-        diagnostic_out["wall_saturation_pressure_refusal_type"] = (
-            "MissingReactivityClassRefusal"
+            diagnostic_out["wall_saturation_pressure_refusal_type"] = (
+                "MissingReactivityClassRefusal"
+            )
+            diagnostic_out["wall_saturation_pressure_notice"] = dict(
+                refusal_record
+            )
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            refusal_reason,
         )
-        return 0.0
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,

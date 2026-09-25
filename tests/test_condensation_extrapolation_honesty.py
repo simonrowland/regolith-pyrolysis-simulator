@@ -148,7 +148,7 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
         additives_kg={}, allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
     execution = RunExecutor().execute(run._session_config())
-    assert execution.status == "failed"
+    assert execution.status == "refused"
     assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
     assert execution.failure_exception.parameter == "stage_area_m2"
     assert execution.failure_exception.terminal_refusal is True
@@ -320,9 +320,13 @@ def test_predict_flag_invalid_wall_input_is_typed_and_terminal(monkeypatch, inva
         allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
     execution = RunExecutor().execute(run._session_config())
-    assert execution.status == "failed"
+    assert execution.status == "refused"
     assert len(execution.snapshots) == 0
-    assert "DepositionInputRefusal" in execution.error_message
+    assert isinstance(
+        execution.failure_exception,
+        condensation.DepositionInputRefusal,
+    )
+    assert "deposition_input_refused" in execution.error_message
     assert "pure_component_antoine.B" in execution.error_message
 
 
@@ -491,7 +495,7 @@ def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, a
         allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
     execution = RunExecutor().execute(run._session_config())
-    assert execution.status == "failed"
+    assert execution.status == "refused"
     assert len(execution.snapshots) == 0
     assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
     assert execution.failure_exception.terminal_refusal is True
@@ -535,7 +539,7 @@ def test_runtime_wall_profile_uses_run_time_after_campaign_transition(monkeypatc
     monkeypatch.setattr(PyrolysisSimulator, "_resolve_lab_surface_temperatures", omit_runtime_knot)
     execution = RunExecutor().execute_session(session, hours=1)
     if missing_knot:
-        assert execution.status == "failed"
+        assert execution.status == "refused"
         assert len(execution.snapshots) == 0
         assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
         assert execution.failure_exception.terminal_refusal is True
@@ -756,12 +760,27 @@ def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeyp
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(0.9)
+    assert eta == pytest.approx(
+        (condensation.HKL_BAND_SAMPLES - 1)
+        / condensation.HKL_BAND_SAMPLES
+        * 3600.0
+        / 4000.0
+    )
     assert calls == condensation.HKL_BAND_SAMPLES
     refused = [item for item in outcomes if item["status"] == "refused"]
     assert len(refused) == 1
     assert refused[0]["authority_level"] == "unavailable"
     assert refused[0]["original_reason"] == "sample refused"
+    lower_bound = next(
+        item for item in outcomes if item["status"] == "status_bearing"
+    )
+    assert lower_bound["refused_fraction"] == pytest.approx(
+        1.0 / condensation.HKL_BAND_SAMPLES
+    )
+    assert lower_bound["eta_basis"] == (
+        "lower_bound_refused_samples_uncaptured"
+    )
+    assert lower_bound["pending_decision"] == "d-025"
 
 
 def test_predict_flag_pareto_unavailable_keeps_extrapolation():
