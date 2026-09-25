@@ -388,14 +388,46 @@ def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
     return formula_composition(formula)
 
 
+def _is_raw_element_label(formula: str) -> bool:
+    """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
+
+    parsed = parse_species_formula(formula)
+    if parsed is None or len(parsed) != 1:
+        return False
+    element, count = parsed[0]
+    return element != "O" and count == 1
+
+
 def match_reported_species(
-    formula: str, reported: Mapping[str, float]
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
 ) -> tuple[str, float] | None:
+    """Closed-formula match. Oxide activity never accepts a raw element label.
+
+    ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
+    map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
+    ``Na`` when this flag is false.
+    """
+
     target = parse_species_formula(formula)
     if target is None:
         return None
+    if oxide_activity and _is_raw_element_label(formula):
+        return None
     for name, value in reported.items():
+        if oxide_activity and _is_raw_element_label(str(name)):
+            continue
         parsed = parse_species_formula(str(name))
+        if parsed == target:
+            return str(name), float(value)
+    if not oxide_activity:
+        return None
+    from engines.alphamelts.domain import canonical_oxide_activity_map
+
+    for name, value in canonical_oxide_activity_map(reported).items():
+        parsed = parse_species_formula(name)
         if parsed == target:
             return str(name), float(value)
     return None
@@ -1390,8 +1422,33 @@ def predict_with_engine(
     else:
         reported = {**activities, **pressures}
 
-    matched = match_reported_species(formula, reported)
-    if matched is None:
+    magnitude: float | None = None
+    converter_reason = ""
+    if quantity is Quantity.ACTIVITY and engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        # The converter refuses Na2O, CaO, MgO, FeO, and K2O. It returns
+        # a(SiO2) from SiO2_Liq. Element labels are not oxide activities.
+        from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+
+        value, converter_reason = melts_endmember_to_parent_oxide_activity(
+            reported, formula,
+        )
+        magnitude = value
+    else:
+        matched = match_reported_species(
+            formula,
+            reported,
+            oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
+        )
+        if matched is not None:
+            _name, magnitude = matched
+    if magnitude is None:
+        detail: dict[str, object] = {
+            "reason": "species_unmatched_in_engine_output",
+            "formula": formula,
+            "reported": sorted(str(name) for name in reported),
+        }
+        if converter_reason:
+            detail["converter"] = converter_reason
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1402,15 +1459,10 @@ def predict_with_engine(
             lineage_complete=False,
             certified_band=certified_band,
             refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "species_unmatched_in_engine_output",
-                "formula": formula,
-                "reported": sorted(reported),
-            },
+            refusal_detail=detail,
             identity=identity,
             requested_composition=requested,
         )
-    _name, magnitude = matched
     if not math.isfinite(magnitude):
         return EnginePrediction(
             engine=engine,

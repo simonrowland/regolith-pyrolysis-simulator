@@ -50,16 +50,30 @@ def _composition(*pairs: tuple[str, str]) -> Composition:
     )
 
 
-def _reference_state() -> State:
+def _reference_state(
+    formula: str = "Na2O",
+    basis: str = "oxide",
+    phase: Phase = Phase.L,
+    convention: ReferenceStateConvention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+) -> State:
     return State.of(StandardState(
-        ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-        Species("Na2O", Phase.L),
-        "oxide",
+        convention,
+        Species(formula, phase),
+        basis,
         Decimal("1"),
     ))
 
 
-def _activity_identity(composition: Composition | None, *, known_reference: bool = True) -> Identity:
+def _activity_identity(
+    composition: Composition | None,
+    *,
+    known_reference: bool = True,
+    formula: str = "Na2O",
+    basis: str = "oxide",
+    species_formula: str | None = None,
+    phase: Phase = Phase.L,
+    convention: ReferenceStateConvention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+) -> Identity:
     composition_state = (
         State.unknown("no composition mapped from source")
         if composition is None
@@ -67,10 +81,14 @@ def _activity_identity(composition: Composition | None, *, known_reference: bool
     )
     return Identity(
         quantity=Quantity.ACTIVITY,
-        species=Species("Na2O", Phase.L),
+        species=Species(species_formula or formula, Phase.L),
         per=State.unknown("test"),
         temperature_K=State.of(Decimal("1473.15")),
-        reference_state=_reference_state() if known_reference else State.unknown("qualifier does not name a reference_state"),
+        reference_state=(
+            _reference_state(formula, basis, phase, convention)
+            if known_reference
+            else State.unknown("qualifier does not name a reference_state")
+        ),
         composition=composition_state,
         fO2_Pa=State.unknown("test"),
         total_pressure_Pa=State.unknown("test"),
@@ -87,6 +105,11 @@ def _case(
     temperature: Value | None = None,
     quantity: Quantity = Quantity.ACTIVITY,
     known_reference: bool = True,
+    formula: str = "Na2O",
+    basis: str = "oxide",
+    species_formula: str | None = None,
+    phase: Phase = Phase.L,
+    convention: ReferenceStateConvention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
 ):
     """One activity row. Pressure, when set, is an interval so engine_point cannot use it."""
     sample_composition = composition
@@ -118,6 +141,11 @@ def _case(
     identity = _activity_identity(
         identity_composition if identity_composition is not None else composition,
         known_reference=known_reference,
+        formula=formula,
+        basis=basis,
+        species_formula=species_formula,
+        phase=phase,
+        convention=convention,
     )
     if quantity is not Quantity.ACTIVITY:
         identity = replace(identity, quantity=State.of(quantity))
@@ -140,8 +168,10 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
+    # SiO2 is a pure-liquid-oxide activity for every activity engine. Na2O is not.
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert [item.readiness.engine for item in results] == list(MELT_ACTIVITY_ENGINES)
@@ -170,6 +200,7 @@ def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
 def test_iron_without_oxygen_is_a_typed_refusal():
     experiment, bench, observation = _case(
         composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
@@ -186,6 +217,7 @@ def test_iron_with_point_oxygen_is_ready():
     experiment, bench, observation = _case(
         composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
         oxygen=Decimal("-9"),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.readiness.status is ReadinessStatus.READY for item in results)
@@ -196,6 +228,7 @@ def test_iron_with_point_oxygen_is_ready():
 def test_zero_iron_does_not_demand_oxygen():
     experiment, bench, observation = _case(
         composition=_composition(("FeO", "0"), ("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.readiness.status is ReadinessStatus.READY for item in results)
@@ -203,7 +236,9 @@ def test_zero_iron_does_not_demand_oxygen():
 
 
 def test_missing_composition_is_refused_and_not_defaulted():
-    experiment, bench, observation = _case(composition=None, identity_composition=None)
+    experiment, bench, observation = _case(
+        composition=None, identity_composition=None, formula="SiO2",
+    )
     # _case copies composition into the identity. Pass unknown on both sides.
     observation = replace(
         observation,
@@ -223,7 +258,9 @@ def test_missing_composition_is_refused_and_not_defaulted():
 def test_identity_composition_outranks_a_different_sample_bulk():
     sample = _composition(("K2O", "0.333"), ("SiO2", "0.667"))
     row = _composition(("K2O", "0.25"), ("SiO2", "0.75"))
-    experiment, bench, observation = _case(composition=sample, identity_composition=row)
+    experiment, bench, observation = _case(
+        composition=sample, identity_composition=row, formula="SiO2",
+    )
     results = _melt(experiment, bench, observation)
     assert results[0].readiness.status is ReadinessStatus.READY
     assert results[0].payload["composition_mol"]["K2O"] == pytest.approx(0.25)
@@ -238,12 +275,16 @@ def test_activity_coefficient_uses_the_same_contract():
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.readiness.status is ReadinessStatus.READY for item in results)
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
-    activity = _melt(*_case(composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6"))))
+    activity = _melt(*_case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+    ))
     assert activity[0].payload["quantity"] == "activity"
     assert activity[0].payload["quantity"] != results[0].payload["quantity"]
     assert activity[0].payload["reference_state"] == results[0].payload["reference_state"]
@@ -284,6 +325,7 @@ def test_unknown_reference_state_is_not_consumed():
 def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
     experiment, bench, observation = _case(
         composition=_composition((oxide, "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
@@ -304,6 +346,7 @@ def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
 def test_iron_alias_without_oxygen_is_a_typed_refusal(alias):
     experiment, bench, observation = _case(
         composition=_composition((alias, "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
@@ -315,6 +358,7 @@ def test_iron_alias_without_oxygen_is_a_typed_refusal(alias):
 def test_zero_iron_does_not_hide_another_multivalent_oxide():
     experiment, bench, observation = _case(
         composition=_composition(("FeO", "0"), ("TiO2", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
@@ -329,10 +373,8 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
         composition=_composition(
             ("Al2O3", "0.1"), ("CaO", "0.2"), ("MgO", "0.1"), ("SiO2", "0.6"),
         ),
-    )
-    observation = replace(
-        observation,
-        identity=replace(observation.identity, species=Species("Ga", Phase.L)),
+        formula="SiO2",
+        species_formula="Ga",
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
@@ -379,6 +421,7 @@ def test_mismatched_reference_state_is_refused(convention, phase, basis, formula
 def test_accepted_reference_is_named_on_the_payload():
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
@@ -396,6 +439,7 @@ def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch)
     )
     experiment, _bench, observation = _case(
         composition=_composition(("TiO2", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
     )
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
@@ -580,6 +624,7 @@ def test_temperature_interval_is_refused():
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         temperature=Value(ValueKind.INTERVAL, interval_low=Decimal("1400"), interval_high=Decimal("1500")),
+        formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert results[0].readiness.status is ReadinessStatus.GAP
@@ -588,3 +633,259 @@ def test_temperature_interval_is_refused():
         for gap in results[0].readiness.gaps
     )
     assert results[0].payload is None
+
+
+def _by_engine(results):
+    return {item.readiness.engine: item for item in results}
+
+
+_MELTS_ACTIVITY = ("alphamelts", "thermoengine")
+_IMCC_ACTIVITY = ("imcc_sf04", "imcc_sf04_ext")
+
+
+def _assert_melts_parent_oxide_refused(item, formula: str) -> None:
+    assert item.payload is None
+    assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    gap = item.readiness.gaps[0]
+    assert gap.waypoint == "reference_state"
+    assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+    assert formula in gap.missing[0]
+    assert "typed-refusal:melts_endmember_not_parent_oxide" in gap.missing[1]
+    assert formula in gap.missing[1]
+
+
+@pytest.mark.parametrize("formula", ["Na2O", "CaO", "MgO", "K2O"])
+@pytest.mark.parametrize("basis", ["oxide", "parent", "parent_oxide"])
+def test_parent_oxide_row_is_ready_only_for_imcc(formula, basis):
+    """Na2O, CaO, MgO, and K2O are IMCC parent activities, not MELTS oxide endmembers."""
+    experiment, bench, observation = _case(
+        composition=_composition((formula, "0.4"), ("SiO2", "0.6")),
+        formula=formula,
+        basis=basis,
+    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    for engine in _IMCC_ACTIVITY:
+        item = results[engine]
+        assert item.readiness.status is ReadinessStatus.READY
+        assert item.payload is not None
+        assert item.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
+        assert "fO2_log" not in item.payload
+    for engine in _MELTS_ACTIVITY:
+        _assert_melts_parent_oxide_refused(results[engine], formula)
+
+
+@pytest.mark.parametrize("basis", ["oxide", "parent", "parent_oxide"])
+def test_feo_parent_row_is_ready_only_for_imcc_when_oxygen_is_printed(basis):
+    experiment, bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        oxygen=Decimal("-7"),
+        formula="FeO",
+        basis=basis,
+    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    for engine in _IMCC_ACTIVITY:
+        item = results[engine]
+        assert item.readiness.status is ReadinessStatus.READY
+        assert item.payload["fO2_log"] == pytest.approx(-7)
+        assert item.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
+    for engine in _MELTS_ACTIVITY:
+        _assert_melts_parent_oxide_refused(results[engine], "FeO")
+
+
+def test_single_cation_formula_with_oxide_token_is_not_scored_as_parent_oxide(monkeypatch):
+    """NaO0.5 is single-cation even when the basis token says oxide. It is not a(Na2O)."""
+    opened: list[str] = []
+
+    def _open(name):
+        opened.append(name)
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"Na2O": 0.2},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="NaO0.5",
+        basis="oxide",
+        species_formula="Na2O",
+    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    assert set(results) == set(MELT_ACTIVITY_ENGINES)
+    for item in results.values():
+        assert item.payload is None
+        assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+        gap = item.readiness.gaps[0]
+        assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+        assert "NaO0.5" in gap.missing[0]
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.IMCC_SF04, Engine.IMCC_SF04_EXT):
+        prediction = predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+        assert prediction.value is None
+        assert prediction.value != Decimal("0.2")
+    assert opened == []
+
+
+def test_na2sio3_endmember_is_not_ready_for_imcc(monkeypatch):
+    opened: list[str] = []
+
+    def _open(name):
+        opened.append(name)
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"Na2SiO3": 0.2, "SiO2": 0.55},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="Na2SiO3",
+        basis="oxide",
+    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    for engine in _IMCC_ACTIVITY:
+        item = results[engine]
+        assert item.payload is None
+        assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+        gap = item.readiness.gaps[0]
+        assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+        assert "Na2SiO3" in gap.missing[0]
+        assert "Na2SiO3" in gap.missing[1]
+    for engine in _MELTS_ACTIVITY:
+        _assert_melts_parent_oxide_refused(results[engine], "Na2SiO3")
+    for engine in (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.ALPHAMELTS):
+        prediction = predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+        assert prediction.value is None
+        assert prediction.value != Decimal("0.2")
+    assert opened == []
+
+
+def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
+    """SiO2_Liq is the raw label. The compared number is a(SiO2). Na, K, and Fe are not."""
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {
+                "SiO2_Liq": 0.42,
+                "Na": 0.08,
+                "K": 0.03,
+                "Fe": 0.25,
+            },
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import match_reported_species, predict_with_engine
+
+    raw = {"SiO2_Liq": 0.42, "Na": 0.08, "K": 0.03, "Fe": 0.25}
+    experiment, _bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Al2O3", "0.4")),
+        formula="SiO2",
+    )
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.IMCC_SF04):
+        prediction = predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+        assert prediction.value == Decimal("0.42")
+        assert prediction.value != Decimal("0.08")
+        assert prediction.value != Decimal("0.03")
+        assert prediction.value != Decimal("0.25")
+
+    element_experiment, _bench, element_observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Al2O3", "0.4")),
+        formula="SiO2",
+        species_formula="Na",
+    )
+    for engine in (Engine.ALPHAMELTS, Engine.IMCC_SF04):
+        element = predict_with_engine(
+            engine, element_observation, experiment=element_experiment, isolated=False,
+        )
+        assert element.value is None
+        assert element.value != Decimal("0.08")
+
+    assert match_reported_species("SiO2", raw, oxide_activity=True) == ("SiO2", 0.42)
+    assert match_reported_species("Na2O", {"Na": 0.2, "K": 0.03, "Fe": 0.25}, oxide_activity=True) is None
+    assert match_reported_species("Na", {"Na": 0.08}, oxide_activity=True) is None
+    assert match_reported_species("Na", {"Na": 0.08}) == ("Na", 0.08)

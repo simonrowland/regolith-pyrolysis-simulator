@@ -47,7 +47,10 @@ from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
-from engines.alphamelts.domain import canonical_melt_oxide_activity_name
+from engines.alphamelts.domain import (
+    canonical_melt_oxide_activity_name,
+    canonical_oxide_activity_map,
+)
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.engine_commissioning import (
     assess_engine_commissioning,
@@ -2359,18 +2362,7 @@ class _MELTSBackendSupport(MeltBackend):
         return MELTS_OXIDE_ALIASES.get(key.lower())
 
     def _canonical_activity_mapping(self, values: Mapping[str, object]) -> dict:
-        activities: Dict[str, float] = {}
-        for raw_name, raw_value in dict(values or {}).items():
-            oxide = canonical_melt_oxide_activity_name(raw_name)
-            if oxide is None:
-                continue
-            try:
-                value = float(raw_value)
-            except (TypeError, ValueError):
-                continue
-            if value > 0.0 and math.isfinite(value):
-                activities.setdefault(oxide, value)
-        return activities
+        return canonical_oxide_activity_map(values)
 
     def _activity_diagnostic_payload(
         self,

@@ -98,11 +98,11 @@ _PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
 class EngineReportedActivity:
     """The activity number this engine reports. A row must match it.
 
-    alphaMELTS ``activity_from_chem_potential`` is pure-liquid-endmember
-    activity. The oxide-component fallback is not that standard state.
-    IMCC ``parent_activity`` is relative to the pure liquid oxide on the
-    parent basis, not the single-cation basis. Nothing here converts one
-    convention into the other.
+    alphaMELTS and ThermoEngine report pure-liquid-endmember activity. That
+    equals a parent-oxide activity only for the MELTS oxide endmembers.
+    IMCC ``parent_activity`` is x* of a parent oxide, relative to the pure
+    liquid oxide. The basis token is not the formula. Nothing here converts
+    one convention into the other.
     """
 
     reported: str
@@ -188,18 +188,77 @@ def _redox_components(composition: Mapping, species: str | None = None) -> tuple
     return tuple(sorted(present))
 
 
-def _reference_matches(state: StandardState, reported: EngineReportedActivity) -> bool:
-    return (
+def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
+    """Pure-liquid-oxide activity exists only for a MELTS oxide endmember.
+
+    An empty activity map has no same-named oxide key, so
+    ``melts_endmember_to_parent_oxide_activity`` returns its typed refusal
+    for every parent that is not itself an oxide endmember (Na2O, CaO, MgO,
+    FeO, K2O, and any other formula). Oxide endmembers only lack a number.
+    The endmember set stays in that function.
+    """
+
+    from engines.alphamelts.domain import (
+        MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
+        melts_endmember_to_parent_oxide_activity,
+    )
+
+    _value, reason = melts_endmember_to_parent_oxide_activity({}, formula)
+    if reason.startswith(MELTS_PARENT_OXIDE_NOT_ENDMEMBER):
+        return False, reason
+    return True, "raoultian_pure_liquid_endmember"
+
+
+def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
+    """IMCC ``parent_activity`` is x* on ``IMCC_PARENT_OXIDES``. Pure limit is 1."""
+
+    from simulator.melt_backend.imcc_sf04.gas import IMCC_PARENT_OXIDES
+
+    if formula in IMCC_PARENT_OXIDES:
+        return True, "raoultian_pure_liquid_oxide_parent"
+    parents = ", ".join(IMCC_PARENT_OXIDES)
+    return False, (
+        f"typed-refusal:not_imcc_parent_oxide:{formula}: "
+        f"IMCC parent_activity is x* on {parents}, pure liquid oxide limit 1"
+    )
+
+
+def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
+    if engine in ("alphamelts", "thermoengine"):
+        return _melts_reports_oxide_endmember(formula)
+    if engine in ("imcc_sf04", "imcc_sf04_ext"):
+        return _imcc_reports_parent_oxide(formula)
+    return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
+
+
+def _reference_matches(
+    state: StandardState, reported: EngineReportedActivity, engine: str,
+) -> tuple[bool, str]:
+    """Convention, phase, basis token, and the endmember formula.
+
+    The basis token is not the formula. ``NaO0.5`` with token ``oxide`` is
+    still the single-cation formula. ``Na2SiO3`` with that token is not an
+    IMCC parent oxide.
+    """
+
+    structural = (
         state.convention is reported.convention
         and phase_token(state.endmember) is reported.phase
         and state.component_basis in reported.component_bases
     )
+    if not structural:
+        return False, reported.reported
+    return _engine_reports_formula(engine, state.endmember.formula)
 
 
 def _reference_labels(state: StandardState, reported: str) -> tuple[str, str]:
     phase = phase_token(state.endmember)
     phase_name = phase.value if phase is not None else "phase_unknown"
-    return f"{state.convention.value}:{phase_name}:{state.component_basis}", reported
+    formula = state.endmember.formula
+    return (
+        f"{state.convention.value}:{phase_name}:{state.component_basis}:{formula}",
+        reported,
+    )
 
 
 def _reference_gap(state: StandardState, reported: str) -> ReadinessGap:
@@ -297,11 +356,12 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     """Activity and activity-coefficient requests for engines that report activities.
 
     Required: a normalized composition, a point temperature, and a reference
-    state that matches the activity that engine reports. An oxygen point is
-    required when the composition or the measured species holds a multivalent
-    element. Pressure and the gas boundary are not inputs. A missing required
-    input is a typed gap. A missing oxygen point is not filled: the scorer
-    must not substitute PO2_ENGINE_DEFAULT for an activity comparison.
+    state whose endmember formula is the activity that engine reports. An
+    oxygen point is required when the composition or the measured species
+    holds a multivalent element. Pressure and the gas boundary are not inputs.
+    A missing required input is a typed gap. A missing oxygen point is not
+    filled: the scorer must not substitute PO2_ENGINE_DEFAULT for an activity
+    comparison.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -364,13 +424,15 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
-        if not _reference_matches(state, reported_activity):
-            # Henrian, 1 wt%, a pure solid, a gas endmember, and a single-cation
-            # basis do not match this engine. Name both conventions. Do not convert.
+        matches, engine_side = _reference_matches(state, reported_activity, engine)
+        if not matches:
+            # Henrian, 1 wt%, a pure solid, a gas endmember, a single-cation
+            # basis, or an endmember formula this engine does not report.
+            # Name both sides. Do not convert.
             results.append(_not_applicable(
                 provenance,
                 engine,
-                (_reference_gap(state, reported_activity.reported),),
+                (_reference_gap(state, engine_side),),
             ))
             continue
         readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)

@@ -502,6 +502,28 @@ def canonical_melt_oxide_activity_name(name: object) -> str | None:
     return None
 
 
+def canonical_oxide_activity_map(values: Mapping[str, object] | None) -> dict[str, float]:
+    """Parent-oxide activities from reported labels.
+
+    This is the map stored as ``diagnostic_oxide_activities``. ``SiO2_Liq``
+    becomes ``SiO2``. A raw element label (``Na``, ``K``, ``Fe``) is not an
+    oxide activity and is omitted. The first positive value for an oxide wins.
+    """
+
+    activities: dict[str, float] = {}
+    for raw_name, raw_value in dict(values or {}).items():
+        oxide = canonical_melt_oxide_activity_name(raw_name)
+        if oxide is None:
+            continue
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if value > 0.0 and math.isfinite(value):
+            activities.setdefault(oxide, value)
+    return activities
+
+
 def melts_endmember_to_parent_oxide_activity(
     endmember_activities: Mapping[str, float],
     parent_oxide: str,
@@ -637,5 +659,6 @@ __all__: Iterable[str] = (
     'MELTS_OXIDE_BASIS',
     'MELTS_PARENT_OXIDE_NOT_ENDMEMBER',
     'canonical_melt_oxide_activity_name',
+    'canonical_oxide_activity_map',
     'melts_endmember_to_parent_oxide_activity',
 )
