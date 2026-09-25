@@ -154,13 +154,13 @@ experiments:
       state: {tag: value, value: Pre-melted alkali borosilicate glass melt}
       locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
     container:
-      state: {tag: value, value: Small platinum shuttle, 100x10x10 mm3}
+      state: {tag: value, value: 'Small platinum shuttle, 100x10x10 mm3'}
       locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
     characterization:
       state: {tag: value, value: Alkali borosilicate glass melt}
       locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
     pretreatment:
-      state: {tag: value, value: Cullets melted in a platinum crucible at a maximum 1500 C, poured into graphite mould, then cooled from 200 K above Tg to room temperature at 30 K/h}
+      state: {tag: value, value: 'Cullets melted in a platinum crucible at a maximum 1500 C, poured into graphite mould, then cooled from 200 K above Tg to room temperature at 30 K/h'}
       locator: {published_page: 206, pdf_page_index: 2, section: Experimental}
   conditions:
     temperature_K:
@@ -172,7 +172,7 @@ experiments:
       locator: {published_page: 207, pdf_page_index: 3, table: '1', note: 'Printed 1000 hPa; unit conversion only'}
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: Synthetic atmosphere and water vapour are described, but gas components and flow are not printed}
+      locator: {published_page: 206, pdf_page_index: 2, section: Experimental, note: 'Synthetic atmosphere and water vapour are described, but gas components and flow are not printed'}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control: &fo2_unknown
@@ -924,7 +924,7 @@ species:
 
     - observation_id: dacko_2004_figure2_weight_loss_qualitative
       type: mass_loss
-      locator: {published_page: 208, pdf_page_index: 4, figure: '2', note: Weight loss per surface area versus time at 0.2, 0.4, and 1 bar; qualitative figure retained without coordinate digitization}
+      locator: {published_page: 208, pdf_page_index: 4, figure: '2', note: 'Weight loss per surface area versus time at 0.2, 0.4, and 1 bar; qualitative figure retained without coordinate digitization'}
       phase: glass
       regime: transpiration
       units: figure-only qualitative result
@@ -1082,7 +1082,7 @@ refused:
   locator: {published_page: 207, pdf_page_index: 3, table: '1'}
 - what: Numeric c2 coefficients for NaOH, NaBO2, and HBO2
   why: The three Table 4 C2 cells are blank in the PDF; blank is not zero and no value was invented.
-  locator: {published_page: 211, pdf_page_index: 7, table: '4', note: rows Na2O/NaOH, Na2O/NaBO2, B2O3/HBO2}
+  locator: {published_page: 211, pdf_page_index: 7, table: '4', note: 'rows Na2O/NaOH, Na2O/NaBO2, B2O3/HBO2'}
 - what: Numeric coordinates digitized from Figure 2
   why: Figure 2 is retained as figure-only qualitative evidence; its plotted points duplicate Table 1 and were not digitized.
   locator: {published_page: 208, pdf_page_index: 4, figure: '2'}

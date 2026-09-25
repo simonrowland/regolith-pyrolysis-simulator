@@ -102,7 +102,7 @@ experiments:
       locator: {published_page: 1, section: 'opening methods paragraphs', note: 'No single run setpoint; source prints a series start and upper extent'}
   thermal_schedule:
     method:
-      state: {tag: value, value: Stepwise heating, about 50 C steps}
+      state: {tag: value, value: 'Stepwise heating, about 50 C steps'}
       locator: {published_page: 1, section: 'opening methods paragraphs'}
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '18000', approximate: true}}

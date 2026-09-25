@@ -27,10 +27,10 @@ experiments:
 - experiment_id: tga-ega-simulant-series
   bench_id: labsys-evo-thermostar
   method: thermogravimetry_evolved_gas_analysis
-  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI, CM, and CR prototype simulants measured at NASA JSC ARES}
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 'CI, CM, and CR prototype simulants measured at NASA JSC ARES'}
   sample:
     printed_composition:
-      state: {tag: value, value: CI, CM, and CR asteroid-simulant prototypes}
+      state: {tag: value, value: 'CI, CM, and CR asteroid-simulant prototypes'}
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
   pressure_environment:
     total_pressure_Pa:
@@ -56,7 +56,7 @@ experiments:
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 'Heating rate and ambient start are printed, but no duration is stated'}
 fidelity_samples:
 - species: CI_Asteroid_Simulant
   observable: gibbs_table
@@ -326,7 +326,7 @@ species:
       standard_state: integrated TG mass loss from ambient to 1000 °C as printed
       regime: tga_ega_flowing_helium
       units: wt% and °C as printed
-      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 11.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C}
+      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 11.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: 'modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C'}
       uncertainty: {note: none printed}
   CR_Asteroid_Simulant:
     observations:
@@ -357,5 +357,5 @@ species:
       standard_state: integrated TG mass loss from ambient to 1000 °C as printed
       regime: tga_ega_flowing_helium
       units: wt% and °C as printed
-      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 3.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C}
+      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 3.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: 'modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C'}
       uncertainty: {note: none printed}

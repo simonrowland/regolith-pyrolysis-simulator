@@ -106,7 +106,7 @@ benches:
       locator: {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2'}
     uncertainty:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 14, published_page: 3052, section: '3.1', note: The printed +/-0.5 C is temperature stability, not calibration uncertainty}
+      locator: {page: 14, published_page: 3052, section: '3.1', note: 'The printed +/-0.5 C is temperature stability, not calibration uncertainty'}
   other_facts:
   - name: cell_body_height
     unit: mm
@@ -127,7 +127,7 @@ benches:
     unit: mm
     value:
       state: {tag: value, value: {kind: categorical, categorical: '0.5 or 0.3'}}
-      locator: {page: 13, published_page: 3051, section: '3.1', note: Discrete alternatives, not an interval; no pairing with lid thickness printed}
+      locator: {page: 13, published_page: 3051, section: '3.1', note: 'Discrete alternatives, not an interval; no pairing with lid thickness printed'}
   - name: offered_lid_thicknesses_not_run_assignments
     unit: mm
     value:
@@ -143,14 +143,14 @@ experiments:
   experiment_id: fe-v-series
   bench_id: rm6k
   method: knudsen_effusion
-  locator: {page: 15, published_page: 3053, section: '3.2', note: Reported Fe-V measurement series, not a claim of one physical charge or one configuration}
+  locator: {page: 15, published_page: 3053, section: '3.2', note: 'Reported Fe-V measurement series, not a claim of one physical charge or one configuration'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
       locator: &loading_locator {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
     printed_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 3054, table: '2', note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal assays, not charge compositions}
+      locator: {published_page: 3054, table: '2', note: 'Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal assays, not charge compositions'}
     form:
       state: {tag: value, value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise}
       locator: *loading_locator
@@ -184,7 +184,7 @@ experiments:
     pumping:
       base_pressure_Pa:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 13, published_page: 3051, note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure}
+        locator: {page: 13, published_page: 3051, note: 'The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure'}
   thermal_schedule:
     method:
       state: {tag: value, value: 'Temperature-dependent measurements. At >=1600 C, limited to about 1 h due to thermocouple wear. Solid N_V=0.796 and 0.900 scans stepped low-high-low twice, about 4 h overall. No numerical heating rate or universal measurement hold printed.'}
@@ -196,7 +196,7 @@ experiments:
     channel: {tag: unknown, reason: not_published}
     buffer:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 15, published_page: 3053, section: '3.2', note: Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified oxygen buffer or pO2}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: 'Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified oxygen buffer or pO2'}
 - <<: *binary_series
   experiment_id: fe-v-cr-series
   locator: {published_page: 3057, table: '3', note: Reported Fe-V-Cr measurement series; per-run orifice and charge mass not assigned}
@@ -226,7 +226,7 @@ experiments:
       locator: {published_page: '3052-3053', section: '3.1; 3.2'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 15, published_page: 3053, section: '3.2', note: Per-run duration unassigned; about 1 h is a conditional limit, not a duration for every run}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: 'Per-run duration unassigned; about 1 h is a conditional limit, not a duration for every run'}
 - <<: *binary_series
   experiment_id: fe-v-solid-scan-series
   locator: {page: 16, published_page: 3054, section: '4.2', note: Explicitly reported scans at N_V=0.796 and 0.900; not an additional inferred charge. Table 2 aggregates several protocols and is not reassigned here}

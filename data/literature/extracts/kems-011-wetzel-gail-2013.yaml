@@ -37,7 +37,7 @@ experiments:
 - experiment_id: sio-film-measurement-series
   bench_id: wetzel-uhv-film-apparatus
   method: knudsen_effusion
-  locator: {page: 2, section: '2.1', note: Source describes a measurement series, not one physical film or one thermal configuration}
+  locator: {page: 2, section: '2.1', note: 'Source describes a measurement series, not one physical film or one thermal configuration'}
   sample:
     printed_composition:
       state: {tag: value, value: 'Commercial SiO (Mateck), 99.9% pure, -325 mesh, CAS no. 10097-28-6'}
@@ -46,10 +46,10 @@ experiments:
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 2, section: '2.1', note: Knudsen cell named, but no orifice diameter printed}
+        locator: {page: 2, section: '2.1', note: 'Knudsen cell named, but no orifice diameter printed'}
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 2, section: '2.1', note: Knudsen cell named, but no orifice channel length printed}
+        locator: {page: 2, section: '2.1', note: 'Knudsen cell named, but no orifice channel length printed'}
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}

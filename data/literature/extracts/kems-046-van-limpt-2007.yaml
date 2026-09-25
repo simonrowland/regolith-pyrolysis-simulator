@@ -50,7 +50,7 @@ benches:
     state: {tag: value, value: Electrically heated horizontal Al2O3 tube furnace}
     locator: {page: 127, section: '3.2.1'}
   detector:
-    state: {tag: value, value: Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser}
+    state: {tag: value, value: 'Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser'}
     locator: {page: 127, section: '3.2.2', figure: '3.2'}
   temperature_measurement:
     sensor:
@@ -66,10 +66,10 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.025'}}
       locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
     printed_composition:
-      state: {tag: value, value: Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions}
+      state: {tag: value, value: 'Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions'}
       locator: {page: 127, section: '3.2.1'}
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -84,7 +84,7 @@ experiments:
       locator: {page: 127, section: '3.2.1', note: Carrier-gas experiment; no total run pressure printed}
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 127, section: '3.2.2', note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are not}
+      locator: {page: 127, section: '3.2.2', note: 'N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are not'}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:

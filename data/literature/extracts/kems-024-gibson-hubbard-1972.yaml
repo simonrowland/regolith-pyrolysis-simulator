@@ -143,7 +143,7 @@ benches:
     state: {tag: value, value: platinum crucible}
     locator: *procedures
   detector:
-    state: {tag: value, value: continuously recorded sample weight, temperature, and in some experiments evolved-gas composition}
+    state: {tag: value, value: 'continuously recorded sample weight, temperature, and in some experiments evolved-gas composition'}
     locator: *procedures
 experiments:
 - experiment_id: lunar-volatilization-series
@@ -172,7 +172,7 @@ experiments:
     channel: {tag: unknown, reason: not_published}
     buffer: {state: {tag: unknown, reason: not_published}, locator: *procedures}
   thermal_schedule:
-    method: {state: {tag: value, value: Heated at 4 or 6 C/min to 950, 1050, 1200, or 1400 C; run assignments are not printed}, locator: *procedures}
+    method: {state: {tag: value, value: 'Heated at 4 or 6 C/min to 950, 1050, 1200, or 1400 C; run assignments are not printed'}, locator: *procedures}
     total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: Most runs held 2 h; one 950/1050 C set held 1-72 h; no universal duration}}
     cooling_or_quench: {state: {tag: value, value: normal cooling curve; 1400 C to room temperature required 4 h}, locator: *procedures}
 species:

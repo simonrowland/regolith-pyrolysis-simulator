@@ -18,7 +18,7 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Sample Analysis at Mars (SAM) evolved gas analysis system}
-    locator: {pdf_page_index: 7, section: '2.1-2.2', note: SAM has two ovens and QMS, GC, and TLS gas-analysis instruments}
+    locator: {pdf_page_index: 7, section: '2.1-2.2', note: 'SAM has two ovens and QMS, GC, and TLS gas-analysis instruments'}
   heating_method:
     state: {tag: value, value: Quartz-cup oven ramp for evolved gas analysis}
     locator: {pdf_page_index: 7, section: '2.2'}
@@ -46,7 +46,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -94,7 +94,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -142,7 +142,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -190,7 +190,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -238,7 +238,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -286,7 +286,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -334,7 +334,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -382,7 +382,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -430,7 +430,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -478,7 +478,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 7, section: '2.2', note: Each result is from a temperature ramp, not one setpoint}
+      locator: {pdf_page_index: 7, section: '2.2', note: 'Each result is from a temperature ramp, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -526,7 +526,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 8, section: '2.3', note: Blank is described as a control, not with a separate setpoint}
+      locator: {pdf_page_index: 8, section: '2.3', note: 'Blank is described as a control, not with a separate setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '2500', approximate: true}}
@@ -1070,7 +1070,7 @@ species:
         - {field: high_temperature_release_C, value: '~800 and >850', locator: {pdf_page_index: 18, figure: '10', column: 'CO release window'} }
     - observation_id: jgr_2024_refused_supplementary_tables
       type: data_availability
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.5', note: Main PDF references Tables S1-S9, but the supplied corpus PDF does not contain those supplementary tables'}
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.5', note: 'Main PDF references Tables S1-S9, but the supplied corpus PDF does not contain those supplementary tables'}
       units: as printed
       values: {status: refused, reason: 'The cited supplementary tables are not present in the supplied source material; exact table-row values cannot be transcribed without inventing them.', method_class: measured_direct}
     - observation_id: jgr_2024_refused_per_run_fugacity

@@ -45,7 +45,7 @@ experiments:
       state: {tag: value, value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm}
       locator: *wimpenny_laser
     pretreatment:
-      state: {tag: value, value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons}
+      state: {tag: value, value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'}
       locator: *wimpenny_laser
   conditions:
     temperature_K:
@@ -67,11 +67,11 @@ experiments:
       regime_class: {tag: unknown, reason: not_published}
   thermal_schedule:
     method:
-      state: {tag: value, value: Samples first melted above liquidus over 20-60 s, then rapidly ramped to target temperature.}
+      state: {tag: value, value: 'Samples first melted above liquidus over 20-60 s, then rapidly ramped to target temperature.'}
       locator: *wimpenny_laser
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed 1-120 s is target-temperature duration after a separate 20-60 s melt stage, not total run duration.}
+      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: 'Printed 1-120 s is target-temperature duration after a separate 20-60 s melt stage, not total run duration.'}
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1873.15', interval_high: '2473.15'}}

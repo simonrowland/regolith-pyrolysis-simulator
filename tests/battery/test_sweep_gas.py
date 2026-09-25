@@ -59,11 +59,14 @@ def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
                       if e.experiment_id.endswith("::tms-n2-glass-series"))
     payload = json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
     # 4702a4d92 preserves each printed original beside a converted scalar.
-    # The sweep-gas value is unchanged; the larger payload and new digest are
-    # the explicit conversion-provenance fields added to its experiment.
-    assert len(payload) == 2637
+    # SC-289 restores the comma-truncated temperature note ("Higher
+    # temperatures than KMS are stated, but no numerical temperature or
+    # interval is printed for this series") and duration note ("Higher
+    # temperatures than KMS stated, but no single duration printed"), adding
+    # 101 bytes to this extract-derived payload.
+    assert len(payload) == 2738
     assert hashlib.sha256(payload).hexdigest() == (
-        "bee143595612dfc9be00d3e1b40724a5678bb04ba38d3616735c18570fda0ac7"
+        "6060c29202f5d63c3ecd15a27b0b615e247ea819180dbbb10231e5246854a7c5"
     )
     assert experiment_from_plain(to_plain(experiment)) == experiment
 

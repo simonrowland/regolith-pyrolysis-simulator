@@ -164,7 +164,7 @@ experiments:
         locator: *b138_apparatus
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 3, published_page: 3, note: Thickness-to-radius ratio 1 and Clausing factor 0.67 are printed, not a channel length}
+        locator: {page: 3, published_page: 3, note: 'Thickness-to-radius ratio 1 and Clausing factor 0.67 are printed, not a channel length'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
@@ -184,7 +184,7 @@ experiments:
       locator: {page: 3, published_page: 3, table: '3'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 3, published_page: 3, table: '3', note: 12 h at 1622 K applies to one Ga2O3 isotherm, not every series run}
+      locator: {page: 3, published_page: 3, table: '3', note: '12 h at 1622 K applies to one Ga2O3 isotherm, not every series run'}
 - experiment_id: in2o3-series
   bench_id: finnigan-mat-271-ir
   method: knudsen_effusion

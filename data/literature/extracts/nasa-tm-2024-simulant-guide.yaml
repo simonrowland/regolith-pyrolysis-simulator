@@ -99,7 +99,7 @@ species:
         - {simulant: OPRH3N, region: Highlands, SiO2: 46.0, TiO2: 2.5, Al2O3: 25.4, FeO: 4.7, MgO: 2.2, CaO: 16.9, Na2O: 2.3, K2O: 0.0, reference: APL SAR 2021}
         - {simulant: OPRH4W30, region: Highlands, SiO2: 48.1, TiO2: 0.2, Al2O3: 30.3, FeO: 1.7, MgO: 1.1, CaO: 15.2, Na2O: 2.3, K2O: 0.1, reference: OPR Datasheet}
         - {simulant: OPRL2N, region: High-Ti Mare, SiO2: 46.2, TiO2: 5.5, Al2O3: 16.6, FeO: 12.9, MgO: 2.7, CaO: 12.9, Na2O: 3.2, K2O: 0.0, reference: APL SAR 2021}
-      uncertainty: {note: No numerical uncertainties printed; K2O 0.0 values are printed table values, not inferred absence.}
+      uncertainty: {note: 'No numerical uncertainties printed; K2O 0.0 values are printed table values, not inferred absence.'}
 
     - observation_id: nasa_tm_2024_table10_particle_size_distribution
       type: rate_series
@@ -184,7 +184,7 @@ species:
         - {simulant: OB-1A, region: Highlands, rho_min_g_cm3: 1.51, rho_max_g_cm3: 1.63, reference: APL SAR 2022}
         - {simulant: OPRH3N, region: Highlands, rho_min_g_cm3: 1.32, rho_max_g_cm3: 1.50, reference: APL SAR 2022}
         - {simulant: OPRL2N, region: High-Ti Mare, rho_min_g_cm3: 1.31, rho_max_g_cm3: 1.54, reference: APL SAR 2022}
-      uncertainty: {note: No numerical uncertainties printed; GreenSpar and OPRH4W30 are n/a, not zero.}
+      uncertainty: {note: 'No numerical uncertainties printed; GreenSpar and OPRH4W30 are n/a, not zero.'}
 
     - observation_id: nasa_tm_2024_table19_shear_strength
       type: rate_series
