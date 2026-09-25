@@ -6664,6 +6664,7 @@ def _pressure_located(
     printed_key: str,
     published: str,
     quote: str | None,
+    source_derivation: str | None,
 ) -> Located[Value] | None:
     si, trail = convert_pressure_to_pa(amount_in_printed_unit, units)
     if si is None or si <= 0 or trail is None:
@@ -6677,7 +6678,7 @@ def _pressure_located(
         if quote:
             extras.append(f"quote={quote}")
         inference = Derivation(
-            relation=base.relation,
+            relation=source_derivation.strip() if source_derivation else base.relation,
             inputs=base.inputs + tuple(extras),
             parameters=base.parameters,
             output_unit=base.output_unit,
@@ -6807,6 +6808,11 @@ def _walk_printed_oxygen(
                 located = _pressure_located(
                     amount, units, locator,
                     printed_key=name, published=published, quote=quote_text,
+                    source_derivation=(
+                        str(node.get("derivation")).strip()
+                        if isinstance(node.get("derivation"), str)
+                        else None
+                    ),
                 )
                 if located is None or not located.state.is_value:
                     continue
@@ -8337,6 +8343,18 @@ class Migrator:
             )
         elif q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
+        if raw_adm == AdmissionStatus.ADMITTED.value:
+            oxygen = collect_printed_oxygen(
+                (values,), locator, skip_tables=True
+            ).oxygen_partial_pressure_Pa
+            if oxygen is not None and oxygen.state.is_value:
+                oxygen_value = oxygen.state.value
+                if (
+                    isinstance(oxygen_value, Value)
+                    and oxygen_value.kind is ValueKind.POINT
+                    and oxygen_value.point is not None
+                ):
+                    ident_kwargs["fO2_Pa"] = State.of(oxygen_value.point)
         if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         elif t_known is None and t_sel.condition_ranges:
