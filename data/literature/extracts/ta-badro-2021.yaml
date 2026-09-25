@@ -398,6 +398,29 @@ experiments:
     printed_composition:
       state: {tag: value, value: '12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%'}
       locator: {published_page: 105, pdf_page_index: 5, table: '1'}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [MgO, '0.179376771290376']
+          - [SiO2, '0.461253133088141']
+          - [Al2O3, '0.112268146557385']
+          - [CaO, '0.247101949064097']
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - Printed nominal starting recipe: MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: Approximately 2 mm spherical glass sample}
       locator: {published_page: 105, pdf_page_index: 5}

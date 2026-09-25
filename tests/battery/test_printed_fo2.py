@@ -167,6 +167,32 @@ def test_sossi_table_row_keeps_its_printed_log(tmp_path: Path) -> None:
     assert isinstance(obs.point_conditions["fO2_log"].state.value, Decimal)
 
 
+def test_author_ratio_po2_is_derived_not_printed() -> None:
+    from simulator.battery.migrate import collect_author_ratio_oxygen
+
+    located = collect_author_ratio_oxygen(
+        [{
+            "po2_over_pK_as_published": 0.226,
+            "P_K_atm_as_published": 6.91e-7,
+            "P_O2_atm": 1.56166e-7,
+        }],
+        _page(279),
+    )
+    assert located is not None
+    assert located.inference is not None
+    assert "author_ratio_P_O2_atm" in located.inference.relation
+    assert located.state.value.point == atm_to_pa(Decimal("1.56166e-7"))
+
+    assert collect_author_ratio_oxygen(
+        [{
+            "po2_over_pK_as_published": 0.226,
+            "P_K_atm_as_published": 6.91e-7,
+            "P_O2_atm": 9.99e-7,
+        }],
+        _page(279),
+    ) is None
+
+
 # Printed per-run log fO2 that sat under ``rows``/``runs``, or in the unscored
 # context container, never reached the store. Those tables are per-run series,
 # so they use the ``series`` key the landing machinery iterates (the sossi-2019
@@ -187,8 +213,12 @@ def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
     )
     stem = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
     parent = f"{stem}::holzheid_1997_table3a_ad_co_variable_mgo"
-    points = _exploded_points(result, parent)
-    assert len(points) == 8
+    run_points = [
+        _exploded_points(result, f"{parent}_1_{run}")
+        for run in range(1, 9)
+    ]
+    assert [len(points) for points in run_points] == [1] * 8
+    points = [run[0] for run in run_points]
     first = points[0]
     located = first.point_conditions["fO2_log"]
     assert located.state.value == Decimal("-9.63")

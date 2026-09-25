@@ -13,6 +13,7 @@ from simulator.battery.enums import MethodToken
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
+    _prefer_located,
     apparatus_from_equipment,
     experiment_from_plain,
     map_method,
@@ -21,8 +22,18 @@ from simulator.battery.migrate import (
     sample_from_equipment,
     to_plain,
 )
-from simulator.battery.records import as_decimal
+from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
+    exact = Located(State.of(Value.point_of("0.01333223684210526315789473684")))
+    approximate = Located(
+        State.of(Value(ValueKind.POINT, point=as_decimal("0.01333223684210526315789473684"), approximate=True))
+    )
+    merged = _prefer_located(exact, approximate)
+    assert merged is approximate
+    assert merged.state.value.approximate is True
 
 
 @pytest.mark.parametrize(
@@ -58,8 +69,9 @@ def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> Non
     assert text.count(f"'{_YAM_EMF_PROCEDURE_SECTION}'") == 6
 
     doc = yaml.safe_load(text)
-    experiment = doc["experiments"][0]
-    assert experiment["experiment_id"] == "na2o-sio2-emf-series"
+    experiment = next(
+        item for item in doc["experiments"] if item["experiment_id"] == "na2o-sio2-emf-series"
+    )
     assert experiment["method"] == "emf_cell"
     assert experiment["locator"]["page"] == 738
     assert experiment["locator"]["section"] == _YAM_EMF_PROCEDURE_SECTION

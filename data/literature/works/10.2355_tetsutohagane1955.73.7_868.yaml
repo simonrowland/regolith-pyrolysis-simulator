@@ -189,38 +189,7 @@ experiments:
         locator:
           published_page: 868
           section: Synopsis
-          note: Printed 1200-1600 C, converted endpoints only
-        inference:
-          relation: celsius_to_kelvin
-          inputs:
-          - T_K = T_C + 273.15
-          - original_unit=C
-          parameters:
-          - - original_low
-            - state:
-                tag: value
-                value: '1200'
-              locator:
-                published_page: 868
-                section: Synopsis
-                note: Printed 1200-1600 C, converted endpoints only
-          - - original_high
-            - state:
-                tag: value
-                value: '1600'
-              locator:
-                published_page: 868
-                section: Synopsis
-                note: Printed 1200-1600 C, converted endpoints only
-          - - factor
-            - state:
-                tag: value
-                value: '273.15'
-              locator:
-                published_page: 868
-                section: Synopsis
-                note: Printed 1200-1600 C, converted endpoints only
-          output_unit: K
+          note: Printed 1200-1600 C
 benches:
 - id: 10.2355/tetsutohagane1955.73.7_868::bench::rm6e
   work_id: 10.2355/tetsutohagane1955.73.7_868

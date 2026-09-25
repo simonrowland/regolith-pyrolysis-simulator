@@ -120,7 +120,7 @@ experiments:
     characterization:
       state:
         tag: value
-        value: Quenched glasses analyzed by EPMA and, for low S, SIMS
+        value: Quenched glasses analyzed by EPMA and
       locator:
         page: 152
         section: 2.3 Analyses
@@ -152,30 +152,7 @@ experiments:
       locator:
         page: 152
         section: 2.2 Experimental conditions
-        note: Atmospheric pressure, 1 atm; unit conversion only.
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              page: 152
-              section: 2.2 Experimental conditions
-              note: Atmospheric pressure, 1 atm; unit conversion only.
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 152
-              section: 2.2 Experimental conditions
-              note: Atmospheric pressure, 1 atm; unit conversion only.
-        output_unit: Pa
+        note: Atmospheric pressure
     sweep_gas:
       state:
         tag: value
@@ -206,7 +183,7 @@ experiments:
     buffer:
       state:
         tag: value
-        value: Air/SO2 ratios 0.11, 0.60, and 4.00; oxidizing fO2 above FMQ, calculated from thermodynamic data
+        value: Air/SO2 ratios 0.11
       locator:
         page: 152
         section: 2.2 Experimental conditions
@@ -240,7 +217,7 @@ experiments:
       locator:
         page: 152
         table: '2'
-        note: Table gives 10 h at lower temperatures, 8 h at 1723 K, and 6 h at 1773 K; no universal duration.
+        note: Table gives 10 h at lower temperatures
     cooling_or_quench:
       state:
         tag: value

@@ -1,6 +1,9 @@
 from dataclasses import replace
 from decimal import Decimal
 import math
+from pathlib import Path
+
+import yaml
 
 import pytest
 
@@ -9,11 +12,12 @@ from simulator.battery.generators import engine_point_requests, kems_case, vacuu
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
-    FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry, Located,
+    Derivation, FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry,
+    Located,
 )
 from simulator.battery.waypoints import (
     charge_moles_by_species, oxygen_condition, consumer_readiness,
-    WaypointAuthority, ReadinessStatus, GapReason,
+    WaypointAuthority, ReadinessStatus, GapReason, UnknownCompositionRelationError,
 )
 from tests.battery import factories as f
 
@@ -98,6 +102,150 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
 
 
+def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = replace(experiment, pressure_environment=replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=f.located(
+            Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("1e-4")),
+            note="printed vacuum during run",
+        ),
+    ))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    oxygen = inputs.waypoints["oxygen_condition"].selected
+    assert oxygen is not None
+    assert oxygen.route == "vacuum_total_pressure_upper_bound"
+    assert oxygen.authority is WaypointAuthority.EXTRAPOLATED
+    assert oxygen.value.point == Decimal("-9")
+    assert oxygen.notice is not None
+    assert "upper bound from printed vacuum 0.0001 Pa" in oxygen.notice
+    assert "bound, not a measurement" in oxygen.notice
+    results = engine_point_requests(inputs)
+    assert all(result.payload is not None for result in results)
+    for result in results:
+        output = result.provenance["output_routes"]["fO2_log"]
+        assert output["authority"] == "extrapolated"
+        assert output["method_class"] == "calculated"
+        assert output["notice"] == oxygen.notice
+
+
+def test_converted_printed_run_vacuum_supplies_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    pressure = Located(
+        State.of(Value.point_of("0.01333223684210526315789473684")),
+        locator=f.loc(note="printed vacuum during run"),
+        inference=Derivation(
+            "Torr_to_Pa",
+            ("P_Pa = P_Torr × 101325 / 760", "original_unit=Torr"),
+            (),
+            "Pa",
+        ),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=pressure
+        ),
+    )
+    selected = oxygen_condition(experiment, bench, observation).selected
+    assert selected is not None
+    assert selected.route == "vacuum_total_pressure_upper_bound"
+    assert selected.value.point == pytest.approx(Decimal("-6.8750969798670607"))
+
+
+def test_approximate_printed_run_vacuum_stays_approximate():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value(ValueKind.POINT, point=Decimal("1e-5"), approximate=True),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    selected = oxygen_condition(experiment, bench, observation).selected
+    assert selected is not None
+    assert selected.route == "vacuum_total_pressure_upper_bound"
+    assert selected.value.approximate is True
+    assert selected.notice is not None
+    assert "approximate upper bound from printed vacuum 0.00001 Pa" in selected.notice
+
+
+def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
+    experiment, bench, observation = case(pressure="1e-4")
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator="<",
+                    bound_value=Decimal("1e-4"),
+                ),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    printed_result = oxygen_condition(experiment, bench, observation)
+    assert {route.route for route in printed_result.routes} == {
+        "observation_fO2_log",
+        "vacuum_total_pressure_upper_bound",
+    }
+    assert printed_result.selected is not None
+    assert printed_result.selected.authority is WaypointAuthority.PRINTED
+    assert printed_result.selected.route == "observation_fO2_log"
+
+    derived_observation = replace(observation, point_conditions={
+        "temperature_K": f.located(Decimal(1400)),
+        "fO2_Pa": f.located(Value.point_of("1e-5")),
+    })
+    derived_result = oxygen_condition(experiment, bench, derived_observation)
+    assert {route.route for route in derived_result.routes} == {
+        "observation_fO2_Pa_to_log_fO2",
+        "vacuum_total_pressure_upper_bound",
+    }
+    assert derived_result.selected is not None
+    assert derived_result.selected.authority is WaypointAuthority.DERIVED
+    assert derived_result.selected.route == "observation_fO2_Pa_to_log_fO2"
+
+
+def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False)
+    pressure = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=Located(State.unknown("apparatus-only ultimate vacuum")),
+        pumping={"base_pressure_Pa": f.located(Value.point_of("1e-4"))},
+    )
+    experiment = replace(experiment, pressure_environment=pressure)
+    result = oxygen_condition(experiment, bench, observation)
+    assert result.selected is None
+    assert not any(route.route == "vacuum_total_pressure_upper_bound" for route in result.routes)
+
+
+def test_inferred_run_pressure_refuses_oxygen_bound():
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    inferred = Located(
+        State.of(Value.point_of("1e-4")),
+        locator=f.loc(note="vacuum inferred from gas load and pumping speed"),
+        inference=Derivation("Q_over_S", ("Q", "S"), (), "Pa"),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=inferred,
+        ),
+    )
+    result = oxygen_condition(experiment, bench, observation)
+    assert result.selected is None
+    assert not any(
+        route.route == "vacuum_total_pressure_upper_bound" for route in result.routes
+    )
+
+
 def test_buffer_derivation_and_domain():
     experiment, bench, observation = case(oxygen=False, pressure="100000")
     experiment = replace(experiment, fO2_control=FO2Control(State.unknown("buffer"), buffer=f.located("IW")))
@@ -179,6 +327,116 @@ def test_engine_inputs_all_eight_and_provenance():
     inferred = replace(bench, identity=BenchIdentity(BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE, reason="embedded"))
     result = engine_point_requests(collect_consumer_inputs(experiment, inferred, observation))[0]
     assert result.provenance["bench_identity"]["basis"] == "inferred_from_embedded_evidence"
+
+
+def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice():
+    root = Path(__file__).parents[2]
+    path = root / "data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml"
+    extract = yaml.safe_load(path.read_text(encoding="utf-8"))
+    experiments = {
+        item["experiment_id"]: item for item in extract["experiments"] if item.get("sample")
+    }
+    mixes = {}
+    recipe_extract = yaml.safe_load(
+        (root / "data/literature/extracts/yam1983.yaml").read_text(encoding="utf-8")
+    )
+    recipe_relation = recipe_extract["experiments"][0]["sample"]["initial_composition"]["inference"]["relation"]
+    measured_relation = next(iter(experiments.values()))["sample"]["initial_composition"]["inference"]["relation"]
+    assert {recipe_relation, measured_relation} == {
+        "calculated_from_printed_recipe_or_aimed_target",
+        "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction",
+    }
+
+    def collect_mix_values(value):
+        if isinstance(value, dict):
+            if value.get("run") is not None and value.get("starting_mix") is not None:
+                mixes.setdefault(value["run"], set()).add(value["starting_mix"])
+            for child in value.values():
+                collect_mix_values(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_mix_values(child)
+
+    collect_mix_values(extract)
+    assert len(experiments) == 36
+    assert len(mixes) == 36
+    assert all(len(values) == 1 for values in mixes.values())
+    expected_components = {
+        "Metalloids": {
+            "CaO": "0.184173189820", "Al2O3": "0.061040917494", "SiO2": "0.407498649620",
+            "MgO": "0.226385291377", "FeO": "0.119155024992", "CuO0.5": "0.000872226180",
+            "ZnO": "0.000874700516",
+        },
+        "Cu-Zn": {
+            "CaO": "0.178646943159", "Al2O3": "0.059209341645", "SiO2": "0.395271364779",
+            "MgO": "0.219592440789", "FeO": "0.115579694296", "CuO0.5": "0.014498540589",
+            "ZnO": "0.017201674743",
+        },
+    }
+
+    for experiment in experiments.values():
+        mix = next(iter(mixes[experiment["locator"]["record"]]))
+        composition = experiment["sample"]["initial_composition"]
+        value = composition["state"]["value"]
+        species = dict(value["components"])
+        assert species == expected_components[mix]
+        assert value["basis"] == "sossi_2020_measured_oxide_mole_fraction"
+        assert composition["method_class"] == "calculated"
+        assert composition["inference"]["relation"] == "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction"
+        assert "FeO" in species and "Fe2O3" not in species
+        assert "CuO0.5" in species and "ZnO" in species
+        assert f"starting_material_measured_concentrations[{mix}]" in " ".join(composition["inference"]["inputs"])
+
+    experiment, bench, observation = case()
+    composition = Composition("printed_recipe", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation=recipe_relation, inputs=("recipe",), parameters=(), output_unit="mole_fraction"),
+    ))
+    result = engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))[0]
+    assert result.payload["composition_method_class"] == "calculated"
+    assert "calculated from printed recipe/aimed target" in result.payload["composition_notice"]
+    assert "calculated from measured composition" not in result.payload["composition_notice"]
+    assert "recipe" in result.payload["composition_notice"]
+    route = result.provenance["output_routes"]["composition_mol"]
+    assert route["method_class"] == "calculated"
+    assert route["notice"] == result.payload["composition_notice"]
+
+    measured_sample = replace(sample, initial_composition=replace(
+        sample.initial_composition,
+        inference=replace(sample.initial_composition.inference, relation=measured_relation),
+    ))
+    measured_result = engine_point_requests(
+        collect_consumer_inputs(replace(experiment, sample=measured_sample), bench, observation)
+    )[0]
+    assert "calculated from measured composition" in measured_result.payload["composition_notice"]
+    assert measured_result.provenance["output_routes"]["composition_mol"]["notice"] == measured_result.payload["composition_notice"]
+
+
+def test_unknown_composition_relation_refuses_loudly():
+    experiment, bench, observation = case()
+    composition = Composition("unknown_relation", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation="not_a_production_relation", inputs=("unknown",), parameters=(), output_unit="mole_fraction"),
+    ))
+    with pytest.raises(UnknownCompositionRelationError, match="unknown normalized composition relation"):
+        engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))
+
+
+def test_production_wt_pct_relation_reaches_engine_notice():
+    experiment, bench, observation = case()
+    composition = Composition("printed_oxides", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
+    sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
+        State.of(composition), locator=f.loc(),
+        inference=Derivation(relation="wt_pct_to_mole_fraction", inputs=("original_unit=wt_pct",), parameters=(), output_unit="mole_fraction"),
+    ))
+    result = engine_point_requests(
+        collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    )[0]
+    assert result.payload["composition_method_class"] == "calculated"
+    assert "calculated from printed oxide wt% composition" in result.payload["composition_notice"]
+    assert result.provenance["output_routes"]["composition_mol"]["notice"] == result.payload["composition_notice"]
 
 
 @pytest.mark.parametrize("name", ["temperature_K", "total_pressure_Pa", "fO2_log"])

@@ -467,6 +467,38 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
+def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"]["series"][0][
+        "point_conditions"
+    ] = {
+        "total_pressure_Pa": {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "interval",
+                    "interval_low": "10",
+                    "interval_high": "20",
+                },
+            }
+        }
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    point = next(
+        observation
+        for observation in result.observations.values()
+        if observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == as_decimal("1200")
+    )
+    pressure = point.point_conditions["total_pressure_Pa"]
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.INTERVAL
+    assert pressure.state.value.interval_low == as_decimal("10")
+    assert pressure.state.value.interval_high == as_decimal("20")
+
+
 def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["values"].pop("admission_status")
@@ -1114,6 +1146,283 @@ def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
     assert child_obs.derived_from == ("fixture-source::raw_parent",)
 
 
+def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+
+    measured = yaml.safe_load(yaml.safe_dump(base))
+    measured["observation_id"] = "measured_parent"
+    measured["values"].pop("series", None)
+    measured["values"]["method_class"] = "measured_direct"
+    measured["values"]["pressure_atm"] = 1.0
+
+    recipe = yaml.safe_load(yaml.safe_dump(measured))
+    recipe["observation_id"] = "recipe_composition"
+    recipe["values"]["method_class"] = "calculated"
+    recipe["values"]["derived_from"] = "measured_parent"
+    recipe["values"]["composition_wt_pct"] = {"SiO2": 60.0, "MgO": 40.0}
+    recipe["values"]["inference"] = {
+        "relation": "recipe_to_mole_fraction",
+        "inputs": ["measured_parent"],
+        "output_unit": "mole_fraction",
+    }
+
+    author = yaml.safe_load(yaml.safe_dump(measured))
+    author["observation_id"] = "author_calculation"
+    author["values"]["method_class"] = "calculated"
+    author["values"]["derived_from"] = "measured_parent"
+    author["values"]["composition_wt_pct"] = {"SiO2": 60.0, "MgO": 40.0}
+    author["values"]["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": ["measured_parent"],
+        "output_unit": "Pa",
+    }
+
+    extract["species"]["Na"]["observations"] = [measured, recipe, author]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+
+    recipe_obs = result.observations["fixture-source::recipe_composition"]
+    author_obs = result.observations["fixture-source::author_calculation"]
+    assert recipe_obs.evidence.class_.is_unknown
+    assert author_obs.evidence.class_.is_value
+    assert author_obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+
+
+def test_calculated_regime_fallback_still_requires_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["regime"] = "calculated"
+    row["values"].pop("method_class", None)
+    row["values"].pop("series", None)
+    row["values"]["pressure_atm"] = 1.0
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.evidence.class_.is_unknown
+    assert not any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_calculated_rejected_parent_cannot_be_measured_ancestry(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "rejected_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"]["admission_status"] = "typed_refusal"
+    parent["values"]["reason"] = "input measurement invalid: calibration failed"
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = "calculated_child"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["admission_status"] = "admitted"
+    child["values"]["derived_from"] = "rejected_parent"
+    child["values"]["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": ["rejected_parent"],
+        "output_unit": "Pa",
+    }
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    parent_obs = result.observations["fixture-source::rejected_parent"]
+    child_obs = result.observations["fixture-source::calculated_child"]
+
+    assert parent_obs.admission.status is AdmissionStatus.REJECTED
+    assert child_obs.evidence.class_.is_unknown
+    assert not any(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_calculated_series_conversion_is_not_author_derivation(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"]["pressure_atm"] = 1.0
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = "calculated_series"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["derived_from"] = "measured_parent"
+    child["values"].pop("pressure_atm", None)
+    child["values"]["series"] = [{"T_K": 1200.0, "pressure_atm": 1.0}]
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "calculated_series" in observation.observation_id
+    ]
+
+    assert len(points) == 1
+    assert points[0].derivation is not None
+    assert points[0].derivation.relation == "atm_to_Pa"
+    assert points[0].evidence.class_.is_unknown
+
+
+def test_calculated_series_as_published_is_not_author_derivation(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"] = {
+        "quantity": "activity_coefficient",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "gamma": 0.8,
+    }
+    child = yaml.safe_load(yaml.safe_dump(base))
+    child.update({"observation_id": "calculated_as_published", "type": "activity_coefficient"})
+    child["values"] = {
+        "quantity": "activity_coefficient",
+        "method_class": "calculated",
+        "admission_status": "admitted",
+        "derived_from": ["measured_parent"],
+        "series": [{"T_K": 1200.0, "gamma": 0.5}],
+    }
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "calculated_as_published" in observation.observation_id
+    ]
+
+    assert len(points) == 1
+    assert points[0].derivation is not None
+    assert points[0].derivation.relation == "as_published"
+    assert points[0].evidence.class_.is_unknown
+
+
+def test_calculated_areal_conversion_keeps_author_derivation(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units="mg/cm2",
+        values={
+            "quantity": "mass_loss_areal_density",
+            "method_class": "calculated",
+            "admission_status": "admitted",
+            "derived_from": ["measured_parent"],
+            "derivation": {
+                "relation": "author_mass_balance_reduction",
+                "inputs": ["measured_parent"],
+                "output_unit": "kg_per_m2",
+            },
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    parent = yaml.safe_load(yaml.safe_dump(extract["species"]["Na"]["observations"][0]))
+    parent["observation_id"] = "measured_parent"
+    parent["values"] = {
+        "quantity": "mass_loss_areal_density",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "delta_q": "1.0",
+    }
+    extract["species"]["Na"]["observations"].insert(0, parent)
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert observation.derivation is not None
+    assert observation.derivation.relation == "author_mass_balance_reduction"
+    assert observation.derivation.output_unit == "kg_per_m2"
+    assert not result.validation.hard_issues
+
+
+def test_calculated_lineage_closes_independent_of_row_order(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+
+    def derived_row(observation_id: str, parent_id: str) -> dict:
+        row = yaml.safe_load(yaml.safe_dump(base))
+        row["observation_id"] = observation_id
+        row["values"].pop("series", None)
+        row["values"]["method_class"] = "calculated"
+        row["values"]["derived_from"] = parent_id
+        row["values"]["derivation"] = {
+            "relation": "author_mass_balance_reduction",
+            "inputs": [parent_id],
+            "output_unit": "Pa",
+        }
+        return row
+
+    parent = yaml.safe_load(yaml.safe_dump(base))
+    parent["observation_id"] = "measured_parent"
+    parent["values"].pop("series", None)
+    parent["values"]["method_class"] = "measured_direct"
+    middle = derived_row("calculated_middle", "measured_parent")
+    child = derived_row("calculated_child", "calculated_middle")
+    extract["species"]["Na"]["observations"] = [child, middle, parent]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    for observation_id in ("calculated_middle", "calculated_child"):
+        observation = result.observations[f"fixture-source::{observation_id}"]
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+
+
+def test_typed_refusal_preserves_admission_reason(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["admission_status"] = "typed_refusal"
+    row["values"]["reason"] = "curves have no printed numeric table"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "curves have no printed numeric table"
+
+
+def test_typed_refusal_preserves_refusal_reason_field(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["admission_status"] = "typed_refusal"
+    row["values"]["refusal_reason"] = "LiquidFractionInvalidError"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "LiquidFractionInvalidError"
+
+
+def test_bare_typed_refusal_method_is_rejected(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"].pop("admission_status", None)
+    row["values"]["method_class"] = "typed_refusal"
+    row["values"]["reason"] = "no printed numeric value"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == "no printed numeric value"
+
+
 def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:
     from simulator.battery.migrate import METHOD_CLASS_MAP, evidence_for
 
@@ -1579,6 +1888,23 @@ def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Pat
     assert exp.sample.form.state.value == "powder"
 
 
+def test_h01_sample_volume_cm3_is_stored_as_m3(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "sample_volume_cm3": {"value": 0.25, "locator": {"table": "2"}},
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    volume = result.experiments[obs.experiment_id].sample.volume_m3
+    assert volume is not None and volume.state.is_value
+    assert volume.state.value.kind is ValueKind.POINT
+    assert volume.state.value.point == as_decimal("0.00000025")
+    assert volume.inference is not None
+    assert volume.inference.relation == "cm3_to_m3"
+    assert volume.locator is not None and volume.locator.table == "2"
+
+
 def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"] = [
@@ -1680,21 +2006,24 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
     source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
     stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
     first = {
-        "bischof_2023_gao15_gamma_s1_1low_polytherm": Decimal("0.0632"),
-        "bischof_2023_gao15_gamma_s2_1low_isotherm": Decimal("0.0353"),
-        "bischof_2023_ino15_gamma_s1_1low_polytherm": Decimal("0.0527"),
-        "bischof_2023_ino15_gamma_s2_1low_isotherm": Decimal("0.0211"),
-    }
-    first_ids = {
-        "bischof_2023_gao15_gamma_s1_1low_polytherm": "T=1586.4:h=d85a6d52fc92",
-        "bischof_2023_gao15_gamma_s2_1low_isotherm": "T=1741.9:h=9b2744505ed4",
-        "bischof_2023_ino15_gamma_s1_1low_polytherm": "T=1586.4:h=5d7ac09ddf55",
-        "bischof_2023_ino15_gamma_s2_1low_isotherm": "T=1741.9:h=4913a4df11f4",
+        "bischof_2023_gao15_gamma_s1_1low_polytherm": ("1586.4", Decimal("0.0632")),
+        "bischof_2023_gao15_gamma_s2_1low_isotherm": ("1741.9", Decimal("0.0353")),
+        "bischof_2023_ino15_gamma_s1_1low_polytherm": ("1586.4", Decimal("0.0527")),
+        "bischof_2023_ino15_gamma_s2_1low_isotherm": ("1741.9", Decimal("0.0211")),
     }
     by_id = {o["observation_id"]: o for o in stored["observations"]}
-    for suffix, gamma in first.items():
-        oid = f"kems-137-bischof-2023::{suffix}::{first_ids[suffix]}"
-        obs = by_id[oid]
+    for suffix, (temperature, gamma) in first.items():
+        prefix = f"kems-137-bischof-2023::{suffix}::T={temperature}:"
+        matches = [
+            obs
+            for oid, obs in by_id.items()
+            if oid.startswith(prefix)
+            and (obs.get("identity") or {}).get("quantity", {}).get("value")
+            == "activity_coefficient"
+            and Decimal(str((obs.get("value") or {}).get("point"))) == gamma
+        ]
+        assert len(matches) == 1, (suffix, temperature, gamma, matches)
+        obs = matches[0]
         q = obs["identity"]["quantity"]
         assert q.get("value") == "activity_coefficient"
         assert Decimal(str(obs["value"]["point"])) == gamma
@@ -1980,6 +2309,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if len(candidates) != 1:
             return None
         return _num(candidates[0][1])
+    if q_token == "transition_temperature":
+        if "T_K" in item:
+            return _num(item.get("T_K"))
+        if "T_C" in item:
+            amount = _num(item.get("T_C"))
+            return None if amount is None else amount + as_decimal("273.15")
+        return None
     if q_token in _CENSUS_PERCENT_FRACTION_QUANTITIES:
         candidates = [
             (key, value)
@@ -2060,10 +2396,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
-def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], list[str], int, int]:
+def _series_census(
+    extracts: Path, extracts_v2: Path
+) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal
 
     census: dict[str, int] = {}
+    per_source: dict[str, dict[str, int]] = {}
     mismatches: list[str] = []
     n_numeric = 0
     n_unavailable = 0
@@ -2148,6 +2487,8 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
                     n_numeric += 1
                     label = q_token if q_token is not None else "unknown"
                     census[label] = census.get(label, 0) + 1
+                    source_census = per_source.setdefault(source_id, {})
+                    source_census[label] = source_census.get(label, 0) + 1
                     if stored_q.get("value") != label:
                         mismatches.append(
                             f"{oid} stored quantity {stored_q.get('value')!r} != declared {label}"
@@ -2160,7 +2501,7 @@ def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], l
                     got = Decimal(str(stored_val.get("point")))
                     if got != expected:
                         mismatches.append(f"{oid} stored {got} != source {expected} for {label}")
-    return census, mismatches, n_numeric, n_unavailable
+    return census, mismatches, n_numeric, n_unavailable, per_source
 
 
 def test_j01_store_census_series_numeric_matches_declared_field() -> None:
@@ -2168,16 +2509,24 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
-    census, mismatches, n_numeric, n_unavailable = _series_census(extracts, extracts_v2)
+    census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
+        extracts, extracts_v2
+    )
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
     assert census.get("activity_coefficient") == 128
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
-    assert census.get("p_partial") == 69
+    # Re-pinned once on this tree with _series_census (mismatches 0) against
+    # 7923cfb59. Numeric series counts moved only for:
+    #   jaggi-2021-mercury-atmosphere p_partial +6
+    #   ta-shirai-2000-lpsc evaporation_coefficient_alpha +6
+    #   kems-005-fedkin-2006 evaporation_coefficient_alpha +12
+    # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
+    assert census.get("p_partial") == 75
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 12
+    assert census.get("evaporation_coefficient_alpha") == 30
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -2186,7 +2535,15 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert census.get("evaporation_rate") == 25
     assert census.get("mass_loss_fraction") == 19
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 274, (n_numeric, census, n_unavailable)
+    # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
+    # adds 58 printed T_C points, routed as transition_temperature. The
+    # Ueshima per-source delta is numeric 0->58 and model_derived 0->58;
+    # mismatches remains 0.
+    assert census.get("transition_temperature") == 58
+    assert per_source.get("ueshima-1982-fe-mo-thermal") == {
+        "transition_temperature": 58
+    }
+    assert n_numeric == 356, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
@@ -2231,7 +2588,9 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         n_mutated += 1
     assert n_mutated == 9, n_mutated
     fedkin.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
-    _census, mismatches, _n_numeric, _n_unavailable = _series_census(extracts, dest)
+    _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
+        extracts, dest
+    )
     assert mismatches, "census must go red when stored alpha points are corrupted"
 
 
@@ -3383,6 +3742,7 @@ def test_g1_delta_fh_mapping_mutation_proof() -> None:
 def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -> None:
     names = (
         "jaggi-2021-mercury-atmosphere.yaml",
+        "ta-shirai-2000-lpsc.yaml",
         "thomas-wood-2021-chlorine-silicate-melts.yaml",
         "ueshima-1982-fe-mo-thermal.yaml",
         "ta-mendybaev-2002-lpsc.yaml",
@@ -3400,28 +3760,80 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
         assert any(obs.source_id == source_id for obs in result.observations.values())
 
     experiments = result.experiments
-    assert any(eid.endswith("::experiment::mercury-magma-ocean-model-cases") for eid in experiments)
-    assert any(eid.endswith("::experiment::cl-solubility-cmas-icb-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::femo-thermal-analysis-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::b133-vacuum-1800C-loop-series") for eid in experiments)
-    assert any(eid.endswith("::experiment::sio2-langmuir-ir-loop-1800C") for eid in experiments)
-    assert any(eid.endswith("::experiment::standard-pyrolysis-600C") for eid in experiments)
-
-    jaggi = next(
-        exp for eid, exp in experiments.items()
-        if eid.endswith("::experiment::mercury-magma-ocean-model-cases")
+    shirai_work_id = "c31f435ac3571abcf67819bf20c1353e15212bf08549e6c62bc389b6c5667bbf"
+    canonical_experiment_ids = {
+        f"{shirai_work_id}::experiment::{experiment_id}"
+        for experiment_id in (
+            "shirai-fig1a-1300-pO2-1e-8",
+            "shirai-fig1a-1300-pO2-1e-9",
+            "shirai-fig1a-1300-pO2-1e-10",
+            "shirai-fig1b-1400-pO2-1e-8",
+            "shirai-fig1b-1400-pO2-1e-9",
+            "shirai-fig1b-1400-pO2-1e-10",
+            "shirai-flow-check-1400-pO2-1e-9",
+        )
+    }
+    canonical_experiment_ids.update(
+        {
+            "10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series",
+            "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series",
+            "10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series",
+            "902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series",
+            "7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C",
+            "8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::standard-pyrolysis-600C",
+        }
     )
-    assert jaggi.fO2_control is not None
-    assert jaggi.fO2_control.channel.is_value
-    assert jaggi.fO2_control.channel.value is FO2Channel.BUFFER
+    assert canonical_experiment_ids <= set(experiments)
 
-    ueshima = next(
-        exp for eid, exp in experiments.items()
-        if eid.endswith("::experiment::femo-thermal-analysis-series")
-    )
-    temperature = ueshima.conditions["temperature_K"]
+    shirai = experiments[
+        f"{shirai_work_id}::experiment::shirai-fig1a-1300-pO2-1e-8"
+    ]
+    assert shirai.fO2_control is not None
+    assert shirai.fO2_control.channel.is_value
+    assert shirai.fO2_control.channel.value is FO2Channel.GAS_MIX
+
+    ueshima = experiments[
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series"
+    ]
+    assert ueshima.thermal_schedule is not None
+    assert ueshima.thermal_schedule.setpoints_and_holds
+    temperature = ueshima.thermal_schedule.setpoints_and_holds[0].temperature_K
     assert temperature.state.is_value
     assert temperature.state.value.kind is ValueKind.INTERVAL
+
+    # Table 2 prints no operating pressure. The extract records that as
+    # point_conditions.total_pressure_Pa unknown/not_published, and the
+    # identity must carry that state rather than a contradictory absence claim.
+    standards = (
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_fe_a4_standard",
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_fe_melting_standard",
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard",
+    )
+    for oid in standards:
+        pressure = result.observations[oid].identity.total_pressure_Pa
+        assert pressure is not None and pressure.is_unknown
+        assert pressure.reason == "not_published"
+        assert pressure.value is None
+        assert not any(
+            entry.observation_id == oid
+            and entry.why == "source does not state a numeric total_pressure_Pa"
+            for entry in result.queue
+        )
+    table4 = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.startswith(
+            "ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis"
+        )
+    ]
+    assert table4
+    assert all(
+        obs.identity.total_pressure_Pa is not None
+        and obs.identity.total_pressure_Pa.is_unknown
+        and obs.identity.total_pressure_Pa.reason
+        == "source does not state a numeric total_pressure_Pa"
+        for obs in table4
+    )
 
     works, loaded_experiments, loaded_observations = load_migrated_store(root)
     assert works and loaded_experiments and loaded_observations
@@ -3429,9 +3841,17 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
         obs.source_id == "ueshima-1982-fe-mo-thermal"
         for obs in loaded_observations.values()
     )
-    assert any(
-        eid.endswith("::experiment::femo-thermal-analysis-series")
-        for eid in loaded_experiments
+    for oid in standards:
+        loaded = loaded_observations[oid].identity.total_pressure_Pa
+        assert loaded is not None and loaded.is_unknown
+        assert loaded.reason == "not_published"
+    assert (
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series"
+        in loaded_experiments
+    )
+    assert (
+        "10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series"
+        in loaded_experiments
     )
 
 
@@ -3446,6 +3866,11 @@ def test_registry_tagged_condition_mutation_proof(monkeypatch: pytest.MonkeyPatc
         ).read_text(encoding="utf-8")
     )["experiments"][0]
     raw = dict(raw)
+    raw["conditions"] = {
+        "temperature_K": raw["thermal_schedule"]["setpoints_and_holds"][0][
+            "temperature_K"
+        ]
+    }
     raw["method"] = "knudsen_effusion"
     live = experiment_from_plain(raw)
     assert live.conditions["temperature_K"].state.value.kind is ValueKind.INTERVAL
@@ -5051,6 +5476,111 @@ def test_pyrolysis_yield_quantities_are_not_collapsed() -> None:
         units="wt_percent",
     )
     assert not model.is_value
+
+
+def test_areal_mass_loss_routes_delta_q_to_kg_per_m2(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units="mg/cm2; T C; P hPa",
+        values={
+            "quantity_as_printed": "delta_q",
+            "method_class": "measured_direct",
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = result.observations["fixture-source::na_psat"]
+    assert quantity_token(obs.identity) is Quantity.MASS_LOSS_AREAL_DENSITY
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("0.0555184")
+    assert obs.derivation is not None
+    assert obs.derivation.relation == "mg_per_cm2_to_kg_per_m2"
+    assert obs.derivation.output_unit == "kg_per_m2"
+
+
+@pytest.mark.parametrize(
+    ("units", "expected", "relation"),
+    [
+        ("g/m2", "0.00555184", "g_per_m2_to_kg_per_m2"),
+        ("mg/m2", "0.00000555184", "mg_per_m2_to_kg_per_m2"),
+    ],
+)
+def test_areal_mass_loss_contradiction_matches_converter(
+    tmp_path: Path, units: str, expected: str, relation: str
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_areal_density",
+        units=units,
+        values={
+            "quantity_as_printed": "delta_q",
+            "method_class": "measured_direct",
+            "delta_q": "5.55184",
+        },
+        obs_type="mass_loss",
+    )
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    obs = result.observations["fixture-source::na_psat"]
+
+    assert quantity_token(obs.identity) is Quantity.MASS_LOSS_AREAL_DENSITY
+    assert obs.value.point == as_decimal(expected)
+    assert obs.derivation is not None
+    assert obs.derivation.relation == relation
+
+
+def test_fugacity_series_routes_bar_to_pa_without_partial_pressure(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    measured = yaml.safe_load(yaml.safe_dump(base))
+    measured["observation_id"] = "measured_parent"
+    measured["values"] = {
+        "quantity": "pure_Psat",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "pressure_atm": 1.0,
+    }
+    fugacity = yaml.safe_load(yaml.safe_dump(base))
+    fugacity.update(
+        {
+            "observation_id": "agI_cl_007_fugacity",
+            "type": "fugacity_series",
+            "units": "bar",
+            "values": {
+                "method_class": "calculated",
+                "admission_status": "admitted",
+                "derived_from": ["measured_parent"],
+                "derivation": {
+                    "relation": "agcl_agi_mass_balance",
+                    "inputs": ["fixture-source::measured_parent"],
+                    "output_unit": "Pa",
+                },
+                "series": [{"T_K": 1200.0, "fCl2_bar": "3.37E-04"}],
+            },
+        }
+    )
+    extract["species"]["Na"]["observations"] = [measured, fugacity]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(
+        item
+        for item in result.observations.values()
+        if "agI_cl_007_fugacity" in item.observation_id
+    )
+    assert quantity_token(obs.identity) is Quantity.FUGACITY
+    assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("33.7")
+    assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert obs.derivation is not None
+    assert obs.derivation.relation == "agcl_agi_mass_balance"
+    assert obs.derivation.output_unit == "Pa"
+    original = dict(obs.derivation.parameters)["original"]
+    assert original.state.value == as_decimal("3.37E-04")
+    assert original.locator == obs.locator
+    assert not result.validation.hard_issues
 
 
 def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None:

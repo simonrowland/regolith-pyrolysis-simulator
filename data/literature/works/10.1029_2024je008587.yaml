@@ -59,7 +59,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -177,7 +177,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -295,7 +295,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -413,7 +413,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -532,7 +532,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -650,7 +650,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -768,7 +768,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -886,7 +886,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1004,7 +1004,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1121,7 +1121,7 @@ experiments:
       locator:
         pdf_page_index: 8
         section: '2.3'
-        note: Blank is described as a control, not with a separate setpoint
+        note: Blank is described as a control
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1239,7 +1239,7 @@ experiments:
       locator:
         pdf_page_index: 7
         section: '2.2'
-        note: Each result is from a temperature ramp, not one setpoint
+        note: Each result is from a temperature ramp
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -1332,7 +1332,7 @@ benches:
     locator:
       pdf_page_index: 7
       section: 2.1-2.2
-      note: SAM has two ovens and QMS, GC, and TLS gas-analysis instruments
+      note: SAM has two ovens and QMS
   pumping_type:
     state:
       tag: unknown
@@ -1914,7 +1914,8 @@ context:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
     pdf_page_index: 7
     section: 2.1-2.5
-    note: Main PDF references Tables S1-S9, but the supplied corpus PDF does not contain those supplementary tables
+    note: Main PDF references Tables S1-S9
+    but the supplied corpus PDF does not contain those supplementary tables': null
   units: as printed
   values:
     status: refused

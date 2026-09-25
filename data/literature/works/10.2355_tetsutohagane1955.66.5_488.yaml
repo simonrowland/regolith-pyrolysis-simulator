@@ -156,30 +156,7 @@ experiments:
         locator:
           published_page: 488
           section: Synopsis
-          note: Printed 1600 C, converted only
-        inference:
-          relation: celsius_to_kelvin
-          inputs:
-          - T_K = T_C + 273.15
-          - original_unit=C
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '1600'
-              locator:
-                published_page: 488
-                section: Synopsis
-                note: Printed 1600 C, converted only
-          - - factor
-            - state:
-                tag: value
-                value: '273.15'
-              locator:
-                published_page: 488
-                section: Synopsis
-                note: Printed 1600 C, converted only
-          output_unit: K
+          note: Printed 1600 C
 benches:
 - id: 10.2355/tetsutohagane1955.66.5_488::bench::rm6k
   work_id: 10.2355/tetsutohagane1955.66.5_488

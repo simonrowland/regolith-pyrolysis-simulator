@@ -137,7 +137,7 @@ experiments:
   locator:
     page: 525
     section: 5.1 Starting Materials
-    note: Type B CAI-like evaporation series; Table 1 retains per-run temperature, pressure, area and duration
+    note: Type B CAI-like evaporation series; Table 1 retains per-run temperature
   bench_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   thermal_schedule:
     total_duration_s:
@@ -205,7 +205,7 @@ benches:
   heating_method:
     state:
       tag: value
-      value: Three furnaces for vacuum, hydrogen, and gas-mixing pressure regimes
+      value: Three furnaces for vacuum
     locator:
       page: 525
       section: 5.2 Experimental Procedure

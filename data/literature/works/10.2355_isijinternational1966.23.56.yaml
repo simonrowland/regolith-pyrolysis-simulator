@@ -55,7 +55,7 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: Pure Fe, pure Sn, and OFHC Cu weighed to desired composition
+        value: Pure Fe
       locator:
         page: 2
         published_page: 56
@@ -119,7 +119,7 @@ experiments:
         locator:
           page: 5
           published_page: 60
-          note: 0.3 mm usually used, but no per-row assignment for Fe-Sn-Cu table
+          note: 0.3 mm usually used
       orifice_channel_length_m:
         state:
           tag: value
@@ -160,7 +160,7 @@ experiments:
       locator:
         page: 5
         published_page: 60
-        note: Printed t=7200 s belongs to depletion calculation, not a measurement hold
+        note: Printed t=7200 s belongs to depletion calculation
 - experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   kind: literature
   method:
@@ -178,7 +178,7 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays, not charge composition
+        value: Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays
       locator:
         page: 2
         published_page: 56
@@ -303,7 +303,7 @@ experiments:
       locator:
         page: 5
         published_page: 60
-        note: 7200 s is the printed depletion-model time, not a universal experimental hold
+        note: 7200 s is the printed depletion-model time
 - experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   kind: literature
   method:
@@ -416,7 +416,7 @@ benches:
       locator:
         page: 2
         published_page: 56
-        note: Printed +/-1 C is temperature fluctuation, not calibration uncertainty
+        note: Printed +/-1 C is temperature fluctuation
   other_facts:
   - name: temperature_fluctuation_magnitude
     value:

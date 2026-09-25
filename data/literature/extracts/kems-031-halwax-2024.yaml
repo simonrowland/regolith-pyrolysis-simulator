@@ -155,6 +155,11 @@ species:
         - sample_surface_area
         missing_note: Lid orifice diameter 0.3 mm stated without channel length — Clausing not invented.
           Sample free-surface area not stated (powder load ~50 mg).
+      equipment:
+        chamber_pressure:
+          value: 1.0e-05
+          units: mbar
+          locator: {page: 825, section: 'III. Experimental', note: 'Starting chamber pressure as printed; unit conversion only'}
       uncertainty:
         note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
     - observation_id: halwax_2024_mgo_third_law_formation_enthalpy
@@ -915,6 +920,7 @@ species:
         source_row: This Study
         delta_H_sub_kJ_mol: 422.0
         mean_temperature_K: 1727.0
+        T_K_as_published: 1727.0
         cell_quote: 422 ± 4
         text_quote: The result was an enthalpy of 422 ± 4 kJ/mol at a temperature of 1727 K.
         T_range_quote: the change of the vapor pressure of Ni was recorded in a temperature range from about 1650 K to 1800 K

@@ -223,8 +223,7 @@ experiments:
     pretreatment:
       state:
         tag: value
-        value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for
-          30 min, and quenched
+        value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched
       locator:
         page: 4
         section: 2.1 Sample preparation
@@ -284,7 +283,7 @@ experiments:
   locator:
     page: 5
     table: '2'
-    note: Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge
+    note: Runs 1_low
   apparatus:
     cell_material_and_liner:
       state:
@@ -328,7 +327,7 @@ experiments:
       locator:
         page: 5
         table: '2'
-        note: 15 h at 1742 K applies to 1_low only, not every series run
+        note: 15 h at 1742 K applies to 1_low only
 - experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
   kind: literature
   method:

@@ -173,7 +173,7 @@ experiments:
         locator:
           page: 13
           published_page: 3051
-          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     published_page: 3057
@@ -225,8 +225,7 @@ experiments:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified
-          oxygen buffer or pO2
+        note: Fe-Al addition only for liquid-state measurements
   bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
   thermal_schedule:
     method:
@@ -245,7 +244,7 @@ experiments:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: Per-run duration unassigned; about 1 h is a conditional limit, not a duration for every run
+        note: Per-run duration unassigned; about 1 h is a conditional limit
 - experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   kind: literature
   method:
@@ -274,7 +273,7 @@ experiments:
         published_page: 3054
         table: '2'
         note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal
-          assays, not charge compositions
+          assays
     form:
       state:
         tag: value
@@ -382,13 +381,13 @@ experiments:
         locator:
           page: 13
           published_page: 3051
-          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     page: 15
     published_page: 3053
     section: '3.2'
-    note: Reported Fe-V measurement series, not a claim of one physical charge or one configuration
+    note: Reported Fe-V measurement series
   apparatus:
     cell_material_and_liner:
       state:
@@ -435,8 +434,7 @@ experiments:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified
-          oxygen buffer or pO2
+        note: Fe-Al addition only for liquid-state measurements
   bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
   thermal_schedule:
     method:
@@ -484,7 +482,7 @@ experiments:
         published_page: 3054
         table: '2'
         note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal
-          assays, not charge compositions
+          assays
     form:
       state:
         tag: value
@@ -592,7 +590,7 @@ experiments:
         locator:
           page: 13
           published_page: 3051
-          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure
+          note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     page: 16
@@ -632,8 +630,7 @@ experiments:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified
-          oxygen buffer or pO2
+        note: Fe-Al addition only for liquid-state measurements
   bench_id: 10.2355/tetsutohagane1955.61.15_3050::bench::rm6k
   thermal_schedule:
     method:
@@ -843,7 +840,7 @@ benches:
         page: 14
         published_page: 3052
         section: '3.1'
-        note: The printed +/-0.5 C is temperature stability, not calibration uncertainty
+        note: The printed +/-0.5 C is temperature stability
   heating_method:
     state:
       tag: value
@@ -909,7 +906,7 @@ benches:
         page: 13
         published_page: 3051
         section: '3.1'
-        note: Discrete alternatives, not an interval; no pairing with lid thickness printed
+        note: Discrete alternatives
     unit: mm
   - name: offered_lid_thicknesses_not_run_assignments
     value:

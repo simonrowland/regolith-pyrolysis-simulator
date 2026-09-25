@@ -1,136 +1,898 @@
 schema_version: literature_extract.v1
 source_id: ta-shirai-2000-lpsc
 source:
-  citation: Shirai, T., Tachibana, S. and Tsuchiyama, A. (2000), Evaporation rates of Na from Na2O-SiO2
-    melt at 1 atm, Lunar and Planetary Science XXXI, abstract 1610.
+  citation: 'Shirai, T., Tachibana, S. & Tsuchiyama, A. (2000), "Evaporation rates of Na from Na2O-SiO2 melt at 1 atm", Lunar and Planetary Science XXXI, abstract 1610.'
   year: 2000
-  source_type: conference_abstract
 extraction:
-  method: layout-preserving pdftotext of 2-page LPSC abstract; printed alpha* values and experimental
-    conditions only; Figures 1-2 curves not digitized
-  date: '2026-09-22'
-  worker: n3-forsterite-evap-2026-09-22
-  provenance_path: ferry/pdfs-n/ta-shirai-2000-lpsc.pdf
-  note: 'Not a forsterite paper: Na evaporation from Na2O-SiO2 melt at 1 atm. Included in N3 corpus lane
-    as assigned; extract reports printed content only.'
+  method: >-
+    PDF-page render and pdftotext -layout cross-checked against MinerU OCR. All printed numbers were
+    verified against the supplied PDF pages. Fig. 1 and Fig. 2 point values were digitized from the
+    rendered PDF figures and are classified figure-only/digitized; printed least-squares coefficients
+    and equations are retained as model-derived evidence.
+  date: '2026-09-24'
+  worker: extract-ta-shirai-2000-lpsc
+  provenance_path: docs-private/research/2026-09-24-inbox-triage/queue.jsonl
 review_status: draft
 fidelity_samples:
-- path: species.Na.observations[shirai_2000_alpha_star_by_T_and_pO2].values.series[0].alpha_star
+- path: species.Na2O.observations[shirai_2000_fig1a_1300_pO2_1e-8].values.series[0].Na2O_wt_pct
+  value: 23.21
+  locator:
+    page: 2
+    figure: '1a'
+    note: 'p(O2)=10^-8 bar, t=0 min, first solid-circle point; approximate digitization from PDF render'
+- path: species.Na2O.observations[shirai_2000_fig1b_1400_pO2_1e-9].values.series[2].Na2O_wt_pct
+  value: 16.72
+  locator:
+    page: 2
+    figure: '1b'
+    note: 'p(O2)=10^-9 bar, t=40 min, square point; approximate digitization from PDF render'
+- path: species.Na.observations[shirai_2000_alpha_star_1300_pO2_1e-8].values.series[0].alpha
   value: 0.13
   locator:
     page: 2
-    figure: 1a
-    note: 1300 C pO2=1e-8 alpha*
-- path: species.Na.observations[shirai_2000_alpha_star_by_T_and_pO2].values.series[3].alpha_star
-  value: 0.048
+    figure: '1a'
+    paragraph: Estimation of alpha*
+    note: 'Printed 1300 C least-squares alpha* at p(O2)=10^-8 bar'
+- path: species.Na2O.observations[shirai_2000_activity_fit_1400].values.quadratic_coefficient
+  value: 5.9
   locator:
     page: 2
-    figure: 1b
-    note: 1400 C pO2=1e-8 alpha*
+    equation: '6'
+    note: 'Printed quadratic coefficient in log a_NaO0.5 activity fit at 1400 C'
+- path: species.Na.observations[shirai_2000_jna_fig2_1400].values.series[1].jNa_as_plotted
+  value: 1.1e16
+  locator:
+    page: 2
+    figure: '2'
+    note: '1400 C solid-circle point at p(O2)=10^-9 bar; approximate digitization from PDF render'
+benches:
+- id: shirai-1atm-wire-loop
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: 1 atm furnace with alumina muffle tube}
+    locator: {page: 1, section: Experiments, note: 'One-atmosphere furnace and alumina muffle tube are printed in the apparatus paragraph'}
+  cell_material_and_liner:
+    state: {tag: value, value: platinum wire loop suspended in an alumina muffle tube}
+    locator: {page: 1, section: Experiments, note: 'Platinum loop supports the charge; alumina muffle tube is the furnace liner'}
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.04'}}
+        locator: {page: 1, section: Experiments, note: 'Printed 4 cm inner diameter; SI conversion only'}
+  heating_method:
+    state: {tag: value, value: wire-loop heating in a hot spot of a gas-mixing furnace}
+    locator: {page: 1, section: Experiments}
+  other_facts:
+  - name: wire_loop_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '2'}}
+      locator: {page: 1, section: Experiments, note: 'Printed platinum wire loop diameter 2 mm'}
+  - name: analysis_beam_diameter
+    unit: micrometres
+    value:
+      state: {tag: value, value: {kind: point, point: '50'}}
+      locator: {page: 1, section: Experiments, note: 'Printed broad EPMA beam diameter 50 micrometres'}
+  - name: analysis_accelerating_voltage
+    unit: kV
+    value:
+      state: {tag: value, value: {kind: point, point: '15'}}
+      locator: {page: 1, section: Experiments, note: 'Printed EPMA accelerating voltage 15 kV'}
+  - name: analysis_beam_current
+    unit: nA
+    value:
+      state: {tag: value, value: {kind: point, point: '12'}}
+      locator: {page: 1, section: Experiments, note: 'Printed EPMA beam current 12 nA'}
+  - name: analysis_standards_and_method
+    unit: as_printed
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 'Albite and quartz standards; quantitative analysis by ZAF method'}}
+      locator: {page: 1, section: Experiments}
+experiments:
+- experiment_id: shirai-fig1a-1300-pO2-1e-8
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1a', note: '1300 C, p(O2)=10^-8 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments, note: 'Starting glass composition as printed'}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1300 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams are named, but component fractions and partial pressures are not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments, note: 'Mixing ratio controlled the printed oxygen fugacity'}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-8 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1a', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-fig1a-1300-pO2-1e-9
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1a', note: '1300 C, p(O2)=10^-9 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1300 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-9 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1a', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-fig1a-1300-pO2-1e-10
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1a', note: '1300 C, p(O2)=10^-10 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1300 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.00001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-10 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1a', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-fig1b-1400-pO2-1e-8
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1b', note: '1400 C, p(O2)=10^-8 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-8 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1b', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-fig1b-1400-pO2-1e-9
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1b', note: '1400 C, p(O2)=10^-9 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-9 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1b', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-fig1b-1400-pO2-1e-10
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 2, figure: '1b', note: '1400 C, p(O2)=10^-10 bar concentration-time series'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.00001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-10 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: heated for a variable duration then quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, figure: '1b', note: 'This experiment is a time series; no single duration applies'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+- experiment_id: shirai-flow-check-1400-pO2-1e-9
+  kind: literature
+  bench_id: shirai-1atm-wire-loop
+  method: langmuir_free_evaporation
+  locator: {page: 1, section: Experiments, note: 'Flow-rate screening at 1400 C, p(O2)=10^-9 bar, 30 min'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%'}
+      locator: {page: 1, section: Experiments}
+    form:
+      state: {tag: value, value: glass charge on platinum wire loop}
+      locator: {page: 1, section: Experiments}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1673.15'}
+      locator: {page: 1, section: Experiments, note: 'Printed 1400 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1 atm total pressure; SI conversion only'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2-CO2 mixed streams named; component fractions not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: H2-CO2 mixed gas streams}
+      locator: {page: 1, section: Experiments}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001'}}
+      locator: {page: 1, section: Experiments, note: 'Printed p(O2)=10^-9 bar; SI conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 30 min heating then quench in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1673.15'}}
+        locator: {page: 1, section: Experiments, note: 'Printed 1400 C; unit conversion only'}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '1800'}}
+        locator: {page: 1, section: Experiments, note: 'Printed 30 minutes; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: quenched in diffusion pump oil}
+      locator: {page: 1, section: Experiments}
 species:
-  Na:
-    context:
-    - observation_id: shirai_2000_experiments
-      type: apparatus
-      locator:
-        page: 1
-        section: Experiments
-      phase: Na2O-SiO2_melt
-      regime: 1atm_H2_CO2_wire_loop
-      units: as published
-      values:
-        quantity: experimental_conditions
-        method_class: method_only
-        starting_material: synthesized Na2O-SiO2 glass
-        starting_Na2O_wt_pct_range:
-        - 22
-        - 23
-        method: Pt wire loop 2 mm diameter in 1 atm furnace with alumina muffle tube (4 cm ID)
-        atmosphere: H2-CO2 mixed gas streams
-        temperatures_C:
-        - 1300
-        - 1400
-        pO2_bar_setpoints:
-        - 1.0e-08
-        - 1.0e-09
-        - 1.0e-10
-        flow_rates_tested_ml_per_min:
-        - 500
-        - 678
-        - 1000
-        - 1500
-        flow_rate_selected_ml_per_min: 1000
-        flow_rate_selection_conditions: 1400 C, pO2=1e-9 bar, 30 min; Na2O concentration independent of
-          flow 500-1500 ml/min
-        quench: diffusion pump oil
-        analysis: EPMA broad beam 50 um, 15 kV, 12 nA; ZAF; albite and quartz standards
-        reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
-      equipment:
-        cell_material:
-          value: Pt wire loop; alumina muffle tube furnace
-          locator:
-            page: 1
-            section: Experiments
+  Na2O:
     observations:
-    - observation_id: shirai_2000_alpha_star_by_T_and_pO2
+    - observation_id: shirai_2000_ref6_activity_input
+      type: activity_coefficient
+      locator: {page: 2, section: Discussion, equation: '5-6', note: 'Reference [6] is the experimental activity source cited by the authors; its numeric source table is not reproduced in this abstract'}
+      T_range_K: [1573.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: quoted_literature_activity
+      units: 'as cited by authors; numeric values not reproduced here'
+      values:
+        quantity: cited_Na2O-SiO2_activity_data
+        method_class: quoted_literature
+        evidence_class: quoted_literature
+        source_reference: 'Tsuchiyama et al. (1981), Geochimica et Cosmochimica Acta 45, 1357-1367, reference [6]'
+        source_role: 'experimental Na2O activity data converted by the authors to a_NaO0.5'
+        numeric_values_in_this_abstract: absent
+    - observation_id: shirai_2000_fig1a_1300_pO2_1e-8
+      experiment: shirai-fig1a-1300-pO2-1e-8
+      type: concentration_series
+      locator:
+        page: 2
+        figure: '1a'
+        note: 'Solid-circle series; p(O2)=10^-8 bar, T=1300 C'
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1a rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions:
+          temperature_C_as_printed: 1300
+          pO2_bar_as_printed: '10^-8'
+          total_pressure_atm_as_printed: 1
+          composition_as_printed: Na2O-SiO2 melt
+        series:
+        - {time_min: 0, Na2O_wt_pct: 23.21, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 60, Na2O_wt_pct: 22.18, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 90, Na2O_wt_pct: 21.71, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 120, Na2O_wt_pct: 21.64, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=120 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 180, Na2O_wt_pct: 20.99, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=180 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 300, Na2O_wt_pct: 17.54, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=300 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 360, Na2O_wt_pct: 16.94, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=360 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 540, Na2O_wt_pct: 15.96, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-8 bar, t=540 min, filled circle; 600 dpi shape-template centroid'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_fig1a_1300_pO2_1e-9
+      experiment: shirai-fig1a-1300-pO2-1e-9
+      type: concentration_series
+      locator: {page: 2, figure: '1a', note: 'Square series; p(O2)=10^-9 bar, T=1300 C'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1a rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions: {temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-9', total_pressure_atm_as_printed: 1, composition_as_printed: Na2O-SiO2 melt}
+        series:
+        - {time_min: 0, Na2O_wt_pct: 22.17, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 60, Na2O_wt_pct: 20.48, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 180, Na2O_wt_pct: 18.14, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-9 bar, t=180 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 240, Na2O_wt_pct: 17.30, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-9 bar, t=240 min, boxed square; 600 dpi shape-template centroid'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_fig1a_1300_pO2_1e-10
+      experiment: shirai-fig1a-1300-pO2-1e-10
+      type: concentration_series
+      locator: {page: 2, figure: '1a', note: 'Triangle series; p(O2)=10^-10 bar, T=1300 C'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1a rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions: {temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-10', total_pressure_atm_as_printed: 1, composition_as_printed: Na2O-SiO2 melt}
+        series:
+        - {time_min: 0, Na2O_wt_pct: 23.52, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 60, Na2O_wt_pct: 22.34, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-10 bar, t=60 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 120, Na2O_wt_pct: 18.00, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-10 bar, t=120 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 180, Na2O_wt_pct: 18.14, approximate: true, locator: {page: 2, figure: '1a', note: 'p(O2)=10^-10 bar, t=180 min, open triangle; 600 dpi shape-template centroid; overlaps the boxed-square marker'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_fig1b_1400_pO2_1e-8
+      experiment: shirai-fig1b-1400-pO2-1e-8
+      type: concentration_series
+      locator: {page: 2, figure: '1b', note: 'Solid-circle series; p(O2)=10^-8 bar, T=1400 C'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1b rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions: {temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-8', total_pressure_atm_as_printed: 1, composition_as_printed: Na2O-SiO2 melt}
+        series:
+        - {time_min: 0, Na2O_wt_pct: 22.89, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 30, Na2O_wt_pct: 19.94, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-8 bar, t=30 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 60, Na2O_wt_pct: 17.50, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid'}}
+        - {time_min: 90, Na2O_wt_pct: 15.86, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_fig1b_1400_pO2_1e-9
+      experiment: shirai-fig1b-1400-pO2-1e-9
+      type: concentration_series
+      locator: {page: 2, figure: '1b', note: 'Square series; p(O2)=10^-9 bar, T=1400 C'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1b rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions: {temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-9', total_pressure_atm_as_printed: 1, composition_as_printed: Na2O-SiO2 melt}
+        series:
+        - {time_min: 0, Na2O_wt_pct: 21.63, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 20, Na2O_wt_pct: 18.86, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-9 bar, t=20 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 40, Na2O_wt_pct: 16.72, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-9 bar, t=40 min, boxed square; 600 dpi shape-template centroid'}}
+        - {time_min: 60, Na2O_wt_pct: 14.75, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_fig1b_1400_pO2_1e-10
+      experiment: shirai-fig1b-1400-pO2-1e-10
+      type: concentration_series
+      locator: {page: 2, figure: '1b', note: 'Triangle series; p(O2)=10^-10 bar, T=1400 C'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_1atm_gas_mix
+      units: 'Na2O wt% vs heating time min, as plotted; values are approximate digitizations'
+      values:
+        quantity: Na2O_concentration_time_series
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 1b rendered at 600 dpi; shape-template centroid converted with printed-tick axis fits'
+        conditions: {temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-10', total_pressure_atm_as_printed: 1, composition_as_printed: Na2O-SiO2 melt}
+        series:
+        - {time_min: 0, Na2O_wt_pct: 23.18, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 10, Na2O_wt_pct: 20.11, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-10 bar, t=10 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 15, Na2O_wt_pct: 18.93, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-10 bar, t=15 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 20, Na2O_wt_pct: 16.89, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-10 bar, t=20 min, open triangle; 600 dpi shape-template centroid'}}
+        - {time_min: 30, Na2O_wt_pct: 15.39, approximate: true, locator: {page: 2, figure: '1b', note: 'p(O2)=10^-10 bar, t=30 min, open triangle; 600 dpi shape-template centroid'}}
+      uncertainty: {note: 'Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.'}
+    - observation_id: shirai_2000_activity_fit_1300
+      type: activity_coefficient
+      derived_from: [shirai_2000_ref6_activity_input]
+      derivation:
+        relation: author_conversion_of_cited_activity_data
+        inputs: [shirai_2000_ref6_activity_input]
+        output_unit: log10 activity dimensionless
+      locator: {page: 2, equation: '5', note: 'Printed log a_NaO0.5 polynomial at 1300 C'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: author_activity_fit
+      units: 'log10 activity dimensionless; X_Na2O in mol% as printed'
+      values:
+        quantity: NaO0.5_activity_polynomial
+        method_class: model_derived
+        evidence_class: author_converted_activity_fit
+        derivation: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (5).'
+        temperature_C_as_printed: 1300
+        X_Na2O_unit_as_printed: mol%
+        formula_as_printed: log a_NaO0.5 = -4.93 + 3.11 X_Na2O + 3.38 (X_Na2O)^2
+        constant: -4.93
+        linear_coefficient: 3.11
+        quadratic_coefficient: 3.38
+    - observation_id: shirai_2000_activity_fit_1400
+      type: activity_coefficient
+      derived_from: [shirai_2000_ref6_activity_input]
+      derivation:
+        relation: author_conversion_of_cited_activity_data
+        inputs: [shirai_2000_ref6_activity_input]
+        output_unit: log10 activity dimensionless
+      locator: {page: 2, equation: '6', note: 'Printed log a_NaO0.5 polynomial at 1400 C'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: author_activity_fit
+      units: 'log10 activity dimensionless; X_Na2O in mol% as printed'
+      values:
+        quantity: NaO0.5_activity_polynomial
+        method_class: model_derived
+        evidence_class: author_converted_activity_fit
+        derivation: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (6).'
+        temperature_C_as_printed: 1400
+        X_Na2O_unit_as_printed: mol%
+        formula_as_printed: log a_NaO0.5 = -4.51 + 1.22 X_Na2O + 5.90 (X_Na2O)^2
+        constant: -4.51
+        linear_coefficient: 1.22
+        quadratic_coefficient: 5.9
+    context:
+    - observation_id: shirai_2000_apparatus_and_analysis_context
+      type: apparatus
+      locator: {page: 1, section: Experiments}
+      units: as printed
+      values:
+        quantity: apparatus_and_analysis_conditions
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        furnace: 1 atm furnace with alumina muffle tube
+        muffle_tube_inner_diameter_cm: 4
+        wire_loop_material: platinum
+        wire_loop_diameter_mm: 2
+        atmosphere: H2-CO2 mixed gas streams
+        heating_temperatures_C: [1300, 1400]
+        oxygen_fugacity_bar_as_printed: ['10^-8', '10^-9', '10^-10']
+        quench: diffusion pump oil
+        analysis: EPMA broad beam, ZAF quantitative analysis
+        beam_diameter_micrometres: 50
+        accelerating_voltage_kV: 15
+        beam_current_nA: 12
+        standards: albite and quartz
+    - observation_id: shirai_2000_flow_rate_screening
+      type: experiment_series
+      locator: {page: 1, section: Experiments and Results, note: 'Flow-rate check at 1400 C, p(O2)=10^-9 bar, 30 min'}
+      units: 'mL/min, C, bar, min as printed'
+      values:
+        quantity: gas_flow_rate_screening
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        conditions: {temperature_C: 1400, pO2_bar_as_printed: '10^-9', duration_min: 30, composition_as_printed: Na2O-SiO2 glass}
+        series:
+        - {flow_rate_mL_min: 500, locator: {page: 1, section: Experiments, note: 'First printed flow-rate condition'}}
+        - {flow_rate_mL_min: 678, locator: {page: 1, section: Experiments, note: 'Second printed flow-rate condition'}}
+        - {flow_rate_mL_min: 1000, selected_for_further_experiments: true, locator: {page: 1, section: Experiments and Results, note: 'Selected flow rate'}}
+        - {flow_rate_mL_min: 1500, locator: {page: 1, section: Experiments, note: 'Fourth printed flow-rate condition'}}
+        concentration_result: 'Na2O concentrations almost constant within errors over 500-1500 mL/min'
+    - observation_id: shirai_2000_tridymite_composition_limit
+      type: characterization
+      locator: {page: 1, section: Results, note: 'Minimum Na2O concentrations and tridymite exclusion statement'}
+      units: wt% Na2O as printed
+      values:
+        quantity: crystallization_limited_minimum_Na2O_concentration
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        minimum_Na2O_wt_pct_at_1300C: 16
+        minimum_Na2O_wt_pct_at_1400C: 14
+        cause: crystallization of tridymite keeps melt composition constant
+        excluded_runs: runs in which tridymite crystallized were not used for further discussion
+    - observation_id: shirai_2000_kinetic_equations
+      type: thermodynamic_example
+      locator: {page: 1, section: Discussion, equation: '1-4', note: 'Printed Na evaporation reaction, equilibrium constant, Hertz-Knudsen form, and apparent-coefficient form'}
+      units: 'bar-based pressure and dimensionless activity as printed; jNa denominator expression retained verbatim'
+      values:
+        quantity: Na_evaporation_model_equations
+        method_class: model_derived
+        evidence_class: author_equations
+        reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
+        equation_1: K = pe(Na) pe(O2)^(1/4) / a_NaO0.5
+        equation_2: jNa = alpha [pe(Na)-p(Na)] / (2 pi mNa k T)^(1/2)
+        equation_3: jNa = alpha* pe(Na) / (2 pi mNa k T)^(1/2)
+        equation_4: jNa = alpha* K a_NaO0.5 pe(O2)^(-1/4) / (2 pi mNa k T)^(1/2)
+        alpha_bounds_as_printed: 0 < alpha* <= alpha <= 1
+        pNa_status: surrounding-gas Na partial pressure is usually unknown in the experiments
+    - observation_id: shirai_2000_activity_conversion_context
+      type: thermodynamic_example
+      locator: {page: 2, section: Discussion, equation: '5-6', note: 'Authors state activities from ref. [6] were converted to a_NaO0.5'}
+      units: 'X_Na2O in mol% as printed; log activity dimensionless'
+      values:
+        quantity: activity_fit_lineage
+        method_class: model_derived
+        evidence_class: cited_activity_conversion
+        cited_source: Tsuchiyama et al. (1981), reference [6]
+        conversion_statement: authors converted published Na2O-SiO2 melt activities to a_NaO0.5
+  Na:
+    observations:
+    - observation_id: shirai_2000_alpha_star_1300_pO2_1e-8
+      experiment: shirai-fig1a-1300-pO2-1e-8
       type: alpha
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      phase: Na2O-SiO2_melt
-      regime: 1atm_HBD_apparent_evaporation_coefficient
-      units: dimensionless
+      derived_from: &shirai_1300_alpha_inputs
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1'
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: ['ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0', 'ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1'], output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.13 at p(O2)=10^-8 bar'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
       values:
-        quantity: apparent_evaporation_coefficient_alpha_star
-        method_class: author_derived_least_squares_fit_to_Na2O_vs_time
-        derived: true
-        definition: alpha* includes recondensation at 1 atm; 0 < alpha* <= alpha <= 1
-        activity_model_source: Rego et al. 1985 converted by authors to a(NaO0.5)
-        series:
-        - T_C: 1300
-          pO2_bar: 1.0e-08
-          alpha_star: 0.13
-        - T_C: 1300
-          pO2_bar: 1.0e-09
-          alpha_star: 0.095
-        - T_C: 1300
-          pO2_bar: 1.0e-10
-          alpha_star: 0.08
-        - T_C: 1400
-          pO2_bar: 1.0e-08
-          alpha_star: 0.048
-        - T_C: 1400
-          pO2_bar: 1.0e-09
-          alpha_star: 0.043
-        - T_C: 1400
-          pO2_bar: 1.0e-10
-          alpha_star: 0.05
-        summary_as_printed: alpha* about 0.1 at 1300 C and about 0.05 at 1400 C; higher than the 0.01
-          assumption of Tsuchiyama and Tachibana [4]
-    - observation_id: shirai_2000_jNa_pO2_slopes
+        quantity: alpha
+        method_class: model_derived
+        evidence_class: author_least_squares_fit
+        derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.'
+        temperature_C_as_printed: 1300
+        pO2_bar_as_printed: '10^-8'
+        composition_as_printed: Na2O-SiO2 melt
+        series: [{alpha: 0.13, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.13 at p(O2)=10^-8 bar'}}]
+        summary_as_printed: alpha* about 0.1 at 1300 C and about 0.05 at 1400 C; higher than the 0.01 assumption of Tsuchiyama and Tachibana [4]
+    - observation_id: shirai_2000_alpha_star_1300_pO2_1e-9
+      experiment: shirai-fig1a-1300-pO2-1e-9
+      type: alpha
+      derived_from: *shirai_1300_alpha_inputs
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: *shirai_1300_alpha_inputs, output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.095 at p(O2)=10^-9 bar'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.095, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.095 at p(O2)=10^-9 bar'}}]}
+    - observation_id: shirai_2000_alpha_star_1300_pO2_1e-10
+      experiment: shirai-fig1a-1300-pO2-1e-10
+      type: alpha
+      derived_from: *shirai_1300_alpha_inputs
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: *shirai_1300_alpha_inputs, output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.08 at p(O2)=10^-10 bar'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.08, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.08 at p(O2)=10^-10 bar'}}]}
+    - observation_id: shirai_2000_alpha_star_1400_pO2_1e-8
+      experiment: shirai-fig1b-1400-pO2-1e-8
+      type: alpha
+      derived_from: &shirai_1400_alpha_inputs
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2'
+      - 'ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3'
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: *shirai_1400_alpha_inputs, output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.048 at p(O2)=10^-8 bar'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-8', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.048, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.048 at p(O2)=10^-8 bar'}}]}
+    - observation_id: shirai_2000_alpha_star_1400_pO2_1e-9
+      experiment: shirai-fig1b-1400-pO2-1e-9
+      type: alpha
+      derived_from: *shirai_1400_alpha_inputs
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: *shirai_1400_alpha_inputs, output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.043 at p(O2)=10^-9 bar'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.043, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.043 at p(O2)=10^-9 bar'}}]}
+    - observation_id: shirai_2000_alpha_star_1400_pO2_1e-10
+      experiment: shirai-fig1b-1400-pO2-1e-10
+      type: alpha
+      derived_from: *shirai_1400_alpha_inputs
+      derivation: {relation: author_least_squares_fit_of_concentration_time_series, inputs: *shirai_1400_alpha_inputs, output_unit: dimensionless alpha*}
+      locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.05 at p(O2)=10^-10 bar'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: dimensionless alpha* as printed
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.05, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.05 at p(O2)=10^-10 bar'}}]}
+    - observation_id: shirai_2000_jna_fig2_1300
       type: rate_series
-      locator:
-        page: 2
-        figure: '2'
-        section: The dependence of jNa on p(O2)
-      phase: Na2O-SiO2_melt
-      regime: 1atm_HBD
-      units: log-log slopes dimensionless; jNa evaluated at Na2O=20 wt%
+      locator: {page: 2, figure: '2', note: 'Dotted 1300 C series at Na2O=20 wt%; points digitized from the PDF plot'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: 'jNa (Na2O=20 wt%)/(cm^2 sec) and p(O2) bar, as plotted'
       values:
-        quantity: log_jNa_vs_log_pO2_slope
-        method_class: author_derived_from_alpha_star_and_activity_model
-        derived: true
-        Na2O_wt_pct_reference: 20
+        quantity: sodium_evaporation_rate_vs_oxygen_pressure
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 2; central markers read against logarithmic axes'
+        conditions: {temperature_C_as_printed: 1300, Na2O_wt_pct: 20, total_pressure_atm_as_printed: 1}
         series:
-        - T_C: 1300
-          slope: -0.153
-          fit_as_printed: jNa = 6.70e13 * x^-0.153
-          R: 0.99653
-        - T_C: 1400
-          slope: -0.26
-          fit_as_printed: jNa = 5.22e13 * x^-0.26
-          R: 0.99426
+        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-10 bar'}}
+        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.5e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-9 bar'}}
+        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 1.1e15, approximate: true, locator: {page: 2, figure: '2', note: '1300 C dotted-line square at p(O2)=10^-8 bar'}}
+      uncertainty: {note: 'No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.'}
+    - observation_id: shirai_2000_jna_fig2_1400
+      type: rate_series
+      locator: {page: 2, figure: '2', note: 'Solid 1400 C series at Na2O=20 wt%; points digitized from the PDF plot'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: 'jNa (Na2O=20 wt%)/(cm^2 sec) and p(O2) bar, as plotted'
+      values:
+        quantity: sodium_evaporation_rate_vs_oxygen_pressure
+        method_class: figure_only
+        evidence_class: figure_only_digitized
+        digitization_source: 'PDF page 2, Fig. 2; central markers read against logarithmic axes'
+        conditions: {temperature_C_as_printed: 1400, Na2O_wt_pct: 20, total_pressure_atm_as_printed: 1}
+        series:
+        - {pO2_bar_as_printed: '10^-10', jNa_as_plotted: 2.5e16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-10 bar'}}
+        - {pO2_bar_as_printed: '10^-9', jNa_as_plotted: 1.1e16, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-9 bar'}}
+        - {pO2_bar_as_printed: '10^-8', jNa_as_plotted: 7.0e15, approximate: true, locator: {page: 2, figure: '2', note: '1400 C solid-line circle at p(O2)=10^-8 bar'}}
+      uncertainty: {note: 'No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.'}
+    - observation_id: shirai_2000_jna_fit_1300
+      type: rate_series
+      derived_from:
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2'
+      derivation:
+        relation: author_power_law_fit_to_figure_2_series
+        inputs:
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0'
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1'
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2'
+        output_unit: 'jNa as plotted per p(O2) in bar'
+      locator: {page: 2, figure: '2', paragraph: 'The dependence of jNa on p(O2)', note: 'Printed dotted-line power-law fit for 1300 C'}
+      T_range_K: [1573.15, 1573.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: 'jNa as plotted; p(O2) in bar; fitted values as printed'
+      values:
+        quantity: sodium_evaporation_rate_power_law_fit
+        method_class: model_derived
+        evidence_class: author_power_law_fit
+        derivation: 'Author fit printed on Fig. 2 for the 1300 C dotted series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
+        temperature_C_as_printed: 1300
+        Na2O_wt_pct: 20
+        equation_as_printed: jNa = 6.70 x 10^13 x^-0.153
+        coefficient: 6.70e13
+        exponent: -0.153
+        R: 0.99653
+        slope_as_printed: -0.153
+    - observation_id: shirai_2000_jna_fit_1400
+      type: rate_series
+      derived_from:
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0'
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1'
+      - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2'
+      derivation:
+        relation: author_power_law_fit_to_figure_2_series
+        inputs:
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0'
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1'
+        - 'ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2'
+        output_unit: 'jNa as plotted per p(O2) in bar'
+      locator: {page: 2, figure: '2', paragraph: 'The dependence of jNa on p(O2)', note: 'Printed solid-line power-law fit for 1400 C'}
+      T_range_K: [1673.15, 1673.15]
+      phase: Na2O-SiO2_silicate_melt
+      regime: open_furnace_apparent_evaporation
+      units: 'jNa as plotted; p(O2) in bar; fitted values as printed'
+      values:
+        quantity: sodium_evaporation_rate_power_law_fit
+        method_class: model_derived
+        evidence_class: author_power_law_fit
+        derivation: 'Author fit printed on Fig. 2 for the 1400 C solid series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
+        temperature_C_as_printed: 1400
+        Na2O_wt_pct: 20
+        equation_as_printed: jNa = 5.22 x 10^13 x^-0.26
+        coefficient: 5.22e13
+        exponent: -0.26
+        R: 0.99426
+        slope_as_printed: -0.26
+    context:
+    - observation_id: shirai_2000_jna_fit_comparison
+      type: thermodynamic_example
+      locator: {page: 2, figure: '2', paragraph: 'The dependence of jNa on p(O2)', note: 'Printed comparison of fitted slopes with theoretical -1/4'}
+      units: dimensionless slope as printed
+      values:
+        quantity: oxygen_pressure_exponent_comparison
+        method_class: model_derived
+        evidence_class: author_text_interpretation
+        slope_1300C: -0.153
+        slope_1400C: -0.26
         theoretical_slope: -0.25
-        note: 1400 C slope almost consistent with -1/4; 1300 C slope smaller than -1/4. Pre-factors as
-          printed on Fig. 2; x denotes p(O2).
+        theoretical_slope_as_printed: '-1/4'
+        interpretation: '1400 C slope is almost consistent with -1/4; 1300 C slope is smaller than -1/4'
+refused:
+- what: typed melt-composition quantity for the Fig. 1 Na2O wt% series
+  reason: the current typed schema has no melt-composition-series quantity; raw digitized values and locators are retained and an amendment is proposed
+- what: typed sodium evaporation-flux quantity for the Fig. 2 jNa series and fits
+  reason: the current typed schema has no surface-flux quantity with the paper's printed (Na2O=20 wt%)/(cm^2 sec) units; raw values and locators are retained and an amendment is proposed
+- what: typed activity-polynomial quantity for Eqs. (5)-(6)
+  reason: the current typed schema has no model-parameter home for a printed log-activity polynomial; all coefficients and the equation locators are retained and an amendment is proposed
+- what: numeric values of the calculated fitting curves drawn in Fig. 1
+  reason: curves are model lines without printed point values; only central experimental markers were digitized
+- what: numeric values of the visible Fig. 1 error bars
+  reason: error-bar magnitudes are not printed or tabulated
+- what: individual H2/CO2 mixing ratios and component partial pressures
+  reason: the paper names H2-CO2 streams and target p(O2), but does not print the mixing ratios or component pressures
+- what: ambient Na partial pressure p(Na) and recondensation flux
+  reason: Eq. (2) explicitly says p(Na) is usually unknown in these experiments
+- what: sample mass and exposed melt surface area
+  reason: not printed in the two-page abstract
+- what: identities of runs that crystallized tridymite
+  reason: the paper says those runs were excluded but does not identify them by time, p(O2), or charge
+- what: independently measured Na flux in absolute SI units
+  reason: Fig. 2 reports jNa only as plotted and the paper does not provide a calibration or unit conversion beyond the plotted quantity
