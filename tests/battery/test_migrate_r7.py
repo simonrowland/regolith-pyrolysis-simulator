@@ -2,6 +2,7 @@
 
 import json
 import re
+from collections.abc import Mapping
 from collections import Counter
 from decimal import Decimal
 from pathlib import Path
@@ -12,7 +13,9 @@ import yaml
 from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import (
+    EXTRACTS_DIR,
     REPO_ROOT,
+    _YAML_LOADER,
     compilation_family_from_store_path,
     iter_observation_store_paths,
     map_quantity,
@@ -24,6 +27,76 @@ from tests.battery.test_migrate import (
     _copy_compilation_record, _copy_extract, _extract_observation, _write_min_tree,
     test_k01_value_constructions_live_inside_the_boundary as boundary_guard,
 )
+
+
+_CHEMISTRY_STRING_KEYS = frozenset(
+    {
+        "species",
+        "gas",
+        "row",
+        "element",
+        "component",
+        "oxide",
+        "formula",
+        "cea_name",
+        "Symbol",
+        "statistic",
+    }
+)
+
+
+def test_yaml_loader_uses_yaml12_core_boolean_resolver() -> None:
+    loaded = yaml.load(
+        "s: N\ne: Y\ng: NO\nx: yes\nt: true\nf: false\n",
+        Loader=_YAML_LOADER,
+    )
+    assert loaded == {
+        "s": "N",
+        "e": "Y",
+        "g": "NO",
+        "x": "yes",
+        "t": True,
+        "f": False,
+    }
+    assert all(
+        isinstance(loaded[key], str) for key in ("s", "e", "g", "x")
+    )
+    assert isinstance(loaded["t"], bool)
+    assert isinstance(loaded["f"], bool)
+
+
+def _assert_extract_tokens_are_not_implicit_bools(
+    node: object,
+    *,
+    source: Path,
+    path: str = "<root>",
+) -> None:
+    if isinstance(node, Mapping):
+        for key, value in node.items():
+            child_path = f"{path}.{key!s}"
+            assert not isinstance(key, bool), (
+                f"{source}:{child_path}: mapping key parsed as bool {key!r}"
+            )
+            if key in _CHEMISTRY_STRING_KEYS:
+                assert not isinstance(value, bool), (
+                    f"{source}:{child_path}: chemistry/statistic value parsed as bool"
+                )
+            _assert_extract_tokens_are_not_implicit_bools(
+                value, source=source, path=child_path
+            )
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            _assert_extract_tokens_are_not_implicit_bools(
+                value, source=source, path=f"{path}[{index}]"
+            )
+
+
+def test_yaml_loader_preserves_chemistry_tokens_across_extract_corpus() -> None:
+    paths = sorted(EXTRACTS_DIR.glob("*.yaml"))
+    assert paths
+    for path in paths:
+        loaded = yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+        _assert_extract_tokens_are_not_implicit_bools(loaded, source=path)
 
 
 @pytest.mark.parametrize("body", [
@@ -340,11 +413,11 @@ def absence_audit(paths=STORE_PATHS):
     judged, bad = Counter(), []
     for directory in ("observations-v2", "extracts-v2"):
         for path in (p for p in paths if _store_kind(p) == directory):
-            store = yaml.load(path.read_text(), Loader=yaml.CSafeLoader)
+            store = yaml.load(path.read_text(), Loader=_YAML_LOADER)
             legacy = {}
             if directory == "extracts-v2":
                 source_path = REPO_ROOT / "data/literature/extracts" / path.name
-                source_doc = yaml.load(source_path.read_text(), Loader=yaml.CSafeLoader)
+                source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
                 for body in (source_doc.get("species") or {}).values():
                     for row in body.get("observations") or []:
                         legacy[str(row["observation_id"])] = row
@@ -355,7 +428,7 @@ def absence_audit(paths=STORE_PATHS):
                     if not source.startswith("data/literature/compilations/"):
                         continue
                     raw = (REPO_ROOT / source).read_text()
-                    record = json.loads(raw) if source.endswith(".json") else yaml.load(raw, Loader=yaml.CSafeLoader)
+                    record = json.loads(raw) if source.endswith(".json") else yaml.load(raw, Loader=_YAML_LOADER)
                 else:
                     local_id = oid.split("::", 1)[1]
                     local = next(
@@ -443,7 +516,7 @@ def _source_observation_rows(path: Path) -> int | None:
     source_path = REPO_ROOT / "data" / "literature" / "extracts" / path.name
     if not source_path.is_file():
         return None
-    source_doc = yaml.load(source_path.read_text(), Loader=yaml.CSafeLoader)
+    source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
     if not isinstance(source_doc, dict):
         return None
     species = source_doc.get("species") or {}
@@ -606,7 +679,7 @@ def _count_claim_audit(paths):
     judged, bad = Counter(), []
     cache = {}
     for path in paths:
-        store = yaml.load(path.read_text(), Loader=yaml.CSafeLoader) or {}
+        store = yaml.load(path.read_text(), Loader=_YAML_LOADER) or {}
         for obs in store.get("observations") or []:
             source = (obs.get("locator") or {}).get("source_path", "")
             if not source.startswith("data/literature/compilations/"):
@@ -616,7 +689,7 @@ def _count_claim_audit(paths):
                 cache[source] = (
                     json.loads(raw)
                     if source.endswith(".json")
-                    else yaml.load(raw, Loader=yaml.CSafeLoader)
+                    else yaml.load(raw, Loader=_YAML_LOADER)
                 )
             record = cache[source]
             counts = _source_numeric_column_counts(record)
@@ -658,7 +731,7 @@ def test_h5_numeric_cell_claim_inventory_and_mutation():
         REPO_ROOT
         / "data/literature/observations-v2/compilations-pankratz-1984-usbm-b677.yaml"
     )
-    store = yaml.load(path.read_text(), Loader=yaml.CSafeLoader)
+    store = yaml.load(path.read_text(), Loader=_YAML_LOADER)
     obs = next(
         item
         for item in store["observations"]

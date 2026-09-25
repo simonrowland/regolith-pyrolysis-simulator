@@ -30,6 +30,7 @@ from typing import Any, Mapping
 import yaml
 
 from engines.domain_reason import OutOfDomainReason
+from engines.yaml_loader import YAML12SafeLoader
 
 # Historical published constants this table replaced. Cited by tests that
 # pin defaults; not a second runtime band.
@@ -332,7 +333,10 @@ def parse_engine_commissioning_file(path: str | Path) -> CommissioningTable:
             f'engine commissioning table not found: {table_path}'
         )
     try:
-        payload = yaml.safe_load(table_path.read_text(encoding='utf-8'))
+        payload = yaml.load(
+            table_path.read_text(encoding='utf-8'),
+            Loader=YAML12SafeLoader,
+        )
     except yaml.YAMLError as exc:
         raise EngineCommissioningError(
             f'engine commissioning table is not valid YAML: {table_path}'

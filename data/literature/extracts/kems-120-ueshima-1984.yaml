@@ -28,7 +28,7 @@ benches:
       work_id: null
       cited_as: 'reference 9'
       for_parameters: [apparatus_family, cell_material_and_liner]
-      locator: &ueshima_apparatus {published_page: 550, section: '2.3 Experimental equipment', note: The paper names the Hitachi RM6K and alumina cell, then defers their details to reference 9}
+      locator: &ueshima_apparatus {published_page: 550, section: '2.3 Experimental equipment', note: 'The paper names the Hitachi RM6K and alumina cell, then defers their details to reference 9'}
   apparatus_family:
     state: {tag: value, value: Hitachi RM6K Knudsen-cell mass spectrometer}
     locator: *ueshima_apparatus
@@ -64,9 +64,9 @@ experiments:
         locator: {published_page: 549, section: Synopsis, note: Second discrete measurement temperature}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 550, section: '2.4 Sample', note: Pre-melting duration is preparation, not a measurement hold}
+      locator: {published_page: 550, section: '2.4 Sample', note: 'Pre-melting duration is preparation, not a measurement hold'}
 - experiment_id: cited-results
-  locator: {published_page: 552, table: '4', note: Fe-Mo revision and Nesmeyanov result are cited/compiled results, not this work's Fe-W bench}
+  locator: {published_page: 552, table: '4', note: 'Fe-Mo revision and Nesmeyanov result are cited/compiled results, not this work''s Fe-W bench'}
 fidelity_samples:
 - path: species.W.observations[ueshima_1984_table2_partial_molar_1873k].values.rows[2].a_Fe
   value: 0.87

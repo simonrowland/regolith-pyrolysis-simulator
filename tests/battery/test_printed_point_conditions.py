@@ -16,6 +16,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.battery.migrate import REPO_ROOT, migrate
 from tests.battery.test_migrate import _write_min_tree
 
@@ -60,7 +62,9 @@ _TEMPERATURE_ROUTES = (
 
 
 def _migrate_real_extract(tmp_path: Path, stem: str):
-    doc = yaml.safe_load((_EXTRACTS / f"{stem}.yaml").read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(
+        (_EXTRACTS / f"{stem}.yaml").read_text(encoding="utf-8")
+    )
     root = _write_min_tree(tmp_path, doc)
     return migrate(root, write=False)
 

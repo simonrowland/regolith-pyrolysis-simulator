@@ -14,7 +14,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.vapour_rail.u0_manifest import (
     GROUP_A_ELEMENT_IDS,
@@ -45,7 +45,7 @@ class TraceAcquisitionError(ValueError):
 
 
 def _load_yaml(path: Path) -> Any:
-    return yaml.safe_load(path.read_text())
+    return load_cached_safe_yaml(path.read_text())
 
 
 @lru_cache(maxsize=1)

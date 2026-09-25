@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.reference_data.nasa_glenn import ELEMENT_SYMBOLS
 
@@ -205,7 +205,7 @@ def _manifest_suspect_cells(entry: dict[str, Any]) -> tuple[OCRSuspectCell, ...]
 
 
 def load_manifest(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False) -> dict:
-    manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    manifest = load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
     if not include_ocr_suspect:
         for entry in manifest["entries"]:
             suspects = _manifest_suspect_cells(entry)

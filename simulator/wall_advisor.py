@@ -6,10 +6,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
-
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -265,7 +264,7 @@ def _load_wall_materials_cached(
 ) -> dict[str, Any]:
     """Reuse a bundled material revision after its first completed parse."""
     with Path(resolved_path).open() as handle:
-        data = yaml.safe_load(handle)
+        data = load_cached_safe_yaml(handle.read())
     if not isinstance(data, dict) or not isinstance(data.get("materials"), dict):
         raise ValueError(f"wall materials data is malformed: {resolved_path}")
     return data
@@ -280,7 +279,7 @@ def _wall_materials_data(path: Path | str) -> dict[str, Any]:
 def load_wall_materials(path: Path | str = DEFAULT_WALL_MATERIALS_PATH) -> dict[str, Any]:
     """Load a detached mutable copy of the selected wall-material dataset."""
     with Path(path).open() as handle:
-        data = yaml.safe_load(handle)
+        data = load_cached_safe_yaml(handle.read())
     if not isinstance(data, dict) or not isinstance(data.get("materials"), dict):
         raise ValueError(f"wall materials data is malformed: {path}")
     return data

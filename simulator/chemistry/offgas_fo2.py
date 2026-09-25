@@ -95,13 +95,12 @@ import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 
-import yaml
-
 from simulator.vapour_rail.nasa_cea import (
     Nasa9Segment,
     NasaCeaPolynomial,
     reaction_equilibrium_constant,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 #: Species whose CEA records this module needs. Both couples plus O2.
 BUFFER_SPECIES: tuple[str, ...] = ("H2", "H2O", "O2", "CO", "CO2")
@@ -237,7 +236,7 @@ def load_buffer_polynomials(
          REJECTS. The token it wants is ``observation['phase']`` ('gas').
     """
 
-    extract = yaml.safe_load(pathlib.Path(extract_path).read_text())
+    extract = load_cached_safe_yaml(pathlib.Path(extract_path).read_text())
     polynomials: dict[str, NasaCeaPolynomial] = {}
     for name in BUFFER_SPECIES:
         try:

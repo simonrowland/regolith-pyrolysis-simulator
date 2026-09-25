@@ -119,6 +119,7 @@ from web.run_store import (
     list_runs,
     load as load_run_artifact,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
@@ -267,7 +268,7 @@ def _load_yaml(filename):
     if not path.exists():
         return {}
     with open(path) as f:
-        return yaml.safe_load(f) or {}
+        return load_cached_safe_yaml(f.read()) or {}
 
 
 def _optimizer_runs_root() -> Path:
@@ -1778,7 +1779,7 @@ def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
     if profiles_dir.is_dir():
         for path in sorted(profiles_dir.glob('*.yaml')):
             with path.open() as f:
-                payload = yaml.safe_load(f) or {}
+                payload = load_cached_safe_yaml(f.read()) or {}
             profile_id = payload.get('profile_id') or path.stem
             feedstock = payload.get('feedstock') or payload.get('feedstock_id')
             objectives = payload.get('objectives') or ()
@@ -4078,7 +4079,7 @@ def load_recipe():
         source = recipe_library_path(raw_name, library_dir=_recipe_library_dir())
         setpoints_patch = load_recipe_patch(source)
         metadata = read_recipe_metadata(source)
-        raw_document = yaml.safe_load(source.read_text(encoding='utf-8')) or {}
+        raw_document = load_cached_safe_yaml(source.read_text(encoding='utf-8')) or {}
         cost_parameters = (
             read_recipe_cost_parameters(source)
             if isinstance(raw_document, Mapping)

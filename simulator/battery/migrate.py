@@ -73,6 +73,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
+from simulator.yaml_cache import YAML12SafeLoader
 from simulator.battery.identity import (
     Exposure,
     Identity,
@@ -1764,7 +1765,7 @@ def resolve_equipment_context(
     return row
 
 
-_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+_YAML_LOADER = YAML12SafeLoader
 
 
 def load_yaml(path: Path) -> object:

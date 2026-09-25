@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -369,7 +370,7 @@ def validate_kems_case(case: Mapping[str, Any]) -> dict[str, Any]:
 def load_kems_case(path: str | Path) -> dict[str, Any]:
     case_path = Path(path)
     try:
-        loaded = yaml.safe_load(case_path.read_text(encoding="utf-8"))
+        loaded = load_cached_safe_yaml(case_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise KEMSSchemaError(f"cannot load KEMS case {case_path}: {exc}") from exc
     return validate_kems_case(_mapping(loaded, str(case_path)))
@@ -508,7 +509,7 @@ def validate_kems_observations(
 def load_kems_observations(path: str | Path) -> dict[str, Any]:
     observations_path = Path(path)
     try:
-        loaded = yaml.safe_load(observations_path.read_text(encoding="utf-8"))
+        loaded = load_cached_safe_yaml(observations_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise KEMSSchemaError(
             f"cannot load KEMS observations {observations_path}: {exc}"

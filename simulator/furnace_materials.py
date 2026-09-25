@@ -8,9 +8,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -82,7 +81,7 @@ def load_furnace_materials(
     if not source_path.exists():
         raise FileNotFoundError(f"required furnace material catalog missing: {source_path}")
     with source_path.open(encoding="utf-8") as handle:
-        data = yaml.safe_load(handle) or {}
+        data = load_cached_safe_yaml(handle.read()) or {}
     catalog = data.get("furnace_materials")
     if not isinstance(catalog, dict):
         raise ValueError(f"furnace material catalog is malformed: {source_path}")

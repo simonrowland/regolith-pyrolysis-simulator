@@ -35,8 +35,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from engines.builtin.cco_redox_buffer import (
     CCO_SOURCE,
     cco_log10_fO2_bar,
@@ -48,6 +46,7 @@ from simulator.silent_zero import (
     ZeroBecause,
     make_note,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 GAS_CONSTANT_J_PER_MOL_K = 8.31446
 CELSIUS_TO_KELVIN = 273.15
@@ -134,7 +133,7 @@ def _require_physical_celsius(value: Any, *, name: str) -> float:
 def load_organics_pyrolysis_params(
     path: Path | None = None,
 ) -> dict[str, Any]:
-    payload = yaml.safe_load((path or _PARAMS_PATH).read_text()) or {}
+    payload = load_cached_safe_yaml((path or _PARAMS_PATH).read_text()) or {}
     if not isinstance(payload, Mapping):
         raise ValueError("organics_pyrolysis.yaml must be a mapping")
     return dict(payload)

@@ -348,7 +348,7 @@ experiments:
       state: {tag: value, value: {kind: interval, interval_low: '0.00003869', interval_high: '0.0000791'}}
       locator: {page: 5, table: '2', note: Printed initial weights across runs}
     printed_composition:
-      state: {tag: value, value: Anorthite-diopside eutectic, 42 wt% anorthite and 58 wt% diopside; Ga, In, and Tl trace-element additions vary by run}
+      state: {tag: value, value: 'Anorthite-diopside eutectic, 42 wt% anorthite and 58 wt% diopside; Ga, In, and Tl trace-element additions vary by run'}
       locator: {page: 4, section: '2.1 Sample preparation'}
     form:
       state: {tag: value, value: Powdered glass}
@@ -357,7 +357,7 @@ experiments:
       state: {tag: value, value: EPMA of pre-KEMS and post-KEMS glasses}
       locator: {page: 6, section: '2.2.2 Electron probe micro-analyser'}
     pretreatment:
-      state: {tag: value, value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched}
+      state: {tag: value, value: 'Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched'}
       locator: {page: 4, section: '2.1 Sample preparation'}
   apparatus:
     geometry:
@@ -386,7 +386,7 @@ experiments:
       locator: {page: 5, table: '2'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, table: '2', note: 15 h at 1742 K applies to 1_low only, not every series run}
+      locator: {page: 5, table: '2', note: '15 h at 1742 K applies to 1_low only, not every series run'}
 species:
   Ga:
     observations:

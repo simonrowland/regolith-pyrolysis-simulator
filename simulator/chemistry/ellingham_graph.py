@@ -25,6 +25,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 # Match simulator.state.GAS_CONSTANT without importing simulator.state here.
 GAS_CONSTANT_J_PER_MOL_K = 8.31446
@@ -160,9 +161,7 @@ def _metal_activity_factor_from_segment(
 
 
 def _load_default_vapor_pressure_data() -> dict[str, Any]:
-    import yaml
-
-    return yaml.safe_load(_DEFAULT_VAPOR_PRESSURES_PATH.read_text())
+    return load_cached_safe_yaml(_DEFAULT_VAPOR_PRESSURES_PATH.read_text())
 
 
 def _resolve_vapor_pressure_data(

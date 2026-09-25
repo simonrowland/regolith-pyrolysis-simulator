@@ -19,6 +19,8 @@ from typing import Any, Iterable, Iterator, Mapping
 
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data" / "literature" / "compilations" / "sgte-unary"
 SOURCE_TDB = COMPILATION_ROOT / "source" / "unary50.tdb"
@@ -1358,7 +1360,7 @@ def build_manifest(
 
 
 def load_record_yaml(path: Path) -> dict[str, Any]:
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise SgteUnaryError(f"{path}: record is not a mapping")
     return payload
@@ -1366,7 +1368,7 @@ def load_record_yaml(path: Path) -> dict[str, Any]:
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
     manifest_path = path or MANIFEST_PATH
-    payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise SgteUnaryError(f"{manifest_path}: manifest is not a mapping")
     return payload
@@ -1394,7 +1396,7 @@ def feedstock_elements(feedstocks_path: Path | None = None) -> tuple[str, ...]:
     """Element symbols declared in data/feedstocks.yaml, including oxygen."""
 
     path = feedstocks_path or FEEDSTOCKS_PATH
-    payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
     elements: set[str] = set()
     if not isinstance(payload, Mapping):
         raise SgteUnaryError(f"{path}: expected a mapping")

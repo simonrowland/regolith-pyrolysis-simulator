@@ -88,7 +88,7 @@ experiments:
         - original_unit=wt_pct
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      state: {tag: value, value: 'Milled powder, sieved using a 63-μm mesh sieve'}
       locator: *reduction_locator
     pretreatment:
       state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}
@@ -114,7 +114,7 @@ experiments:
     pumping:
       base_pressure_Pa:
         state: {tag: not_applicable, reason: not_applicable}
-        locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention, not a pump or base-pressure measurement}
+        locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: 'The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention, not a pump or base-pressure measurement'}
   thermal_schedule:
     method:
       state: {tag: value, value: H2 flush before heating; furnace turned off after roasting; tube immediately removed and cooled by pressurized air then wet towels}
@@ -172,7 +172,7 @@ experiments:
         - original_unit=wt_pct
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      state: {tag: value, value: 'Milled powder, sieved using a 63-μm mesh sieve'}
       locator: *reduction_locator
     pretreatment:
       state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}
@@ -219,7 +219,7 @@ experiments:
         - original_unit=wt_pct
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      state: {tag: value, value: 'Milled powder, sieved using a 63-μm mesh sieve'}
       locator: *reduction_locator
     pretreatment:
       state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}

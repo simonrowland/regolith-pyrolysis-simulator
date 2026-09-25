@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/robie-hemingway-1995-usgs-b2131"
@@ -24,7 +24,7 @@ class OcrSuspectTableValueError(LookupError):
 
 
 def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
-    return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    return load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
 
 
 def _has_ocr_suspect_value(value) -> bool:

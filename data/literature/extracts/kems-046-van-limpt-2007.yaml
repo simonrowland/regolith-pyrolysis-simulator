@@ -50,7 +50,7 @@ benches:
     state: {tag: value, value: Electrically heated horizontal Al2O3 tube furnace}
     locator: {page: 127, section: '3.2.1'}
   detector:
-    state: {tag: value, value: Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser}
+    state: {tag: value, value: 'Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser'}
     locator: {page: 127, section: '3.2.2', figure: '3.2'}
   temperature_measurement:
     sensor:
@@ -87,7 +87,7 @@ experiments:
         table: '4.2'
         note: 'Float glass without SO3 column; XRF mass% as printed; label float glass without SO3; cells printed <0.01 omitted (SO3, Cl, Sb2O3, BaO)'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -102,7 +102,7 @@ experiments:
       locator: {page: 127, section: '3.2.1', note: Carrier-gas experiment; no total run pressure printed}
     sweep_gas:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 127, section: '3.2.2', note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are not}
+      locator: {page: 127, section: '3.2.2', note: 'N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are not'}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
@@ -144,7 +144,7 @@ experiments:
         table: '4.2'
         note: 'Float glass with SO3 column; XRF mass% as printed; label float glass with SO3; cells printed <0.01 omitted (Cl, Sb2O3, BaO)'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -173,7 +173,7 @@ experiments:
         table: '4.2'
         note: 'Tableware glass A column; XRF mass% as printed; measured (not parenthetical) values; cells printed <0.01 omitted (MgO, Fe2O3, Cl); Sb2O3 uses measured 0.22 not batch (0.30)'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -205,7 +205,7 @@ experiments:
         table: '4.2'
         note: 'Tableware glass B column; ONLY parenthetical theoretical batch mass% are printed (footnote 1); no measured XRF column body; landed as printed theoretical values; zeros printed as 0 retained'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -235,7 +235,7 @@ experiments:
         table: '4.2'
         note: 'Tableware glass C column; XRF mass% as printed; measured values (parenthetical batch ignored); cells printed <0.01 omitted (MgO, Fe2O3); SO3 uses measured 0.13 not (0.40); Cl uses 0.03 not (0.44); Sb2O3 uses 0.06 not (0.10)'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -301,7 +301,7 @@ experiments:
           max_abs_residual_wt_pct: '7.492e-11'
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -367,7 +367,7 @@ experiments:
           max_abs_residual_wt_pct: '5.367e-11'
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -434,7 +434,7 @@ experiments:
           note: Printed glass-3 values sum to 99.95 wt%; the check preserves that printed total instead of silently renormalising it to 100.
         output_unit: mole_fraction
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
@@ -453,7 +453,7 @@ experiments:
         section: '4.3.1'
         note: 'Named sodium-disilicate melt; scout/Table search found no separate binary wt% starting assay; stoichiometric oxide wt% not invented'
     form:
-      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      state: {tag: value, value: 'Quenched cullet grains, 5-10 mm'}
       locator: {page: 127, section: '3.2.1'}
     pretreatment:
       state: {tag: value, value: Cullet remelted in boat for 30-60 min at 1400-1450 C}

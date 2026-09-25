@@ -49,6 +49,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
@@ -278,7 +279,7 @@ def _load_yaml(path: Path) -> dict:
     if not path.exists():
         raise RunnerError(f"required data file missing: {path}")
     with path.open() as f:
-        return yaml.safe_load(f) or {}
+        return load_cached_safe_yaml(f.read()) or {}
 
 
 @dataclass(frozen=True)
@@ -312,7 +313,7 @@ def _load_preset_run_spec(
 ) -> PresetRunSpec | MREPresetRunSpec:
     try:
         raw_bytes = path.read_bytes()
-        document = yaml.safe_load(raw_bytes.decode("utf-8")) or {}
+        document = load_cached_safe_yaml(raw_bytes) or {}
     except (OSError, UnicodeDecodeError, yaml.YAMLError) as exc:
         raise PresetRunnerError(
             f"malformed_preset: could not read preset file {path}: {exc}",
@@ -436,7 +437,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         "digest": f"sha256:{digest}",
     }
     try:
-        preset = yaml.safe_load(raw_bytes.decode("utf-8")) or {}
+        preset = load_cached_safe_yaml(raw_bytes) or {}
     except (UnicodeDecodeError, yaml.YAMLError) as exc:
         raise PresetRunnerError(
             f"malformed_preset: {path}: {exc}",

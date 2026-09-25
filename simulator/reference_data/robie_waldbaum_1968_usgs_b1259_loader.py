@@ -16,6 +16,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data/literature/compilations/robie-waldbaum-1968-usgs-b1259"
@@ -2348,7 +2349,7 @@ def lookup(
 
 
 def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
-    return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    return load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
 
 
 def load_records(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False):

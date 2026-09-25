@@ -52,7 +52,7 @@ experiments:
       state: {tag: value, value: Oxide and carbonate powders crushed under ethanol then decarbonated overnight at 1273 K; starting compositions reground.}
       locator: {page: 151, section: '2.1 Starting materials'}
     characterization:
-      state: {tag: value, value: Quenched glasses analyzed by EPMA and, for low S, SIMS}
+      state: {tag: value, value: 'Quenched glasses analyzed by EPMA and, for low S, SIMS'}
       locator: {page: 152, section: '2.3 Analyses'}
   conditions:
     temperature_K:
@@ -61,7 +61,7 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '101325'}}
-      locator: {page: 152, section: '2.2 Experimental conditions', note: Atmospheric pressure, 1 atm; unit conversion only.}
+      locator: {page: 152, section: '2.2 Experimental conditions', note: 'Atmospheric pressure, 1 atm; unit conversion only.'}
     sweep_gas:
       state:
         tag: value
@@ -75,7 +75,7 @@ experiments:
   fO2_control:
     channel: {tag: value, value: gas_mix}
     buffer:
-      state: {tag: value, value: Air/SO2 ratios 0.11, 0.60, and 4.00; oxidizing fO2 above FMQ, calculated from thermodynamic data}
+      state: {tag: value, value: 'Air/SO2 ratios 0.11, 0.60, and 4.00; oxidizing fO2 above FMQ, calculated from thermodynamic data'}
       locator: *bw_conditions
   thermal_schedule:
     method:
@@ -83,7 +83,7 @@ experiments:
       locator: *bw_conditions
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 152, table: '2', note: Table gives 10 h at lower temperatures, 8 h at 1723 K, and 6 h at 1773 K; no universal duration.}
+      locator: {page: 152, table: '2', note: 'Table gives 10 h at lower temperatures, 8 h at 1723 K, and 6 h at 1773 K; no universal duration.'}
     setpoints_and_holds:
     - temperature_K:
         state: {tag: value, value: {kind: interval, interval_low: '1473', interval_high: '1773'}}

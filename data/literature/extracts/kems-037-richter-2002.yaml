@@ -18,7 +18,7 @@ benches:
     state: {tag: value, value: Langmuir free-evaporation furnace suite}
     locator: {page: 525, section: '5.2 Experimental Procedure'}
   heating_method:
-    state: {tag: value, value: Three furnaces for vacuum, hydrogen, and gas-mixing pressure regimes}
+    state: {tag: value, value: 'Three furnaces for vacuum, hydrogen, and gas-mixing pressure regimes'}
     locator: {page: 525, section: '5.2 Experimental Procedure'}
   detector:
     state: {tag: value, value: JEOL JSM-5800LV SEM with Oxford Link ISIS-300 EDS}
@@ -28,7 +28,7 @@ experiments:
   experiment_id: b-133-evaporation
   bench_id: evaporation-furnaces
   method: langmuir_free_evaporation
-  locator: {page: 525, section: '5.1 Starting Materials', note: B-133 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
+  locator: {page: 525, section: '5.1 Starting Materials', note: 'B-133 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
@@ -73,7 +73,7 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 525, table: '1', note: Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned}
+      locator: {page: 525, table: '1', note: 'Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned'}
     sweep_gas:
       state: {tag: unknown, reason: not_published}
       locator: {page: 525, section: '5.2 Experimental Procedure', note: Multiple pressure-regime furnaces; no common sweep gas}
@@ -88,7 +88,7 @@ experiments:
       locator: {page: 525, table: '1', note: 15-300 min per run; converted to s}
 - <<: *cai_common
   experiment_id: b-113-evaporation
-  locator: {page: 525, section: '5.1 Starting Materials', note: B-113 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
+  locator: {page: 525, section: '5.1 Starting Materials', note: 'B-113 starting-glass series; Table 1 retains per-run temperature, pressure, area and duration'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
@@ -132,7 +132,7 @@ experiments:
       locator: {page: 525, section: '5.1 Starting Materials'}
 - <<: *cai_common
   experiment_id: bcai-evaporation
-  locator: {page: 525, section: '5.1 Starting Materials', note: BCAI starting-glass series; Table 1 retains per-run temperature, pressure, area and duration}
+  locator: {page: 525, section: '5.1 Starting Materials', note: 'BCAI starting-glass series; Table 1 retains per-run temperature, pressure, area and duration'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}

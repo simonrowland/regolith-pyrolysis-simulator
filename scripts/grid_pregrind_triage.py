@@ -16,9 +16,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from scripts.grid_pregrind import DEFAULT_FEEDSTOCK_ANCHORS
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 FAITHFUL_RUMP = "faithful-rump"
@@ -242,7 +241,7 @@ def build_triage_report(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 def load_feedstock_anchors(path: Path) -> dict[str, dict[str, float]]:
-    payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
     return {
         str(feedstock_id): {
             str(species): float(value)

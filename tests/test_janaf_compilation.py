@@ -17,6 +17,8 @@ import os
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.reference_data.janaf import (
     COMPILATION_ROOT,
     NON_STOICHIOMETRIC_TABLES,
@@ -339,7 +341,7 @@ def test_compilation_refuses_validation_and_scoring() -> None:
 
 def test_legacy_extract_left_in_place() -> None:
     assert EXTRACT.is_file()
-    payload = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(EXTRACT.read_text(encoding="utf-8"))
     assert payload["source_id"] == "janaf-4th"
     assert payload["schema_version"] == "literature_extract.v1"
 

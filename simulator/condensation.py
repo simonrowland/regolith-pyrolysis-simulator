@@ -122,6 +122,7 @@ from simulator.accounting.queries import (
 from simulator.config import load_config_bundle
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
@@ -386,7 +387,7 @@ C4B_WALL_ROUTE_ORDER = ('SiO', 'Mg', 'Fe', 'Na', 'K')
 
 
 def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
-    raw = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+    raw = load_cached_safe_yaml(path.read_text(encoding='utf-8')) or {}
     if not isinstance(raw, Mapping):
         raise ValueError(f'{path}: sticking data must be a mapping')
     species = raw.get('species')
@@ -640,7 +641,7 @@ def _validate_alkali_activity_entry(path: Path, species: str, entry: Any) -> Non
 def _load_wall_reactivity_matrix(
     path: Path = WALL_REACTIVITY_MATRIX_PATH,
 ) -> dict[str, Any]:
-    raw = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+    raw = load_cached_safe_yaml(path.read_text(encoding='utf-8')) or {}
     if not isinstance(raw, Mapping):
         raise ValueError(f'{path}: wall reactivity matrix must be a mapping')
     if raw.get('version') != 1:

@@ -20,12 +20,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
-import yaml
-
-try:
-    _YAML_LOADER = yaml.CSafeLoader
-except AttributeError:  # pragma: no cover
-    _YAML_LOADER = yaml.SafeLoader
+from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data" / "literature" / "compilations" / "janaf"
@@ -680,16 +675,15 @@ def load_table_document(path: Path) -> dict[str, Any]:
     if raw.lstrip().startswith(b"{"):
         document = json.loads(raw.decode("utf-8"))
     else:
-        document = yaml.load(raw.decode("utf-8"), Loader=_YAML_LOADER)
+        document = load_cached_safe_yaml(raw)
     if not isinstance(document, Mapping):
         raise JanafParseError(f"{path}: expected a mapping")
     return dict(document)
 
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
-    payload = yaml.load(
-        (path or MANIFEST_PATH).read_text(encoding="utf-8"),
-        Loader=_YAML_LOADER,
+    payload = load_cached_safe_yaml(
+        (path or MANIFEST_PATH).read_text(encoding="utf-8")
     )
     if not isinstance(payload, Mapping):
         raise JanafParseError("manifest is not a mapping")
@@ -746,7 +740,7 @@ def feedstock_element_symbols(feedstocks_path: Path | None = None) -> list[str]:
     """Element symbols declared in ``data/feedstocks.yaml`` compositions."""
 
     path = feedstocks_path or FEEDSTOCKS_PATH
-    payload = yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise JanafParseError(f"{path}: expected mapping")
     found: set[str] = set()

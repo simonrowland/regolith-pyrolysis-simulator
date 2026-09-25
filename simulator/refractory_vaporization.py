@@ -6,11 +6,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Mapping
 
-import yaml
 from scipy.optimize import brentq
 
 from simulator.accounting.formulas import parse_formula
 from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 STANDARD_PRESSURE_PA = 100_000.0
@@ -100,7 +100,7 @@ class CongruentVaporizationResult:
 @lru_cache(maxsize=1)
 def _thermo_data() -> dict:
     with _DATA_PATH.open() as handle:
-        data = yaml.safe_load(handle)
+        data = load_cached_safe_yaml(handle.read())
     if float(data["standard_pressure_pa"]) != STANDARD_PRESSURE_PA:
         raise CongruentVaporizationError(
             "refractory vapor sidecar standard pressure must be 100000 Pa"

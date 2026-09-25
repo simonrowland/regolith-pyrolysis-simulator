@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
@@ -882,7 +883,7 @@ def _diagnostic_source_label(
 def _load_default_vapor_pressure_data() -> dict[str, Any]:
     root = Path(__file__).resolve().parents[2]
     with (root / "data" / "vapor_pressures.yaml").open() as handle:
-        payload = yaml.safe_load(handle) or {}
+        payload = load_cached_safe_yaml(handle.read()) or {}
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     return vapor_pressure_legacy_view(payload)

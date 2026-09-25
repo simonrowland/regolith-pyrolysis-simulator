@@ -220,6 +220,12 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
     def refuse_after_registering_fallback() -> None:
         sim._register_freeze_gate_liquid_fraction_providers()
         assert registry.fallback_for(intent) is not None
+        registry.register(
+            MAGEMinShadowProvider(),
+            [intent],
+            shadow=True,
+        )
+        assert len(registry.shadows_for(intent)) == 2
         raise refusal
 
     sim._step_one_hour = refuse_after_registering_fallback

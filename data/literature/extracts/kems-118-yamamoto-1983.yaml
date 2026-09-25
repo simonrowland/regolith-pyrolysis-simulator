@@ -87,7 +87,7 @@ benches:
       locator: *yam_apparatus
     uncertainty:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 2, published_page: 56, note: Printed +/-1 C is temperature fluctuation, not calibration uncertainty}
+      locator: {page: 2, published_page: 56, note: 'Printed +/-1 C is temperature fluctuation, not calibration uncertainty'}
   other_facts:
   - name: temperature_fluctuation_magnitude
     unit: C
@@ -156,7 +156,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p020
   bench_id: rm-6e
@@ -219,7 +219,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p030
   bench_id: rm-6e
@@ -282,7 +282,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p040
   bench_id: rm-6e
@@ -345,7 +345,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p050
   bench_id: rm-6e
@@ -408,7 +408,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p060
   bench_id: rm-6e
@@ -471,7 +471,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p070
   bench_id: rm-6e
@@ -534,7 +534,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p080
   bench_id: rm-6e
@@ -597,7 +597,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p089
   bench_id: rm-6e
@@ -660,7 +660,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 
 - experiment_id: fe-sn-nsn-0p100
   bench_id: rm-6e
@@ -723,7 +723,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 - experiment_id: fe-sn-series
   bench_id: rm-6e
   method: knudsen_effusion
@@ -733,7 +733,7 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: *yam_apparatus
     printed_composition:
-      state: {tag: value, value: Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays, not charge composition}
+      state: {tag: value, value: 'Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays, not charge composition'}
       locator: {page: 2, published_page: 56, note: 'Series label retained; dilute Table 4 N_Sn grid is on fe-sn-nsn-* experiments; Table 1 impurity assay is not the charge'}
     form:
       state: {tag: value, value: Alloys melted in situ}
@@ -764,7 +764,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+      locator: {page: 5, published_page: 60, note: '7200 s is the printed depletion-model time, not a universal experimental hold'}
 - experiment_id: fe-sn-cu-series
   bench_id: rm-6e
   method: knudsen_effusion
@@ -783,7 +783,7 @@ experiments:
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 5, published_page: 60, note: 0.3 mm usually used, but no per-row assignment for Fe-Sn-Cu table}
+        locator: {page: 5, published_page: 60, note: '0.3 mm usually used, but no per-row assignment for Fe-Sn-Cu table'}
       orifice_channel_length_m:
         state: {tag: value, value: {kind: point, point: '0.001'}}
         locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
@@ -802,7 +802,7 @@ experiments:
       locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 60, note: Printed t=7200 s belongs to depletion calculation, not a measurement hold}
+      locator: {page: 5, published_page: 60, note: 'Printed t=7200 s belongs to depletion calculation, not a measurement hold'}
 species:
   Fe:
     observations:

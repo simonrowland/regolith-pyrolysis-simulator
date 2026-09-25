@@ -936,7 +936,7 @@ def view_over_residuals(
 
     key_map: dict[str, str] = {}
     if pins_path.is_file():
-        doc = yaml.safe_load(pins_path.read_text(encoding="utf-8")) or {}
+        doc = load_cached_safe_yaml(pins_path.read_text(encoding="utf-8")) or {}
         key_map = dict(doc.get("key_map") or {})
     old_rows = [asdict(s) for s in scores]
     new_rows = list(load_residuals_jsonl(residuals_path))
@@ -1071,7 +1071,7 @@ def write_ledger(
 
 def load_ledger(path: Path | None = None) -> dict[str, Any]:
     dest = path or LEDGER_PATH
-    doc = yaml.safe_load(dest.read_text(encoding="utf-8"))
+    doc = load_cached_safe_yaml(dest.read_text(encoding="utf-8"))
     if not isinstance(doc, Mapping):
         raise GibbsBatteryError(f"ledger is not a mapping: {dest}")
     return dict(doc)

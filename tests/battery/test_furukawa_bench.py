@@ -2,6 +2,8 @@ from pathlib import Path
 
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from simulator.battery.enums import BenchIdentityBasis, ValueKind
 from simulator.battery.migrate import Migrator
 from simulator.battery.waypoints import effective_escape_area
@@ -10,7 +12,7 @@ from tests.battery.test_migrate import _write_min_tree
 
 def test_furukawa_registry_preserves_unassigned_geometry_and_observations(tmp_path):
     path = Path(__file__).resolve().parents[2] / "data/literature/extracts/kems-119-furukawa-1975.yaml"
-    doc = yaml.safe_load(path.read_text())
+    doc = load_cached_safe_yaml(path.read_text())
     doc["source_id"] = "fixture-source"
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     bench, = result.benches.values()

@@ -18,6 +18,7 @@ from simulator.recipe import (
     RecipeSchema,
     RecipeValidationError,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 RECIPE_LIBRARY_DIR = Path(__file__).resolve().parent.parent / "data" / "recipes"
@@ -229,7 +230,7 @@ def _load_recipe_mapping(path: Path) -> Mapping[str, Any]:
         raise RecipeIOError(f"recipe file not found: {path}")
     try:
         with path.open("r", encoding="utf-8") as handle:
-            payload = yaml.safe_load(handle)
+            payload = load_cached_safe_yaml(handle.read())
     except yaml.YAMLError as exc:
         raise RecipeIOError(f"recipe file malformed YAML ({path}): {exc}") from exc
     except OSError as exc:

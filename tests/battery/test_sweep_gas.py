@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
-import yaml
+
+from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import (
@@ -48,7 +50,9 @@ def _extract_with_gas(gas: object) -> dict:
 
 
 def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
-    doc = yaml.safe_load((EXTRACTS / "kems-027-plante-hastie-1983.yaml").read_text())
+    doc = load_cached_safe_yaml(
+        (EXTRACTS / "kems-027-plante-hastie-1983.yaml").read_text()
+    )
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     experiment = next(e for e in result.experiments.values()
                       if e.experiment_id.endswith("::tms-n2-glass-series"))
@@ -62,6 +66,14 @@ def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
     assert printed["analytical"]["Na2O"] == "8.59"
     gas = plain["pressure_environment"]["sweep_gas"]["state"]["value"]
     assert gas["species"] == "N2"
+    payload = json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
+    # SC-289 restores the comma-truncated temperature and duration notes in
+    # this extract-derived payload. The candidate line also preserves the
+    # printed nominal and analytical compositions above.
+    assert len(payload) == 4429
+    assert hashlib.sha256(payload).hexdigest() == (
+        "42abec9a42d254ffc175d2953f72c5c7d044bbf37b27a72adbdec94ed832430d"
+    )
     assert to_plain(experiment_from_plain(plain)) == plain
 
 
@@ -117,7 +129,7 @@ def test_component_quantities_round_trip() -> None:
 
 
 def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
-    doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
+    doc = load_cached_safe_yaml((EXTRACTS / "ts1985.yaml").read_text())
     assert validate_extract_document(doc) == []
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     # EP split the printed composition/temperature runs into distinct

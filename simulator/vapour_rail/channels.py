@@ -1601,10 +1601,10 @@ def load_typed_needs_channel_reasons(
             raise ValueError(
                 "load_typed_needs_channel_reasons requires entries= or gaps_path="
             )
-        import yaml
-
         path = Path(gaps_path)
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        from simulator.yaml_cache import load_cached_safe_yaml
+
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         raw_entries = payload.get("entries") if isinstance(payload, Mapping) else None
         if not isinstance(raw_entries, list):
             return ()
@@ -1637,10 +1637,10 @@ def reconstruct_878_pathway_cohort(
             raise ValueError(
                 "reconstruct_878_pathway_cohort requires entries= or gaps_path="
             )
-        import yaml
-
         path = Path(gaps_path)
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        from simulator.yaml_cache import load_cached_safe_yaml
+
+        payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         raw_entries = payload.get("entries") if isinstance(payload, Mapping) else None
         if not isinstance(raw_entries, list):
             entries = []

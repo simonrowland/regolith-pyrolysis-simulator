@@ -39,8 +39,7 @@ os.environ.setdefault("XDG_CACHE_HOME", str(_CACHE_ROOT / "xdg-cache"))
 Path(os.environ["MPLCONFIGDIR"]).mkdir(parents=True, exist_ok=True)
 Path(os.environ["XDG_CACHE_HOME"]).mkdir(parents=True, exist_ok=True)
 
-import yaml
-
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -161,7 +160,7 @@ def _skip_result(name: str, description: str, reason: str) -> dict[str, Any]:
 
 
 def _load_profile(path: Path) -> dict[str, Any]:
-    loaded = yaml.safe_load(path.read_text())
+    loaded = load_cached_safe_yaml(path.read_text())
     if not isinstance(loaded, dict):
         raise ValueError(f"profile must load to a mapping: {path}")
     return loaded
@@ -442,7 +441,7 @@ def _fork_worker(queue: Any, payload: str) -> None:
         if payload == "noop":
             queue.put(("ok", None))
             return
-        profile = yaml.safe_load(Path(payload).read_text())
+        profile = load_cached_safe_yaml(Path(payload).read_text())
         if not isinstance(profile, dict):
             raise ValueError(f"profile must load to a mapping: {payload}")
         _evaluate_internal_analytical_once(profile, candidate_id="profile-fork")

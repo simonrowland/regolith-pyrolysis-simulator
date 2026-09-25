@@ -28,8 +28,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
@@ -40,6 +38,7 @@ from engines.builtin.vapor_pressure import (
 )
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.evaporation import _load_evaporation_alpha_by_species
+from simulator.yaml_cache import load_cached_safe_yaml
 _VAPOR_PRESSURE_GROUPS = ("metals", "oxide_vapors")
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _VAPOR_PRESSURES_PATH = _REPO_ROOT / "data" / "vapor_pressures.yaml"
@@ -292,7 +291,7 @@ def series_flux(
 
 @lru_cache(maxsize=1)
 def _vapor_pressure_data() -> dict[str, Any]:
-    payload = yaml.safe_load(_VAPOR_PRESSURES_PATH.read_text()) or {}
+    payload = load_cached_safe_yaml(_VAPOR_PRESSURES_PATH.read_text()) or {}
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     return vapor_pressure_legacy_view(payload)
@@ -374,7 +373,7 @@ class BaselineValidationRow:
 
 
 def _baseline_validation_rows() -> list[dict[str, Any]]:
-    payload = yaml.safe_load(_VALIDATION_SIDECAR_PATH.read_text()) or {}
+    payload = load_cached_safe_yaml(_VALIDATION_SIDECAR_PATH.read_text()) or {}
     measurements = payload.get("measurements") or {}
     return [
         dict(row, measurement_id=measurement_id)

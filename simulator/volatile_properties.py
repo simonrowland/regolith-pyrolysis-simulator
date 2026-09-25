@@ -22,8 +22,6 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Literal, TypeAlias
 
-import yaml
-
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     SpeciesFormula,
@@ -31,6 +29,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 PropertyKind: TypeAlias = Literal[
@@ -879,7 +878,7 @@ def _catalog() -> tuple[
     Mapping[str, str],
 ]:
     with _SPECIES_CATALOG_PATH.open("r", encoding="utf-8") as handle:
-        raw = yaml.safe_load(handle) or {}
+        raw = load_cached_safe_yaml(handle.read()) or {}
     entries = raw.get("species")
     if not isinstance(entries, Sequence):
         raise _fail("invalid_species_catalog", "species catalog must contain a list")
@@ -1089,7 +1088,7 @@ class VolatilePropertyRegistry:
                     "public registry loading cannot read from tests/",
                 )
             with source_path.open("r", encoding="utf-8") as handle:
-                data = yaml.safe_load(handle) or {}
+                data = load_cached_safe_yaml(handle.read()) or {}
             try:
                 source_registry = str(source_path.relative_to(_PROJECT_ROOT))
             except ValueError:
@@ -1285,7 +1284,7 @@ class VolatilePropertyRegistry:
                     f"{label}.source_path must be data/vapor_pressures.yaml",
                 )
             with source_file.open("r", encoding="utf-8") as handle:
-                legacy_root = yaml.safe_load(handle) or {}
+                legacy_root = load_cached_safe_yaml(handle.read()) or {}
             from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
             legacy_root = vapor_pressure_legacy_view(legacy_root)

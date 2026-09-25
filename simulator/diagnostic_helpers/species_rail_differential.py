@@ -66,6 +66,7 @@ from simulator.reference_data.janaf import (
     iter_table_paths,
     load_table_document,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.state import OXIDE_TO_METAL
 from simulator.vapour_rail.catalog import (
     CatalogCompileError,
@@ -990,7 +991,7 @@ def ellingham_provenance(metal: str, compilation_id: str) -> str:
 
 @lru_cache(maxsize=1)
 def _vapor_pressures_payload() -> Mapping[str, Any]:
-    return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text(encoding="utf-8")) or {}
+    return load_cached_safe_yaml(VAPOR_PRESSURES_PATH.read_text(encoding="utf-8")) or {}
 
 
 @lru_cache(maxsize=1)

@@ -25,8 +25,6 @@ if str(REPO_ROOT) not in sys.path:
 
 MAX_SOLVES = 50
 
-import yaml  # noqa: E402
-
 from simulator.alphamelts_reference_pressure import (  # noqa: E402
     alphamelts_condensed_phase_pressure_bar,
     annotate_alphamelts_reference_pressure,
@@ -37,6 +35,7 @@ from simulator.melt_backend.melt_envelope import (  # noqa: E402
     melt_extrapolation_diagnostic,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend  # noqa: E402
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.optimize.canonical import (  # noqa: E402
     canonical_json_dumps,
     normalize_canonical_value,
@@ -846,7 +845,7 @@ def normalize_composition(value: Any) -> dict[str, float]:
 
 def load_yaml(path: Path) -> Any:
     with path.open() as handle:
-        return yaml.safe_load(handle) or {}
+        return load_cached_safe_yaml(handle.read()) or {}
 
 
 def data_digests_for(profile_path: Path) -> dict[str, str]:

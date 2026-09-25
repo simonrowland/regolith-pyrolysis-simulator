@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml as _load_cached_safe_yaml
 
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/pankratz-1987-usbm-b689"
@@ -34,7 +34,7 @@ def _guard(value, record_id, include_ocr_suspect):
 
 
 def _manifest(root):
-    return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    return _load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
 
 
 def _record(root, entry):

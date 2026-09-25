@@ -46,7 +46,7 @@ experiments:
   locator: {page: 5, section: DSC, note: Six lunar-regolith simulants measured under argon}
   sample:
     printed_composition:
-      state: {tag: value, value: Six lunar regolith simulants, including EAC-1}
+      state: {tag: value, value: 'Six lunar regolith simulants, including EAC-1'}
       locator: {page: 5, section: DSC}
   conditions:
     temperature_K:
@@ -54,11 +54,11 @@ experiments:
       locator: {page: 5, section: DSC, note: Starts at room temperature; no numerical start temperature printed}
   thermal_schedule:
     method:
-      state: {tag: value, value: Heated from room temperature to 1,200 C at 10 K/minute}
+      state: {tag: value, value: 'Heated from room temperature to 1,200 C at 10 K/minute'}
       locator: {page: 5, section: DSC}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, section: DSC, note: Heating rate and endpoints are printed, but no duration is stated}
+      locator: {page: 5, section: DSC, note: 'Heating rate and endpoints are printed, but no duration is stated'}
 species:
   EAC-1A:
     observations:

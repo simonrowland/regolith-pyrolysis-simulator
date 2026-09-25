@@ -43,12 +43,12 @@ experiments:
       state: {tag: value, value: {kind: interval, interval_low: '0.00005', interval_high: '0.0003'}}
       locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: 50-300 mg solvent-extracted sample; unit conversion only}
     printed_composition:
-      state: {tag: value, value: Crushed whole Murchison meteorite, solvent-extracted and catalyst-impregnated}
+      state: {tag: value, value: 'Crushed whole Murchison meteorite, solvent-extracted and catalyst-impregnated'}
       locator: *hydro_apparatus
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: Program has 220 C and 520 C endpoints, not one run temperature}
+      locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: 'Program has 220 C and 520 C endpoints, not one run temperature'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '15000000'}}

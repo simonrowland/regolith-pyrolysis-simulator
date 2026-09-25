@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
-import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPILATION_ROOT = ROOT / "data" / "literature" / "compilations" / "nasa-glenn"
@@ -1173,7 +1173,7 @@ def load_record_document(path: Path) -> dict[str, Any]:
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
     manifest_path = path or (COMPILATION_ROOT / "manifest.yaml")
-    payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise NasaGlennParseError(f"{manifest_path}: manifest is not a mapping")
     return payload
@@ -1231,7 +1231,7 @@ _FEEDSTOCK_COMPOSITION_SECTIONS = (
 def feedstock_element_symbols(feedstocks_path: Path | None = None) -> list[str]:
     """Element symbols declared in ``data/feedstocks.yaml`` compositions."""
     path = feedstocks_path or (ROOT / "data" / "feedstocks.yaml")
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise NasaGlennParseError(f"{path}: expected mapping")
     found: set[str] = set()

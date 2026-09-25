@@ -65,7 +65,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 8, section: '2.1 Experiments', note: Discrete 1250, 1300, and 1400 C setpoints are retained in observations; no single series setpoint}
+      locator: {pdf_page_index: 8, section: '2.1 Experiments', note: 'Discrete 1250, 1300, and 1400 C setpoints are retained in observations; no single series setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}

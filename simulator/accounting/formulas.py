@@ -12,6 +12,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.yaml_cache import load_cached_safe_yaml
 
 
 # Abridged standard atomic weights for normal terrestrial materials.
@@ -459,13 +460,7 @@ class _FormulaParser:
 
 def _load_formula_source(source: str | Path | Mapping[str, Any]) -> Mapping[str, Any]:
     if isinstance(source, (str, Path)):
-        try:
-            import yaml
-        except ImportError as exc:  # pragma: no cover - depends on environment
-            raise AccountingError("PyYAML is required to load formula YAML") from exc
-
-        with Path(source).open("r", encoding="utf-8") as handle:
-            data = yaml.safe_load(handle) or {}
+        data = load_cached_safe_yaml(Path(source).read_text(encoding="utf-8")) or {}
     elif isinstance(source, Mapping):
         data = source
     else:

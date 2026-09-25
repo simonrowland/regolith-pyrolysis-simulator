@@ -78,6 +78,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import Bench, BenchIdentity, Reaction, Species, State, as_decimal
 from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
+from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from tests.battery import factories as F
 
 FIXTURE_EXTRACT = {
@@ -2135,7 +2136,7 @@ def test_j01_explicit_pressure_atm_control_still_lifts(tmp_path: Path) -> None:
 
 def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     src = REPO_ROOT / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml"
-    extract = yaml.safe_load(src.read_text(encoding="utf-8"))
+    extract = load_cached_safe_yaml(src.read_text(encoding="utf-8"))
     root = _write_min_tree(tmp_path, extract)
     (root / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml").write_text(
         src.read_text(encoding="utf-8"), encoding="utf-8"
@@ -2686,7 +2687,7 @@ def test_k01_tsaplin_store_activity_not_coefficient() -> None:
     path = REPO_ROOT / "data" / "literature" / "extracts-v2" / "kems-ms2000-044.yaml"
     if not path.is_file():
         pytest.skip("migrated store not generated yet")
-    stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+    stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     rows = [
         o
         for o in stored.get("observations") or []
@@ -3013,7 +3014,7 @@ def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
         path = REPO_ROOT / "data" / "literature" / "extracts-v2" / fname
         if not path.is_file():
             pytest.skip("migrated store not generated yet")
-        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         rows = [
             o
             for o in stored.get("observations") or []
@@ -3348,7 +3349,7 @@ _FIELD_ALPHA_CONTRADICTIONS = [
 
 
 def _extract_observation(fname: str, observation_id: str) -> dict:
-    source = yaml.safe_load(
+    source = load_cached_safe_yaml(
         (REPO_ROOT / "data" / "literature" / "extracts" / fname).read_text(encoding="utf-8")
     )
     for body in (source.get("species") or {}).values():
@@ -4521,7 +4522,7 @@ def test_l05g0_store_atomic_weight_is_not_delta_fg() -> None:
     )
     if not path.is_file():
         pytest.skip("migrated store not generated yet")
-    stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+    stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     rows = [
         o
         for o in stored.get("observations") or []
@@ -4565,7 +4566,7 @@ def test_observation_store_reader_unions_file_and_shard_directory(tmp_path: Path
 
 
 _OBS_V2 = REPO_ROOT / "data" / "literature" / "observations-v2"
-_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+_YAML_LOADER = YAML12SafeLoader
 
 
 def _account_compilation_shard(path: Path, summary: dict[str, dict]) -> None:
@@ -5849,7 +5850,7 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
     ]
     rows = []
     for path in files:
-        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         for raw in stored.get("observations") or []:
             obs = observation_from_plain(raw)
             q = quantity_token(obs.identity)
@@ -5893,7 +5894,7 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_not_robinot_duplicates(
     tmp_path: Path,
 ) -> None:
     root = _write_min_tree(tmp_path)
-    sidecar = yaml.safe_load(
+    sidecar = load_cached_safe_yaml(
         (REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml").read_text(
             encoding="utf-8"
         )
@@ -5966,7 +5967,7 @@ def test_d032_context_rows_carried_not_observed(tmp_path: Path) -> None:
     works_docs = [
         d
         for d in (
-            yaml.safe_load(p.read_text(encoding="utf-8"))
+            load_cached_safe_yaml(p.read_text(encoding="utf-8"))
             for p in (root / "data" / "literature" / "works").glob("*.yaml")
         )
         if isinstance(d, dict)
@@ -5985,7 +5986,7 @@ def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
     ``boulliung_2025_ssas_apparatus_and_run_conditions`` BY REFERENCE.
     Equipment values are read through the FK and never copied onto the
     experiment record."""
-    extract = yaml.safe_load(
+    extract = load_cached_safe_yaml(
         (
             REPO_ROOT
             / "data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml"

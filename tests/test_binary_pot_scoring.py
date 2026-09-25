@@ -10,6 +10,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.yaml_cache import load_cached_safe_yaml
+
 from scripts.calibration_battery import envelope, rail_for
 from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_COMPOSITION_PROJECTED,
@@ -77,7 +79,7 @@ def test_scoring_pots_are_content_derived_from_extracts(tmp_path: Path) -> None:
     # Table 3 is the only convertible PbO-P2O5 composition source. Emptying
     # it must drop those three pots; a hardcoded list would not shrink.
     extract_path = SCORING_EXTRACTS[0]
-    payload = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
     mutated = copy.deepcopy(payload)
     found = False
     for block in mutated["species"].values():
@@ -410,7 +412,7 @@ def _successful_p2o5_cell(pot) -> EquilibrateCell:
 
 def _mutate_kambayashi_gamma(mutator, tmp_path: Path, filename: str) -> Path:
     extract_path = SCORING_EXTRACTS[0]
-    payload = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    payload = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
     mutated = copy.deepcopy(payload)
     found = False
     for block in mutated["species"].values():

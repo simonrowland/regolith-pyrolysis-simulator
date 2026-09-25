@@ -62,6 +62,11 @@ except ImportError as exc:  # pragma: no cover
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+
 DEFAULT_YAML = REPO_ROOT / "data" / "flowsheet.yaml"
 DEFAULT_OUT = (
     REPO_ROOT
@@ -189,7 +194,7 @@ GEO_EPS = 0.75
 
 def load_flowsheet(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as fh:
-        data = yaml.safe_load(fh)
+        data = yaml.safe_load(fh.read())
     if not isinstance(data, dict):
         raise ValueError(f"flowsheet root must be a mapping: {path}")
     return data
@@ -644,7 +649,7 @@ def load_trace_element_facts(
         return {}
     try:
         with trace_path.open("r", encoding="utf-8") as fh:
-            doc = yaml.safe_load(fh)
+            doc = load_cached_safe_yaml(fh.read())
     except (OSError, yaml.YAMLError):
         return {}
     if not isinstance(doc, dict):
@@ -784,7 +789,7 @@ def build_live_major_facts() -> dict[str, dict[str, Any]]:
     if vp_path.is_file():
         try:
             with vp_path.open("r", encoding="utf-8") as fh:
-                vp = yaml.safe_load(fh) or {}
+                vp = load_cached_safe_yaml(fh.read()) or {}
             from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
             vp = vapor_pressure_legacy_view(vp)
@@ -1176,7 +1181,7 @@ def lint_against_trace_elements(
 
     try:
         with trace_path.open("r", encoding="utf-8") as fh:
-            trace_doc = yaml.safe_load(fh)
+            trace_doc = load_cached_safe_yaml(fh.read())
     except (OSError, yaml.YAMLError) as exc:
         errors.append(f"{trace_path.name} could not be parsed: {exc}")
         return LintResult(

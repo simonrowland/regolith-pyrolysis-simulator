@@ -69,7 +69,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 5, table: '1', note: Table contains two programmed ramps, not one universal run schedule}
+      locator: {published_page: 5, table: '1', note: 'Table contains two programmed ramps, not one universal run schedule'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.000001', approximate: true}}

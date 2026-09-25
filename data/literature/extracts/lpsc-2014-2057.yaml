@@ -40,7 +40,7 @@ experiments:
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 1, section: Materials and Methods, note: 25-715 C is a program range, not one setpoint}
+      locator: {page: 1, section: Materials and Methods, note: '25-715 C is a program range, not one setpoint'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: interval, interval_low: '3000', interval_high: '7500'}}

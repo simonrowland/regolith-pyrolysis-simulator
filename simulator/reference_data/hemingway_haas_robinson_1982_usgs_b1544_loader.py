@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_ID = "hemingway-haas-robinson-1982-usgs-b1544"
@@ -1175,7 +1176,7 @@ def census_from_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def load_records(
     root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False
 ) -> list[dict[str, Any]]:
-    manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    manifest = load_cached_safe_yaml((root / "manifest.yaml").read_text(encoding="utf-8"))
     records = []
     for entry in manifest["entries"]:
         payload = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
@@ -1278,7 +1279,9 @@ def feedstock_coverage(records: list[dict[str, Any]]) -> dict[str, int]:
     from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 
     registry = load_species_formulas(ROOT / "data/species_catalog.yaml")
-    feedstocks = yaml.safe_load((ROOT / "data/feedstocks.yaml").read_text(encoding="utf-8"))
+    feedstocks = load_cached_safe_yaml(
+        (ROOT / "data/feedstocks.yaml").read_text(encoding="utf-8")
+    )
     elements: set[str] = set()
     for feedstock in feedstocks.values():
         for species in feedstock.get("composition_wt_pct", {}):
@@ -1318,7 +1321,7 @@ def ingest(pdf: Path | None = None, output: Path = COMPILATION_ROOT, cache_dir: 
     sidecar = {}
     sidecar_path = source_dir / "sidecar.yaml"
     if sidecar_path.is_file():
-        sidecar = yaml.safe_load(sidecar_path.read_text(encoding="utf-8")) or {}
+        sidecar = load_cached_safe_yaml(sidecar_path.read_text(encoding="utf-8")) or {}
     source = {
         "database": "USGS Bulletin 1544",
         "citation": sidecar.get(
