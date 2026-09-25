@@ -240,6 +240,43 @@ def _alcock_source_pa(species: str, phase: str, temperature_K: float) -> float:
     return 10.0 ** log10_pa
 
 
+@lru_cache(maxsize=None)
+def _janaf_formation_gibbs_kj_mol(table_id: str, temperature_K: float) -> float:
+    """Read one independent JANAF delta-f G point, not simulator output."""
+
+    table_path = (
+        DATA_DIR
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / f"{table_id}.yaml"
+    )
+    payload = yaml.safe_load(table_path.read_text())
+    for point in payload["table"]["values"]:
+        if point["temperature"]["value"] == temperature_K:
+            value = point["formation_gibbs_energy"]["value"]
+            assert value is not None
+            return float(value)
+    raise AssertionError(f"JANAF {table_id} has no exact {temperature_K:g} K point")
+
+
+def _janaf_liquid_vapour_pa(species: str, temperature_K: float) -> float:
+    table_ids = {
+        "Al": ("Al-003", "Al-005"),
+        "Si": ("Si-003", "Si-005"),
+    }
+    liquid_table, gas_table = table_ids[species]
+    delta_g_kj_mol = _janaf_formation_gibbs_kj_mol(
+        gas_table, temperature_K
+    ) - _janaf_formation_gibbs_kj_mol(liquid_table, temperature_K)
+    # JANAF p° = 0.1 MPa. K = P_sat/p° for M(l) -> M(g), so this is an
+    # external-table computation independent of the runtime Antoine row.
+    return 100_000.0 * 10.0 ** (
+        -delta_g_kj_mol / (GAS_CONSTANT / 1000.0 * temperature_K * math.log(10.0))
+    )
+
+
 def _shomate_h_increment_kj_mol(coeff: dict, temperature_K: float) -> float:
     t = temperature_K / 1000.0
     return (
@@ -399,10 +436,6 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # NIST Chemistry WebBook SRD 69, aluminum Antoine row, Stull 1947.
-        ("Al", 2200.0, 46_484.884967, 1e-6),
-        # NIST Chemistry WebBook SRD 69, silicon Antoine row, Stull 1947.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
         # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
         ("Cr", 2200.0, 2_704.347348, 1e-6),
         # CRC.b/Stull source-tabulated Mg pressure levels.
@@ -427,6 +460,30 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
         expected_pa,
         rel=rel_tol,
     )
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K"),
+    [
+        pytest.param("Al", 2200.0, id="Al-JANAF-003-005-2200K"),
+        pytest.param("Si", 2200.0, id="Si-JANAF-003-005-2200K"),
+    ],
+)
+def test_pure_component_janaf_fit_matches_independent_liquid_vapour_point(
+    species: str,
+    temperature_K: float,
+) -> None:
+    """d-021: the active sidecars are grounded against JANAF, not self-parity."""
+
+    expected_pa = _janaf_liquid_vapour_pa(species, temperature_K)
+    actual_pa = _pure_component_antoine_pa(
+        _vapor_pressure_data()["metals"][species], temperature_K
+    )
+
+    # The YAML derivation records the full-grid max residual: 0.0044 dex for
+    # Al and 0.0234 dex for Si. Six percent leaves that declared Si fit error
+    # visible while making a restored Stull row fail by 1.16/1.77 dex.
+    assert actual_pa == pytest.approx(expected_pa, rel=0.06)
 
 
 def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() -> None:
@@ -681,10 +738,6 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
         # the recovered-P runtime path — same class as Al/Cr oxide-coupled rails.
         # Ca condensed rail (below boil 1757 K) still uses pure-component * Ellingham.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # Al/Cr oxide-coupled runtime uses liquid_oxide_standard_reaction (pairing
-        # fix); pure-component sidecars remain NBP/NIST ground-truth only and are
-        # covered by pure_component_antoine point tests, not this recovered-P path.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
     ],
 )
 def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(
@@ -746,8 +799,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
     label_cases = [
         ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
         ("Ca", 1700.0, "pure_component_source_equation_fit"),
-        ("Al", 2300.0, "pure_component_source_equation_fit"),
-        ("Si", 2500.0, "pure_component_source_equation_fit"),
+        ("Al", 2300.0, "pure_component_derived_from_evaluation"),
+        ("Si", 2500.0, "pure_component_derived_from_evaluation"),
         ("Cr", 2700.0, "pure_component_source_equation_fit"),
         ("Mn", 1519.0, "pure_component_derived_from_evaluation"),
         ("Mn", 1700.0, "pure_component_derived_from_evaluation"),

@@ -91,7 +91,9 @@ CHANNEL_VAPOUR_RAIL_PSAT = "vapour_rail_psat"
 QUANTITY_LOG10_PSAT = "log10_Psat_over_P0"
 # P_sat-channel finding classes (b-493). Cheap hypotheses first:
 # condensed_row_past_transition, antoine_extrapolated_beyond_fit; else
-# compilation_disagreement. Al/Si mismatches are the last of those.
+# compilation_disagreement. The active Al/Si rows are JANAF-derived fits;
+# residuals outside the independent agreement band remain ordinary fit/data
+# disagreements, never a reason to retune the sidecar.
 FINDING_CONDENSED_ROW_PAST_TRANSITION = "condensed_row_past_transition"
 FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT = "antoine_extrapolated_beyond_fit"
 # JANAF melting points. Used only to name the H1 hypothesis, not to retune.
@@ -1190,21 +1192,14 @@ def psat_finding_class(
     """P_sat-channel finding class after the b-493 cheap hypotheses.
 
     Premise: ln(P_sat/P0) = −[dfG(g)−dfG(cr or l)]/(R T) at printed T.
-    Cheap H1 (condensed_row_past_transition): a cr row used above the
-    melting point (Al 933.5 K, Si 1687 K) would drift monotonically.
-    Adapter picks liquid when present (Al-003 / Si-003), so H1 dies.
-    Cheap H2 (antoine_extrapolated_beyond_fit): T outside the Stull
-    sidecar fit (Al 1557–2329 K, Si 1997–2560 K) can drift. Al 1700/2200
-    and Si 2200 sit inside the fit with residual still 1.16–1.77 dex, so
-    H2 is not the class. Cheap H3: Alcock 1984 liquid Al agrees with
-    JANAF to ~0.01 dex; Alcock does not tabulate Si. Rail Stull 1947 is
-    the departing side. Al/Si mismatches are compilation_disagreement
-    at every T, including the extrapolated ends. Other species keep the
-    generic independent-tabulation class.
+    Cheap H1 (condensed_row_past_transition): a crystal row used above the
+    melting point would drift monotonically; the adapter picks liquid when
+    present (Al-003 / Si-003). Cheap H2 (antoine_extrapolated_beyond_fit): a
+    temperature outside the declared sidecar range can drift. A remaining
+    mismatch is a generic compilation/data disagreement, including a
+    residual of the active JANAF-derived fit.
     """
 
-    if formula in {"Al", "Si"} and status == "mismatch":
-        return "compilation_disagreement"
     return _finding_class(provenance_class, status)
 
 
@@ -1747,8 +1742,8 @@ def score_psat_pair(
             f"P0={P0:g} Pa; rail_id={species_id}; "
             f"condensed_record={condensed.record_id}; a_melt=1"
             + (
-                "; mechanism=compilation_disagreement "
-                "(Stull 1947 sidecar vs JANAF ΔvapG)"
+                "; mechanism=JANAF_antoine_fit_residual "
+                "(active sidecar vs JANAF ΔvapG)"
                 if gas.formula in {"Al", "Si"} and status == "mismatch"
                 else ""
             )

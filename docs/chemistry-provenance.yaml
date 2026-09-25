@@ -353,25 +353,60 @@ values:
 
   - id: Al_pure_antoine
     quantity: "Pure liquid aluminum vapor-pressure Antoine coefficients."
-    value: {A: 10.73623, B: 13204.109, C: -24.306}
+    value: {A: 10.4937063712, B: 15051.1182906, C: -47.6858467007}
     units: "log10(P_Pa) = A - B/(T_K + C)"
     tier: CITED
-    basis: "Pure liquid Al metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    basis: >-
+      Pure liquid Al metal, Raoultian standard state; JANAF Al(l)/Al(g) delta-f G difference converted with
+      log10(P/Pa) = 5 - delta_r G/(R T ln 10), then fitted to the existing Antoine form. The former Stull
+      1947 coefficients remain inactive provenance under d-021 in data/vapor_pressures.yaml.
     range:
-      T_K: [1557, 2329]
-      recipe_1773_2173K: within or near source range
-      measured_vs_extrapolated: interpolated
-    uncertainty: "NIST fit to Stull compilation data."
+      T_K: [933.45, 2792.15]
+      tabulated_support_T_K: [1000, 2700]
+      normal_boiling_point_K: 2792.15
+      measured_vs_extrapolated: fit-derived
+    uncertainty: "JANAF fit residual max 0.004385 dex, RMS 0.003274 dex over 17 table points plus the 101325 Pa boiling-point check."
     chosen:
-      ref: REF-002
-      locus: "Industrial & Engineering Chemistry 39(4):517-540; NIST WebBook Antoine table, 1557-2329 K aluminum row."
-      url: "https://doi.org/10.1021/ie50448a022"
-      why: "Existing project bibliography entry for the Stull compilation row used by NIST."
+      ref: REF-020
+      locus: "NIST-JANAF 4th ed. Al-003 (Al(l)) and Al-005 (Al(g)); source hashes are pinned in data/literature/compilations/janaf/manifest.yaml."
+      url: "https://janaf.nist.gov/tables/Al-003.html"
+      why: "Owner ruling d-021 replaces the high Stull sidecar with the evaluated liquid-to-gas JANAF difference."
     alternatives:
-      - ref: "earlier aluminum vapor-pressure primaries"
-        lacks: "not the exact NIST/Stull compilation row embedded in the data file"
+      - ref: REF-002
+        lacks: "Stull 1947 fit is the retired 1.16 dex-high 2200 K sidecar, not the adopted source."
+      - ref: REF-032
+        lacks: "Alcock-Itkin-Horrigan 1984 numeric Al equation is not available in the offline corpus."
     code_sites:
-      - "data/vapor_pressures.yaml:271 (metals.Al.pure_component_antoine)"
+      - "data/vapor_pressures.yaml:families.metals_al_family.physical_properties.species.Al.pure_component_antoine"
+    status: active
+
+  - id: Si_pure_antoine
+    quantity: "Pure liquid silicon vapor-pressure Antoine coefficients."
+    value: {A: 10.285771463, B: 17797.0716171, C: -152.57880732}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: >-
+      Pure liquid Si metal, Raoultian standard state; JANAF Si(l)/Si(g) delta-f G difference converted with
+      log10(P/Pa) = 5 - delta_r G/(R T ln 10), then fitted to the existing Antoine form. The former Stull
+      1947 coefficients remain inactive provenance under d-021 in data/vapor_pressures.yaml.
+    range:
+      T_K: [1685, 3538.15]
+      tabulated_support_T_K: [1700, 3500]
+      normal_boiling_point_K: 3538.15
+      measured_vs_extrapolated: fit-derived
+    uncertainty: "JANAF fit residual max 0.023314 dex, RMS 0.016850 dex over 18 table points plus the 101325 Pa boiling-point check."
+    chosen:
+      ref: REF-020
+      locus: "NIST-JANAF 4th ed. Si-003 (Si(l)) and Si-005 (Si(g)); source hashes are pinned in data/literature/compilations/janaf/manifest.yaml."
+      url: "https://janaf.nist.gov/tables/Si-003.html"
+      why: "Owner ruling d-021 replaces the high Stull sidecar with the evaluated liquid-to-gas JANAF difference."
+    alternatives:
+      - ref: REF-002
+        lacks: "Stull 1947 fit is the retired 1.77 dex-high 2200 K sidecar, not the adopted source."
+      - ref: REF-032
+        lacks: "Alcock-Itkin-Horrigan 1984 numeric Si equation is not available in the offline corpus."
+    code_sites:
+      - "data/vapor_pressures.yaml:families.metals_si_family.physical_properties.species.Si.pure_component_antoine"
     status: active
 
   - id: Fe_pure_antoine
