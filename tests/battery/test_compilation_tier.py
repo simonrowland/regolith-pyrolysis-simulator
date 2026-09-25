@@ -425,9 +425,10 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
         ),
     )
     assert forced.source_relation is SourceRelation.UNKNOWN
-    assert forced.numeric is None
-    assert forced.refusal is not None
-    assert forced.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert forced.status is ResidualStatus.NO_BAND
+    assert forced.numeric is not None
+    assert forced.numeric.decision_band is None
+    assert forced.refusal is None
 
     both = replace(
         independent_ctx,

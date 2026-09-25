@@ -2,14 +2,15 @@
 
 Generated only. Pins are an independent baseline and are never
 re-centred from these residuals. Refusals are diagnostics, never hidden.
-Headline accuracy per rail is the product of score_eligible rows;
-a rail with zero eligible references is reported as zero.
+Headline accuracy per rail reports n, RMS dex, median |dex|, and
+no-band rows. Measured and compilation tiers are separate and never
+summed; match rate is secondary.
 
 Hostname: `Simon-MacBookPro-M5.local`.
 
 The measuring store for this ledger is unknown.
 
-Warning: residuals ledger has no store revision; live store is `bfcd28637`
+Warning: residuals ledger has no store revision; live store is `935644dfb`
 
 Engines: vaporock, alphamelts, thermoengine, magemin, imcc_sf04, imcc_sf04_ext, internal-analytical.
 
@@ -17,64 +18,64 @@ Engines: vaporock, alphamelts, thermoengine, magemin, imcc_sf04, imcc_sf04_ext, 
 
 score_eligible only. Compilation rows are not in this table.
 
-| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |
-|---|---|---:|---:|---:|---:|---:|
-| SiO_evolution | alphamelts | 0 | 0 | 0 | — | — |
-| SiO_evolution | imcc_sf04 | 0 | 0 | 0 | — | — |
-| SiO_evolution | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| SiO_evolution | internal-analytical | 0 | 0 | 0 | — | — |
-| SiO_evolution | magemin | 0 | 0 | 0 | — | — |
-| SiO_evolution | thermoengine | 0 | 0 | 0 | — | — |
-| SiO_evolution | vaporock | 0 | 0 | 0 | — | — |
-| alkali_shuttle | alphamelts | 0 | 0 | 0 | — | — |
-| alkali_shuttle | imcc_sf04 | 0 | 0 | 0 | — | — |
-| alkali_shuttle | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| alkali_shuttle | internal-analytical | 0 | 0 | 0 | — | — |
-| alkali_shuttle | magemin | 0 | 0 | 0 | — | — |
-| alkali_shuttle | thermoengine | 0 | 0 | 0 | — | — |
-| alkali_shuttle | vaporock | 0 | 0 | 0 | — | — |
-| melt_activity | alphamelts | 0 | 0 | 0 | — | — |
-| melt_activity | imcc_sf04 | 0 | 0 | 0 | — | — |
-| melt_activity | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| melt_activity | internal-analytical | 0 | 0 | 0 | — | — |
-| melt_activity | magemin | 0 | 0 | 0 | — | — |
-| melt_activity | thermoengine | 0 | 0 | 0 | — | — |
-| melt_activity | vaporock | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | alphamelts | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | imcc_sf04 | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | internal-analytical | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | magemin | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | thermoengine | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | vaporock | 0 | 0 | 0 | — | — |
-| redox | alphamelts | 0 | 0 | 0 | — | — |
-| redox | imcc_sf04 | 0 | 0 | 0 | — | — |
-| redox | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| redox | internal-analytical | 0 | 0 | 0 | — | — |
-| redox | magemin | 0 | 0 | 0 | — | — |
-| redox | thermoengine | 0 | 0 | 0 | — | — |
-| redox | vaporock | 0 | 0 | 0 | — | — |
-| thermochemistry | alphamelts | 0 | 0 | 0 | — | — |
-| thermochemistry | imcc_sf04 | 0 | 0 | 0 | — | — |
-| thermochemistry | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| thermochemistry | internal-analytical | 0 | 0 | 0 | — | — |
-| thermochemistry | magemin | 0 | 0 | 0 | — | — |
-| thermochemistry | thermoengine | 0 | 0 | 0 | — | — |
-| thermochemistry | vaporock | 0 | 0 | 0 | — | — |
-| vapour | alphamelts | 0 | 0 | 0 | — | — |
-| vapour | imcc_sf04 | 0 | 0 | 0 | — | — |
-| vapour | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| vapour | internal-analytical | 0 | 0 | 0 | — | — |
-| vapour | magemin | 0 | 0 | 0 | — | — |
-| vapour | thermoengine | 0 | 0 | 0 | — | — |
-| vapour | vaporock | 0 | 0 | 0 | — | — |
-| wall_deposition | alphamelts | 0 | 0 | 0 | — | — |
-| wall_deposition | imcc_sf04 | 0 | 0 | 0 | — | — |
-| wall_deposition | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| wall_deposition | internal-analytical | 0 | 0 | 0 | — | — |
-| wall_deposition | magemin | 0 | 0 | 0 | — | — |
-| wall_deposition | thermoengine | 0 | 0 | 0 | — | — |
-| wall_deposition | vaporock | 0 | 0 | 0 | — | — |
+| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| SiO_evolution | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| SiO_evolution | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| alkali_shuttle | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| melt_activity | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| pyrolysis_yield | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| redox | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| redox | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| redox | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| redox | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| redox | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| redox | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| redox | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| thermochemistry | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| vapour | vaporock | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | alphamelts | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | imcc_sf04 | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | imcc_sf04_ext | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | internal-analytical | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | magemin | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | thermoengine | 0 | 0 | 0 | — | — | 0 | — |
+| wall_deposition | vaporock | 0 | 0 | 0 | — | — | 0 | — |
 
 ## Compilation tier
 
@@ -85,6 +86,10 @@ compilation (JANAF-4th refit versus JANAF; NASA CEA thermo.inp
 versus the Glenn coefficient database). Pending admission is
 unchanged. Printed uncertainty is the reference observation's
 uncertainty (often none on a grid).
+
+| rail | engine | n | RMS dex | median abs dex | n no band | match rate |
+|---|---|---:|---:|---:|---:|---:|
+| (none) | (none) | 0 | — | — | 0 | — |
 
 | engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |
 |---|---:|---:|---:|---:|---:|---:|---:|

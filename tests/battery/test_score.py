@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import math
 import warnings
 from dataclasses import replace
 from decimal import Decimal
@@ -29,6 +30,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    UncertaintyKind,
 )
 from simulator.battery.pins import (
     PinBandRecord,
@@ -46,6 +48,7 @@ from simulator.battery.records import (
     ResidualNumeric,
     DecisionBand,
     State,
+    Uncertainty,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
 from simulator.battery.score import (
@@ -705,8 +708,8 @@ def test_report_states_admission_alone_deaths_without_changing_the_rule() -> Non
     assert "The admission rule is unchanged." in report
 
 
-def test_non_thermo_quantities_refuse_without_invented_band() -> None:
-    """Vapour / activity / alpha / yield have no sourced agreement band."""
+def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> None:
+    """Vapour / activity / alpha / yield keep residuals without a band."""
 
     from simulator.battery.score import populate_numeric
 
@@ -726,10 +729,10 @@ def test_non_thermo_quantities_refuse_without_invented_band() -> None:
             reference=Decimal("1"),
             source_relation=SourceRelation.INDEPENDENT,
         )
-        assert numeric is None
-        assert reason is RefusalReason.DECISION_RULE_MISSING
-        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
-        assert detail.get("quantity") == quantity.value
+        assert numeric is not None
+        assert numeric.decision_band is None
+        assert reason is None
+        assert detail == {}
 
     thermo, reason, _ = populate_numeric(
         quantity=Quantity.DELTA_FG,
@@ -752,15 +755,123 @@ def test_non_thermo_quantities_refuse_without_invented_band() -> None:
         source_id="work-1",
     )
     residual, _ = _compile(ref, exp, _predict(Decimal("0.1"), ident))
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
-    assert residual.refusal.detail.get("reason") == "no_sourced_decision_band:p_sat"
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.score_eligible is True
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.refusal is None
 
 
-def test_pyrolysis_yield_does_not_use_robinot_eleven_percent_floor() -> None:
-    """n=2 same-rig O2 scatter is not a sourced yield agreement band."""
+def test_no_band_residual_carries_printed_uncertainty() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = replace(
+        F.observation(
+            "na-psat-sigma",
+            exp.experiment_id,
+            ident,
+            Decimal("0.1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"sigma": "0.02"},
+        ),
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.2"), ident))
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.metric_uncertainty == ref.uncertainty
+    assert residual.numeric.value == Decimal(str(math.log10(2)))
+
+
+def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
+    from simulator.battery.score import headline_records
+
+    exp = F.tabulation_experiment()
+    measured_obs = F.observation(
+        "headline-measured",
+        exp.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    compilation_obs = F.observation(
+        "headline-compilation",
+        exp.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    ctx = replace(
+        _context(F.work(), exp, measured_obs, compilation_obs),
+        origins={compilation_obs.observation_id: "compilations-janaf/Na.yaml"},
+    )
+    band = DecisionBand(Decimal("0.1"), "dimensionless", "test")
+    measured = F.residual(
+        "headline-measured::p_sat::vapour::internal-analytical",
+        measured_obs.observation_id,
+        candidate="engine-measured",
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.DEX,
+            unit="dimensionless",
+            value=Decimal("0.1"),
+            decision_band=band,
+        ),
+    )
+    no_band = replace(
+        measured,
+        key="headline-no-band::p_sat::vapour::internal-analytical",
+        reference=measured_obs.observation_id,
+        status=ResidualStatus.NO_BAND,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.DEX,
+            unit="dimensionless",
+            value=Decimal("0.2"),
+            decision_band=None,
+        ),
+    )
+    compilation = F.residual(
+        "headline-compilation::p_sat::vapour::internal-analytical",
+        compilation_obs.observation_id,
+        candidate="engine-compilation",
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=False,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.DEX,
+            unit="dimensionless",
+            value=Decimal("0.3"),
+            decision_band=band,
+        ),
+    )
+    records = headline_records(
+        (measured, no_band, compilation),
+        context=ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    by_tier = {
+        row["tier"]: row
+        for row in records
+        if row["rail"] == Rail.VAPOUR.value
+        and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+    }
+    assert by_tier["measured"]["n"] == 2
+    assert by_tier["measured"]["n_no_band"] == 1
+    assert by_tier["measured"]["match_rate"] == 1.0
+    assert by_tier["compilation"]["n"] == 1
+    assert by_tier["compilation"]["n_no_band"] == 0
+    assert by_tier["compilation"]["rms_dex"] == "0.3"
+
+
+def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
+    """n=2 same-rig O2 scatter is not a sourced agreement band."""
 
     from simulator.battery.score import decision_band_for, populate_numeric
 
@@ -778,11 +889,10 @@ def test_pyrolysis_yield_does_not_use_robinot_eleven_percent_floor() -> None:
             reference=Decimal("0.0105"),
             source_relation=SourceRelation.INDEPENDENT,
         )
-        assert numeric is None
-        assert reason is RefusalReason.DECISION_RULE_MISSING
-        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
-        assert "0.11" not in str(detail)
-        assert "11" not in str(detail.get("reason") or "")
+        assert numeric is not None
+        assert numeric.decision_band is None
+        assert reason is None
+        assert detail == {}
 
 
 def test_vapour_rail_is_only_vapour_pressures() -> None:
@@ -872,9 +982,10 @@ def test_gibbs_band_applies_only_to_formation_energies() -> None:
             reference=Decimal("9"),
             source_relation=SourceRelation.INDEPENDENT,
         )
-        assert numeric is None
-        assert reason is RefusalReason.DECISION_RULE_MISSING
-        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
+        assert numeric is not None
+        assert numeric.decision_band is None
+        assert reason is None
+        assert detail == {}
     assert decision_band_for(Quantity.DELTA_FH, SourceRelation.INDEPENDENT) is None
     for quantity in (Quantity.DELTA_FG,):
         band = decision_band_for(quantity, SourceRelation.INDEPENDENT)
@@ -1202,6 +1313,42 @@ def test_write_residuals_stamps_derived_store_and_load_skips_it(tmp_path: Path) 
     assert "kind" not in rows[0] or rows[0].get("kind") != STORE_STAMP_KIND
 
 
+def test_write_headline_summary_has_tier_and_null_data_scatter_slot(tmp_path: Path) -> None:
+    import json
+
+    from simulator.battery.score import write_headline_summary_json
+
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    reference = F.observation(
+        "summary-no-band",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, _ = _compile(reference, exp, _predict(Decimal("0.2"), ident))
+    ctx = _context(F.work(), exp, reference)
+    path = tmp_path / "score-summary.json"
+    write_headline_summary_json(
+        (residual,),
+        path,
+        context=ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    row = next(
+        row
+        for row in payload["records"]
+        if row["tier"] == "measured" and row["rail"] == Rail.VAPOUR.value
+    )
+    assert row["n"] == 1
+    assert row["n_no_band"] == 1
+    assert row["rms_dex"] is not None
+    assert row["data_scatter_ratio"] is None
+
+
 def test_score_report_names_the_measured_store() -> None:
     from simulator.battery.score import derive_store_stamp, render_score_report
 
@@ -1229,6 +1376,9 @@ def test_score_report_names_the_measured_store() -> None:
     assert f"{stamp['experiments']} experiments" in report
     assert f"queue {stamp['queue']}" in report
     assert f"{stamp['hard_issues']} hard issues" in report
+    assert "RMS dex" in report
+    assert "median abs dex" in report
+    assert "n no band" in report
     assert "Warning:" not in report
 
 

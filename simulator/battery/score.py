@@ -42,6 +42,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    UncertaintyKind,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
 )
@@ -368,7 +369,11 @@ class EligibleConjuncts:
 
     def as_mapping(self) -> dict[str, bool]:
         return {
-            "status_match_or_mismatch": self.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH},
+            "status_match_or_mismatch": self.status in {
+                ResidualStatus.MATCH,
+                ResidualStatus.MISMATCH,
+                ResidualStatus.NO_BAND,
+            },
             "finite_numeric_point_endpoints": self.finite_numeric_point_endpoints,
             "valid_metric_domain": self.valid_metric_domain,
             "reference_measured_evidence": self.reference_measured_evidence,
@@ -895,6 +900,7 @@ def populate_numeric(
     candidate: Decimal,
     reference: Decimal,
     source_relation: SourceRelation,
+    metric_uncertainty: Uncertainty | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
     operation = metric_operation(quantity)
     if operation is None:
@@ -910,16 +916,9 @@ def populate_numeric(
             "reference": str(reference),
         }
     band = decision_band_for(quantity, source_relation)
-    if band is None:
-        return None, RefusalReason.DECISION_RULE_MISSING, {
-            "reason": f"no_sourced_decision_band:{quantity.value}",
-            "quantity": quantity.value,
-            "operation": operation.value,
-        }
-    # Dimension guard. decision_band_for already refuses a mismatched
-    # sourced band; this still fires when a caller forces the kJ band
-    # onto a quantity of another dimension.
-    if not band_dimension_matches(quantity, band):
+    # Dimension guard. decision_band_for normally filters mismatched bands;
+    # keep this check for callers that replace it in a focused test.
+    if band is not None and not band_dimension_matches(quantity, band):
         return None, RefusalReason.DECISION_RULE_MISSING, {
             "reason": f"band_dimension_mismatch:{quantity.value}",
             "quantity": quantity.value,
@@ -932,11 +931,14 @@ def populate_numeric(
         unit=unit,
         value=value,
         decision_band=band,
+        metric_uncertainty=metric_uncertainty,
     )
     return numeric, None, {}
 
 
 def match_status(numeric: ResidualNumeric) -> ResidualStatus:
+    if numeric.decision_band is None:
+        return ResidualStatus.NO_BAND
     if abs(numeric.value) <= numeric.decision_band.value:
         return ResidualStatus.MATCH
     return ResidualStatus.MISMATCH
@@ -2158,6 +2160,11 @@ def compile_residual(
         candidate=prediction.value,
         reference=ref_point,
         source_relation=source_relation,
+        metric_uncertainty=(
+            reference.uncertainty
+            if reference.uncertainty.kind is UncertaintyKind.PRINTED
+            else None
+        ),
     )
     if numeric is None:
         return _refused(
@@ -2642,6 +2649,12 @@ def _median_abs(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _rms(values: Sequence[Decimal]) -> Decimal | None:
+    if not values:
+        return None
+    return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
+
+
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
@@ -2662,58 +2675,171 @@ def _measured_residuals(
     ]
 
 
+def _compilation_residuals(
+    residuals: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[Residual]:
+    if context is None:
+        return []
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    return [
+        residual
+        for residual in residuals
+        if compilation_row_observation(
+            residual.reference, context.observations, context.origins
+        )
+        is not None
+    ]
+
+
+def _headline_metric_row(
+    rail: str,
+    engine: str,
+    bucket: Sequence[Residual],
+    *,
+    tier: str,
+) -> dict[str, object]:
+    if tier == "measured":
+        scored = [r for r in bucket if r.score_eligible and r.numeric is not None]
+    elif tier == "compilation":
+        scored = [r for r in bucket if r.numeric is not None]
+    else:
+        raise ValueError(f"unknown headline tier {tier!r}")
+    matches = [
+        r
+        for r in scored
+        if r.status is ResidualStatus.MATCH
+    ]
+    banded = [
+        r
+        for r in scored
+        if r.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+    ]
+    dex_values = [
+        r.numeric.value
+        for r in scored
+        if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
+    ]
+    median = _median_abs(dex_values)
+    rms = _rms(dex_values)
+    n_scored = len(scored)
+    match_rate: str | float | None
+    if not banded:
+        match_rate = None
+    else:
+        match_rate = len(matches) / len(banded)
+    return {
+        "tier": tier,
+        "rail": rail,
+        "engine": engine,
+        "n": n_scored,
+        "n_candidates": len(bucket),
+        "n_refused": sum(1 for r in bucket if r.status is ResidualStatus.REFUSED),
+        "n_scored": n_scored,
+        "n_match": len(matches),
+        "match_rate": match_rate,
+        "rms_dex": None if rms is None else str(rms),
+        "median_abs_dex": None if median is None else str(median),
+        "n_no_band": sum(1 for r in scored if r.status is ResidualStatus.NO_BAND),
+        "data_scatter_ratio": None,
+    }
+
+
 def headline_rows(
     residuals: Sequence[Residual],
     *,
     context: ScoreContext | None = None,
+    tier: str = "measured",
+    engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Per rail × engine headline. Measured rows only; score_eligible is n_scored."""
+    """Per rail × engine headline for one tier.
+
+    Measured rows use ``score_eligible``. Compilation rows use numeric
+    residuals and remain a separate diagnostic tier.
+    """
 
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
-    for residual in _measured_residuals(residuals, context):
+    if tier == "measured":
+        tier_residuals = _measured_residuals(residuals, context)
+    elif tier == "compilation":
+        tier_residuals = _compilation_residuals(residuals, context)
+    else:
+        raise ValueError(f"unknown headline tier {tier!r}")
+    for residual in tier_residuals:
         if residual.rail is None:
             continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
         groups.setdefault((residual.rail.value, engine), []).append(residual)
+    engine_names = [engine.value for engine in engines or ()]
+    engine_names.extend(name for name in sorted(engines_seen) if name not in engine_names)
     for rail in Rail:
-        for engine in sorted(engines_seen) or [e.value for e in SCORE_ENGINE_SET]:
+        for engine in engine_names or [e.value for e in SCORE_ENGINE_SET]:
             groups.setdefault((rail.value, engine), [])
     rows: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        scored = [r for r in bucket if r.score_eligible]
-        matches = [r for r in scored if r.status is ResidualStatus.MATCH]
-        dex_values = [
-            r.numeric.value
-            for r in scored
-            if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
-        ]
-        n_scored = len(scored)
-        match_rate: str | float | None
-        if n_scored == 0:
-            match_rate = None
-        else:
-            match_rate = len(matches) / n_scored
-        median = _median_abs(dex_values)
-        rows.append(
-            {
-                "rail": rail,
-                "engine": engine,
-                "n_candidates": len(bucket),
-                "n_refused": sum(1 for r in bucket if r.status is ResidualStatus.REFUSED),
-                "n_scored": n_scored,
-                "n_match": len(matches),
-                "match_rate": match_rate,
-                "median_abs_dex": None if median is None else str(median),
-                "n_eligible_references": sum(
-                    1
-                    for r in bucket
-                    if r.score_eligible or "reference_measured_evidence" not in r.exclusions
-                ),
-            }
+        row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        row["n_eligible_references"] = sum(
+            1
+            for r in bucket
+            if r.score_eligible or "reference_measured_evidence" not in r.exclusions
         )
+        rows.append(row)
     return rows
+
+
+def headline_records(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext | None = None,
+    engines: Sequence[Engine] | None = None,
+) -> list[dict[str, object]]:
+    """Machine-readable measured and compilation accuracy records."""
+
+    return [
+        *headline_rows(residuals, context=context, tier="measured", engines=engines),
+        *headline_rows(residuals, context=context, tier="compilation", engines=engines),
+    ]
+
+
+HEADLINE_SUMMARY_KIND = "battery_headline_summary"
+
+
+def headline_summary_payload(
+    records: Sequence[Mapping[str, object]],
+    *,
+    store_stamp: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    return {
+        "kind": HEADLINE_SUMMARY_KIND,
+        "schema_version": "v1",
+        "store": None if store_stamp is None else dict(store_stamp),
+        "records": [dict(record) for record in records],
+    }
+
+
+def write_headline_summary_json(
+    residuals: Sequence[Residual],
+    path: Path,
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+    root: Path | None = None,
+) -> None:
+    """Write the tier-separated accuracy ratchet input."""
+
+    stamp = derive_store_stamp(root or REPO_ROOT)
+    payload = headline_summary_payload(
+        headline_records(residuals, context=context, engines=engines),
+        store_stamp=stamp,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _short_refusal_token(detail_reason: object) -> str | None:
@@ -2893,9 +3019,9 @@ def render_score_report(
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "The measured tier is score_eligible rows. The compilation tier is",
-        "beside it and is never added to it. A rail with zero eligible",
-        "references is reported as zero.",
+        "The measured tier is score_eligible rows; its headline reports n,",
+        "RMS dex, median |dex|, and n no band. The compilation tier is",
+        "beside it and is never added to it. Match rate is banded rows only.",
         "",
         f"Hostname: `{context.hostname}`.",
     ]
@@ -2955,17 +3081,19 @@ def render_score_report(
     else:
         lines.extend(
             [
-                "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
-                "|---|---|---:|---:|---:|---:|---:|",
+                "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in headline_rows(residuals, context=context):
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
+            rms = row["rms_dex"] or "—"
             med = row["median_abs_dex"] or "—"
             lines.append(
                 f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-                f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
+                f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+                f"{row['n_no_band']} | {rate_s} |"
             )
     from simulator.battery.compilation_tier import compilation_tier_lines
 
@@ -3127,7 +3255,11 @@ def refusal_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, i
 def headline_payloads(
     rows: Sequence[Mapping[str, object]],
     engines: Sequence[Engine],
+    *,
+    tier: str = "measured",
 ) -> list[dict[str, object]]:
+    if tier not in {"measured", "compilation"}:
+        raise ValueError(f"unknown headline tier {tier!r}")
     groups: dict[tuple[str, str], list[Mapping[str, object]]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
@@ -3145,8 +3277,23 @@ def headline_payloads(
         groups.setdefault((rail, engine), []).append(row)
     out: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        scored = [r for r in bucket if r.get("score_eligible")]
-        matches = [r for r in scored if r.get("status") == ResidualStatus.MATCH.value]
+        if tier == "measured":
+            scored = [
+                r
+                for r in bucket
+                if r.get("score_eligible") and isinstance(r.get("numeric"), Mapping)
+            ]
+        else:
+            scored = [r for r in bucket if isinstance(r.get("numeric"), Mapping)]
+        matches = [
+            r for r in scored if r.get("status") == ResidualStatus.MATCH.value
+        ]
+        banded = [
+            r
+            for r in scored
+            if r.get("status")
+            in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}
+        ]
         dex_values = []
         for r in scored:
             numeric = r.get("numeric") if isinstance(r.get("numeric"), Mapping) else None
@@ -3156,19 +3303,82 @@ def headline_payloads(
                 except (TypeError, ValueError, ArithmeticError):
                     pass
         n_scored = len(scored)
+        rms = _rms(dex_values)
         out.append(
             {
+                "tier": tier,
                 "rail": rail,
                 "engine": engine,
+                "n": n_scored,
                 "n_candidates": len(bucket),
                 "n_refused": sum(1 for r in bucket if r.get("status") == ResidualStatus.REFUSED.value),
                 "n_scored": n_scored,
                 "n_match": len(matches),
-                "match_rate": None if n_scored == 0 else len(matches) / n_scored,
+                "match_rate": None if not banded else len(matches) / len(banded),
+                "rms_dex": None if rms is None else str(rms),
                 "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
+                "n_no_band": sum(
+                    1 for r in scored if r.get("status") == ResidualStatus.NO_BAND.value
+                ),
+                "data_scatter_ratio": None,
             }
         )
     return out
+
+
+def headline_payload_records(
+    rows: Sequence[Mapping[str, object]],
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+) -> list[dict[str, object]]:
+    """Machine-readable headline records from residual payloads."""
+
+    measured_rows: Sequence[Mapping[str, object]] = rows
+    compilation_rows: Sequence[Mapping[str, object]] = ()
+    if observations is not None:
+        from simulator.battery.compilation_tier import compilation_row_observation
+
+        measured_rows = []
+        compilation_rows = []
+        for row in rows:
+            is_compilation = (
+                compilation_row_observation(
+                    str(row.get("reference") or ""), observations, origins
+                )
+                is not None
+            )
+            (compilation_rows if is_compilation else measured_rows).append(row)
+    return [
+        *headline_payloads(measured_rows, engines, tier="measured"),
+        *headline_payloads(compilation_rows, engines, tier="compilation"),
+    ]
+
+
+def write_headline_summary_from_payloads_json(
+    rows: Sequence[Mapping[str, object]],
+    path: Path,
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+    store_stamp: Mapping[str, object] | None = None,
+) -> None:
+    payload = headline_summary_payload(
+        headline_payload_records(
+            rows,
+            engines=engines,
+            observations=observations,
+            origins=origins,
+        ),
+        store_stamp=store_stamp,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def notice_backlog_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
@@ -3219,8 +3429,9 @@ def render_score_report_from_payloads(
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "Headline accuracy per rail is the product of score_eligible rows;",
-        "a rail with zero eligible references is reported as zero.",
+        "Headline accuracy per rail reports n, RMS dex, median |dex|, and",
+        "no-band rows. Measured and compilation tiers are separate and never",
+        "summed; match rate is secondary.",
         "",
         f"Hostname: `{hostname}`.",
     ]
@@ -3241,17 +3452,19 @@ def render_score_report_from_payloads(
                 if observations is not None
                 else []
             ),
-            "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
-            "|---|---|---:|---:|---:|---:|---:|",
+            "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for row in headline_payloads(measured_rows, engines):
         rate = row["match_rate"]
         rate_s = "—" if rate is None else f"{rate:.3f}"
+        rms = row["rms_dex"] or "—"
         med = row["median_abs_dex"] or "—"
         lines.append(
             f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
+            f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+            f"{row['n_no_band']} | {rate_s} |"
         )
     if compilation_lines:
         lines.extend(["", *compilation_lines])

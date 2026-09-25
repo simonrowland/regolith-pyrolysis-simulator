@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Score the v2.1 battery store against the explicit all-engine set.
 
-Writes data/battery/residuals.jsonl (generated) and data/battery/score-report.md.
+Writes data/battery/residuals.jsonl (generated), data/battery/score-summary.json,
+and data/battery/score-report.md.
 Pins are an independent baseline (data/battery/pins.yaml) and are never
 regenerated from residuals.
 """
@@ -38,6 +39,8 @@ from simulator.battery.score import (  # noqa: E402
     residual_to_plain,
     score_store,
     status_diff_rows,
+    write_headline_summary_from_payloads_json,
+    write_headline_summary_json,
     write_residuals_jsonl,
 )
 
@@ -229,6 +232,14 @@ def main(argv: list[str] | None = None) -> int:
             origins=context.origins,
         )
         report_path.write_text(report, encoding="utf-8")
+        write_headline_summary_from_payloads_json(
+            payloads,
+            args.root / "data" / "battery" / "score-summary.json",
+            engines=engines,
+            observations=context.observations,
+            origins=context.origins,
+            store_stamp=recorded,
+        )
         print(f"report-only residuals={len(payloads)} pin_failures={len(failures)}")
         return 0
 
@@ -258,6 +269,13 @@ def main(argv: list[str] | None = None) -> int:
     residuals_path = args.root / "data" / "battery" / "residuals.jsonl"
     report_path = args.root / "data" / "battery" / "score-report.md"
     write_residuals_jsonl(residuals, candidates, residuals_path, root=args.root)
+    write_headline_summary_json(
+        residuals,
+        args.root / "data" / "battery" / "score-summary.json",
+        context=context,
+        engines=engines,
+        root=args.root,
+    )
 
     failures: list[dict] = []
     unmapped: list[str] = []

@@ -327,6 +327,7 @@ class Authority(StrEnum):
 class ResidualStatus(StrEnum):
     MATCH = "match"
     MISMATCH = "mismatch"
+    NO_BAND = "no_band"
     REFUSED = "refused"
 
 
