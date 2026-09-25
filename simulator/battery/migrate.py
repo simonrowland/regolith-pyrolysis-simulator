@@ -4400,6 +4400,104 @@ def make_species(
     )
 
 
+def reference_state_from_extract(
+    raw: object,
+    *,
+    species_formula: str,
+    values: Mapping[str, Any],
+) -> State[StandardState] | None:
+    """Lift an explicit extract ``standard_state`` into the typed identity.
+
+    The extract field is source prose, so an unrecognised or explicitly
+    unprinted statement remains an unknown rather than becoming a convention
+    by inference.  Canonical prefixes are used where a source has both a
+    Raoultian mass-action standard and a Henry/infinite-dilution coefficient.
+    """
+
+    if raw in (None, ""):
+        return None
+    text = " ".join(str(raw).split())
+    lowered = text.casefold()
+    if not text:
+        return None
+
+    if "vapour reference" in lowered or "vapor reference" in lowered:
+        return State.unknown(
+            "source names a vapour reference; no typed vapour convention exists"
+        )
+    if "not printed" in lowered or "not stated" in lowered:
+        return State.unknown(f"source reference state not printed: {text}")
+
+    # Prefixes disambiguate a paper that states a Raoultian oxide standard but
+    # evaluates its coefficient at the Henry/infinite-dilution limit.
+    if lowered.startswith(("raoultian", "raoultian_pure_endmember")):
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif (
+        lowered.startswith(("henrian", "henry"))
+        or "infinite-dilution" in lowered
+        or "infinite dilution" in lowered
+    ):
+        convention = (
+            ReferenceStateConvention.HENRIAN_SOLID
+            if "solid" in lowered
+            else ReferenceStateConvention.HENRIAN_LIQUID
+        )
+    elif "1 wt%" in lowered or "1 wt.%" in lowered or "one wt%" in lowered:
+        convention = ReferenceStateConvention.HYPOTHETICAL_1WT_PCT
+    elif "pure liquid" in lowered or "pure solid" in lowered or "tridymite" in lowered:
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif re.search(r"\b(?:liquid|solid)\s+[A-Z]", text):
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif "pure " in lowered and "metal" in lowered:
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    else:
+        return State.unknown(f"source standard_state is not typed: {text}")
+
+    formula: str | None = None
+    for key in (
+        "reference_state_endmember_formula",
+        "oxide_formula_as_published",
+        "oxide",
+        "formula",
+    ):
+        candidate = values.get(key)
+        if isinstance(candidate, str) and re.fullmatch(r"[A-Za-z][A-Za-z0-9.]*", candidate.strip()):
+            formula = candidate.strip()
+            break
+    if formula is None:
+        for pattern in (
+            r"endmember(?:\s+formula)?\s*[:=]\s*([A-Z][A-Za-z0-9.]*)",
+            r"(?:liquid|solid)\s+([A-Z][A-Za-z0-9.]*)",
+        ):
+            match = re.search(pattern, text)
+            candidate = match.group(1) if match else None
+            if candidate and candidate.casefold() not in {"oxide", "metal", "phase"}:
+                formula = candidate
+                break
+    formula = formula or species_formula
+
+    if "solid" in lowered or "tridymite" in lowered or "(c)" in lowered:
+        phase: Phase | State[Phase] = Phase.CR
+    elif (
+        "liquid" in lowered
+        or "(l)" in lowered
+        or convention is ReferenceStateConvention.HENRIAN_LIQUID
+    ):
+        phase = Phase.L
+    else:
+        phase = State.unknown("source does not print the reference endmember phase")
+
+    endmember = make_species(formula, phase)
+    return State.of(
+        StandardState(
+            convention=convention,
+            endmember=endmember,
+            component_basis=formula,
+            reference_pressure_bar=Decimal("1"),
+        )
+    )
+
+
 def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
     form = obs.get("condensed_form")
     if isinstance(form, Mapping) and form.get("polymorph"):
@@ -8386,7 +8484,28 @@ class Migrator:
             and values.get("Delta_f_G_298_kJ_mol") is not None
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
-        if suffix_reference:
+        source_reference_state = None
+        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+            source_standard_state = obs.get("standard_state")
+            if source_standard_state in (None, ""):
+                source_standard_state = values.get("standard_state")
+            source_reference_state = reference_state_from_extract(
+                source_standard_state,
+                species_formula=species.formula,
+                values=values,
+            )
+        if source_reference_state is not None:
+            ident_kwargs["reference_state"] = source_reference_state
+            if source_reference_state.is_unknown:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["reference_state"],
+                    source_reference_state.reason or "source reference state is unknown",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+        elif suffix_reference:
             ident_kwargs["reference_state"] = State.unknown(
                 f"qualifier {suffix_reference} does not name a reference_state"
             )

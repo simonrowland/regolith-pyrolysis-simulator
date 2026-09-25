@@ -29,6 +29,7 @@ from simulator.battery.enums import (
     Polymorph,
     Quantity,
     Rail,
+    ReferenceStateConvention,
     RefusalReason,
     StateTag,
     ValueKind,
@@ -3180,6 +3181,32 @@ def test_l05g1a_qualified_activity_token_lifts_activity(tmp_path: Path) -> None:
     assert obs.value.kind is ValueKind.POINT
     assert obs.value.point == as_decimal("4e-06")
     assert obs.identity.species.formula == "CsBO2"
+
+
+def test_activity_standard_state_source_prose_lifts_typed_reference(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity_from_table2_AT_B",
+        units="dimensionless",
+        values={
+            "quantity": "activity_from_table2_AT_B",
+            "activity": 0.12,
+            "method_class": "measured_direct",
+        },
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["phase"] = "condensed_liquid"
+    row["standard_state"] = (
+        "raoultian_pure_endmember; pure liquid Na2O endmember=Na2O"
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    reference_state = obs.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert reference_state.value.endmember.formula == "Na2O"
+    assert reference_state.value.endmember.phase.value is Phase.L
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
