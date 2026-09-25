@@ -37,9 +37,10 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
 from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -308,9 +309,57 @@ def _table_pair_payload(delta_obs: Observation, log_obs: Observation) -> dict | 
     }
 
 
+def build_printed_thermo_index(
+    observations: Mapping[str, Observation],
+) -> dict[tuple[str, Quantity], tuple[Observation, ...]]:
+    """Printed ΔfG and log10 Kf points, keyed by experiment and quantity.
+
+    One pass. Series rows stay out: a series is not a point pair, and
+    ``_table_pair_payload`` would drop it. Callers that score every cell
+    pass this in so each cell does not walk the store.
+    """
+
+    buckets: dict[tuple[str, Quantity], list[Observation]] = {}
+    for other in observations.values():
+        if not _is_printed_observation(other):
+            continue
+        other_ident = other.identity
+        if not isinstance(other_ident, Identity):
+            continue
+        quantity = quantity_token(other_ident)
+        if quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+            continue
+        if other.value.kind is not ValueKind.POINT:
+            continue
+        buckets.setdefault((other.experiment_id, quantity), []).append(other)
+    return {key: tuple(rows) for key, rows in buckets.items()}
+
+
+def _table_partners(
+    reference: Observation,
+    observations: Mapping[str, Observation],
+    want: Quantity,
+    index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None,
+) -> Iterator[Observation]:
+    if index is None:
+        for other in observations.values():
+            if other.observation_id == reference.observation_id:
+                continue
+            if other.experiment_id != reference.experiment_id:
+                continue
+            if not _is_printed_observation(other):
+                continue
+            yield other
+        return
+    for other in index.get((reference.experiment_id, want), ()):
+        if other.observation_id != reference.observation_id:
+            yield other
+
+
 def _table_payloads(
     reference: Observation,
     observations: Mapping[str, Observation],
+    index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
 ) -> tuple[dict, ...]:
     """Every printed ΔfG / log10_Kf pair at the complete identity point."""
 
@@ -324,13 +373,7 @@ def _table_payloads(
         return ()
     want = Quantity.LOG10_KF if ident_q is Quantity.DELTA_FG else Quantity.DELTA_FG
     payloads: list[dict] = []
-    for other in observations.values():
-        if other.observation_id == reference.observation_id:
-            continue
-        if other.experiment_id != reference.experiment_id:
-            continue
-        if not _is_printed_observation(other):
-            continue
+    for other in _table_partners(reference, observations, want, index):
         other_ident = other.identity
         if not isinstance(other_ident, Identity) or quantity_token(other_ident) is not want:
             continue
@@ -1112,11 +1155,89 @@ def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
     return None
 
 
-# First resolution of a work walks every observation. Series scoring calls
-# it once per printed cell; the set depends only on the maps' identity and
-# size. Callers must not mutate the returned set. A map that grows changes
-# len() and misses the cache.
-_WORK_INPUT_CACHE: dict[tuple[int, int, str, int, int], set[str]] = {}
+# A scoring walk resolves the same work once per cell. The bound index is
+# that walk's snapshot: the maps must not be edited while it is entered.
+# An unbound call recomputes. It does not remember a previous map, so
+# replacing an observation in the same dict cannot return the old ids.
+_BOUND_WORK_INPUTS: dict[
+    tuple[int, int], tuple[frozenset[str], dict[str, set[str]]]
+] = {}
+
+
+def _inputs_for_work(
+    work: Work,
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+    table_ids: set[str],
+    obs_by_work: Mapping[str, tuple[Observation, ...]] | None = None,
+) -> set[str]:
+    ids: set[str] = set()
+    for asset in work.source_files.files:
+        if asset.role is AssetRole.TABLE_CSV:
+            ids.add(asset.asset_id)
+    if not experiments:
+        return ids
+    grouped = (
+        obs_by_work.get(work.work_id, ())
+        if obs_by_work is not None
+        else tuple(
+            obs
+            for obs in observations.values()
+            if (experiment := experiments.get(obs.experiment_id)) is not None
+            and experiment.work_id == work.work_id
+        )
+    )
+    for obs in grouped:
+        nested = _observation_lineage(obs.observation_id, observations, table_ids)
+        if nested:
+            ids |= nested
+    return ids
+
+
+def _index_work_inputs(
+    works: Mapping[str, Work],
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+    table_ids: set[str],
+) -> dict[str, set[str]]:
+    obs_by_work: dict[str, list[Observation]] = {}
+    if experiments:
+        for obs in observations.values():
+            experiment = experiments.get(obs.experiment_id)
+            if experiment is None:
+                continue
+            obs_by_work.setdefault(experiment.work_id, []).append(obs)
+    grouped = {work_id: tuple(rows) for work_id, rows in obs_by_work.items()}
+    return {
+        work.work_id: _inputs_for_work(
+            work, observations, experiments, table_ids, grouped
+        )
+        for work in works.values()
+    }
+
+
+@contextmanager
+def bound_work_inputs(
+    works: Mapping[str, Work],
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+) -> Iterator[None]:
+    """One work-input index for a scoring walk. Cleared on exit."""
+
+    key = (id(observations), id(experiments))
+    previous = _BOUND_WORK_INPUTS.get(key)
+    table_ids = _table_ids(works)
+    _BOUND_WORK_INPUTS[key] = (
+        frozenset(table_ids),
+        _index_work_inputs(works, observations, experiments, table_ids),
+    )
+    try:
+        yield
+    finally:
+        if previous is None:
+            _BOUND_WORK_INPUTS.pop(key, None)
+        else:
+            _BOUND_WORK_INPUTS[key] = previous
 
 
 def _inputs_registered_under_work(
@@ -1125,29 +1246,12 @@ def _inputs_registered_under_work(
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
 ) -> set[str]:
-    key = (
-        id(observations),
-        id(experiments),
-        work.work_id,
-        len(observations),
-        -1 if experiments is None else len(experiments),
-    )
-    cached = _WORK_INPUT_CACHE.get(key)
-    if cached is not None:
-        return cached
-    ids: set[str] = set()
-    for asset in work.source_files.files:
-        if asset.role is AssetRole.TABLE_CSV:
-            ids.add(asset.asset_id)
-    if experiments:
-        for obs in observations.values():
-            experiment = experiments.get(obs.experiment_id)
-            if experiment is not None and experiment.work_id == work.work_id:
-                nested = _observation_lineage(obs.observation_id, observations, table_ids)
-                if nested:
-                    ids |= nested
-    _WORK_INPUT_CACHE[key] = ids
-    return ids
+    bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
+    if bound is not None and bound[0] == frozenset(table_ids):
+        found = bound[1].get(work.work_id)
+        if found is not None:
+            return found
+    return _inputs_for_work(work, observations, experiments, table_ids)
 
 
 def _observation_lineage(

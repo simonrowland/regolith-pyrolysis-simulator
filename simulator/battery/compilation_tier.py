@@ -7,9 +7,10 @@ slice measured 2026-09-25 was 53,135 JSON bytes for 769 cells and about
 574,790 banded cells are on the order of 1.8 GB on top of the existing
 observation store.
 
-A series point's identity is ``{observation_id}#{index}`` with index the
-position in the stored series. That is the printed order. Intervals are
-not collapsed. ``transition_temperature`` series are not expanded.
+A series point's identity is ``{observation_id}#t{T}v{value}`` with an
+``n{occurrence}`` suffix only when the same temperature and value repeat.
+Reordering the stored pairs does not rename a printed point. Intervals
+are not collapsed. ``transition_temperature`` series are not expanded.
 """
 
 from __future__ import annotations
@@ -115,15 +116,59 @@ class ThermoAttempt:
     call_evidence: str
 
 
-def compilation_point_id(observation_id: str, index: int) -> str:
-    return f"{observation_id}#{index}"
+def _decimal_token(value: Decimal) -> str:
+    text = format(value, "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    if text in {"", "-", "-0"}:
+        return "0"
+    return text
+
+
+def _is_decimal_token(text: str) -> bool:
+    body = text[1:] if text.startswith("-") else text
+    if not body or body.count(".") > 1:
+        return False
+    return body.replace(".", "").isdigit()
+
+
+def _is_point_suffix(suffix: str) -> bool:
+    if not suffix.startswith("t"):
+        return False
+    body = suffix[1:]
+    head, sep, tail = body.partition("v")
+    if not sep or not head:
+        return False
+    if "n" in tail:
+        value, mark, occurrence = tail.rpartition("n")
+        if not mark or not occurrence.isdigit():
+            return False
+        tail = value
+    return _is_decimal_token(head) and _is_decimal_token(tail)
+
+
+def compilation_point_id(
+    observation_id: str,
+    temperature: Decimal,
+    magnitude: Decimal,
+    occurrence: int = 0,
+) -> str:
+    """Stable id of one printed series cell. Not its stored position."""
+
+    token = f"t{_decimal_token(temperature)}v{_decimal_token(magnitude)}"
+    if occurrence:
+        token = f"{token}n{occurrence}"
+    return f"{observation_id}#{token}"
 
 
 def parent_observation_id(reference_id: str) -> str:
-    """Series-point ids end in ``#<index>``. Anything else is itself."""
+    """Series-point ids end in ``#<index>`` or ``#t<T>v<value>``.
 
-    parent, sep, index = reference_id.rpartition("#")
-    if sep and index.isdigit():
+    Anything else is itself. No stored observation id contains ``#``.
+    """
+
+    parent, sep, suffix = reference_id.rpartition("#")
+    if sep and (suffix.isdigit() or _is_point_suffix(suffix)):
         return parent
     return reference_id
 
@@ -176,17 +221,25 @@ def compilation_series_points(
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         return (observation,)
     points: list[Observation] = []
-    for index, (temperature, magnitude) in enumerate(value.series):
+    seen: dict[str, int] = {}
+    for temperature, magnitude in value.series:
+        temp_d = as_decimal(temperature)
+        mag_d = as_decimal(magnitude)
+        key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
+        occurrence = seen.get(key, 0)
+        seen[key] = occurrence + 1
         identity = replace(
             observation.identity,
-            temperature_K=State.of(temperature),
+            temperature_K=State.of(temp_d),
         )
         points.append(
             replace(
                 observation,
-                observation_id=compilation_point_id(observation.observation_id, index),
+                observation_id=compilation_point_id(
+                    observation.observation_id, temp_d, mag_d, occurrence
+                ),
                 identity=identity,
-                value=Value.point_of(magnitude),
+                value=Value.point_of(mag_d),
                 derived_from=(observation.observation_id,)
                 + tuple(observation.derived_from or ()),
             )
@@ -277,9 +330,13 @@ def _ellingham_attempt(
 ) -> ThermoAttempt:
     """ΔfG and log10 Kf from the Ellingham reaction fit. Nothing else.
 
-    The fit stores dG(T) = dH − T·dS in kJ per mol O2 for
-    ``n_M metal + O2 → n_ox oxide``. The oxide formation value on a
-    mol-species basis is that dG divided by n_ox.
+    The fit stores dG(T) = dH − T·dS in kJ per mol O2 for one reaction,
+    ``n_M metal + O2 → n_ox oxide``, with the metal and oxide phases
+    named on that segment. Dividing by n_ox is the oxide formation value
+    only while those phases are the standard states, which is the
+    segment's own temperature range. Outside that range the selector
+    clamps to a neighbouring reaction. That number is not ΔfG and is
+    refused, not scored as an extrapolated formation value.
 
     Unit check: (kJ/mol O2) / (mol oxide / mol O2) = kJ/mol oxide.
     log10 Kf = −ΔfG / (R T ln 10) with ΔfG in kJ/mol and R in kJ/(mol·K)
@@ -291,6 +348,7 @@ def _ellingham_attempt(
     ΔfG = −7.4056 / 2 = −3.7028 kJ/mol. Residual +0.183 kJ/mol, inside
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
+    K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
     """
 
     if quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
@@ -355,6 +413,23 @@ def _ellingham_attempt(
             extra={"formulas": [item[0] for item in matches]},
         )
     metal, segment, product, extrapolated = matches[0]
+    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
+    if product.polymorph is None and product.phase is Phase.CR:
+        call += ":generic-solid"
+    if extrapolated:
+        # Neighbouring-segment reaction dG is a different reference state.
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "ellingham-formation-outside-segment",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "segment_range_K": [segment.range_K[0], segment.range_K[1]],
+                "temperature_K": str(temperature_K),
+                "phase_basis": segment.phase_basis,
+            },
+            call_evidence=call + ":outside-segment",
+        )
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
     per_species = dG / (Decimal(product.coeff.numerator) / Decimal(product.coeff.denominator))
@@ -367,7 +442,7 @@ def _ellingham_attempt(
         unit = QUANTITY_UNITS[Quantity.DELTA_FG]
     notices: list[Notice] = []
     authority = Authority.CERTIFIED
-    if extrapolated or segment.authority_status != "authoritative":
+    if segment.authority_status != "authoritative":
         authority = Authority.EXTRAPOLATED
         notices.append(
             Notice(
@@ -388,11 +463,7 @@ def _ellingham_attempt(
         notices=tuple(notices),
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=(
-            f"ellingham:{metal}:{product.token}:T={temperature_K}"
-            + (":generic-solid" if product.polymorph is None and product.phase is Phase.CR else "")
-            + (":extrapolated" if extrapolated else "")
-        ),
+        call_evidence=call,
     )
 
 
@@ -754,6 +825,39 @@ def reference_observation(observations: Mapping[str, Observation], reference_id:
     return observations.get(parent_observation_id(reference_id))
 
 
+def compilation_origin(
+    reference_id: str, origins: Mapping[str, str] | None
+) -> str | None:
+    if not origins:
+        return None
+    return origins.get(reference_id) or origins.get(parent_observation_id(reference_id))
+
+
+def compilation_row_observation(
+    reference_id: str,
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str] | None = None,
+) -> Observation | None:
+    """Observation when this residual is compilation, else None.
+
+    Assessed compilations and quoted rows stored under a compilation
+    path are the same exclusion from the measured tier. Both belong in
+    the compilation table.
+    """
+
+    from simulator.battery.score import is_compilation_source
+
+    observation = reference_observation(observations, reference_id)
+    if observation is None:
+        return None
+    origin = compilation_origin(reference_id, origins)
+    if is_compilation_evidence(observation) or is_compilation_source(
+        observation.source_id, origin
+    ):
+        return observation
+    return None
+
+
 def compilation_family(source_id: str | None, origin: str | None) -> str:
     if origin:
         return origin.replace("\\", "/").split("/", 1)[0]
@@ -770,38 +874,33 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
     return str((ordered[mid - 1] + ordered[mid]) / Decimal(2))
 
 
-def compilation_tier_lines(
-    residuals: Sequence[object],
-    observations: Mapping[str, Observation],
-) -> list[str]:
-    """Compilation tier beside the measured tier. The two counts are not added."""
+@dataclass(frozen=True)
+class _TierCell:
+    engine: str
+    status: ResidualStatus
+    relation: SourceRelation
+    numeric: Decimal | None
+    family: str
+    quantity: str
+    uncertainty: str
 
-    from simulator.battery.score import Residual
 
-    by_engine: dict[str, list[Residual]] = defaultdict(list)
-    by_source: dict[tuple[str, str], list[Residual]] = defaultdict(list)
-    for residual in residuals:
-        if not isinstance(residual, Residual):
-            continue
-        observation = reference_observation(observations, residual.reference)
-        if observation is None or not is_compilation_evidence(observation):
-            continue
-        engine = residual.key.rsplit("::", 1)[-1]
-        by_engine[engine].append(residual)
-        quantity = "unknown"
-        if isinstance(observation.identity, Identity):
-            token = quantity_token(observation.identity)
-            quantity = token.value if token is not None else "unknown"
-        family = compilation_family(observation.source_id, None)
-        by_source[(family, quantity)].append(residual)
+def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
+    by_engine: dict[str, list[_TierCell]] = defaultdict(list)
+    by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
+    for cell in cells:
+        by_engine[cell.engine].append(cell)
+        by_source[(cell.family, cell.quantity)].append(cell)
     lines = [
         "## Compilation tier",
         "",
-        "COMPILATION_ASSESSED comparisons. Not part of the measured tier",
-        "and not added to it. same-source means the engine coefficients",
-        "resolve to this compilation (JANAF-4th refit versus JANAF).",
-        "Pending admission is unchanged. Printed uncertainty is the",
-        "reference observation's uncertainty (often none on a grid).",
+        "Compilation comparisons: assessed tables and quoted rows stored",
+        "under a compilation. Not part of the measured tier and not added",
+        "to it. same-source means the engine coefficients resolve to this",
+        "compilation (JANAF-4th refit versus JANAF; NASA CEA thermo.inp",
+        "versus the Glenn coefficient database). Pending admission is",
+        "unchanged. Printed uncertainty is the reference observation's",
+        "uncertainty (often none on a grid).",
         "",
         "| engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |",
         "|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -810,8 +909,12 @@ def compilation_tier_lines(
         lines.append("| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |")
     for engine, bucket in sorted(by_engine.items()):
         numeric = [row for row in bucket if row.numeric is not None]
-        same = [row for row in numeric if row.source_relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}]
-        independent = [row for row in numeric if row.source_relation is SourceRelation.INDEPENDENT]
+        same = [
+            row
+            for row in numeric
+            if row.relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}
+        ]
+        independent = [row for row in numeric if row.relation is SourceRelation.INDEPENDENT]
         lines.append(
             f"| {engine} | {len(bucket)} | "
             f"{sum(1 for row in bucket if row.status is ResidualStatus.REFUSED)} | "
@@ -829,18 +932,105 @@ def compilation_tier_lines(
     if not by_source:
         lines.append("| (none) |  | 0 | 0 | 0 | — |  |")
     for (family, quantity), bucket in sorted(by_source.items()):
-        numeric_values = [
-            row.numeric.value for row in bucket if row.numeric is not None
-        ]
-        observation = reference_observation(observations, bucket[0].reference)
-        uncertainty = "—" if observation is None else uncertainty_text(observation.uncertainty)
+        numeric_values = [row.numeric for row in bucket if row.numeric is not None]
         lines.append(
             f"| `{family}` | `{quantity}` | {len(bucket)} | {len(numeric_values)} | "
             f"{sum(1 for row in bucket if row.status is ResidualStatus.REFUSED)} | "
-            f"{_median_abs(numeric_values) or '—'} | {uncertainty} |"
+            f"{_median_abs(numeric_values) or '—'} | {bucket[0].uncertainty} |"
         )
     lines.append("")
     return lines
+
+
+def _cell_from_observation(
+    *,
+    engine: str,
+    status: ResidualStatus,
+    relation: SourceRelation,
+    numeric: Decimal | None,
+    observation: Observation,
+    origin: str | None,
+) -> _TierCell:
+    quantity = "unknown"
+    if isinstance(observation.identity, Identity):
+        token = quantity_token(observation.identity)
+        quantity = token.value if token is not None else "unknown"
+    return _TierCell(
+        engine=engine,
+        status=status,
+        relation=relation,
+        numeric=numeric,
+        family=compilation_family(observation.source_id, origin),
+        quantity=quantity,
+        uncertainty=uncertainty_text(observation.uncertainty),
+    )
+
+
+def compilation_tier_lines(
+    residuals: Sequence[object],
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str] | None = None,
+) -> list[str]:
+    """Compilation tier beside the measured tier. The two counts are not added."""
+
+    from simulator.battery.score import Residual
+
+    cells: list[_TierCell] = []
+    for residual in residuals:
+        if not isinstance(residual, Residual):
+            continue
+        observation = compilation_row_observation(
+            residual.reference, observations, origins
+        )
+        if observation is None:
+            continue
+        cells.append(
+            _cell_from_observation(
+                engine=residual.key.rsplit("::", 1)[-1],
+                status=residual.status,
+                relation=residual.source_relation,
+                numeric=None if residual.numeric is None else residual.numeric.value,
+                observation=observation,
+                origin=compilation_origin(residual.reference, origins),
+            )
+        )
+    return _tier_markdown(cells)
+
+
+def compilation_tier_lines_from_payloads(
+    rows: Sequence[Mapping[str, object]],
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str] | None = None,
+) -> list[str]:
+    """Same compilation table from a residuals.jsonl payload."""
+
+    cells: list[_TierCell] = []
+    for row in rows:
+        reference = str(row.get("reference") or "")
+        observation = compilation_row_observation(reference, observations, origins)
+        if observation is None:
+            continue
+        request = row.get("candidate_request")
+        engine = ""
+        if isinstance(request, Mapping) and request.get("engine"):
+            engine = str(request["engine"])
+        if not engine:
+            engine = str(row.get("key") or "").rsplit("::", 1)[-1]
+        raw_numeric = row.get("numeric")
+        numeric = None
+        if isinstance(raw_numeric, Mapping) and raw_numeric.get("value") is not None:
+            numeric = as_decimal(raw_numeric["value"])
+        cells.append(
+            _cell_from_observation(
+                engine=engine or "unknown",
+                status=ResidualStatus(str(row.get("status"))),
+                relation=SourceRelation(str(row.get("source_relation") or SourceRelation.UNKNOWN.value)),
+                numeric=numeric,
+                observation=observation,
+                origin=compilation_origin(reference, origins),
+            )
+        )
+    return _tier_markdown(cells)
 
 
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):
@@ -895,9 +1085,10 @@ def compilation_tier_census(
 
     Ellingham is evaluated at each printed temperature. Other engines'
     thermochemistry refusal does not depend on which printed temperature
-    it is, so it is computed once per series. ``invoke_pure_phase`` false
-    records ``pure-phase-call-required`` instead of opening MAGEMin or
-    ThermoEngine. Relation and validity gates are the same functions
+    it is, so it is computed once per series when pure-phase is not
+    invoked. An invoked pure-phase value depends on T and is not reused.
+    ``invoke_pure_phase`` false records ``pure-phase-call-required``
+    instead of opening MAGEMin or ThermoEngine. Relation and validity gates are the same functions
     ``compile_residual`` uses. A sample of points is checked against
     ``compile_residual`` when ``audit_compile_residual`` is set.
     """
@@ -1025,166 +1216,173 @@ def compilation_tier_census(
         row["refused"][key] += 1
         return key
 
-    for obs in context.observations.values():
-        origin = context.origins.get(obs.observation_id)
-        if is_internal_consistency(origin) or is_sf04_workbook(obs):
-            continue
-        if not (
-            is_compilation_evidence(obs)
-            or is_compilation_source(obs.source_id, origin)
-        ):
-            continue
-        quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
-        if (
-            obs.value.kind is ValueKind.SERIES
-            and obs.value.series
-            and quantity is Quantity.TRANSITION_TEMPERATURE
-        ):
-            transition_series_cells += len(obs.value.series)
-            continue
-        points = compilation_series_points(obs, origin)
-        expanded = bool(points) and points[0].observation_id != obs.observation_id
-        if expanded:
-            series_cells += len(points)
-            if quantity in _THERMO_QUANTITIES:
-                banded_series_cells += len(points)
-        family = compilation_family(obs.source_id, origin)
-        walked += 1
-        if walked % 2000 == 0:
-            print(
-                f"compilation census observations={walked} points={reachable}",
-                flush=True,
-            )
-        formula = ""
-        if isinstance(obs.identity, Identity):
-            formula = obs.identity.species.formula
-        formula_bad = quantity is not None and parse_species_formula(formula) is None
-        gate = gate_token(obs, quantity)
-        reused: dict[Engine, ThermoAttempt] = {}
-        for point in points:
-            if point.value.kind is not ValueKind.POINT or point.value.point is None:
+    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
+
+    table_index = build_printed_thermo_index(context.observations)
+    with bound_work_inputs(context.works, context.observations, context.experiments):
+        for obs in context.observations.values():
+            origin = context.origins.get(obs.observation_id)
+            if is_internal_consistency(origin) or is_sf04_workbook(obs):
                 continue
-            token = quantity_token(point.identity) if isinstance(point.identity, Identity) else None
-            qname = token.value if token is not None else "unknown"
-            row = bucket(family, qname)
-            row["reachable"] += 1
-            reachable += 1
-            reference = point.value.point
-            for engine in engine_set:
-                attempt: ThermoAttempt | None
-                if token not in _THERMO_QUANTITIES:
-                    attempt = _refuse(
-                        RefusalReason.UNSUPPORTED,
-                        "not-thermochemistry",
-                        quantity=token or Quantity.DELTA_FG,
-                        origin=point.observation_id,
-                    )
-                else:
-                    # A 0 K row is a real printed point. Do not reuse its
-                    # refusal for later temperatures in the same series.
-                    temperature_state = (
-                        point.identity.temperature_K
-                        if isinstance(point.identity, Identity)
-                        else None
-                    )
-                    nonpositive = (
-                        isinstance(temperature_state, State)
-                        and temperature_state.is_value
-                        and temperature_state.value is not None
-                        and as_decimal(temperature_state.value) <= 0
+            if not (
+                is_compilation_evidence(obs)
+                or is_compilation_source(obs.source_id, origin)
+            ):
+                continue
+            quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
+            if (
+                obs.value.kind is ValueKind.SERIES
+                and obs.value.series
+                and quantity is Quantity.TRANSITION_TEMPERATURE
+            ):
+                transition_series_cells += len(obs.value.series)
+                continue
+            points = compilation_series_points(obs, origin)
+            expanded = bool(points) and points[0].observation_id != obs.observation_id
+            if expanded:
+                series_cells += len(points)
+                if quantity in _THERMO_QUANTITIES:
+                    banded_series_cells += len(points)
+            family = compilation_family(obs.source_id, origin)
+            walked += 1
+            if walked % 2000 == 0:
+                print(
+                    f"compilation census observations={walked} points={reachable}",
+                    flush=True,
+                )
+            formula = ""
+            if isinstance(obs.identity, Identity):
+                formula = obs.identity.species.formula
+            formula_bad = quantity is not None and parse_species_formula(formula) is None
+            gate = gate_token(obs, quantity)
+            reused: dict[Engine, ThermoAttempt] = {}
+            for point in points:
+                if point.value.kind is not ValueKind.POINT or point.value.point is None:
+                    continue
+                token = quantity_token(point.identity) if isinstance(point.identity, Identity) else None
+                qname = token.value if token is not None else "unknown"
+                row = bucket(family, qname)
+                row["reachable"] += 1
+                reachable += 1
+                reference = point.value.point
+                for engine in engine_set:
+                    attempt: ThermoAttempt | None
+                    if token not in _THERMO_QUANTITIES:
+                        attempt = _refuse(
+                            RefusalReason.UNSUPPORTED,
+                            "not-thermochemistry",
+                            quantity=token or Quantity.DELTA_FG,
+                            origin=point.observation_id,
+                        )
+                    else:
+                        temperature_state = (
+                            point.identity.temperature_K
+                            if isinstance(point.identity, Identity)
+                            else None
+                        )
+                        nonpositive = (
+                            isinstance(temperature_state, State)
+                            and temperature_state.is_value
+                            and temperature_state.value is not None
+                            and as_decimal(temperature_state.value) <= 0
+                        )
+                        # A 0 K refusal is not reused. A pure-phase value
+                        # depends on T, so an invoked call is not reused either.
+                        # The uninvoked refusal does not depend on T.
+                        reuse = (
+                            not nonpositive
+                            and engine is not Engine.INTERNAL_ANALYTICAL
+                            and not invoke_pure_phase
+                        )
+                        if reuse and engine in reused:
+                            attempt = reused[engine]
+                        else:
+                            attempt = predict_thermo_attempt(
+                                engine,
+                                point,
+                                invoke_pure_phase=invoke_pure_phase,
+                            )
+                            if reuse:
+                                reused[engine] = attempt
+                    relation = relation_for(obs, engine)
+                    account(
+                        row,
+                        attempt=attempt,
+                        relation=relation,
+                        reference=reference,
+                        formula_bad=formula_bad,
+                        gate=gate,
+                        quantity=token,
                     )
                     if (
-                        not nonpositive
-                        and engine is not Engine.INTERNAL_ANALYTICAL
-                        and engine in reused
+                        audit_compile_residual
+                        and audited < 3
+                        and engine is Engine.INTERNAL_ANALYTICAL
+                        and token in _THERMO_QUANTITIES
+                        and not formula_bad
+                        and gate is None
                     ):
-                        attempt = reused[engine]
-                    else:
-                        attempt = predict_thermo_attempt(
-                            engine,
-                            point,
-                            invoke_pure_phase=invoke_pure_phase,
-                        )
-                        if not nonpositive and engine is not Engine.INTERNAL_ANALYTICAL:
-                            reused[engine] = attempt
-                relation = relation_for(obs, engine)
-                account(
-                    row,
-                    attempt=attempt,
-                    relation=relation,
-                    reference=reference,
-                    formula_bad=formula_bad,
-                    gate=gate,
-                    quantity=token,
-                )
-                if (
-                    audit_compile_residual
-                    and audited < 3
-                    and engine is Engine.INTERNAL_ANALYTICAL
-                    and token in _THERMO_QUANTITIES
-                    and not formula_bad
-                    and gate is None
-                ):
-                    from simulator.battery.score import compile_residual
+                        from simulator.battery.score import compile_residual
 
-                    residual, _candidate = compile_residual(
-                        point,
-                        engine,
-                        context=context,
-                        comparison_ids=set(),
-                        predict=lambda eng, observation, handles=None, isolated=None, _attempt=attempt: _prediction_from_attempt(
-                            eng, observation, _attempt
-                        ),
-                        lineage_observation_id=(
-                            obs.observation_id
-                            if point.observation_id != obs.observation_id
-                            else None
-                        ),
-                    )
-                    if residual.numeric is None:
-                        got = _refusal_key(
-                            residual.refusal.reason, residual.refusal.detail
-                        ) if residual.refusal is not None else "none"
-                    else:
-                        got = f"numeric:{residual.numeric.value}:{residual.source_relation.value}"
-                    expect_band = decision_band_for(token, relation)
-                    if attempt.value is not None and expect_band is not None:
-                        expect = f"numeric:{attempt.value - reference}:{relation.value}"
-                    elif attempt.value is not None:
-                        expect = f"decision_rule_missing:no_sourced_decision_band:{token.value}"
-                    else:
-                        expect = _refusal_key(
-                            attempt.refusal_reason or RefusalReason.UNSUPPORTED,
-                            attempt.refusal_detail,
+                        residual, _candidate = compile_residual(
+                            point,
+                            engine,
+                            context=context,
+                            comparison_ids=set(),
+                            predict=lambda eng, observation, handles=None, isolated=None, _attempt=attempt: _prediction_from_attempt(
+                                eng, observation, _attempt
+                            ),
+                            lineage_observation_id=(
+                                obs.observation_id
+                                if point.observation_id != obs.observation_id
+                                else None
+                            ),
+                            table_index=table_index,
                         )
-                    if got != expect:
-                        raise RuntimeError(
-                            f"census/compile_residual mismatch {point.observation_id}: {got} != {expect}"
-                        )
-                    audited += 1
-    rendered = []
-    for (family, quantity), row in sorted(buckets.items()):
-        rendered.append(
-            {
-                "family": family,
-                "quantity": quantity,
-                "reachable": row["reachable"],
-                "engine_values": row["engine_values"],
-                "numeric": row["numeric"],
-                "same_source": row["same_source"],
-                "independent": row["independent"],
-                "match_same_source": row["match_same_source"],
-                "match_independent": row["match_independent"],
-                "median_abs_residual": _median_abs(row["residuals"]),
-                "refused": dict(sorted(row["refused"].items())),
-            }
-        )
-    return {
-        "measured_candidates_by_rail": dict(sorted(measured.items())),
-        "comparison_candidates": sum(measured.values()),
-        "reachable_points": reachable,
-        "series_cells_expanded": series_cells,
-        "banded_series_cells_expanded": banded_series_cells,
-        "transition_temperature_series_cells_left": transition_series_cells,
-        "rows": rendered,
-    }
+                        if residual.numeric is None:
+                            got = _refusal_key(
+                                residual.refusal.reason, residual.refusal.detail
+                            ) if residual.refusal is not None else "none"
+                        else:
+                            got = f"numeric:{residual.numeric.value}:{residual.source_relation.value}"
+                        expect_band = decision_band_for(token, relation)
+                        if attempt.value is not None and expect_band is not None:
+                            expect = f"numeric:{attempt.value - reference}:{relation.value}"
+                        elif attempt.value is not None:
+                            expect = f"decision_rule_missing:no_sourced_decision_band:{token.value}"
+                        else:
+                            expect = _refusal_key(
+                                attempt.refusal_reason or RefusalReason.UNSUPPORTED,
+                                attempt.refusal_detail,
+                            )
+                        if got != expect:
+                            raise RuntimeError(
+                                f"census/compile_residual mismatch {point.observation_id}: {got} != {expect}"
+                            )
+                        audited += 1
+        rendered = []
+        for (family, quantity), row in sorted(buckets.items()):
+            rendered.append(
+                {
+                    "family": family,
+                    "quantity": quantity,
+                    "reachable": row["reachable"],
+                    "engine_values": row["engine_values"],
+                    "numeric": row["numeric"],
+                    "same_source": row["same_source"],
+                    "independent": row["independent"],
+                    "match_same_source": row["match_same_source"],
+                    "match_independent": row["match_independent"],
+                    "median_abs_residual": _median_abs(row["residuals"]),
+                    "refused": dict(sorted(row["refused"].items())),
+                }
+            )
+        return {
+            "measured_candidates_by_rail": dict(sorted(measured.items())),
+            "comparison_candidates": sum(measured.values()),
+            "reachable_points": reachable,
+            "series_cells_expanded": series_cells,
+            "banded_series_cells_expanded": banded_series_cells,
+            "transition_temperature_series_cells_left": transition_series_cells,
+            "rows": rendered,
+        }

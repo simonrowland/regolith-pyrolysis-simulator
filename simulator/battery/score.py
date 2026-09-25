@@ -262,7 +262,12 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "antoine_sidecar": ("nist-webbook",),
-    "ellingham": ("janaf-4th",),
+    # JANAF-4th is the refit for the oxide segments that cite Chase.
+    # Zr, Rb, Cs, and P cite NASA CEA thermo.inp. nasa-glenn is that
+    # database; nasa-cea-thermo is the extract it superseded. Pankratz
+    # B677 and B689 are different bulletins from the B672 Mn rows and
+    # are not coefficient sources.
+    "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
     "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
     "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
 }
@@ -769,14 +774,14 @@ def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
 ) -> DecisionBand | None:
-    # The sourced bands are kJ/mol (gibbs_battery_residual_ledger).
-    # log10 Kf is dimensionless. Reusing the kJ band would call a
-    # 0.004 residual a match against 0.05 kJ. No log10 band was sourced.
-    if quantity is Quantity.LOG10_KF:
+    # The sourced band is Gibbs kJ/mol (gibbs_battery_residual_ledger).
+    # Cp and S are J/(K·mol); a 0.5 J residual must not match 1.0 kJ.
+    # ΔfH and H−H298 share the kJ unit and were not given this band.
+    # log10 Kf is dimensionless. No sourced band → None, which
+    # populate_numeric records as decision_rule_missing.
+    if quantity is not Quantity.DELTA_FG:
         return None
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
-        return THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
-    return None
+    return THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
 
 
 def populate_numeric(
@@ -1385,6 +1390,7 @@ def compile_residual(
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     lineage_observation_id: str | None = None,
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
 ) -> tuple[Residual, Observation | None]:
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -1403,7 +1409,9 @@ def compile_residual(
     experiment = context.experiments.get(reference.experiment_id)
     if experiment is not None:
         gates = run_validity_gates(
-            experiment, reference, tables=_gate_tables(reference, context.observations)
+            experiment,
+            reference,
+            tables=_gate_tables(reference, context.observations, table_index),
         )
     else:
         from simulator.battery.validity import GateCheck
@@ -1658,10 +1666,11 @@ def _check_refs(gates: GateOutcome, reason: RefusalReason) -> tuple[str, ...]:
 def _gate_tables(
     reference: Observation,
     observations: Mapping[str, Observation],
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
 ) -> tuple[dict, ...]:
     from simulator.battery.validate import _table_payloads
 
-    return _table_payloads(reference, observations)
+    return _table_payloads(reference, observations, table_index)
 
 
 def load_score_context(root: Path | None = None) -> ScoreContext:
@@ -1780,82 +1789,91 @@ def score_store(
     residuals: list[Residual] = []
     candidates: dict[str, Observation] = {}
     # Snapshot. Engine candidates are returned separately and are not
-    # lineage inputs, so the work-expansion cache stays valid.
+    # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
     origins = dict(context.origins)
     live_context = replace(context, observations=observations, origins=origins)
     empirical_ids = comparison_ids
+    expanded_refs = [
+        (obs, compilation_series_points(obs, origins.get(obs.observation_id)))
+        for obs in refs
+    ]
     started = time.monotonic()
     last_progress = started
     done = 0
-    total = len(refs) * max(len(engine_set), 1)
-    for obs in refs:
-        origin = origins.get(obs.observation_id)
-        for point in compilation_series_points(obs, origin):
-            if point.observation_id not in origins:
-                origins[point.observation_id] = origin or ""
-            point_origin = origins.get(point.observation_id)
-            diagnostic = (
-                obs.observation_id not in empirical_ids
-                or is_internal_consistency(point_origin)
-                or is_compilation_source(point.source_id, point_origin)
-                or is_compilation_evidence(point)
-                or is_sf04_workbook(point)
-            )
-            quantity = (
-                quantity_token(point.identity)
-                if isinstance(point.identity, Identity)
-                else None
-            )
-            thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
-            compilation_thermo = (
-                thermo
-                and (
-                    is_compilation_evidence(point)
+    total = sum(len(points) for _, points in expanded_refs) * max(len(engine_set), 1)
+    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
+
+    table_index = build_printed_thermo_index(observations)
+    with bound_work_inputs(context.works, observations, context.experiments):
+        for obs, points in expanded_refs:
+            origin = origins.get(obs.observation_id)
+            for point in points:
+                if point.observation_id not in origins:
+                    origins[point.observation_id] = origin or ""
+                point_origin = origins.get(point.observation_id)
+                diagnostic = (
+                    obs.observation_id not in empirical_ids
+                    or is_internal_consistency(point_origin)
                     or is_compilation_source(point.source_id, point_origin)
+                    or is_compilation_evidence(point)
+                    or is_sf04_workbook(point)
                 )
-                and not is_internal_consistency(point_origin)
-                and not is_sf04_workbook(point)
-            )
-            for engine in engine_set:
-                prediction = None
-                if diagnostic and predict is None and not compilation_thermo:
-                    prediction = EnginePrediction(
-                        engine=engine,
-                        channel=ENGINE_CHANNELS[engine],
-                        execution=Execution(state=ExecutionState.NOT_PROBED),
-                        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                        lineage_complete=False,
-                        refusal_reason=RefusalReason.UNSUPPORTED,
-                        refusal_detail={"reason": "diagnostic_population"},
-                        identity=point.identity if isinstance(point.identity, Identity) else None,
-                    )
-                residual, candidate = compile_residual(
-                    point,
-                    engine,
-                    context=live_context,
-                    prediction=prediction,
-                    comparison_ids=comparison_ids,
-                    predict=predict,
-                    handles=handles,
-                    lineage_observation_id=(
-                        obs.observation_id
-                        if point.observation_id != obs.observation_id
-                        else None
-                    ),
+                quantity = (
+                    quantity_token(point.identity)
+                    if isinstance(point.identity, Identity)
+                    else None
                 )
-                residuals.append(residual)
-                if candidate is not None:
-                    candidates[candidate.observation_id] = candidate
-                done += 1
-                now = time.monotonic()
-                if now - last_progress >= 60:
-                    print(
-                        f"score progress {done}/{total} residuals "
-                        f"{int(now - started)}s host={context.hostname}",
-                        flush=True,
+                thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
+                compilation_thermo = (
+                    thermo
+                    and (
+                        is_compilation_evidence(point)
+                        or is_compilation_source(point.source_id, point_origin)
                     )
-                    last_progress = now
+                    and not is_internal_consistency(point_origin)
+                    and not is_sf04_workbook(point)
+                )
+                for engine in engine_set:
+                    prediction = None
+                    if diagnostic and predict is None and not compilation_thermo:
+                        prediction = EnginePrediction(
+                            engine=engine,
+                            channel=ENGINE_CHANNELS[engine],
+                            execution=Execution(state=ExecutionState.NOT_PROBED),
+                            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                            lineage_complete=False,
+                            refusal_reason=RefusalReason.UNSUPPORTED,
+                            refusal_detail={"reason": "diagnostic_population"},
+                            identity=point.identity if isinstance(point.identity, Identity) else None,
+                        )
+                    residual, candidate = compile_residual(
+                        point,
+                        engine,
+                        context=live_context,
+                        prediction=prediction,
+                        comparison_ids=comparison_ids,
+                        predict=predict,
+                        handles=handles,
+                        lineage_observation_id=(
+                            obs.observation_id
+                            if point.observation_id != obs.observation_id
+                            else None
+                        ),
+                        table_index=table_index,
+                    )
+                    residuals.append(residual)
+                    if candidate is not None:
+                        candidates[candidate.observation_id] = candidate
+                    done += 1
+                    now = time.monotonic()
+                    if now - last_progress >= 60:
+                        print(
+                            f"score progress {done}/{total} residuals "
+                            f"{int(now - started)}s host={context.hostname}",
+                            flush=True,
+                        )
+                        last_progress = now
     residuals.sort(key=lambda r: (r.rail.value, r.reference, r.key))
     return tuple(residuals), candidates
 
@@ -2068,16 +2086,36 @@ def _median_abs(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _measured_residuals(
+    residuals: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[Residual]:
+    """Drop compilation rows. They have their own table."""
+
+    if context is None:
+        return list(residuals)
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    return [
+        residual
+        for residual in residuals
+        if compilation_row_observation(
+            residual.reference, context.observations, context.origins
+        )
+        is None
+    ]
+
+
 def headline_rows(
     residuals: Sequence[Residual],
     *,
     context: ScoreContext | None = None,
 ) -> list[dict[str, object]]:
-    """Per rail × engine headline. Empirical score_eligible only."""
+    """Per rail × engine headline. Measured rows only; score_eligible is n_scored."""
 
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
-    for residual in residuals:
+    for residual in _measured_residuals(residuals, context):
         engine = _engine_of(residual)
         engines_seen.add(engine)
         groups.setdefault((residual.rail.value, engine), []).append(residual)
@@ -2271,9 +2309,21 @@ def render_score_report(
         )
     from simulator.battery.compilation_tier import compilation_tier_lines
 
-    lines.extend(["", *compilation_tier_lines(residuals, context.observations)])
-    lines.extend(["", "## Refusal census", "", "| reason | n |", "|---|---:|"])
-    census = refusal_census(residuals)
+    lines.extend(
+        ["", *compilation_tier_lines(residuals, context.observations, context.origins)]
+    )
+    lines.extend(
+        [
+            "",
+            "## Refusal census",
+            "",
+            "Measured tier only. Compilation refusals are in the compilation table.",
+            "",
+            "| reason | n |",
+            "|---|---:|",
+        ]
+    )
+    census = refusal_census(_measured_residuals(residuals, context))
     if not census:
         lines.append("| (none) | 0 |")
     else:
@@ -2467,7 +2517,28 @@ def render_score_report_from_payloads(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     mismatch_warning: str | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
 ) -> str:
+    measured_rows: Sequence[Mapping[str, object]] = rows
+    compilation_lines: list[str] = []
+    if observations is not None:
+        from simulator.battery.compilation_tier import (
+            compilation_row_observation,
+            compilation_tier_lines_from_payloads,
+        )
+
+        measured_rows = [
+            row
+            for row in rows
+            if compilation_row_observation(
+                str(row.get("reference") or ""), observations, origins
+            )
+            is None
+        ]
+        compilation_lines = compilation_tier_lines_from_payloads(
+            rows, observations, origins
+        )
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
@@ -2488,13 +2559,18 @@ def render_score_report_from_payloads(
             "",
             f"Engines: {', '.join(e.value for e in engines)}.",
             "",
-            "## Per rail × engine headline",
+            "## Measured tier" if observations is not None else "## Per rail × engine headline",
             "",
+            *(
+                ["score_eligible only. Compilation rows are not in this table.", ""]
+                if observations is not None
+                else []
+            ),
             "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
             "|---|---|---:|---:|---:|---:|---:|",
         ]
     )
-    for row in headline_payloads(rows, engines):
+    for row in headline_payloads(measured_rows, engines):
         rate = row["match_rate"]
         rate_s = "—" if rate is None else f"{rate:.3f}"
         med = row["median_abs_dex"] or "—"
@@ -2502,8 +2578,23 @@ def render_score_report_from_payloads(
             f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
             f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
         )
-    lines.extend(["", "## Refusal census", "", "| reason | n |", "|---|---:|"])
-    census = refusal_census_payloads(rows)
+    if compilation_lines:
+        lines.extend(["", *compilation_lines])
+    lines.extend(
+        [
+            "",
+            "## Refusal census",
+            "",
+            *(
+                ["Measured tier only. Compilation refusals are in the compilation table.", ""]
+                if observations is not None
+                else []
+            ),
+            "| reason | n |",
+            "|---|---:|",
+        ]
+    )
+    census = refusal_census_payloads(measured_rows)
     if not census:
         lines.append("| (none) | 0 |")
     else:
