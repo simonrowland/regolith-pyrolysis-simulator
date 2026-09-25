@@ -856,9 +856,11 @@ def _standard_state_from_extract_text(
 
     Extracts predate the v2 ``StandardState`` record and store this field as
     source prose.  The mapper accepts the closed Raoultian convention only
-    when the prose (or the same row's printed phase field) names one liquid or
-    solid endmember.  Vapor-pressure ratios, mixed Raoultian/Henrian claims,
-    and rows with both solid and liquid alternatives stay unresolved.
+    when that prose names one liquid or solid endmember.  ``phase_raw`` is the
+    measurement phase (the alloy or melt).  It is not a printed standard-state
+    phase and never supplies the endmember.  Vapor-pressure ratios, mixed
+    Raoultian/Henrian claims, and rows that name more than one endmember stay
+    unresolved.
     """
 
     if not isinstance(raw, str):
@@ -905,21 +907,17 @@ def _standard_state_from_extract_text(
         endmember, phase = matching[0]
     elif len(unique_explicit) == 1:
         endmember, phase = unique_explicit[0]
-    elif unique_explicit:
-        return None
     else:
-        phase_text = str(phase_raw or "").lower()
-        has_liquid = "liquid" in phase_text
-        has_solid = "solid" in phase_text
-        if has_liquid == has_solid:
-            return None
-        endmember = species_formula
-        phase = Phase.L if has_liquid else Phase.CR
+        # No endmember in the prose. Do not invent one from species_formula
+        # and the measurement phase (phase_raw).
+        return None
 
     return StandardState(
         convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         endmember=make_species(endmember, phase),
-        component_basis="raoultian_pure_endmember",
+        component_basis=endmember,
+        # Required Decimal. Same default as _standard_state_from_plain when
+        # the payload omits a pressure. The activity prose does not print it.
         reference_pressure_bar=Decimal("1"),
     )
 
