@@ -9,10 +9,12 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import MethodToken
 from simulator.battery.migrate import (
     REPO_ROOT,
     apparatus_from_equipment,
     experiment_from_plain,
+    map_method,
     migrate,
     pressure_from_equipment,
     sample_from_equipment,
@@ -20,6 +22,21 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+@pytest.mark.parametrize(
+    ("printed_method", "expected"),
+    [
+        ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
+        ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
+    ],
+)
+def test_printed_method_aliases_map_to_closed_tokens(
+    printed_method: str, expected: MethodToken
+) -> None:
+    mapped = map_method(printed_method)
+    assert mapped.is_value
+    assert mapped.value is expected
 
 
 def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> None:
