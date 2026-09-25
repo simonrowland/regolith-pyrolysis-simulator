@@ -1188,14 +1188,22 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
     )
 
     assert route.wall_deposit_by_species.get("Mg", 0.0) == pytest.approx(0.0)
-    refusal = route.sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+    extrapolation = route.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
     ]["Mg"]["stage_0_to_stage_1"]
-    assert refusal["status"] == "refused"
-    assert refusal["output_status"] == "status_bearing"
-    assert refusal["reason"] == "wall_saturation_pressure_out_of_domain"
-    assert refusal["wall_temperature_K"] == pytest.approx(wall_temperature_K)
-    assert refusal["wall_saturation_pressure_pa"] is None
+    assert extrapolation["status"] == "extrapolated"
+    assert extrapolation["output_status"] == "status_bearing"
+    assert extrapolation["authority_level"] == "extrapolated"
+    assert extrapolation["valid_range_K"] == [701.0, 1361.0]
+    diagnostic = {}
+    condensation_module._wall_deposition_driving_pressure_pa(
+        "Mg", 100.0, wall_temperature_K, diagnostic_out=diagnostic,
+    )
+    assert diagnostic["wall_saturation_pressure_pa"] > 100.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert "Mg" not in route.sticking_alpha_provenance_notice.get(
+        "wall_saturation_pressure_refusals_by_species", {}
+    )
     assert any(
         "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
         in warning
@@ -1204,11 +1212,10 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
 
     assert authority["authoritative_for_deposit_mass"] is False
     assert authority["output_status"] == "status_bearing"
-    assert authority["code"] == "wall_deposit_saturation_pressure_refused"
-    assert authority["status_bearing_alpha_count"] == 1
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["status_bearing_alpha_count"] == 0
     assert authority["out_of_domain_alpha_species"] == ["Mg"]
-    assert authority["status_bearing_refusal_count"] == 1
-    assert authority["wall_saturation_pressure_refused_species"] == ["Mg"]
+    assert "wall_saturation_pressure_refused_species" not in authority
     fouling = _wall_fouling_report(
         route.wall_deposit_by_species,
         alpha_notice=route.sticking_alpha_provenance_notice,
@@ -1258,9 +1265,15 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
         melt,
     )
 
-    assert "Mg" in first.sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
-    ]
+    first_extrapolation = first.sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
+    ]["Mg"]["stage_0_to_stage_1"]
+    assert first_extrapolation["status"] == "extrapolated"
+    assert first_extrapolation["output_status"] == "status_bearing"
+    assert first_extrapolation["authority_level"] == "extrapolated"
+    assert "Mg" not in first.sticking_alpha_provenance_notice.get(
+        "wall_saturation_pressure_refusals_by_species", {}
+    )
     assert not any(
         bool(rate_diagnostic.get("wall_saturation_pressure_refused", False))
         for by_species in model.last_wall_deposition_rate_shadow_candidate.values()
@@ -1268,10 +1281,10 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
     )
     final_notice = model.last_sticking_alpha_provenance_notice
     assert "Mg" in final_notice[
-        "wall_saturation_pressure_refusals_by_species"
+        "wall_saturation_pressure_extrapolations_by_species"
     ]
     assert "Mg" in second.sticking_alpha_provenance_notice[
-        "wall_saturation_pressure_refusals_by_species"
+        "wall_saturation_pressure_extrapolations_by_species"
     ]
 
     final_wall = {

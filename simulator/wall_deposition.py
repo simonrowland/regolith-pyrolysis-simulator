@@ -358,29 +358,42 @@ def wall_deposit_candidate_for_surface_kg(
         applied_regime_factor = _deposition_finite_scalar(
             "regime_factor", applied_regime_factor
         )
-        flux = _series_resistance_deposition_flux_mol_m2_s(
-            species, P_local_pa, T_wall_K, alpha_s,
-            pipe_diameter_m=applied_pipe_diameter_m,
-            stir_factor=model.stir_factor,
-            radial_stir_factor=model.radial_stir_factor,
-            regime_factor=applied_regime_factor,
-            T_gas_K=T_gas_K,
-            overhead_pressure_pa=overhead_pressure_pa,
-            carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
-            vapor_pressure_data=vapor_pressure_data,
-            # Same eligibility gate as the stage band-sampling site in
-            # condensation.py: the SiO disproportionation backstop may
-            # materialize product only at/below the declared condensation
-            # temperature. Without this the helper's True default let a HOT
-            # wall (above T_cond) mass-deposit reactive products — the inverse
-            # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
-            reactive_product_backstop=(
-                _reactive_product_backstop_authorized(species)
-                and float(wall_temperature_C) <= float(T_cond_C)
-            ),
-            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-            diagnostic_out=rate_diagnostic,
-        )
+        try:
+            flux = _series_resistance_deposition_flux_mol_m2_s(
+                species, P_local_pa, T_wall_K, alpha_s,
+                pipe_diameter_m=applied_pipe_diameter_m,
+                stir_factor=model.stir_factor,
+                radial_stir_factor=model.radial_stir_factor,
+                regime_factor=applied_regime_factor,
+                T_gas_K=T_gas_K,
+                overhead_pressure_pa=overhead_pressure_pa,
+                carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
+                vapor_pressure_data=vapor_pressure_data,
+                # Same eligibility gate as the stage band-sampling site in
+                # condensation.py: the SiO disproportionation backstop may
+                # materialize product only at/below the declared condensation
+                # temperature. Without this the helper's True default let a HOT
+                # wall (above T_cond) mass-deposit reactive products — the inverse
+                # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
+                reactive_product_backstop=(
+                    _reactive_product_backstop_authorized(species)
+                    and float(wall_temperature_C) <= float(T_cond_C)
+                ),
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                diagnostic_out=rate_diagnostic,
+            )
+        except WallSaturationPressureRefusal as exc:
+            # A typed wall refusal is not a zero-rate candidate. Keep the
+            # existing unavailable return path so callers leave the supply on
+            # the gas route, without integrating a refused quantity.
+            rate_diagnostic.setdefault("wall_saturation_pressure_refused", True)
+            rate_diagnostic.setdefault(
+                "wall_saturation_pressure_refusal_reason", str(exc)
+            )
+            rate_diagnostic.setdefault(
+                "wall_saturation_pressure_refusal_type", type(exc).__name__
+            )
+            flux = 0.0
     if rate_diagnostic.get("wall_saturation_pressure_refused"):
         refusal_reason = rate_diagnostic["wall_saturation_pressure_refusal_reason"]
         _record_wall_pressure_notice(model, "wall_saturation_pressure_refusals_by_species",
@@ -435,7 +448,21 @@ def wall_deposit_candidate_for_surface_kg(
             "wall_temperature_K": T_wall_K,
         }
     pressure_notice = rate_diagnostic.get("wall_saturation_pressure_notice")
-    if pressure_notice is not None:
+    if (
+        pressure_notice is not None
+        or rate_diagnostic.get("wall_saturation_pressure_status")
+        == "reactive_product_backstop"
+    ):
+        if pressure_notice is None:
+            pressure_notice = {
+                "status": "extrapolated",
+                "authority_level": "extrapolated",
+                "output_status": "status_bearing",
+                "reason": "reactive_product_backstop",
+                "saturation_pressure_policy": "reactive_product_backstop",
+                "temperature_K": T_wall_K,
+                "wall_saturation_pressure_pa": 0.0,
+            }
         _record_wall_pressure_notice(model, "wall_saturation_pressure_extrapolations_by_species",
             species, str(getattr(segment, "name", "default_pipe")), pressure_notice)
     rate_diagnostic["species_partial_pressure_pa"] = P_local_pa

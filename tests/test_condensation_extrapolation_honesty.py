@@ -205,16 +205,90 @@ def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pre
     assert diagnostic["wall_saturation_pressure_refused"] is False
 
 
-def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+def test_predict_flag_fe_below_band_keeps_antoine_bits_and_records_construction_band():
+    expected = 10.0 ** (10.670336 - 17759.430841 / 900.0)
+    notices = {}
+    pressure = condensation._antoine_psat_pa(
+        "Fe", 900.0, antoine_extrapolations=notices,
+    )
+    assert pressure == expected
+    assert notices["Fe"]["valid_range_K"] == [1809.0, 3134.0]
+    assert notices["Fe"]["continuation"] == "antoine"
+    assert notices["Fe"]["output_status"] == "status_bearing"
+
     diagnostic = {}
-    condensation._wall_deposition_driving_pressure_pa(
+    driving = condensation._wall_deposition_driving_pressure_pa(
+        "Fe", 100.0, 900.0, diagnostic_out=diagnostic,
+    )
+    assert driving == pytest.approx(100.0 - expected, rel=1e-12)
+    assert diagnostic["wall_saturation_pressure_notice"]["valid_range_K"] == [
+        1809.0, 3134.0,
+    ]
+
+
+def test_predict_flag_fe_boiling_anchor_outside_construction_band_only():
+    outside_K = 2862.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    expected_outside = 10.0 ** (10.670336 - 17759.430841 / outside_K)
+    outside_notices = {}
+    outside_pressure = condensation._antoine_psat_pa(
+        "Fe", outside_K, antoine_extrapolations=outside_notices,
+    )
+    assert outside_pressure == expected_outside
+    assert outside_notices["Fe"]["valid_range_K"] == [1809.0, 3134.0]
+
+    inside_K = 3133.0
+    expected_inside = 10.0 ** (10.670336 - 17759.430841 / inside_K)
+    inside_notices = {}
+    inside_pressure = condensation._antoine_psat_pa(
+        "Fe", inside_K, antoine_extrapolations=inside_notices,
+    )
+    assert inside_pressure.hex() == expected_inside.hex()
+    assert inside_notices == {}
+
+
+def test_predict_flag_cold_na_pole_continues_and_flags_positive_deposition():
+    diagnostic = {}
+    driving = condensation._wall_deposition_driving_pressure_pa(
         "Na", 100.0, 298.15, diagnostic_out=diagnostic,
     )
-    assert diagnostic["wall_saturation_pressure_pa"] is None
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
+        4.637229568365543e-11, rel=1e-9,
+    )
+    assert driving == pytest.approx(100.0, rel=1e-9)
+    assert diagnostic["wall_saturation_pressure_refused"] is False
     notice = diagnostic["wall_saturation_pressure_notice"]
-    assert notice["authority_level"] == "unavailable"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["status"] == "extrapolated"
+    assert notice["output_status"] == "status_bearing"
+    assert notice["continuation"] == "clausius_clapeyron_band_edge"
     assert notice["valid_range_K"] == [924.0, 1118.0]
-    assert "no extrapolation available" in notice["reason"]
+    assert "T+C <= 0" in notice["original_reason"]
+
+    model = condensation.CondensationModel(
+        CondensationTrain.create_default(), wall_temperature_C=25.0,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+    )
+    candidate_kg = wall_deposit_candidate_for_surface_kg(
+        model,
+        species="Na",
+        rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["Na"],
+        melt_temperature_C=1700.0,
+        wall_temperature_C=25.0,
+        surface_area_m2=1.0,
+    )
+    assert isinstance(candidate_kg, float)
+    assert candidate_kg > 0.0
+    candidate_notice = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
+    ]["Na"]["default_pipe"]
+    assert candidate_notice["continuation"] == "clausius_clapeyron_band_edge"
+    assert candidate_notice["original_reason"] == notice["original_reason"]
 
 
 @pytest.mark.parametrize("invalid_value", [None, float("nan")], ids=["missing_B", "nan_B"])
@@ -311,12 +385,15 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         wall = row["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
-        refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
+        na_extrapolations = wall["wall_saturation_pressure_extrapolations_by_species"]["Na"]
         assert any(
-            "no extrapolation available" in record["reason"]
-            for record in refused["Na"].values()
+            record["continuation"] == "clausius_clapeyron_band_edge"
+            and "T+C <= 0" in record["original_reason"]
+            for record in na_extrapolations.values()
         )
+        refused = wall["wall_saturation_pressure_refusals_by_species"]
+        assert "Na" not in refused
+        assert "Al2" in refused
         # Al2 has no reactive-product backstop, so reactivity metadata is not
         # applicable.  Its real reversible wall route instead refuses because
         # the available reaction-term source is not a wall saturation curve.
@@ -339,7 +416,7 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
-    assert pareto["Na"]["status"] == "unavailable"
+    assert pareto["Na"]["authority_level"] == "extrapolated"
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
@@ -497,12 +574,151 @@ def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeyp
     assert diagnostics["wall_deposit_liner_temperature_C"] is None
 
 
-@pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
-def test_predict_flag_underflow_is_unavailable(species, temperature):
+@pytest.mark.parametrize(("species", "temperature", "band"), [
+    ("Na", 417.0, [924.0, 1118.0]),
+    ("Mg", 115.0, [701.0, 1361.0]),
+])
+def test_predict_flag_underflow_continues_from_band_edge(species, temperature, band):
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
-    assert diagnostic["wall_saturation_pressure_pa"] is None
-    assert "no extrapolation available" in diagnostic["wall_saturation_pressure_refusal_reason"]
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["continuation"] == "clausius_clapeyron_band_edge"
+    assert notice["valid_range_K"] == band
+
+
+def test_predict_flag_sio_cold_backstop_records_extrapolation_and_hot_wall_refuses():
+    cold_model = condensation.CondensationModel(
+        CondensationTrain.create_default(), wall_temperature_C=900.0,
+    )
+    cold_model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+    )
+    cold_candidate = wall_deposit_candidate_for_surface_kg(
+        cold_model,
+        species="SiO",
+        rate_kg_hr=1.0,
+        T_cond_C=1400.0,
+        melt_temperature_C=1700.0,
+        wall_temperature_C=900.0,
+        surface_area_m2=1.0,
+    )
+    assert isinstance(cold_candidate, float)
+    assert cold_candidate > 0.0
+    cold_notice = cold_model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
+    ]["SiO"]["default_pipe"]
+    assert cold_notice["output_status"] == "status_bearing"
+    assert cold_notice["authority_level"] == "extrapolated"
+    assert cold_notice["saturation_pressure_policy"] == "reactive_product_backstop"
+    assert cold_notice["wall_saturation_pressure_pa"] == 0.0
+    assert cold_notice["original_reason"]
+
+    hot_model = condensation.CondensationModel(
+        CondensationTrain.create_default(), wall_temperature_C=1500.0,
+    )
+    hot_model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+    )
+    hot_candidate = wall_deposit_candidate_for_surface_kg(
+        hot_model,
+        species="SiO",
+        rate_kg_hr=1.0,
+        T_cond_C=1050.0,
+        melt_temperature_C=1700.0,
+        wall_temperature_C=1500.0,
+        surface_area_m2=1.0,
+    )
+    assert hot_candidate["status"] == "unavailable"
+    assert hot_model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_refusals_by_species"
+    ]["SiO"]["default_pipe"]
+
+
+def test_condensation_efficiency_stage7_na_band_is_positive():
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+        stage_area_m2_by_stage={"7": 1.0},
+    )
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 7)
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=model.condensation_temperatures_C["Na"],
+        residence_s=1.0,
+        available_kg=1.0,
+        alpha_s_value=1.0,
+        efficiency_outcomes=outcomes,
+    )
+    assert eta > 0.0
+    assert not any(item["status"] == "refused" for item in outcomes)
+
+
+def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeypatch):
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+        stage_area_m2_by_stage={"7": 1.0},
+    )
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 7)
+    calls = 0
+
+    def one_refused_sample(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        diagnostic = kwargs["diagnostic_out"]
+        if calls == 1:
+            diagnostic.update({
+                "wall_saturation_pressure_refused": True,
+                "wall_saturation_pressure_refusal_reason": "sample refused",
+                "wall_saturation_pressure_refusal_type": "WallSaturationPressureRefusal",
+                "wall_saturation_pressure_notice": {
+                    "reason": "sample refused",
+                },
+            })
+            return 0.0
+        return 1.0
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        one_refused_sample,
+    )
+    available_kg = (
+        condensation._molecular_mass_kg_per_molecule("Na")
+        * condensation.AVOGADRO_MOL
+    )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=model.condensation_temperatures_C["Na"],
+        residence_s=1.0,
+        available_kg=available_kg,
+        alpha_s_value=1.0,
+        efficiency_outcomes=outcomes,
+    )
+    assert eta == pytest.approx(1.0)
+    assert calls == condensation.HKL_BAND_SAMPLES
+    refused = [item for item in outcomes if item["status"] == "refused"]
+    assert len(refused) == 1
+    assert refused[0]["authority_level"] == "unavailable"
+    assert refused[0]["original_reason"] == "sample refused"
 
 
 def test_predict_flag_pareto_unavailable_keeps_extrapolation():

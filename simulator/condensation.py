@@ -4406,6 +4406,42 @@ class CondensationModel:
                 efficiency_outcomes.append(record)
             return 0.0
 
+        def _record_refused_sample(
+            T_surface_C: float,
+            rate_diagnostic: Mapping[str, Any],
+            refusal: WallSaturationPressureRefusal | None = None,
+        ) -> str:
+            notice = rate_diagnostic.get('wall_saturation_pressure_notice')
+            if isinstance(notice, Mapping):
+                original_reason = str(
+                    notice.get('original_reason')
+                    or notice.get('reason')
+                    or 'wall_saturation_pressure_refused'
+                )
+            else:
+                original_reason = str(
+                    rate_diagnostic.get(
+                        'wall_saturation_pressure_refusal_reason',
+                    )
+                    or 'wall_saturation_pressure_refused'
+                )
+            reason = str(
+                rate_diagnostic.get('wall_saturation_pressure_refusal_reason')
+                or (refusal.reason if refusal is not None else original_reason)
+            )
+            if efficiency_outcomes is not None:
+                efficiency_outcomes.append({
+                    'status': 'refused',
+                    'reason': reason,
+                    'original_reason': original_reason,
+                    'output_status': 'status_bearing',
+                    'authority_level': 'unavailable',
+                    'species': species,
+                    'stage_number': int(getattr(stage, 'stage_number', -1)),
+                    'T_surface_C': float(T_surface_C),
+                })
+            return reason
+
         if not math.isfinite(float(residence_s)):
             raise ValueError('residence_s must be finite')
         if not math.isfinite(float(alpha_s_value)):
@@ -4416,6 +4452,22 @@ class CondensationModel:
                 'zero_residence_or_alpha',
                 residence_s=float(residence_s),
                 alpha_s_value=float(alpha_s_value),
+            )
+
+        # A declared target list makes the stage surface applicable to those
+        # species only. An empty list has no named capture surface for the
+        # intentional no-curve SiO route. Pass it through before wall-pressure
+        # evaluation rather than turning an upstream stage into a refusal.
+        if (
+            species == 'SiO'
+            and (
+                not stage.target_species
+                or species not in stage.target_species
+            )
+        ):
+            return _mint_zero(
+                'species_not_targeted_by_stage',
+                target_species=list(stage.target_species),
             )
 
         # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
@@ -4485,6 +4537,24 @@ class CondensationModel:
             }
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append(domain_outcome)
+            # The default hot duct, dust filter and turbine declare no
+            # condenser surface. This topology pass-through applies to
+            # reactive species too; otherwise an unavailable pure-species
+            # pressure would make every sampled wall temperature a refusal.
+            if (
+                stage.stage_number in (0, 5, 6)
+                and not stage.target_species
+                and f'stage_{stage.stage_number}' not in self.stage_area_m2_by_stage
+                and str(stage.stage_number) not in self.stage_area_m2_by_stage
+            ):
+                return _mint_zero(
+                    'no_capture_surface_in_train_topology',
+                    applicability_evidence={
+                        'stage_number': stage.stage_number,
+                        'target_species': [],
+                        'configured_capture_surface': False,
+                    },
+                )
             if species != 'SiO':
                 domain_outcome['saturation_pressure_policy'] = 'declared_pressure_isolated_stage_efficiency'
                 available_kg = _deposition_finite_scalar('available_kg', available_kg)
@@ -4492,22 +4562,6 @@ class CondensationModel:
                     raise DepositionInputRefusal('available_kg', available_kg, 'mass must be nonnegative')
                 if available_kg == 0.0:
                     return _mint_zero('no_available_mass')
-                # The default hot duct, dust filter and turbine declare no
-                # condenser surface. Explicit area overrides still need validation.
-                if (
-                    stage.stage_number in (0, 5, 6)
-                    and not stage.target_species
-                    and f'stage_{stage.stage_number}' not in self.stage_area_m2_by_stage
-                    and str(stage.stage_number) not in self.stage_area_m2_by_stage
-                ):
-                    return _mint_zero(
-                        'no_capture_surface_in_train_topology',
-                        applicability_evidence={
-                            'stage_number': stage.stage_number,
-                            'target_species': [],
-                            'configured_capture_surface': False,
-                        },
-                    )
                 stage_area_m2 = _deposition_finite_scalar(
                     'stage_area_m2',
                     self._stage_area_m2_for_stage_number(stage.stage_number),
@@ -4544,6 +4598,8 @@ class CondensationModel:
             lo_C, hi_C = hi_C, lo_C
 
         band_flux_mol_m2_s = 0.0
+        band_samples_used = 0
+        refused_sample: WallSaturationPressureRefusal | None = None
         width_C = hi_C - lo_C
         spec = (
             alpha_record.get('alpha_s_coefficient_spec')
@@ -4587,49 +4643,74 @@ class CondensationModel:
             )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             rate_diagnostic: dict[str, Any] = {}
-            flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, sample_alpha_s,
-                pipe_diameter_m=self.pipe_diameter_m,
-                # 0.5.3 Phase B: pass both axes (see twin call above
-                # in ``_wall_deposit_candidate_for_surface_kg`` for the
-                # precedence rationale; the helper reads radial as the
-                # Sh driver, legacy stir_factor as audit-history).
-                stir_factor=self.stir_factor,
-                radial_stir_factor=self.radial_stir_factor,
-                regime_factor=self.regime_factor,
-                T_gas_K=T_gas_K,
-                overhead_pressure_pa=overhead_pressure_pa,
-                carrier_gas=self.carrier_gas,
-                vapor_pressure_data=self.vapor_pressure_data,
-                # Standard-reaction SiO rows intentionally have no pure-SiO
-                # wall P_sat.  At and below the declared condensation
-                # temperature, baffles materialize the disproportionation
-                # product instead of silently disabling capture when the melt
-                # reaction term is rejected as a wall pressure.  The
-                # temperature gate preserves colder downstream carryover
-                # without admitting hotter upstream stages.
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and T_surface_C <= T_cond_C
-                ),
-                # Stable product class (CrO2 today) materializes the declared
-                # irreversible oxide route instead of reversible pure-species Psat.
-                stable_condensation_product_backstop=(
-                    _stable_condensation_product_backstop_authorized(species)
-                ),
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                diagnostic_out=rate_diagnostic,
-            )
-            if (
-                bool(rate_diagnostic.get('wall_saturation_pressure_refused'))
-                and flux > 0.0
-            ):
-                raise RuntimeError(
-                    "wall saturation-pressure refusal produced positive flux"
+            try:
+                flux = _series_resistance_deposition_flux_mol_m2_s(
+                    species, P_local_pa, T_surface_K, sample_alpha_s,
+                    pipe_diameter_m=self.pipe_diameter_m,
+                    # 0.5.3 Phase B: pass both axes (see twin call above
+                    # in ``_wall_deposit_candidate_for_surface_kg`` for the
+                    # precedence rationale; the helper reads radial as the
+                    # Sh driver, legacy stir_factor as audit-history).
+                    stir_factor=self.stir_factor,
+                    radial_stir_factor=self.radial_stir_factor,
+                    regime_factor=self.regime_factor,
+                    T_gas_K=T_gas_K,
+                    overhead_pressure_pa=overhead_pressure_pa,
+                    carrier_gas=self.carrier_gas,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    # Standard-reaction SiO rows intentionally have no pure-SiO
+                    # wall P_sat.  At and below the declared condensation
+                    # temperature, baffles materialize the disproportionation
+                    # product instead of silently disabling capture when the melt
+                    # reaction term is rejected as a wall pressure.  The
+                    # temperature gate preserves colder downstream carryover
+                    # without admitting hotter upstream stages.
+                    reactive_product_backstop=(
+                        _reactive_product_backstop_authorized(species)
+                        and T_surface_C <= T_cond_C
+                    ),
+                    # Stable product class (CrO2 today) materializes the declared
+                    # irreversible oxide route instead of reversible pure-species Psat.
+                    stable_condensation_product_backstop=(
+                        _stable_condensation_product_backstop_authorized(species)
+                    ),
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                    diagnostic_out=rate_diagnostic,
                 )
+            except WallSaturationPressureRefusal as exc:
+                _record_refused_sample(T_surface_C, rate_diagnostic, exc)
+                if rate_diagnostic.get(
+                    'wall_saturation_pressure_refusal_type'
+                ) == 'MissingReactivityClassRefusal':
+                    raise
+                if refused_sample is None:
+                    refused_sample = exc
+                continue
+            if bool(rate_diagnostic.get('wall_saturation_pressure_refused')):
+                reason = _record_refused_sample(T_surface_C, rate_diagnostic)
+                if rate_diagnostic.get(
+                    'wall_saturation_pressure_refusal_type'
+                ) == 'MissingReactivityClassRefusal':
+                    raise WallSaturationPressureRefusal(
+                        species,
+                        T_surface_K,
+                        reason,
+                    )
+                if refused_sample is None:
+                    refused_sample = WallSaturationPressureRefusal(
+                        species,
+                        T_surface_K,
+                        reason,
+                    )
+                continue
             band_flux_mol_m2_s += flux
-        band_flux_mol_m2_s /= HKL_BAND_SAMPLES
+            band_samples_used += 1
+        if band_samples_used == 0:
+            if refused_sample is not None:
+                raise refused_sample
+            raise RuntimeError('condensation efficiency sampled no wall temperatures')
+        band_flux_mol_m2_s /= band_samples_used
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
                 max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
@@ -5813,6 +5894,43 @@ def _default_pipe_surface_area_m2() -> float:
     return math.pi * float(pipe.diameter_m) * float(pipe.length_m)
 
 
+def _wall_antoine_source_band(
+    data: Mapping[str, Any],
+    coefficient_block: str | None,
+    *,
+    temperature_K: float,
+    selected_coefficients: Mapping[str, Any] | None = None,
+) -> list[float] | None:
+    """Select the wall fit's declared source band in metadata order."""
+    from engines.builtin.vapor_pressure import _coefficient_mapping
+
+    block = selected_coefficients
+    if not isinstance(block, Mapping):
+        block = _coefficient_mapping(
+            data,
+            coefficient_block,
+            temperature_K=temperature_K,
+        )
+    sources = [block]
+    # Refusal records for a catalog row without a wall coefficient block carry
+    # the row's source band. A selected coefficient block must never inherit
+    # that row metadata (notably pure sidecars).
+    if not block:
+        sources.append(data)
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for field in (
+            "source_certified_range_K",
+            "valid_range_K",
+            "construction_support_range_K",
+        ):
+            bounds = _valid_temperature_range_K(source.get(field))
+            if bounds is not None:
+                return bounds
+    return None
+
+
 def _record_antoine_extrapolation(
     species: str,
     T_K: float,
@@ -5822,35 +5940,25 @@ def _record_antoine_extrapolation(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
 ) -> None:
-    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
-
-    valid_range = vapor_pressure_valid_range_K(
+    valid_range = _wall_antoine_source_band(
         data,
         coefficient_block,
         temperature_K=T_K,
     )
-    if not (isinstance(valid_range, (list, tuple)) and len(valid_range) == 2):
+    if valid_range is None:
         return
-    try:
-        valid_low = float(valid_range[0])
-        valid_high = float(valid_range[1])
-    except (TypeError, ValueError):
-        return
-    if not (
-        math.isfinite(valid_low)
-        and math.isfinite(valid_high)
-        and valid_low <= valid_high
-    ):
-        return
+    valid_low, valid_high = valid_range
     if valid_low <= T_K <= valid_high:
         return
 
     record = {
         'temperature_K': T_K,
-        'valid_range_K': (valid_low, valid_high),
+        'valid_range_K': [valid_low, valid_high],
         'authority_level': 'extrapolated',
         'reason': 'wall_saturation_pressure_out_of_validated_range',
         'status': 'extrapolated',
+        'output_status': 'status_bearing',
+        'continuation': 'antoine',
     }
     if antoine_extrapolations is not None:
         existing_records = [
@@ -5895,6 +6003,7 @@ def _antoine_psat_pa(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
+    T_K = _deposition_finite_scalar("T_wall_K", T_K)
     has_legacy_antoine = any(
         isinstance(block, Mapping)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
@@ -5938,8 +6047,6 @@ def _antoine_psat_pa(
         _coefficient_mapping,
         reconstructed_vapor_pressure_authority_limit,
         require_antoine_source_certified_temperature,
-        vapor_pressure_source_equation_range_K,
-        vapor_pressure_valid_range_K,
         wall_condensation_antoine_coefficients,
     )
 
@@ -5962,31 +6069,36 @@ def _antoine_psat_pa(
         data,
         temperature_K=T_K,
     )
-    source_band = vapor_pressure_source_equation_range_K(
-        data, coefficient_block, T_K,
-    ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
-    if not antoine:
-        declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
+    declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
+    coefficients = antoine if isinstance(antoine, Mapping) and antoine else declared
+    if not isinstance(coefficients, Mapping) or not coefficients:
         if declared:
             for key in ("A", "B", "C"):
-                _deposition_finite_scalar(f"{coefficient_block}.{key}", declared.get(key))
+                _deposition_finite_scalar(
+                    f"{coefficient_block}.{key}", declared.get(key)
+                )
         refusal = WallSaturationPressureRefusal(species, T_K,
             "no extrapolation available: wall fit absent or outside its finite positive-denominator branch; "
-            f"valid_range_K={source_band}")
-        refusal.valid_range_K = source_band
+            "valid_range_K="
+            f"{_wall_antoine_source_band(data, coefficient_block, temperature_K=T_K)}")
+        refusal.valid_range_K = _wall_antoine_source_band(
+            data,
+            coefficient_block,
+            temperature_K=T_K,
+        )
         raise refusal
     A, B, C = (
-        _deposition_finite_scalar(f"{coefficient_block}.{key}", antoine.get(key))
+        _deposition_finite_scalar(f"{coefficient_block}.{key}", coefficients.get(key))
         for key in ("A", "B", "C")
     )
-    T_K = _deposition_finite_scalar("T_wall_K", T_K)
     if T_K <= 0.0 or A <= 0.0:
         raise DepositionInputRefusal(coefficient_block, (A, T_K), "requires A > 0 and T > 0")
-    if T_K + C <= 0.0:
-        refusal = WallSaturationPressureRefusal(species, T_K,
-            f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
-        refusal.valid_range_K = source_band
-        raise refusal
+    source_band = _wall_antoine_source_band(
+        data,
+        coefficient_block,
+        temperature_K=T_K,
+        selected_coefficients=coefficients,
+    )
     domain_reason = None
     try:
         require_antoine_source_certified_temperature(
@@ -5994,36 +6106,132 @@ def _antoine_psat_pa(
         )
     except VaporPressureRangeError as exc:
         domain_reason = str(exc)
-    _record_antoine_extrapolation(
-        species,
-        T_K,
-        data,
-        coefficient_block,
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-    )
-    if domain_reason is not None:
-        if antoine_extrapolation_warnings is not None and domain_reason not in antoine_extrapolation_warnings:
-            antoine_extrapolation_warnings.append(domain_reason)
-        if antoine_extrapolations is not None:
-            antoine_extrapolations[f"{species}#wall:{T_K}"] = {
-                "temperature_K": T_K,
-                "valid_range_K": source_band,
-                "authority_level": "extrapolated",
-                "reason": domain_reason,
-                "status": "extrapolated",
-            }
     # Same Antoine form used by equilibrium.py and builtin vapor pressure.
-    try:
-        pressure_pa = 10.0 ** (A - B / (T_K + C))
-    except OverflowError:
-        pressure_pa = math.inf
-    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
-        refusal = WallSaturationPressureRefusal(species, T_K,
-            f"no extrapolation available: Antoine pressure is not representable as finite positive; valid_range_K={source_band}")
-        refusal.valid_range_K = source_band
-        raise refusal
-    return pressure_pa
+    direct_reason = None
+    if T_K + C <= 0.0:
+        direct_reason = (
+            "no extrapolation available: Antoine denominator T+C <= 0; "
+            f"valid_range_K={source_band}"
+        )
+        pressure_pa = math.nan
+    else:
+        try:
+            pressure_pa = 10.0 ** (A - B / (T_K + C))
+        except OverflowError:
+            pressure_pa = math.inf
+        if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+            direct_reason = (
+                "no extrapolation available: Antoine pressure is not "
+                f"representable as finite positive; valid_range_K={source_band}"
+            )
+    if direct_reason is None:
+        _record_antoine_extrapolation(
+            species,
+            T_K,
+            data,
+            coefficient_block,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        )
+        if domain_reason is not None:
+            if (
+                antoine_extrapolation_warnings is not None
+                and domain_reason not in antoine_extrapolation_warnings
+            ):
+                antoine_extrapolation_warnings.append(domain_reason)
+            if antoine_extrapolations is not None:
+                antoine_extrapolations[f"{species}#wall:{T_K}"] = {
+                    "temperature_K": T_K,
+                    "valid_range_K": source_band,
+                    "authority_level": "extrapolated",
+                    "reason": domain_reason,
+                    "status": "extrapolated",
+                    "output_status": "status_bearing",
+                    "continuation": "antoine",
+                }
+        return pressure_pa
+
+    if source_band is not None:
+        low_K, high_K = source_band
+        edge_K = (
+            low_K
+            if T_K < low_K
+            else high_K
+            if T_K > high_K
+            else min((low_K, high_K), key=lambda edge: abs(T_K - edge))
+        )
+        edge_denominator = edge_K + C
+        if edge_K > 0.0 and edge_denominator > 0.0:
+            edge_pressure_pa = math.nan
+            try:
+                edge_pressure_pa = 10.0 ** (
+                    A - B / edge_denominator
+                )
+                delta_h_over_R_K = (
+                    math.log(10.0)
+                    * B
+                    * edge_K**2
+                    / edge_denominator**2
+                )
+                log_pressure_pa = (
+                    math.log(10.0)
+                    * (A - B / edge_denominator)
+                    - delta_h_over_R_K * (1.0 / T_K - 1.0 / edge_K)
+                )
+                pressure_pa = math.exp(log_pressure_pa)
+            except (OverflowError, ValueError, ZeroDivisionError):
+                pressure_pa = math.nan
+            if math.isfinite(edge_pressure_pa) and edge_pressure_pa > 0.0 and math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                # Derivation: premise — log10(P/Pa)=A-B/(T+C) rises with T;
+                # continue its Clausius-Clapeyron slope from the nearest
+                # declared edge T_e instead of clamping P_sat or substituting
+                # zero. Algebra — P_e=10**(A-B/(T_e+C)), dH/R=ln(10)*B*T_e**2/
+                # (T_e+C)**2, and ln(P/P_e)=-(dH/R)*(1/T-1/T_e). Units —
+                # B, T, and dH/R are kelvin, so the exponent is dimensionless
+                # and P is pascal. Sanity — the Na sidecar at T_e=924 K gives
+                # P(298.15 K)=4.637e-11 Pa; with P_local=100 Pa this changes
+                # deposition by zero at the displayed precision while the
+                # extrapolation notice carries authority. Known limitation —
+                # the slope is the source equation's slope, not measured
+                # sublimation enthalpy; Na implies dH~119 kJ/mol versus
+                # ~107 kJ/mol for Na(s), so cold P_sat is understated by
+                # roughly 1-2 decades at 298 K.
+                record = {
+                    "temperature_K": T_K,
+                    "valid_range_K": source_band,
+                    "authority_level": "extrapolated",
+                    "reason": "wall_saturation_pressure_out_of_validated_range",
+                    "original_reason": direct_reason,
+                    "status": "extrapolated",
+                    "output_status": "status_bearing",
+                    "continuation": "clausius_clapeyron_band_edge",
+                }
+                if antoine_extrapolations is not None:
+                    record_key = next(
+                        (
+                            key
+                            for key, existing in antoine_extrapolations.items()
+                            if str(key).split("#", 1)[0] == species
+                            and isinstance(existing, Mapping)
+                            and existing.get("temperature_K") == T_K
+                        ),
+                        f"{species}#wall:{T_K}",
+                    )
+                    antoine_extrapolations[record_key] = record
+                if antoine_extrapolation_warnings is not None:
+                    temperature_text = f"{T_K:.3f}".rstrip("0").rstrip(".")
+                    warning = (
+                        f"{species} metal Antoine fit extrapolated beyond "
+                        f"valid_range_K [{low_K:g}, {high_K:g}] at "
+                        f"{temperature_text} K"
+                    )
+                    if warning not in antoine_extrapolation_warnings:
+                        antoine_extrapolation_warnings.append(warning)
+                return pressure_pa
+
+    refusal = WallSaturationPressureRefusal(species, T_K, direct_reason)
+    refusal.valid_range_K = source_band
+    raise refusal
 
 
 def _try_antoine_psat_pa(
@@ -6696,6 +6904,23 @@ def _wall_deposition_driving_pressure_pa(
             # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
             # full local SiO pressure remains the deposition driving pressure.
             if diagnostic_out is not None:
+                record = dict(
+                    (antoine_extrapolations or {}).get(
+                        f"{species}#wall:{T_surface_K}", {}
+                    )
+                )
+                if record:
+                    original_reason = str(record.get("reason", ""))
+                    record.update({
+                        "status": "extrapolated",
+                        "authority_level": "extrapolated",
+                        "reason": "antoine_psat_unavailable_at_T",
+                        "original_reason": original_reason,
+                        "output_status": "status_bearing",
+                        "saturation_pressure_policy": "reactive_product_backstop",
+                        "wall_saturation_pressure_pa": 0.0,
+                    })
+                    diagnostic_out["wall_saturation_pressure_notice"] = record
                 diagnostic_out["wall_saturation_pressure_pa"] = 0.0
                 diagnostic_out["wall_saturation_pressure_refused"] = False
                 diagnostic_out["wall_saturation_pressure_status"] = (
@@ -6728,12 +6953,6 @@ def _wall_deposition_driving_pressure_pa(
             refusal_reason = "source_certified_range_refused"
         else:
             refusal_reason = "saturation_pressure_unavailable"
-        if (
-            refusal_reason == "saturation_pressure_unavailable"
-            and species == "SiO"
-            and not reactive_product_backstop
-        ):
-            return 0.0
         if diagnostic_out is not None:
             diagnostic_out["wall_saturation_pressure_pa"] = None
             diagnostic_out["wall_saturation_pressure_refused"] = True
@@ -6744,7 +6963,9 @@ def _wall_deposition_driving_pressure_pa(
             if record is not None:
                 diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
                 diagnostic_out["wall_saturation_pressure_refusal_reason"] = record["reason"]
-            return 0.0
+                diagnostic_out["wall_saturation_pressure_refusal_type"] = record.get(
+                    "refusal_type", WallSaturationPressureRefusal.__name__
+                )
         raise WallSaturationPressureRefusal(
             species,
             T_surface_K,
