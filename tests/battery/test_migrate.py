@@ -56,7 +56,10 @@ from simulator.battery.migrate import (
     load_migrated_context,
     map_phase,
     map_quantity,
+    parse_quantity_suffix,
+    split_qualified_quantity,
     QUANTITY_ALIASES,
+    _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
     is_compilation_record_path,
@@ -2930,7 +2933,6 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     ("alias", "expected"),
     [
         ("pure_vapor_pressure", Quantity.P_SAT),
-        ("partial_pressure_figure_only", Quantity.P_PARTIAL),
         ("partial_pressure_overlay_figure_only", Quantity.P_PARTIAL),
         ("partial_pressure_O2", Quantity.P_PARTIAL),
         ("partial_pressure_CsBO2", Quantity.P_PARTIAL),
@@ -2946,7 +2948,6 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("undetected_radionuclide_partial_pressure_limit", Quantity.P_PARTIAL),
         ("undetected_radionuclide_simulant_partial_pressure", Quantity.P_PARTIAL),
         ("raoultian_activity", Quantity.ACTIVITY),
-        ("henrian_activity", Quantity.ACTIVITY),
         ("apparent_gamma_K2O", Quantity.ACTIVITY_COEFFICIENT),
         ("henrian_activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
         ("evaporation_coefficient_gamma_Si", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
@@ -2970,8 +2971,6 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("ion_intensity_vs_time_cooling", Quantity.ION_INTENSITY),
         ("ion_intensity_vs_time_heating", Quantity.ION_INTENSITY),
         ("I_T_vs_time_figure_only", Quantity.ION_INTENSITY),
-        ("ion_current", Quantity.ION_INTENSITY),
-        ("relative_ion_intensity", Quantity.ION_INTENSITY_RATIO),
         ("I+_Al / I+_Fe vs chamber voltage", Quantity.ION_INTENSITY_RATIO),
         ("ion_current_ratio_vs_time", Quantity.ION_INTENSITY_RATIO),
         ("ion_current_ratio_vs_T", Quantity.ION_INTENSITY_RATIO),
@@ -3021,12 +3020,6 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
             Quantity.ION_INTENSITY,
         ),
         (
-            "relative_ion_intensity",
-            {"quantity": "relative_ion_intensity", "ratio": 1.5},
-            "dimensionless",
-            Quantity.ION_INTENSITY_RATIO,
-        ),
-        (
             "second_law_enthalpy_of_vaporization",
             {"quantity": "second_law_enthalpy_of_vaporization", "value": 42.0},
             "kcal/mol",
@@ -3036,6 +3029,169 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
     for alias, values, units, expected in cases:
         state, reason = map_quantity(None, values, units=units)
         assert state.is_value and state.value is expected, (alias, state, reason)
+
+
+_BLOCKED_QUANTITY_ALIASES = (
+    "ion_current",
+    "henrian_activity",
+    "relative_ion_intensity",
+    "partial_pressure_figure_only",
+)
+
+_QUANTITY_FIELD_RE = re.compile(
+    r"(?m)(?:^|\s)quantity:\s*(?:\"([^\"]+)\"|'([^']+)'|([^\"'\n#,}]+))"
+)
+
+
+def _quantity_token(raw: str) -> Quantity | None:
+    state, _reason = map_quantity(None, {"quantity": raw})
+    if state.is_value:
+        return state.value
+    return None
+
+
+def _alias_extends_shorter(alias: str) -> bool:
+    return any(
+        other != alias and alias.startswith(other + "_") for other in QUANTITY_ALIASES
+    )
+
+
+def _parse_pair(raw: str) -> tuple[tuple[Quantity | None, str | None], Quantity | None]:
+    return split_qualified_quantity(raw), _quantity_token(raw)
+
+
+def test_l02_blocked_quantity_aliases_are_absent() -> None:
+    """Wrong observables stay unmapped. Henrian activity is not Raoultian activity."""
+
+    for alias in _BLOCKED_QUANTITY_ALIASES:
+        assert alias not in QUANTITY_ALIASES
+        state, reason = map_quantity(None, {"quantity": alias})
+        assert not state.is_value, (alias, state, reason)
+        assert reason and alias in reason
+
+
+def test_l02_alias_prefix_does_not_retarget_closed_names() -> None:
+    """A label must not change how a longer closed quantity or alias parses.
+
+    A species-formula suffix from a stem that is not itself `shorter_formula`
+    may still split (`partial_pressure` + `NaBO2`). A bare remainder
+    (`fraction`, `rate`, `ratio`, `fit`, `coefficient`) may not.
+    """
+
+    protected = [quantity.value for quantity in Quantity] + list(QUANTITY_ALIASES)
+    for alias in list(QUANTITY_ALIASES):
+        victims = [name for name in protected if name != alias and name.startswith(alias + "_")]
+        saved = QUANTITY_ALIASES.pop(alias)
+        try:
+            without = {name: _parse_pair(name) for name in victims}
+        finally:
+            QUANTITY_ALIASES[alias] = saved
+        for name, baseline in without.items():
+            suffix = name[len(alias) + 1 :]
+            got = _parse_pair(name)
+            formula, derivation, _reference = parse_quantity_suffix(suffix)
+            assert got[1] == baseline[1], (alias, name, got, baseline)
+            if formula is None and derivation is None:
+                assert got[0] == baseline[0], (alias, name, got, baseline)
+            elif _alias_extends_shorter(alias):
+                assert got[0] == baseline[0], (alias, name, got, baseline)
+
+
+def _extract_quantity_strings() -> set[str]:
+    found: set[str] = set()
+    root = REPO_ROOT / "data" / "literature" / "extracts"
+    for path in root.iterdir():
+        if path.suffix != ".yaml":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for match in _QUANTITY_FIELD_RE.finditer(text):
+            raw = next(group for group in match.groups() if group)
+            found.add(raw.strip())
+    return found
+
+
+def test_l02_alias_prefix_does_not_retarget_extract_quantity_strings() -> None:
+    """No alias changes the parse of another quantity string in the extracts.
+
+    Historical stems may still prefix an unqualified string that is not itself
+    a closed quantity or alias (`partial_pressure_atomic_oxygen`). They may
+    not change a string that is already a closed name.
+    """
+
+    strings = _extract_quantity_strings()
+    assert strings
+    protected = {quantity.value for quantity in Quantity} | set(QUANTITY_ALIASES)
+    for alias in list(QUANTITY_ALIASES):
+        victims = [raw for raw in strings if raw.startswith(alias + "_")]
+        saved = QUANTITY_ALIASES.pop(alias)
+        try:
+            without = {raw: _parse_pair(raw) for raw in victims}
+        finally:
+            QUANTITY_ALIASES[alias] = saved
+        extends = _alias_extends_shorter(alias)
+        for raw, baseline in without.items():
+            suffix = raw[len(alias) + 1 :]
+            got = _parse_pair(raw)
+            formula, derivation, _reference = parse_quantity_suffix(suffix)
+            cuts_closed = raw in protected or any(
+                name != alias and name.startswith(alias + "_") and raw.startswith(name + "_")
+                for name in protected
+            )
+            if formula is None and derivation is None:
+                if cuts_closed or alias not in _HISTORICAL_PREFIX_STEMS:
+                    assert got == baseline, (alias, raw, got, baseline)
+            elif extends:
+                assert got == baseline, (alias, raw, got, baseline)
+            else:
+                assert got[1] == baseline[1], (alias, raw, got, baseline)
+
+
+def test_l02_reviewed_prefix_collisions_keep_the_unaliased_parse() -> None:
+    assert split_qualified_quantity("activity_CsBO2") == (Quantity.ACTIVITY, "CsBO2")
+    assert split_qualified_quantity("mass_loss_fraction") == (None, None)
+    assert split_qualified_quantity("mass_loss_rate") == (None, None)
+    assert _quantity_token("mass_loss_fraction") is Quantity.MASS_LOSS_FRACTION
+    assert _quantity_token("mass_loss_rate") is Quantity.MASS_LOSS_RATE
+    assert split_qualified_quantity("ion_current_ratio") == (None, None)
+    assert _quantity_token("ion_current_ratio") is Quantity.ION_INTENSITY_RATIO
+    assert split_qualified_quantity("henrian_activity_coefficient") == (None, None)
+    assert split_qualified_quantity("partial_pressure_NaBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "NaBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_LiBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "LiBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_CsBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "CsBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_NaBO2") == (
+        Quantity.P_PARTIAL,
+        "NaBO2",
+    )
+    assert _quantity_token("partial_pressure_NaBO2") is Quantity.P_PARTIAL
+    assert _quantity_token("mass_loss") is Quantity.MASS_LOSS_FRACTION
+    assert split_qualified_quantity("pure_vapor_pressure_fit") == (None, None)
+    assert split_qualified_quantity("raoultian_activity_coefficient") == (None, None)
+    assert split_qualified_quantity("relative_ion_intensity_comparison") == (None, None)
+    for label in (
+        "mass_loss",
+        "pure_vapor_pressure",
+        "partial_pressure_NaBO2",
+        "partial_pressure_LiBO2",
+        "partial_pressure_CsBO2",
+        "raoultian_activity",
+        "solidus",
+        "henrian_activity",
+        "ion_current",
+        "relative_ion_intensity",
+        "partial_pressure_figure_only",
+        "second_law_enthalpy_of_vaporization",
+        "invariant_transformation_temperature",
+    ):
+        assert label not in _HISTORICAL_PREFIX_STEMS
 
 
 _TYPE_CONTRADICTIONS = [
