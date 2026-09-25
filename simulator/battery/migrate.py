@@ -2164,6 +2164,32 @@ def _initial_oxide_map_from_values(
     return _oxide_map_from_mapping(values)
 
 
+def _mole_fraction_composition_from_values(values: object) -> Composition | None:
+    if not isinstance(values, Mapping):
+        return None
+    raw = values.get("composition_mol")
+    components: list[tuple[str, Decimal]] = []
+    if isinstance(raw, Mapping):
+        for name, amount in raw.items():
+            parsed = _as_dec_or_none(amount)
+            if parsed is not None:
+                components.append((str(name), parsed))
+    if len(components) < 2:
+        for key in ("X_Na2O_as_published", "X_Na2O"):
+            fraction = _as_dec_or_none(values.get(key))
+            if fraction is None or not Decimal("0") <= fraction <= Decimal("1"):
+                continue
+            components = [("Na2O", fraction), ("SiO2", Decimal("1") - fraction)]
+            break
+    if len(components) < 2:
+        return None
+    return Composition(
+        basis="printed_mole_fraction",
+        components=tuple(components),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
 def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
     return {str(k): _dec_str(as_decimal(v)) for k, v in wt.items()}
 
@@ -5271,6 +5297,14 @@ def select_declared_source(
             )
         if condition_ranges:
             name, lo, hi = condition_ranges[0]
+            if lo == hi:
+                return _point_selection(
+                    lo,
+                    name,
+                    "as_published:K",
+                    payload,
+                    condition_ranges,
+                )
             return _unavailable_selection(
                 f"source {name} [{lo}, {hi}] is a temperature domain, not a point",
                 condition_ranges=condition_ranges,
@@ -8205,6 +8239,7 @@ class Migrator:
             quantity if isinstance(quantity, Quantity) else None
         )
         initial_oxide_map = _initial_oxide_map_from_values(values)
+        initial_composition = _mole_fraction_composition_from_values(values)
         if q_token in _BULK_PROPERTY_QUANTITIES:
             species_formula = bulk_property_species_formula(
                 quantity=q_token,
@@ -8327,7 +8362,9 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
-        if initial_oxide_map:
+        if initial_composition is not None:
+            ident_kwargs["composition"] = State.of(initial_composition)
+        elif initial_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
             )

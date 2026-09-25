@@ -2199,6 +2199,57 @@ def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
     assert selection.field_name == "evaporation_rate_1200C"
 
 
+def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
+    point = select_declared_source(
+        "temperature_K", None, {"T_range_K": [1673.15, 1673.15]}
+    )
+    assert point.value.kind is ValueKind.POINT
+    assert point.amount == as_decimal("1673.15")
+    assert point.field_name == "T_range_K"
+
+    interval = select_declared_source(
+        "temperature_K", None, {"T_range_K": [1300, 1800]}
+    )
+    assert interval.value.kind is ValueKind.UNAVAILABLE
+    assert interval.condition_ranges == (("T_range_K", as_decimal("1300"), as_decimal("1800")),)
+    assert "temperature domain" in (interval.reason or "")
+
+
+@pytest.mark.parametrize(
+    "extra, expected",
+    [
+        ({"X_Na2O_as_published": 0.4}, {"Na2O": as_decimal("0.4"), "SiO2": as_decimal("0.6")}),
+        (
+            {"composition_mol": {"SiO2": 0.79, "Na2O": 0.07, "B2O3": 0.10, "Al2O3": 0.03, "minor constituents": 0.01}},
+            {"SiO2": as_decimal("0.79"), "Na2O": as_decimal("0.07"), "B2O3": as_decimal("0.10"), "Al2O3": as_decimal("0.03"), "minor constituents": as_decimal("0.01")},
+        ),
+    ],
+)
+def test_printed_mole_fraction_composition_maps_without_wt_conversion(
+    tmp_path: Path, extra: dict, expected: dict
+) -> None:
+    values = {
+        "quantity": "activity",
+        "activity": 0.2,
+        "method_class": "measured_direct",
+        **extra,
+    }
+    root = _write_min_tree(
+        tmp_path,
+        _scalar_extract(
+            quantity="activity",
+            units="dimensionless",
+            values=values,
+            obs_type="activity_coefficient",
+        ),
+    )
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert obs.identity.composition is not None
+    assert obs.identity.composition.is_value
+    assert obs.identity.composition.value.as_map() == expected
+
+
 def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
     import shutil
     from decimal import Decimal
