@@ -93,22 +93,21 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
     )
     # bounds_digest moved with the knob bounds themselves: the furnace envelope
-    # top (2000 -> catalog max), the hot-wall ceiling (1750 -> inherited), and
-    # the upstream search floor (1400 -> lowest downstream envelope, 20 C).
+    # top (2000 -> catalog max) and the hot-wall ceiling (1750 -> inherited).
     # This digest IS the cache-invalidation lever for a bounds change -- it fires
     # automatically, which is why no allowlist_version bump is warranted here:
     # the set of tunable PATHS did not change, only two paths' bounds.
     assert schema.bounds_digest == (
-        "daf7cf8e507e8fa14f50ba3d3cd681798ff0240e236ef16f01c0e0b915256afa"
+        "9d87f2394cc45bc6a4d99a3dfa287ed304aa1a5473182c4b1eda2d04df66cccd"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-09-25 (b-282).
+    # tracks the schema. Recomputed 2026-08-29 (b-329).
     assert empty.recipe_id(schema) == (
-        "651ca17d450393d007d61507372220391574fd85cf7f5f2d03f227b72d85a17a"
+        "d71962c0eb855b0260adc13d4036800e331b948c48d3f2a8e7fb617dee494b78"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -119,10 +118,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
-    # Fourth and last digest in this test to move with the b-282 bounds change,
-    # for the same reason as the three above. Recomputed 2026-09-25.
+    # Fourth and last digest in this test to move with the b-329 bounds change,
+    # for the same reason as the three above. Recomputed 2026-08-29.
     assert identity_digest == (
-        "22456908647764c769fd405a6d61702126455ff5356969d4fb061182bfb1d160"
+        "f25190100b5ee2a9cbb7b8d877dfa6a65a1926501c0c6b8ad7a43a16c6fa8669"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -1670,14 +1669,12 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # 2026-08-29 b-329: recomputed again for the same reason, one layer out --
     # the hot-wall ceiling stopped being a literal (1750, Doloma-REE) and now
     # inherits the furnace-material envelope, taking offset_min -443 -> -800 with
-    # it. 2026-09-25 b-282: the upstream floor moved from 1400 to the lowest
-    # downstream envelope (20 C), taking offset_min -800 -> -2180. Note the -443
-    # above was itself a re-derivation of this same pin: a
+    # it. Note the -443 above was itself a re-derivation of this same pin: a
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned.
     assert (
         first.recipe_id()
-                == "7e45f340bda3f9090f35b195a681ceb7ca37b621ec6afb535b7599bbd3815828"
+                == "c9d30fc5ce7426f78c331b7d3a441f293d9fe0512bb255fae315e1cfd214904b"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
