@@ -29,6 +29,10 @@ from simulator.state import (
     MeltState,
     ProcessInventory,
 )
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
 from tests.chemistry.conftest import _build_sim
 
 
@@ -184,8 +188,53 @@ def _external_input_mass_kg(sim) -> float:
     )
 
 
+def _assert_transitional_evaporation_notice(
+    sim,
+    transitional_hours: list[int],
+) -> None:
+    """Check each committed transitional hour's published flux diagnostic."""
+
+    # This is the diagnostic published by the evaporation dispatch and then
+    # consumed by the runner's pressure/coating report, not a local provider
+    # result or a reconstructed Kn value.
+    diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    series_by_species = diagnostic.get("evaporation_series_resistance", {})
+    transitional_series = []
+    for species, series in series_by_species.items():
+        try:
+            knudsen_number = float(series.get("knudsen_number"))
+            gas_resistance_weight = float(
+                series.get("gas_resistance_weight", 0.0)
+            )
+        except (TypeError, ValueError):
+            continue
+        # The provider also reports Kn on its deliberate HKL-only path. A
+        # zero gas-resistance weight means viscous P_bulk transport is not
+        # load-bearing there; only the transitional series that carries that
+        # continuum flux requires the extrapolation notice.
+        if (
+            gas_resistance_weight > 0.0
+            and VISCOUS_KNUDSEN_MAX <= knudsen_number
+            < FREE_MOLECULAR_KNUDSEN_MIN
+        ):
+            transitional_series.append((species, knudsen_number))
+    if not transitional_series:
+        return
+
+    transitional_hours.append(int(sim.melt.hour) - 1)
+    notice = diagnostic.get("continuum_extrapolation_notice")
+    assert isinstance(notice, dict)
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert notice["status"] == "extrapolated"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert notice["ledger_yields_authorized"] is True
+
+
 def _run_c2a_staged_to_completion(
     sim,
+    *,
+    transitional_hours: list[int],
 ) -> tuple[int, EvaporationFluxRefusal | None]:
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     decision_choice = {
@@ -216,6 +265,7 @@ def _run_c2a_staged_to_completion(
             assert sim.atom_ledger.element_atom_drift_report() == drift_before
             break
         steps += 1
+        _assert_transitional_evaporation_notice(sim, transitional_hours)
         # Typed campaign-endpoint refusal is non-resumable (no next decision).
         # Treat it as a finished batch for mass-balance closure checks.
         if getattr(sim, "campaign_endpoint_refused", lambda: False)():
@@ -406,14 +456,19 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         record_liquid_fraction,
     )
 
-    steps, refusal = _run_c2a_staged_to_completion(sim)
+    transitional_hours = []
+    steps, refusal = _run_c2a_staged_to_completion(
+        sim,
+        transitional_hours=transitional_hours,
+    )
 
-    # The staged allocator authorizes the configured 130 ledger hours; this
-    # observed pin is the completed campaign length, not a capture-budget
-    # consequence of b-324 (which only changes HKL stage weights).
+    # The staged allocator completed this run in 130 observed ledger hours;
+    # this pin is not a capture-budget consequence of b-324 (which only
+    # changes HKL stage weights).
     assert refusal is None
     assert steps == 130
     assert sim.is_complete()
+    assert transitional_hours
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
@@ -526,11 +581,10 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    # Drive the no-MRE path through the allocator. If a transitional-Kn
-    # refusal occurs, the loop checks that no hour was committed before the
-    # completion assertion rejects the run. A separate forced-refusal test
-    # protects the full rollback surfaces; this run protects cumulative
-    # closure for the completed path.
+    # Drive the no-MRE path through the allocator and inspect the published
+    # evaporation diagnostic after every committed hour. A separate
+    # forced-refusal test protects the full rollback surfaces; this run
+    # protects cumulative closure for the completed path.
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -539,6 +593,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
     }
     steps = 0
     refusal = None
+    transitional_hours = []
     while not sim.is_complete() and steps < 5000:
         if sim.paused_for_decision:
             decision = sim.pending_decision
@@ -558,10 +613,12 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
             assert tuple(sim.atom_ledger.transitions) == transitions_before
             assert sim.atom_ledger.element_atom_drift_report() == drift_before
             break
+        _assert_transitional_evaporation_notice(sim, transitional_hours)
         steps += 1
 
     assert refusal is None
     assert sim.is_complete()
+    assert transitional_hours
     transitions = sim.atom_ledger.transitions
     assert transitions
 

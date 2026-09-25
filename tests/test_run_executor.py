@@ -85,10 +85,23 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
 
     assert execution.status == "ok"
     assert execution.error_message == ""
-    outcomes = (
+    species_record = (
         execution.simulator.condensation_model
-        .last_condensation_refusals_by_species["SiO"]["stage_outcomes"]
+        .last_condensation_refusals_by_species["SiO"]
     )
+    assert species_record["status"] == "status_bearing"
+    assert species_record["reason"] == (
+        "wall_saturation_pressure_refused_band_sample"
+    )
+    assert species_record["output_status"] == "status_bearing"
+    assert species_record["authority_level"] == "unavailable"
+    assert species_record["pending_decision"] == "d-025"
+    assert species_record["refused_fraction"] == pytest.approx(1.0)
+    assert species_record["eta_basis"] == (
+        "lower_bound_refused_samples_uncaptured"
+    )
+    assert species_record["original_reason"]
+    outcomes = species_record["stage_outcomes"]
     lower_bound = next(
         outcome
         for outcome in outcomes
@@ -99,6 +112,21 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
     assert lower_bound["pending_decision"] == "d-025"
     assert lower_bound["refused_fraction"] == pytest.approx(1.0)
     assert lower_bound["eta"] == pytest.approx(0.0)
+    assert any(outcome.get("status") == "extrapolated" for outcome in outcomes)
+
+    published = run._build_output(execution)["condensation_refusals_by_species"][
+        "by_species"
+    ]["SiO"]
+    for field in (
+        "status",
+        "reason",
+        "authority_level",
+        "pending_decision",
+        "refused_fraction",
+        "eta_basis",
+        "original_reason",
+    ):
+        assert published[field] == species_record[field]
 
 
 @pytest.mark.parametrize(

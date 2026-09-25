@@ -712,7 +712,7 @@ def test_condensation_efficiency_uses_hourly_vapour_rate_units(monkeypatch):
     assert eta == pytest.approx(expected_eta)
 
 
-def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeypatch):
+def test_condensation_efficiency_lower_bound_keeps_refused_sample_in_denominator_without_capture(monkeypatch):
     model = condensation.CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
@@ -780,6 +780,54 @@ def test_condensation_efficiency_does_not_average_refused_sample_as_zero(monkeyp
     assert lower_bound["eta_basis"] == (
         "lower_bound_refused_samples_uncaptured"
     )
+    assert lower_bound["pending_decision"] == "d-025"
+
+
+def test_condensation_efficiency_records_lower_bound_before_zero_available_return(monkeypatch):
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0},
+        gas_temperature_C=1700.0,
+        campaign_name="C0",
+        stage_area_m2_by_stage={"7": 1.0},
+    )
+    stage = next(stage for stage in model.train.stages if stage.stage_number == 7)
+
+    def refused_sample(*args, **kwargs):
+        diagnostic = kwargs["diagnostic_out"]
+        diagnostic.update({
+            "wall_saturation_pressure_refused": True,
+            "wall_saturation_pressure_refusal_reason": "sample refused",
+            "wall_saturation_pressure_refusal_type": "WallSaturationPressureRefusal",
+            "wall_saturation_pressure_notice": {"reason": "sample refused"},
+        })
+        return 0.0
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        refused_sample,
+    )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Na",
+        T_cond_C=model.condensation_temperatures_C["Na"],
+        residence_s=1.0,
+        available_kg=0.0,
+        alpha_s_value=1.0,
+        efficiency_outcomes=outcomes,
+    )
+
+    assert eta == 0.0
+    lower_bound = next(
+        item
+        for item in outcomes
+        if item.get("eta_basis") == "lower_bound_refused_samples_uncaptured"
+    )
+    assert lower_bound["refused_fraction"] == pytest.approx(1.0)
+    assert lower_bound["eta"] == pytest.approx(0.0)
     assert lower_bound["pending_decision"] == "d-025"
 
 

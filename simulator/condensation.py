@@ -3579,6 +3579,34 @@ class CondensationModel:
                 ),
                 None,
             )
+            lower_bound_outcome = next(
+                (
+                    item for item in outcomes
+                    if item.get('eta_basis')
+                    == 'lower_bound_refused_samples_uncaptured'
+                ),
+                None,
+            )
+            lower_bound_record = {}
+            if lower_bound_outcome is not None:
+                lower_bound_record = {
+                    'status': lower_bound_outcome['status'],
+                    'reason': lower_bound_outcome['reason'],
+                    'output_status': 'status_bearing',
+                    'refused_fraction': lower_bound_outcome[
+                        'refused_fraction'
+                    ],
+                    'eta_basis': lower_bound_outcome['eta_basis'],
+                    'pending_decision': lower_bound_outcome[
+                        'pending_decision'
+                    ],
+                    'authority_level': lower_bound_outcome[
+                        'authority_level'
+                    ],
+                    'original_reason': lower_bound_outcome[
+                        'original_reason'
+                    ],
+                }
             if domain_outcome is not None:
                 authority = condensation_authority_by_species.get(species)
                 if authority is not None:
@@ -3598,6 +3626,8 @@ class CondensationModel:
                 existing = condensation_refusals_by_species[species]
                 if isinstance(existing, dict):
                     existing = dict(existing)
+                    if lower_bound_record:
+                        existing.update(lower_bound_record)
                     stage_list = list(existing.get('stage_outcomes') or [])
                     stage_list.extend(outcomes)
                     existing['stage_outcomes'] = stage_list
@@ -3616,6 +3646,10 @@ class CondensationModel:
                 'output_status': 'status_bearing',
                 'stage_outcomes': list(outcomes),
             }
+            if lower_bound_record:
+                condensation_refusals_by_species[species].update(
+                    lower_bound_record
+                )
 
         for species, authority in condensation_authority_by_species.items():
             input_mass = max(
@@ -4717,6 +4751,34 @@ class CondensationModel:
             ]
             alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
 
+        refused_count = band_samples_total - band_samples_used
+        refused_band_outcome = None
+        if refused_count:
+            # d-025 leaves two candidate policies for owner adjudication:
+            # mean over authorized samples only, or a lower-bound mean over
+            # every sample with refused fractions uncaptured. Use the latter
+            # pending decision: it is coating-conservative and keeps vapor in
+            # the downstream route instead of aborting the hour.
+            refused_band_outcome = {
+                'status': 'status_bearing',
+                'output_status': 'status_bearing',
+                'authority_level': 'unavailable',
+                'reason': 'wall_saturation_pressure_refused_band_sample',
+                'original_reason': (
+                    refused_sample_reason
+                    or 'wall_saturation_pressure_refused'
+                ),
+                'refused_fraction': refused_count / band_samples_total,
+                'refused_count': refused_count,
+                'total_samples': band_samples_total,
+                'eta_basis': 'lower_bound_refused_samples_uncaptured',
+                'pending_decision': 'd-025',
+                'species': species,
+                'stage_number': int(getattr(stage, 'stage_number', -1)),
+                'T_cond_C': float(T_cond_C),
+                'eta': 0.0,
+            }
+
         stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
         if stage_area_m2 is not None:
             molar_mass_kg_mol = (
@@ -4731,6 +4793,11 @@ class CondensationModel:
                 or available_kg <= 0.0
                 or molar_mass_kg_mol <= 0.0
             ):
+                if (
+                    refused_band_outcome is not None
+                    and efficiency_outcomes is not None
+                ):
+                    efficiency_outcomes.append(refused_band_outcome)
                 return 0.0
             # Premise: ``available_kg`` is the route's available vapor rate in
             # kg h^-1, not the inventory occupying one residence interval.
@@ -4765,32 +4832,8 @@ class CondensationModel:
         # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
         eta_uncapped = float(eta)
         eta = max(0.0, min(1.0, eta))
-        refused_count = band_samples_total - band_samples_used
-        if refused_count:
-            # d-025 leaves two candidate policies for owner adjudication:
-            # mean over authorized samples only, or a lower-bound mean over
-            # every sample with refused fractions uncaptured. Use the latter
-            # pending decision: it is coating-conservative and keeps vapor in
-            # the downstream route instead of aborting the hour.
-            refused_band_outcome = {
-                'status': 'status_bearing',
-                'output_status': 'status_bearing',
-                'authority_level': 'unavailable',
-                'reason': 'wall_saturation_pressure_refused_band_sample',
-                'original_reason': (
-                    refused_sample_reason
-                    or 'wall_saturation_pressure_refused'
-                ),
-                'refused_fraction': refused_count / band_samples_total,
-                'refused_count': refused_count,
-                'total_samples': band_samples_total,
-                'eta_basis': 'lower_bound_refused_samples_uncaptured',
-                'pending_decision': 'd-025',
-                'species': species,
-                'stage_number': int(getattr(stage, 'stage_number', -1)),
-                'T_cond_C': float(T_cond_C),
-                'eta': eta,
-            }
+        if refused_band_outcome is not None:
+            refused_band_outcome['eta'] = eta
             if efficiency_outcomes is not None:
                 efficiency_outcomes.append(refused_band_outcome)
         supply_limited = eta_uncapped > 1.0
@@ -6275,10 +6318,10 @@ def _try_antoine_psat_pa(
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
-    ``(None, True)`` means typed refusal — including the case where the
-    species has Antoine data somewhere but no segment covers ``T_K``
-    (``_antoine_psat_pa`` returns None without raising). Never invent a
-    pressure for that gap (b-127 fabricated 100 Pa).
+    ``_antoine_psat_pa`` raises ``WallSaturationPressureRefusal`` when no wall
+    continuation is available; this wrapper catches that typed refusal (and
+    the catalog range errors below) and returns ``(None, True)``. Never invent
+    a pressure for that gap (b-127 fabricated 100 Pa).
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
