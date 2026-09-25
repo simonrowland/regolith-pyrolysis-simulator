@@ -7,50 +7,101 @@ a rail with zero eligible references is reported as zero.
 
 Hostname: `Simon-MacBookPro-M5.local`.
 
-This report measured store `bfcd28637`: 46574 rows in, 103877 observations, 255 works, 2988 experiments, queue 70645, 1499 hard issues.
+The measuring store for this ledger is unknown.
+
+Warning: residuals ledger has no store revision; live store is `bfcd28637`
 
 Engines: vaporock, alphamelts, thermoengine, magemin, imcc_sf04, imcc_sf04_ext, internal-analytical.
 
-No engine residuals were regenerated for this store revision.
-Match rate is blank. score_eligible is 0.
-The live candidate census is the published candidate count.
+## Measured tier
 
-## Live candidate census
+score_eligible only. Compilation rows are not in this table.
 
-Comparison candidates are measured rows admitted or pending.
-Admitted is split from pending. Counts are observations, not
-residuals, so they are not multiplied by the engine set.
-A vapour candidate is only `p_sat`, `p_partial`, or `p_reference`.
+| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |
+|---|---|---:|---:|---:|---:|---:|
+| SiO_evolution | alphamelts | 0 | 0 | 0 | — | — |
+| SiO_evolution | imcc_sf04 | 0 | 0 | 0 | — | — |
+| SiO_evolution | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| SiO_evolution | internal-analytical | 0 | 0 | 0 | — | — |
+| SiO_evolution | magemin | 0 | 0 | 0 | — | — |
+| SiO_evolution | thermoengine | 0 | 0 | 0 | — | — |
+| SiO_evolution | vaporock | 0 | 0 | 0 | — | — |
+| alkali_shuttle | alphamelts | 0 | 0 | 0 | — | — |
+| alkali_shuttle | imcc_sf04 | 0 | 0 | 0 | — | — |
+| alkali_shuttle | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| alkali_shuttle | internal-analytical | 0 | 0 | 0 | — | — |
+| alkali_shuttle | magemin | 0 | 0 | 0 | — | — |
+| alkali_shuttle | thermoengine | 0 | 0 | 0 | — | — |
+| alkali_shuttle | vaporock | 0 | 0 | 0 | — | — |
+| melt_activity | alphamelts | 0 | 0 | 0 | — | — |
+| melt_activity | imcc_sf04 | 0 | 0 | 0 | — | — |
+| melt_activity | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| melt_activity | internal-analytical | 0 | 0 | 0 | — | — |
+| melt_activity | magemin | 0 | 0 | 0 | — | — |
+| melt_activity | thermoengine | 0 | 0 | 0 | — | — |
+| melt_activity | vaporock | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | alphamelts | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | imcc_sf04 | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | internal-analytical | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | magemin | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | thermoengine | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | vaporock | 0 | 0 | 0 | — | — |
+| redox | alphamelts | 0 | 0 | 0 | — | — |
+| redox | imcc_sf04 | 0 | 0 | 0 | — | — |
+| redox | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| redox | internal-analytical | 0 | 0 | 0 | — | — |
+| redox | magemin | 0 | 0 | 0 | — | — |
+| redox | thermoengine | 0 | 0 | 0 | — | — |
+| redox | vaporock | 0 | 0 | 0 | — | — |
+| thermochemistry | alphamelts | 0 | 0 | 0 | — | — |
+| thermochemistry | imcc_sf04 | 0 | 0 | 0 | — | — |
+| thermochemistry | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| thermochemistry | internal-analytical | 0 | 0 | 0 | — | — |
+| thermochemistry | magemin | 0 | 0 | 0 | — | — |
+| thermochemistry | thermoengine | 0 | 0 | 0 | — | — |
+| thermochemistry | vaporock | 0 | 0 | 0 | — | — |
+| vapour | alphamelts | 0 | 0 | 0 | — | — |
+| vapour | imcc_sf04 | 0 | 0 | 0 | — | — |
+| vapour | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| vapour | internal-analytical | 0 | 0 | 0 | — | — |
+| vapour | magemin | 0 | 0 | 0 | — | — |
+| vapour | thermoengine | 0 | 0 | 0 | — | — |
+| vapour | vaporock | 0 | 0 | 0 | — | — |
+| wall_deposition | alphamelts | 0 | 0 | 0 | — | — |
+| wall_deposition | imcc_sf04 | 0 | 0 | 0 | — | — |
+| wall_deposition | imcc_sf04_ext | 0 | 0 | 0 | — | — |
+| wall_deposition | internal-analytical | 0 | 0 | 0 | — | — |
+| wall_deposition | magemin | 0 | 0 | 0 | — | — |
+| wall_deposition | thermoengine | 0 | 0 | 0 | — | — |
+| wall_deposition | vaporock | 0 | 0 | 0 | — | — |
 
-| rail | candidates | admitted | pending | points |
-|---|---:|---:|---:|---:|
-| vapour | 246 | 0 | 246 | 230 |
-| melt_activity | 43 | 0 | 43 | 37 |
-| thermochemistry | 6 | 0 | 6 | 3 |
-| SiO_evolution | 4 | 0 | 4 | 3 |
-| pyrolysis_yield | 69 | 40 | 29 | 69 |
-| wall_deposition | 0 | 0 | 0 | 0 |
-| redox | 0 | 0 | 0 | 0 |
-| alkali_shuttle | 9 | 0 | 9 | 9 |
+## Compilation tier
 
-### No headline rail
+Compilation comparisons: assessed tables and quoted rows stored
+under a compilation. Not part of the measured tier and not added
+to it. same-source means the engine coefficients resolve to this
+compilation (JANAF-4th refit versus JANAF; NASA CEA thermo.inp
+versus the Glenn coefficient database). Pending admission is
+unchanged. Printed uncertainty is the reference observation's
+uncertainty (often none on a grid).
 
-These quantities are not vapour candidates and not SiO_evolution
-candidates. The reason is the refusal, not a borrowed rail.
+| engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-| reason | candidates | admitted | pending | points |
-|---|---:|---:|---:|---:|
-| `non_alkali_kinetic` | 8 | 0 | 8 | 2 |
-| `not_a_vapour_quantity` | 110 | 0 | 110 | 0 |
-| `quantity_unknown` | 1411 | 0 | 1411 | 0 |
+| compilation | quantity | reachable | predicted | refused | median abs residual | uncertainty |
+|---|---|---:|---:|---:|---:|---|
+| (none) |  | 0 | 0 | 0 | — |  |
 
-## Per rail × engine headline
-
-Not regenerated. Match rate is blank. score_eligible is 0.
 
 ## Refusal census
 
-Engine refusals were not regenerated with this census. Rows with no headline rail are counted above and are not hidden.
+Measured tier only. Compilation refusals are in the compilation table.
+
+| reason | n |
+|---|---:|
+| (none) | 0 |
 
 ## Admission
 
@@ -60,8 +111,6 @@ numeric, never the empirical headline). The admission rule is unchanged.
 
 | count | n |
 |---|---:|
-| comparison candidates pending | 1866 |
-| comparison candidates admitted | 40 |
 | residuals with admission_admitted exclusion | 0 |
 | residuals that die on admission alone | 0 |
 | unique observations that die on admission alone | 0 |
@@ -83,8 +132,64 @@ Diagnostic residuals in this file: 0.
 
 ## Pin failures
 
-Pins were not compared; no residuals ledger was regenerated for this store revision.
+23750 pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.
+
+| key | reason | live | centre | pin_band |
+|---|---|---:|---:|---:|
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=1000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 0.18948855698057443 | 0.05 |
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=1100::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 0.14372565013721683 | 0.05 |
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=1200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -2.063268928562815 | 0.05 |
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=298.15::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 0.34498564053745895 | 0.05 |
+| `janaf-4th::JANAF1998_P2_formation_tabulation:T=800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 0.2686241107947893 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=1000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 595.8531702387063 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=1200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 588.6477351845931 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=1500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 520.6573160164673 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=1800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 454.44487642807553 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=2000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 411.13288882744814 | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=298.15::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN:T=500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 602.7214491113905 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=1000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -0.20247953020196974 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=1200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -4.678866402513819 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=1500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -68.55010777461884 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=1800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -130.6239985826359 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=2000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -171.17144039609832 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=298.15::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 0.04185941297454665 | 0.05 |
+| `janaf-4th::JANAF1998_P4_formation_tabulation:T=800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -0.07312075640304627 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 34.17285423130056 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 33.64006607481434 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1400::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 23.565787294276106 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 18.621404532036877 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1600::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 13.731330446057711 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=1800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 4.098683381209071 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=2000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -5.3574815136906295 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=2200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -14.658448532362343 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=2500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -28.351240677385732 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=298.15::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 33.13027888537073 | 0.05 |
+| `janaf-4th::JANAF1998_PO2_formation_tabulation:T=800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | 33.67872575672442 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -4.357607706356021 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -5.476937762089818 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1400::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -16.17837767523571 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -21.446152756203844 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1600::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -26.665260786370695 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=1800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -36.96722082233276 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=2000::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -47.10600785312542 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=2200::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -57.09878992534115 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=2500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -71.84514679430181 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=298.15::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=500::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -4.295388540535633 | 0.05 |
+| `janaf-4th::JANAF1998_PO_formation_tabulation:T=800::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | -4.324562937737184 | 0.05 |
+| `janaf-4th::anchor_P2_deltafG:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::anchor_PO2_deltafG:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::anchor_PO_deltafG:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::extreme_reduction_from_phosphate:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| `janaf-4th::extreme_reduction_from_phosphate_P4:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
+| … | 23700 more | | | |
 
 ## status_diff vs old scorers
 
-status_diff was not run; no residuals ledger was regenerated for this store revision.
+No mapped outcome changes.
+
+Unmapped legacy keys: 23750. Old ledgers retained.

@@ -360,7 +360,22 @@ UNIT_DECLARED_QUANTITY = {
 QUANTITY_ALIASES = {
     "pure_Psat": Quantity.P_SAT,
     "vapor_pressure": Quantity.P_SAT,
+    "pure_vapor_pressure": Quantity.P_SAT,
     "partial_pressure": Quantity.P_PARTIAL,
+    "partial_pressure_overlay_figure_only": Quantity.P_PARTIAL,
+    "partial_pressure_O2": Quantity.P_PARTIAL,
+    "partial_pressure_CsBO2": Quantity.P_PARTIAL,
+    "partial_pressure_LiBO2": Quantity.P_PARTIAL,
+    "partial_pressure_NaBO2": Quantity.P_PARTIAL,
+    "partial_pressure_Mg": Quantity.P_PARTIAL,
+    "partial_pressure_O": Quantity.P_PARTIAL,
+    "partial_pressure_SiO": Quantity.P_PARTIAL,
+    "partial_pressure_over_illite": Quantity.P_PARTIAL,
+    "partial_pressure_series": Quantity.P_PARTIAL,
+    "partial_pressure_vs_setpoint_T": Quantity.P_PARTIAL,
+    "P_Na_over_soda_lime_glass": Quantity.P_PARTIAL,
+    "undetected_radionuclide_partial_pressure_limit": Quantity.P_PARTIAL,
+    "undetected_radionuclide_simulant_partial_pressure": Quantity.P_PARTIAL,
     "potassium_partial_pressure_as_published": Quantity.P_PARTIAL,
     "deltafG": Quantity.DELTA_FG,
     "delta_fG": Quantity.DELTA_FG,
@@ -371,18 +386,52 @@ QUANTITY_ALIASES = {
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "activity": Quantity.ACTIVITY,
+    "raoultian_activity": Quantity.ACTIVITY,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "activity_coefficient_this_work": Quantity.ACTIVITY_COEFFICIENT,
+    "apparent_gamma_K2O": Quantity.ACTIVITY_COEFFICIENT,
+    "henrian_activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "wagner_interaction_parameter": Quantity.INTERACTION_PARAMETER,
     "literature_vaporization_coefficient": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "evaporation_coefficient_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "evaporation_coefficient_gamma_Si": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "bulk_mass_loss_wt_pct": Quantity.MASS_LOSS_FRACTION,
     "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
+    "mass_loss": Quantity.MASS_LOSS_FRACTION,
+    "total_integrated_mass_loss": Quantity.MASS_LOSS_FRACTION,
+    "total_gas_evolution_mass_loss": Quantity.MASS_LOSS_FRACTION,
+    "isothermal_hold_mass_loss": Quantity.MASS_LOSS_FRACTION,
+    "water_released_during_drying": Quantity.MASS_LOSS_FRACTION,
+    "dta_transition_temperatures": Quantity.TRANSITION_TEMPERATURE,
+    "invariant_transformation_temperature": Quantity.TRANSITION_TEMPERATURE,
+    "invariant_transformation_temperature_range": Quantity.TRANSITION_TEMPERATURE,
+    "pure_Fe_melting_onset": Quantity.TRANSITION_TEMPERATURE,
+    "solidus": Quantity.TRANSITION_TEMPERATURE,
+    "composition_dependent_solidus_points": Quantity.TRANSITION_TEMPERATURE,
+    "miscibility_gap_temperature": Quantity.TRANSITION_TEMPERATURE,
+    "measured_KEMS_ion_intensities": Quantity.ION_INTENSITY,
+    "ion_count_rate": Quantity.ION_INTENSITY,
+    "ion_intensity_isotherm": Quantity.ION_INTENSITY,
+    "ion_intensity_arrest_curve": Quantity.ION_INTENSITY,
+    "ion_intensity_monovariant_solidus_liquidus": Quantity.ION_INTENSITY,
+    "ion_intensity_vs_time_cooling": Quantity.ION_INTENSITY,
+    "ion_intensity_vs_time_heating": Quantity.ION_INTENSITY,
+    "I_T_vs_time_figure_only": Quantity.ION_INTENSITY,
     "ion_current_ratio": Quantity.ION_INTENSITY_RATIO,
     "ion_intensity_ratio": Quantity.ION_INTENSITY_RATIO,
+    "I+_Al / I+_Fe vs chamber voltage": Quantity.ION_INTENSITY_RATIO,
+    "ion_current_ratio_vs_time": Quantity.ION_INTENSITY_RATIO,
+    "ion_current_ratio_vs_T": Quantity.ION_INTENSITY_RATIO,
+    "ion_intensity_ratio_Mg_Fe_figure_only": Quantity.ION_INTENSITY_RATIO,
+    "Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system": Quantity.ION_INTENSITY_RATIO,
+    "Fig. 3. Experimental values of the ion current ratio for the Fe-S system": Quantity.ION_INTENSITY_RATIO,
+    "Fig. 3. Temperature dependence of the ion current ratio": Quantity.ION_INTENSITY_RATIO,
+    "Fig. 4. Ion current ratios for the Fe-P system at 1600 C": Quantity.ION_INTENSITY_RATIO,
+    "Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.": Quantity.ION_INTENSITY_RATIO,
+    "second_law_enthalpy_of_vaporization": Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
 }
 
 # guard_09_05: legacy rail names including underscored aliases.
@@ -3198,8 +3247,43 @@ _FORMULA_SUFFIX_RE = re.compile(
 _DERIVATION_SUFFIX_WORDS = ("gibbs_duhem", "ideal_mixing")
 
 
+def _alias_extends_shorter_stem(alias: str) -> bool:
+    """True when `alias` is already `shorter_suffix`, so it is a label not a stem."""
+
+    for other in QUANTITY_ALIASES:
+        if other != alias and alias.startswith(other + "_"):
+            return True
+    return False
+
+
+def _suffix_names_qualifier(suffix: str) -> bool:
+    """Species formula or derivation word. A bare word is not a qualifier."""
+
+    formula, derivation, _reference = parse_quantity_suffix(suffix)
+    return formula is not None or derivation is not None
+
+
+def _alias_cuts_closed_name(alias: str, raw: str) -> bool:
+    """True when `alias` slices through a closed quantity or another alias."""
+
+    protected = {quantity.value for quantity in Quantity} | set(QUANTITY_ALIASES)
+    return any(
+        name != alias
+        and name.startswith(alias + "_")
+        and (raw == name or raw.startswith(name + "_"))
+        for name in protected
+    )
+
+
 def split_qualified_quantity(raw: str) -> tuple[Quantity | None, str | None]:
-    """Split activity_CsBO2 into (ACTIVITY, 'CsBO2'). Never cross quantities."""
+    """Split activity_CsBO2 into (ACTIVITY, 'CsBO2'). Never cross quantities.
+
+    An alias prefixes a longer string only when the remainder is a species
+    formula or a derivation word. `fraction`, `rate`, `ratio`, `fit`, and
+    `coefficient` are not qualifiers; treating them as one rewrites
+    reference_state or species on a name that was already closed. A label
+    that is itself `shorter_formula` is an exact alias, not a second stem.
+    """
 
     if not raw or raw in _NEVER_QUALIFY_QUANTITY:
         return None, None
@@ -3208,9 +3292,58 @@ def split_qualified_quantity(raw: str) -> tuple[Quantity | None, str | None]:
         if raw.startswith(prefix + "_"):
             return quantity, raw[len(prefix) + 1 :]
     for alias, quantity in sorted(QUANTITY_ALIASES.items(), key=lambda kv: -len(kv[0])):
-        if raw.startswith(alias + "_"):
-            return quantity, raw[len(alias) + 1 :]
+        if not raw.startswith(alias + "_"):
+            continue
+        if _alias_extends_shorter_stem(alias):
+            continue
+        suffix = raw[len(alias) + 1 :]
+        if not _suffix_names_qualifier(suffix) and (
+            _alias_cuts_closed_name(alias, raw) or not _historical_prefix_stem(alias)
+        ):
+            continue
+        return quantity, suffix
     return None, None
+
+
+# Stems that already prefixed unqualified extract strings before the empirical
+# labels. A new label is exact-match unless its suffix is a species formula
+# or a derivation word. Keeping that set here, rather than "any alias that
+# is not a proper prefix", is what lets `partial_pressure` still qualify
+# `partial_pressure_atomic_oxygen` without letting `pure_vapor_pressure`
+# qualify `pure_vapor_pressure_fit`.
+_HISTORICAL_PREFIX_STEMS = frozenset(
+    {
+        "pure_Psat",
+        "vapor_pressure",
+        "partial_pressure",
+        "potassium_partial_pressure_as_published",
+        "deltafG",
+        "delta_fG",
+        "delta_fG_kJ_mol",
+        "delta_fH",
+        "deltafH",
+        "delta_f_H",
+        "log10_Kf",
+        "log10_kf",
+        "activity",
+        "activity_coefficient",
+        "activity_coefficient_this_work",
+        "wagner_interaction_parameter",
+        "literature_vaporization_coefficient",
+        "alpha",
+        "evaporation_coefficient_alpha",
+        "o2_yield",
+        "mass_loss_fraction",
+        "bulk_mass_loss_wt_pct",
+        "non_condensed_mass_loss_fraction",
+        "ion_current_ratio",
+        "ion_intensity_ratio",
+    }
+)
+
+
+def _historical_prefix_stem(alias: str) -> bool:
+    return alias in _HISTORICAL_PREFIX_STEMS
 
 
 def _co_present_quantity_field(quantity: Quantity, values: Mapping[str, Any]) -> bool:

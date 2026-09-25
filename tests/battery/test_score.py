@@ -1262,6 +1262,17 @@ def test_score_report_from_payloads_surfaces_mismatch_warning() -> None:
     assert "Warning:" not in silent
 
 
+def test_payload_headline_skips_missing_rail() -> None:
+    from simulator.battery.score import headline_payloads
+
+    rows = headline_payloads(
+        [{"key": "off-rail::none::internal-analytical", "status": "refused"}],
+        (Engine.INTERNAL_ANALYTICAL,),
+    )
+
+    assert all(row["n_candidates"] == 0 for row in rows)
+
+
 def test_unstamped_ledger_report_is_unknown_provenance() -> None:
     from simulator.battery.score import (
         render_score_report_from_payloads,

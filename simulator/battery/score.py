@@ -2939,7 +2939,10 @@ def headline_payloads(
         for engine in engine_names:
             groups[(rail.value, engine)] = []
     for row in rows:
-        rail = str(row.get("rail") or "")
+        raw_rail = row.get("rail")
+        if not raw_rail:
+            continue
+        rail = str(raw_rail)
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
