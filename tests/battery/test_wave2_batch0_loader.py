@@ -44,6 +44,47 @@ def _migrate_obs(tmp_path: Path, values: dict):
     return row, result
 
 
+def test_exploded_row_parent_derived_from_points_at_children(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    first = extract["species"]["Na"]["observations"][0]
+    first["values"] = {
+        "quantity": "pure_Psat",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "rows": [
+            {"T_K": 1200, "pressure_atm": 1, "run": "a"},
+            {"T_K": 1300, "pressure_atm": 2, "run": "b"},
+        ],
+    }
+    extract["species"]["Na"]["observations"].append(
+        {
+            "observation_id": "from_table",
+            "type": "psat_series",
+            "locator": {"table": "II", "page": 3},
+            "phase": "gas",
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "derived_from": "na_psat",
+                "rows": [{"T_K": 1400, "pressure_atm": 1, "run": "c"}],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path / "tree", extract), write=False)
+    child = next(obs for obs in result.observations.values() if "from_table" in obs.observation_id)
+    assert child.derived_from
+    assert "fixture-source::na_psat" not in child.derived_from
+    assert all(item.startswith("fixture-source::na_psat::") for item in child.derived_from)
+    dangling = [
+        issue for issue in result.validation.hard_issues
+        if issue.reason.value == "referential_integrity"
+    ]
+    assert not dangling
+
+
 def test_rows_explode_through_series_point_path(tmp_path: Path) -> None:
     parent, result = _migrate_obs(
         tmp_path,

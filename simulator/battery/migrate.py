@@ -552,6 +552,12 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def _temperature_number(value: object) -> Decimal | None:
+    if isinstance(value, Value) and value.kind is ValueKind.POINT:
+        return value.point
+    return _as_dec_or_none(value)
+
+
 # ---------------------------------------------------------------------------
 # YAML plain codec (deterministic; no timestamps)
 # ---------------------------------------------------------------------------
@@ -8641,6 +8647,25 @@ class Migrator:
         ident_kwargs = dict(ident_kwargs)
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
+        else:
+            # A row that does not print T must not inherit a parent temperature
+            # that contradicts the experiment. That disagreement is an invalid
+            # identity, and the row did not state the number.
+            inherited = ident_kwargs.get("temperature_K")
+            experiment = self.result.experiments.get(experiment_id)
+            exp_t = experiment.conditions.get("temperature_K") if experiment is not None else None
+            inherited_n = (
+                _temperature_number(inherited.value)
+                if inherited is not None and getattr(inherited, "is_value", False)
+                else None
+            )
+            exp_n = (
+                _temperature_number(exp_t.state.value)
+                if exp_t is not None and exp_t.state.is_value
+                else None
+            )
+            if inherited_n is not None and exp_n is not None and inherited_n != exp_n:
+                ident_kwargs.pop("temperature_K", None)
         q_token_point = (
             quantity.value
             if isinstance(quantity, State) and quantity.is_value
@@ -10185,11 +10210,43 @@ class Migrator:
                 ),
             )
 
+    def _retarget_exploded_parents(self) -> None:
+        """Point derived_from at exploded children when the parent row was not kept.
+
+        values.rows / values.points replace the parent observation, the same
+        way values.series does. A sibling that named that parent id would
+        otherwise dangle.
+        """
+
+        ids = self.result.observations
+        for obs in list(ids.values()):
+            if not obs.derived_from:
+                continue
+            rewritten: list[str] = []
+            changed = False
+            for parent in obs.derived_from:
+                if parent in ids:
+                    rewritten.append(parent)
+                    continue
+                prefix = parent + "::"
+                children = [
+                    oid for oid in ids
+                    if oid.startswith(prefix) and oid != obs.observation_id
+                ]
+                if children:
+                    rewritten.extend(children)
+                    changed = True
+                else:
+                    rewritten.append(parent)
+            if changed:
+                object.__setattr__(obs, "derived_from", tuple(dict.fromkeys(rewritten)))
+
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
         self._resolve_queue_ids()
         self._close_conditional_method_classes()
+        self._retarget_exploded_parents()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by
