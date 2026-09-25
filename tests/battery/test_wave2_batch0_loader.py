@@ -11,11 +11,18 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import EvidenceClass, ValueKind
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.identity import atm_to_pa
-from simulator.battery.migrate import migrate, wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    Migrator,
+    _sample_from_plain,
+    migrate,
+    wt_pct_to_mole_fraction,
+)
 from simulator.battery.records import Sample, as_decimal
 from simulator.battery.waypoints import (
     GapReason,
@@ -26,6 +33,7 @@ from simulator.battery.waypoints import (
 from tests.battery import factories
 from tests.battery.test_bench_generators import case
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tests.battery.test_schema_admission import _child, _migrate, _row
 from tests.battery.test_waypoints import _bench
 
 
@@ -220,7 +228,11 @@ def test_feot_maps_to_feo_with_notice_and_printed_map_keeps_feot() -> None:
     assert selected.notice is not None
     assert "total_iron_as_FeO" in selected.notice
     assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
+    assert selected.inference is not None
+    assert selected.inference.relation == "total_iron_as_FeO"
+    assert selected.inference.inputs == ("FeOT",)
     assert "FeOT" in str(experiment.sample.printed_composition.state.value)
+    assert experiment.sample.printed_composition.inference is None
     requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
     assert len(requests) == 8
     assert all(item.payload is not None for item in requests)
@@ -230,6 +242,10 @@ def test_feot_maps_to_feo_with_notice_and_printed_map_keeps_feot() -> None:
         for item in requests
     )
     assert all("FeO" in item.payload["composition_mol"] and "FeOT" not in item.payload["composition_mol"] for item in requests)
+    assert all(
+        item.provenance["output_routes"]["composition_mol"]["relation"] == "total_iron_as_FeO"
+        for item in requests
+    )
 
 
 def test_printed_feo_fe2o3_pair_is_not_rewritten() -> None:
@@ -332,6 +348,261 @@ def test_row_pressure_columns_convert_through_the_unit_route(tmp_path: Path) -> 
     obs = next(iter(vapor.observations.values()))
     assert "total_pressure_Pa" not in (obs.point_conditions or {})
     assert obs.value.point == atm_to_pa("1")
+
+
+def _basis_sample(raw: dict):
+    experiment, bench, observation = case()
+    experiment = replace(
+        experiment,
+        sample=_sample_from_plain({
+            "printed_composition": {
+                "state": {"tag": "value", "value": raw},
+                "locator": {"table": "review-composition"},
+            }
+        }),
+    )
+    return experiment, bench, observation
+
+
+def test_amount_basis_is_enforced_before_mass_conversion() -> None:
+    """Reviewer probe: mole_fraction must not be read as wt%.
+
+    mass_percent still gets the 1 wt% omission. mole_fraction is moles.
+    A non-oxide above zero in mole terms refuses. Unknown bases refuse.
+    """
+
+    oxides = {"amount_basis": "mole_fraction", "components": [["SiO2", "0.6"], ["MgO", "0.4"]]}
+    experiment, _bench_unused, _observation = _basis_sample(oxides)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert selected.value["SiO2"] == Decimal("0.6")
+    assert selected.value["MgO"] == Decimal("0.4")
+    assert selected.notice is None or "wt%" not in selected.notice
+
+    chlorine = {
+        "amount_basis": "mole_fraction",
+        "components": [["SiO2", "0.5"], ["MgO", "0.25"], ["Cl", "0.25"]],
+    }
+    experiment, bench, observation = _basis_sample(chlorine)
+    refused = normalized_composition(experiment, _bench())
+    assert refused.selected is None
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert len(requests) == 8
+    assert all(item.payload is None for item in requests)
+
+    for basis in ("mol_inventory", "not_printed"):
+        experiment, bench, observation = _basis_sample({
+            "amount_basis": basis,
+            "components": [["SiO2", "0.5"], ["MgO", "0.25"], ["Cl", "0.25"]],
+        })
+        unknown = normalized_composition(experiment, _bench())
+        assert unknown.selected is None
+        assert unknown.absence is not None
+        assert unknown.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+        assert all(item.payload is None for item in requests)
+
+    bare = {"components": [["SiO2", "50"], ["MgO", "50"]]}
+    missing = normalized_composition(_basis_sample(bare)[0], _bench())
+    assert missing.selected is None
+    assert missing.absence is not None
+    assert missing.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+    mass = {
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "60"], ["MgO", "39.75"], ["Cl", "0.25"]],
+    }
+    experiment, bench, observation = _basis_sample(mass)
+    selected = normalized_composition(experiment, _bench()).selected
+    assert selected is not None
+    assert set(selected.value) == {"SiO2", "MgO"}
+    assert selected.notice is not None and "Cl 0.25 wt%" in selected.notice
+    requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert all(item.payload is not None for item in requests)
+
+
+def test_exploded_rows_inherit_parent_temperature_provenance(tmp_path: Path) -> None:
+    _, result = _migrate_obs(
+        tmp_path,
+        {
+            "T_C": 1300,
+            "rows": [
+                {"pressure_atm": 1, "run": "inherited"},
+                {"T_K": 1800, "pressure_atm": 2, "run": "printed"},
+            ],
+        },
+    )
+    by_run = {obs.observation_id: obs for obs in result.observations.values()}
+    inherited = next(obs for oid, obs in by_run.items() if "row=inherited" in oid)
+    printed = next(obs for oid, obs in by_run.items() if "row=printed" in oid)
+    temperature = inherited.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1573.15")
+    assert temperature.inference is not None
+    assert temperature.inference.relation == "celsius_to_kelvin"
+    originals = [
+        located.state.value
+        for name, located in temperature.inference.parameters
+        if name == "original"
+    ]
+    assert originals == [Decimal("1300")]
+    override = printed.point_conditions["temperature_K"]
+    assert override.state.value == Decimal("1800")
+    assert override.inference is None or override.inference.relation != "celsius_to_kelvin"
+    assert "fixture-source::na_psat" not in result.observations
+
+
+def test_kambayashi_table3_children_keep_1573_K() -> None:
+    """The 1300 C table loses its waypoint when rows replace the parent."""
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts/kems-057-kambayashi-1985.yaml"
+    )
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+    stem = "kambayashi_1985_pbo_table3_ion_current_ratios_1300c"
+    children = [
+        obs
+        for oid, obs in migrator.result.observations.items()
+        if stem in oid and oid.rsplit("::", 1)[-1] != stem
+    ]
+    assert len(children) == 3
+    assert all("::point:" not in obs.observation_id for obs in children)
+    for obs in children:
+        located = obs.point_conditions["temperature_K"]
+        assert located.state.value == Decimal("1573")
+        experiment = migrator.result.experiments[obs.experiment_id]
+        bench = migrator.result.benches.get(experiment.bench_id)
+        if bench is None:
+            from scripts.bench_readiness import _implicit_bench
+
+            bench = _implicit_bench(
+                experiment, migrator.result.works.get(experiment.work_id)
+            )
+        assert bench is not None
+        selected = collect_consumer_inputs(experiment, bench, obs).waypoints["temperature_K"].selected
+        assert selected is not None
+        assert selected.value.point == Decimal("1573")
+
+
+def test_no_temperature_ids_follow_the_printed_row(tmp_path: Path) -> None:
+    source_path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts/usgs-lunar-sourcebook-tab8-2.yaml"
+    )
+    import yaml
+
+    source = yaml.safe_load(source_path.read_text())
+    source["species"] = {"Li": source["species"]["Li"]}
+    rows = source["species"]["Li"]["observations"][0]["values"]["rows"]
+    source["species"]["Li"]["observations"][0]["values"]["rows"] = rows[:2]
+
+    def located(reverse: bool) -> dict:
+        extract = deepcopy(source)
+        if reverse:
+            extract["species"]["Li"]["observations"][0]["values"]["rows"].reverse()
+        result = migrate(_write_min_tree(tmp_path / ("rev" if reverse else "fwd"), extract), write=False)
+        assert all("::point:" not in oid for oid in result.observations)
+        # `row` is not a Locator field; it is kept on the note.
+        return {key: obs.locator.note for key, obs in result.observations.items()}
+
+    forward = located(False)
+    backward = located(True)
+    assert forward == backward
+    assert len(forward) == 2
+    assert any("Apollo 11 MBAS Average" in (note or "") for note in forward.values())
+    assert any("Apollo 12 MBAS Average" in (note or "") for note in forward.values())
+
+
+def test_flemetakis_list_rows_are_not_collapsed() -> None:
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts/ta-flemetakis-2024.yaml"
+    )
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+    # Eight observations, four of them list-row tables (68 printed rows).
+    # Replacing each table with one child would leave 8. Each printed list
+    # row has to remain its own observation.
+    assert len(migrator.result.observations) == 72
+    assert not migrator.result.dedupe_aliases
+
+
+def test_list_rows_keep_distinct_printed_payloads(tmp_path: Path) -> None:
+    parent = _row("parent", "measured_direct", relation=None)
+    parent["values"].pop("pressure_atm")
+    parent["values"]["rows"] = [
+        ["fO2", "B1a", 1245, 8.43],
+        ["time", "B1a", 1245, 8.43],
+    ]
+    result = _migrate(tmp_path, [parent])
+    assert len(result.observations) == 2
+    assert len(result.dedupe_aliases) == 0
+    assert all("::point:" not in oid for oid in result.observations)
+
+
+def test_rows_and_points_without_temperature_do_not_merge(tmp_path: Path) -> None:
+    parent = _row("parent", "measured_direct", relation=None)
+    parent["values"].pop("pressure_atm")
+    parent["values"].update({
+        "rows": [{"pressure_atm": 1, "run": "a"}],
+        "points": [{"pressure_atm": 1, "run": "b"}],
+    })
+    result = _migrate(tmp_path, [parent])
+    assert len(result.observations) == 2
+    assert not result.dedupe_aliases
+    assert sorted(obs.value.point for obs in result.observations.values()) == [
+        atm_to_pa("1"),
+        atm_to_pa("1"),
+    ]
+    assert all("::point:" not in oid for oid in result.observations)
+    rows_id = next(oid for oid in result.observations if "::rows:" in oid)
+    points_id = next(oid for oid in result.observations if "::points:" in oid)
+    assert rows_id != points_id
+
+
+def test_author_lineage_retargets_before_admission_closure(tmp_path: Path) -> None:
+    for shape in ("rows", "points"):
+        parent = _row("parent", "measured_direct", relation=None)
+        parent["values"][shape] = [
+            {"T_K": 1200, "pressure_atm": 1, "run": "a"},
+            {"T_K": 1300, "pressure_atm": 2, "run": "b"},
+        ]
+        result = _migrate(tmp_path / shape, [parent, _row("child", parents=["parent"])])
+        child = _child(result)
+        children = [
+            oid for oid in result.observations if oid.startswith("fixture-source::parent::")
+        ]
+        assert len(children) == 2
+        assert child.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert set(child.derived_from) == set(children)
+        assert set(child.derivation.inputs) == set(children)
+        assert "fixture-source::parent" not in child.derived_from
+        assert "fixture-source::parent" not in child.derivation.inputs
+        dangling = [
+            issue for issue in result.validation.hard_issues
+            if str(issue.reason.value if hasattr(issue.reason, "value") else issue.reason)
+            == "referential_integrity"
+        ]
+        assert not dangling
+
+
+def test_lineage_retarget_does_not_prefix_match(tmp_path: Path) -> None:
+    result = _migrate(tmp_path, [
+        _row("parent::unrelated", "measured_direct", relation=None),
+        _row("child", "measured_direct", ["fixture-source::parent"], relation=None),
+    ])
+    child = _child(result)
+    assert child.derived_from == ("fixture-source::parent",)
+    assert all("unrelated" not in item for item in child.derived_from)
+    dangling = [
+        issue for issue in result.validation.hard_issues
+        if str(issue.reason.value if hasattr(issue.reason, "value") else issue.reason)
+        == "referential_integrity"
+    ]
+    assert dangling
 
 
 def test_non_oxide_total_at_one_weight_percent_is_omitted() -> None:

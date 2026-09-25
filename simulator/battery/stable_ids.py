@@ -119,8 +119,12 @@ def series_point_id(
     if temperature is not None:
         base = f"{parent_id}::T={temperature_token(temperature)}"
         return f"{base}:{extra}" if extra else base
+    # No temperature: the printed row/content suffix is the identity.
+    # An encounter index would rename the row when the table is reordered.
+    if extra:
+        return f"{parent_id}::{extra}"
     raise ValueError(
-        "series point id requires a temperature or field name (no ordinal index)"
+        "series point id requires a temperature, field name, or printed-row identity (no ordinal index)"
     )
 
 
