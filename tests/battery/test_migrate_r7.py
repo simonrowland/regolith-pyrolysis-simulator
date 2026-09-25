@@ -10,12 +10,19 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import (
     EXTRACTS_DIR,
     REPO_ROOT,
     _YAML_LOADER,
+    _standard_state_from_extract_text,
     compilation_family_from_store_path,
     iter_observation_store_paths,
     map_quantity,
@@ -24,9 +31,153 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import State
 from tests.battery.test_migrate import (
-    _copy_compilation_record, _copy_extract, _extract_observation, _write_min_tree,
+    _copy_compilation_record,
+    _copy_extract,
+    _extract_observation,
+    _write_min_tree,
     test_k01_value_constructions_live_inside_the_boundary as boundary_guard,
 )
+
+
+@pytest.mark.parametrize(
+    "raw,formula,phase_raw,expected",
+    [
+        (
+            "Raoultian GaO1.5(l); gamma relative to pure liquid sesquioxide",
+            "Ga",
+            "silicate_melt",
+            ("GaO1.5", Phase.L),
+        ),
+        (
+            "Raoultian InO1.5(l)",
+            "In",
+            "silicate_melt",
+            ("InO1.5", Phase.L),
+        ),
+        (
+            "Raoultian pure liquid Fe",
+            "Fe",
+            "liquid_Fe-Mo",
+            ("Fe", Phase.L),
+        ),
+        (
+            "Raoultian pure liquid Co",
+            "Co",
+            "liquid_Ti-Co",
+            ("Co", Phase.L),
+        ),
+    ],
+)
+def test_h6_extract_activity_reference_state_maps_only_explicit_raoultian(
+    raw, formula, phase_raw, expected
+):
+    state = _standard_state_from_extract_text(raw, formula, phase_raw=phase_raw)
+    assert state is not None
+    assert state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert (state.endmember.formula, state.endmember.phase.value) == (
+        expected[0],
+        expected[1],
+    )
+    assert state.component_basis == expected[0]
+    assert state.component_basis != "raoultian_pure_endmember"
+
+
+@pytest.mark.parametrize(
+    "raw,formula,phase_raw",
+    [
+        (
+            "a(NaBO2)=P/P°(NaBO2,l); not a Raoultian Na2O activity",
+            "Fe",
+            "liquid_alloy",
+        ),
+        (
+            "Raoultian / Henrian as in Fruehan; V2O3-saturated",
+            "Fe",
+            "liquid_alloy",
+        ),
+        ("as in Nesmeyanov; quoted", "Fe", "liquid_alloy"),
+        ("activity coefficient of CrO in silicate melts", "Fe", "liquid_alloy"),
+        ("Raoultian Fe(l) and Fe(s)", "Fe", "liquid_alloy"),
+        ("Raoultian Fe(l) and Co(s)", "Fe", "liquid_alloy"),
+        (
+            "Raoultian log gamma_Si at N_Si=0.5 as cited",
+            "Si",
+            "liquid_alloy",
+        ),
+        (
+            "Raoultian; B ignores dissolved oxygen; T integrates the Ti-Co-O path (eqs 5-6)",
+            "Ti",
+            "liquid_Ti-Co",
+        ),
+    ],
+)
+def test_h6_extract_activity_reference_state_refuses_unresolved_forms(
+    raw, formula, phase_raw
+):
+    assert _standard_state_from_extract_text(
+        raw, formula, phase_raw=phase_raw
+    ) is None
+
+
+def test_h6_migration_attaches_extract_reference_state_to_activity_row(tmp_path):
+    root = _write_min_tree(
+        tmp_path,
+        extract={
+            "schema_version": "literature_extract.v1",
+            "source_id": "fixture-source",
+            "source": {"citation": "Fixture, A. (2026), Test Journal 1:1"},
+            "experiments": [{"experiment_id": "activity-run"}],
+            "species": {
+                "Ga": {
+                    "observations": [
+                        {
+                            "observation_id": "gamma-row",
+                            "experiment": "activity-run",
+                            "type": "activity_coefficient",
+                            "phase": "condensed_liquid",
+                            "standard_state": "Raoultian GaO1.5(l)",
+                            "T_range_K": [1700.0, 1700.0],
+                            "values": {
+                                "quantity": "activity_coefficient",
+                                "gamma": 0.036,
+                                "T_K": 1700.0,
+                            },
+                        }
+                    ]
+                },
+                "Si": {
+                    "observations": [
+                        {
+                            "observation_id": "unspecified-endmember",
+                            "experiment": "activity-run",
+                            "type": "activity_coefficient",
+                            "phase": "liquid_alloy",
+                            "standard_state": (
+                                "Raoultian log gamma_Si at N_Si=0.5 as cited"
+                            ),
+                            "T_range_K": [1873.0, 1873.0],
+                            "values": {
+                                "quantity": "activity_coefficient",
+                                "gamma": 0.468,
+                                "T_K": 1873.0,
+                            },
+                        }
+                    ]
+                },
+            },
+        },
+    )
+    result = migrate(root, write=False)
+    observation = result.observations["fixture-source::gamma-row"]
+    reference_state = observation.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert reference_state.value.endmember.formula == "GaO1.5"
+    assert reference_state.value.endmember.phase.value is Phase.L
+    assert reference_state.value.component_basis == "GaO1.5"
+    unspecified = result.observations["fixture-source::unspecified-endmember"]
+    assert unspecified.identity.reference_state is not None
+    assert not unspecified.identity.reference_state.is_value
 
 
 _CHEMISTRY_STRING_KEYS = frozenset(

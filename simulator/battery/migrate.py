@@ -888,6 +888,83 @@ def _standard_state_from_plain(payload: object) -> StandardState:
     )
 
 
+_EXTRACT_STANDARD_ENDMEMBER_RE = re.compile(
+    r"\b([A-Z][a-z]?(?:O(?:1\.5|2|3)?)?)\s*\(\s*([ls])\s*\)"
+)
+_EXTRACT_STANDARD_PURE_RE = re.compile(
+    r"\bpure\s+(liquid|solid)\s+([A-Z][a-z]?(?:O(?:1\.5|2|3)?)?)\b",
+    re.IGNORECASE,
+)
+
+
+def _standard_state_from_extract_text(
+    raw: object,
+    species_formula: str,
+    *,
+    phase_raw: object = None,
+) -> StandardState | None:
+    """Map only an explicit, single-convention extract standard state.
+
+    Extracts predate the v2 ``StandardState`` record and store this field as
+    source prose.  The mapper accepts the closed Raoultian convention only
+    when that prose names one liquid or solid endmember.  ``phase_raw`` is the
+    measurement phase (the alloy or melt).  It is not a printed standard-state
+    phase and never supplies the endmember.  Vapor-pressure ratios, mixed
+    Raoultian/Henrian claims, and rows that name more than one endmember stay
+    unresolved.
+    """
+
+    if not isinstance(raw, str):
+        return None
+    text = " ".join(raw.split())
+    lowered = text.lower()
+    if "raoultian" not in lowered:
+        return None
+    if any(
+        marker in lowered
+        for marker in (
+            "not a raoultian",
+            "henrian",
+            "henry's law",
+            "p/p°",
+            "p/p0",
+            "janaf",
+            "gurvich",
+            "vapor",
+            "vapour",
+        )
+    ):
+        return None
+
+    explicit: list[tuple[str, Phase]] = []
+    for match in _EXTRACT_STANDARD_ENDMEMBER_RE.finditer(text):
+        explicit.append(
+            (match.group(1), Phase.L if match.group(2).lower() == "l" else Phase.CR)
+        )
+    for match in _EXTRACT_STANDARD_PURE_RE.finditer(text):
+        explicit.append(
+            (
+                match.group(2),
+                Phase.L if match.group(1).lower() == "liquid" else Phase.CR,
+            )
+        )
+
+    species_formula = str(species_formula)
+    unique_explicit = list(dict.fromkeys(explicit))
+    if len(unique_explicit) != 1:
+        return None
+    endmember, phase = unique_explicit[0]
+
+    return StandardState(
+        convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+        endmember=make_species(endmember, phase),
+        component_basis=endmember,
+        # Required Decimal. Same default as _standard_state_from_plain when
+        # the payload omits a pressure. The activity prose does not print it.
+        reference_pressure_bar=Decimal("1"),
+    )
+
+
 def _identity_from_plain(payload: object) -> Identity:
     assert isinstance(payload, Mapping)
     kwargs: dict[str, Any] = {
@@ -8518,6 +8595,14 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+            reference_state = _standard_state_from_extract_text(
+                obs.get("standard_state"),
+                species.formula,
+                phase_raw=phase_raw,
+            )
+            if reference_state is not None:
+                ident_kwargs["reference_state"] = State.of(reference_state)
         if q_token is Quantity.TRANSITION_TEMPERATURE:
             kind = values.get("property_kind") or values.get("quantity")
             if isinstance(kind, str) and kind:
