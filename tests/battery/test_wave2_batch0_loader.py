@@ -563,6 +563,33 @@ def test_rows_and_points_without_temperature_do_not_merge(tmp_path: Path) -> Non
     assert rows_id != points_id
 
 
+def test_existing_series_without_temperature_keep_legacy_ids(tmp_path: Path) -> None:
+    _, result = _migrate_obs(
+        tmp_path,
+        {"series": [{"pressure_atm": 1}, {"pressure_atm": 2}]},
+    )
+    assert set(result.observations) == {
+        "fixture-source::na_psat::point:0",
+        "fixture-source::na_psat::point:1",
+    }
+
+
+def test_equal_row_values_keep_printed_locator_identity(tmp_path: Path) -> None:
+    _, result = _migrate_obs(
+        tmp_path,
+        {
+            "rows": [
+                {"pressure_atm": 1, "locator": {"page": 1, "table": "A"}},
+                {"pressure_atm": 1, "locator": {"page": 2, "table": "B"}},
+            ]
+        },
+    )
+    children = list(result.observations.values())
+    assert len(children) == 2
+    assert len({child.observation_id for child in children}) == 2
+    assert {child.locator.page for child in children} == {1, 2}
+
+
 def test_author_lineage_retargets_before_admission_closure(tmp_path: Path) -> None:
     for shape in ("rows", "points"):
         parent = _row("parent", "measured_direct", relation=None)

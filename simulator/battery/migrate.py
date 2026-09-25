@@ -8500,6 +8500,7 @@ class Migrator:
                         equipment=obs.get("equipment"),
                         parent_values=values,
                         parent_point_conditions=point_conditions,
+                        content_stable_id=True,
                     )
             if self._count(source_key).observations_out > before:
                 return
@@ -8577,6 +8578,7 @@ class Migrator:
         equipment: object = None,
         parent_values: object = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
+        content_stable_id: bool = False,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -8630,9 +8632,24 @@ class Migrator:
             t_trail = t_sel.unit_trail
             t_original = _temperature_field_raw(raw_item, t_sel.field_name)
             coord = t_sel.amount
-            point_id = _exploded_point_id(
-                parent_id, item, coord, raw_item, series_row_extra(raw_item)
+            row_extra = series_row_extra(
+                raw_item, include_locator=content_stable_id
             )
+            if content_stable_id:
+                point_id = _exploded_point_id(
+                    parent_id, item, coord, raw_item, row_extra
+                )
+            elif coord is not None:
+                point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
+            else:
+                point_id = _rekey_ordinal_point_observation_id(
+                    f"{parent_id}::point:{index}",
+                    temperature=None,
+                )
+                if point_id.endswith(f"::point:{index}"):
+                    printed = raw_item.get("as_published") or raw_item.get("value")
+                    if printed is not None:
+                        point_id = f"{parent_id}::printed:{printed}"
             if t_sel.field_name and not t_sel.available:
                 self.result.add_queue(
                     work.work_id,
@@ -8672,7 +8689,10 @@ class Migrator:
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
         else:
-            point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
+            if content_stable_id:
+                point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
+            else:
+                point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
         if coord is not None:
