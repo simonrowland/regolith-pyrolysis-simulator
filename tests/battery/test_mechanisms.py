@@ -1727,6 +1727,56 @@ def test_r03_match_mismatch_requires_numeric() -> None:
     assert validate_corpus([w], [exp], [ref, cand], [control]).ok
 
 
+def test_r03_no_band_requires_numeric_and_forbids_refusal() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-no-band-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r03-no-band-cand", exp.experiment_id, ident, Decimal("0"))
+    missing = F.residual(
+        "r03-no-band-no-numeric",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.NO_BAND,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [missing])
+    assert not report.ok
+    assert any("no_band requires numeric" in i.detail for i in report.issues)
+
+    numeric = F.residual(
+        "r03-no-band-numeric-seed",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    valid = replace(
+        numeric,
+        key="r03-no-band-numeric",
+        status=ResidualStatus.NO_BAND,
+        numeric=replace(numeric.numeric, decision_band=None),
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [valid]).ok
+
+    with_refusal = replace(
+        valid,
+        key="r03-no-band-refusal",
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_MISMATCH, {"fields": ["quantity"]}),
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [with_refusal])
+    assert not report.ok
+    assert any("numeric branch forbids refusal" in i.detail for i in report.issues)
+
+
 def test_r03_score_eligible_requires_measured_evidence() -> None:
     ident = F.o2_identity()
     w = F.work()
