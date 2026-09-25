@@ -90,7 +90,7 @@ experiments:
   locator:
     page: 105
     table: '5.3'
-    note: JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass
+    note: JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration
   bench_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::bench::dlr-solar-vacuum-system
 - experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   kind: literature
@@ -139,7 +139,7 @@ benches:
   cell_material_and_liner:
     state:
       tag: value
-      value: Aluminum-oxide ceramic plate
+      value: Aluminum-oxide ceramic plate, ring, or tube sample holders
     locator:
       page: 54
       section: 4.1.2 Pulverproben

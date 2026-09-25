@@ -62,14 +62,14 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: Sodium-silicate
+        value: Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions
       locator:
         page: 127
         section: 3.2.1
     form:
       state:
         tag: value
-        value: Quenched cullet grains
+        value: Quenched cullet grains, 5-10 mm
       locator:
         page: 127
         section: 3.2.1
@@ -106,7 +106,8 @@ experiments:
       locator:
         page: 127
         section: 3.2.2
-        note: N2/O2/H2O carrier gas is printed
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
     regime:
       regime_class:
         tag: unknown
@@ -235,7 +236,7 @@ benches:
   detector:
     state:
       tag: value
-      value: Extractive gas sampling probe
+      value: Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser
     locator:
       page: 127
       figure: '3.2'

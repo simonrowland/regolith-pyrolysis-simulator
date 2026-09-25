@@ -94,7 +94,7 @@ experiments:
     form:
       state:
         tag: value
-        value: Hydraulically pressed pellet
+        value: Hydraulically pressed pellet, 13 mm diameter and 10 mm height
       locator:
         section: 3.2 Solar pyrolysis procedure
     pretreatment:
@@ -110,7 +110,8 @@ experiments:
         reason: not_published
       locator:
         section: 4.1 Experimental results
-        note: Around 1800 C is a punctual peak measurement
+        note: Around 1800 C is a punctual peak measurement, not a series-wide condition; retained in existing observation
+          evidence
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -217,7 +218,7 @@ experiments:
           reason: not_published
         locator:
           section: 4.1 Experimental results
-          note: Peak temperature reported around 1800 C
+          note: Peak temperature reported around 1800 C, but no hold temperature assigned
       hold_duration_s:
         state:
           tag: value
@@ -519,7 +520,7 @@ benches:
     sensor:
       state:
         tag: value
-        value: Omicron IN 140/5 pyrometer
+        value: Omicron IN 140/5 pyrometer, 4.8-5.2 um, emissivity 1
       locator:
         section: 3.1 Experimental setup
   heating_method:

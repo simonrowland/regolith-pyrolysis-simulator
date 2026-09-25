@@ -35,30 +35,7 @@ experiments:
       locator:
         pdf_page_index: 1
         section: Samples
-        note: Two ~1 mg subsamples; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              pdf_page_index: 1
-              section: Samples
-              note: Two ~1 mg subsamples; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              pdf_page_index: 1
-              section: Samples
-              note: Two ~1 mg subsamples; unit conversion only
-        output_unit: kg
+        note: Two ~1 mg subsamples; unit conversion only, DERIVED kg = 1e-6 kg from ~1 mg
     printed_composition:
       state:
         tag: value
