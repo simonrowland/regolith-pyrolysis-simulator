@@ -10,7 +10,8 @@ from simulator.battery.records import Value
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
-    ENGINE_POINT_CONSUMERS, WaypointFlag,
+    ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
+    WaypointResult, pure_substance_engine_point_gap,
 )
 
 
@@ -60,6 +61,57 @@ def _requirements(inputs, consumer, engine=None):
 
 class UnsupportedValue(ValueError):
     pass
+
+
+# Iron is the redox component the activity engines partition from fO2.
+# alphaMELTS splits FeO/Fe2O3, ThermoEngine solves fO2 against iron, and
+# IMCC refuses Fe2O3 until the caller has applied a redox model.
+# Cr2O3, TiO2, and MnO are passed through; they are not partitioned here.
+_REDOX_PARTITIONED_COMPONENTS = frozenset({"FeO", "Fe2O3", "FeO_total", "FeOt", "FeOT"})
+
+
+def _redox_components(composition: Mapping) -> tuple[str, ...]:
+    present = []
+    for name, amount in composition.items():
+        if str(name) not in _REDOX_PARTITIONED_COMPONENTS:
+            continue
+        try:
+            number = Decimal(str(amount))
+        except (ArithmeticError, ValueError):
+            continue
+        if number > 0:
+            present.append(str(name))
+    return tuple(sorted(present))
+
+
+def _melt_composition(inputs: ConsumerInputs) -> WaypointResult:
+    """Row composition: an observation map, else the identity mole map, else the sample."""
+    current = inputs.waypoints["normalized_composition"]
+    selected = current.selected
+    if selected is not None and str(selected.route).startswith("observation_"):
+        return current
+    identity = inputs.identity_composition
+    if identity is not None:
+        return WaypointResult("normalized_composition", identity, (identity, *current.routes))
+    return current
+
+
+def _point_gap(name: str, selected: Waypoint) -> ReadinessGap | None:
+    value = selected.value
+    if isinstance(value, Value) and value.kind is ValueKind.POINT:
+        return None
+    reason = (GapReason.INTERVAL_NEEDS_POINT
+              if isinstance(value, Value) and value.kind is ValueKind.INTERVAL
+              else GapReason.UNSUPPORTED_PRINT_FORM)
+    return ReadinessGap(name, reason, (name,))
+
+
+def _not_applicable(provenance, engine: str, gaps: tuple[ReadinessGap, ...] = ()) -> GeneratedInput:
+    return GeneratedInput(
+        ConsumerReadiness("melt_activity", ReadinessStatus.NOT_APPLICABLE, gaps, engine),
+        None,
+        provenance,
+    )
 
 
 def _point(inputs, name):
@@ -113,6 +165,110 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                 "composition_mol": {"waypoint": "normalized_composition", "authority": "derived",
                                     "formula": "x_i * 1 mol reference charge"},
             }}))
+        except UnsupportedValue as exc:
+            results.append(_refused(readiness, provenance, str(exc)))
+    return tuple(results)
+
+
+def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
+    """Activity and activity-coefficient requests for engines that report activities.
+
+    Required: a normalized composition and a point temperature. An oxygen
+    point is required only when that composition contains iron. Pressure and
+    the gas boundary are not inputs. A missing required input is a typed gap;
+    nothing here is defaulted.
+    """
+    provenance = _provenance(inputs)
+    if inputs.pure_substance_reference:
+        gap = pure_substance_engine_point_gap()
+        return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
+    if not inputs.melt_activity:
+        return tuple(_not_applicable(provenance, engine) for engine in MELT_ACTIVITY_ENGINES)
+    if not inputs.reference_state_known:
+        # A vapour-referenced or untyped standard state is not a(oxide).
+        # Excluded, not run with a guessed convention.
+        gap = ReadinessGap(
+            "reference_state", GapReason.MISSING_EVIDENCE, ("identity.reference_state",),
+        )
+        return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
+
+    composition = _melt_composition(inputs)
+    gaps: list[ReadinessGap] = []
+    if composition.selected is not None and len(composition.selected.value) == 1:
+        gap = ReadinessGap("normalized_composition", GapReason.SINGLE_SPECIES_CHARGE)
+        return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
+    if composition.selected is None:
+        absence = composition.absence
+        gaps.append(ReadinessGap(
+            "normalized_composition",
+            absence.reason if absence else GapReason.MISSING_EVIDENCE,
+            absence.missing if absence else (),
+        ))
+    temperature = inputs.waypoints["temperature_K"]
+    if temperature.selected is None:
+        absence = temperature.absence
+        gaps.append(ReadinessGap(
+            "temperature_K",
+            absence.reason if absence else GapReason.MISSING_EVIDENCE,
+            absence.missing if absence else (),
+        ))
+    else:
+        point_gap = _point_gap("temperature_K", temperature.selected)
+        if point_gap is not None:
+            gaps.append(point_gap)
+    redox: tuple[str, ...] = ()
+    if composition.selected is not None:
+        redox = _redox_components(composition.selected.value)
+    if redox:
+        oxygen = inputs.waypoints["oxygen_condition"]
+        if oxygen.selected is None:
+            absence = oxygen.absence
+            gaps.append(ReadinessGap(
+                "oxygen_condition",
+                GapReason.MISSING_EVIDENCE,
+                tuple(dict.fromkeys((*redox, *(absence.missing if absence else ())))),
+            ))
+        else:
+            point_gap = _point_gap("oxygen_condition", oxygen.selected)
+            if point_gap is not None:
+                gaps.append(point_gap)
+    status = ReadinessStatus.GAP if gaps else ReadinessStatus.READY
+    gap_tuple = tuple(dict.fromkeys(gaps))
+    results = []
+    for engine in MELT_ACTIVITY_ENGINES:
+        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
+        if status is not ReadinessStatus.READY:
+            results.append(GeneratedInput(readiness, None, provenance))
+            continue
+        try:
+            moles = {}
+            for species, value in composition.selected.value.items():
+                if not value.is_finite() or value < 0:
+                    raise UnsupportedValue("normalized_composition." + species)
+                moles[species] = float(value)
+            temperature_K = _point(inputs, "temperature_K")
+            if temperature_K <= 0 or not any(moles.values()):
+                raise UnsupportedValue("physical_inputs")
+            # Celsius = kelvin - 273.15. 1500 K -> 1226.85 C. Derived, never printed.
+            payload = {
+                "engine": engine,
+                "temperature_C": float(temperature_K - Decimal("273.15")),
+                "composition_mol": moles,
+            }
+            routes = {
+                "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
+                "composition_mol": {
+                    "waypoint": "normalized_composition",
+                    "authority": composition.selected.authority.value,
+                    "route": composition.selected.route,
+                },
+                "pressure_bar": {"authority": "not_an_input", "reason": "condensed-phase activity; PV term omitted"},
+            }
+            if redox:
+                oxygen_log = _point(inputs, "oxygen_condition")
+                payload["fO2_log"] = float(oxygen_log)
+                routes["fO2_log"] = {"waypoint": "oxygen_condition", "because": list(redox)}
+            results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": routes}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
     return tuple(results)

@@ -503,6 +503,9 @@ def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
         _bench(geometry=experiment.apparatus.geometry),
     )
     for item in readiness:
+        if item.consumer == "melt_activity":
+            assert item.status is ReadinessStatus.NOT_APPLICABLE
+            continue
         name = {"kems": "temperature_program", "rps": "thermal_path", "engine_point": "temperature_K"}[item.consumer]
         assert any(gap.waypoint == name for gap in item.gaps)
 
@@ -570,6 +573,10 @@ def test_incomplete_or_unordered_ramp_hold_schedule_cannot_earn_readiness(ambigu
     assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     assert result.routes  # Evidence remains inspectable, never selected as a complete path.
     for item in consumer_readiness(experiment, bench):
+        if item.consumer == "melt_activity":
+            assert item.status is ReadinessStatus.NOT_APPLICABLE
+            assert item.gaps == ()
+            continue
         assert item.status is ReadinessStatus.GAP
         name = {"kems": "temperature_program", "rps": "thermal_path", "engine_point": "temperature_K"}[item.consumer]
         assert any(gap.waypoint == name for gap in item.gaps)
@@ -675,7 +682,10 @@ def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
     bench = _bench(geometry=experiment.apparatus.geometry)
     readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
     assert readiness["engine_point"].status is ReadinessStatus.READY
-    engines = [item for item in consumer_readiness(experiment, bench) if item.engine]
+    engines = [
+        item for item in consumer_readiness(experiment, bench)
+        if item.consumer == "engine_point" and item.engine
+    ]
     assert [item.engine for item in engines] == [
         "internal-analytical",
         "alphamelts",

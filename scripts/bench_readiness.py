@@ -41,6 +41,7 @@ from simulator.battery.records import (  # noqa: E402
 from simulator.battery.waypoints import (  # noqa: E402
     ConsumerReadiness,
     ENGINE_POINT_CONSUMERS,
+    MELT_ACTIVITY_ENGINES,
     GapReason,
     ReadinessGap,
     ReadinessStatus,
@@ -247,17 +248,21 @@ def _aggregate(
     items: list[tuple[str, tuple[ConsumerReadiness, ...]]],
     *,
     engine: str | None = None,
-) -> dict[str, object]:
+    consumer: str | None = None,
+) -> dict[str, object] | None:
+    wanted = consumer if consumer is not None else ("engine_point" if engine else None)
     selected = [
         (experiment_id, item)
         for experiment_id, group in items
         for item in group
         if item.engine == engine
-        and (engine is None or item.consumer == "engine_point")
+        and (wanted is None or item.consumer == wanted)
     ]
     records = [item for _, item in selected]
+    if not records:
+        return None
     return {
-        "consumer": "engine_point" if engine else records[0].consumer,
+        "consumer": wanted if engine else records[0].consumer,
         **({"engine": engine} if engine else {}),
         "status": _status(records).value,
         "gaps": _deduplicated_gaps(selected),
@@ -314,7 +319,10 @@ def _no_scoreable_observations_row(source_id: str) -> dict[str, object]:
 
 
 def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness:
-    engines = [item for item in group if item.engine is not None]
+    engines = [
+        item for item in group
+        if item.engine is not None and item.consumer == "engine_point"
+    ]
     gaps = []
     seen = set()
     for item in engines:
@@ -398,6 +406,18 @@ def report(root: Path) -> dict[str, object]:
                     continue
                 records = [item for group in groups for item in group
                            if item.consumer == base.consumer and item.engine == base.engine]
+                # A non-activity row is not_applicable. It must not turn an
+                # activity row's ready/gap into partial.
+                if base.consumer == "melt_activity":
+                    applicable = [
+                        item for item in records
+                        if item.status is not ReadinessStatus.NOT_APPLICABLE
+                    ]
+                    if applicable:
+                        records = applicable
+                if not records:
+                    aggregated.append(base)
+                    continue
                 aggregated.append(ConsumerReadiness(base.consumer, _status(records),
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
                     tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
@@ -425,7 +445,13 @@ def report(root: Path) -> dict[str, object]:
             )
         consumers = tuple(item for item in readiness if item.engine is None)
         consumers += (_collapse_engines(readiness),)
-        engines = tuple(item for item in readiness if item.engine is not None)
+        engines = tuple(
+            item for item in readiness
+            if item.engine is not None and item.consumer == "engine_point"
+        )
+        melt_activity = tuple(
+            item for item in readiness if item.consumer == "melt_activity"
+        )
         for source_id in row_source_ids:
             by_source.setdefault(source_id, []).append(
                 {
@@ -435,6 +461,7 @@ def report(root: Path) -> dict[str, object]:
                     "bench_identity": to_plain(bench.identity) if bench is not None else None,
                     "consumers": to_plain(consumers),
                     "engines": to_plain(engines),
+                    "melt_activity": to_plain(melt_activity),
                     "informational_gaps": (
                         [
                             {
@@ -479,6 +506,9 @@ def report(root: Path) -> dict[str, object]:
     by_engine: dict[str, dict[str, int]] = {
         engine: dict(empty_counts) for engine in ENGINE_POINT_CONSUMERS
     }
+    by_melt_activity: dict[str, dict[str, int]] = {
+        engine: dict(empty_counts) for engine in MELT_ACTIVITY_ENGINES
+    }
     blockers: dict[tuple[str, str], dict[str, set[str]]] = {}
     for source_id in sorted(by_source):
         source_items = source_readiness[source_id]
@@ -491,6 +521,10 @@ def report(root: Path) -> dict[str, object]:
                 counts[status] = counts.get(status, 0) + 1
             for item in row["engines"]:
                 counts = by_engine[str(item["engine"])]
+                status = str(item["status"])
+                counts[status] = counts.get(status, 0) + 1
+            for item in row.get("melt_activity") or []:
+                counts = by_melt_activity[str(item["engine"])]
                 status = str(item["status"])
                 counts[status] = counts.get(status, 0) + 1
             blockers.setdefault(
@@ -511,8 +545,18 @@ def report(root: Path) -> dict[str, object]:
         ]
         consumer_rows.append(_aggregate(collapsed))
         engine_rows = [
-            _aggregate(source_items, engine=engine)
-            for engine in ENGINE_POINT_CONSUMERS
+            row for row in (
+                _aggregate(source_items, engine=engine)
+                for engine in ENGINE_POINT_CONSUMERS
+            )
+            if row is not None
+        ]
+        melt_rows = [
+            row for row in (
+                _aggregate(source_items, engine=engine, consumer="melt_activity")
+                for engine in MELT_ACTIVITY_ENGINES
+            )
+            if row is not None
         ]
         info_ids = sorted(source_information.get(source_id, set()))
         informational_gaps: list[dict[str, object]] = []
@@ -542,6 +586,7 @@ def report(root: Path) -> dict[str, object]:
                 "source_id": source_id,
                 "consumers": consumer_rows,
                 "engines": engine_rows,
+                "melt_activity": melt_rows,
                 "informational_gaps": informational_gaps,
                 "experiments": by_source[source_id],
             }
@@ -554,9 +599,15 @@ def report(root: Path) -> dict[str, object]:
             counts = by_engine[str(item["engine"])]
             status = str(item["status"])
             counts[status] = counts.get(status, 0) + 1
+        for item in melt_rows:
+            counts = by_melt_activity[str(item["engine"])]
+            status = str(item["status"])
+            counts[status] = counts.get(status, 0) + 1
         for experiment_id, group in source_items:
             seen = set()
             for item in group:
+                if item.consumer == "melt_activity":
+                    continue
                 if item.status is not ReadinessStatus.GAP:
                     continue
                 for gap in item.gaps:
@@ -600,6 +651,7 @@ def report(root: Path) -> dict[str, object]:
         "summary": {
             "by_consumer": by_consumer,
             "by_engine": by_engine,
+            "by_melt_activity": by_melt_activity,
             "top_blocking_waypoints": top_blockers,
             # The two bench_identity verdicts, counted separately so a caller can
             # tell how much of the gap acquisition could ever close: permanent

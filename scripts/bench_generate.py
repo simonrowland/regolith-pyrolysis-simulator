@@ -13,13 +13,22 @@ if str(ROOT) not in sys.path:
 
 from simulator.battery.migrate import load_migrated_store, load_migrated_benches, to_plain
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
+from simulator.battery.generators import (
+    engine_point_requests,
+    kems_case,
+    melt_activity_requests,
+    vacuum_pyrolysis_preset,
+)
 from scripts.bench_readiness import _implicit_bench, _apparatus_references
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--consumer", choices=("kems", "rps", "engine_point"), required=True)
+    parser.add_argument(
+        "--consumer",
+        choices=("kems", "rps", "engine_point", "melt_activity"),
+        required=True,
+    )
     parser.add_argument("--source")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--output", type=Path, default=Path("generated-bench-inputs"))
@@ -52,8 +61,14 @@ def main(argv=None):
         contexts = [None] if args.consumer == "rps" else by_experiment.get(experiment.experiment_id, [None])
         for observation in contexts:
             inputs = collect_consumer_inputs(experiment, bench, observation)
-            results = engine_point_requests(inputs) if args.consumer == "engine_point" else (
-                kems_case(inputs) if args.consumer == "kems" else vacuum_pyrolysis_preset(inputs, modelling_inputs=model),)
+            if args.consumer == "engine_point":
+                results = engine_point_requests(inputs)
+            elif args.consumer == "melt_activity":
+                results = melt_activity_requests(inputs)
+            elif args.consumer == "kems":
+                results = (kems_case(inputs),)
+            else:
+                results = (vacuum_pyrolysis_preset(inputs, modelling_inputs=model),)
             for result in results:
                 status = "generated" if result.payload is not None else "refused"
                 counts[status] += 1
