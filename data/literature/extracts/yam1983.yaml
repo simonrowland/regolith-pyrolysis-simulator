@@ -64,8 +64,14 @@ benches:
 experiments:
 - experiment_id: na2o-sio2-emf-series
   bench_id: beta-alumina-emf-cell
-  method: melt_equilibration_quench
-  locator: {page: 736, section: Abstract, note: Na2O activity measurements in Na2O-SiO2 melts using beta-alumina solid electrolyte.}
+  method: emf_cell
+  locator:
+    page: 738
+    section: 'III. EMF measurement'
+    note: >-
+      EMF was measured in the beta-alumina galvanic cell after temperature
+      stabilization; the water-cooled copper-plate quench in p. 737 §II is
+      sample preparation for the vitrified charge.
   sample:
     printed_composition:
       state: {tag: value, value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions}
