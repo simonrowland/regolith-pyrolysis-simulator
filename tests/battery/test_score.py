@@ -855,7 +855,7 @@ def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
 
 
 def test_gibbs_band_applies_only_to_formation_energies() -> None:
-    """cp, S, H-H298, and log10_Kf do not borrow the 1.0 kJ/mol Gibbs band."""
+    """Only formation Gibbs energy uses the sourced 1.0 kJ/mol band."""
 
     from simulator.battery.score import decision_band_for, populate_numeric
 
@@ -875,7 +875,8 @@ def test_gibbs_band_applies_only_to_formation_energies() -> None:
         assert numeric is None
         assert reason is RefusalReason.DECISION_RULE_MISSING
         assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
-    for quantity in (Quantity.DELTA_FG, Quantity.DELTA_FH):
+    assert decision_band_for(Quantity.DELTA_FH, SourceRelation.INDEPENDENT) is None
+    for quantity in (Quantity.DELTA_FG,):
         band = decision_band_for(quantity, SourceRelation.INDEPENDENT)
         assert band is not None
         assert band.value == Decimal("1.0")

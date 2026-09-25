@@ -178,10 +178,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.report_only:
         from simulator.battery.score import (
             load_residuals_jsonl,
+            load_score_context,
             render_score_report_from_payloads,
         )
 
         payloads = load_residuals_jsonl(residuals_path)
+        context = load_score_context(args.root)
         recorded = load_residuals_stamp(residuals_path)
         live = derive_store_stamp(args.root)
         mismatch = emit_store_stamp_mismatch_warning(recorded, live)
@@ -223,6 +225,8 @@ def main(argv: list[str] | None = None) -> int:
             unmapped_legacy_keys=unmapped,
             store_stamp=recorded,
             mismatch_warning=mismatch,
+            observations=context.observations,
+            origins=context.origins,
         )
         report_path.write_text(report, encoding="utf-8")
         print(f"report-only residuals={len(payloads)} pin_failures={len(failures)}")
