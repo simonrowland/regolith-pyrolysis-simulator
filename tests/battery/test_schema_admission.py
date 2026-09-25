@@ -782,15 +782,32 @@ def test_geometry_context_keeps_original_source_record():
     raw = M.load_yaml(source)
     original = next(row for body in raw["species"].values() for row in body.get("context", [])
                     if row["observation_id"].endswith("kems_method_geometry"))
+    source_row = next(row for _, row in M.iter_extract_observations(raw)
+                      if row["observation_id"] == "yakovlev_shornikov_2011_Po2_table_bar_calculated")
+    printed_rows = source_row["values"]["points"]
     migrator = M.Migrator(M.REPO_ROOT)
     migrator._migrate_extract(source)
     migrator.finalize()
     result = migrator.result
-    assert len(result.observations) == 5
+    prefix = f"{raw['source_id']}::{source_row['observation_id']}::"
+    children = [observation for observation_id, observation in result.observations.items()
+                if observation_id.startswith(prefix)]
+    assert len(children) == len(printed_rows)
+    assert children
     context = next(row for rows in result.context_by_work.values() for row in rows
                    if row["observation_id"] == original["observation_id"])
+    assert context["source_id"] == raw["source_id"]
     assert context["values"] == original["values"]
     assert context["locator"] == original["locator"]
+    for child in children:
+        assert child.source_id == raw["source_id"]
+        assert child.read_from == f"pdf:{raw['source_id']}"
+        experiment = result.experiments[child.experiment_id]
+        assert any(row["context_id"] == context["context_id"]
+                   and row["source_id"] == raw["source_id"]
+                   and row["values"] == original["values"]
+                   and row["locator"] == original["locator"]
+                   for row in result.context_by_work[experiment.work_id])
 
 
 @pytest.mark.parametrize("source", [

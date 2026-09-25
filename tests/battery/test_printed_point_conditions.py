@@ -28,7 +28,9 @@ _TEMPERATURE_ROUTES = (
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_si_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_w_psat_1873k", "1873.0", "table", "1"),
     # Table 3 "at 1300 C"; the extract documents the authors' T_C + 273 convention.
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=979ecc7f3c6b", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=cedcb5fddf77", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=535271423e81", "1573.0", "table", "3"),
     ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.0", "figure", "2"),
     # Fig. 8 slope: "Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C".
     ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.0", "figure", "8"),
@@ -36,14 +38,35 @@ _TEMPERATURE_ROUTES = (
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_sio2_cao_saturated_model_derived", "1873.15", "equation", "5"),
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_p2o5_model_derived", "1873.15", "equation", "5"),
     # Quoted Table 4: "Izotermicheskaya degazatsiya ... (800 C, posle 15 min)".
-    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2", "1073.15", "table", "4"),
-    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2o", "1073.15", "table", "4"),
+    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2::T=1073.15:h=358acbddd711", "1073.15", "table", "4"),
+    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2o::T=1073.15:h=756df92a3970", "1073.15", "table", "4"),
     # Figure captions print the single temperature of each plotted dataset.
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig4_figure_only", "1823.0", "figure", "4"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig6_figure_only", "1923.0", "figure", "6"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig10_figure_only", "1873.0", "figure", "10"),
-    # Table 1 FactSage prediction "at 2500 K"; second-law prose "at 1976 K".
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat", "2500.0", "table", "1"),
+    # Table 1 FactSage prediction "at 2500 K"; every printed species row carries
+    # the same table temperature into its child observation.
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=74d5773621a8", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=3572ac165c05", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=724db990a5f0", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8e91d02ef91b", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=9068cb979358", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0d961a132e64", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e0c484f68fb4", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0e35afbec232", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4de3eec4d492", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=f9397cac3476", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8a4250e30775", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c19469749fc3", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=22a6308ffb70", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c048d1e20a62", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=69c8c69b6bb4", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8909c73dbda3", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4c03a6797e19", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=dc8fb3e575aa", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=87bebe4f0dc4", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=30ff34758a56", "2500.0", "table", "1"),
+    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=42696be8be5a", "2500.0", "table", "1"),
     ("kems-139-jacobson-2024", "jacobson_2024_t2_hfo_second_law_narrative", "1976.0", None, None),
     # "each experiment run at a temperature of 2650 K" (Experiments section).
     ("steurer-1985-vapor-phase-pyrolysis", "steurer_1985_sio2_induction_experiment", "2650.0", None, None),
