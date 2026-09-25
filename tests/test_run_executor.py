@@ -92,38 +92,79 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
     )
     assert "pending_decision" not in species_record
     assert species_record["status"] == "status_bearing"
-    assert species_record["reason"] in {
-        "reactive_uptake",
-        "reactive_equilibrium_undersaturated",
-    }
+    assert species_record["reason"] == "reactive_uptake"
     assert species_record["output_status"] == "status_bearing"
     assert species_record["authority_level"] == "bridge"
     assert species_record["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert species_record["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert species_record["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
     outcomes = species_record["stage_outcomes"]
     reactive = next(
         outcome
         for outcome in outcomes
-        if outcome.get("reason") == species_record["reason"]
+        if outcome.get("reason") == "reactive_uptake"
         and outcome.get("saturation_pressure_policy") == "reactive_equilibrium"
     )
     assert reactive["status"] == "status_bearing"
+    assert reactive["reason"] == "reactive_uptake"
     assert reactive["authority_level"] == "bridge"
+    assert reactive["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert reactive["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
     assert "pending_decision" not in reactive
     assert "eta_basis" not in reactive
     assert math.isfinite(float(reactive["eta"]))
     assert any(outcome.get("status") == "extrapolated" for outcome in outcomes)
 
+    route_authority = execution.simulator.condensation_model.last_condensation_authority_by_species[
+        "SiO"
+    ]
+    assert route_authority["authority_level"] == "bridge"
+    assert route_authority["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert route_authority["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
+
+    wall_notice = execution.simulator.condensation_model.last_sticking_alpha_provenance_notice
+    wall_records = wall_notice["alpha_s_provenance_by_species"]["SiO"]
+    reactive_alpha_records = [
+        record
+        for record in wall_records.values()
+        if record.get("reactive_uptake_reason")
+    ]
+    assert reactive_alpha_records
+    for record in reactive_alpha_records:
+        assert record["authority_level"] == "bridge"
+        assert record["reactive_uptake_envelope"] == pytest.approx(
+            [0.003, 0.067]
+        )
+        assert record["original_reason"] == (
+            "evaporation_alpha_proxy_not_reactive_uptake"
+        )
+
     published = run._build_output(execution)["condensation_refusals_by_species"][
         "by_species"
     ]["SiO"]
-    for field in (
-        "status",
-        "reason",
-        "authority_level",
-        "saturation_pressure_policy",
-        "output_status",
-    ):
-        assert published[field] == species_record[field]
+    assert published["status"] == species_record["status"]
+    assert published["reason"] == "reactive_uptake"
+    assert published["authority_level"] == "bridge"
+    assert published["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert published["output_status"] == "status_bearing"
+    assert published["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert published["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
 
 
 @pytest.mark.parametrize(

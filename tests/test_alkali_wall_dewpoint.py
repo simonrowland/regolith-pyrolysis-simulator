@@ -52,7 +52,9 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from simulator.condensation import (
+    _capture_budget_alpha_record,
     _sticking_reactivity_class,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
@@ -65,6 +67,8 @@ CELSIUS_TO_KELVIN = 273.15
 
 # Premise of the 7d42b4f claim: 10 mbar total system pressure.
 TOTAL_PRESSURE_PA = 10.0 * MBAR_TO_PA  # 1000 Pa
+R_J_MOL_K = 8.31446261815324
+STANDARD_PRESSURE_PA = 100_000.0
 
 # The run's wall band from the claim: 1500-1650 C.
 WALL_BAND_C = (1500.0, 1550.0, 1575.0, 1600.0, 1650.0)
@@ -105,6 +109,48 @@ def _antoine_dew_point_K(coeff: dict, pressure_pa: float) -> float:
     return float(coeff["B"]) / (
         float(coeff["A"]) - math.log10(float(pressure_pa))
     ) - float(coeff.get("C", 0.0))
+
+
+def _expected_silicate_pO2_eq_bar(
+    species: str,
+    temperature_K: float,
+    p_metal_pa: float,
+    log10_activity: float,
+) -> float:
+    """Hand-evaluate the cited Ellingham row and silicate gate relation."""
+
+    segment = next(
+        row
+        for row in ELLINGHAM_FIT_SEGMENTS[species]
+        if float(row.range_K[0]) <= temperature_K < float(row.range_K[1])
+    )
+    dG_J_per_mol_O2 = (
+        float(segment.dH_f_kJ_per_mol_O2)
+        - temperature_K * float(segment.dS_f_kJ_per_mol_K_per_mol_O2)
+    ) * 1000.0
+    equilibrium_constant = math.exp(
+        -dG_J_per_mol_O2 / (R_J_MOL_K * temperature_K)
+    )
+    reduced_metal_pressure = p_metal_pa / STANDARD_PRESSURE_PA
+    return (10.0 ** log10_activity) ** 2 / (
+        equilibrium_constant * reduced_metal_pressure ** 4
+    )
+
+
+@pytest.mark.parametrize("species", ["Na", "K"])
+def test_alkali_capture_alpha_keeps_extrapolated_upper_bound(
+    species: str,
+) -> None:
+    record = _capture_budget_alpha_record(
+        species,
+        T_K=1500.0 + CELSIUS_TO_KELVIN,
+    )
+
+    assert record["authority_level"] == "extrapolated"
+    assert record["reactive_uptake_envelope"] == pytest.approx([0.0, 1.0])
+    assert record["original_reason"] == (
+        "physical_bound_only_no_reactive_uptake_measurement"
+    )
 
 
 @pytest.mark.parametrize("species", ["Na", "K"])
@@ -237,6 +283,26 @@ def test_silica_class_na_driving_pressure_is_the_partial_pressure() -> None:
     assert "disagrees" in notice["activity_band_notice"]
     assert notice["headspace_pO2_bar"] == pytest.approx(1.0e-9)
     assert notice["original_reason"] == "silicate_activity_anchor_not_this_wall"
+    expected_pO2_eq = {
+        log10_activity: _expected_silicate_pO2_eq_bar(
+            "Na",
+            wall_temperature_K,
+            100.0,
+            log10_activity,
+        )
+        for log10_activity in (-8.0, -7.0)
+    }
+    assert expected_pO2_eq[-8.0] == pytest.approx(
+        9.459203645e-11, rel=2e-6
+    )
+    assert expected_pO2_eq[-7.0] == pytest.approx(
+        9.459203645e-09, rel=2e-6
+    )
+    assert notice["pO2_eq_bar_by_log10_a"] == pytest.approx({
+        str(float(key)): value for key, value in expected_pO2_eq.items()
+    })
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reactive_uptake_envelope"] == pytest.approx([0.0, 1.0])
 
     bare = _wall_deposition_driving_pressure_pa(
         "Na",
@@ -267,7 +333,21 @@ def test_silica_class_k_uses_the_same_gate_with_its_own_ellingham_row() -> None:
     notice = floor["silicate_equilibrium_notice"]
     assert notice["potassium_activity_status"] == "K_TBAND_PROXY_FROM_NA_GAP"
     assert notice["silicate_activity_band_log10_a"] == pytest.approx([-8.0, -7.0])
-    pO2_eq = float(notice["pO2_eq_bar_by_log10_a"]["-8.0"])
+    expected_pO2_eq = {
+        log10_activity: _expected_silicate_pO2_eq_bar(
+            "K",
+            wall_temperature_K,
+            100.0,
+            log10_activity,
+        )
+        for log10_activity in (-8.0, -7.0)
+    }
+    assert notice["pO2_eq_bar_by_log10_a"] == pytest.approx({
+        str(float(key)): value for key, value in expected_pO2_eq.items()
+    })
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reactive_uptake_envelope"] == pytest.approx([0.0, 1.0])
+    pO2_eq = expected_pO2_eq[-8.0]
     assert pO2_eq > 1.0e-9
     assert floor_driving == 0.0
     above: dict = {}

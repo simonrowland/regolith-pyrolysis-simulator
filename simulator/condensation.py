@@ -1034,6 +1034,7 @@ def _annotate_reactive_uptake_alpha(
         record['reactive_uptake_reason'] = (
             'evaporation_alpha_proxy_not_reactive_uptake'
         )
+        record['original_reason'] = str(record['reactive_uptake_reason'])
         record['alpha_reactive_ladder'] = 'species_bridge'
         if isinstance(envelope, (list, tuple)) and len(envelope) == 2:
             record['reactive_uptake_envelope'] = [
@@ -1048,10 +1049,38 @@ def _annotate_reactive_uptake_alpha(
         record['reactive_uptake_reason'] = (
             'physical_bound_only_no_reactive_uptake_measurement'
         )
+        record['original_reason'] = str(record['reactive_uptake_reason'])
         record['reactive_uptake_envelope'] = [0.0, 1.0]
         record['alpha_reactive_ladder'] = 'physical_ceiling'
         record['output_status'] = 'status_bearing'
     return record
+
+
+def _reactive_uptake_provenance(
+    species: str,
+    *,
+    wall_material_class: str | None,
+    T_K: float | None = None,
+) -> dict[str, Any]:
+    """Return the alpha provenance carried by a reactive pressure notice."""
+
+    record = _sidecar_alpha_record(species, T_K=T_K)
+    _annotate_reactive_uptake_alpha(
+        record,
+        species,
+        wall_material_class=wall_material_class,
+    )
+    provenance = {}
+    for key in (
+        'authority_level',
+        'reactive_uptake_envelope',
+        'reactive_uptake_reason',
+    ):
+        if key in record:
+            provenance[key] = copy.deepcopy(record[key])
+    if 'reactive_uptake_reason' in record:
+        provenance['original_reason'] = str(record['reactive_uptake_reason'])
+    return provenance
 
 
 def _sio_liquid_ellingham_leg():
@@ -1363,6 +1392,18 @@ def _alkali_silicate_gate(
         'headspace_pO2_missing': pO2_missing,
         'favoured': favoured,
     }
+    reactive_provenance = _reactive_uptake_provenance(
+        str(species),
+        wall_material_class='silica',
+        T_K=temperature_K,
+    )
+    for key in (
+        'authority_level',
+        'reactive_uptake_envelope',
+        'reactive_uptake_reason',
+    ):
+        if key in reactive_provenance:
+            notice[key] = reactive_provenance[key]
     if str(species) == 'K':
         notice['potassium_activity_status'] = str(
             band.get('potassium_activity_status')
@@ -1377,6 +1418,7 @@ def _apply_sio_disproportionation_driving_pressure(
     *,
     vapor_pressure_data: Mapping[str, Any] | None,
     diagnostic_out: MutableMapping[str, Any] | None,
+    wall_material_class: str | None = None,
 ) -> float:
     equilibrium = _sio_disproportionation_equilibrium(
         temperature_K,
@@ -1390,6 +1432,11 @@ def _apply_sio_disproportionation_driving_pressure(
         else 'reactive_equilibrium_undersaturated'
     )
     if diagnostic_out is not None:
+        reactive_provenance = _reactive_uptake_provenance(
+            'SiO',
+            wall_material_class=wall_material_class,
+            T_K=float(temperature_K),
+        )
         notice = {
             'status': 'status_bearing',
             'output_status': 'status_bearing',
@@ -1425,6 +1472,7 @@ def _apply_sio_disproportionation_driving_pressure(
                 2500.0,
             ],
         }
+        notice.update(reactive_provenance)
         diagnostic_out['wall_saturation_pressure_pa'] = p_eq_pa
         diagnostic_out['wall_saturation_pressure_refused'] = False
         diagnostic_out['wall_saturation_pressure_status'] = 'reactive_equilibrium'
@@ -1436,6 +1484,13 @@ def _apply_sio_disproportionation_driving_pressure(
         )
         diagnostic_out['driving_pressure_pa'] = driving_pressure_pa
         diagnostic_out['wall_saturation_pressure_notice'] = notice
+        for key in (
+            'reactive_uptake_envelope',
+            'reactive_uptake_reason',
+            'original_reason',
+        ):
+            if key in reactive_provenance:
+                diagnostic_out[key] = reactive_provenance[key]
     return driving_pressure_pa
 
 
@@ -3918,8 +3973,29 @@ class CondensationModel:
                 )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
             if hkl_sink_total_kg <= 1e-15:
-                capture_budget_kg = 0.0
-            elif capture_budget_kg > 0.0:
+                # The pressure-isolated budget keeps total removal independent
+                # of the reactive wall driving force.  A clean reactive wall
+                # must therefore leave no wall parcel, but it still needs a
+                # designated baffle destination; otherwise the new p_eq zero
+                # changes terminal SiO by changing the accounting split rather
+                # than the melt-side evolved amount.
+                fallback_stage = designated_stage_number(species)
+                if (
+                    species == 'SiO'
+                    and capture_budget_kg > 0.0
+                    and any(
+                        int(stage.stage_number) == int(fallback_stage)
+                        for stage in self.train.stages
+                    )
+                ):
+                    hkl_condensed_by_stage = {
+                        int(fallback_stage): capture_budget_kg
+                    }
+                    hkl_condensed_total_kg = capture_budget_kg
+                    hkl_sink_total_kg = capture_budget_kg
+                else:
+                    capture_budget_kg = 0.0
+            if hkl_sink_total_kg > 1e-15 and capture_budget_kg > 0.0:
                 used_capture_budget_regularizer = True
                 wall_deposit_kg = capture_budget_kg * (
                     wall_hkl_kg / hkl_sink_total_kg
@@ -4273,6 +4349,8 @@ class CondensationModel:
                     'standard_state_crossing_band_C',
                     'activity_band_notice',
                     'activity_band_ends_disagree',
+                    'reactive_uptake_envelope',
+                    'reactive_uptake_reason',
                     'original_reason',
                 ):
                     if key in reactive_outcome:
@@ -4301,6 +4379,15 @@ class CondensationModel:
                         'reason': reactive_outcome['reason'],
                         'saturation_pressure_policy': 'reactive_equilibrium',
                     })
+                    for key in (
+                        'reactive_uptake_envelope',
+                        'reactive_uptake_reason',
+                        'original_reason',
+                    ):
+                        if key in reactive_outcome:
+                            authority[key] = copy.deepcopy(
+                                reactive_outcome[key]
+                            )
             if species in condensation_refusals_by_species:
                 existing = condensation_refusals_by_species[species]
                 if isinstance(existing, dict):
@@ -5520,6 +5607,8 @@ class CondensationModel:
                     'activity_band_notice',
                     'gate_log10_a_oxide',
                     'headspace_pO2_bar',
+                    'reactive_uptake_envelope',
+                    'reactive_uptake_reason',
                     'original_reason',
                 ):
                     if key in reactive_notice:
@@ -6733,7 +6822,14 @@ def _capture_budget_alpha_record(
     species: str,
     T_K: float | None = None,
 ) -> dict[str, Any]:
-    return _sidecar_alpha_record(species, T_K=T_K)
+    # Alkali capture keeps the silicate-gate upper bound even before the
+    # material-specific wall pass selects a liner class.
+    wall_material_class = 'silica' if str(species) in {'Na', 'K'} else None
+    return _annotate_reactive_uptake_alpha(
+        _sidecar_alpha_record(species, T_K=T_K),
+        species,
+        wall_material_class=wall_material_class,
+    )
 
 
 def _liner_material_config(
@@ -7789,6 +7885,7 @@ def _wall_deposition_driving_pressure_pa(
             T_surface_K,
             vapor_pressure_data=vapor_pressure_data,
             diagnostic_out=diagnostic_out,
+            wall_material_class=wall_material_class,
         )
     if sink_kind == 'alkali_silicate':
         gate = _alkali_silicate_gate(
@@ -7822,6 +7919,13 @@ def _wall_deposition_driving_pressure_pa(
                 diagnostic_out['reason'] = 'reactive_uptake'
                 diagnostic_out['driving_pressure_pa'] = local_pressure_pa
                 diagnostic_out['wall_saturation_pressure_notice'] = notice
+                for key in (
+                    'reactive_uptake_envelope',
+                    'reactive_uptake_reason',
+                    'original_reason',
+                ):
+                    if key in notice:
+                        diagnostic_out[key] = notice[key]
             return max(0.0, local_pressure_pa)
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
@@ -7854,6 +7958,13 @@ def _wall_deposition_driving_pressure_pa(
                         "saturation_pressure_policy": "reactive_equilibrium",
                         "wall_saturation_pressure_pa": 0.0,
                     })
+                    record.update(
+                        _reactive_uptake_provenance(
+                            species,
+                            wall_material_class=wall_material_class,
+                            T_K=float(T_surface_K),
+                        )
+                    )
                     diagnostic_out["wall_saturation_pressure_notice"] = record
                 diagnostic_out["wall_saturation_pressure_pa"] = 0.0
                 diagnostic_out["wall_saturation_pressure_refused"] = False
