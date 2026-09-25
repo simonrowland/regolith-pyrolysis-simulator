@@ -981,12 +981,81 @@ def cell_notices(
     return tuple(notices)
 
 
+def melt_quantity_report(
+    quantity: Quantity,
+    activities: Mapping[str, float],
+    coefficients: Mapping[str, float],
+) -> dict[str, float] | None:
+    """The engine map that matches this row.
+
+    Activity is a. The activity coefficient is gamma. Engines that print
+    both use a = gamma * x on the same component. The two maps are not
+    substitutes, and a missing gamma is not filled from a.
+    """
+
+    if quantity is Quantity.ACTIVITY:
+        return dict(activities)
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        if not coefficients:
+            return None
+        return dict(coefficients)
+    return None
+
+
+def _activity_contract_refusal(
+    engine: Engine,
+    *,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    generated,
+) -> EnginePrediction:
+    from simulator.battery.waypoints import GapReason
+
+    gaps = () if generated is None else generated.readiness.gaps
+    first = gaps[0] if gaps else None
+    reason_token = first.reason.value if first is not None else "engine_does_not_report_melt_activity"
+    detail: dict[str, object] = {
+        "reason": reason_token,
+        "consumer": "melt_activity",
+        "gaps": [
+            {
+                "waypoint": gap.waypoint,
+                "reason": gap.reason.value,
+                "missing": list(gap.missing),
+            }
+            for gap in gaps
+        ],
+    }
+    if first is not None and first.reason is GapReason.REFERENCE_STATE_MISMATCH and len(first.missing) >= 2:
+        detail["row_convention"] = first.missing[0]
+        detail["engine_convention"] = first.missing[1]
+    refusal = (
+        RefusalReason.UNSUPPORTED
+        if first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH
+        else RefusalReason.IDENTITY_INCOMPLETE
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=refusal,
+        refusal_detail=detail,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
+    experiment: Experiment | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -996,6 +1065,7 @@ def predict_with_engine(
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
         PO2_ENGINE_DEFAULT,
+        PO2_NOT_AN_INPUT,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -1062,7 +1132,60 @@ def predict_with_engine(
 
     wt: dict[str, float] | None = None
     requested: State[Composition] | None = None
-    if identity.composition is not None and identity.composition.is_value:
+    activity_payload: Mapping | None = None
+    if quantity in MELT_ACTIVITY_QUANTITIES:
+        # Activity rows use the melt-activity contract. A gap is a typed
+        # refusal. PO2_ENGINE_DEFAULT (-9) is not an input on this path.
+        from simulator.battery.enums import AmountBasis
+        from simulator.battery.generators.bench import activity_request_for_engine
+        from simulator.battery.records import Composition as OxideComposition
+
+        if experiment is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "melt_activity_contract_requires_experiment",
+                    "consumer": "melt_activity",
+                },
+                identity=identity,
+            )
+        generated = activity_request_for_engine(experiment, observation, engine.value)
+        if generated is None or generated.payload is None:
+            return _activity_contract_refusal(
+                engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
+                generated=generated,
+            )
+        activity_payload = generated.payload
+        moles = dict(activity_payload.get("composition_mol") or {})
+        built = OxideComposition(
+            "oxides",
+            tuple((str(name), Decimal(str(amount))) for name, amount in moles.items()),
+            AmountBasis.MOLE_FRACTION,
+        )
+        requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
+        wt = composition_wt_pct(built)
+        if wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "composition_unparsed"},
+                identity=identity,
+                requested_composition=requested,
+            )
+    elif identity.composition is not None and identity.composition.is_value:
         requested = identity.composition
         assert identity.composition.value is not None
         wt = composition_wt_pct(identity.composition.value)
@@ -1135,7 +1258,16 @@ def predict_with_engine(
         )
 
     fo2_state = identity.fO2_Pa
-    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+    if activity_payload is not None:
+        # The contract's oxygen point, or none. Never the engine default.
+        if "fO2_log" in activity_payload:
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=10.0 ** float(activity_payload["fO2_log"]),
+            )
+        else:
+            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    elif fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
         # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
         # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
         po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
@@ -1231,7 +1363,26 @@ def predict_with_engine(
     reported: Mapping[str, float]
     unit = QUANTITY_UNITS[quantity]
     if quantity in MELT_ACTIVITY_QUANTITIES:
-        reported = activities
+        coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
+        selected = melt_quantity_report(quantity, activities, coefficients)
+        if selected is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.PRODUCED, call_evidence=call_evidence),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_reported_activity_not_coefficient",
+                    "quantity": quantity.value,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+        reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
         reported = pressures
@@ -1452,7 +1603,7 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
-        prediction = predictor(engine, reference, handles=handles)
+        prediction = predictor(engine, reference, handles=handles, experiment=experiment)
 
     notices = union_notices(notices, prediction.notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)

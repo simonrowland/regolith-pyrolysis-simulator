@@ -79,6 +79,8 @@ QUANTITY_PRESSURE = "gas_partial_pressure_Pa"
 
 PO2_ENGINE_DEFAULT = "engine_default"
 PO2_COMMANDED = "commanded"
+# Condensed-phase activity with no multivalent element. Not -9.
+PO2_NOT_AN_INPUT = "not_an_input"
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
 REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
@@ -245,6 +247,9 @@ class EquilibrateCell:
     exit_code: int | None = None
     model_id: str | None = None
     engine_annotation: str | None = None
+    # gamma, where the engine reports it. Activity stays on melt_activities.
+    # a = gamma * x. An empty map is not activity reused as a coefficient.
+    melt_activity_coefficients: dict[str, float] = field(default_factory=dict)
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -258,6 +263,7 @@ class EquilibrateCell:
             "engine_reason": self.engine_reason,
             "engine_annotation": self.engine_annotation,
             "melt_activities": dict(self.melt_activities),
+            "melt_activity_coefficients": dict(self.melt_activity_coefficients),
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "liquid_fraction": self.liquid_fraction,
             "wall_s": self.wall_s,
@@ -311,6 +317,12 @@ class EquilibrateCell:
             gas_partial_pressures_Pa=dict(
                 payload.get("gas_partial_pressures_Pa") or {}
             ),
+            melt_activity_coefficients={
+                str(name): float(value)
+                for name, value in dict(
+                    payload.get("melt_activity_coefficients") or {}
+                ).items()
+            },
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
@@ -852,6 +864,29 @@ def extract_reported_quantities(
     return activities, pressures
 
 
+def reported_activity_coefficients(result: Any) -> dict[str, float]:
+    """Gamma, when the engine reported it separately from activity.
+
+    a = gamma * x. The activity field is not reused as gamma.
+    """
+
+    direct = getattr(result, "reported_activity_coefficients", None)
+    nested = None
+    if not isinstance(direct, Mapping) or not direct:
+        diagnostics = getattr(result, "diagnostics", None) or {}
+        if isinstance(diagnostics, Mapping):
+            nested = diagnostics.get("reported_activity_coefficients")
+    source = direct if isinstance(direct, Mapping) and direct else nested
+    gammas: dict[str, float] = {}
+    if not isinstance(source, Mapping):
+        return gammas
+    for name, value in source.items():
+        number = _finite_float(value)
+        if number is not None and number > 0.0:
+            gammas[str(name)] = number
+    return gammas
+
+
 def _plain_data(value: Any) -> Any:
     """JSON-safe copy. Commissioning notices carry tuples; report dumps do not."""
 
@@ -1306,6 +1341,7 @@ def reclassify_projected_composition_cells(
                 engine_status="out_of_domain",
                 engine_reason=note,
                 melt_activities={},
+                melt_activity_coefficients={},
                 gas_partial_pressures_Pa={},
             )
         )
@@ -1404,10 +1440,16 @@ class _ImccBatteryBackend:
             allow_out_of_envelope=True,
         )
         activities: dict[str, float] = {}
-        for name, value in zip(result.parent_oxides, result.parent_activity):
+        gammas: dict[str, float] = {}
+        for name, value, gamma in zip(
+            result.parent_oxides, result.parent_activity, result.parent_gamma
+        ):
             number = _finite_float(value)
             if number is not None and number > 0.0:
                 activities[str(name)] = number
+            gamma_number = _finite_float(gamma)
+            if gamma_number is not None and gamma_number > 0.0:
+                gammas[str(name)] = gamma_number
         notices: list[dict[str, Any]] = []
         if result.extrapolated:
             notices.append(
@@ -1478,6 +1520,7 @@ class _ImccBatteryBackend:
             diagnostics=diagnostics,
             warnings=[],
             activity_coefficients=activities,
+            reported_activity_coefficients=gammas,
             vapor_pressures_Pa=pressures,
             liquid_fraction=1.0,
             phase_assemblage_available=True,
@@ -2109,6 +2152,8 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     if request.mode == PO2_COMMANDED:
         assert request.po2_bar is not None
         return math.log10(float(request.po2_bar))
+    if request.mode == PO2_NOT_AN_INPUT:
+        return None
     if handle.supports_intrinsic_fo2:
         return None
     return _DEFAULT_FO2_LOG
@@ -2269,6 +2314,7 @@ def equilibrate_cell(
             engine_reason = f"{gate_name}"
             engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
+        coefficients = reported_activity_coefficients(result)
         vapor_authority = extract_vapor_authority(result)
         flag_notices, flag_authority, flag_band = engine_flags_from_result(result)
         crash_diag = diagnostics.get("subprocess_failure") or {}
@@ -2285,6 +2331,7 @@ def equilibrate_cell(
             engine_reason=engine_reason,
             engine_annotation=engine_annotation,
             melt_activities=activities,
+            melt_activity_coefficients=coefficients,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),

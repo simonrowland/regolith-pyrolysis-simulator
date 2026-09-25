@@ -4,22 +4,22 @@ from dataclasses import dataclass, fields, is_dataclass
 from collections.abc import Mapping
 from decimal import Decimal
 
-from simulator.battery.records import Located, Value
+from simulator.battery.records import Located, StandardState, Value
 from simulator.battery.enums import ValueKind
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
     ConsumerReadiness, _AUTHORITY_RANK, _result, charge_moles_by_species, thermal_path,
     pressure_boundary, oxygen_condition, effective_escape_area, normalized_composition,
     identity_composition_waypoint, is_melt_activity_observation, is_pure_substance_engine_reference,
-    reference_state_is_known,
+    reference_state_is_known, reference_state_value,
 )
 
 
 REQUIREMENTS = {
     "engine_point": ("normalized_composition", "temperature_K", "pressure_boundary", "oxygen_condition"),
     # Condensed-phase activity at fixed T and composition. Pressure is not an
-    # input (the PV term is negligible here) and oxygen is required only when
-    # the composition contains iron, which the activity engines redox-partition.
+    # input (the PV term is negligible here). Oxygen is required when the
+    # composition or the measured species contains a multivalent element.
     # That conditional check is not a static tuple entry.
     "melt_activity": ("normalized_composition", "temperature_K"),
     "kems": ("charge_moles_by_species", "mass_kg", "post_mass_kg", "purity_fraction",
@@ -49,6 +49,21 @@ class ConsumerInputs:
     pure_substance_reference: bool = False
     # Unknown reference state is not a melt activity the engines can run.
     reference_state_known: bool = False
+    # Printed standard state when it is a value. Engines still have to match it.
+    reference_state: StandardState | None = None
+    # activity or activity_coefficient. Absent on every other quantity.
+    activity_quantity: str | None = None
+    # Measured species formula. A multivalent solute can sit outside the bulk map.
+    measured_species: str | None = None
+
+
+def _activity_quantity(observation) -> str | None:
+    if not is_melt_activity_observation(observation):
+        return None
+    from simulator.battery.identity import quantity_token
+
+    quantity = quantity_token(observation.identity)
+    return None if quantity is None else quantity.value
 
 
 def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInputs:
@@ -173,4 +188,9 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
         melt_activity=is_melt_activity_observation(observation),
         identity_composition=identity_composition_waypoint(observation),
         pure_substance_reference=observation is not None and is_pure_substance_engine_reference(observation),
-        reference_state_known=reference_state_is_known(observation))
+        reference_state_known=reference_state_is_known(observation),
+        reference_state=reference_state_value(observation),
+        activity_quantity=_activity_quantity(observation),
+        measured_species=(
+            observation.identity.species.formula if observation is not None else None
+        ))

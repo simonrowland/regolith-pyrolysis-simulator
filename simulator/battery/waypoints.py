@@ -16,6 +16,7 @@ from simulator.battery.records import (
     Located,
     Locator,
     Observation,
+    StandardState,
     State,
     ThermalSchedule,
     Value,
@@ -47,6 +48,9 @@ class GapReason(StrEnum):
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
+    # The row names a reference the engine does not report. Both conventions
+    # are on the gap. Nothing is converted from one to the other.
+    REFERENCE_STATE_MISMATCH = "reference_state_mismatch"
     # Pure-substance engine-reference tabulation. The generator declares
     # derivation.pure_substance_reference; identity.composition is
     # not_applicable. engine_point reproduces a melt composition at a bench
@@ -553,6 +557,16 @@ def reference_state_is_known(observation: Observation | None) -> bool:
         return False
     state = observation.identity.reference_state
     return state is not None and state.is_value
+
+
+def reference_state_value(observation: Observation | None) -> StandardState | None:
+    """The printed standard state, when it is a value. Matching is separate."""
+    if not reference_state_is_known(observation):
+        return None
+    assert observation is not None
+    assert observation.identity.reference_state is not None
+    value = observation.identity.reference_state.value
+    return value if isinstance(value, StandardState) else None
 
 
 def is_melt_activity_observation(observation: Observation | None) -> bool:

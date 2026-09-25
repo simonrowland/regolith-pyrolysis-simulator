@@ -5,8 +5,8 @@ from decimal import Decimal
 from collections.abc import Mapping
 
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
-from simulator.battery.enums import ValueKind
-from simulator.battery.records import Value
+from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
+from simulator.battery.records import StandardState, Value, phase_token
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
@@ -63,25 +63,148 @@ class UnsupportedValue(ValueError):
     pass
 
 
-# Iron is the redox component the activity engines partition from fO2.
-# alphaMELTS splits FeO/Fe2O3, ThermoEngine solves fO2 against iron, and
-# IMCC refuses Fe2O3 until the caller has applied a redox model.
-# Cr2O3, TiO2, and MnO are passed through; they are not partitioned here.
-_REDOX_PARTITIONED_COMPONENTS = frozenset({"FeO", "Fe2O3", "FeO_total", "FeOt", "FeOT"})
+# Each element has more than one oxidation state in silicate melts over the
+# fO2 range these engines are asked to run. Omitting fO2 lets the engine
+# invent that redox state. Composition names and the measured species are
+# mapped onto this table; the element symbols are not repeated elsewhere.
+# Fe: Fe2+ and Fe3+, and Fe0 at very low fO2. Every MELTS iron alias, including
+#     the total-iron prints, maps here.
+# Ti: Ti4+ and Ti3+.
+# Cr: Cr3+ and Cr2+.
+# Mn: Mn2+ and Mn3+.
+# V: V3+, V4+, and V5+.
+# Eu: Eu3+ and Eu2+.
+# Ce: Ce4+ and Ce3+.
+# S: sulfide S2- and sulfate S6+.
+# Ga: Ga3+ and Ga+. Bischof measures Ga dissolved in CMAS, so Ga is not in the bulk map.
+MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
+    "Fe": "Fe2+/Fe3+",
+    "Ti": "Ti4+/Ti3+",
+    "Cr": "Cr3+/Cr2+",
+    "Mn": "Mn2+/Mn3+",
+    "V": "V3+/V4+/V5+",
+    "Eu": "Eu3+/Eu2+",
+    "Ce": "Ce4+/Ce3+",
+    "S": "S2-/S6+",
+    "Ga": "Ga3+/Ga+",
+}
+
+# Parent-oxide basis tokens already printed on rows. single_cation is a
+# different activity and is not converted into this set.
+_PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
 
 
-def _redox_components(composition: Mapping) -> tuple[str, ...]:
-    present = []
+@dataclass(frozen=True)
+class EngineReportedActivity:
+    """The activity number this engine reports. A row must match it.
+
+    alphaMELTS ``activity_from_chem_potential`` is pure-liquid-endmember
+    activity. The oxide-component fallback is not that standard state.
+    IMCC ``parent_activity`` is relative to the pure liquid oxide on the
+    parent basis, not the single-cation basis. Nothing here converts one
+    convention into the other.
+    """
+
+    reported: str
+    convention: ReferenceStateConvention
+    phase: Phase
+    component_bases: frozenset[str]
+
+
+_ENGINE_REPORTED_ACTIVITY = {
+    engine: EngineReportedActivity(
+        "raoultian_pure_liquid_endmember",
+        ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+        Phase.L,
+        _PARENT_OXIDE_COMPONENT_BASES,
+    )
+    for engine in ("alphamelts", "thermoengine")
+}
+_ENGINE_REPORTED_ACTIVITY.update({
+    engine: EngineReportedActivity(
+        "raoultian_pure_liquid_oxide_parent",
+        ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+        Phase.L,
+        _PARENT_OXIDE_COMPONENT_BASES,
+    )
+    for engine in ("imcc_sf04", "imcc_sf04_ext")
+})
+
+
+def _oxide_lookup_key(name: str) -> str:
+    key = str(name).strip()
+    if key.endswith("_Liq"):
+        key = key[:-4]
+    # FeO* is total iron written as FeO. The MELTS alias map keys FeO, not the star.
+    if key.endswith("*"):
+        key = key[:-1]
+    return key
+
+
+def _elements_of_component(name: str) -> frozenset[str]:
+    """Elements in one composition name or species formula.
+
+    Iron aliases come from the MELTS basis map (FeO_tot, FeOT, FeO_total,
+    and the same keys in any case). A name the map does not know is parsed
+    as a formula, which is how TiO2, V2O3, and Ga reach the element table.
+    """
+
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+    from simulator.reference_data.janaf import formula_composition
+
+    key = _oxide_lookup_key(name)
+    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
+    # FeO_total does not parse: the underscore is not a formula token.
+    # Every MELTS total-iron alias is total Fe expressed as FeO.
+    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
+    parsed = formula_composition(formula)
+    if not parsed:
+        return frozenset()
+    return frozenset(element for element, _count in parsed)
+
+
+def _is_multivalent(name: str) -> bool:
+    return any(element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name))
+
+
+def _redox_components(composition: Mapping, species: str | None = None) -> tuple[str, ...]:
+    """Names that hold a multivalent element at a positive amount, plus the species.
+
+    A printed zero does not count, so FeO = 0 cannot hide TiO2.
+    """
+
+    present: list[str] = []
     for name, amount in composition.items():
-        if str(name) not in _REDOX_PARTITIONED_COMPONENTS:
-            continue
         try:
             number = Decimal(str(amount))
         except (ArithmeticError, ValueError):
             continue
-        if number > 0:
+        if number <= 0:
+            continue
+        if _is_multivalent(str(name)):
             present.append(str(name))
+    if species and _is_multivalent(species) and species not in present:
+        present.append(species)
     return tuple(sorted(present))
+
+
+def _reference_matches(state: StandardState, reported: EngineReportedActivity) -> bool:
+    return (
+        state.convention is reported.convention
+        and phase_token(state.endmember) is reported.phase
+        and state.component_basis in reported.component_bases
+    )
+
+
+def _reference_labels(state: StandardState, reported: str) -> tuple[str, str]:
+    phase = phase_token(state.endmember)
+    phase_name = phase.value if phase is not None else "phase_unknown"
+    return f"{state.convention.value}:{phase_name}:{state.component_basis}", reported
+
+
+def _reference_gap(state: StandardState, reported: str) -> ReadinessGap:
+    row, engine = _reference_labels(state, reported)
+    return ReadinessGap("reference_state", GapReason.REFERENCE_STATE_MISMATCH, (row, engine))
 
 
 def _melt_composition(inputs: ConsumerInputs) -> WaypointResult:
@@ -173,10 +296,12 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
 def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
     """Activity and activity-coefficient requests for engines that report activities.
 
-    Required: a normalized composition and a point temperature. An oxygen
-    point is required only when that composition contains iron. Pressure and
-    the gas boundary are not inputs. A missing required input is a typed gap;
-    nothing here is defaulted.
+    Required: a normalized composition, a point temperature, and a reference
+    state that matches the activity that engine reports. An oxygen point is
+    required when the composition or the measured species holds a multivalent
+    element. Pressure and the gas boundary are not inputs. A missing required
+    input is a typed gap. A missing oxygen point is not filled: the scorer
+    must not substitute PO2_ENGINE_DEFAULT for an activity comparison.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -184,14 +309,14 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
     if not inputs.melt_activity:
         return tuple(_not_applicable(provenance, engine) for engine in MELT_ACTIVITY_ENGINES)
-    if not inputs.reference_state_known:
+    if not inputs.reference_state_known or not isinstance(inputs.reference_state, StandardState):
         # A vapour-referenced or untyped standard state is not a(oxide).
         # Excluded, not run with a guessed convention.
         gap = ReadinessGap(
             "reference_state", GapReason.MISSING_EVIDENCE, ("identity.reference_state",),
         )
         return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
-
+    state = inputs.reference_state
     composition = _melt_composition(inputs)
     gaps: list[ReadinessGap] = []
     if composition.selected is not None and len(composition.selected.value) == 1:
@@ -218,7 +343,9 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             gaps.append(point_gap)
     redox: tuple[str, ...] = ()
     if composition.selected is not None:
-        redox = _redox_components(composition.selected.value)
+        redox = _redox_components(composition.selected.value, inputs.measured_species)
+    elif inputs.measured_species and _is_multivalent(inputs.measured_species):
+        redox = (inputs.measured_species,)
     if redox:
         oxygen = inputs.waypoints["oxygen_condition"]
         if oxygen.selected is None:
@@ -236,6 +363,16 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
+        if not _reference_matches(state, reported_activity):
+            # Henrian, 1 wt%, a pure solid, a gas endmember, and a single-cation
+            # basis do not match this engine. Name both conventions. Do not convert.
+            results.append(_not_applicable(
+                provenance,
+                engine,
+                (_reference_gap(state, reported_activity.reported),),
+            ))
+            continue
         readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
         if status is not ReadinessStatus.READY:
             results.append(GeneratedInput(readiness, None, provenance))
@@ -250,10 +387,13 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             if temperature_K <= 0 or not any(moles.values()):
                 raise UnsupportedValue("physical_inputs")
             # Celsius = kelvin - 273.15. 1500 K -> 1226.85 C. Derived, never printed.
+            reported = reported_activity.reported
             payload = {
                 "engine": engine,
+                "quantity": inputs.activity_quantity,
                 "temperature_C": float(temperature_K - Decimal("273.15")),
                 "composition_mol": moles,
+                "reference_state": reported,
             }
             routes = {
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
@@ -263,6 +403,11 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "route": composition.selected.route,
                 },
                 "pressure_bar": {"authority": "not_an_input", "reason": "condensed-phase activity; PV term omitted"},
+                "quantity": {"waypoint": "identity.quantity"},
+                "reference_state": {
+                    "waypoint": "identity.reference_state",
+                    "engine_reports": reported,
+                },
             }
             if redox:
                 oxygen_log = _point(inputs, "oxygen_condition")
@@ -272,6 +417,28 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
     return tuple(results)
+
+
+def activity_request_for_engine(experiment, observation, engine: str) -> GeneratedInput | None:
+    """One engine's melt-activity contract for this observation.
+
+    The scorer calls this before it would fill a missing fO2. A gap here is
+    a typed refusal. PO2_ENGINE_DEFAULT is not an oxygen input.
+    """
+
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.enums import BenchIdentityBasis
+    from simulator.battery.records import Bench, BenchIdentity
+
+    bench = Bench(
+        getattr(experiment, "bench_id", None) or observation.observation_id or "melt-activity",
+        getattr(experiment, "work_id", None) or observation.source_id or "melt-activity",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    for item in melt_activity_requests(collect_consumer_inputs(experiment, bench, observation)):
+        if item.readiness.engine == engine:
+            return item
+    return None
 
 
 def kems_case(inputs: ConsumerInputs) -> GeneratedInput:
