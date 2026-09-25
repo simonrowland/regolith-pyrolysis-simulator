@@ -889,3 +889,191 @@ def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
     assert match_reported_species("Na2O", {"Na": 0.2, "K": 0.03, "Fe": 0.25}, oxide_activity=True) is None
     assert match_reported_species("Na", {"Na": 0.08}, oxide_activity=True) is None
     assert match_reported_species("Na", {"Na": 0.08}) == ("Na", 0.08)
+
+
+def _fake_engine(monkeypatch, activities, gammas=None):
+    opened: list[str] = []
+
+    def _open(name):
+        opened.append(name)
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": dict(activities),
+            "melt_activity_coefficients": dict(gammas or {}),
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return opened
+
+
+def test_h2o_endmember_activity_is_the_reported_label(monkeypatch):
+    """H2O is admitted for MELTS, and the reported H2O label is the activity.
+
+    IMCC does not report a(H2O). The activity coefficient of that same
+    label stays the coefficient. The 14-oxide diagnostic map is untouched.
+    """
+
+    from engines.alphamelts.domain import (
+        MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
+        canonical_oxide_activity_map,
+        melts_endmember_to_parent_oxide_activity,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    present, present_reason = melts_endmember_to_parent_oxide_activity({"H2O": 0.3}, "H2O")
+    liquid, _liquid_reason = melts_endmember_to_parent_oxide_activity({"H2O_Liq": 0.31}, "H2O")
+    assert present == pytest.approx(0.3)
+    assert present_reason == ""
+    assert liquid == pytest.approx(0.31)
+    assert "H2O" not in canonical_oxide_activity_map({"H2O": 0.3, "SiO2_Liq": 0.42})
+
+    experiment, bench, observation = _case(
+        composition=_composition(("H2O", "0.2"), ("SiO2", "0.8")),
+        formula="H2O",
+    )
+    results = _by_engine(_melt(experiment, bench, observation))
+    for engine in _MELTS_ACTIVITY:
+        item = results[engine]
+        assert item.readiness.status is ReadinessStatus.READY
+        assert item.payload is not None
+        assert "fO2_log" not in item.payload
+    for engine in _IMCC_ACTIVITY:
+        item = results[engine]
+        assert item.payload is None
+        assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+        gap = item.readiness.gaps[0]
+        assert "H2O" in gap.missing[0]
+        assert "not_imcc_parent_oxide" in gap.missing[1]
+        assert MELTS_PARENT_OXIDE_NOT_ENDMEMBER not in gap.missing[1]
+
+    opened = _fake_engine(
+        monkeypatch,
+        {"H2O": 0.3, "SiO2_Liq": 0.42, "Na": 0.08},
+        {"H2O": 1.7},
+    )
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        prediction = predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+        assert prediction.value == Decimal("0.3")
+        assert prediction.value != Decimal("0.42")
+        assert "no positive activity" not in str(prediction.refusal_detail)
+    imcc_before = len(opened)
+    imcc = predict_with_engine(
+        Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
+    )
+    assert imcc.value is None
+    assert imcc.value != Decimal("0.3")
+    assert len(opened) == imcc_before
+
+    coefficient_observation = replace(
+        observation,
+        identity=replace(observation.identity, quantity=State.of(Quantity.ACTIVITY_COEFFICIENT)),
+    )
+    coefficient = predict_with_engine(
+        Engine.ALPHAMELTS, coefficient_observation, experiment=experiment, isolated=False,
+    )
+    assert coefficient.value == Decimal("1.7")
+
+
+def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypatch):
+    """Endmember SiO2 is the compared formula. Species Na2O and Na2SiO3 are not.
+
+    A raw element species stays unmatched: the admitted oxide is not
+    substituted for Na.
+    """
+
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    composition = _composition(("Na2O", "0.4"), ("SiO2", "0.6"))
+
+    def _score(engine, species, activities, gammas=None, quantity=Quantity.ACTIVITY):
+        _fake_engine(monkeypatch, activities, gammas)
+        experiment, _bench, observation = _case(
+            composition=composition,
+            formula="SiO2",
+            species_formula=species,
+            quantity=quantity,
+        )
+        return predict_with_engine(
+            engine, observation, experiment=experiment, isolated=False,
+        )
+
+    imcc_compound_only = _score(Engine.IMCC_SF04, "Na2SiO3", {"Na2SiO3": 0.2})
+    assert imcc_compound_only.value is None
+    assert imcc_compound_only.value != Decimal("0.2")
+    assert imcc_compound_only.refusal_detail["formula"] == "SiO2"
+
+    melts_both = _score(
+        Engine.ALPHAMELTS,
+        "Na2O",
+        {"Na2O": 0.2, "SiO2_Liq": 0.42, "Na": 0.08},
+    )
+    assert melts_both.value == Decimal("0.42")
+    assert melts_both.value != Decimal("0.2")
+    assert melts_both.value != Decimal("0.08")
+
+    melts_only_parent = _score(Engine.ALPHAMELTS, "Na2O", {"Na2O": 0.2})
+    assert melts_only_parent.value is None
+    assert melts_only_parent.value != Decimal("0.2")
+    assert melts_only_parent.refusal_detail["formula"] == "SiO2"
+
+    imcc_both = _score(
+        Engine.IMCC_SF04,
+        "Na2O",
+        {"Na2O": 0.2, "SiO2": 0.55},
+    )
+    assert imcc_both.value == Decimal("0.55")
+    assert imcc_both.value != Decimal("0.2")
+
+    imcc_compound = _score(
+        Engine.IMCC_SF04,
+        "Na2SiO3",
+        {"Na2SiO3": 0.2, "SiO2": 0.55},
+    )
+    assert imcc_compound.value == Decimal("0.55")
+    assert imcc_compound.value != Decimal("0.2")
+
+    melts_compound = _score(
+        Engine.ALPHAMELTS,
+        "Na2SiO3",
+        {"Na2SiO3": 0.2, "SiO2_Liq": 0.42},
+    )
+    assert melts_compound.value == Decimal("0.42")
+    assert melts_compound.value != Decimal("0.2")
+
+    coefficient = _score(
+        Engine.IMCC_SF04,
+        "Na2SiO3",
+        {"Na2SiO3": 0.2, "SiO2": 0.55},
+        {"Na2SiO3": 9.9, "SiO2": 1.5},
+        Quantity.ACTIVITY_COEFFICIENT,
+    )
+    assert coefficient.value == Decimal("1.5")
+    assert coefficient.value != Decimal("9.9")
+    assert coefficient.value != Decimal("0.2")

@@ -536,11 +536,14 @@ def melts_endmember_to_parent_oxide_activity(
     endmember* (Raoultian). The bench set scores parent-oxide activities
     ``a(SiO2)``, ``a(Al2O3)``, ``a(CaO)``, ``a(MgO)``.
 
-    Algebra, identity case: SiO2, TiO2, Al2O3, and Fe2O3 *are* liquid
-    endmembers, so the parent-oxide activity is the reported endmember
-    activity. ``a_parent = a_endmember``. Both sides are dimensionless.
-    Sanity: if the engine reports ``a(SiO2)=0.42``, the parent-oxide
-    value is 0.42; at the pure-SiO2 limit both are 1.
+    Algebra, identity case: SiO2, TiO2, Al2O3, Fe2O3, and H2O *are*
+    liquid endmembers, so the parent-oxide activity is the reported
+    endmember activity. ``a_parent = a_endmember``. Both sides are
+    dimensionless. Sanity: if the engine reports ``a(SiO2)=0.42``, the
+    parent-oxide value is 0.42; at the pure-SiO2 limit both are 1.
+    H2O is not in the 14-oxide composition basis, so the basis
+    canonical name does not see an ``H2O`` or ``H2O_Liq`` label. The
+    identity still holds: the label is the endmember.
 
     Algebra, compound case: CaO is not an endmember. The Ca-bearing
     liquid endmembers are CaSiO3 and Ca3(PO4)2. Component inversion
@@ -559,18 +562,27 @@ def melts_endmember_to_parent_oxide_activity(
     oxides that exist only inside compound endmembers (Na2O, K2O, FeO,
     ...).
 
-    Therefore: identity when the parent is a reported oxide endmember;
-    typed refusal otherwise, naming the compound carriers.
+    Therefore: identity when the parent is a reported oxide endmember.
+    A same-named key is not that identity for any other oxide. Na2O,
+    CaO, MgO, FeO, and K2O are typed refusals even when the map
+    contains their names. Typed refusal otherwise, naming the compound
+    carriers.
     """
     parent = canonical_melt_oxide_activity_name(parent_oxide)
     if parent is None:
-        parent = str(parent_oxide).strip()
+        parent = _liquid_oxide_endmember_label(parent_oxide) or str(parent_oxide).strip()
     if not parent:
         return None, f'{MELTS_PARENT_OXIDE_NOT_ENDMEMBER}: empty parent oxide'
 
-    reported_labels = tuple(str(label) for label in endmember_activities)
+    # Membership before the number. A literal Na2O key is not a(Na2O):
+    # Na2O is not a liquid endmember.
+    if parent not in MELTS_LIQUID_OXIDE_ENDMEMBERS:
+        return _parent_oxide_not_endmember(parent, endmember_activities)
+
     for label, raw in endmember_activities.items():
         oxide = canonical_melt_oxide_activity_name(label)
+        if oxide is None and _liquid_oxide_endmember_label(label) == parent:
+            oxide = parent
         if oxide != parent:
             continue
         try:
@@ -580,15 +592,35 @@ def melts_endmember_to_parent_oxide_activity(
         if value > 0.0 and math.isfinite(value):
             return value, ''
 
+    return None, f'engine returned no positive activity for {parent}'
+
+
+def _liquid_oxide_endmember_label(name: object) -> str | None:
+    """Oxide endmember label, including H2O outside the 14-oxide basis."""
+
+    key = str(name).strip().strip('"\'')
+    if not key:
+        return None
+    match = re.match(r'^(?:a|activity)\(([^)]+)\)$', key, flags=re.IGNORECASE)
+    if match:
+        key = match.group(1).strip()
+    if key.endswith('_Liq'):
+        key = key[:-4]
+    if key in MELTS_LIQUID_OXIDE_ENDMEMBERS:
+        return key
+    return None
+
+
+def _parent_oxide_not_endmember(
+    parent: str,
+    endmember_activities: Mapping[str, float],
+) -> tuple[float | None, str]:
+    reported_labels = tuple(str(label) for label in endmember_activities)
     model_carriers = tuple(
         endmember
         for endmember, oxides in MELTS_LIQUID_COMPOUND_ENDMEMBER_PARENTS.items()
         if parent in oxides
     )
-    if parent in MELTS_LIQUID_OXIDE_ENDMEMBERS:
-        return None, (
-            f'engine returned no positive activity for {parent}'
-        )
     if model_carriers:
         reported_carriers = tuple(
             label
