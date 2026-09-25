@@ -56,6 +56,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     map_phase,
     map_quantity,
+    QUANTITY_ALIASES,
     compilation_quantity_from_record,
     choose_read_from,
     is_compilation_record_path,
@@ -2923,6 +2924,118 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     )
     assert not bad.is_value
     assert reason and "not_hkl" in reason or "Olette" in (reason or "") or "outside" in (reason or "")
+
+
+@pytest.mark.parametrize(
+    ("alias", "expected"),
+    [
+        ("pure_vapor_pressure", Quantity.P_SAT),
+        ("partial_pressure_figure_only", Quantity.P_PARTIAL),
+        ("partial_pressure_overlay_figure_only", Quantity.P_PARTIAL),
+        ("partial_pressure_O2", Quantity.P_PARTIAL),
+        ("partial_pressure_CsBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_LiBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_NaBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_Mg", Quantity.P_PARTIAL),
+        ("partial_pressure_O", Quantity.P_PARTIAL),
+        ("partial_pressure_SiO", Quantity.P_PARTIAL),
+        ("partial_pressure_over_illite", Quantity.P_PARTIAL),
+        ("partial_pressure_series", Quantity.P_PARTIAL),
+        ("partial_pressure_vs_setpoint_T", Quantity.P_PARTIAL),
+        ("P_Na_over_soda_lime_glass", Quantity.P_PARTIAL),
+        ("undetected_radionuclide_partial_pressure_limit", Quantity.P_PARTIAL),
+        ("undetected_radionuclide_simulant_partial_pressure", Quantity.P_PARTIAL),
+        ("raoultian_activity", Quantity.ACTIVITY),
+        ("henrian_activity", Quantity.ACTIVITY),
+        ("apparent_gamma_K2O", Quantity.ACTIVITY_COEFFICIENT),
+        ("henrian_activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
+        ("evaporation_coefficient_gamma_Si", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
+        ("mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("total_integrated_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("total_gas_evolution_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("isothermal_hold_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("water_released_during_drying", Quantity.MASS_LOSS_FRACTION),
+        ("dta_transition_temperatures", Quantity.TRANSITION_TEMPERATURE),
+        ("invariant_transformation_temperature", Quantity.TRANSITION_TEMPERATURE),
+        ("invariant_transformation_temperature_range", Quantity.TRANSITION_TEMPERATURE),
+        ("pure_Fe_melting_onset", Quantity.TRANSITION_TEMPERATURE),
+        ("solidus", Quantity.TRANSITION_TEMPERATURE),
+        ("composition_dependent_solidus_points", Quantity.TRANSITION_TEMPERATURE),
+        ("miscibility_gap_temperature", Quantity.TRANSITION_TEMPERATURE),
+        ("measured_KEMS_ion_intensities", Quantity.ION_INTENSITY),
+        ("ion_count_rate", Quantity.ION_INTENSITY),
+        ("ion_intensity_isotherm", Quantity.ION_INTENSITY),
+        ("ion_intensity_arrest_curve", Quantity.ION_INTENSITY),
+        ("ion_intensity_monovariant_solidus_liquidus", Quantity.ION_INTENSITY),
+        ("ion_intensity_vs_time_cooling", Quantity.ION_INTENSITY),
+        ("ion_intensity_vs_time_heating", Quantity.ION_INTENSITY),
+        ("I_T_vs_time_figure_only", Quantity.ION_INTENSITY),
+        ("ion_current", Quantity.ION_INTENSITY),
+        ("relative_ion_intensity", Quantity.ION_INTENSITY_RATIO),
+        ("I+_Al / I+_Fe vs chamber voltage", Quantity.ION_INTENSITY_RATIO),
+        ("ion_current_ratio_vs_time", Quantity.ION_INTENSITY_RATIO),
+        ("ion_current_ratio_vs_T", Quantity.ION_INTENSITY_RATIO),
+        ("ion_intensity_ratio_Mg_Fe_figure_only", Quantity.ION_INTENSITY_RATIO),
+        (
+            "Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system",
+            Quantity.ION_INTENSITY_RATIO,
+        ),
+        (
+            "Fig. 3. Experimental values of the ion current ratio for the Fe-S system",
+            Quantity.ION_INTENSITY_RATIO,
+        ),
+        ("Fig. 3. Temperature dependence of the ion current ratio", Quantity.ION_INTENSITY_RATIO),
+        ("Fig. 4. Ion current ratios for the Fe-P system at 1600 C", Quantity.ION_INTENSITY_RATIO),
+        ("Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.", Quantity.ION_INTENSITY_RATIO),
+        ("second_law_enthalpy_of_vaporization", Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW),
+    ],
+)
+def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
+    assert QUANTITY_ALIASES[alias] is expected
+
+
+def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
+    cases = [
+        (
+            "pure_vapor_pressure",
+            {"quantity": "pure_vapor_pressure", "points": [{"T_K": 1400, "p_atm": 1.0}]},
+            None,
+            Quantity.P_SAT,
+        ),
+        (
+            "raoultian_activity",
+            {"quantity": "raoultian_activity", "activity": 0.2},
+            "dimensionless",
+            Quantity.ACTIVITY,
+        ),
+        (
+            "solidus",
+            {"quantity": "solidus", "T_K": 2050},
+            "K",
+            Quantity.TRANSITION_TEMPERATURE,
+        ),
+        (
+            "ion_count_rate",
+            {"quantity": "ion_count_rate", "count_rate": 12.0},
+            "counts/s",
+            Quantity.ION_INTENSITY,
+        ),
+        (
+            "relative_ion_intensity",
+            {"quantity": "relative_ion_intensity", "ratio": 1.5},
+            "dimensionless",
+            Quantity.ION_INTENSITY_RATIO,
+        ),
+        (
+            "second_law_enthalpy_of_vaporization",
+            {"quantity": "second_law_enthalpy_of_vaporization", "value": 42.0},
+            "kcal/mol",
+            Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
+        ),
+    ]
+    for alias, values, units, expected in cases:
+        state, reason = map_quantity(None, values, units=units)
+        assert state.is_value and state.value is expected, (alias, state, reason)
 
 
 _TYPE_CONTRADICTIONS = [
