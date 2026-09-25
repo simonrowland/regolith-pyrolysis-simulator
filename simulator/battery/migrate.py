@@ -9064,17 +9064,38 @@ class Migrator:
                         observation_id=obs_id,
                     )
                 else:
-                    ident_kwargs["total_pressure_Pa"] = State.unknown(
-                        "source does not state a numeric total_pressure_Pa"
+                    # Explicit unknown point_conditions is the stated absence.
+                    raw_pc = obs.get("point_conditions")
+                    raw_pressure = (
+                        raw_pc.get("total_pressure_Pa")
+                        if isinstance(raw_pc, Mapping)
+                        else None
                     )
-                    self.result.add_queue(
-                        work.work_id,
-                        locator,
-                        ["total_pressure_Pa"],
-                        "source does not state a numeric total_pressure_Pa",
-                        source=source_key,
-                        observation_id=obs_id,
+                    raw_state = (
+                        raw_pressure.get("state")
+                        if isinstance(raw_pressure, Mapping)
+                        else None
                     )
+                    stated_reason = (
+                        raw_state.get("reason")
+                        if isinstance(raw_state, Mapping)
+                        and str(raw_state.get("tag") or "") == StateTag.UNKNOWN.value
+                        else None
+                    )
+                    if isinstance(stated_reason, str) and stated_reason.strip():
+                        ident_kwargs["total_pressure_Pa"] = State.unknown(stated_reason)
+                    else:
+                        ident_kwargs["total_pressure_Pa"] = State.unknown(
+                            "source does not state a numeric total_pressure_Pa"
+                        )
+                        self.result.add_queue(
+                            work.work_id,
+                            locator,
+                            ["total_pressure_Pa"],
+                            "source does not state a numeric total_pressure_Pa",
+                            source=source_key,
+                            observation_id=obs_id,
+                        )
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
             value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):

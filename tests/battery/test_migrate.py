@@ -3801,12 +3801,50 @@ def test_registry_extracts_migrate_and_load_typed_observations(tmp_path: Path) -
     assert temperature.state.is_value
     assert temperature.state.value.kind is ValueKind.INTERVAL
 
+    # Table 2 prints no operating pressure. The extract records that as
+    # point_conditions.total_pressure_Pa unknown/not_published, and the
+    # identity must carry that state rather than a contradictory absence claim.
+    standards = (
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_fe_a4_standard",
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_fe_melting_standard",
+        "ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard",
+    )
+    for oid in standards:
+        pressure = result.observations[oid].identity.total_pressure_Pa
+        assert pressure is not None and pressure.is_unknown
+        assert pressure.reason == "not_published"
+        assert pressure.value is None
+        assert not any(
+            entry.observation_id == oid
+            and entry.why == "source does not state a numeric total_pressure_Pa"
+            for entry in result.queue
+        )
+    table4 = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.startswith(
+            "ueshima-1982-fe-mo-thermal::ueshima_1982_table4_thermal_analysis"
+        )
+    ]
+    assert table4
+    assert all(
+        obs.identity.total_pressure_Pa is not None
+        and obs.identity.total_pressure_Pa.is_unknown
+        and obs.identity.total_pressure_Pa.reason
+        == "source does not state a numeric total_pressure_Pa"
+        for obs in table4
+    )
+
     works, loaded_experiments, loaded_observations = load_migrated_store(root)
     assert works and loaded_experiments and loaded_observations
     assert any(
         obs.source_id == "ueshima-1982-fe-mo-thermal"
         for obs in loaded_observations.values()
     )
+    for oid in standards:
+        loaded = loaded_observations[oid].identity.total_pressure_Pa
+        assert loaded is not None and loaded.is_unknown
+        assert loaded.reason == "not_published"
     assert (
         "10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series"
         in loaded_experiments
