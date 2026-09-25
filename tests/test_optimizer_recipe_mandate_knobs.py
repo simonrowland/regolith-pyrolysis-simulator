@@ -110,7 +110,9 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     hot_duct = metals_train["stage_0_hot_duct"]
     c2a_continuous = setpoints["campaigns"]["C2A_continuous"]
 
-    assert hot_duct["temp_range_C"][0] == OVERHEAD_HOT_WALL_MIN_C
+    # The stage-0 hardware band remains 1400-1600 C; it is not an optimizer
+    # violation threshold.
+    assert hot_duct["temp_range_C"] == [1400, 1600]
     # SINGLE SOURCE OF TRUTH: the duct is built of the furnace material, so its
     # service ceiling is that material's rating and the YAML row must NOT restate
     # it. The row used to carry `max_service_T_C: 1750` (Doloma-REE) and this test
@@ -122,12 +124,8 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     assert "max_service_T_C" not in hot_duct
     assert OVERHEAD_HOT_WALL_MAX_C == FURNACE_MAX_T_BOUNDS_C[1]
     # Offset floor is derived against the FURNACE ceiling, not C2A_continuous's
-    # own declared range. A knob bound must admit the worst case the optimizer can
-    # command, and campaigns.py caps every run at the furnace ceiling -- so the
-    # liner must be able to reach its 1400 C floor even from the hottest melt the
-    # hardware allows. Widening the floor cannot breach a safety limit: the liner
-    # minimum is enforced on the absolute liner knob (asserted below), and a
-    # COOLER-than-reachable gas was already permissible at every melt temperature.
+    # own declared range. A knob bound admits the lowest downstream envelope;
+    # per-species dew point, not a uniform temperature, decides the wall gate.
     assert (
         OVERHEAD_HEADSPACE_OFFSET_MIN_K
         == OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
@@ -179,6 +177,9 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
         "stage_6_to_stage_7": (stage_ranges[7][0], stage_ranges[6][1]),
     }
     assert dict(OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C) == downstream_bounds
+    assert OVERHEAD_HOT_WALL_MIN_C == min(
+        low for low, _high in downstream_bounds.values()
+    )
     for segment_name, (low, high) in downstream_bounds.items():
         spec = schema.spec_for(
             _path(
