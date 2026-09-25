@@ -410,7 +410,12 @@ RAIL_MAP = {
 
 METHOD_TOKENS = {m.value: m for m in MethodToken}
 REGIME_TO_METHOD = {
-    "kems_effusion": None,  # insufficient by spec; page_grounded
+    # These extract labels all describe the Knudsen-effusion mass-spectrometric
+    # pressure method; the closed schema token is KNUDSEN_EFFUSION.
+    "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
+    "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
+    "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
+    "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,

@@ -591,20 +591,23 @@ def test_richter_langmuir_alpha_still_fails_exposed_area() -> None:
     ).passed
 
 
-def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
+@pytest.mark.parametrize("quantity", (Quantity.P_PARTIAL, Quantity.P_SAT))
+def test_calibrated_kems_pressure_needs_no_effusion_geometry(quantity: Quantity) -> None:
+    calibrated = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=True
+    )
+    assert underdetermined_apparatus(calibrated, quantity).passed
+
     incomplete = F.kems_experiment(
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
-    gate = underdetermined_apparatus(incomplete, Quantity.P_PARTIAL)
+    gate = underdetermined_apparatus(incomplete, quantity)
     assert gate.passed is False
     assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert gate.primary_check == "geometry_determinants"
-    missing = next(
-        c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
-    )
-    assert "orifice_area_m2" in missing
-    assert "clausing_factor" in missing
-    assert "calibration" in missing
+    assert gate.primary_check == "kems_calibration"
+    check = next(c for c in gate.checks if c.name == "kems_calibration")
+    assert check.detail["missing"] == ["calibration"]
+    assert "calibration" in check.detail["reason"]
 
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_PARTIAL).passed
@@ -620,6 +623,27 @@ def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
     )
     outcome = run_validity_gates(complete, ref)
     assert outcome.passed is True
+
+
+def test_knudsen_absolute_flux_requires_orifice_area() -> None:
+    exp = F.kems_experiment(orifice_area=None, clausing=None)
+    assert exp.apparatus is not None
+    exp = replace(
+        exp,
+        apparatus=replace(
+            exp.apparatus,
+            geometry=ApparatusGeometry(
+                exposed_area_m2=Located(State.of(Decimal("1e-4"))),
+            ),
+        ),
+    )
+    gate = underdetermined_apparatus(exp, Quantity.MASS_LOSS_RATE)
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    missing = next(
+        c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
+    )
+    assert "orifice_area_m2" in missing
 
 
 def test_battery_score_script_runs_status_diff() -> None:

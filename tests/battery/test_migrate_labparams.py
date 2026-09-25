@@ -30,6 +30,10 @@ from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
     [
         ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
         ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
+        ("kems_effusion", MethodToken.KNUDSEN_EFFUSION),
+        ("kems_effusion_compiled_experiment", MethodToken.KNUDSEN_EFFUSION),
+        ("kems_effusion_method_context", MethodToken.KNUDSEN_EFFUSION),
+        ("kems_effusion_review_compilation", MethodToken.KNUDSEN_EFFUSION),
     ],
 )
 def test_printed_method_aliases_map_to_closed_tokens(

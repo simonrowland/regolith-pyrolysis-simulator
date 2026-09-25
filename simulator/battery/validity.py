@@ -17,11 +17,12 @@ Ambiguity resolutions:
   effusion; the background-high gate does not double-count).
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
-- Apparatus determinants are those the actual derivation needs: effusion
-  pressure requires orifice area + Clausing/geometry; Langmuir
-  pressure/alpha requires exposed area. Determinants must be grounded
-  VALUES (unknown calibration fails), physically valid (area > 0,
-  Clausing in (0, 1]), and present for TGA/solar/vacuum kinetic area.
+- Apparatus determinants are those the actual derivation needs: calibrated
+  KEMS p_partial/p_sat requires a grounded calibration but no orifice
+  geometry; absolute-flux effusion and Langmuir pressure/alpha require their
+  respective geometry. Determinants must be grounded VALUES (unknown
+  calibration fails), physically valid (area > 0, Clausing in (0, 1]), and
+  present for TGA/solar/vacuum kinetic area.
   Missing required geometry is ``underdetermined_apparatus``. Unknown
   method is ``method_unknown`` when the quantity class is one the schema
   scopes by method (effusion pressure, Langmuir pressure/alpha,
@@ -186,6 +187,13 @@ def _is_effusion_pressure(method: MethodToken, quantity: Quantity) -> bool:
     }
 
 
+def _is_kems_calibrated_pressure(method: MethodToken, quantity: Quantity) -> bool:
+    return method is MethodToken.KNUDSEN_EFFUSION and quantity in {
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+    }
+
+
 def _is_langmuir_pressure_or_alpha(method: MethodToken, quantity: Quantity) -> bool:
     return method is MethodToken.LANGMUIR_FREE_EVAPORATION and quantity in {
         Quantity.P_SAT,
@@ -275,7 +283,33 @@ def underdetermined_apparatus(
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
-    if _is_effusion_pressure(method, quantity):
+    if _is_kems_calibrated_pressure(method, quantity):
+        # Knudsen-effusion mass spectrometry uses the calibrated pressure
+        # relation P_i = k_i I_i^+ T.  k_i comes from a calibration (for
+        # example, a reference vaporization such as Ag, or a weight-loss
+        # calibration), so this route needs neither orifice area nor a
+        # Clausing factor. Those geometry terms enter only the absolute-flux
+        # Hertz-Knudsen weight-loss route:
+        # p = (dm/dt)/(A W) * sqrt(2 pi R T / M).
+        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+        calibrated = _calibration_grounded(calibration)
+        checks.append(
+            GateCheck(
+                "kems_calibration",
+                calibrated,
+                {
+                    "missing": [] if calibrated else ["calibration"],
+                    "method": method.value,
+                    "quantity": quantity.value,
+                    "reason": None
+                    if calibrated
+                    else "KEMS pressure requires a recorded calibration",
+                },
+            )
+        )
+        if not calibrated:
+            return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
+    elif _is_effusion_pressure(method, quantity):
         if geometry is None:
             missing.extend(["orifice_area_m2", "clausing_factor"])
         else:
@@ -303,16 +337,17 @@ def underdetermined_apparatus(
             wall = None if experiment.apparatus is None else experiment.apparatus.wall
             if not wall or "temperature_K" not in wall or "material" not in wall:
                 missing.append("wall.temperature_K/material")
-        if geometry is None or (
+        if method is MethodToken.KNUDSEN_EFFUSION:
+            needs_orifice = geometry is None or _finite_positive(geometry.orifice_area_m2) is None
+            if needs_orifice and "orifice_area_m2" not in missing:
+                missing.append("orifice_area_m2")
+        elif geometry is None or (
             _finite_positive(geometry.exposed_area_m2) is None
             and _finite_positive(geometry.orifice_area_m2) is None
         ):
             if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
                 if "exposed_area_m2" not in missing:
                     missing.append("exposed_area_m2")
-            elif method is MethodToken.KNUDSEN_EFFUSION:
-                if "orifice_area_m2" not in missing:
-                    missing.append("orifice_area_m2")
             elif "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     checks.append(
