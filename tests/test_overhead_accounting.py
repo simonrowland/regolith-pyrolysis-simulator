@@ -957,16 +957,22 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
-    # supersaturated on the first two walls; segment-local depletion then
-    # leaves 0.913341865141524 kg for terminal conversion.
+    # 2026-09-25 wall-cluster round 4: CrO2 remains a stable-product backstop,
+    # not a pure-metal Antoine route. b-324 uses the rate boundary
+    # n_dot=available_kg/(M*3600); at stage 2 its executable
+    # eta_uncapped=5.741923273629473, so eta clamps to 1. The fixed 1 kg/h
+    # capture budget is then split by the stable-product HKL weights: wall
+    # total=0.03504679835238949 kg, stage-2 remainder=0.9649532016476106 kg,
+    # with segment shares 0.4705882352941176 and 0.5294117647058825. The
+    # prior 0.04078029875692986 / 0.045877836101546096 wall pins were the
+    # pre-b324 split, not a b-125 cold-wall misroute.
     assert wall_cro2_by_account_kg == pytest.approx(
         {
             "process.wall_deposit_segment_stage_0_to_stage_1": (
-                0.04078029875692986
+                0.01649261098935976
             ),
             "process.wall_deposit_segment_stage_1_to_stage_2": (
-                0.045877836101546096
+                0.01855418736302973
             ),
         },
         rel=1e-12,

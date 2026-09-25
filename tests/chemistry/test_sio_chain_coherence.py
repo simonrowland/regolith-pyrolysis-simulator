@@ -108,9 +108,11 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # tree (1.03186545664e-05). docs-private/research/2026-08-02-train13-adjudication.md
 # Rebaselined 2026-08-28 after 090d0481/a34318c made the live SiO2(g)
 # draw debit the same SiO2 pool used by the SiO-yield chain.
-# Moved with the 2026-09-22 Chapman-Enskog prefactor correction
-# (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
-PHASE3BIS_SIO_EVOLVED_KG = 1.04099243606e-05
+# 2026-09-25 wall-cluster round 4: executable Mac-Studio-256-1 fresh-green
+# capture agrees with the regenerated C2A fixture at 1.04097913286e-05 kg.
+# The prior 1.04099243606e-05 kg pin was stale versus that capture; the wall
+# cluster rebooks stage destinations but does not change evolved SiO.
+PHASE3BIS_SIO_EVOLVED_KG = 1.04097913286e-05
 
 
 @lru_cache(maxsize=None)
@@ -171,18 +173,11 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
         f'spread {spread:.6g} kg across {wall_t_sweep_c}, values {evolved}'
     )
 
-    # CLAIM 2, the absolute magnitude, which is a SNAPSHOT and ages. Pinned at
-    # 4705a2fd (2026-08-01, REPIN round 4) under the repaired MAGEMin config;
-    # 245 commits later, 25 of them touching condensation.py/evaporation.py,
-    # the tree evolves 1.05260475258e-05 kg, i.e. +2.0092%.
-    #
-    # Deliberately left RED rather than regenerated. Regenerating a pin BECAUSE
-    # it is red is a tautology -- it records nothing except that the code
-    # changed. A regen is legitimate only once an identified correctness fix is
-    # known to have moved the right answer, and that attribution across the 25
-    # rail commits has not been done. Owner-gated with the b-302 regen batch;
-    # the failure message says which claim is red so nobody has to re-derive
-    # this.
+    # CLAIM 2, the absolute magnitude. The 2026-09-25 fixture regen is an
+    # executable studio capture, not a value pasted from this assertion: fresh
+    # green and the b8d9bfca3 candidate agree at the pin above. The previous
+    # local constant was a stale snapshot, so this update does not attribute a
+    # physical SiO-evolution change to wall-stage rebooking.
     assert evolved[0] == pytest.approx(
         PHASE3BIS_SIO_EVOLVED_KG, rel=0.0, abs=5e-11
     ), (

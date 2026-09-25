@@ -290,9 +290,15 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # measured fix/HEAD ratio, about -1.103% on evolved kg:
 # lunar 1.05260475258e-05 -> 1.04099243606e-05,
 # mars 1.0653327814e-05 -> 1.05357832376e-05.
+# 2026-09-25 wall-cluster round 4: b8d9bfca3 regenerated these fixtures from
+# executable Mac-Studio-256-1 output. Fresh green studio capture kept evolved
+# SiO unchanged; the old constants were stale versus that capture, not moved
+# by the b-324 stage rebooking. Values and stale-snapshot deltas are:
+# lunar 1.04099243606e-05 -> 1.04097913286e-05 kg (-1.33032e-10 kg),
+# mars 1.05357832376e-05 -> 1.04873763032e-05 kg (-4.84069344e-08 kg).
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099243606e-05,
-    "mars_basalt": 1.05357832376e-05,
+    "lunar_mare_low_ti": 1.04097913286e-05,
+    "mars_basalt": 1.04873763032e-05,
 }
 
 
@@ -615,10 +621,18 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
 
     _assert_synthetic_sio_route_authority(route)
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
-    # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
-    # Wetzel/Gail evaporation-Arrhenius validity floor, so less vapor remains
-    # in offgas once it reaches cold stages.
+    # Round 4: stage 4 is not a SiO target. The species_not_targeted_by_stage
+    # pass-through is intentional: the designated stage gets the capture
+    # budget, while a non-target stage is omitted rather than published as a
+    # positive SiO carryover entry. The old positive assertion encoded the
+    # superseded pre-gate route and raised KeyError after the entry vanished.
+    assert route.condensed_by_stage_species.get(4, {}).get("SiO", 0.0) == pytest.approx(0.0)
+    stage_outcomes = route.condensation_refusals_by_species["SiO"]["stage_outcomes"]
+    assert any(
+        outcome.get("stage_number") == 4
+        and outcome.get("reason") == "species_not_targeted_by_stage"
+        for outcome in stage_outcomes
+    )
     assert route.remaining_by_species["SiO"] == pytest.approx(
         0.04275021936015011
     )

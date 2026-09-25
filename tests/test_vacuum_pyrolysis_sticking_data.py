@@ -297,19 +297,19 @@ def test_pressure_isolated_efficiency_refuses_invalid_stage_temperature_bounds(
         )
 
 
-def test_sio_stage_band_flux_uses_cold_wall_gate(
+def test_sio_stage_band_flux_uses_reactive_backstop_at_or_below_t_cond(
     monkeypatch,
     synthetic_sio_stage_authority,
 ):
-    valid_floor_K = _load_sticking_data()["species"]["SiO"]["value"][
-        "valid_range_K"
-    ][0]
-    captured_below_floor_alphas: list[float] = []
+    t_cond_K = condensation.CONDENSATION_TEMPS_C["SiO"] + 273.15
+    captured_cold_gate_calls: list[tuple[float, bool]] = []
     original_flux = condensation._series_resistance_deposition_flux_mol_m2_s
 
     def capture_flux(species, P_local_pa, T_surface_K, alpha_s, *args, **kwargs):
-        if species == "SiO" and T_surface_K < valid_floor_K:
-            captured_below_floor_alphas.append(float(alpha_s))
+        if species == "SiO" and T_surface_K <= t_cond_K:
+            captured_cold_gate_calls.append(
+                (float(alpha_s), bool(kwargs.get("reactive_product_backstop")))
+            )
         return original_flux(
             species,
             P_local_pa,
@@ -334,10 +334,13 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
 
     _assert_synthetic_sio_route_authority(route)
     assert route.condensed_for_species("SiO") > 0.0
-    assert captured_below_floor_alphas
-    assert captured_below_floor_alphas == pytest.approx(
-        [1.0] * len(captured_below_floor_alphas)
-    )
+    # The target stage's 900-1200 C band contains samples at or below its
+    # 1050 C routing temperature. These samples must use the cited reactive
+    # product backstop even though they remain above the Arrhenius valid-floor
+    # temperature. The superseded assertion watched non-target downstream
+    # stages, which the designated-stage pass-through correctly skips.
+    assert captured_cold_gate_calls
+    assert all(backstop for _, backstop in captured_cold_gate_calls)
 
 
 def test_non_sio_sticking_alpha_s_keeps_scalar_value():
