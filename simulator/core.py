@@ -4627,9 +4627,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise
             except Exception as exc:  # noqa: BLE001 - optional liquidus engines
                 # composition_projected is out-of-domain physics, not a missing
-                # liquidus. The floor (liquid_fraction = 1 above the Kress
-                # calibration) is only for a known absence. A refusal must
-                # not take that branch.
+                # liquidus. Usable projected bounds, a later ladder bound, or
+                # the named Kress floor are chosen inside _freeze_gate_curve.
+                # This branch must not treat the projection's exception as
+                # that floor: doing so arms liquidus_unavailable_floor_fallback
+                # and drops the named source.
                 if 'composition_projected' in str(exc):
                     raise
                 reason = str(exc)

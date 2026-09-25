@@ -20,6 +20,7 @@ from simulator.chemistry.kernel import (
 from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_referenced_log_fO2,
 )
 from simulator.melt_backend.base import MeltCompositionError
@@ -421,6 +422,16 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'MnO',
     'P2O5',
 ))
+# Lower authority when a projected bulk has no usable solidus/liquidus.
+# The projection is not this source: the calibration floor is.
+_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE = (
+    'kress91_liquid_calibration_floor'
+)
+# Curve schema requires solidus < liquidus. The floor is a step at the
+# calibration minimum (liquid strictly above it). This gap is below any
+# recipe temperature quantum, so interpolation matches
+# temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C.
+_KRESS91_FLOOR_OPEN_SIDE_C = 1.0e-6
 
 
 def _assert_runtime_alpha_source_not_vaporock(
@@ -1671,7 +1682,7 @@ class EvaporationMixin:
         for existing in stored:
             if _composition_projected_notice_key(existing) == key:
                 return
-        stored.append({
+        stored_notice = {
             'kind': notice.get('kind'),
             'reason': notice.get('reason'),
             'authority': notice.get('authority'),
@@ -1684,7 +1695,14 @@ class EvaporationMixin:
                 for row in (notice.get('dropped_components') or ())
                 if isinstance(row, Mapping)
             ],
-        })
+        }
+        # Present only when the projected bounds were not the curve. A
+        # usable projection keeps the historical notice shape.
+        if 'bounds_source' in notice:
+            stored_notice['bounds_source'] = notice.get('bounds_source')
+        if 'projected_bounds' in notice:
+            stored_notice['projected_bounds'] = notice.get('projected_bounds')
+        stored.append(stored_notice)
         self._composition_projected_liquidus_notices = stored
 
     def composition_projected_liquidus_run_notice(self) -> dict[str, Any] | None:
@@ -1711,14 +1729,12 @@ class EvaporationMixin:
         reasons: list[str],
         path: tuple = (),
     ) -> dict[str, Any] | None:
-        """Use the projected bulk's liquidus when that is what the ladder has.
+        """Use the projected bulk's liquidus only when its bounds are usable.
 
-        The freeze-gate runtime engine is MAGEMin (fallback for
-        GATE_LIQUID_FRACTION unless a MELTS backend was selected, in which
-        case MELTS already answered). Nothing else registered on this ladder
-        covers the ig-order drops, so category 3 predicts on the projected
-        bulk and names the drops. A refusal without those bounds is not a
-        curve and must not be reported as a missing liquidus.
+        Invalid or missing projected bounds are not a curve and do not arm
+        the Kress floor by themselves. The caller keeps the drop notice and
+        continues the ladder. A missing per-component fraction stays a typed
+        refusal from ``composition_projected_liquidus_notice``.
         """
         from simulator.melt_backend.magemin import (
             composition_projected_liquidus_notice,
@@ -1754,6 +1770,7 @@ class EvaporationMixin:
                 reasons=reasons,
             )
         if curve is None:
+            self._stash_invalid_projected_liquidus_notice(notice)
             if not any('composition_projected' in reason for reason in reasons):
                 reasons.append(
                     f'{source} composition_projected refusal has no '
@@ -1763,6 +1780,114 @@ class EvaporationMixin:
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
         return curve
+
+    def _stash_invalid_projected_liquidus_notice(
+        self,
+        notice: Mapping[str, Any],
+    ) -> None:
+        if getattr(self, '_invalid_projected_liquidus_notice', None) is not None:
+            return
+        self._invalid_projected_liquidus_notice = {
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+        }
+
+    def _invalid_projection_bounds_notice(
+        self,
+        notice: Mapping[str, Any],
+        *,
+        bounds_source: str,
+    ) -> dict[str, Any]:
+        return {
+            'kind': notice.get('kind'),
+            'reason': notice.get('reason'),
+            'authority': notice.get('authority'),
+            'certified_band': dict(notice.get('certified_band') or {}),
+            'dropped_components': [
+                {
+                    'component': str(row.get('component')),
+                    'mass_fraction': float(row.get('mass_fraction')),
+                }
+                for row in (notice.get('dropped_components') or ())
+                if isinstance(row, Mapping)
+            ],
+            'bounds_source': bounds_source,
+            'projected_bounds': 'invalid',
+        }
+
+    def _freeze_gate_kress_floor_curve(
+        self,
+        notice: Mapping[str, Any],
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        """Kress91 calibration step, named as its own authority.
+
+        Applies only when the cleaned melt still has a silicate species the
+        floor was calibrated on. The invalid projection is not the source.
+        """
+        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        if not any(
+            species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
+            for species, mol in cleaned_mol.items()
+        ):
+            reasons.append(
+                'kress91 liquid calibration floor unavailable: no cleaned melt'
+            )
+            return None
+        solidus_T_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+        liquidus_T_C = solidus_T_C + _KRESS91_FLOOR_OPEN_SIDE_C
+        source = _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        return {
+            'source': source,
+            'solidus_T_C': solidus_T_C,
+            'liquidus_T_C': liquidus_T_C,
+            'path': (
+                (solidus_T_C, 0.0),
+                (liquidus_T_C, 1.0),
+            ),
+            'composition_projected_notice': (
+                self._invalid_projection_bounds_notice(
+                    notice,
+                    bounds_source=source,
+                )
+            ),
+        }
+
+    def _refuse_freeze_gate_without_liquidus_authority(
+        self,
+        notice: Mapping[str, Any],
+        reasons: list[str],
+    ) -> None:
+        """No projected, ladder, or Kress bound. Typed run refusal, not abort."""
+        annotated = self._invalid_projection_bounds_notice(
+            notice,
+            bounds_source='refused',
+        )
+        self._record_composition_projected_liquidus_notice(annotated)
+        detail = '; '.join(reasons[-6:]) or 'no liquidus bound of any authority'
+        raise EvaporationFluxRefusal(
+            'composition_projected; freeze gate has no liquidus bound of '
+            f'any authority. {detail}',
+            {
+                'reason_refused': 'freeze_gate_no_liquidus_authority',
+                'kind': 'composition_projected',
+                'reason': 'composition_projected',
+                'bounds_source': 'refused',
+                'projected_bounds': 'invalid',
+                'composition_projected_notice': annotated,
+                'detail': detail,
+            },
+        )
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -1836,6 +1961,12 @@ class EvaporationMixin:
         self._freeze_gate_liquid_fraction_cache = computing_cache
         self._freeze_gate_curve_in_progress = True
         cache_committed = False
+        previous_invalid_notice = getattr(
+            self,
+            '_invalid_projected_liquidus_notice',
+            None,
+        )
+        self._invalid_projected_liquidus_notice = None
         try:
             reasons: list[str] = []
             curve = self._freeze_gate_curve_from_gate_dispatch(
@@ -1853,6 +1984,45 @@ class EvaporationMixin:
                     reasons,
                     fO2_log=fO2_log,
                 )
+            # Invalid projected bounds are not a liquidus. A later ladder
+            # bound wins; otherwise the Kress floor is the prediction and
+            # the notice names that source plus the dropped components.
+            # The projection itself is never the curve source. No bound at
+            # all is a typed refusal, not a run-killing RuntimeError.
+            invalid_notice = getattr(
+                self,
+                '_invalid_projected_liquidus_notice',
+                None,
+            )
+            if isinstance(invalid_notice, Mapping):
+                existing_notice = (
+                    curve.get('composition_projected_notice')
+                    if isinstance(curve, Mapping)
+                    else None
+                )
+                if isinstance(curve, Mapping) and isinstance(
+                    existing_notice,
+                    Mapping,
+                ):
+                    pass
+                elif isinstance(curve, Mapping):
+                    curve = dict(curve)
+                    curve['composition_projected_notice'] = (
+                        self._invalid_projection_bounds_notice(
+                            invalid_notice,
+                            bounds_source=str(curve.get('source') or ''),
+                        )
+                    )
+                else:
+                    curve = self._freeze_gate_kress_floor_curve(
+                        invalid_notice,
+                        reasons,
+                    )
+                    if curve is None:
+                        self._refuse_freeze_gate_without_liquidus_authority(
+                            invalid_notice,
+                            reasons,
+                        )
             if curve is None:
                 detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
                 # Keep the token even when the joined tail is long. The redox
@@ -1879,6 +2049,7 @@ class EvaporationMixin:
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
             )
         finally:
+            self._invalid_projected_liquidus_notice = previous_invalid_notice
             if (
                 not cache_committed
                 and getattr(self, '_freeze_gate_liquid_fraction_cache', None)
