@@ -519,7 +519,10 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     values = sorted(p.value.point for p in points)
     assert values[0] == atm_to_pa("1")
     assert values[1] == atm_to_pa("2")
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in points)
+    assert all(
+        p.derivation is not None and "atm_to_Pa" in p.derivation.relation
+        for p in points
+    )
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 

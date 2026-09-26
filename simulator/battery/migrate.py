@@ -3262,6 +3262,45 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+def _source_standard_state_phase(raw: object, phase: str) -> str | None:
+    text = " ".join(str(raw).split())
+    match = re.search(
+        rf"\b([A-Za-z][A-Za-z0-9]*)\s*(?:\({re.escape(phase)}\)|,\s*{re.escape(phase)}\))",
+        text,
+    )
+    return f"{match.group(1)}({phase})" if match is not None else None
+
+
+def _pressure_species_phase_provenance(
+    quantity: Quantity | None, source_standard_state: object
+) -> str | None:
+    if quantity not in {Quantity.P_PARTIAL, Quantity.P_SAT}:
+        return None
+    declared_gas = _source_standard_state_phase(source_standard_state, "g")
+    declared_non_gas = None
+    for candidate in ("s", "cr", "l", "aq", "glass", "supercooled_l"):
+        declared_non_gas = _source_standard_state_phase(source_standard_state, candidate)
+        if declared_non_gas is not None:
+            break
+    if (
+        declared_non_gas is not None
+        and declared_gas is None
+        and quantity is Quantity.P_PARTIAL
+    ):
+        return None
+    if declared_gas is not None:
+        return f"species.phase=gas declared by source standard_state {declared_gas}"
+    if quantity is Quantity.P_PARTIAL:
+        return (
+            "species.phase=gas derived from quantity=partial_pressure "
+            "(partial pressure is a gas-phase quantity)"
+        )
+    return (
+        "species.phase=gas derived from quantity=p_sat "
+        "(p_sat identity names the gas species)"
+    )
+
+
 def _printed_field_text(raw: object) -> str | None:
     if isinstance(raw, str):
         text = raw.strip()
@@ -9347,21 +9386,16 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
-        if source_id == "kems-042-plante-1979" and q_token is Quantity.P_PARTIAL:
-            phase = State.of(Phase.G)
-            unmapped_phase = None
+        if q_token in {Quantity.P_PARTIAL, Quantity.P_SAT}:
             source_standard_state = obs.get("standard_state") or values.get(
                 "standard_state"
             )
-            if re.search(r"\bK\s*\(g\)", " ".join(str(source_standard_state).split())):
-                phase_provenance = (
-                    "species.phase=gas declared by source standard_state K(g)"
-                )
-            else:
-                phase_provenance = (
-                    "species.phase=gas derived from quantity=partial_pressure "
-                    "(partial pressure is a gas-phase quantity)"
-                )
+            phase_provenance = _pressure_species_phase_provenance(
+                q_token, source_standard_state
+            )
+            if phase_provenance is not None:
+                phase = State.of(Phase.G)
+                unmapped_phase = None
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
             self.result.add_queue(
@@ -9888,7 +9922,7 @@ class Migrator:
                     relation=phase_provenance,
                     inputs=(read_from,),
                     parameters=(),
-                    output_unit="phase",
+                    output_unit="Pa",
                 )
             else:
                 value_derivation = replace(
@@ -9973,6 +10007,7 @@ class Migrator:
                     read_from=read_from,
                     derived_from=derived_from,
                     source_derivation=source_derivation,
+                    phase_provenance=phase_provenance,
                     notices=point_notices,
                     equipment=obs.get("equipment"),
                     parent_values=values,
@@ -9998,6 +10033,7 @@ class Migrator:
                     read_from=read_from,
                     derived_from=derived_from,
                     source_derivation=source_derivation,
+                    phase_provenance=phase_provenance,
                     equipment=obs.get("equipment"),
                     parent_values=values,
                 )
@@ -10106,6 +10142,7 @@ class Migrator:
         read_from: str,
         derived_from: tuple[str, ...] | None = None,
         source_derivation: Derivation | None = None,
+        phase_provenance: str | None = None,
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
         parent_values: object = None,
@@ -10277,6 +10314,19 @@ class Migrator:
             derivation = _merge_source_conversion_derivation(
                 source_derivation, converted, read_from
             )
+        if phase_provenance is not None:
+            if derivation is None:
+                derivation = Derivation(
+                    relation=phase_provenance,
+                    inputs=(read_from,),
+                    parameters=(),
+                    output_unit="Pa",
+                )
+            else:
+                derivation = replace(
+                    derivation,
+                    relation=f"{derivation.relation}; {phase_provenance}",
+                )
         if parent_id in self._author_derivations:
             self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
@@ -10473,6 +10523,16 @@ class Migrator:
             if isinstance(quantity, Quantity)
             else (quantity.value if isinstance(quantity, State) and quantity.is_value else None)
         )
+        phase_provenance = None
+        if q_for_comp in {Quantity.P_PARTIAL, Quantity.P_SAT} and species.phase.is_unknown:
+            phase_provenance = _pressure_species_phase_provenance(q_for_comp, None)
+            if phase_provenance is not None:
+                species = make_species(
+                    species.formula,
+                    State.of(Phase.G),
+                    polymorph=species.polymorph,
+                    charge=species.charge,
+                )
         if q_for_comp in _BULK_PROPERTY_QUANTITIES and ident_kwargs.get("composition") is None:
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         identity = fill_identity(quantity, species, **ident_kwargs)
@@ -10522,6 +10582,19 @@ class Migrator:
             locator.source_path if locator is not None else None,
         )
         read_from = choose_read_from(work, locator)
+        if phase_provenance is not None:
+            if derivation is None:
+                derivation = Derivation(
+                    relation=phase_provenance,
+                    inputs=(read_from,),
+                    parameters=(),
+                    output_unit="Pa",
+                )
+            else:
+                derivation = replace(
+                    derivation,
+                    relation=f"{derivation.relation}; {phase_provenance}",
+                )
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
             self.result.add_queue(

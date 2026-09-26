@@ -441,6 +441,30 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             assert obs.identity.fO2_Pa.is_value
 
 
+def test_g2_non_plante_partial_pressure_species_are_gas(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-184-behrens-1979.yaml")
+    result = migrate(root, write=False)
+    measured = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-184-behrens-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(measured) == 18
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in measured
+    )
+    assert all(
+        observation.derivation is not None
+        and "species.phase=gas derived from quantity=partial_pressure"
+        in observation.derivation.relation
+        for observation in measured
+    )
+
+
 def test_g2_plante_pressure_rows_lift_page_271_calibration(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-042-plante-1979.yaml")
