@@ -109,6 +109,13 @@ MELTS_ENGINES: frozenset[Engine] = frozenset(
 IMCC_ENGINES: frozenset[Engine] = frozenset(
     {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT}
 )
+# These adapters consume the supplied composition as one homogeneous liquid.
+# AlphaMELTS, ThermoEngine, and MAGEMin can resolve a liquid from a bulk input.
+SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
+    {Engine.VAPOROCK, *IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
+)
+TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
+TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 # Engines that consume the SF04 magma companion workbook. Never score them
 # against those rows (chunk-3 carried ruling).
 SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
@@ -1915,6 +1922,25 @@ def candidate_observation(
     )
 
 
+def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
+    """Read the source's two-phase marker; never classify from composition values."""
+
+    identity = observation.identity
+    if isinstance(identity, Identity):
+        phase = identity.species.phase
+        if isinstance(phase, State) and phase.is_unknown:
+            reason = phase.reason or ""
+            if (
+                TWO_PHASE_BULK_COMPOSITION_STATUS in reason
+                or TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER in reason
+            ):
+                return True
+    return any(
+        notice.band == TWO_PHASE_BULK_COMPOSITION_STATUS
+        for notice in observation.notices
+    )
+
+
 def _none_uncertainty() -> Uncertainty:
     from simulator.battery.enums import UncertaintyKind
 
@@ -2022,6 +2048,16 @@ def compile_residual(
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch",),
+        )
+    if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+        return _refused(
+            RefusalReason.BULK_NOT_LIQUID_COMPOSITION,
+            {
+                "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
+                "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
+                "engine": engine.value,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
     if point_magnitude(reference.value) is None:
         reason_token = "value_unknown"
