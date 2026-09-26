@@ -52,13 +52,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from simulator.condensation import (
     _capture_budget_alpha_record,
     _sticking_reactivity_class,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
 )
+from simulator.reference_data.janaf import load_table_document
 from simulator.runner import PyrolysisRun
 
 PA_PER_ATM = 101_325.0
@@ -111,23 +111,60 @@ def _antoine_dew_point_K(coeff: dict, pressure_pa: float) -> float:
     ) - float(coeff.get("C", 0.0))
 
 
+def _raw_oxide_formation_gibbs_fit_kj_mol(
+    species: str,
+    temperature_K: float,
+) -> float:
+    """Fit the raw JANAF oxide rows used by the silicate reaction leg."""
+    table_id, bounds = {
+        "Na": ("Na-014", (1500.0, 1800.0)),
+        "K": ("K-012", (1600.0, 1900.0)),
+    }[species]
+    table = load_table_document(
+        DATA_DIR
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / f"{table_id}.yaml"
+    )["table"]
+    low_K, high_K = bounds
+    rows = [
+        (
+            float(point["temperature"]["value"]),
+            float(point["formation_gibbs_energy"]["value"]),
+        )
+        for point in table["values"]
+        if point["formation_gibbs_energy"]["value"] is not None
+        and low_K <= float(point["temperature"]["value"]) <= high_K
+    ]
+    assert len(rows) >= 2
+    n = float(len(rows))
+    sum_t = sum(row[0] for row in rows)
+    sum_g = sum(row[1] for row in rows)
+    sum_tt = sum(row[0] * row[0] for row in rows)
+    sum_tg = sum(row[0] * row[1] for row in rows)
+    slope = (n * sum_tg - sum_t * sum_g) / (n * sum_tt - sum_t * sum_t)
+    intercept = (sum_g - slope * sum_t) / n
+    return intercept + slope * float(temperature_K)
+
+
 def _expected_silicate_pO2_eq_bar(
     species: str,
     temperature_K: float,
     p_metal_pa: float,
     log10_activity: float,
 ) -> float:
-    """Hand-evaluate the cited Ellingham row and silicate gate relation."""
+    """Hand-evaluate raw JANAF oxide rows and the silicate gate relation.
 
-    segment = next(
-        row
-        for row in ELLINGHAM_FIT_SEGMENTS[species]
-        if float(row.range_K[0]) <= temperature_K < float(row.range_K[1])
+    The reaction is 4 M(g) + O2 -> 2 M2O(cr/l), so the source-row ΔfG°
+    value is multiplied by two to obtain the reaction ΔG° per mol O2.
+    """
+
+    dG_J_per_mol_O2 = 2.0 * 1000.0 * _raw_oxide_formation_gibbs_fit_kj_mol(
+        species,
+        temperature_K,
     )
-    dG_J_per_mol_O2 = (
-        float(segment.dH_f_kJ_per_mol_O2)
-        - temperature_K * float(segment.dS_f_kJ_per_mol_K_per_mol_O2)
-    ) * 1000.0
     equilibrium_constant = math.exp(
         -dG_J_per_mol_O2 / (R_J_MOL_K * temperature_K)
     )
@@ -345,6 +382,12 @@ def test_silica_class_k_uses_the_same_gate_with_its_own_ellingham_row() -> None:
     assert notice["pO2_eq_bar_by_log10_a"] == pytest.approx({
         str(float(key)): value for key, value in expected_pO2_eq.items()
     })
+    # Independent K anchor from the raw K-012 rows at 1773.15 K, p_K=100 Pa,
+    # and log10(a_K2O)=-8; this guards the K gate against copying Na's value.
+    assert expected_pO2_eq[-8.0] == pytest.approx(
+        1.994471357570e-06,
+        rel=1e-9,
+    )
     assert notice["authority_level"] == "extrapolated"
     assert notice["reactive_uptake_envelope"] == pytest.approx([0.0, 1.0])
     pO2_eq = expected_pO2_eq[-8.0]

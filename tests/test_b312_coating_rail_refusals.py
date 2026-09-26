@@ -22,9 +22,14 @@ from simulator.wall_deposition import (
     _wall_geometry_conductance_weight,
 )
 from simulator.condensation import (
+    DEFAULT_BINARY_DIFFUSION_M2_S,
     CondensationModel,
     DepositionInputRefusal,
+    GAS_CONSTANT_J_MOL_K,
+    _hkl_impingement_flux_mol_m2_s,
     _series_resistance_deposition_flux_mol_m2_s,
+    _stirring_enhanced_sherwood,
+    _wall_deposition_driving_pressure_pa,
 )
 from simulator.stage0_foulant_report_markdown import (
     _format_kg,
@@ -369,9 +374,39 @@ def test_b304_zero_local_pressure_and_driving_pressure_stay_zero():
 
 
 def test_b304_healthy_sio_flux_at_ten_pa_1200k_alpha_004():
+    species = "SiO"
+    pressure_pa = 10.0
+    temperature_K = 1200.0
+    alpha_s = 0.04
+    pipe_diameter_m = 0.12
+    driving_pressure_pa = _wall_deposition_driving_pressure_pa(
+        species,
+        pressure_pa,
+        temperature_K,
+    )
+    k_hkl_per_pa = alpha_s * _hkl_impingement_flux_mol_m2_s(
+        species,
+        1.0,
+        temperature_K,
+    )
+    k_mt_per_pa = (
+        _stirring_enhanced_sherwood(1.0)
+        * DEFAULT_BINARY_DIFFUSION_M2_S
+        / (pipe_diameter_m * GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
+    # Premise: regime_factor=0 keeps both resistances in series. Algebra:
+    # J = Δp / (1/k_HKL + 1/k_MT), with each k in mol m^-2 s^-1 Pa^-1.
+    expected_flux = driving_pressure_pa / (
+        1.0 / k_hkl_per_pa + 1.0 / k_mt_per_pa
+    )
     flux = _series_resistance_deposition_flux_mol_m2_s(
-        "SiO", 10.0, 1200.0, 0.04,
+        species,
+        pressure_pa,
+        temperature_K,
+        alpha_s,
+        pipe_diameter_m=pipe_diameter_m,
     )
     # d-025 uses the reactive-equilibrium driving pressure instead of the
     # interim zero-product-pressure backstop.
-    assert flux == pytest.approx(2.909946766e-4, rel=1e-4)
+    assert flux == pytest.approx(expected_flux, rel=1e-12)
+    assert expected_flux == pytest.approx(2.909946766e-4, rel=1e-4)

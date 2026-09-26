@@ -1454,6 +1454,18 @@ def _apply_sio_disproportionation_driving_pressure(
             wall_material_class=wall_material_class,
             T_K=float(temperature_K),
         )
+        valid_range_K = equilibrium['valid_range_K']
+        certified_band_K = None
+        if valid_range_K is not None and len(valid_range_K) == 2:
+            certified_band_K = [
+                max(
+                    float(equilibrium['liquid_standard_state_min_K']),
+                    float(valid_range_K[0]),
+                ),
+                min(2500.0, float(valid_range_K[1])),
+            ]
+            if certified_band_K[0] > certified_band_K[1]:
+                certified_band_K = None
         notice = {
             'status': 'status_bearing',
             'output_status': 'status_bearing',
@@ -1489,10 +1501,7 @@ def _apply_sio_disproportionation_driving_pressure(
             ),
             'primary_phase_basis': equilibrium['primary_phase_basis'],
             'comparison_phase_basis': equilibrium['comparison_phase_basis'],
-            'certified_band_K': [
-                equilibrium['liquid_standard_state_min_K'],
-                2500.0,
-            ],
+            'certified_band_K': certified_band_K,
         }
         notice.update(reactive_provenance)
         diagnostic_out['wall_saturation_pressure_pa'] = p_eq_pa
@@ -3661,6 +3670,7 @@ class CondensationModel:
             margin_C=self.cold_spot_margin_C,
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
+            materials=self.materials,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -4318,31 +4328,6 @@ class CondensationModel:
                 ),
                 None,
             )
-            lower_bound_outcome = next(
-                (
-                    item for item in outcomes
-                    if item.get('eta_basis')
-                    == 'lower_bound_refused_samples_uncaptured'
-                ),
-                None,
-            )
-            lower_bound_record = {}
-            if lower_bound_outcome is not None:
-                lower_bound_record = {
-                    'status': lower_bound_outcome['status'],
-                    'reason': lower_bound_outcome['reason'],
-                    'output_status': 'status_bearing',
-                    'refused_fraction': lower_bound_outcome[
-                        'refused_fraction'
-                    ],
-                    'eta_basis': lower_bound_outcome['eta_basis'],
-                    'authority_level': lower_bound_outcome[
-                        'authority_level'
-                    ],
-                    'original_reason': lower_bound_outcome[
-                        'original_reason'
-                    ],
-                }
             reactive_outcome = next(
                 (
                     item for item in outcomes
@@ -4418,8 +4403,6 @@ class CondensationModel:
                 existing = condensation_refusals_by_species[species]
                 if isinstance(existing, dict):
                     existing = dict(existing)
-                    if lower_bound_record:
-                        existing.update(lower_bound_record)
                     if reactive_record:
                         existing.update(reactive_record)
                     stage_list = list(existing.get('stage_outcomes') or [])
@@ -4440,10 +4423,6 @@ class CondensationModel:
                 'output_status': 'status_bearing',
                 'stage_outcomes': list(outcomes),
             }
-            if lower_bound_record:
-                condensation_refusals_by_species[species].update(
-                    lower_bound_record
-                )
             if reactive_record:
                 condensation_refusals_by_species[species].update(
                     reactive_record
@@ -5444,9 +5423,7 @@ class CondensationModel:
             lo_C, hi_C = hi_C, lo_C
 
         band_flux_mol_m2_s = 0.0
-        band_samples_used = 0
         band_samples_total = 0
-        refused_sample_reason: str | None = None
         reactive_sample_count = 0
         reactive_uptake_count = 0
         reactive_authority: str | None = None
@@ -5539,19 +5516,16 @@ class CondensationModel:
                     diagnostic_out=rate_diagnostic,
                 )
             except WallSaturationPressureRefusal as exc:
-                reason = _record_refused_sample(
-                    T_surface_C, rate_diagnostic, exc
-                )
-                if refused_sample_reason is None:
-                    refused_sample_reason = reason
-                continue
+                _record_refused_sample(T_surface_C, rate_diagnostic, exc)
+                raise
             if bool(rate_diagnostic.get('wall_saturation_pressure_refused')):
                 reason = _record_refused_sample(T_surface_C, rate_diagnostic)
-                if refused_sample_reason is None:
-                    refused_sample_reason = reason
-                continue
+                raise WallSaturationPressureRefusal(
+                    species,
+                    T_surface_K,
+                    reason,
+                )
             band_flux_mol_m2_s += flux
-            band_samples_used += 1
             if rate_diagnostic.get('wall_saturation_pressure_status') == (
                 'reactive_equilibrium'
             ):
@@ -5576,31 +5550,6 @@ class CondensationModel:
             ]
             alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
 
-        refused_count = band_samples_total - band_samples_used
-        refused_band_outcome = None
-        if refused_count:
-            # A physisorber that still has no wall curve keeps the refused
-            # samples in the denominator as uncaptured. That is a typed
-            # refusal, not a reactive equilibrium. The d-025 decision is
-            # closed and is not named on this record.
-            refused_band_outcome = {
-                'status': 'status_bearing',
-                'output_status': 'status_bearing',
-                'authority_level': 'unavailable',
-                'reason': 'wall_saturation_pressure_refused_band_sample',
-                'original_reason': (
-                    refused_sample_reason
-                    or 'wall_saturation_pressure_refused'
-                ),
-                'refused_fraction': refused_count / band_samples_total,
-                'refused_count': refused_count,
-                'total_samples': band_samples_total,
-                'eta_basis': 'lower_bound_refused_samples_uncaptured',
-                'species': species,
-                'stage_number': int(getattr(stage, 'stage_number', -1)),
-                'T_cond_C': float(T_cond_C),
-                'eta': 0.0,
-            }
         reactive_band_outcome = None
         if reactive_sample_count:
             reactive_reason = (
@@ -5657,8 +5606,6 @@ class CondensationModel:
                 or molar_mass_kg_mol <= 0.0
             ):
                 if efficiency_outcomes is not None:
-                    if refused_band_outcome is not None:
-                        efficiency_outcomes.append(refused_band_outcome)
                     if reactive_band_outcome is not None:
                         efficiency_outcomes.append(reactive_band_outcome)
                 return 0.0
@@ -5695,10 +5642,6 @@ class CondensationModel:
         # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
         eta_uncapped = float(eta)
         eta = max(0.0, min(1.0, eta))
-        if refused_band_outcome is not None:
-            refused_band_outcome['eta'] = eta
-            if efficiency_outcomes is not None:
-                efficiency_outcomes.append(refused_band_outcome)
         if reactive_band_outcome is not None:
             reactive_band_outcome['eta'] = eta
             if efficiency_outcomes is not None:
@@ -9000,6 +8943,7 @@ def cold_spot_diagnostic(
     upstream_hot_wall_min_C: float | None = None,
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    materials: Mapping[str, Any] | None = None,
     species_partial_pressures_pa: Mapping[str, float] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
@@ -9063,8 +9007,17 @@ def cold_spot_diagnostic(
                 # same 100 Pa at 1100 C is over p_eq ≈ 6 Pa and must flag.
                 # A refused SiO Antoine is not a finding by itself.
                 wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
+                liner_material = str(
+                    getattr(segment, 'liner_material', '') or ''
+                )
+                if not liner_material:
+                    liner_material = str(
+                        _wall_material_config(materials).get('liner_material')
+                        or ''
+                    )
                 wall_class = wall_material_class_for_liner(
-                    str(getattr(segment, 'liner_material', '') or '')
+                    liner_material,
+                    materials,
                 )
                 sink = _declared_reactive_sink(str(species), wall_class)
                 reactive_finding = False

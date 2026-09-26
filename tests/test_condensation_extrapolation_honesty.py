@@ -251,8 +251,29 @@ def test_predict_flag_cold_na_pole_continues_and_flags_positive_deposition():
     driving = condensation._wall_deposition_driving_pressure_pa(
         "Na", 100.0, 298.15, diagnostic_out=diagnostic,
     )
+    na_data = condensation._species_vapor_data(
+        "Na",
+        vapor_pressure_data=condensation.VAPOR_PRESSURE_DATA,
+    )
+    coefficients = na_data["pure_component_antoine"]
+    low_K = float(coefficients["valid_range_K"][0])
+    denominator = low_K + float(coefficients["C"])
+    edge_pressure_pa = 10.0 ** (
+        float(coefficients["A"]) - float(coefficients["B"]) / denominator
+    )
+    delta_h_over_R_K = (
+        math.log(10.0)
+        * float(coefficients["B"])
+        * low_K**2
+        / denominator**2
+    )
+    expected_cold_pressure_pa = edge_pressure_pa * math.exp(
+        -delta_h_over_R_K * (1.0 / 298.15 - 1.0 / low_K)
+    )
+    # Clausius-Clapeyron continuation from the loaded lower fit edge.
     assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
-        4.637229568365543e-11, rel=1e-9,
+        expected_cold_pressure_pa,
+        rel=1e-9,
     )
     assert driving == pytest.approx(100.0, rel=1e-9)
     assert diagnostic["wall_saturation_pressure_refused"] is False
@@ -715,7 +736,7 @@ def test_condensation_efficiency_uses_hourly_vapour_rate_units(monkeypatch):
     assert eta == pytest.approx(expected_eta)
 
 
-def test_condensation_efficiency_lower_bound_keeps_refused_sample_in_denominator_without_capture(monkeypatch):
+def test_condensation_efficiency_refused_sample_is_typed_unavailable(monkeypatch):
     model = condensation.CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
@@ -754,39 +775,28 @@ def test_condensation_efficiency_lower_bound_keeps_refused_sample_in_denominator
         * 4000.0
     )
     outcomes = []
-    eta = model._condensation_efficiency(
-        stage=stage,
-        species="Na",
-        T_cond_C=model.condensation_temperatures_C["Na"],
-        residence_s=1.0,
-        available_kg=available_kg,
-        alpha_s_value=1.0,
-        efficiency_outcomes=outcomes,
-    )
-    assert eta == pytest.approx(
-        (condensation.HKL_BAND_SAMPLES - 1)
-        / condensation.HKL_BAND_SAMPLES
-        * 3600.0
-        / 4000.0
-    )
-    assert calls == condensation.HKL_BAND_SAMPLES
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="sample refused",
+    ):
+        model._condensation_efficiency(
+            stage=stage,
+            species="Na",
+            T_cond_C=model.condensation_temperatures_C["Na"],
+            residence_s=1.0,
+            available_kg=available_kg,
+            alpha_s_value=1.0,
+            efficiency_outcomes=outcomes,
+        )
+    assert calls == 1
     refused = [item for item in outcomes if item["status"] == "refused"]
     assert len(refused) == 1
     assert refused[0]["authority_level"] == "unavailable"
     assert refused[0]["original_reason"] == "sample refused"
-    lower_bound = next(
-        item for item in outcomes if item["status"] == "status_bearing"
-    )
-    assert lower_bound["refused_fraction"] == pytest.approx(
-        1.0 / condensation.HKL_BAND_SAMPLES
-    )
-    assert lower_bound["eta_basis"] == (
-        "lower_bound_refused_samples_uncaptured"
-    )
-    assert "pending_decision" not in lower_bound
+    assert all("eta_basis" not in item for item in outcomes)
 
 
-def test_condensation_efficiency_records_lower_bound_before_zero_available_return(monkeypatch):
+def test_condensation_efficiency_refusal_precedes_zero_available_return(monkeypatch):
     model = condensation.CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
@@ -813,25 +823,22 @@ def test_condensation_efficiency_records_lower_bound_before_zero_available_retur
         refused_sample,
     )
     outcomes = []
-    eta = model._condensation_efficiency(
-        stage=stage,
-        species="Na",
-        T_cond_C=model.condensation_temperatures_C["Na"],
-        residence_s=1.0,
-        available_kg=0.0,
-        alpha_s_value=1.0,
-        efficiency_outcomes=outcomes,
-    )
-
-    assert eta == 0.0
-    lower_bound = next(
-        item
-        for item in outcomes
-        if item.get("eta_basis") == "lower_bound_refused_samples_uncaptured"
-    )
-    assert lower_bound["refused_fraction"] == pytest.approx(1.0)
-    assert lower_bound["eta"] == pytest.approx(0.0)
-    assert "pending_decision" not in lower_bound
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="sample refused",
+    ):
+        model._condensation_efficiency(
+            stage=stage,
+            species="Na",
+            T_cond_C=model.condensation_temperatures_C["Na"],
+            residence_s=1.0,
+            available_kg=0.0,
+            alpha_s_value=1.0,
+            efficiency_outcomes=outcomes,
+        )
+    assert len(outcomes) == 1
+    assert outcomes[0]["status"] == "refused"
+    assert all("eta_basis" not in item for item in outcomes)
 
 
 def test_predict_flag_pareto_unavailable_keeps_extrapolation():
@@ -840,14 +847,66 @@ def test_predict_flag_pareto_unavailable_keeps_extrapolation():
 
     notice = {"authority_level": "extrapolated", "temperature_K": 500.0,
               "valid_range_K": [701.0, 1361.0], "reason": "outside source band"}
+    reactive_notice = {
+        "authority_level": "bridge",
+        "temperature_K": 1500.0,
+        "valid_range_K": [1400.0, 2273.15],
+        "reason": "reactive_equilibrium_undersaturated",
+        "saturation_pressure_policy": "reactive_equilibrium",
+    }
     sim = SimpleNamespace(condensation_model=SimpleNamespace(
         last_sticking_alpha_provenance_notice={
-            "wall_saturation_pressure_extrapolations_by_species": {"Mg": {"wall": notice}}
+            "wall_saturation_pressure_extrapolations_by_species": {
+                "Mg": {"wall": notice},
+                "SiO": {"wall": reactive_notice},
+            }
         }))
     result = pressure_coating_pareto_diagnostic(sim)
     entry = result["by_species"]["Mg"]
     assert entry["status"] == "unavailable"
     assert entry["wall_saturation_pressure_extrapolations"]["wall"] == notice
+    assert result["by_species"]["SiO"]["authority_level"] == "bridge"
+
+
+def test_wall_authority_payload_distinguishes_bridge_from_antoine_records():
+    from simulator.diagnostics import _wall_deposit_authority_payload
+
+    reactive_record = {
+        "authority_level": "bridge",
+        "saturation_pressure_policy": "reactive_equilibrium",
+    }
+    bridge_payload = _wall_deposit_authority_payload(
+        authoritative=True,
+        code="wall_alpha",
+        deposited_species=["SiO"],
+        uncertified_species=[],
+        provenance={},
+        wall_saturation_pressure_extrapolations_by_species={
+            "SiO": {"wall": reactive_record},
+        },
+    )
+    assert bridge_payload["authority_level"] == "bridge"
+    assert "BRIDGE quantities" in bridge_payload["message"]
+    assert "EXTRAPOLATED quantities" not in bridge_payload["message"]
+
+    mixed_payload = _wall_deposit_authority_payload(
+        authoritative=True,
+        code="wall_alpha",
+        deposited_species=["SiO"],
+        uncertified_species=[],
+        provenance={},
+        wall_saturation_pressure_extrapolations_by_species={
+            "SiO": {
+                "reactive": reactive_record,
+                "antoine": {
+                    "authority_level": "extrapolated",
+                    "saturation_pressure_policy": "pure_component_antoine",
+                },
+            },
+        },
+    )
+    assert mixed_payload["authority_level"] == "extrapolated"
+    assert "EXTRAPOLATED quantities" in mixed_payload["message"]
 
 
 def test_predict_flag_wall_history_keeps_both_source_band_misses():

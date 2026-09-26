@@ -298,7 +298,13 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     if invalid_data in {None, "pure_component_antoine"}:
         record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
         assert isinstance(record, float)
-        assert record >= 0.0
+        assert record == pytest.approx(0.0)
+        shadow_record = model.last_wall_deposition_rate_shadow_candidate[
+            "default_pipe"
+        ][species]
+        assert shadow_record["reason"] == "reactive_equilibrium_undersaturated"
+        assert shadow_record["authority_level"] == "bridge"
+        assert shadow_record["saturation_pressure_policy"] == "reactive_equilibrium"
     else:
         with pytest.raises(DepositionInputRefusal) as refused:
             wall_deposit_candidate_for_surface_kg(model, **kwargs)
@@ -798,11 +804,28 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
     # d-025 removes the T_cond capture conjunct. The silica reactive branch
     # therefore captures the supersaturated Na sample instead of forcing every
     # Na wall candidate to zero.
-    assert any(
+    silica_records = [
+        record
+        for record in records_by_species["Na"]
+        if record["surface"]["material"] == "fused_silica_baffles"
+    ]
+    non_silica_records = [
+        record
+        for record in records_by_species["Na"]
+        if record["surface"]["material"] != "fused_silica_baffles"
+    ]
+    assert silica_records
+    assert all(
         float(record["mol_s"]) > 0.0
         and record["supersaturated"] is True
         and record["reason"] == "reactive_uptake"
-        for record in records_by_species["Na"]
+        for record in silica_records
+    )
+    assert non_silica_records
+    assert all(
+        float(record["mol_s"]) == pytest.approx(0.0)
+        and record["supersaturated"] is False
+        for record in non_silica_records
     )
     assert len(records_by_species["SiO"]) > 1
     for species, records in records_by_species.items():

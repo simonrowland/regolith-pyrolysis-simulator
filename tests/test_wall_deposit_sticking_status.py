@@ -1194,7 +1194,9 @@ def test_out_of_domain_wall_psat_refusal_is_status_bearing() -> None:
     assert extrapolation["status"] == "extrapolated"
     assert extrapolation["output_status"] == "status_bearing"
     assert extrapolation["authority_level"] == "extrapolated"
-    assert extrapolation["valid_range_K"] == [701.0, 1361.0]
+    assert extrapolation["valid_range_K"] == [
+        float(value) for value in certified_range_K
+    ]
     diagnostic = {}
     condensation_module._wall_deposition_driving_pressure_pa(
         "Mg", 100.0, wall_temperature_K, diagnostic_out=diagnostic,

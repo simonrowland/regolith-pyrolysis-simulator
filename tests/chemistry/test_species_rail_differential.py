@@ -88,6 +88,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     _count_matrix,
 )
 from simulator.reference_data.janaf import FEEDSTOCKS_PATH
+from tests.test_physics_ground_truth import _janaf_liquid_vapour_pa
 
 
 def _pilot_ledger_digest() -> bytes:
@@ -1365,7 +1366,13 @@ def test_psat_al_si_match_janaf_fit_and_kill_old_stull_disagreement() -> None:
     assert al_score.finding_class == "compilation_agreement"
     assert al_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
     assert al_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
-    assert al_score.residual_log10K == pytest.approx(-0.0011178, abs=5e-5)
+    # Derive the expected residual from the raw JANAF liquid/vapour grid at
+    # the assertion site; do not preserve a copied decimal pin.
+    al_source_pa = _janaf_liquid_vapour_pa("Al", 1700.0)
+    assert al_score.residual_log10K == pytest.approx(
+        math.log10(al_P / al_source_pa),
+        abs=5e-5,
+    )
     assert "Al-003" in (al_score.note or "")
     assert "Stull 1947" not in (al_score.note or "")
     assert psat_finding_class(
@@ -1431,7 +1438,11 @@ def test_psat_al_si_match_janaf_fit_and_kill_old_stull_disagreement() -> None:
     assert si_score.finding_class == "compilation_agreement"
     assert si_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
     assert si_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
-    assert si_score.residual_log10K == pytest.approx(0.0213359, abs=5e-5)
+    si_source_pa = _janaf_liquid_vapour_pa("Si", 2200.0)
+    assert si_score.residual_log10K == pytest.approx(
+        math.log10(si_P / si_source_pa),
+        abs=5e-5,
+    )
     assert "Si-003" in (si_score.note or "")
 
     rail = derive_species_rail()

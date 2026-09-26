@@ -7,6 +7,7 @@ it at 1100 C. The wall flux and b-282 fouling diagnostic must agree.
 
 from __future__ import annotations
 
+import copy
 import math
 from pathlib import Path
 
@@ -14,15 +15,16 @@ import pytest
 import yaml
 
 from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
 from simulator.condensation import (
     CELSIUS_TO_KELVIN_OFFSET,
     CondensationModel,
+    MATERIALS_DATA,
     _series_resistance_deposition_flux_mol_m2_s,
     _wall_alpha_record,
     _wall_deposition_driving_pressure_pa,
     cold_spot_diagnostic,
 )
+from simulator.reference_data.janaf import load_table_document
 from simulator.state import CondensationTrain, PipeSegment
 
 
@@ -30,18 +32,57 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 R_J_MOL_K = 8.314462618
 
 
-def _sio_source_rows() -> tuple[dict, tuple[object, ...]]:
+def _sio_source_row() -> dict:
     payload = yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text())
-    source_row = payload["families"]["oxide_vapors_sio_family"][
+    return payload["families"]["oxide_vapors_sio_family"][
         "physical_properties"
     ]["species"]["SiO"]
-    segments = ELLINGHAM_FIT_SEGMENTS["Si"]
-    return source_row, segments
+
+
+def _o039_formation_gibbs_fit_kj_mol(
+    temperature_K: float,
+    *,
+    phase: str,
+) -> float:
+    """Fit raw O-039 formation-Gibbs rows for the selected phase leg.
+
+    JANAF prints ΔfG° directly in kJ/mol. The runtime Ellingham dH/dS
+    segments are linear fits to these same rows, so fitting the raw rows here
+    recreates dG(T) without importing the runtime segment table.
+    """
+    table = load_table_document(
+        DATA_DIR
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / "O-039.yaml"
+    )["table"]
+    bounds = {"solid": (1100.0, 1600.0), "liquid": (1700.0, 2500.0)}
+    low_K, high_K = bounds[phase]
+    rows = [
+        (
+            float(point["temperature"]["value"]),
+            float(point["formation_gibbs_energy"]["value"]),
+        )
+        for point in table["values"]
+        if point["formation_gibbs_energy"]["value"] is not None
+        and low_K <= float(point["temperature"]["value"]) <= high_K
+    ]
+    assert len(rows) >= 2
+    n = float(len(rows))
+    sum_t = sum(row[0] for row in rows)
+    sum_g = sum(row[1] for row in rows)
+    sum_tt = sum(row[0] * row[0] for row in rows)
+    sum_tg = sum(row[0] * row[1] for row in rows)
+    slope = (n * sum_tg - sum_t * sum_g) / (n * sum_tt - sum_t * sum_t)
+    intercept = (sum_g - slope * sum_t) / n
+    return intercept + slope * float(temperature_K)
 
 
 def _sio_expected_p_eq_pa(
     temperature_K: float,
-    segment: object,
+    phase: str,
     source_row: dict,
 ) -> float:
     reaction = source_row["reaction"]
@@ -57,10 +98,10 @@ def _sio_expected_p_eq_pa(
     )
     k_b = (p_ref_pa / p_std_pa) * math.sqrt(pO2_reference_bar)
     dG_b_J = -R_J_MOL_K * temperature_K * math.log(k_b)
-    dG_a_J = (
-        float(segment.dH_f_kJ_per_mol_O2)
-        - temperature_K * float(segment.dS_f_kJ_per_mol_K_per_mol_O2)
-    ) * 1000.0
+    dG_a_J = 1000.0 * _o039_formation_gibbs_fit_kj_mol(
+        temperature_K,
+        phase=phase,
+    )
     dG_disproportionation_J = -2.0 * dG_b_J - dG_a_J
     return p_std_pa * math.exp(
         dG_disproportionation_J / (2.0 * R_J_MOL_K * temperature_K)
@@ -70,22 +111,13 @@ def _sio_expected_p_eq_pa(
 def _sio_expected_phase_legs(
     wall_temperature_C: float,
 ) -> tuple[float, float | None]:
-    source_row, segments = _sio_source_rows()
+    source_row = _sio_source_row()
     temperature_K = wall_temperature_C + 273.15
-    solid = next(
-        segment for segment in segments if float(segment.range_K[0]) == 1100.0
-    )
-    liquid = next(
-        segment for segment in segments if float(segment.range_K[0]) == 1696.0
-    )
-    primary = liquid if temperature_K < 1696.0 else next(
-        segment
-        for segment in segments
-        if float(segment.range_K[0]) <= temperature_K < float(segment.range_K[1])
-    )
-    primary_p_eq = _sio_expected_p_eq_pa(temperature_K, primary, source_row)
+    # The production bridge uses the liquid SiO2 leg below the Si melt
+    # transition and above it; the solid leg remains a comparison diagnostic.
+    primary_p_eq = _sio_expected_p_eq_pa(temperature_K, "liquid", source_row)
     comparison_p_eq = (
-        _sio_expected_p_eq_pa(temperature_K, solid, source_row)
+        _sio_expected_p_eq_pa(temperature_K, "solid", source_row)
         if temperature_K < 1696.0
         else None
     )
@@ -148,21 +180,29 @@ def test_sio_equilibrium_controls_flux_on_any_liner(
         wall_material_class=wall_material_class,
         diagnostic_out=driving_notice,
     )
-    assert driving_pa == pytest.approx(expected_drive_pa, rel=2e-9)
+    # Raw-row regression coefficients retain more digits than the rounded
+    # runtime dH/dS constants; use an absolute floor for the small residual
+    # driving pressure rather than hiding that source-to-runtime rounding.
+    assert driving_pa == pytest.approx(
+        expected_drive_pa,
+        rel=2e-9,
+        abs=1e-5,
+    )
     assert driving_notice["wall_saturation_pressure_pa"] == pytest.approx(
-        expected_primary_p_eq, rel=2e-9
+        expected_primary_p_eq, rel=1e-7
     )
     notice = driving_notice["wall_saturation_pressure_notice"]
     assert notice["p_eq_comparison_pa"] == (
-        pytest.approx(expected_comparison_p_eq, rel=2e-9)
+        pytest.approx(expected_comparison_p_eq, rel=1e-7)
         if expected_comparison_p_eq is not None
         else None
     )
-    source_row, _ = _sio_source_rows()
+    source_row = _sio_source_row()
     expected_valid_range_K = source_row["pressure_models"][0]["valid_domain"][
         "temperature_K"
     ]
     assert notice["valid_range_K"] == expected_valid_range_K
+    assert notice["certified_band_K"] == [1696.0, 2273.15]
     assert notice["antoine_standard_state_extrapolated"] is (
         wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET
         < expected_valid_range_K[0]
@@ -190,6 +230,19 @@ def test_sio_equilibrium_controls_flux_on_any_liner(
         if expect_flux
         else "reactive_equilibrium_undersaturated"
     )
+
+
+def test_sio_certified_band_excludes_2400_K() -> None:
+    notice: dict[str, object] = {}
+    _wall_deposition_driving_pressure_pa(
+        "SiO",
+        100.0,
+        2400.0,
+        diagnostic_out=notice,
+    )
+    certified_band = notice["wall_saturation_pressure_notice"]["certified_band_K"]
+    assert certified_band == [1696.0, 2273.15]
+    assert not certified_band[0] <= 2400.0 <= certified_band[1]
 
 
 @pytest.mark.parametrize(
@@ -233,6 +286,20 @@ def test_sio_b282_fouling_diagnostic_agrees_with_flux(
         "fail_closed_no_direct_sticking_coefficient"
     )
     assert fused_alpha["authority_level"] == "bridge"
+
+
+def test_cold_spot_uses_runtime_liner_material_class() -> None:
+    materials = copy.deepcopy(MATERIALS_DATA)
+    materials["liner_materials"]["fused_silica_baffles"][
+        "wall_material_class"
+    ] = None
+    diagnostic = cold_spot_diagnostic(
+        [_sio_segment(1100.0, liner_material="fused_silica_baffles")],
+        {"Na": 1.0},
+        species_partial_pressures_pa={"Na": 100.0},
+        materials=materials,
+    )
+    assert diagnostic["has_upstream_hot_wall_violation"] is False
 
 
 def test_sio_wall_capture_does_not_restore_the_t_cond_gate() -> None:

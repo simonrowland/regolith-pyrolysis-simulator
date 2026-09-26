@@ -167,6 +167,51 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
     )
 
 
+def test_run_executor_classifies_injected_hot_sio_refusal(monkeypatch):
+    from simulator import condensation
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    simulator = session.simulator
+    simulator.condensation_model.condensation_temperatures_C["SiO"] = 900.0
+    simulator._calculate_evaporation = lambda *_args, **_kwargs: EvaporationFlux(
+        species_kg_hr={"SiO": 1.0},
+        total_kg_hr=1.0,
+    )
+    original_flux = condensation._series_resistance_deposition_flux_mol_m2_s
+    calls = 0
+
+    def refuse_first_sio_sample(*args, **kwargs):
+        nonlocal calls
+        if args and args[0] == "SiO":
+            calls += 1
+            if calls == 1:
+                raise WallSaturationPressureRefusal(
+                    "SiO",
+                    float(args[2]),
+                    "injected missing wall data",
+                )
+        return original_flux(*args, **kwargs)
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        refuse_first_sio_sample,
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert calls >= 1
+    assert execution.status == "refused"
+    assert isinstance(execution.failure_exception, WallSaturationPressureRefusal)
+    assert execution.failure_exception.species == "SiO"
+    assert execution.failure_exception.reason == "injected missing wall data"
+
+
 @pytest.mark.parametrize(
     "refusal",
     [

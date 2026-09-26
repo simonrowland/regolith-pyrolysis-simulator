@@ -963,8 +963,23 @@ def _wall_deposit_authority_payload(
         payload["wall_saturation_pressure_extrapolations_by_species"] = _plain_mapping(
             wall_saturation_pressure_extrapolations_by_species
         )
-        payload["authority_level"] = "extrapolated"
-        payload["message"] += " Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached."
+        has_antoine_extrapolation = any(
+            isinstance(records, Mapping)
+            and _wall_extrapolation_has_antoine_record(records)
+            for records in wall_saturation_pressure_extrapolations_by_species.values()
+        )
+        payload["authority_level"] = (
+            "extrapolated"
+            if has_antoine_extrapolation
+            else "bridge"
+        )
+        payload["message"] += (
+            " Wall saturation includes EXTRAPOLATED quantities; source bands "
+            "and reasons remain attached."
+            if has_antoine_extrapolation
+            else " Wall saturation includes BRIDGE quantities; source bands "
+            "and reasons remain attached."
+        )
     if evaporation_transport_notices_by_species:
         payload["evaporation_transport_notices_by_species"] = _plain_mapping(
             evaporation_transport_notices_by_species
@@ -1488,6 +1503,29 @@ def _attach_pareto_source_notices(
             entry["status"] = authority
 
 
+def _wall_extrapolation_has_antoine_record(
+    records: Mapping[str, Any],
+) -> bool:
+    return any(
+        isinstance(record, Mapping)
+        and record.get("saturation_pressure_policy") != "reactive_equilibrium"
+        for record in records.values()
+    )
+
+
+def _reactive_equilibrium_authority(
+    records: Mapping[str, Any],
+) -> str:
+    for record in records.values():
+        if (
+            isinstance(record, Mapping)
+            and record.get("saturation_pressure_policy")
+            == "reactive_equilibrium"
+        ):
+            return str(record.get("authority_level") or "bridge")
+    return "bridge"
+
+
 def _pressure_coating_pareto_unavailable(
     target_species: Sequence[str],
     reason: str,
@@ -1513,7 +1551,12 @@ def _pressure_coating_pareto_unavailable(
         for species, records in (wall_notice or {}).get(key, {}).items():
             entry = diagnostic["by_species"].setdefault(str(species), {"status": "unavailable", "reason": reason})
             entry[output_key] = _plain_mapping(records)
-            entry["authority_level"] = "unavailable" if "refusals" in key else "extrapolated"
+            if "refusals" in key:
+                entry["authority_level"] = "unavailable"
+            elif _wall_extrapolation_has_antoine_record(records):
+                entry["authority_level"] = "extrapolated"
+            else:
+                entry["authority_level"] = _reactive_equilibrium_authority(records)
     if alpha_authority_status_by_species:
         diagnostic["alpha_authority_status_by_species"] = dict(
             alpha_authority_status_by_species
@@ -1793,9 +1836,12 @@ def pressure_coating_pareto_diagnostic(
     for name, records in wall_extrapolations.items():
         entry = by_species[name]
         entry["wall_saturation_pressure_extrapolations"] = _plain_mapping(records)
-        entry["authority_level"] = "extrapolated"
-        if entry.get("status") != "unavailable":
-            entry["status"] = "extrapolated"
+        if _wall_extrapolation_has_antoine_record(records):
+            entry["authority_level"] = "extrapolated"
+            if entry.get("status") != "unavailable":
+                entry["status"] = "extrapolated"
+        else:
+            entry["authority_level"] = _reactive_equilibrium_authority(records)
 
     _attach_pareto_source_notices(by_species, wall_notice)
 
