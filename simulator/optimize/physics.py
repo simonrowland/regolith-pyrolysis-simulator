@@ -49,7 +49,10 @@ SourceKind = Literal[
 # Boolean exclusion, so cached v4 feasibility verdicts cannot be reused.
 # v6: predicted upstream coating, including flagged quantities, is a hard
 # no-coating violation; refused wall quantities are unavailable.
-PHYSICS_GATE_VERSION = "physics-feasibility-v6-predicted-coating"
+# v7: d-045 bounds upstream wall deposition by feedstock charge mass and
+# bounds refused trace species by their vapour flux instead of pricing them as
+# zero.
+PHYSICS_GATE_VERSION = "physics-feasibility-v7-d045-upstream-fraction"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -65,9 +68,12 @@ TARGET_SPECIES_YIELD_CONSUMERS: tuple[str, ...] = (
     "product_summary.target_species_yield_report",
 )
 _EPS = 1.0e-12
-# Round-off guard only. This is not a physical coating threshold: any larger
-# predicted upstream deposit violates the no-coating gate.
+# Round-off guard only. The d-045 physical fraction below determines whether a
+# non-zero upstream deposit violates the no-coating gate.
 COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN = 1.0e-12
+# d-045 (2026-09-26): the physical no-coating envelope is
+# deposit_kg_per_campaign <= 5e-4 * m_charge_kg. The fraction is dimensionless.
+MAX_UPSTREAM_WALL_DEPOSIT_FRACTION_PER_CAMPAIGN = 5.0e-4
 
 
 @dataclass(frozen=True)
@@ -87,6 +93,19 @@ class ThresholdSpec:
             raise ValueError(f"{self.id}.tolerance must be finite and non-negative")
         if not self.source_ref:
             raise ValueError(f"{self.id}.source_ref must be declared")
+
+
+def _d045_upstream_wall_deposit_threshold() -> ThresholdSpec:
+    return ThresholdSpec(
+        id="coating_max_upstream_wall_deposit_fraction_per_campaign",
+        value=MAX_UPSTREAM_WALL_DEPOSIT_FRACTION_PER_CAMPAIGN,
+        units="fraction",
+        source="engineering_envelope",
+        source_ref=(
+            "d-045 (2026-09-26): upstream wall deposit / feedstock charge "
+            "mass per campaign"
+        ),
+    )
 
 
 @dataclass(frozen=True)
@@ -315,6 +334,7 @@ class PhysicsConstraintSet:
         thresholds = [
             self.stream_purity_min,
             self.coating_min_campaigns_to_resinter,
+            _d045_upstream_wall_deposit_threshold(),
             self.extraction_min_fraction,
             *tuple(self.extraction_min_fraction_by_species.values()),
             self.knudsen_max,
@@ -339,6 +359,14 @@ class PhysicsConstraintSet:
                     f"{self.coating_min_campaigns_to_resinter.value:g}"
                 ),
                 self.coating_min_campaigns_to_resinter.source,
+            ),
+            (
+                "coating",
+                (
+                    f"{_d045_upstream_wall_deposit_threshold().id}="
+                    f"{MAX_UPSTREAM_WALL_DEPOSIT_FRACTION_PER_CAMPAIGN:g}"
+                ),
+                "engineering_envelope",
             ),
             (
                 "extraction_completeness",
@@ -756,6 +784,20 @@ class PhysicsConstraintSet:
                     else []
                 )
         deposit_records = _coating_report_deposit_records(report)
+        physical_fraction_mode = (
+            report.get("coating_constraint_mode")
+            == "upstream_deposit_fraction"
+            or "feedstock_charge_mass_kg" in report
+        )
+        if physical_fraction_mode:
+            return _coating_from_upstream_deposit_fraction_report(
+                report=report,
+                authority=authority_payload,
+                diagnostics=diagnostics,
+                deposit_records=deposit_records,
+                output_status=output_status,
+                status_reason=status_reason,
+            )
         unavailable_reason = _coating_wall_quantity_unavailable(
             report,
             authority_payload,
@@ -1901,6 +1943,8 @@ def _coating_authority_flags(authority: Mapping[str, Any]) -> dict[str, Any]:
         "out_of_domain_alpha_species",
         "uncertified_alpha_species",
         "codes",
+        "not_applicable_carrier_species",
+        "not_applicable_by_species",
     )
     return {
         key: _plain_value(authority[key])
@@ -1921,6 +1965,605 @@ def _coating_reason_record(
         "authority": _plain_value(authority),
         "flags": _coating_authority_flags(authority),
     }
+
+
+def _coating_from_upstream_deposit_fraction_report(
+    *,
+    report: Mapping[str, Any],
+    authority: Mapping[str, Any],
+    diagnostics: Mapping[str, Any],
+    deposit_records: list[Mapping[str, Any]],
+    output_status: str,
+    status_reason: str,
+) -> GateMargin:
+    """Apply d-045 to a report with an explicit feedstock charge basis."""
+
+    threshold = _d045_upstream_wall_deposit_threshold()
+    charge_mass_kg = _coating_report_feedstock_charge_mass(report)
+    limit_kg = threshold.value * charge_mass_kg
+    refused_species = _coating_wall_refused_species(report, authority)
+    not_applicable_species, not_applicable_by_species = (
+        _coating_not_applicable_carriers(authority)
+    )
+    certain_deposit_kg, certain_records = _coating_certain_upstream_deposit(
+        report,
+        deposit_records,
+    )
+    refused_bounds = _coating_refused_flux_bounds(report, refused_species)
+    warning_flags: list[dict[str, Any]] = []
+    violation_reasons: list[dict[str, Any]] = []
+
+    for record in certain_records:
+        amount = float(record["deposit_kg_per_campaign"])
+        if (
+            amount <= limit_kg
+            and _coating_quantity_is_flagged(record, authority)
+        ):
+            warning_flags.append(
+                _coating_reason_record(
+                    "flagged_upstream_wall_deposit_below_threshold",
+                    authority=authority,
+                    **{
+                        key: _plain_value(record[key])
+                        for key in (
+                            "campaign",
+                            "segment",
+                            "species",
+                            "zone",
+                        )
+                        if key in record
+                    },
+                    deposit_kg_per_campaign=amount,
+                    threshold_kg_per_campaign=limit_kg,
+                )
+            )
+
+    for finding in diagnostics.get("upstream_hot_wall_findings", ()):
+        warning_flags.append(
+            _coating_reason_record(
+                "upstream_hot_wall_supersaturation",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
+        )
+
+    for species in refused_species:
+        if species in refused_bounds:
+            warning_flags.append(
+                _coating_reason_record(
+                    "wall_saturation_pressure_refused_bounded",
+                    authority=authority,
+                    species=species,
+                    flux_upper_bound_kg_per_campaign=refused_bounds[species],
+                    derivation=(
+                        "a refused species' wall deposit cannot exceed its "
+                        "total vapour flux reaching the segment in the "
+                        "campaign"
+                    ),
+                )
+            )
+
+    for finding in diagnostics.get("silica_exposed_to_alkali_findings", ()):
+        violation_reasons.append(
+            _coating_reason_record(
+                "silica_exposed_to_alkali",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
+        )
+
+    for explicit in report.get("coating_violation_reasons", ()):
+        if isinstance(explicit, Mapping):
+            reason = dict(_plain_value(explicit))
+            reason.setdefault("authority", _plain_value(authority))
+            reason.setdefault("flags", _coating_authority_flags(authority))
+            violation_reasons.append(reason)
+
+    non_refusal_unavailable = _coating_fraction_wall_quantity_unavailable(
+        report,
+        authority,
+        refused_species,
+    )
+    missing_bounds = [
+        species for species in refused_species if species not in refused_bounds
+    ]
+    if non_refusal_unavailable:
+        return _coating_fraction_unavailable_margin(
+            report=report,
+            authority=authority,
+            threshold=threshold,
+            output_status=output_status,
+            reason=non_refusal_unavailable,
+            violation_reasons=violation_reasons,
+            warning_flags=warning_flags,
+            refused_species=refused_species,
+            not_applicable_species=not_applicable_species,
+            not_applicable_by_species=not_applicable_by_species,
+            refused_bounds=refused_bounds,
+            charge_mass_kg=charge_mass_kg,
+            limit_kg=limit_kg,
+            certain_deposit_kg=certain_deposit_kg,
+        )
+    if missing_bounds:
+        return _coating_fraction_unavailable_margin(
+            report=report,
+            authority=authority,
+            threshold=threshold,
+            output_status=output_status,
+            reason=(
+                "wall saturation pressure refused for "
+                + ", ".join(missing_bounds)
+                + "; vapour flux upper bound unavailable"
+            ),
+            violation_reasons=violation_reasons,
+            warning_flags=warning_flags,
+            refused_species=refused_species,
+            not_applicable_species=not_applicable_species,
+            not_applicable_by_species=not_applicable_by_species,
+            refused_bounds=refused_bounds,
+            charge_mass_kg=charge_mass_kg,
+            limit_kg=limit_kg,
+            certain_deposit_kg=certain_deposit_kg,
+        )
+
+    refused_bound_kg = sum(refused_bounds.get(species, 0.0) for species in refused_species)
+    upper_bound_kg = certain_deposit_kg + refused_bound_kg
+    if refused_species and upper_bound_kg > limit_kg:
+        return _coating_fraction_unavailable_margin(
+            report=report,
+            authority=authority,
+            threshold=threshold,
+            output_status=output_status,
+            reason=(
+                "certain upstream deposit plus refused-species vapour-flux "
+                f"upper bound {upper_bound_kg:.6g} kg/campaign exceeds "
+                f"d-045 limit {limit_kg:.6g} kg/campaign"
+            ),
+            violation_reasons=violation_reasons,
+            warning_flags=warning_flags,
+            refused_species=refused_species,
+            not_applicable_species=not_applicable_species,
+            not_applicable_by_species=not_applicable_by_species,
+            refused_bounds=refused_bounds,
+            charge_mass_kg=charge_mass_kg,
+            limit_kg=limit_kg,
+            certain_deposit_kg=certain_deposit_kg,
+            upper_bound_kg=upper_bound_kg,
+        )
+
+    if not refused_species and certain_deposit_kg > limit_kg:
+        reason_payload = {
+            key: _plain_value(certain_records[0][key])
+            for key in ("campaign", "segment", "species", "zone")
+            if len(certain_records) == 1 and key in certain_records[0]
+        }
+        violation_reasons.append(
+            _coating_reason_record(
+                "upstream_wall_deposit_fraction_exceeded",
+                authority=authority,
+                **reason_payload,
+                deposit_kg_per_campaign=certain_deposit_kg,
+                threshold_kg_per_campaign=limit_kg,
+                feedstock_charge_mass_kg=charge_mass_kg,
+                deposit_fraction=certain_deposit_kg / charge_mass_kg,
+            )
+        )
+
+    if not violation_reasons and diagnostics.get(
+        "silica_exposed_to_alkali_findings"
+    ):
+        # Keep the hard silica rule explicit if a future reason filter changes
+        # the list above; zero deposited mass does not waive this finding.
+        violation_reasons.extend(
+            _coating_reason_record(
+                "silica_exposed_to_alkali",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
+            for finding in diagnostics["silica_exposed_to_alkali_findings"]
+        )
+
+    unique_warnings = _unique_coating_records(warning_flags)
+    unique_reasons = _unique_coating_records(violation_reasons)
+    feasible = not unique_reasons
+    observed_kg = upper_bound_kg
+    observed_fraction = observed_kg / charge_mass_kg
+    coating_authoritative = _authority_is_authoritative(authority)
+    status = "warning" if unique_warnings or not coating_authoritative else "available"
+    detail = (
+        "coating constraint violated: "
+        f"{_coating_reason_summary(unique_reasons)}; "
+        f"upstream deposit upper bound={observed_kg:.6g} kg/campaign, "
+        f"d-045 limit={limit_kg:.6g} kg/campaign"
+        if unique_reasons
+        else (
+            "d-045 upstream wall-deposit upper bound="
+            f"{observed_kg:.6g} kg/campaign <= {limit_kg:.6g} kg/campaign"
+        )
+    )
+    payload = _coating_fraction_payload(
+        report=report,
+        authority=authority,
+        threshold=threshold,
+        violation_reasons=unique_reasons,
+        warning_flags=unique_warnings,
+        refused_species=refused_species,
+        not_applicable_species=not_applicable_species,
+        not_applicable_by_species=not_applicable_by_species,
+        refused_bounds=refused_bounds,
+        charge_mass_kg=charge_mass_kg,
+        limit_kg=limit_kg,
+        certain_deposit_kg=certain_deposit_kg,
+        upper_bound_kg=upper_bound_kg,
+        verdict="violated" if unique_reasons else "clear",
+        constraint_authoritative=True,
+    )
+    return GateMargin(
+        gate="coating",
+        feasible=feasible,
+        margin=threshold.value - observed_fraction,
+        threshold=threshold,
+        observed=observed_fraction,
+        detail=detail,
+        status=status,
+        authoritative=coating_authoritative,
+        output_status=output_status,
+        status_reason=(
+            ""
+            if coating_authoritative
+            else status_reason
+            if "resinter threshold" not in status_reason.lower()
+            else ""
+        ),
+        status_payload=payload,
+    )
+
+
+def _coating_fraction_unavailable_margin(
+    *,
+    report: Mapping[str, Any],
+    authority: Mapping[str, Any],
+    threshold: ThresholdSpec,
+    output_status: str,
+    reason: str,
+    violation_reasons: list[dict[str, Any]],
+    warning_flags: list[dict[str, Any]],
+    refused_species: tuple[str, ...],
+    not_applicable_species: tuple[str, ...],
+    not_applicable_by_species: Mapping[str, Any],
+    refused_bounds: Mapping[str, float],
+    charge_mass_kg: float,
+    limit_kg: float,
+    certain_deposit_kg: float,
+    upper_bound_kg: float | None = None,
+) -> GateMargin:
+    payload = _coating_fraction_payload(
+        report=report,
+        authority=authority,
+        threshold=threshold,
+        violation_reasons=_unique_coating_records(violation_reasons),
+        warning_flags=_unique_coating_records(warning_flags),
+        refused_species=refused_species,
+        not_applicable_species=not_applicable_species,
+        not_applicable_by_species=not_applicable_by_species,
+        refused_bounds=refused_bounds,
+        charge_mass_kg=charge_mass_kg,
+        limit_kg=limit_kg,
+        certain_deposit_kg=certain_deposit_kg,
+        upper_bound_kg=upper_bound_kg,
+        verdict="unavailable",
+        constraint_authoritative=False,
+    )
+    payload["coating_unavailable_reason"] = reason
+    payload["coating_excluded_species"] = [
+        {
+            "species": species,
+            "status": "unavailable",
+            "reason": "wall_saturation_pressure_refused",
+        }
+        for species in refused_species
+    ]
+    return GateMargin(
+        gate="coating",
+        feasible=False,
+        margin=-math.inf,
+        threshold=threshold,
+        observed=None,
+        detail=f"coating unavailable: {reason}",
+        status="unavailable",
+        authoritative=False,
+        output_status=output_status,
+        status_reason=reason,
+        status_payload=payload,
+    )
+
+
+def _coating_fraction_payload(
+    *,
+    report: Mapping[str, Any],
+    authority: Mapping[str, Any],
+    threshold: ThresholdSpec,
+    violation_reasons: list[dict[str, Any]],
+    warning_flags: list[dict[str, Any]],
+    refused_species: tuple[str, ...],
+    not_applicable_species: tuple[str, ...],
+    not_applicable_by_species: Mapping[str, Any],
+    refused_bounds: Mapping[str, float],
+    charge_mass_kg: float,
+    limit_kg: float,
+    certain_deposit_kg: float,
+    upper_bound_kg: float | None,
+    verdict: str,
+    constraint_authoritative: bool,
+) -> dict[str, Any]:
+    payload = {
+        **_plain_value(report),
+        "coating_constraint_mode": "upstream_deposit_fraction",
+        "coating_constraint_authoritative": constraint_authoritative,
+        "constraint_mode": "fraction",
+        "coating_threshold_fraction": threshold.value,
+        "feedstock_charge_mass_kg": charge_mass_kg,
+        "upstream_wall_deposit_limit_kg_per_campaign": limit_kg,
+        "certain_upstream_deposit_kg_per_campaign": certain_deposit_kg,
+        "upstream_wall_deposit_upper_bound_kg_per_campaign": upper_bound_kg,
+        "wall_saturation_pressure_refused_species": list(refused_species),
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign": {
+            str(species): float(bound)
+            for species, bound in refused_bounds.items()
+        },
+        "not_applicable_carrier_species": list(not_applicable_species),
+        "not_applicable_by_species": _plain_value(not_applicable_by_species),
+        "coating_violation_reasons": violation_reasons,
+        "coating_warning_flags": warning_flags,
+        "coating_verdict": verdict,
+        "coating_positive_deposit_tolerance_kg_per_campaign": (
+            COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+        ),
+    }
+    return payload
+
+
+def _coating_report_feedstock_charge_mass(report: Mapping[str, Any]) -> float:
+    raw = report.get("feedstock_charge_mass_kg")
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "d-045 coating report requires numeric feedstock_charge_mass_kg"
+        )
+    mass = float(raw)
+    if not math.isfinite(mass) or mass <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "d-045 feedstock_charge_mass_kg must be finite and positive"
+        )
+    return mass
+
+
+def _coating_certain_upstream_deposit(
+    report: Mapping[str, Any],
+    records: list[Mapping[str, Any]],
+) -> tuple[float, list[dict[str, Any]]]:
+    total = 0.0
+    certain_records: list[dict[str, Any]] = []
+    upstream_record_seen = False
+    scoped_record_seen = False
+    for record in records:
+        scope = str(record.get("scope", "upstream"))
+        if scope in {"designated_condenser", "condenser"}:
+            scoped_record_seen = True
+            continue
+        upstream_record_seen = True
+        raw_amount = record.get(
+            "deposit_kg_per_campaign",
+            record.get("wall_deposit_kg_per_campaign", record.get("kg", 0.0)),
+        )
+        try:
+            amount = float(raw_amount)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(amount) or amount < 0.0:
+            raise CoatingFeasibilityReportError(
+                "upstream wall deposit must be finite and non-negative"
+            )
+        if amount <= COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN:
+            continue
+        item = dict(_plain_value(record))
+        item["deposit_kg_per_campaign"] = amount
+        certain_records.append(item)
+        total += amount
+    if not upstream_record_seen and not scoped_record_seen:
+        raw_aggregate = report.get(
+            "unqualified_deposition_rate_kg_per_campaign",
+            report.get("wall_deposit_kg_per_campaign"),
+        )
+        if raw_aggregate is not None:
+            try:
+                aggregate = float(raw_aggregate)
+            except (TypeError, ValueError) as exc:
+                raise CoatingFeasibilityReportError(
+                    "wall deposit rate must be numeric"
+                ) from exc
+            if not math.isfinite(aggregate) or aggregate < 0.0:
+                raise CoatingFeasibilityReportError(
+                    "wall deposit rate must be finite and non-negative"
+                )
+            if aggregate > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN:
+                certain_records.append({
+                    "scope": "upstream",
+                    "deposit_kg_per_campaign": aggregate,
+                })
+                total = aggregate
+    return total, certain_records
+
+
+def _coating_quantity_is_flagged(
+    record: Mapping[str, Any],
+    authority: Mapping[str, Any],
+) -> bool:
+    if any(
+        bool(record.get(key))
+        for key in ("flagged", "extrapolated", "is_extrapolated", "status_bearing")
+    ):
+        return True
+    code = " ".join(
+        str(authority.get(key, ""))
+        for key in ("code", "output_status", "status", "message")
+    ).lower()
+    return "extrapolat" in code or "status_bearing" in code
+
+
+def _coating_wall_refused_species(
+    *sources: Mapping[str, Any] | None,
+) -> tuple[str, ...]:
+    species: set[str] = set()
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        raw_species = source.get("wall_saturation_pressure_refused_species", ())
+        if isinstance(raw_species, str):
+            species.add(raw_species)
+        elif isinstance(raw_species, (tuple, list, set, frozenset)):
+            species.update(str(item) for item in raw_species if str(item))
+        raw_map = source.get("wall_saturation_pressure_refusals_by_species")
+        if isinstance(raw_map, Mapping):
+            species.update(str(item) for item in raw_map if str(item))
+    return tuple(sorted(species))
+
+
+def _coating_not_applicable_carriers(
+    authority: Mapping[str, Any],
+) -> tuple[tuple[str, ...], dict[str, Any]]:
+    species: set[str] = set()
+    records: dict[str, Any] = {}
+    raw_species = authority.get("not_applicable_carrier_species", ())
+    if isinstance(raw_species, str):
+        species.add(raw_species)
+    elif isinstance(raw_species, (tuple, list, set, frozenset)):
+        species.update(str(item) for item in raw_species if str(item))
+    raw_records = authority.get("not_applicable_by_species")
+    if isinstance(raw_records, Mapping):
+        for item, record in raw_records.items():
+            key = str(item)
+            species.add(key)
+            records[key] = _plain_value(record)
+    carriers = authority.get("vapour_carrier_authority_by_species", {})
+    if isinstance(carriers, Mapping):
+        for item, record in carriers.items():
+            if not isinstance(record, Mapping) or not _is_inapplicable_carrier(record):
+                continue
+            key = str(item)
+            species.add(key)
+            records[key] = _plain_value(record)
+    return tuple(sorted(species)), records
+
+
+def _is_inapplicable_carrier(record: Mapping[str, Any]) -> bool:
+    if str(record.get("refusal_code", "")) == "inapplicable_by_declared_predicate":
+        return True
+    extra = record.get("extra")
+    evidence = extra.get("applicability_evidence") if isinstance(extra, Mapping) else None
+    return (
+        isinstance(evidence, Mapping)
+        and str(evidence.get("code", evidence.get("refusal_code", "")))
+        == "inapplicable_by_declared_predicate"
+    )
+
+
+def _coating_refused_flux_bounds(
+    report: Mapping[str, Any],
+    refused_species: tuple[str, ...],
+) -> dict[str, float]:
+    raw = report.get(
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign",
+        report.get("refused_species_flux_upper_bounds_kg_per_campaign", {}),
+    )
+    if raw is None:
+        return {}
+    if isinstance(raw, Mapping):
+        entries = raw.items()
+    elif isinstance(raw, (tuple, list)):
+        entries = (
+            (
+                item.get("species"),
+                item.get(
+                    "flux_upper_bound_kg_per_campaign",
+                    item.get("bound_kg_per_campaign"),
+                ),
+            )
+            for item in raw
+            if isinstance(item, Mapping)
+        )
+    else:
+        raise CoatingFeasibilityReportError(
+            "refused species flux upper bounds must be a mapping or records"
+        )
+    bounds: dict[str, float] = {}
+    for raw_species, raw_bound in entries:
+        if raw_species is None:
+            continue
+        if isinstance(raw_bound, bool) or not isinstance(raw_bound, int | float):
+            raise CoatingFeasibilityReportError(
+                f"refused species flux bound for {raw_species!r} must be numeric"
+            )
+        bound = float(raw_bound)
+        if not math.isfinite(bound) or bound < 0.0:
+            raise CoatingFeasibilityReportError(
+                f"refused species flux bound for {raw_species!r} must be finite "
+                "and non-negative"
+            )
+        bounds[str(raw_species)] = bound
+    # Mutation guard: refused flux bounds must not default to zero.
+    return bounds
+
+
+def _coating_fraction_wall_quantity_unavailable(
+    report: Mapping[str, Any],
+    authority: Mapping[str, Any],
+    refused_species: tuple[str, ...],
+) -> str:
+    for source in (report, authority):
+        if not isinstance(source, Mapping):
+            continue
+        if source.get("wall_quantity_unavailable") is True:
+            if refused_species:
+                continue
+            return str(
+                source.get("status_reason")
+                or source.get("message")
+                or "wall quantity unavailable"
+            )
+        code = str(source.get("code", "")).lower()
+        if (
+            "saturation_pressure_refused" in code
+            or "wall_saturation_pressure_refused" in code
+        ) and not refused_species:
+            return str(
+                source.get("status_reason")
+                or source.get("message")
+                or "wall saturation pressure was refused"
+            )
+        if code == "wall_deposit_coverage_unknown":
+            return str(source.get("message") or "wall deposit quantity is unavailable")
+        lowered_reason = str(source.get("status_reason", "")).lower()
+        if (
+            "wall saturation pressure" in lowered_reason
+            and "refus" in lowered_reason
+            and not refused_species
+        ):
+            return str(source.get("status_reason"))
+    return ""
+
+
+def _unique_coating_records(
+    records: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    unique: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for record in records:
+        key = repr(_plain_value(record))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(record)
+    return unique
 
 
 def _coating_violation_reasons(

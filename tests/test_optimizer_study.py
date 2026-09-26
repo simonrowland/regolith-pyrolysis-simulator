@@ -4565,10 +4565,10 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     )
     new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
 
-    # v6: flagged upstream wall deposition is a hard no-coating violation and
-    # refused wall quantities are unavailable; old feasibility caches cannot be
+    # v7: d-045 bounds upstream wall deposition by charge mass and bounds
+    # refused wall quantities by vapour flux; old feasibility caches cannot be
     # served under the same physics_constraints_digest.
-    assert current_version == "physics-feasibility-v6-predicted-coating"
+    assert current_version == "physics-feasibility-v7-d045-upstream-fraction"
     assert old_digest != new_digest
     assert old_cache_key != new_cache_key
     assert old_recipe_id == new_recipe_id

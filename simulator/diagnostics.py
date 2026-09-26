@@ -312,8 +312,26 @@ def wall_deposit_sticking_authority_status(
     )
     carrier_authority = _vapour_carrier_authority_by_species(notice)
     carrier_lineage = _vapour_carrier_lineage_by_deposited_species(notice)
+    not_applicable_by_species = _inapplicable_carrier_records(notice)
+    not_applicable_species = set(not_applicable_by_species)
+    not_applicable_species.update(
+        str(species)
+        for species in notice.get("not_applicable_carrier_species", ())
+        if str(species)
+    )
+    not_applicable_products = {
+        str(species)
+        for species in deposited_species
+        if _lineage_is_not_applicable(
+            carrier_lineage.get(str(species)),
+            not_applicable_species,
+        )
+    }
     carrier_species = tuple(sorted(
-        set(deposited_species) | set(carrier_authority)
+        (
+            set(deposited_species)
+            | set(carrier_authority)
+        ) - not_applicable_species - not_applicable_products
     ))
     def _lineage_sources(species: str) -> tuple[str, ...]:
         return vapour_carrier_lineage_species(
@@ -375,6 +393,8 @@ def wall_deposit_sticking_authority_status(
         "missing_carrier_authority_species": (
             missing_carrier_authority_species
         ),
+        "not_applicable_carrier_species": tuple(sorted(not_applicable_species)),
+        "not_applicable_by_species": not_applicable_by_species,
     }
     refused_species = tuple(sorted(saturation_pressure_refusals))
     geometry_notice = _surface_geometry_provenance_notice(notice)
@@ -907,6 +927,8 @@ def _wall_deposit_authority_payload(
     refused_carrier_species: Sequence[str] = (),
     proven_zero_carrier_species: Sequence[str] = (),
     missing_carrier_authority_species: Sequence[str] = (),
+    not_applicable_carrier_species: Sequence[str] = (),
+    not_applicable_by_species: Mapping[str, Any] | None = None,
     wall_saturation_pressure_extrapolations_by_species: Mapping[str, Any] | None = None,
     evaporation_transport_notices_by_species: Mapping[str, Any] | None = None,
     out_of_domain_alpha_species: Sequence[str] = (),
@@ -955,6 +977,12 @@ def _wall_deposit_authority_payload(
         "proven_zero_carrier_species": list(proven_zero_carrier_species),
         "missing_carrier_authority_species": list(
             missing_carrier_authority_species
+        ),
+        "not_applicable_carrier_species": list(
+            not_applicable_carrier_species
+        ),
+        "not_applicable_by_species": _plain_mapping(
+            not_applicable_by_species or {}
         ),
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
         "message": message,
@@ -1163,6 +1191,47 @@ def _vapour_carrier_authority_by_species(
         for species, record in raw.items()
         if isinstance(record, Mapping)
     }
+
+
+def _inapplicable_carrier_records(
+    notice: Mapping[str, Any],
+) -> dict[str, Mapping[str, Any]]:
+    carriers = _vapour_carrier_authority_by_species(notice)
+    result: dict[str, Mapping[str, Any]] = {}
+    for species, record in carriers.items():
+        if _carrier_is_inapplicable(record):
+            result[species] = _plain_mapping(record)
+    raw = notice.get("not_applicable_by_species")
+    if isinstance(raw, Mapping):
+        for species, record in raw.items():
+            if isinstance(record, Mapping):
+                result[str(species)] = _plain_mapping(record)
+    return result
+
+
+def _carrier_is_inapplicable(record: Mapping[str, Any]) -> bool:
+    if str(record.get("refusal_code", "")) == "inapplicable_by_declared_predicate":
+        return True
+    extra = record.get("extra")
+    evidence = extra.get("applicability_evidence") if isinstance(extra, Mapping) else None
+    return (
+        isinstance(evidence, Mapping)
+        and str(evidence.get("code", evidence.get("refusal_code", "")))
+        == "inapplicable_by_declared_predicate"
+    )
+
+
+def _lineage_is_not_applicable(
+    lineage: Any,
+    not_applicable_species: set[str],
+) -> bool:
+    if isinstance(lineage, str):
+        sources = (lineage,)
+    elif isinstance(lineage, Sequence) and not isinstance(lineage, (bytes, bytearray)):
+        sources = tuple(str(item) for item in lineage)
+    else:
+        sources = ()
+    return bool(sources) and all(source in not_applicable_species for source in sources)
 
 
 def _vapour_carrier_lineage_by_deposited_species(

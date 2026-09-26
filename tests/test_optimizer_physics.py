@@ -157,6 +157,25 @@ def _valid_trace_object(**overrides: object) -> SimpleNamespace:
     return SimpleNamespace(**fields)
 
 
+def _d045_report(**overrides: object) -> dict[str, object]:
+    report: dict[str, object] = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": False,
+        "output_status": "non-authoritative-threshold",
+        "status_reason": "resinter threshold is not grounded",
+        "feedstock_charge_mass_kg": 1.0,
+        "coating_constraint_mode": "upstream_deposit_fraction",
+        "coating_constraint_authoritative": True,
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+        },
+    }
+    report.update(overrides)
+    return report
+
+
 def _assert_insufficient_target_evidence_is_unknown(
     target: dict[str, object],
 ) -> None:
@@ -560,6 +579,246 @@ def test_direct_null_threshold_report_binds_no_unqualified_deposition() -> None:
     assert coating.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"
     )
+
+
+def test_d045_threshold_just_below_is_feasible() -> None:
+    report = _d045_report(
+        wall_deposit_kg_per_campaign=4.999e-4,
+        unqualified_deposition_rate_kg_per_campaign=4.999e-4,
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.observed == pytest.approx(4.999e-4)
+    assert coating.margin > 0.0
+    assert coating.threshold.id == (
+        "coating_max_upstream_wall_deposit_fraction_per_campaign"
+    )
+
+
+def test_d045_threshold_just_above_is_a_violation() -> None:
+    report = _d045_report(
+        wall_deposit_kg_per_campaign=5.001e-4,
+        unqualified_deposition_rate_kg_per_campaign=5.001e-4,
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_wall_deposit_fraction_exceeded"
+    )
+
+
+def test_d045_flagged_deposit_below_threshold_passes_with_flag() -> None:
+    report = _d045_report(
+        wall_deposit_kg_per_campaign=4.0e-4,
+        unqualified_deposition_rate_kg_per_campaign=4.0e-4,
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_extrapolated",
+            "wall_saturation_pressure_extrapolations_by_species": {
+                "Fe": {"wall_temperature_C": 1400.0},
+            },
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status == "warning"
+    assert coating.status_payload["coating_warning_flags"][0]["reason"] == (
+        "flagged_upstream_wall_deposit_below_threshold"
+    )
+
+
+def test_d045_silica_exposure_fails_at_zero_wall_deposit_mass() -> None:
+    report = _d045_report(
+        wall_deposit_kg_per_campaign=0.0,
+        coating_diagnostics={
+            "silica_exposed_to_alkali_findings": [{
+                "key": "silica_exposed_to_alkali",
+                "stage_number": 3,
+            }],
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert any(
+        reason["reason"] == "silica_exposed_to_alkali"
+        for reason in coating.status_payload["coating_violation_reasons"]
+    )
+
+
+def test_d045_dew_point_finding_below_threshold_is_a_warning() -> None:
+    report = _d045_report(
+        coating_diagnostics={
+            "upstream_hot_wall_findings": [{
+                "segment": "stage_0_to_stage_1",
+                "species": "Fe",
+                "finding": "p_i > P_sat,i(T_wall)",
+            }],
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status == "warning"
+    assert coating.status_payload["coating_violation_reasons"] == []
+    assert coating.status_payload["coating_warning_flags"][0]["reason"] == (
+        "upstream_hot_wall_supersaturation"
+    )
+
+
+def test_d045_refused_species_bound_below_threshold_is_feasible_with_flag() -> None:
+    report = _d045_report(
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 4.0e-4,
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status == "warning"
+    flag = coating.status_payload["coating_warning_flags"][0]
+    assert flag["reason"] == "wall_saturation_pressure_refused_bounded"
+    assert flag["species"] == "CrO2"
+    assert flag["flux_upper_bound_kg_per_campaign"] == pytest.approx(4.0e-4)
+
+
+def test_d045_refused_species_bound_above_threshold_is_unavailable() -> None:
+    report = _d045_report(
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+        wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign={
+            "CrO2": 6.0e-4,
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert coating.status_payload["coating_excluded_species"] == [{
+        "species": "CrO2",
+        "status": "unavailable",
+        "reason": "wall_saturation_pressure_refused",
+    }]
+
+
+def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
+    report = _d045_report(
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["CrO2"],
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert "upper bound unavailable" in coating.status_reason
+
+
+def test_d045_inapplicable_carrier_is_excluded_and_feasible() -> None:
+    report = _d045_report(
+        output_status="status_bearing",
+        status_reason=(
+            "Wall routing carried non-authoritative vapour evidence "
+            "(P2=refused); zero wall deposition cannot be certified. "
+            "Wall saturation includes EXTRAPOLATED quantities."
+        ),
+        sticking_alpha_authority={
+            "authoritative_for_deposit_mass": True,
+            "vapour_carrier_authority_by_species": {
+                "P2": {
+                    "species_id": "P2",
+                    "refusal_code": "inapplicable_by_declared_predicate",
+                    "is_refused": True,
+                    "extra": {
+                        "applicability_evidence": {
+                            "code": "inapplicable_by_declared_predicate",
+                            "flux_dormant": True,
+                        },
+                    },
+                },
+            },
+        },
+    )
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status_payload["not_applicable_carrier_species"] == ["P2"]
+    assert coating.status_payload["not_applicable_by_species"]["P2"][
+        "refusal_code"
+    ] == "inapplicable_by_declared_predicate"
+
+
+def test_wall_authority_records_inapplicable_carrier_without_unknown_status() -> None:
+    authority = wall_deposit_sticking_authority_status(
+        {("hot_wall", "Fe"): 0.0},
+        {
+            "vapour_carrier_authority_by_species": {
+                "P2": {
+                    "species_id": "P2",
+                    "refusal_code": "inapplicable_by_declared_predicate",
+                    "is_refused": True,
+                    "extra": {
+                        "applicability_evidence": {
+                            "code": "inapplicable_by_declared_predicate",
+                            "flux_dormant": True,
+                        },
+                    },
+                },
+            },
+        },
+    )
+
+    assert authority["not_applicable_carrier_species"] == ["P2"]
+    assert authority["not_applicable_by_species"]["P2"]["refusal_code"] == (
+        "inapplicable_by_declared_predicate"
+    )
+    assert "P2" not in authority["non_authoritative_carrier_species"]
+    assert "P2" not in authority["refused_carrier_species"]
 
 
 @pytest.mark.parametrize(
