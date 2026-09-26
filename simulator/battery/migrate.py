@@ -5265,9 +5265,10 @@ def _reference_endmember_formula(
         token = _reference_formula_token(values.get(key))
         if token is not None:
             return token
-    return _reference_formula_token(species_formula) or (
-        species_formula if species_formula else None
-    )
+    activity = re.search(rf"\ba_({_REFERENCE_FORMULA})\b", text)
+    if activity is not None:
+        return _reference_formula_token(activity.group(1))
+    return None
 
 
 def _reference_phase_for_formula(
@@ -10070,7 +10071,21 @@ class Migrator:
             phase_provenance = _pressure_species_phase_provenance(
                 q_token, source_standard_state
             )
-            if phase_provenance is not None:
+            # Derived/reduced pressure rows may identify a gas species even
+            # when the source phase names its condensed system; measured rows
+            # keep an explicit, missing, or unmapped source phase.
+            method_class = str(values.get("method_class") or "").strip().casefold()
+            inferred_pressure_phase = (
+                _source_standard_state_phase(source_standard_state, "g") is not None
+                or method_class
+                in {
+                    "model_derived",
+                    "calculated",
+                    "author_derived",
+                    "directly_reduced_measurement",
+                }
+            )
+            if phase_provenance is not None and phase.is_unknown and inferred_pressure_phase:
                 phase = State.of(Phase.G)
                 unmapped_phase = None
         if phase_raw is None or phase_raw == "":
@@ -10613,7 +10628,7 @@ class Migrator:
                 value_conversion,
                 read_from,
             )
-        if phase_provenance is not None:
+        if phase_provenance is not None and value.kind is not ValueKind.UNAVAILABLE:
             if value_derivation is None:
                 value_derivation = Derivation(
                     relation=phase_provenance,
@@ -11386,16 +11401,6 @@ class Migrator:
             if isinstance(quantity, Quantity)
             else (quantity.value if isinstance(quantity, State) and quantity.is_value else None)
         )
-        phase_provenance = None
-        if q_for_comp in {Quantity.P_PARTIAL, Quantity.P_SAT} and species.phase.is_unknown:
-            phase_provenance = _pressure_species_phase_provenance(q_for_comp, None)
-            if phase_provenance is not None:
-                species = make_species(
-                    species.formula,
-                    State.of(Phase.G),
-                    polymorph=species.polymorph,
-                    charge=species.charge,
-                )
         if q_for_comp in _BULK_PROPERTY_QUANTITIES and ident_kwargs.get("composition") is None:
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         identity = fill_identity(quantity, species, **ident_kwargs)
@@ -11445,19 +11450,6 @@ class Migrator:
             locator.source_path if locator is not None else None,
         )
         read_from = choose_read_from(work, locator)
-        if phase_provenance is not None:
-            if derivation is None:
-                derivation = Derivation(
-                    relation=phase_provenance,
-                    inputs=(read_from,),
-                    parameters=(),
-                    output_unit="Pa",
-                )
-            else:
-                derivation = replace(
-                    derivation,
-                    relation=f"{derivation.relation}; {phase_provenance}",
-                )
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
             self.result.add_queue(

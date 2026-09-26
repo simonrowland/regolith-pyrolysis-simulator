@@ -4106,7 +4106,7 @@ def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
     loaded = next(
         obs
         for obs in arxiv.observations.values()
-        if obs.observation_id.endswith("sossi_fegley_2018_table2_activity_coefficients")
+        if "sossi_fegley_2018_table2_activity_coefficients" in obs.observation_id
     )
     reference = loaded.identity.reference_state
     assert reference is None or not reference.is_value or (
