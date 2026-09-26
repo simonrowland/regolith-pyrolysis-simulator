@@ -5581,6 +5581,7 @@ class CondensationModel:
             species,
             T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
             vapor_pressure_data=self.vapor_pressure_data,
+            reactive_product_backstop=False,
             antoine_extrapolations=psat_notices,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
@@ -7202,6 +7203,7 @@ def _antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    reactive_product_backstop: bool = True,
 ) -> float | None:
     if enforce_hot_train_applicability:
         _assert_condensation_applicable(
@@ -7213,6 +7215,57 @@ def _antoine_psat_pa(
         vapor_pressure_data=vapor_pressure_data,
     )
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
+    pure_component = data.get("pure_component_antoine")
+    if (
+        str(species) == "SiO"
+        and reactive_product_backstop
+        and str(data.get("fit_target") or "") == "standard_reaction_term"
+        and (
+            not isinstance(pure_component, Mapping)
+            or not pure_component
+        )
+    ):
+        # SiO's source ``antoine`` block is the SiO2(l) -> SiO(g) + 0.5 O2(g)
+        # reaction term, not a pure SiO(g) wall curve. The wall product
+        # saturation pressure is the existing reactive bridge for
+        # 2 SiO(g) = Si + SiO2, with dG_disp = -2 dG_B - dG_A.
+        if T_K <= 0.0:
+            raise DepositionInputRefusal(
+                "T_wall_K", T_K, "must be above absolute zero"
+            )
+        equilibrium = _sio_disproportionation_equilibrium(
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        pressure_pa = float(equilibrium["p_eq_pa"])
+        valid_range = equilibrium.get("valid_range_K")
+        if equilibrium.get("antoine_standard_state_extrapolated") and valid_range:
+            low_K, high_K = (float(value) for value in valid_range)
+            record = {
+                "temperature_K": T_K,
+                "valid_range_K": [low_K, high_K],
+                "authority_level": equilibrium["authority_level"],
+                "reason": "wall_saturation_pressure_out_of_validated_range",
+                "original_reason": "sio_reactive_equilibrium_bridge",
+                "status": "extrapolated",
+                "output_status": "status_bearing",
+                "continuation": "sio_reactive_equilibrium_bridge",
+                "saturation_pressure_policy": "reactive_equilibrium",
+                "wall_saturation_pressure_pa": pressure_pa,
+                "antoine_standard_state_extrapolated": True,
+            }
+            if antoine_extrapolations is not None:
+                antoine_extrapolations[f"{species}#wall:{T_K}"] = record
+            if antoine_extrapolation_warnings is not None:
+                temperature_text = f"{T_K:.3f}".rstrip("0").rstrip(".")
+                warning = (
+                    f"{species} reactive wall bridge extrapolated beyond "
+                    f"valid_range_K [{low_K:g}, {high_K:g}] at "
+                    f"{temperature_text} K"
+                )
+                if warning not in antoine_extrapolation_warnings:
+                    antoine_extrapolation_warnings.append(warning)
+        return pressure_pa
     has_legacy_antoine = any(
         isinstance(block, Mapping)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
@@ -7451,6 +7504,7 @@ def _try_antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    reactive_product_backstop: bool = True,
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
@@ -7477,6 +7531,7 @@ def _try_antoine_psat_pa(
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             enforce_hot_train_applicability=enforce_hot_train_applicability,
+            reactive_product_backstop=reactive_product_backstop,
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
             WallSaturationPressureRefusal) as exc:
@@ -7520,6 +7575,7 @@ def _local_species_pressure_pa(
         species,
         T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
+        reactive_product_backstop=False,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -8182,6 +8238,7 @@ def _wall_deposition_driving_pressure_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
+        reactive_product_backstop=reactive_product_backstop,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )

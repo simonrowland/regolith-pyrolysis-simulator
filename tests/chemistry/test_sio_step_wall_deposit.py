@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+import math
 from typing import Any
 
 import pytest
@@ -23,6 +24,38 @@ from simulator.condensation import (
 )
 from simulator.runner import build_sio_yield_report
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
+
+
+def _sio_product_psat_from_source(temperature_K: float) -> float:
+    """Recompute the SiO product pressure from the source-row coefficients."""
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_segment_for_temperature,
+    )
+
+    source = condensation_module._species_vapor_data("SiO")
+    coefficients = source["antoine"]
+    reaction = source["reaction"]
+    p_ref_pa = 10.0 ** (
+        float(coefficients["A"])
+        - float(coefficients["B"])
+        / (float(temperature_K) + float(coefficients.get("C", 0.0)))
+    )
+    p_std_pa = float(reaction["standard_pressure_Pa"])
+    pO2_reference_bar = float(
+        source.get("pO2_reference_bar")
+        or reaction["pO2_reference_bar"]
+    )
+    k_b = (p_ref_pa / p_std_pa) * math.sqrt(pO2_reference_bar)
+    dG_b_J = -condensation_module.GAS_CONSTANT_J_MOL_K * temperature_K * math.log(k_b)
+    silicon_segment = ellingham_segment_for_temperature("Si", temperature_K)
+    dG_a_J = (
+        float(silicon_segment.delta_g_kJ_per_mol_O2(temperature_K)) * 1000.0
+    )
+    # 2 SiO(g) = Si + SiO2: dG_disp = -2 dG_B - dG_A.
+    return p_std_pa * math.exp(
+        (-2.0 * dG_b_J - dG_a_J)
+        / (2.0 * condensation_module.GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
 
 
 @lru_cache(maxsize=None)
@@ -239,12 +272,11 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     p_local_pa = 1.0
     alpha_s = 0.04
 
-    with pytest.raises(WallSaturationPressureRefusal) as refusal:
-        _antoine_psat_pa("SiO", wall_T_K)
-    # SiO now carries the melt standard-reaction term, which must not be
-    # consumed as a pure-vapor wall saturation pressure. The authorized
-    # disproportionation-product backstop supplies the P_sat ~= 0 limit.
-    assert refusal.value.valid_range_K == [1400.0, 2273.15]
+    sio_psat_pa = _antoine_psat_pa("SiO", wall_T_K)
+    assert sio_psat_pa == pytest.approx(
+        _sio_product_psat_from_source(wall_T_K), rel=2e-12,
+    )
+    assert sio_psat_pa > p_local_pa
 
     driving_notice: dict[str, object] = {}
     driving_pressure = _wall_deposition_driving_pressure_pa(
@@ -274,6 +306,40 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     assert hkl_flux == pytest.approx(expected_hkl)
     assert series_flux == pytest.approx(expected_hkl)
     assert hkl_flux == 0.0
+
+
+@pytest.mark.parametrize("temperature_K", [1400.001, 2273.149])
+def test_sio_wall_pressure_inside_declared_band_is_a_value(temperature_K):
+    notices: dict[str, dict[str, Any]] = {}
+    pressure_pa = _antoine_psat_pa(
+        "SiO",
+        temperature_K,
+        antoine_extrapolations=notices,
+    )
+
+    assert math.isfinite(pressure_pa) and pressure_pa > 0.0
+    assert notices == {}
+
+
+@pytest.mark.parametrize("temperature_K", [1399.999, 2273.151])
+def test_sio_wall_pressure_outside_band_predicts_and_flags(temperature_K):
+    notices: dict[str, dict[str, Any]] = {}
+    warnings: list[str] = []
+    pressure_pa = _antoine_psat_pa(
+        "SiO",
+        temperature_K,
+        antoine_extrapolations=notices,
+        antoine_extrapolation_warnings=warnings,
+    )
+
+    assert math.isfinite(pressure_pa) and pressure_pa > 0.0
+    notice = notices[f"SiO#wall:{temperature_K}"]
+    assert notice["status"] == "extrapolated"
+    assert notice["output_status"] == "status_bearing"
+    assert notice["authority_level"] == "bridge"
+    assert notice["valid_range_K"] == [1400.0, 2273.15]
+    assert notice["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert warnings
 
 
 @pytest.mark.parametrize(

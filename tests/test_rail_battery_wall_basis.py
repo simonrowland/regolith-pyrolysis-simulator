@@ -188,8 +188,8 @@ def test_sio_reactive_equilibrium_at_1400_c_stays_undersaturated():
     """1 mbar SiO at 1400 C is below p_eq, so the duct stays clear."""
 
     sio_psat, refused = _try_antoine_psat_pa("SiO", WALL_1400_K)
-    assert refused is True
-    assert sio_psat is None
+    assert refused is False
+    assert sio_psat is not None and sio_psat > 0.0
 
     notice: dict[str, object] = {}
     driving = _wall_deposition_driving_pressure_pa(
