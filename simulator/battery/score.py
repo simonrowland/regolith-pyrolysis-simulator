@@ -101,13 +101,14 @@ SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.MAGEMIN,
     Engine.IMCC_SF04,
     Engine.IMCC_SF04_EXT,
+    Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
     {Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN}
 )
 IMCC_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT}
+    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC}
 )
 # These adapters consume the supplied composition as one homogeneous liquid.
 # AlphaMELTS, ThermoEngine, and MAGEMin can resolve a liquid from a bulk input.
@@ -281,6 +282,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.MAGEMIN: "magemin",
     Engine.IMCC_SF04: "imcc_sf04",
     Engine.IMCC_SF04_EXT: "imcc_sf04_ext",
+    Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
@@ -290,6 +292,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.MAGEMIN: ("magemin",),
     Engine.IMCC_SF04: ("imcc-sf04-v1.0.2",),
     Engine.IMCC_SF04_EXT: ("imcc-sf04-ext-v4",),
+    Engine.OPENIMCC: ("openimcc-v1.0.2",),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
@@ -345,6 +348,7 @@ class EnginePrediction:
     refusal_reason: RefusalReason | None = None
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
+    version: str | None = None
 
 
 @dataclass(frozen=True)
@@ -975,7 +979,7 @@ def _row_out_of_certified_band(kind: str, row: Mapping[str, object]) -> bool:
         return True
     if str(row.get("authority") or "") == "extrapolated":
         return True
-    return kind.startswith("imcc_") and (
+    return (kind.startswith("imcc_") or kind.startswith("openimcc_")) and (
         "extrapolated" in kind or "outside" in kind
     )
 
@@ -1087,6 +1091,24 @@ def cell_notices(
                         if row.get("dropped_mass_fraction") is None
                         else as_decimal(row["dropped_mass_fraction"])
                     ),
+                )
+            )
+        elif kind == "openimcc_notice":
+            notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
                 )
             )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
@@ -1686,8 +1708,53 @@ def predict_with_engine(
     if handle is None:
         handle = open_battery_engine(engine.value)
     name = str(getattr(handle, "name", engine.value))
+    engine_version: str | None = None
+    if engine is Engine.OPENIMCC:
+        identity_block = getattr(handle, "identity", None) or {}
+        if isinstance(identity_block, Mapping):
+            engine_version = str(identity_block.get("version") or "") or None
+            provenance = (
+                ("openimcc-pack-version", identity_block.get("pack_version")),
+                ("openimcc-pack-digest", identity_block.get("pack_digest")),
+                ("openimcc-gas-table", identity_block.get("gas_table_source")),
+            )
+            sources = tuple(
+                dict.fromkeys(
+                    [
+                        *sources,
+                        *(
+                            f"{label}:{value}"
+                            for label, value in provenance
+                            if value
+                        ),
+                    ]
+                )
+            )
     available = bool(getattr(handle, "available", False))
     if not available:
+        unavailable_reason = str(getattr(handle, "unavailable_reason", None) or "")
+        if engine is Engine.OPENIMCC and "openimcc_not_importable" in unavailable_reason:
+            remedy = unavailable_reason[unavailable_reason.find("remedy:") :]
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=f"open_battery_engine:{name}",
+                ),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                refusal_detail={
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "engine_reason": unavailable_reason,
+                    "remedy": remedy or unavailable_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1701,10 +1768,11 @@ def predict_with_engine(
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
             refusal_detail={
                 "reason": REFUSAL_UNAVAILABLE,
-                "engine_reason": getattr(handle, "unavailable_reason", None),
+                "engine_reason": unavailable_reason,
             },
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
 
     qualification = False
@@ -1743,6 +1811,16 @@ def predict_with_engine(
     )
     if status != "ok":
         typed = str(refusal or status or "unavailable")
+        engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        openimcc_outside_species = engine is Engine.OPENIMCC and any(
+            token in f"{typed} {engine_side_reason}"
+            for token in (
+                "imcc_component_outside_domain",
+                "imcc_species_not_found",
+                "imcc_ferric_input_unsupported",
+                "imcc_sp_extension_required",
+            )
+        )
         if typed in {REFUSAL_ENGINE_CRASH, "subprocess_died"} or getattr(cell, "exit_signal", None):
             return EnginePrediction(
                 engine=engine,
@@ -1765,6 +1843,7 @@ def predict_with_engine(
                 },
                 identity=identity,
                 requested_composition=requested,
+                version=engine_version,
             )
         if typed == REFUSAL_TIMEOUT:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
@@ -1772,6 +1851,9 @@ def predict_with_engine(
         elif typed == REFUSAL_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
             reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif openimcc_outside_species:
+            exec_state = ExecutionState.UNSUPPORTED
+            reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
         else:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.UNSUPPORTED
@@ -1786,10 +1868,16 @@ def predict_with_engine(
             refusal_reason=reason,
             refusal_detail={
                 "refusal_reason": typed,
-                "engine_reason": getattr(cell, "engine_reason", None),
+                "engine_reason": engine_side_reason,
+                **(
+                    {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
+                    if openimcc_outside_species
+                    else {}
+                ),
             },
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
 
     activities = dict(getattr(cell, "melt_activities", None) or {})
@@ -1815,6 +1903,7 @@ def predict_with_engine(
                 },
                 identity=identity,
                 requested_composition=requested,
+                version=engine_version,
             )
         reported = selected
         unit = "dimensionless"
@@ -1856,6 +1945,11 @@ def predict_with_engine(
         }
         if converter_reason:
             detail["converter"] = converter_reason
+        refusal_reason = RefusalReason.UNSUPPORTED
+        if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
+            refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+            detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+            detail["engine"] = "openimcc gas tables"
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1865,10 +1959,11 @@ def predict_with_engine(
             coefficient_sources=sources,
             lineage_complete=False,
             certified_band=certified_band,
-            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_reason=refusal_reason,
             refusal_detail=detail,
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
     if not math.isfinite(magnitude):
         return EnginePrediction(
@@ -1883,6 +1978,7 @@ def predict_with_engine(
             refusal_detail={"reason": "nonfinite_engine_value", "value": str(magnitude)},
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
@@ -1898,6 +1994,7 @@ def predict_with_engine(
         certified_band=certified_band,
         identity=identity,
         requested_composition=requested,
+        version=engine_version,
     )
 
 
@@ -1935,6 +2032,7 @@ def candidate_observation(
             run_id=prediction.execution.call_evidence or f"{prediction.engine.value}:run",
             coefficient_sources=prediction.coefficient_sources or ("unresolved",),
             lineage_complete=prediction.lineage_complete,
+            version=prediction.version,
             requested_composition=prediction.requested_composition,
         ),
         authority=prediction.authority,

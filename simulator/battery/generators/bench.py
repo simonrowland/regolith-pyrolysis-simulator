@@ -165,6 +165,12 @@ _ENGINE_REPORTED_ACTIVITY.update({
     )
     for engine in ("imcc_sf04", "imcc_sf04_ext")
 })
+_ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
+    "raoultian_pure_liquid_oxide_parent",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -269,7 +275,7 @@ def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
 def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
     if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
-    if engine in ("imcc_sf04", "imcc_sf04_ext"):
+    if engine in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
         return _imcc_reports_parent_oxide(formula)
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
