@@ -1637,7 +1637,10 @@ def _engine_melt_psat_pa(
             temperature_C=float(T_K) - 273.15,
             pressure_bar=max(float(pO2_bar), 1.0e-30),
             fO2_log=math.log10(max(float(pO2_bar), 1.0e-30)),
-            control_inputs={"pO2_bar": float(pO2_bar)},
+            control_inputs={
+                "pO2_bar": float(pO2_bar),
+                "interface_pO2_bar": float(pO2_bar),
+            },
         )
         try:
             result = provider.dispatch(request)

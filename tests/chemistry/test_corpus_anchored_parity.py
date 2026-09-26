@@ -241,7 +241,10 @@ def _dispatch_vapor_pressure(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=anchor.T_K - 273.15,
             pressure_bar=1e-12,
-            control_inputs={"pO2_bar": pO2_bar},
+            control_inputs={
+                "pO2_bar": pO2_bar,
+                "interface_pO2_bar": pO2_bar,
+            },
             fO2_log=anchor.fO2_log,
         )
     except ProviderUnavailableError as exc:

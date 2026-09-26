@@ -1402,11 +1402,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             'interface_pO2_bar' in controls
             and controls.get('interface_pO2_bar') is not None
         )
-        interface_pO2_bar = (
-            float(controls['interface_pO2_bar'])
-            if interface_pO2_supplied
-            else transport_pO2_bar
-        )
+        if not interface_pO2_supplied:
+            raise VaporPressureComputationError(
+                'interface_pO2_bar is required for melt-surface release '
+                'equilibria; transport pO2_bar is not a substitute'
+            )
+        interface_pO2_bar = float(controls['interface_pO2_bar'])
         if not math.isfinite(interface_pO2_bar) or interface_pO2_bar <= 0.0:
             raise VaporPressureComputationError(
                 'interface_pO2_bar must be finite and positive'
@@ -2746,11 +2747,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
             "pO2_bar": transport_pO2_bar,
             "interface_pO2_bar": interface_pO2_bar,
-            "interface_pO2_source": (
-                "explicit_sso_r_interface"
-                if interface_pO2_supplied
-                else "direct_provider_transport_boundary"
-            ),
+            "interface_pO2_source": "explicit_sso_r_interface",
             "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
                 **metal_extrapolations,

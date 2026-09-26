@@ -14,6 +14,7 @@ from simulator.core import (
     OxygenInterfaceConfigurationError,
     PyrolysisSimulator,
 )
+from engines.builtin.overhead_bleed import controlled_flow_capacity
 from simulator.chemistry.offgas_fo2 import (
     co2_dissociation_log10_K,
     load_buffer_polynomials,
@@ -24,7 +25,7 @@ from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     GAS_CONSTANT,
 )
-from simulator.state import EvaporationFlux
+from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT, EvaporationFlux
 from simulator.transport_constants import COLLISION_DIAMETERS_M
 from simulator.transport_regime import (
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -101,8 +102,6 @@ def test_high_throughput_leaves_free_molecular_regime():
 def test_transitional_conductance_matches_both_endpoint_limits():
     """The duct pressure curve has no jump at either declared Kn boundary."""
 
-    from simulator.transport_regime import _duct_conductance_at_mean_pressure
-
     T_K = 1773.15
     diameter_m = 0.12
     length_m = 1.0
@@ -114,40 +113,65 @@ def test_transitional_conductance_matches_both_endpoint_limits():
         / (math.sqrt(2.0) * math.pi * collision_diameter_m ** 2 * length_m)
     )
 
-    def conductance_at_kn(knudsen):
+    def independent_conductance_at_kn(knudsen):
         mean_pressure_pa = pressure_factor / knudsen
-        return _duct_conductance_at_mean_pressure(
-            diameter_m,
-            length_m,
-            T_K,
-            mean_pressure_pa,
-            molar_mass_kg_mol,
-            viscosity_pa_s,
-            collision_diameter_m,
-        )[0]
+        molecular = (
+            math.pi
+            / 12.0
+            * math.sqrt(8.0 * GAS_CONSTANT * T_K / (math.pi * molar_mass_kg_mol))
+            * diameter_m ** 3
+            / length_m
+        )
+        viscous = (
+            math.pi
+            * (diameter_m / 2.0) ** 4
+            * mean_pressure_pa
+            / (8.0 * viscosity_pa_s * length_m)
+        )
+        if knudsen <= VISCOUS_KNUDSEN_MAX:
+            return viscous
+        if knudsen >= FREE_MOLECULAR_KNUDSEN_MIN:
+            return molecular
+        weight = math.log(FREE_MOLECULAR_KNUDSEN_MIN / knudsen) / math.log(
+            FREE_MOLECULAR_KNUDSEN_MIN / VISCOUS_KNUDSEN_MAX
+        )
+        return (1.0 - weight) * molecular + weight * viscous
 
-    molecular_boundary = conductance_at_kn(FREE_MOLECULAR_KNUDSEN_MIN)
-    viscous_boundary = conductance_at_kn(VISCOUS_KNUDSEN_MAX)
+    def result_at_kn(knudsen):
+        mean_pressure_pa = pressure_factor / knudsen
+        expected_conductance = independent_conductance_at_kn(knudsen)
+        target_headspace_pa = 2.0 * mean_pressure_pa
+        flow = expected_conductance * target_headspace_pa / (GAS_CONSTANT * T_K)
+        return _duct_result(flow, flow), expected_conductance
+
     for boundary, expected in (
-        (FREE_MOLECULAR_KNUDSEN_MIN, molecular_boundary),
-        (VISCOUS_KNUDSEN_MAX, viscous_boundary),
+        (
+            VISCOUS_KNUDSEN_MAX,
+            independent_conductance_at_kn(VISCOUS_KNUDSEN_MAX),
+        ),
+        (
+            FREE_MOLECULAR_KNUDSEN_MIN,
+            independent_conductance_at_kn(FREE_MOLECULAR_KNUDSEN_MIN),
+        ),
     ):
-        below = conductance_at_kn(boundary * (1.0 - 1.0e-8))
-        above = conductance_at_kn(boundary * (1.0 + 1.0e-8))
-        assert below == pytest.approx(expected, rel=2.0e-7)
-        assert above == pytest.approx(expected, rel=2.0e-7)
+        result, _ = result_at_kn(boundary)
+        assert result.conductance_m3_s == pytest.approx(expected, rel=2.0e-7)
 
-    flows = [
-        1.0e-7,
-        3.0e-7,
-        1.0e-6,
-        3.0e-6,
-        1.0e-5,
-        3.0e-5,
-        1.0e-4,
-        3.0e-4,
-        1.0e-3,
-    ]
+    threshold_epsilon = 1.0e-6
+    for boundary in (VISCOUS_KNUDSEN_MAX, FREE_MOLECULAR_KNUDSEN_MIN):
+        for side in (1.0 - threshold_epsilon, 1.0 + threshold_epsilon):
+            target_kn = boundary * side
+            result, _ = result_at_kn(target_kn)
+            expected_headspace_bar = (
+                2.0 * pressure_factor / target_kn / 1.0e5
+            )
+            assert result.p_headspace_bar == pytest.approx(
+                expected_headspace_bar,
+                rel=2.0e-7,
+            )
+            assert result.knudsen_number == pytest.approx(target_kn, rel=2.0e-7)
+
+    flows = [10.0 ** (-7.0 + 4.0 * index / 2000.0) for index in range(2001)]
     pressures = [_duct_result(flow, flow).p_headspace_bar for flow in flows]
     assert all(b > a for a, b in zip(pressures, pressures[1:]))
 
@@ -354,6 +378,29 @@ def test_co2_duct_outlet_respects_declared_ambient_without_pump():
     assert finite_source.p_headspace_bar > zero_source.p_headspace_bar
 
 
+def test_co2_duct_outlet_uses_effective_pump_downstream_pressure():
+    sim = _transport_sim()
+    sim.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
+    sim.melt.p_total_mbar = 5.0
+    sim._headspace_transport_source_total_mol_s = 0.0
+    sim._headspace_transport_source_o2_mol_s = 0.0
+    sim._headspace_transport_source_molar_mass_kg_mol = 0.031998
+    pump_capacity = controlled_flow_capacity(
+        pipe_capacity_kg_hr=10.0,
+        equipment_capacity_kg_hr=2.0,
+        evolved_flux_kg_hr=1.0,
+        upstream_pressure_bar=5.0e-3,
+    )
+    sim._effective_transport_capacity_this_tick = pump_capacity
+
+    result = sim._headspace_venting_throughput()
+
+    assert result.p_headspace_bar == pytest.approx(
+        pump_capacity.downstream_pressure_bar
+    )
+    assert result.p_headspace_bar < 5.0e-3
+
+
 def test_co2_buffer_assumption_is_published_in_headspace_state():
     sim = _transport_sim()
     sim.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
@@ -404,16 +451,54 @@ def test_interface_po2_uses_two_film_log_series_resistance_and_publishes_regime(
     melt_k = diagnostic['melt_side_k_O_m_s']
     transport_pO2_bar = reservoir.headspace_transport_pO2_bar
     melt_pO2_bar = diagnostic['melt_intrinsic_pO2_bar']
-    expected_bar = math.exp(
-        (
-            gas_k * math.log(transport_pO2_bar)
-            + melt_k * math.log(melt_pO2_bar)
-        )
-        / (gas_k + melt_k)
+    gas_temperature_K = float(
+        getattr(sim.overhead, 'headspace_temperature_K', 0.0)
+        or sim.melt.temperature_C + 273.15
     )
+    gas_pressure_factor = 1.0e5 / (STATE_GAS_CONSTANT * gas_temperature_K)
+    melt_depth_m = float(
+        sim.setpoints['sso_r']['oxygen_exchange']['effective_melt_depth_m']
+    )
+    melt_conductance = melt_k * diagnostic[
+        'redox_buffer_capacity_mol_per_ln_fO2'
+    ] / (sim.melt.melt_surface_area_m2 * melt_depth_m)
+    gas_log = math.log(transport_pO2_bar)
+    melt_log = math.log(melt_pO2_bar)
 
+    def flux_residual(interface_log):
+        interface_pressure_bar = math.exp(interface_log)
+        gas_flux = gas_k * gas_pressure_factor * (
+            transport_pO2_bar - interface_pressure_bar
+        )
+        melt_flux = melt_conductance * (interface_log - melt_log)
+        return gas_flux - melt_flux
+
+    lo = min(gas_log, melt_log)
+    hi = max(gas_log, melt_log)
+    lo_residual = flux_residual(lo)
+    for _ in range(160):
+        mid = 0.5 * (lo + hi)
+        mid_residual = flux_residual(mid)
+        if lo_residual * mid_residual <= 0.0:
+            hi = mid
+        else:
+            lo = mid
+            lo_residual = mid_residual
+    expected_bar = math.exp(0.5 * (lo + hi))
+    gas_flux = gas_k * gas_pressure_factor * (
+        transport_pO2_bar - interface_pO2_bar
+    )
+    melt_flux = melt_conductance * (
+        math.log(interface_pO2_bar) - melt_log
+    )
     assert math.isfinite(gas_k) and gas_k > 0.0
-    assert interface_pO2_bar == pytest.approx(expected_bar, rel=1.0e-12)
+    assert interface_pO2_bar == pytest.approx(expected_bar, rel=1.0e-10)
+    assert gas_flux == pytest.approx(melt_flux, rel=1.0e-10, abs=2.0e-14)
+    assert diagnostic['interface_flux_mol_m2_s'] == pytest.approx(
+        gas_flux,
+        rel=1.0e-10,
+        abs=2.0e-14,
+    )
     assert reservoir.interface_pO2_bar == pytest.approx(interface_pO2_bar)
     assert reservoir.interface_pO2_limiting_regime == diagnostic[
         'limiting_regime'
@@ -585,6 +670,17 @@ def test_interface_po2_refuses_missing_sso_r_exchange_config():
         sim._interface_pO2_bar()
 
     assert exc_info.value.reason == 'missing_sso_r_oxygen_exchange_config'
+
+
+def test_oxygen_exchange_refuses_missing_config_before_no_capacity_return():
+    sim = _transport_sim()
+    sim.setpoints['sso_r'] = {}
+
+    with pytest.raises(
+        OxygenInterfaceConfigurationError,
+        match='missing_sso_r_oxygen_exchange_config',
+    ):
+        sim._apply_oxygen_reservoir_exchange()
 
 
 def test_internal_equilibrium_uses_interface_for_all_surface_release_consumers():

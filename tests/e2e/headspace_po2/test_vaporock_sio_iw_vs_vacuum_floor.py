@@ -122,7 +122,10 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
         temperature_C=temperature_C,
         pressure_bar=max(sim.melt.p_total_mbar / 1000.0, 1.0e-9),
         fO2_log=fO2_log_iw,
-        control_inputs={"pO2_bar": 10.0 ** fO2_log_iw},
+        control_inputs={
+            "pO2_bar": 10.0 ** fO2_log_iw,
+            "interface_pO2_bar": 10.0 ** fO2_log_iw,
+        },
     )
     p_sio_iw = dict(iw_result.diagnostic or {}).get(
         "vapor_pressures_Pa", {}
@@ -177,9 +180,11 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
     diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
     p_sio = diagnostic["vapor_pressures_Pa"]["SiO"]
+    interface_pO2_bar = sim.melt.oxygen_reservoir.interface_pO2_bar
 
     assert diagnostic["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
-    assert provenance["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
+    assert provenance["pO2_bar"] == pytest.approx(interface_pO2_bar)
+    assert interface_pO2_bar >= requested_transport_pO2_bar
     assert p_sio == pytest.approx(provenance["P_eq_Pa"])
     assert equilibrium.vapor_pressures_Pa["SiO"] == pytest.approx(p_sio)
 

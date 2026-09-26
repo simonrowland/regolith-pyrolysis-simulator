@@ -1055,7 +1055,20 @@ def test_vaporock_as_active_backend_fails_closed_with_clear_message():
     # consumer, never for the authoritative _get_equilibrium path.
     sim = PyrolysisSimulator(
         VapoRockBackend(),
-        {"campaigns": {}},
+        {
+            "campaigns": {},
+            "sso_r": {
+                "oxygen_exchange": {
+                    "k_O_ref_m_s": 2.0e-5,
+                    "k_O_min_m_s": 5.0e-6,
+                    "k_O_max_m_s": 5.0e-5,
+                    "T_ref_K": 1773.15,
+                    "Ea_J_mol": 150000.0,
+                    "effective_melt_depth_m": 0.2,
+                    "temperature_dependence_enabled": True,
+                },
+            },
+        },
         {
             "oxide": {
                 "label": "Oxide",

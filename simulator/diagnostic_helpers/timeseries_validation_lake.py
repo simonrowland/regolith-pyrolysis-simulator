@@ -542,7 +542,10 @@ def _builtin_provider_p_eq_pa(model_species: str, T_K: float) -> float:
         ),
         temperature_C=T_K - 273.15,
         pressure_bar=1.0e-6,
-        control_inputs={"pO2_bar": VALIDATION_PO2_BAR},
+        control_inputs={
+            "pO2_bar": VALIDATION_PO2_BAR,
+            "interface_pO2_bar": VALIDATION_PO2_BAR,
+        },
     )
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", VaporPressureFallbackWarning)

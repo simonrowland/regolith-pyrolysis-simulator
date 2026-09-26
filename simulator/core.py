@@ -3824,15 +3824,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             oxygen_exchange = dict(sso_r.get('oxygen_exchange', {}) or {})
         return oxygen_exchange
 
-    def _oxygen_exchange_k_m_s(self, T_K: float) -> tuple[float, str]:
+    def _require_oxygen_exchange_config(self) -> Dict[str, Any]:
         config = self._oxygen_exchange_config()
+        required = (
+            'k_O_ref_m_s',
+            'k_O_min_m_s',
+            'k_O_max_m_s',
+            'T_ref_K',
+            'Ea_J_mol',
+            'effective_melt_depth_m',
+        )
+        missing = [key for key in required if key not in config]
+        if missing:
+            raise OxygenInterfaceConfigurationError(
+                'missing_sso_r_oxygen_exchange_config',
+                f'missing declared keys: {", ".join(missing)}',
+            )
+        return config
+
+    def _oxygen_exchange_k_m_s(self, T_K: float) -> tuple[float, str]:
+        config = self._require_oxygen_exchange_config()
         declared_values = {
             'T_K': T_K,
-            'k_O_ref_m_s': config.get('k_O_ref_m_s', 2.0e-5),
-            'k_O_min_m_s': config.get('k_O_min_m_s', 5.0e-6),
-            'k_O_max_m_s': config.get('k_O_max_m_s', 5.0e-5),
-            'T_ref_K': config.get('T_ref_K', 1773.15),
-            'Ea_J_mol': config.get('Ea_J_mol', 150000.0),
+            'k_O_ref_m_s': config['k_O_ref_m_s'],
+            'k_O_min_m_s': config['k_O_min_m_s'],
+            'k_O_max_m_s': config['k_O_max_m_s'],
+            'T_ref_K': config['T_ref_K'],
+            'Ea_J_mol': config['Ea_J_mol'],
         }
         if not all(
             is_declared_real_scalar(value, allow_numeric_str=True)
@@ -3874,8 +3892,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return min(k_max, max(k_min, raw)), source
 
     def _oxygen_exchange_effective_melt_depth_m(self) -> float:
-        config = self._oxygen_exchange_config()
-        raw_depth = config.get('effective_melt_depth_m', 0.2)
+        config = self._require_oxygen_exchange_config()
+        raw_depth = config['effective_melt_depth_m']
         if not is_declared_real_scalar(
             raw_depth,
             allow_numeric_str=True,
@@ -3901,16 +3919,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Resolve the universal gas/melt oxygen interface for release equilibria.
 
         Premise: the SSO-R exchange configuration supplies the melt-side film;
-        the existing Sherwood evaporation path supplies the gas-side film. We
-        linearise each film in ``ln(pO2)`` because for an ideal gas
-        ``dC = C d(ln p)`` near the interface. With the same local O-bearing
-        concentration scale on both sides, O-flux continuity is
-        ``J = k_g C (ln p_g - ln p_i) = k_O C (ln p_i - ln p_m)``.
-        Solving gives ``ln p_i = (k_g ln p_g + k_O ln p_m)/(k_g+k_O)``.
-        Therefore a melt-side-limited film (k_O << k_g) tracks the headspace,
-        while a gas-side-limited film (k_g << k_O) tracks the bulk melt.
-        This log interpolation preserves positive pressure and is the local
-        multiplicative analogue of two series resistances.
+        the existing Sherwood evaporation path supplies the gas-side film.
+        The two films do not share a concentration scale. For the gas film,
+        ``C_g = p_O2/(R*T_g)`` is an ideal-gas concentration. For the melt
+        film, the existing Kress91 differential capacity ``C_m`` is mol O2 per
+        natural-log oxygen potential for the whole melt; dividing by the
+        effective melt volume ``A*h_eff`` gives the melt reference
+        concentration per ``ln(pO2)``. The gas-side flux is therefore exact
+        in pressure, while the melt-side SSO-R response remains linearised in
+        ``ln(pO2)``:
+
+        ``J_g = k_g*(p_g-p_i)/(R*T_g)`` and
+        ``J_m = k_O*C_m/(A*h_eff)*ln(p_i/p_m)``.
+
+        The interface pressure is the root of ``J_g = J_m`` between the gas
+        and melt pressures. This gives the correct limits: a melt-side-limited
+        film (large gas conductance, ``k_O*C_m/(A*h_eff)`` small) tracks the
+        headspace, while a gas-side-limited film tracks the melt. The prior
+        equal-``C`` log interpolation could be wrong by nearly five decades
+        across a multi-decade gap: at 1773.15 K, 100 mbar, A=0.2 m2,
+        h_eff=0.2 m, k_g=0.127 m/s, k_O=2e-5 m/s, p_g=1e-9 bar, and
+        p_m=1e-4 bar, it returned 1.00e-9 bar while the concentration-aware
+        flux root is 9.91e-5 bar (9.9e4x). The discrepancy is the omitted
+        gas/melt concentration ratio, not a tuning factor.
 
         The interpolation is not allowed to turn a ratio-limit redox state into
         an artificial pressure source.  Kress91's Fe3+/ΣFe fraction is a
@@ -3935,21 +3966,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure is silently substituted for the gas-side value.
         """
 
-        config = self._oxygen_exchange_config()
-        required = (
-            'k_O_ref_m_s',
-            'k_O_min_m_s',
-            'k_O_max_m_s',
-            'T_ref_K',
-            'Ea_J_mol',
-            'effective_melt_depth_m',
-        )
-        missing = [key for key in required if key not in config]
-        if missing:
-            raise OxygenInterfaceConfigurationError(
-                'missing_sso_r_oxygen_exchange_config',
-                f'missing declared keys: {", ".join(missing)}',
-            )
+        self._require_oxygen_exchange_config()
         # Validate the depth key with the same typed numeric guard used by the
         # exchange update. The interface does not need the depth algebraically,
         # but accepting an invalid SSO-R exchange configuration here would make
@@ -4020,6 +4037,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             redox_buffer_fraction = None
         k_g, gas_source = self._oxygen_interface_gas_side_k_m_s(T_K)
+        gas_reference_concentration_mol_m3 = None
+        melt_reference_concentration_mol_m3_per_ln = None
+        gas_conductance_mol_m2_s_per_ln = (
+            math.inf if math.isinf(k_g) else 0.0
+        )
+        melt_conductance_mol_m2_s_per_ln = None
+        interface_flux_mol_m2_s = None
         if redox_buffer_status == 'no_fe_redox_buffer':
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'gas_side_no_fe_redox_buffer'
@@ -4030,14 +4054,107 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'melt_side_limited'
         else:
-            interface_ln = (
-                k_g * math.log(transport_pO2_bar)
-                + k_O * math.log(melt_pO2_bar)
-            ) / (k_g + k_O)
-            interface_pO2_bar = math.exp(interface_ln)
-            limiting_regime = (
-                'gas_side_limited' if k_g <= k_O else 'melt_side_limited'
+            surface_area_m2 = float(
+                getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
             )
+            if not math.isfinite(surface_area_m2) or surface_area_m2 <= 0.0:
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_oxygen_interface_geometry',
+                    'melt_surface_area_m2 must be finite and positive',
+                )
+            gas_temperature_K = float(
+                getattr(self.overhead, 'headspace_temperature_K', 0.0)
+                or T_K
+            )
+            if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_oxygen_interface_gas_transport',
+                    f'headspace_temperature_K={gas_temperature_K!r}',
+                )
+            melt_volume_m3 = (
+                surface_area_m2 * self._oxygen_exchange_effective_melt_depth_m()
+            )
+            melt_reference_concentration_mol_m3_per_ln = (
+                redox_buffer_state['capacity_mol_per_ln_fO2']
+                / melt_volume_m3
+            )
+            gas_pressure_factor_mol_m3_per_bar = (
+                1.0e5 / (GAS_CONSTANT * gas_temperature_K)
+            )
+            melt_conductance_mol_m2_s_per_ln = (
+                k_O * melt_reference_concentration_mol_m3_per_ln
+            )
+            gas_pressure_log = math.log(transport_pO2_bar)
+            melt_pressure_log = math.log(melt_pO2_bar)
+
+            def flux_residual(interface_log: float) -> float:
+                interface_pressure_bar = math.exp(interface_log)
+                gas_flux = k_g * gas_pressure_factor_mol_m3_per_bar * (
+                    transport_pO2_bar - interface_pressure_bar
+                )
+                melt_flux = melt_conductance_mol_m2_s_per_ln * (
+                    interface_log - melt_pressure_log
+                )
+                return gas_flux - melt_flux
+
+            if gas_pressure_log == melt_pressure_log:
+                interface_log = gas_pressure_log
+            else:
+                lo = min(gas_pressure_log, melt_pressure_log)
+                hi = max(gas_pressure_log, melt_pressure_log)
+                lo_residual = flux_residual(lo)
+                hi_residual = flux_residual(hi)
+                if lo_residual * hi_residual > 0.0:
+                    raise OxygenInterfaceConfigurationError(
+                        'invalid_oxygen_interface_transport',
+                        'gas/melt flux continuity root is not bracketed',
+                    )
+                for _ in range(100):
+                    mid = 0.5 * (lo + hi)
+                    mid_residual = flux_residual(mid)
+                    if abs(mid_residual) <= 1.0e-14:
+                        lo = hi = mid
+                        break
+                    if lo_residual * mid_residual <= 0.0:
+                        hi = mid
+                        hi_residual = mid_residual
+                    else:
+                        lo = mid
+                        lo_residual = mid_residual
+                interface_log = 0.5 * (lo + hi)
+            interface_pO2_bar = math.exp(interface_log)
+            gas_pressure_delta_bar = transport_pO2_bar - interface_pO2_bar
+            log_pressure_delta = gas_pressure_log - interface_log
+            if abs(log_pressure_delta) > 1.0e-15:
+                gas_reference_concentration_mol_m3 = (
+                    gas_pressure_factor_mol_m3_per_bar
+                    * gas_pressure_delta_bar
+                    / log_pressure_delta
+                )
+            else:
+                gas_reference_concentration_mol_m3 = (
+                    gas_pressure_factor_mol_m3_per_bar
+                    * interface_pO2_bar
+                )
+            gas_conductance_mol_m2_s_per_ln = (
+                k_g * gas_reference_concentration_mol_m3
+            )
+            limiting_regime = (
+                'gas_side_limited'
+                if gas_conductance_mol_m2_s_per_ln
+                <= melt_conductance_mol_m2_s_per_ln
+                else 'melt_side_limited'
+            )
+            interface_flux_mol_m2_s = (
+                melt_conductance_mol_m2_s_per_ln
+                * (interface_log - melt_pressure_log)
+            )
+        if math.isinf(k_g):
+            gas_reference_concentration_mol_m3 = None
+            gas_conductance_mol_m2_s_per_ln = math.inf
+            melt_reference_concentration_mol_m3_per_ln = None
+            melt_conductance_mol_m2_s_per_ln = None
+            interface_flux_mol_m2_s = None
         return {
             'interface_pO2_bar': interface_pO2_bar,
             'limiting_regime': limiting_regime,
@@ -4053,6 +4170,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 redox_buffer_state['capacity_mol_per_ln_fO2']
             ),
             'redox_buffer_exhausted': redox_buffer_exhausted,
+            'gas_reference_concentration_mol_m3': (
+                None
+                if gas_reference_concentration_mol_m3 is None
+                else float(gas_reference_concentration_mol_m3)
+            ),
+            'melt_reference_concentration_mol_m3_per_ln': (
+                None
+                if melt_reference_concentration_mol_m3_per_ln is None
+                else float(melt_reference_concentration_mol_m3_per_ln)
+            ),
+            'gas_conductance_mol_m2_s_per_ln': float(
+                gas_conductance_mol_m2_s_per_ln
+            ),
+            'melt_conductance_mol_m2_s_per_ln': (
+                None
+                if melt_conductance_mol_m2_s_per_ln is None
+                else float(melt_conductance_mol_m2_s_per_ln)
+            ),
+            'interface_flux_mol_m2_s': (
+                None
+                if interface_flux_mol_m2_s is None
+                else float(interface_flux_mol_m2_s)
+            ),
         }
 
     def _oxygen_interface_gas_side_k_m_s(
@@ -4467,7 +4607,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         diameter_m, length_m = self._headspace_duct_geometry()
         temperature_K = self._headspace_temperature_K()
-        downstream_pressure_bar = self._headspace_downstream_pressure_bar()
+        downstream_pressure_bar = self._headspace_downstream_pressure_bar(
+            getattr(self, '_effective_transport_capacity_this_tick', None)
+        )
         # A commanded O₂ hold is an upstream lower bound, not automatically a
         # downstream partial pressure. The duct balance contributes the
         # downstream term y_O2,d*p_d only when the declared downstream total
@@ -7014,6 +7156,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
     ) -> OxygenReservoirState:
+        self._require_oxygen_exchange_config()
         gate_authority = self._resolved_melt_redox_gate_authority(
             gate_authority
         )
@@ -7057,36 +7200,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         redox_buffer_status = str(redox_buffer_state['status'])
         C_m = float(redox_buffer_state['capacity_mol_per_ln_fO2'])
-        exchange_config = self._oxygen_exchange_config()
-        exchange_config_required = {
-            'k_O_ref_m_s',
-            'k_O_min_m_s',
-            'k_O_max_m_s',
-            'T_ref_K',
-            'Ea_J_mol',
-            'effective_melt_depth_m',
-        }
-        no_fe_without_exchange_config = (
-            redox_buffer_status == 'no_fe_redox_buffer'
-            and not exchange_config_required.issubset(exchange_config)
-        )
-        if no_fe_without_exchange_config:
-            # A Fe-free melt has no redox state for SSO-R to transport.  Some
-            # legacy accounting-only callers intentionally omit the SSO-R
-            # coefficients; preserve their no-Fe no-op without inventing a
-            # transport coefficient.  The live interface path still refuses
-            # this incomplete config when a melt surface pressure is asked
-            # for directly.
-            k_O = 0.0
-            k_source = 'not_required:no_fe_redox_buffer'
-            h_eff_m = 0.0
-            tau_s = 0.0
-            alpha = 0.0
-        else:
-            k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
-            h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
-            tau_s = h_eff_m / k_O
-            alpha = 1.0 - math.exp(-3600.0 / tau_s)
+        k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
+        h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
+        tau_s = h_eff_m / k_O
+        alpha = 1.0 - math.exp(-3600.0 / tau_s)
         # C_m is a differential conductance for the two-film solve, not an
         # authority to integrate an independent fO2 scalar.  At an exhausted
         # numerical capacity the gas-side relaxation still has a finite limit:
@@ -7122,34 +7239,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if C_h <= 0.0:
             reservoir.exchange_direction = 'none:no_headspace_capacity'
-            self.melt.oxygen_reservoir = reservoir
-            self._sync_oxygen_reservoir_mirror()
-            return reservoir
-
-        if no_fe_without_exchange_config:
-            reservoir.interface_pO2_bar = max(
-                self._vacuum_floor_bar(),
-                transport_pO2,
-            )
-            reservoir.interface_pO2_limiting_regime = (
-                'gas_side_no_fe_redox_buffer'
-            )
-            reservoir.interface_gas_side_k_m_s = 0.0
-            self._last_oxygen_interface_diagnostic = {
-                'interface_pO2_bar': reservoir.interface_pO2_bar,
-                'limiting_regime': 'gas_side_no_fe_redox_buffer',
-                'gas_side_k_m_s': 0.0,
-                'gas_side_source': 'not_required:no_fe_redox_buffer',
-                'melt_side_k_O_m_s': 0.0,
-                'melt_side_source': 'not_required:no_fe_redox_buffer',
-                'melt_intrinsic_pO2_bar': reservoir.interface_pO2_bar,
-                'redox_buffer_fraction': None,
-                'redox_buffer_status': redox_buffer_status,
-                'redox_buffer_inventory_mol': 0.0,
-                'redox_buffer_capacity_mol_per_ln_fO2': 0.0,
-                'redox_buffer_exhausted': False,
-            }
-            reservoir.exchange_direction = 'none:no_fe_redox_buffer'
             self.melt.oxygen_reservoir = reservoir
             self._sync_oxygen_reservoir_mirror()
             return reservoir

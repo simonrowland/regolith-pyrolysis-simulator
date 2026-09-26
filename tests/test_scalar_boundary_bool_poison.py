@@ -516,19 +516,38 @@ def _headspace_downstream_pressure(value: Any) -> float:
     return PyrolysisSimulator._headspace_downstream_pressure_bar(sim)
 
 
+_OXYGEN_EXCHANGE_BASE_CONFIG = {
+    "k_O_ref_m_s": 2.0e-5,
+    "k_O_min_m_s": 5.0e-6,
+    "k_O_max_m_s": 5.0e-5,
+    "T_ref_K": 1773.15,
+    "Ea_J_mol": 150000.0,
+    "effective_melt_depth_m": 0.2,
+}
+
+
 def _oxygen_exchange_k(field: str, value: Any) -> tuple[float, str]:
-    sim = SimpleNamespace(_oxygen_exchange_config=lambda: {field: value})
+    config = {**_OXYGEN_EXCHANGE_BASE_CONFIG, field: value}
+    sim = SimpleNamespace(
+        _oxygen_exchange_config=lambda: config,
+        _require_oxygen_exchange_config=lambda: config,
+    )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, 1773.15)
 
 
 def _oxygen_exchange_temperature(value: Any) -> tuple[float, str]:
-    sim = SimpleNamespace(_oxygen_exchange_config=lambda: {})
+    sim = SimpleNamespace(
+        _oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
+        _require_oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
+    )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, value)
 
 
 def _oxygen_exchange_depth(value: Any) -> float:
+    config = {**_OXYGEN_EXCHANGE_BASE_CONFIG, "effective_melt_depth_m": value}
     sim = SimpleNamespace(
-        _oxygen_exchange_config=lambda: {"effective_melt_depth_m": value}
+        _oxygen_exchange_config=lambda: config,
+        _require_oxygen_exchange_config=lambda: config,
     )
     return PyrolysisSimulator._oxygen_exchange_effective_melt_depth_m(sim)
 
@@ -1769,8 +1788,13 @@ _OFF_REFERENCE_T_K = 1500.0
 
 
 def _oxygen_exchange_flag(value: Any, T_K: float = _OFF_REFERENCE_T_K):
-    config: dict[str, Any] = {} if value is ... else {_TDE: value}
-    sim = SimpleNamespace(_oxygen_exchange_config=lambda: dict(config))
+    config: dict[str, Any] = dict(_OXYGEN_EXCHANGE_BASE_CONFIG)
+    if value is not ...:
+        config[_TDE] = value
+    sim = SimpleNamespace(
+        _oxygen_exchange_config=lambda: dict(config),
+        _require_oxygen_exchange_config=lambda: dict(config),
+    )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, T_K)
 
 

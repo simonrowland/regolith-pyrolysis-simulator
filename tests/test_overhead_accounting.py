@@ -23,6 +23,23 @@ from simulator.vapour_rail.batch import (
 )
 
 
+def _minimal_setpoints():
+    return {
+        "campaigns": {},
+        "sso_r": {
+            "oxygen_exchange": {
+                "k_O_ref_m_s": 2.0e-5,
+                "k_O_min_m_s": 5.0e-6,
+                "k_O_max_m_s": 5.0e-5,
+                "T_ref_K": 1773.15,
+                "Ea_J_mol": 150000.0,
+                "effective_melt_depth_m": 0.2,
+                "temperature_dependence_enabled": True,
+            },
+        },
+    }
+
+
 def _install_passthrough_vapour_batch(sim):
     """Test seam: carry the independently supplied equilibrium Pa in answers."""
 
@@ -65,7 +82,7 @@ def _gas_train_sim(mass_kg=100.0):
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"oxide": {"label": "Oxide", "composition_wt_pct": {"FeO": 100.0}}},
         {
             "metals": {
@@ -85,7 +102,7 @@ def _sio_train_sim():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
@@ -120,7 +137,7 @@ def _cro2_train_sim():
     o2_mw = MOLAR_MASS["O2"]
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"chromia": {"label": "Chromia", "composition_wt_pct": {"Cr2O3": 100.0}}},
         {
             "metals": {},
@@ -162,7 +179,7 @@ def test_overhead_model_does_not_recompute_provider_partition():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"oxide": {"label": "Oxide", "composition_wt_pct": {"SiO2": 100.0}}},
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -375,7 +392,7 @@ def test_mre_anode_o2_is_not_turbine_throughput():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"oxide": {"label": "Oxide", "composition_wt_pct": {"SiO2": 100.0}}},
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -613,7 +630,7 @@ def _sio_in_domain_train_sim():
     }
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
@@ -764,7 +781,7 @@ def test_sio_vapor_requires_explicit_stoich_metadata():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
@@ -789,7 +806,7 @@ def test_vapor_species_without_parent_oxide_fails_before_flux():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"oxide": {"label": "Oxide", "composition_wt_pct": {"FeO": 100.0}}},
         {
             "metals": {
@@ -814,7 +831,7 @@ def test_sio_vapor_explicit_stoich_must_mass_close():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
@@ -841,7 +858,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"feo": {"label": "FeO", "composition_wt_pct": {"FeO": 100.0}}},
         {
             "metals": {},
@@ -915,7 +932,7 @@ def test_explicit_vapor_stoich_must_conserve_atoms_not_just_mass():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
@@ -998,7 +1015,7 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
     o2_per_feo = 0.25 * MOLAR_MASS["O2"] / MOLAR_MASS["FeO"]
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        _minimal_setpoints(),
         {"ferric": {"label": "Ferric", "composition_wt_pct": {"Fe2O3": 100.0}}},
         {
             "metals": {},

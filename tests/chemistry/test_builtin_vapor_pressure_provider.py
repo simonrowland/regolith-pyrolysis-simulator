@@ -271,7 +271,7 @@ def _ca_range_extrapolation_request() -> IntentRequest:
         ),
         temperature_C=_CA_RANGE_EXTRAPOLATION_T_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
@@ -284,7 +284,7 @@ def _mg_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
@@ -297,7 +297,7 @@ def _mn_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
@@ -310,7 +310,7 @@ def _co_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
@@ -411,7 +411,7 @@ def _si_only_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
@@ -431,6 +431,7 @@ def _si_only_transport_redox_request(
         fO2_log=-8.0,
         control_inputs={
             "pO2_bar": transport_pO2_bar,
+            "interface_pO2_bar": transport_pO2_bar,
             "intrinsic_fO2_log": intrinsic_fO2_log,
         },
     )
@@ -442,7 +443,7 @@ def _fe_redox_request(
     intrinsic_fO2_log: float | None,
     fO2_log: float | None = -9.0,
 ) -> IntentRequest:
-    controls = {"pO2_bar": 1e-9}
+    controls = {"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9}
     if intrinsic_fO2_log is not None:
         controls["intrinsic_fO2_log"] = intrinsic_fO2_log
     return IntentRequest(
@@ -532,6 +533,7 @@ def _composition_sensitivity_request(
         fO2_log=-9.0,
         control_inputs={
             "pO2_bar": 1e-3,
+            "interface_pO2_bar": 1e-3,
             "intrinsic_fO2_log": -9.0,
         },
     )
@@ -681,7 +683,11 @@ def test_neutral_total_pressure_does_not_change_vapor_equilibrium_peq(
             temperature_C=1300.0,
             pressure_bar=pressure_bar,
             fO2_log=-9.0,
-            control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+            control_inputs={
+                "pO2_bar": 1e-9,
+                "interface_pO2_bar": 1e-9,
+                "intrinsic_fO2_log": -9.0,
+            },
         )
         result = provider.dispatch(request)
         vapor_pressures = result.diagnostic["vapor_pressures_Pa"]
@@ -837,7 +843,7 @@ def test_sodium_provider_omits_nonphysical_pole_branch(
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     result = provider.dispatch(request)
@@ -883,6 +889,7 @@ def test_compiled_p_carrier_provenance_records_intrinsic_melt_fo2(
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": 1e-2,
+            "interface_pO2_bar": 1e-2,
             "intrinsic_fO2_log": -11.0,
             "process_phase": "stage0",
         },
@@ -916,6 +923,7 @@ def test_demaria_1971_k_validation_case_uses_measured_table1_po2(
             pressure_bar=1e-6,
             control_inputs={
                 "pO2_bar": pO2_bar,
+                "interface_pO2_bar": pO2_bar,
                 "intrinsic_fO2_log": math.log10(pO2_bar),
             },
         )
@@ -1099,7 +1107,11 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
         temperature_C=1500.0,
         pressure_bar=1e-6,
         fO2_log=-9.0,
-        control_inputs={"pO2_bar": 1.0, "intrinsic_fO2_log": -9.0},
+        control_inputs={
+            "pO2_bar": 1.0,
+            "interface_pO2_bar": 1.0,
+            "intrinsic_fO2_log": -9.0,
+        },
     )
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
@@ -1146,7 +1158,11 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
         temperature_C=1500.0,
         pressure_bar=1e-6,
         fO2_log=-9.0,
-        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
+            "intrinsic_fO2_log": -9.0,
+        },
     )
     monkeypatch.setattr(
         melt_activity,
@@ -1327,6 +1343,7 @@ def test_na_coherent_pair_and_constant_gamma_golden(
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": pO2_bar,
+            "interface_pO2_bar": pO2_bar,
             "intrinsic_fO2_log": math.log10(pO2_bar),
         },
     )
@@ -1384,6 +1401,7 @@ def test_demaria_1971_na_heldout_per_sample_residuals(
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": pO2_bar,
+            "interface_pO2_bar": pO2_bar,
             "intrinsic_fO2_log": math.log10(pO2_bar),
         },
     )
@@ -1408,6 +1426,7 @@ def test_demaria_1971_na_heldout_per_sample_residuals(
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": p_floor,
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": math.log10(p_floor),
         },
     )
@@ -1477,6 +1496,7 @@ def test_pairing_metals_authority_class_emitted(
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": -9.0,
         },
     )
@@ -1516,7 +1536,7 @@ def test_cro2_non_authoritative_class_survives_authoritative_provider_label(
         ),
         temperature_C=1800.0 - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
     result = provider.dispatch(request)
     assert result.status == "ok"
@@ -2135,7 +2155,7 @@ def test_ellingham_fit_band_extrapolation_is_diagnostic(
         account_view=view,
         temperature_C=800.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     result = provider.dispatch(request)
@@ -2170,7 +2190,7 @@ def test_low_confidence_fe_pseudo_vaporock_fallback_is_omitted_outside_range(
         ),
         temperature_C=1800.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     result = provider.dispatch(request)
@@ -2199,7 +2219,7 @@ def test_low_confidence_k_pseudo_vaporock_gas_rail_ignores_condensed_fallback(
         ),
         temperature_C=1800.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     result = provider.dispatch(request)
@@ -2245,7 +2265,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
         ),
         temperature_C=_FeOnlyHighTMelt.temperature_C,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     provider_result = provider.dispatch(request)
@@ -2314,7 +2334,7 @@ def test_interval_required_foulant_vapor_row_is_not_certifying(
         ),
         temperature_C=1500.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     with pytest.raises(
@@ -2350,7 +2370,7 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
         account_view=account_view,
         temperature_C=temperature_C,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -2420,7 +2440,11 @@ def test_al2o_provider_applies_single_cation_activity_square_once(
             account_view=account_view,
             temperature_C=1650.0,
             pressure_bar=1.0e-6,
-            control_inputs={"pO2_bar": 1.0e-9, "intrinsic_fO2_log": -9.0},
+            control_inputs={
+                "pO2_bar": 1.0e-9,
+                "interface_pO2_bar": 1.0e-9,
+                "intrinsic_fO2_log": -9.0,
+            },
         )
     )
     oxide_activity = melt_oxide_activity("Al2O3", melt_mol)
@@ -2458,7 +2482,10 @@ def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
         ),
         temperature_C=1500.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": pO2_bar},
+        control_inputs={
+            "pO2_bar": pO2_bar,
+            "interface_pO2_bar": 1e-9,
+        },
     )
 
     with pytest.raises(ValueError, match="pO2_bar"):
@@ -2643,7 +2670,7 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
         ),
         temperature_C=_SiOnlyMelt.temperature_C,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     kernel_vp = dict(
@@ -2773,6 +2800,26 @@ def test_every_surface_release_consumer_reads_explicit_interface_po2(
     )
 
 
+def test_builtin_provider_refuses_missing_interface_po2(vapor_pressure_data):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = replace(
+        _si_only_transport_redox_request(
+            transport_pO2_bar=1.0e-9,
+            intrinsic_fO2_log=-9.0,
+        ),
+        control_inputs={
+            "pO2_bar": 1.0e-9,
+            "intrinsic_fO2_log": -9.0,
+        },
+    )
+
+    with pytest.raises(
+        VaporPressureComputationError,
+        match="interface_pO2_bar is required",
+    ):
+        provider.dispatch(request)
+
+
 def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     vapor_pressure_data,
     feedstocks_data,
@@ -2900,7 +2947,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=1400.0,
             pressure_bar=1e-6,
-            control_inputs={"pO2_bar": 1e-9},
+            control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
         )
     finally:
         BuiltinVaporPressureProvider.dispatch = original_dispatch
@@ -3156,6 +3203,7 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
             "pO2_bar": sim._headspace_transport_pO2_bar(),
+            "interface_pO2_bar": sim.melt.oxygen_reservoir.interface_pO2_bar,
             "intrinsic_fO2_log": sim.melt.melt_fO2_log,
             "process_phase": "stage0",
         },
@@ -3214,7 +3262,10 @@ def test_provider_emits_no_ledger_transition(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        control_inputs={
+            "pO2_bar": sim._commanded_pO2_bar(),
+            "interface_pO2_bar": sim.melt.oxygen_reservoir.interface_pO2_bar,
+        },
     )
     assert result.transition is None, (
         "VAPOR_PRESSURE is diagnostic per binding spec §3 — provider must "
@@ -3243,7 +3294,7 @@ def test_provider_short_circuits_below_400_k(vapor_pressure_data):
         temperature_C=25.0,  # Well below 400 K
         pressure_bar=1e-6,
         fO2_log=None,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
     result = provider.dispatch(request)
     assert result.status == "ok"
@@ -3266,7 +3317,7 @@ def test_inactive_metal_consumer_status_suppresses_builtin_fallback(
         temperature_C=1700.0,
         pressure_bar=1e-6,
         fO2_log=None,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     inactive_result = provider.dispatch(request)
@@ -3316,7 +3367,7 @@ def test_vapor_pressure_provider_raises_on_unregistered_species_in_view(
         temperature_C=1500.0,  # Above the 400 K early-exit
         pressure_bar=1e-6,
         fO2_log=None,
-        control_inputs={"pO2_bar": 1e-9},
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
     with pytest.raises(AccountingError):

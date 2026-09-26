@@ -1298,7 +1298,11 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
         temperature_C=826.85,
         pressure_bar=1.0e-6,
         fO2_log=-4.0,
-        control_inputs={"pO2_bar": 1.0e-4, "intrinsic_fO2_log": -4.0},
+        control_inputs={
+            "pO2_bar": 1.0e-4,
+            "interface_pO2_bar": 1.0e-4,
+            "intrinsic_fO2_log": -4.0,
+        },
     )
 
     result = provider.dispatch(request)
@@ -1363,7 +1367,11 @@ def test_metals_projection_reference_evaluation_declares_neutral_inputs() -> Non
         temperature_C=826.85,
         pressure_bar=1.0e-6,
         fO2_log=-4.0,
-        control_inputs={"pO2_bar": 1.0e-4, "intrinsic_fO2_log": -4.0},
+        control_inputs={
+            "pO2_bar": 1.0e-4,
+            "interface_pO2_bar": 1.0e-4,
+            "intrinsic_fO2_log": -4.0,
+        },
     )
 
     result = provider.dispatch(request)
@@ -1685,6 +1693,7 @@ def test_physical_melt_dissociation_pO2_bar_refuses_nan_before_envelope() -> Non
         pressure_bar=1e-9,
         control_inputs={
             "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": float("nan"),
         },
     )

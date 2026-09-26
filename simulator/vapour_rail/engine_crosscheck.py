@@ -237,6 +237,7 @@ def _rail_request(
     oxygen_bar = 10.0**fo2_log10_bar
     control_inputs: dict[str, Any] = {
         "pO2_bar": oxygen_bar,
+        "interface_pO2_bar": oxygen_bar,
         "intrinsic_fO2_log": fo2_log10_bar,
     }
     if process_phase is not None:

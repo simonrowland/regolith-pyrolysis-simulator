@@ -28,9 +28,15 @@ def _sim(feedstocks):
     vapor_pressures = yaml.safe_load(
         (Path(__file__).parent.parent / "data" / "vapor_pressures.yaml").read_text()
     )
+    shipped_setpoints = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "setpoints.yaml").read_text()
+    )
     return PyrolysisSimulator(
         backend,
-        {"campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)}},
+        {
+            "campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)},
+            "sso_r": deepcopy(shipped_setpoints["sso_r"]),
+        },
         feedstocks,
         vapor_pressures,
     )
