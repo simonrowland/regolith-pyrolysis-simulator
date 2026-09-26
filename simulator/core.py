@@ -129,132 +129,201 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
         model.operating_history = history.materialize()
 
 
-# Immutable leaves cannot contain MappingProxyType, so they cannot need a
-# deepcopy memo seed. Shared interned keys dominate the hourly walk
-# (measured ~7 calls/id by hour 100 on lunar_mare_low_ti); skipping them
-# does not change which proxies get seeded.
-_REFUSAL_SEED_LEAVES = (str, bytes, bytearray, int, float, complex, bool, type(None))
+_REFUSAL_MISSING = object()
+
+
+def _mappingproxy_referent(proxy: MappingProxyType) -> Any:
+    referents = [
+        item
+        for item in gc.get_referents(proxy)
+        if isinstance(item, (dict, MappingProxyType))
+    ]
+    if len(referents) != 1:
+        raise RefusalStateSnapshotError(
+            'mappingproxy rollback snapshot requires exactly one '
+            f'mapping referent; found {len(referents)}'
+        )
+    return referents[0]
+
+
+def _deepcopy_refusal_list(
+    value: list[Any], memo: Dict[int, Any],
+) -> list[Any]:
+    copied: list[Any] = []
+    memo[id(value)] = copied
+    copied.extend(_deepcopy_refusal_value(item, memo) for item in value)
+    return copied
+
+
+def _deepcopy_refusal_tuple(
+    value: tuple[Any, ...], memo: Dict[int, Any],
+) -> tuple[Any, ...]:
+    copied_items = [_deepcopy_refusal_value(item, memo) for item in value]
+    try:
+        return memo[id(value)]
+    except KeyError:
+        pass
+    if any(
+        original is not copied
+        for original, copied in zip(value, copied_items)
+    ):
+        return tuple(copied_items)
+    return value
+
+
+def _deepcopy_refusal_dict(
+    value: dict[Any, Any], memo: Dict[int, Any],
+) -> dict[Any, Any]:
+    copied: dict[Any, Any] = {}
+    memo[id(value)] = copied
+    for key, item in value.items():
+        copied[_deepcopy_refusal_value(key, memo)] = _deepcopy_refusal_value(
+            item, memo,
+        )
+    return copied
+
+
+def _deepcopy_refusal_mappingproxy(
+    proxy: MappingProxyType,
+    memo: Dict[int, Any],
+) -> MappingProxyType:
+    """Copy a mapping-proxy chain after the local copier reaches it."""
+    proxy_chain: list[MappingProxyType] = []
+    chain_ids: set[int] = set()
+    backing: Any = proxy
+    while isinstance(backing, MappingProxyType):
+        backing_id = id(backing)
+        if backing_id in memo:
+            break
+        if backing_id in chain_ids:
+            raise RefusalStateSnapshotError(
+                'mappingproxy rollback snapshot has a referent cycle'
+            )
+        chain_ids.add(backing_id)
+        proxy_chain.append(backing)
+        backing = _mappingproxy_referent(backing)
+
+    if isinstance(backing, MappingProxyType):
+        copied_referent = memo[id(backing)]
+        base_backing = None
+    elif isinstance(backing, dict):
+        backing_id = id(backing)
+        copied_referent = memo.get(backing_id, _REFUSAL_MISSING)
+        if copied_referent is _REFUSAL_MISSING:
+            copied_referent = {}
+            memo[backing_id] = copied_referent
+            base_backing = backing
+        else:
+            base_backing = None
+    else:
+        raise RefusalStateSnapshotError(
+            'mappingproxy rollback snapshot requires a dict backing'
+        )
+
+    # Install every proxy before copying backing entries. This preserves cycles
+    # and aliases when a backing dict points back to any proxy layer.
+    for layer in reversed(proxy_chain):
+        copied_referent = MappingProxyType(copied_referent)
+        memo[id(layer)] = copied_referent
+    if base_backing is not None:
+        copied_backing = memo[id(backing)]
+        for key, item in base_backing.items():
+            copied_backing[_deepcopy_refusal_value(key, memo)] = (
+                _deepcopy_refusal_value(item, memo)
+            )
+    return memo[id(proxy)]
+
+
+def _deepcopy_refusal_reconstruct(
+    value: Any,
+    memo: Dict[int, Any],
+    reducer_result: Any,
+) -> Any:
+    if isinstance(reducer_result, str):
+        return value
+    return copy._reconstruct(
+        value,
+        memo,
+        *reducer_result,
+        deepcopy=_deepcopy_refusal_value,
+    )
+
+
+def _deepcopy_refusal_value(value: Any, memo: Dict[int, Any]) -> Any:
+    """Deep-copy one value while keeping mapping-proxy dispatch local."""
+    # copy.deepcopy has no per-call dispatch argument. Mirror its recursive
+    # container/reduce paths here so nested proxies use this same memo without
+    # changing copy._deepcopy_dispatch for other threads.
+    value_id = id(value)
+    copied = memo.get(value_id, _REFUSAL_MISSING)
+    if copied is not _REFUSAL_MISSING:
+        return copied
+
+    if isinstance(value, MappingProxyType):
+        copied = _deepcopy_refusal_mappingproxy(value, memo)
+    else:
+        cls = type(value)
+        copier = copy._deepcopy_dispatch.get(cls)
+        # Python 3.14 stores atomic types separately; older versions dispatch
+        # them through _deepcopy_atomic. Neither path mutates the dispatch map.
+        atomic_copier = getattr(copy, '_deepcopy_atomic', None)
+        if cls in getattr(copy, '_atomic_types', ()):
+            copied = value
+        elif atomic_copier is not None and copier is atomic_copier:
+            copied = copier(value, memo)
+        elif copier is copy._deepcopy_list:
+            copied = _deepcopy_refusal_list(value, memo)
+        elif copier is copy._deepcopy_tuple:
+            copied = _deepcopy_refusal_tuple(value, memo)
+        elif copier is copy._deepcopy_dict:
+            copied = _deepcopy_refusal_dict(value, memo)
+        elif copier is copy._deepcopy_method:
+            copied = type(value)(
+                value.__func__,
+                _deepcopy_refusal_value(value.__self__, memo),
+            )
+        elif copier is not None:
+            copied = copier(value, memo)
+        elif issubclass(cls, type):
+            copied = value
+        else:
+            copier = getattr(value, '__deepcopy__', None)
+            if copier is not None:
+                copied = copier(memo)
+            else:
+                reductor = copy.dispatch_table.get(cls)
+                if reductor is not None:
+                    reducer_result = reductor(value)
+                else:
+                    reductor = getattr(value, '__reduce_ex__', None)
+                    if reductor is not None:
+                        reducer_result = reductor(4)
+                    else:
+                        reductor = getattr(value, '__reduce__', None)
+                        if reductor is None:
+                            raise copy.Error(
+                                'un(deep)copyable object of type %s' % cls
+                            )
+                        reducer_result = reductor()
+                copied = _deepcopy_refusal_reconstruct(
+                    value, memo, reducer_result,
+                )
+
+    if copied is not value:
+        memo[value_id] = copied
+        copy._keep_alive(value, memo)
+    return copied
 
 
 def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
     """Deep-copy rollback state while retaining immutable mapping views."""
-    visited: set[int] = set()
-    # id() is unique only among live objects. Hold every keyed referent
-    # for the duration of this walk so a freed object cannot alias a
-    # later MappingProxyType and skip its memo seed.
-    visited_keep: list[Any] = []
-    prepared_backings: set[int] = set()
-
-    def mark_visited(obj: Any) -> None:
-        visited.add(id(obj))
-        visited_keep.append(obj)
-
-    def mapping_referent(proxy: MappingProxyType) -> Any:
-        referents = [
-            item for item in gc.get_referents(proxy)
-            if isinstance(item, (dict, MappingProxyType))
-        ]
-        if len(referents) != 1:
-            raise RefusalStateSnapshotError(
-                'mappingproxy rollback snapshot requires exactly one '
-                f'mapping referent; found {len(referents)}'
-            )
-        return referents[0]
-
-    def seed_mapping_proxies(candidate: Any) -> None:
-        if isinstance(candidate, _REFUSAL_SEED_LEAVES):
-            return
-        candidate_id = id(candidate)
-        # The committed-history list has an O(1) prefix replacement in the
-        # deepcopy memo.  Do not recursively scan the source list after that
-        # replacement has been installed.
-        if (
-            isinstance(memo.get(candidate_id), _RefusalSnapshotHistoryPrefix)
-            or candidate_id in visited
-        ):
-            return
-        mark_visited(candidate)
-
-        if isinstance(candidate, MappingProxyType):
-            # Normalized schedules are immutable by contract. Copy the actual
-            # backing dict and rewrap every proxy layer before copying dict
-            # contents. Bottom-up construction is load-bearing when the base
-            # dict points back to the outer proxy: deepcopy must see the outer
-            # memo entry before it encounters that cycle.
-            proxy_chain: list[MappingProxyType] = []
-            chain_ids: set[int] = set()
-            backing: Any = candidate
-            while isinstance(backing, MappingProxyType):
-                backing_id = id(backing)
-                if backing_id in memo:
-                    break
-                if backing_id in chain_ids:
-                    raise RefusalStateSnapshotError(
-                        'mappingproxy rollback snapshot has a referent cycle'
-                    )
-                chain_ids.add(backing_id)
-                proxy_chain.append(backing)
-                mark_visited(backing)
-                backing = mapping_referent(backing)
-            if isinstance(backing, MappingProxyType):
-                copied_referent = memo[id(backing)]
-                base_backing = None
-            elif isinstance(backing, dict):
-                backing_id = id(backing)
-                copied_referent = memo.setdefault(backing_id, {})
-                base_backing = backing
-                mark_visited(backing)
-            else:
-                raise RefusalStateSnapshotError(
-                    'mappingproxy rollback snapshot requires a dict backing'
-                )
-            for proxy in reversed(proxy_chain):
-                copied_referent = MappingProxyType(copied_referent)
-                memo[id(proxy)] = copied_referent
-            if base_backing is not None and backing_id not in prepared_backings:
-                prepared_backings.add(backing_id)
-                for key, item in base_backing.items():
-                    seed_mapping_proxies(key)
-                    seed_mapping_proxies(item)
-                for key, item in base_backing.items():
-                    memo[backing_id][copy.deepcopy(key, memo)] = copy.deepcopy(
-                        item, memo
-                    )
-            return
-
-        if isinstance(candidate, dict):
-            children = (*candidate.keys(), *candidate.values())
-        elif isinstance(candidate, (list, tuple, set, frozenset, deque)):
-            children = candidate
-        else:
-            attributes = getattr(candidate, '__dict__', None)
-            children = (
-                list(attributes.values())
-                if isinstance(attributes, dict)
-                else []
-            )
-            for cls in type(candidate).__mro__:
-                slots = getattr(cls, '__slots__', ())
-                if isinstance(slots, str):
-                    slots = (slots,)
-                for slot in slots:
-                    if slot in ('__dict__', '__weakref__'):
-                        continue
-                    try:
-                        children.append(getattr(candidate, slot))
-                    except AttributeError:
-                        pass
-        for child in children:
-            seed_mapping_proxies(child)
-
     try:
-        seed_mapping_proxies(value)
-        return copy.deepcopy(value, memo)
+        return _deepcopy_refusal_value(value, memo)
     except RefusalStateSnapshotError:
         raise
     except (KeyboardInterrupt, SystemExit, GeneratorExit):
         # Multiple inheritance can make a process-control signal an Exception
-        # too.  Preserve control flow by testing these classes first.
+        # too. Preserve control flow at the snapshot boundary.
         raise
     except Exception as exc:
         # Do not format the caught exception: its __str__/__repr__ is part of
