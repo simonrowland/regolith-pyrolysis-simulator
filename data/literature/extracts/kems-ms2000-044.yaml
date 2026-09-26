@@ -1314,6 +1314,7 @@ species:
           composition_mol: {SiO2: 0.805, Na2O: 0.195}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1354,6 +1355,7 @@ species:
           composition_mol: {SiO2: 0.753, Na2O: 0.247}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1394,6 +1396,7 @@ species:
           composition_mol: {SiO2: 0.709, Na2O: 0.291}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1434,6 +1437,7 @@ species:
           composition_mol: {SiO2: 0.671, Na2O: 0.329}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1474,6 +1478,7 @@ species:
           composition_mol: {SiO2: 0.625, Na2O: 0.375}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1514,6 +1519,7 @@ species:
           composition_mol: {SiO2: 0.573, Na2O: 0.427}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1554,6 +1560,7 @@ species:
           composition_mol: {SiO2: 0.524, Na2O: 0.476}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1594,6 +1601,7 @@ species:
           composition_mol: {SiO2: 0.477, Na2O: 0.523}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1634,6 +1642,7 @@ species:
           composition_mol: {SiO2: 0.43, Na2O: 0.570}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1674,6 +1683,7 @@ species:
           composition_mol: {SiO2: 0.405, Na2O: 0.595}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1714,6 +1724,7 @@ species:
           composition_mol: {SiO2: 0.382, Na2O: 0.618}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1754,6 +1765,7 @@ species:
           composition_mol: {SiO2: 0.349, Na2O: 0.651}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -1777,8 +1789,8 @@ species:
         standard_state: liquid K2O
         regime: experimental_melt_activity
         units: dimensionless activity
-        values: {activity: null, model_activity: 8.92e-11, oxide_formula_as_published: K2O, system: K2O-SiO2, x_SiO2_as_published: 0.892, composition_mol: {SiO2: 0.892, K2O: 0.108}, composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system", method_class: measured_direct, system_class: silicate_melt, payload_status: CONTESTED, source_readings: ['8.98e-11 intended reading', 'raw text 8.981x0-11']}
-        uncertainty: {note: Experimental activity cell is CONTESTED and remains null.}
+        values: {activity: 8.981e-11, model_activity: 8.92e-11, oxide_formula_as_published: K2O, system: K2O-SiO2, x_SiO2_as_published: 0.892, composition_mol: {SiO2: 0.892, K2O: 0.108}, composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system", method_class: measured_direct, system_class: silicate_melt}
+        uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0848_t1573
         experiment: k2o-sio2-xsio2-0p848
@@ -1931,7 +1943,7 @@ species:
           table: '1'
           page: PDF p. 22
           row: K2O-SiO2 x(SiO2)=0.892 T=1723 K
-        quote: 0.892 1723 0.880 0.878 8.981×0-11 8.92×10-11
+        quote: 0.892 1723 0.880 0.878 8.981×10−11 8.92×10−11
         T_range_K:
         - 1723.0
         - 1723.0
@@ -1944,7 +1956,7 @@ species:
         regime: experimental_melt_activity
         units: dimensionless activity
         values:
-          activity: null
+          activity: 8.981e-11
           model_activity: 8.92e-11
           oxide_formula_as_published: K2O
           system: K2O-SiO2
@@ -1952,13 +1964,10 @@ species:
           composition_mol: {SiO2: 0.892, K2O: 0.108}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
-          payload_status: CONTESTED
-          source_readings:
-          - 8.98e-11 intended reading
-          - raw text 8.981x0-11
         uncertainty:
-          note: Experimental activity cell is CONTESTED and remains null.
+          note: Table 1 states no uncertainty for this point.
         equipment: {}
         supersedes: ms2000_044_k2o_activity_xsio2_0892_t1723_contested
         model_provenance:
@@ -1996,6 +2005,7 @@ species:
           composition_mol: {SiO2: 0.848, K2O: 0.152}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2036,6 +2046,7 @@ species:
           composition_mol: {SiO2: 0.811, K2O: 0.189}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Experimental and model entries differ by two decades as printed; neither is altered.
@@ -2076,6 +2087,7 @@ species:
           composition_mol: {SiO2: 0.77, K2O: 0.230}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2116,6 +2128,7 @@ species:
           composition_mol: {SiO2: 0.722, K2O: 0.278}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2156,6 +2169,7 @@ species:
           composition_mol: {SiO2: 0.722, K2O: 0.278}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2196,6 +2210,7 @@ species:
           composition_mol: {SiO2: 0.674, K2O: 0.326}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2236,6 +2251,7 @@ species:
           composition_mol: {SiO2: 0.63, K2O: 0.370}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2276,6 +2292,7 @@ species:
           composition_mol: {SiO2: 0.63, K2O: 0.370}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2316,6 +2333,7 @@ species:
           composition_mol: {SiO2: 0.591, K2O: 0.409}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2356,6 +2374,7 @@ species:
           composition_mol: {SiO2: 0.543, K2O: 0.457}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2396,6 +2415,7 @@ species:
           composition_mol: {SiO2: 0.5, K2O: 0.500}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2798,6 +2818,7 @@ species:
           composition_mol: {SiO2: 0.805, Na2O: 0.195}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2841,6 +2862,7 @@ species:
           composition_mol: {SiO2: 0.753, Na2O: 0.247}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2884,6 +2906,7 @@ species:
           composition_mol: {SiO2: 0.709, Na2O: 0.291}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2927,6 +2950,7 @@ species:
           composition_mol: {SiO2: 0.671, Na2O: 0.329}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -2970,6 +2994,7 @@ species:
           composition_mol: {SiO2: 0.625, Na2O: 0.375}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3013,6 +3038,7 @@ species:
           composition_mol: {SiO2: 0.573, Na2O: 0.427}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3056,6 +3082,7 @@ species:
           composition_mol: {SiO2: 0.524, Na2O: 0.476}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3099,6 +3126,7 @@ species:
           composition_mol: {SiO2: 0.477, Na2O: 0.523}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3142,6 +3170,7 @@ species:
           composition_mol: {SiO2: 0.43, Na2O: 0.570}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3185,6 +3214,7 @@ species:
           composition_mol: {SiO2: 0.405, Na2O: 0.595}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3228,6 +3258,7 @@ species:
           composition_mol: {SiO2: 0.382, Na2O: 0.618}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3271,6 +3302,7 @@ species:
           composition_mol: {SiO2: 0.349, Na2O: 0.651}
           composition_derivation: "x(SiO2) printed; x(Na2O)=1-x(SiO2) in binary Na2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3314,6 +3346,7 @@ species:
           composition_mol: {SiO2: 0.892, K2O: 0.108}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3357,6 +3390,7 @@ species:
           composition_mol: {SiO2: 0.848, K2O: 0.152}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3400,6 +3434,7 @@ species:
           composition_mol: {SiO2: 0.811, K2O: 0.189}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3443,6 +3478,7 @@ species:
           composition_mol: {SiO2: 0.77, K2O: 0.230}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3486,6 +3522,7 @@ species:
           composition_mol: {SiO2: 0.722, K2O: 0.278}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3529,6 +3566,7 @@ species:
           composition_mol: {SiO2: 0.722, K2O: 0.278}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3572,6 +3610,7 @@ species:
           composition_mol: {SiO2: 0.674, K2O: 0.326}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3615,6 +3654,7 @@ species:
           composition_mol: {SiO2: 0.63, K2O: 0.370}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3658,6 +3698,7 @@ species:
           composition_mol: {SiO2: 0.63, K2O: 0.370}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3701,6 +3742,7 @@ species:
           composition_mol: {SiO2: 0.591, K2O: 0.409}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3744,6 +3786,7 @@ species:
           composition_mol: {SiO2: 0.543, K2O: 0.457}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
@@ -3787,6 +3830,7 @@ species:
           composition_mol: {SiO2: 0.5, K2O: 0.500}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: derived
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Table 1 states no uncertainty for this point.
