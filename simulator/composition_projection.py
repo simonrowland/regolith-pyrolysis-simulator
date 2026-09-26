@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 import math
-from typing import Any, Mapping
+import numbers
+from typing import Any
 
 
 # The 1.0 wt% boundary is the shared composition-basis rule from
@@ -40,12 +42,12 @@ class ProjectedBulkClassification:
     threshold_wt_pct: float
     source_sum_wt_pct: float
     verdict: str
-    invalid_reason: str | None
     _dropped_component_mol_unavailable_reasons: Mapping[str, str] = field(
         default_factory=dict,
         repr=False,
         compare=False,
     )
+    invalid_reason: str | None = None
 
     @property
     def dropped_components(self) -> tuple[str, ...]:
@@ -113,33 +115,50 @@ def classify_projected_bulk(
     values and total are normalized to the full input bulk (100 wt%).
     """
     invalid_reason: str | None = None
-    try:
-        source_sum = float(source_sum_wt_pct)
-    except (TypeError, ValueError):
+    if (
+        not isinstance(source_sum_wt_pct, numbers.Real)
+        or isinstance(source_sum_wt_pct, bool)
+    ):
         source_sum = 0.0
         invalid_reason = 'source_sum_not_positive_finite'
+    else:
+        try:
+            source_sum = float(source_sum_wt_pct)
+        except (OverflowError, TypeError, ValueError):
+            source_sum = 0.0
+            invalid_reason = 'source_sum_not_positive_finite'
     if source_sum <= 0.0 or not math.isfinite(source_sum):
         source_sum = 0.0
         invalid_reason = 'source_sum_not_positive_finite'
     positive: dict[str, float] = {}
-    for component, value in dropped_component_wt_pct.items():
-        name = str(component)
-        try:
-            numeric = float(value)
-        except (TypeError, ValueError):
-            if invalid_reason is None:
-                invalid_reason = f'component_not_numeric:{name}'
-            continue
-        if not math.isfinite(numeric):
-            if invalid_reason is None:
-                invalid_reason = f'component_not_finite:{name}'
-            continue
-        if numeric < PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
-            if invalid_reason is None:
-                invalid_reason = f'component_negative:{name}'
-            continue
-        if numeric > PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
-            positive[name] = numeric
+    if not isinstance(dropped_component_wt_pct, Mapping):
+        invalid_reason = 'dropped_components_not_mapping'
+    else:
+        for component, value in dropped_component_wt_pct.items():
+            name = str(component)
+            if (
+                not isinstance(value, numbers.Real)
+                or isinstance(value, bool)
+            ):
+                if invalid_reason is None:
+                    invalid_reason = f'component_not_numeric:{name}'
+                continue
+            try:
+                numeric = float(value)
+            except (OverflowError, TypeError, ValueError):
+                if invalid_reason is None:
+                    invalid_reason = f'component_not_numeric:{name}'
+                continue
+            if not math.isfinite(numeric):
+                if invalid_reason is None:
+                    invalid_reason = f'component_not_finite:{name}'
+                continue
+            if numeric < PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
+                if invalid_reason is None:
+                    invalid_reason = f'component_negative:{name}'
+                continue
+            if numeric > PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
+                positive[name] = numeric
     if invalid_reason is None:
         scale = 100.0 / source_sum
     else:
@@ -148,7 +167,21 @@ def classify_projected_bulk(
         component: value * scale
         for component, value in sorted(positive.items())
     }
-    dropped_total = math.fsum(normalized.values())
+    if any(not math.isfinite(value) for value in normalized.values()):
+        normalized = {}
+        dropped_total = 0.0
+        invalid_reason = 'normalized_value_not_finite'
+    else:
+        try:
+            dropped_total = math.fsum(normalized.values())
+        except OverflowError:
+            normalized = {}
+            dropped_total = 0.0
+            invalid_reason = 'normalized_value_not_finite'
+        if not math.isfinite(dropped_total):
+            normalized = {}
+            dropped_total = 0.0
+            invalid_reason = 'normalized_value_not_finite'
     if invalid_reason is not None:
         verdict = 'invalid_input'
     else:
