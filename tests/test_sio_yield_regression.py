@@ -553,12 +553,22 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     assert "wall_deposit_kg" in report
     # This projection subtracts nearly equal bulk-melt SiO2 inventories.  The
     # 03616bb20 Chapman-Enskog D_AB ratio (0.9879823545) changes wall routing
-    # and therefore the cancellation path.  Executable re-grounding gives the
-    # pins below; canonical atom-ledger closure remains independently bounded
+    # and therefore the cancellation path.  On 2026-09-25 b-573 re-grounding,
+    # green treated the projected MAGEMin liquidus as unavailable and used the
+    # Kress floor (F=0 through 1200 C, then F=1); tip uses projected bounds.
+    # The first projected bounds are lunar 918.75--1370.3125 C after dropping
+    # 0.308801 wt% MnO+P2O5, and Mars 1018.75--1320.3125 C after dropping
+    # 0.880961 wt% P2O5.  Both drops are within the 1.0 wt% ruling bound.
+    # Derivation: the freeze-gate fraction enters the active redox capacity as
+    # C_m_effective = C_m_full * F, and each hour applies
+    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before the SiO
+    # route and terminal ledger cancellation.  Re-running the 24-hour report
+    # therefore re-grounds the two cancellation residuals, not a free tuning
+    # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.5372763104166192e-6,
-        "mars_basalt": 1.548043317570604e-7,
+        "lunar_mare_low_ti": 5.717403344648834e-7,
+        "mars_basalt": 6.656418718358862e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
