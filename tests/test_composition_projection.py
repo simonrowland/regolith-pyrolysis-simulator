@@ -148,6 +148,20 @@ def test_non_mapping_components_refuse_with_typed_reason(components):
     assert classification.within_threshold is False
 
 
+@pytest.mark.parametrize(
+    "components",
+    [pytest.param(None, id="non-mapping"), pytest.param({"NaCl": "bad"}, id="bad-component")],
+)
+def test_invalid_source_sum_reason_takes_precedence_over_component_reasons(components):
+    classification = classify_projected_bulk(
+        components,
+        source_sum_wt_pct="bad",
+    )
+
+    assert classification.verdict == "invalid_input"
+    assert classification.invalid_reason == "source_sum_not_positive_finite"
+
+
 def test_projected_bulk_classification_constructor_defaults_invalid_reason():
     classification = ProjectedBulkClassification(
         (),

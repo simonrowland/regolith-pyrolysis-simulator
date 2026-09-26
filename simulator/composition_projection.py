@@ -131,8 +131,10 @@ def classify_projected_bulk(
         source_sum = 0.0
         invalid_reason = 'source_sum_not_positive_finite'
     positive: dict[str, float] = {}
+    # First invalid reason wins: the source sum is checked before the container.
     if not isinstance(dropped_component_wt_pct, Mapping):
-        invalid_reason = 'dropped_components_not_mapping'
+        if invalid_reason is None:
+            invalid_reason = 'dropped_components_not_mapping'
     else:
         for component, value in dropped_component_wt_pct.items():
             name = str(component)
