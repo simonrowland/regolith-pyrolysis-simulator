@@ -33,8 +33,8 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     #      from FURNACE_MAX_T_BOUNDS_C[1], not an independent lever)
     #   8. overhead_headspace.temperature_offset_K.low -443 -> -800
     #      (1400 - 2200; 36da8e17)
-    #   9-14. those six overhead *.default_C.bounds_source: literal 1750 /
-    #      Doloma service text -> inherited-from-envelope text (36da8e17)
+    #   9-14. those six overhead *.default_C.bounds_source: literal 1750 / Doloma
+    #      service text -> inherited-from-envelope text (36da8e17)
     #   15. overhead_headspace.temperature_offset_K.bounds_source:
     #      1843-dense-alumina derivation -> envelope-minus-1400 (36da8e17)
     #   16. bounds_digest 5a5aba76...ecd9184 -> 9d87f239...df66cccd (derived)

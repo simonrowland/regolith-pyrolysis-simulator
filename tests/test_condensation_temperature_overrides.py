@@ -318,13 +318,11 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
     assert not base.last_cold_spot_diagnostic[
         'has_upstream_hot_wall_violation'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] == 1425.0
-    assert custom.last_cold_spot_diagnostic[
+    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] is None
+    assert not custom.last_cold_spot_diagnostic[
         'has_upstream_hot_wall_violation'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_findings'][0][
-        'segment'
-    ] == 'stage_0_to_stage_1'
+    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_findings'] == []
     assert base_route.cold_spot_warnings == ()
     assert custom_route.cold_spot_warnings == ()
     assert custom_route.remaining_by_species == base_route.remaining_by_species

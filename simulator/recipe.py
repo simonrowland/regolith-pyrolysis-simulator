@@ -51,6 +51,7 @@ _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 #   2200 C. A run's actual ceiling is capped down from the campaign's named
 #   `furnace_material` in campaigns.py; this bound only says no recipe may ask for
 #   more than the best enabled material in the catalog is rated to hold.
+# Do not lower until the optimizer coating gate reads the dew-point/deposit result.
 OVERHEAD_HOT_WALL_MIN_C = 1400.0
 OVERHEAD_HOT_WALL_MAX_C = float(FURNACE_MAX_T_BOUNDS_C[1])
 # Offset window derivation: the offset knob is liner-relative-to-melt (K).
